@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"net/url"
 	"time"
 
@@ -35,7 +36,7 @@ type Config struct {
 
 func GetAppConfig() (*Config, error) {
 	if err := godotenv.Load(); err != nil {
-		return nil, err
+    log.Println("No .env file found, use default values and environment variables")
 	}
 
 	var cfg Config

@@ -29,7 +29,7 @@ type InfoRepository struct {
 }
 
 func init() {
-	if buildTime == "" {
+	if buildTime == "" || buildTime == "unknown"{
 		buildTime = time.Now().Format("2006-01-02T15:04:05-0700")
 	}
 }
