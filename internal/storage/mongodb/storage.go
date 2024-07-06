@@ -8,6 +8,7 @@ import (
 	"github.com/SmartCityFlensburg/green-space-management/config"
 	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
 	"github.com/SmartCityFlensburg/green-space-management/internal/storage/mongodb/sensor"
+	"github.com/SmartCityFlensburg/green-space-management/internal/storage/mongodb/tree"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -21,7 +22,7 @@ func NewMongoClient(ctx context.Context, cfg config.DatabaseConfig) (*mongo.Clie
 		return nil, storage.ErrMongoCannotCreateClient
 	}
 
-  log.Println("Trying to connect to MongoDB...")
+	log.Println("Trying to connect to MongoDB...")
 
 	ctx, cancel := context.WithTimeout(ctx, cfg.Timeout)
 	defer cancel()
@@ -42,10 +43,14 @@ func NewRepository(cfg *config.Config) (*storage.Repository, error) {
 		return nil, err
 	}
 
-	collection := mongoClient.Database(cfg.Database.Name).Collection(cfg.Database.Collection)
-	mongoMqttRepo := sensor.NewSensorRepository(mongoClient, collection)
+	sensorCollection := mongoClient.Database(cfg.Database.Name).Collection("sensors")
+	mongoSensorRepo := sensor.NewSensorRepository(mongoClient, sensorCollection)
+
+	treeCollection := mongoClient.Database(cfg.Database.Name).Collection("trees")
+	mongoTreeRepo := tree.NewTreeRepository(mongoClient, treeCollection)
 
 	return &storage.Repository{
-		Sensor: mongoMqttRepo,
+		Sensor: mongoSensorRepo,
+		Tree:   mongoTreeRepo,
 	}, nil
 }

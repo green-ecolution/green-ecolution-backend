@@ -2,12 +2,20 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/SmartCityFlensburg/green-space-management/config"
 	"github.com/SmartCityFlensburg/green-space-management/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
+
+type HTTPError struct {
+	Error  string `json:"error"`
+	Code   int    `json:"code"`
+	Path   string `json:"path"`
+	Method string `json:"method"`
+} //@Name HTTPError
 
 type Server struct {
 	cfg      *config.Config
@@ -22,7 +30,9 @@ func NewServer(cfg *config.Config, services *service.Services) *Server {
 }
 
 func (s *Server) Run(ctx context.Context) error {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: errorHandler,
+	})
 	app.Use(s.healthCheck())
 	app.Mount("/", s.router())
 
@@ -35,4 +45,18 @@ func (s *Server) Run(ctx context.Context) error {
 	}()
 
 	return app.Listen(s.cfg.Url.String())
+}
+
+func errorHandler(c *fiber.Ctx, err error) error {
+	c.Status(fiber.StatusInternalServerError)
+	var e *fiber.Error
+	if errors.As(err, &e) {
+		return c.JSON(HTTPError{
+			e.Message,
+			e.Code,
+			c.Path(),
+			c.Method(),
+		})
+	}
+	return nil
 }

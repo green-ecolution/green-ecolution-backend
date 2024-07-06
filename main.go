@@ -1,4 +1,7 @@
 //go:generate mockery
+//go:generate swag fmt
+//go:generate swag init --requiredByDefault
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/SmartCityFlensburg/green-space-management/internal/mapper
 package main
 
 import (
@@ -19,6 +22,17 @@ import (
 )
 
 var version = "develop"
+
+//	@title			Green Space Management API
+//	@version		develop
+//	@description	This is the API for the Green Space Management System. It provides endpoints to get information about trees and sensors.
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	Green Ecolution
+//	@contact.url	https://green-ecolution.de
+
+//	@license.name	GPL-3.0
+//	@license.url	https://raw.githubusercontent.com/SmartCityFlensburg/green-space-management/develop/LICENSE
 
 func main() {
 	cfg, err := config.GetAppConfig()
@@ -45,8 +59,9 @@ func main() {
 	}
 
 	repositories := &storage.Repository{
-		Info: localRepo.Info,
+		Info:   localRepo.Info,
 		Sensor: dbRepo.Sensor,
+		Tree:   dbRepo.Tree,
 	}
 
 	services := domain.NewService(cfg, repositories)
