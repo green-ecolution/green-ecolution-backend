@@ -268,3 +268,4 @@ $RECYCLE.BIN/
 .secrets
 data/mongo
 internal/mapper/generated
+docs
