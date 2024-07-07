@@ -51,15 +51,16 @@ type MqttLocationEntity struct {
 }
 
 type MqttRxMetadataEntity struct {
-	GatewayIDs   MqttRxMetadataGatewayIDsEntity   `bson:"gateway_i_ds"`
-	PacketBroker MqttRxMetadataPacketBrokerEntity `bson:"packet_broker"`
-	Time         *time.Time                       `bson:"time"`
-	Rssi         int                              `bson:"rssi"`
-	ChannelRssi  int                              `bson:"channel_rssi"`
-	Snr          float64                          `bson:"snr"`
-	Location     MqttLocationEntity               `bson:"location"`
-	UplinkToken  string                           `bson:"uplink_token"`
-	RecievedAt   *time.Time                       `bson:"recieved_at"`
+	GatewayIDs      MqttRxMetadataGatewayIDsEntity   `bson:"gateway_i_ds"`
+	PacketBroker    MqttRxMetadataPacketBrokerEntity `bson:"packet_broker"`
+	Time            *time.Time                       `bson:"time"`
+	Rssi            int                              `bson:"rssi"`
+	ChannelRssi     int                              `bson:"channel_rssi"`
+	Snr             float64                          `bson:"snr"`
+	FrequencyOffset string                           `bson:"frequency_offset"`
+	Location        MqttLocationEntity               `bson:"location"`
+	UplinkToken     string                           `bson:"uplink_token"`
+	RecievedAt      *time.Time                       `bson:"recieved_at"`
 }
 
 type MqttUplinkSettingsLoraEntity struct {
@@ -147,14 +148,14 @@ type MqttEntity struct {
 }
 
 func (m *MqttEntity) GetID() string {
-  return m.ID.Hex()
+	return m.ID.Hex()
 }
 
 func (m *MqttEntity) SetID(id string) error {
-  objID, err := primitive.ObjectIDFromHex(id)
-  if err != nil {
-    return err
-  }
-  m.ID = objID
-  return nil
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	m.ID = objID
+	return nil
 }

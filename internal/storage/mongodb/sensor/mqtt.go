@@ -21,7 +21,7 @@ func NewSensorRepository(client *mongo.Client, collection *mongo.Collection) *Se
 	return &SensorRepository{client: client, collection: collection}
 }
 
-func (r *SensorRepository) Insert(ctx context.Context, data sensor.MqttEntity) (*sensor.MqttEntity, error) {
+func (r *SensorRepository) Insert(ctx context.Context, data *sensor.MqttEntity) (*sensor.MqttEntity, error) {
 	if data.ID == primitive.NilObjectID {
 		objID := primitive.NewObjectID()
 		data.ID = objID
@@ -31,7 +31,7 @@ func (r *SensorRepository) Insert(ctx context.Context, data sensor.MqttEntity) (
 		return nil, storage.ErrMongoCannotUpsertData
 	}
 
-	return &data, nil
+	return data, nil
 }
 
 func (r *SensorRepository) Get(ctx context.Context, id string) (*sensor.MqttEntity, error) {

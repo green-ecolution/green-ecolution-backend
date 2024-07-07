@@ -26,7 +26,7 @@ type InfoRepository interface {
 }
 
 type SensorRepository interface {
-	Insert(ctx context.Context, data sensor.MqttEntity) (*sensor.MqttEntity, error)
+	Insert(ctx context.Context, data *sensor.MqttEntity) (*sensor.MqttEntity, error)
 	Get(ctx context.Context, id string) (*sensor.MqttEntity, error)
 	GetFirst(ctx context.Context) (*sensor.MqttEntity, error)
 	GetAllByTreeID(ctx context.Context, treeID string) ([]*sensor.MqttEntity, error)

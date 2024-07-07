@@ -13,6 +13,8 @@ type MqttMapper interface {
 	FromEntity(src *repo.MqttEntity) *domain.MqttPayload
 	FromEntityList(src []*repo.MqttEntity) []*domain.MqttPayload
 
+  ToEntity(src *domain.MqttPayload) *repo.MqttPayloadEntity
+
 	ToResponse(src *domain.MqttPayload) *response.MqttPayloadResponse
   ToResponseList(src []*domain.MqttPayload) []*response.MqttPayloadResponse
 	FromResponse(src *response.MqttPayloadResponse) *domain.MqttPayload

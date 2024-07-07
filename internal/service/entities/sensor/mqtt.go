@@ -49,15 +49,16 @@ type MqttLocationResponse struct {
 } //@Name MqttLocation
 
 type MqttRxMetadataResponse struct {
-	GatewayIDs   MqttRxMetadataGatewayIDsResponse   `json:"gateway_ids"`
-	PacketBroker MqttRxMetadataPacketBrokerResponse `json:"packet_broker"`
-	Time         *time.Time                         `json:"time"`
-	Rssi         int                                `json:"rssi"`
-	ChannelRssi  int                                `json:"channel_rssi"`
-	Snr          float64                            `json:"snr"`
-	Location     MqttLocationResponse               `json:"location"`
-	UplinkToken  string                             `json:"uplink_token"`
-	RecievedAt   *time.Time                         `json:"recieved_at"`
+	GatewayIDs      MqttRxMetadataGatewayIDsResponse   `json:"gateway_ids"`
+	PacketBroker    MqttRxMetadataPacketBrokerResponse `json:"packet_broker"`
+	Time            *time.Time                         `json:"time"`
+	Rssi            int                                `json:"rssi"`
+	ChannelRssi     int                                `json:"channel_rssi"`
+	Snr             float64                            `json:"snr"`
+	FrequencyOffset string                             `json:"frequency_offset"`
+	Location        MqttLocationResponse               `json:"location"`
+	UplinkToken     string                             `json:"uplink_token"`
+	RecievedAt      *time.Time                         `json:"recieved_at"`
 } //@Name MqttRxMetadata
 
 type MqttUplinkSettingsLoraResponse struct {

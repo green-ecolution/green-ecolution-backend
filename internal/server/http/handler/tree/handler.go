@@ -13,7 +13,7 @@ import (
 // @Tags			Trees
 // @Produce		json
 // @Param			sensor_data	query		boolean	false	"Get raw sensor data for each tree"
-// @Success		200			{object}	tree.TreeSensorDataResponse
+// @Success		200			{object}	[]tree.TreeSensorDataResponse
 // @Failure		400			{object}	HTTPError
 // @Failure		401			{object}	HTTPError
 // @Failure		403			{object}	HTTPError

@@ -49,15 +49,16 @@ type MqttLocation struct {
 }
 
 type MqttRxMetadata struct {
-	GatewayIDs   MqttRxMetadataGatewayIDs
-	PacketBroker MqttRxMetadataPacketBroker
-	Time         *time.Time
-	Rssi         int
-	ChannelRssi  int
-	Snr          float64
-	Location     MqttLocation
-	UplinkToken  string
-	RecievedAt   *time.Time
+	GatewayIDs      MqttRxMetadataGatewayIDs
+	PacketBroker    MqttRxMetadataPacketBroker
+	Time            *time.Time
+	Rssi            int
+	ChannelRssi     int
+	Snr             float64
+	FrequencyOffset string
+	Location        MqttLocation
+	UplinkToken     string
+	RecievedAt      *time.Time
 }
 
 type MqttUplinkSettingsLora struct {
@@ -139,9 +140,9 @@ type MqttPayload struct {
 }
 
 func (m *MqttPayload) GetHumidity() int {
-  return m.UplinkMessage.DecodedPayload.Humidity
+	return m.UplinkMessage.DecodedPayload.Humidity
 }
 
 func (m *MqttPayload) GetBattery() float64 {
-  return m.UplinkMessage.DecodedPayload.Battery
+	return m.UplinkMessage.DecodedPayload.Battery
 }
