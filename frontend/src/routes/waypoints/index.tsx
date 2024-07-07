@@ -40,6 +40,7 @@ interface Waypoint {
   id: string;
   title: string;
   description: string;
+  teamMembers: string;
   trees?: Tree[];
 }
 
@@ -55,18 +56,21 @@ function Waypoints() {
         id: "1",
         title: "Einsatzplanung 1",
         description: "Mürwik -> Sonwick -> ...",
+        teamMembers: "Timo Müller, Hans Dieter",
         trees: usedTrees.slice(0, 3),
       },
       {
         id: "2",
         title: "Einsatzplanung 2",
         description: "Christiansen Park -> Wassersleben -> ...",
+        teamMembers: "Robert Petersen",
         trees: usedTrees.slice(3, 6),
       },
       {
         id: "3",
         title: "Einsatzplanung 3",
         description: "Zob -> Exe -> ...",
+        teamMembers: "Hans Dieter, Jonas Heinrich",
         trees: usedTrees.slice(6, trees.length - 1),
       },
     ],
@@ -201,13 +205,6 @@ export const WaypointDetails = ({ waypoint }: { waypoint: Waypoint }) => {
           </TooltipTrigger>
           <TooltipContent>Vollbild</TooltipContent>
         </Tooltip>
-
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-grey-100 rounded-xl"></div>
-          <div className="h-8 w-8 bg-grey-100 rounded-xl"></div>
-          <div className="h-8 w-8 bg-grey-100 rounded-xl"></div>
-          <div className="h-8 w-8 bg-grey-100 rounded-xl"></div>
-        </div>
       </div>
       <Separator />
       <div className="m-2 grid grid-cols-2 gap-4">
@@ -293,6 +290,10 @@ export const WaypointDetails = ({ waypoint }: { waypoint: Waypoint }) => {
                 <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
                   2 Stunden
                 </code>
+              </div>
+              <div className="flex items-center justify-between">
+                <h4 className="font-bold">Team Mitglieder</h4>
+                <p>{waypoint.teamMembers}</p>
               </div>
             </div>
           </CardContent>

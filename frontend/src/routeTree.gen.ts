@@ -12,6 +12,8 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as VehiclesImport } from './routes/vehicles'
+import { Route as TeamImport } from './routes/team'
+import { Route as CalendarImport } from './routes/calendar'
 import { Route as IndexImport } from './routes/index'
 import { Route as WaypointsIndexImport } from './routes/waypoints/index'
 import { Route as WaypointsNewImport } from './routes/waypoints/new'
@@ -20,6 +22,16 @@ import { Route as WaypointsNewImport } from './routes/waypoints/new'
 
 const VehiclesRoute = VehiclesImport.update({
   path: '/vehicles',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TeamRoute = TeamImport.update({
+  path: '/team',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CalendarRoute = CalendarImport.update({
+  path: '/calendar',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -47,6 +59,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarImport
+      parentRoute: typeof rootRoute
+    }
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamImport
       parentRoute: typeof rootRoute
     }
     '/vehicles': {
@@ -77,6 +103,8 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
+  CalendarRoute,
+  TeamRoute,
   VehiclesRoute,
   WaypointsNewRoute,
   WaypointsIndexRoute,
@@ -91,6 +119,8 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/calendar",
+        "/team",
         "/vehicles",
         "/waypoints/new",
         "/waypoints/"
@@ -98,6 +128,12 @@ export const routeTree = rootRoute.addChildren({
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/calendar": {
+      "filePath": "calendar.tsx"
+    },
+    "/team": {
+      "filePath": "team.tsx"
     },
     "/vehicles": {
       "filePath": "vehicles.tsx"

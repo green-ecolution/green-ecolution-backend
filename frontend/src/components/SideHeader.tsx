@@ -37,24 +37,14 @@ const SideHeader = ({ open }: SideHeaderProps) => {
       to: "/team",
     },
     {
-      title: "Kalender",
-      icon: <Calendar className="w-5 h-5" />,
-      to: "/calendar",
-    },
-    {
-      title: "Dokumete",
-      icon: <Book className="w-5 h-5" />,
-      to: "/documents",
-    },
-    {
       title: "Fahrzeuge",
       icon: <Truck className="w-5 h-5" />,
       to: "/vehicles",
     },
     {
-      title: "Einstellungen",
-      icon: <Settings className="w-5 h-5" />,
-      to: "/settings",
+      title: "Kalender",
+      icon: <Calendar className="w-5 h-5" />,
+      to: "/calendar",
     },
   ];
 
