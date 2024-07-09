@@ -77,7 +77,7 @@ func (r *SensorRepository) GetAllByTreeID(ctx context.Context, treeID string) ([
 
 func (r *SensorRepository) GetLastByTreeID(ctx context.Context, treeID string) (*sensor.MqttEntity, error) {
 	filter := bson.M{"tree_id": treeID}
-	opts := options.FindOne().SetSort(bson.D{{Key: "time", Value: -1}})
+	opts := options.FindOne().SetSort(bson.D{{Key: "data.received_at", Value: -1}})
 	var data sensor.MqttEntity
 	err := r.collection.FindOne(ctx, filter, opts).Decode(&data)
 	if err != nil {
