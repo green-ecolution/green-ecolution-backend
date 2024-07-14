@@ -9,6 +9,7 @@ import (
 
 	"github.com/SmartCityFlensburg/green-space-management/internal/entities/info"
 	"github.com/SmartCityFlensburg/green-space-management/internal/entities/tree"
+	"github.com/SmartCityFlensburg/green-space-management/internal/service/domain/route"
 	infoResponse "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/info"
 	treeResponse "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/tree"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -60,9 +61,15 @@ type TreeService interface {
 	Service
 	InsertTree(ctx context.Context, data tree.Tree) error
 
-  GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error)
-  GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error)
-  GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*treeResponse.TreeSensorPredictionResponse, error)
+	GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error)
+	GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error)
+	GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*treeResponse.TreeSensorPredictionResponse, error)
+}
+
+type RouteService interface {
+	Service
+	NearestNeighbor(points []route.Point) ([]route.Point, float64)
+  DemoPoints() []route.Point
 }
 
 type Service interface {
@@ -70,9 +77,10 @@ type Service interface {
 }
 
 type Services struct {
-	InfoService   InfoService
-	MqttService   MqttService
-	TreeService   TreeService
+	InfoService InfoService
+	MqttService MqttService
+	TreeService TreeService
+  RouteService RouteService
 }
 
 func (s *Services) AllServicesReady() bool {
