@@ -7,11 +7,11 @@ import (
 	"log"
 	"reflect"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/entities/info"
-	"github.com/SmartCityFlensburg/green-space-management/internal/entities/tree"
-	infoResponse "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/info"
-	treeResponse "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/tree"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
+	infoResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/info"
+	treeResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/tree"
 )
 
 var (
@@ -60,9 +60,9 @@ type TreeService interface {
 	Service
 	InsertTree(ctx context.Context, data tree.Tree) error
 
-  GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error)
-  GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error)
-  GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*treeResponse.TreeSensorPredictionResponse, error)
+	GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error)
+	GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error)
+	GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*treeResponse.TreeSensorPredictionResponse, error)
 }
 
 type Service interface {
@@ -70,9 +70,9 @@ type Service interface {
 }
 
 type Services struct {
-	InfoService   InfoService
-	MqttService   MqttService
-	TreeService   TreeService
+	InfoService InfoService
+	MqttService MqttService
+	TreeService TreeService
 }
 
 func (s *Services) AllServicesReady() bool {

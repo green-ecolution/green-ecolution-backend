@@ -1,4 +1,4 @@
-module github.com/SmartCityFlensburg/green-space-management
+module github.com/green-ecolution/green-ecolution-backend
 
 go 1.22.4
 

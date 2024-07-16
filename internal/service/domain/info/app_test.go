@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/entities/info"
-	"github.com/SmartCityFlensburg/green-space-management/internal/service"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	storageMock "github.com/SmartCityFlensburg/green-space-management/internal/storage/_mock"
-	infoRepo "github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
+	infoRepo "github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/info"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -57,11 +57,11 @@ func TestGetAppInfo(t *testing.T) {
 		// given
 		repo := storageMock.NewMockInfoRepository(t)
 		svc := NewInfoService(repo)
-    buildTime := time.Now()
+		buildTime := time.Now()
 		expectedAppInfo := info.App{
 			Version:   "1.0.0",
 			GoVersion: "1.16",
-      BuildTime: buildTime,
+			BuildTime: buildTime,
 			Git: info.Git{
 				Commit: "123456",
 				Branch: "main",
@@ -86,10 +86,10 @@ func TestGetAppInfo(t *testing.T) {
 			},
 		}
 
-	  appInfoEntity := infoRepo.AppEntity{
+		appInfoEntity := infoRepo.AppEntity{
 			Version:   "1.0.0",
 			GoVersion: "1.16",
-      BuildTime: buildTime,
+			BuildTime: buildTime,
 			Git: infoRepo.GitEntity{
 				Commit: "123456",
 				Branch: "main",
@@ -120,7 +120,7 @@ func TestGetAppInfo(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-    assert.EqualValues(t, expectedAppInfo, *appInfo)
+		assert.EqualValues(t, expectedAppInfo, *appInfo)
 	})
 }
 

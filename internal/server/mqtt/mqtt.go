@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/SmartCityFlensburg/green-space-management/config"
-	"github.com/SmartCityFlensburg/green-space-management/internal/service"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
 type Mqtt struct {

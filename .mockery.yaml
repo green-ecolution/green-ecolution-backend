@@ -1,6 +1,6 @@
 with-expecter: true
-packages: 
-  github.com/SmartCityFlensburg/green-space-management/internal/service:
+packages:
+  github.com/green-ecolution/green-ecolution-backend/internal/service:
     config: 
       dir: ./internal/service/_mock
     interfaces:
@@ -8,7 +8,7 @@ packages:
       MqttService:
       TreeService:
       Service:
-  github.com/SmartCityFlensburg/green-space-management/internal/storage:
+  github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
       dir: ./internal/storage/_mock
     interfaces:

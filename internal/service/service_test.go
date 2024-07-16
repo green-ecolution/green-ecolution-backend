@@ -3,7 +3,7 @@ package service
 import (
 	"testing"
 
-	serviceMock "github.com/SmartCityFlensburg/green-space-management/internal/service/_mock"
+	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,9 +14,9 @@ func TestAllServiceReady(t *testing.T) {
 		mqttSvc := serviceMock.NewMockMqttService(t)
 		treeSvc := serviceMock.NewMockTreeService(t)
 		svc := Services{
-			InfoService:   infoSvc,
-			MqttService:   mqttSvc,
-			TreeService:   treeSvc,
+			InfoService: infoSvc,
+			MqttService: mqttSvc,
+			TreeService: treeSvc,
 		}
 
 		// when

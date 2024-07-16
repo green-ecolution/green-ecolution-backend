@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/mapper"
-	"github.com/SmartCityFlensburg/green-space-management/internal/mapper/generated"
-	sensorResponse "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/sensor"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	sensorRepo "github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/sensor"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/green-ecolution/green-ecolution-backend/internal/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/mapper/generated"
+	sensorResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sensorRepo "github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/sensor"
 )
 
 type MqttService struct {
@@ -32,8 +32,6 @@ func (s *MqttService) HandleMessage(client MQTT.Client, msg MQTT.Message) {
 		log.Printf("Error unmarshalling sensor data: %v\n", err)
 		return
 	}
-
-
 
 	payloadEntity := s.mapper.ToEntity(
 		s.mapper.FromResponse(&sensorData),

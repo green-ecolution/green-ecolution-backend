@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/SmartCityFlensburg/green-space-management/config"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/mongodb/sensor"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/mongodb/tree"
+	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/tree"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
