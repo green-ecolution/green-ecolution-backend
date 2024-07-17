@@ -1,12 +1,12 @@
 package http
 
 import (
-	"github.com/SmartCityFlensburg/green-space-management/internal/server/http/handler/info"
-	"github.com/SmartCityFlensburg/green-space-management/internal/server/http/handler/tree"
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/tree"
 
-	_ "github.com/SmartCityFlensburg/green-space-management/docs"
 	"github.com/gofiber/swagger"
+	_ "github.com/green-ecolution/green-ecolution-backend/docs"
 )
 
 func (s *Server) router() *fiber.App {

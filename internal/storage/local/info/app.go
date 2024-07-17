@@ -8,15 +8,15 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/SmartCityFlensburg/green-space-management/config"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/info"
 )
 
 var version = "development"
 var gitCommit = "unknown"
 var gitBranch = "develop"
-var gitRepository = "https://github.com/SmartCityFlensburg/green-space-management"
+var gitRepository = "https://github.com/green-ecolution/green-ecolution-management"
 var buildTime = ""
 var runTime = time.Now()
 
@@ -29,7 +29,7 @@ type InfoRepository struct {
 }
 
 func init() {
-	if buildTime == "" || buildTime == "unknown"{
+	if buildTime == "" || buildTime == "unknown" {
 		buildTime = time.Now().Format("2006-01-02T15:04:05-0700")
 	}
 }

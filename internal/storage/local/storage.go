@@ -1,9 +1,9 @@
 package local
 
 import (
-	"github.com/SmartCityFlensburg/green-space-management/config"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/local/info"
+	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local/info"
 )
 
 func NewRepository(cfg *config.Config) (*storage.Repository, error) {

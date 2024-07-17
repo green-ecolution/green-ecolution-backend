@@ -1,7 +1,7 @@
 //go:generate mockery
 //go:generate swag fmt
 //go:generate swag init --requiredByDefault
-//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/SmartCityFlensburg/green-space-management/internal/mapper
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/mapper
 package main
 
 import (
@@ -12,13 +12,13 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/SmartCityFlensburg/green-space-management/config"
-	"github.com/SmartCityFlensburg/green-space-management/internal/server/http"
-	"github.com/SmartCityFlensburg/green-space-management/internal/server/mqtt"
-	"github.com/SmartCityFlensburg/green-space-management/internal/service/domain"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/local"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/mongodb"
+	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb"
 )
 
 var version = "develop"

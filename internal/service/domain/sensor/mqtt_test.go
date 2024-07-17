@@ -3,7 +3,7 @@ package sensor
 import (
 	"testing"
 
-	storageMock "github.com/SmartCityFlensburg/green-space-management/internal/storage/_mock"
+	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
 

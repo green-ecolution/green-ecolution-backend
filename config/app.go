@@ -36,7 +36,7 @@ type Config struct {
 
 func GetAppConfig() (*Config, error) {
 	if err := godotenv.Load(); err != nil {
-    log.Println("No .env file found, use default values and environment variables")
+		log.Println("No .env file found, use default values and environment variables")
 	}
 
 	var cfg Config

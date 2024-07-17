@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/info"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/sensor"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/tree"
 )
 
 var (

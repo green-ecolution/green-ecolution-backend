@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/sensor"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

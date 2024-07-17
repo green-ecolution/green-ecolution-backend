@@ -4,23 +4,23 @@ import (
 	"context"
 	"errors"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/entities/info"
-	infoResponse "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/info"
-	"github.com/SmartCityFlensburg/green-space-management/internal/mapper"
-	"github.com/SmartCityFlensburg/green-space-management/internal/mapper/generated"
-	"github.com/SmartCityFlensburg/green-space-management/internal/service"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	infoResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
 type InfoService struct {
 	infoRepository storage.InfoRepository
-  mapper mapper.InfoMapper
+	mapper         mapper.InfoMapper
 }
 
 func NewInfoService(infoRepository storage.InfoRepository) *InfoService {
 	return &InfoService{
 		infoRepository: infoRepository,
-    mapper: &generated.InfoMapperImpl{},
+		mapper:         &generated.InfoMapperImpl{},
 	}
 }
 
@@ -45,12 +45,12 @@ func (s *InfoService) GetAppInfo(ctx context.Context) (*info.App, error) {
 }
 
 func (s *InfoService) GetAppInfoResponse(ctx context.Context) (*infoResponse.AppInfoResponse, error) {
-  appInfo, err := s.GetAppInfo(ctx)
-  if err != nil {
-    return nil, err
-  }
+	appInfo, err := s.GetAppInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-  return s.mapper.ToResponse(appInfo), nil
+	return s.mapper.ToResponse(appInfo), nil
 }
 
 func (s *InfoService) Ready() bool {

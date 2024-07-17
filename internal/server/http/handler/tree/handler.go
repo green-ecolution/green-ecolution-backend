@@ -1,10 +1,10 @@
 package tree
 
 import (
-	"github.com/SmartCityFlensburg/green-space-management/internal/server/http/handler"
-	"github.com/SmartCityFlensburg/green-space-management/internal/service"
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/tree"
 )
 
 // @Summary		Get all trees

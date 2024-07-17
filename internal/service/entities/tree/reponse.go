@@ -1,6 +1,6 @@
 package tree
 
-import "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/sensor"
+import "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/sensor"
 
 type TreeSensorPredictionResponse struct {
 	Tree             *TreeResponse                 `json:"tree,omitempty"`

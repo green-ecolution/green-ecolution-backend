@@ -1,9 +1,9 @@
 package mapper
 
 import (
-	domain "github.com/SmartCityFlensburg/green-space-management/internal/entities/info"
-	response "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/info"
-	repo "github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/info"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	response "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/info"
+	repo "github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/info"
 )
 
 // goverter:converter
@@ -16,4 +16,3 @@ type InfoMapper interface {
 	ToResponse(src *domain.App) *response.AppInfoResponse
 	FromResponse(src *response.AppInfoResponse) *domain.App
 }
-

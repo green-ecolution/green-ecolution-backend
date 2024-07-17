@@ -3,9 +3,9 @@ package handler
 import (
 	"errors"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
 func HandleError(err error) *fiber.Error {

@@ -3,8 +3,8 @@ package tree
 import (
 	"context"
 
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage"
-	"github.com/SmartCityFlensburg/green-space-management/internal/storage/entities/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/tree"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -53,5 +53,5 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*tree.TreeEntity, error)
 		return nil, storage.ErrMongoDataNotFound
 	}
 
-  return data, nil
+	return data, nil
 }

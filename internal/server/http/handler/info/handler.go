@@ -1,10 +1,10 @@
 package info
 
 import (
-	"github.com/SmartCityFlensburg/green-space-management/internal/server/http/handler"
-	"github.com/SmartCityFlensburg/green-space-management/internal/service"
-	_ "github.com/SmartCityFlensburg/green-space-management/internal/service/entities/info"
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/info"
 )
 
 // @Summary		Get info about the app
@@ -21,10 +21,10 @@ import (
 // @Router			/info [get]
 func GetAppInfo(svc service.InfoService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    info, err := svc.GetAppInfoResponse(c.Context())
-    if err != nil {
-      return handler.HandleError(err)
-    }
-    return c.JSON(info)
+		info, err := svc.GetAppInfoResponse(c.Context())
+		if err != nil {
+			return handler.HandleError(err)
+		}
+		return c.JSON(info)
 	}
 }
