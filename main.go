@@ -32,7 +32,7 @@ var version = "develop"
 //	@contact.url	https://green-ecolution.de
 
 //	@license.name	GPL-3.0
-//	@license.url	https://raw.githubusercontent.com/SmartCityFlensburg/green-space-management/develop/LICENSE
+//	@license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
 
 func main() {
 	cfg, err := config.GetAppConfig()

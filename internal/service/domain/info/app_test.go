@@ -68,7 +68,7 @@ func TestGetAppInfo(t *testing.T) {
 				Repository: &url.URL{
 					Scheme: "https",
 					Host:   "github.com",
-					Path:   "/SmartCityFlensburg/green-space-management",
+					Path:   "/green-ecolution/green-space-management",
 				},
 			},
 			Server: info.Server{
@@ -96,7 +96,7 @@ func TestGetAppInfo(t *testing.T) {
 				Repository: &url.URL{
 					Scheme: "https",
 					Host:   "github.com",
-					Path:   "/SmartCityFlensburg/green-space-management",
+					Path:   "/green-ecolution/green-space-management",
 				},
 			},
 			Server: infoRepo.ServerEntity{
