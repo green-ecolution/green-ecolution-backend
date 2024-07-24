@@ -14,11 +14,8 @@ var (
 	ErrIFacesNotFound        = errors.New("cant get interfaces")
 	ErrIFacesAddressNotFound = errors.New("cant get interfaces address")
 	ErrHostnameNotFound      = errors.New("cant get hostname")
-
-	ErrMongoCannotCreateClient = errors.New("cannot create mongo client")
-	ErrMongoCannotPingClient   = errors.New("cannot ping mongo client")
-	ErrMongoCannotUpsertData   = errors.New("cannot upsert data")
-	ErrMongoDataNotFound       = errors.New("data not found")
+	ErrCannotUpsertData      = errors.New("cannot upsert data")
+	ErrDataNotFound          = errors.New("data not found")
 )
 
 type InfoRepository interface {
@@ -39,8 +36,14 @@ type TreeRepository interface {
 	GetAll(ctx context.Context) ([]*tree.Tree, error)
 }
 
+type SchemaRepository interface {
+	SetupSensorTable()
+	SetupTreeTable()
+	TeardownDatabase()
+}
 type Repository struct {
 	Info   InfoRepository
 	Sensor SensorRepository
 	Tree   TreeRepository
+	Schema SchemaRepository
 }

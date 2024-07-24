@@ -13,7 +13,7 @@ func (s *Server) router() *fiber.App {
 	app := fiber.New()
 
 	app.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-	app.Mount("/tree", tree.RegisterRoutes(s.services.TreeService))
+	app.Mount("/treeSQL", tree.RegisterRoutes(s.services.TreeService))
 
 	app.Get("/swagger/*", swagger.HandlerDefault) // default
 

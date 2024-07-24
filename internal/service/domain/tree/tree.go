@@ -181,7 +181,7 @@ func getHealth(humidity int) tree.PredictedHealth {
 }
 
 func handleError(err error) error {
-	if errors.Is(err, storage.ErrMongoDataNotFound) {
+	if errors.Is(err, storage.ErrDataNotFound) {
 		return service.NewError(service.NotFound, err.Error())
 	}
 

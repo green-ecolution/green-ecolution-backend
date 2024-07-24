@@ -9,6 +9,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgreSQL"
 	"log"
 	"log/slog"
 	"os"
@@ -23,7 +24,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb"
 )
 
 var version = "develop"
@@ -65,7 +65,7 @@ func main() {
 		return
 	}
 
-	dbRepo, err := mongodb.NewRepository(cfg)
+	dbRepo, err := postgreSQL.NewPostgresDB(context.Background(), cfg.Database)
 	if err != nil {
 		slog.Error("Error while creating MongoDB repository", "error", err)
 		return
@@ -75,6 +75,7 @@ func main() {
 		Info:   localRepo.Info,
 		Sensor: dbRepo.Sensor,
 		Tree:   dbRepo.Tree,
+		Schema: dbRepo.Schema,
 	}
 
 	services := domain.NewService(cfg, repositories)

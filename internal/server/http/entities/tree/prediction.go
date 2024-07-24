@@ -10,7 +10,7 @@ const (
 
 type SensorPredictionResponse struct {
 	SensorID string                  `json:"sensor_id"`
-	Tree     *TreeResponse           `json:"tree"`
+	Tree     *TreeResponse           `json:"treeSQL"`
 	Health   PredictedHealthResponse `json:"health"`
 	Humidity int                     `json:"humidity"`
 } // @Name SensorPrediction
