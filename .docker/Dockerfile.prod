@@ -53,6 +53,7 @@ RUN adduser -D gorunner
 USER gorunner
 WORKDIR /app
 
+COPY --from=preparer_go /app/build/docs/swagger.json /app/api-docs.json
 COPY --chown=gorunner:gorunner --from=builder /app/build/backend /app/backend
 
 ENTRYPOINT [ "/app/backend" ]
