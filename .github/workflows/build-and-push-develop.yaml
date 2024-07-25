@@ -64,6 +64,13 @@ jobs:
           push: true
           tags: ghcr.io/${{ env.REPO_LC }}-dev:latest, ghcr.io/${{ env.REPO_LC }}-dev:${{ env.COMMIT_SHA }}
 
+      - name: Notify management repo to update submodules
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GREEN_ECOLUTION_PAT }}
+          repository: green-ecolution/green-ecolution-management
+          event-type: "update-submodules"
+
   check_api_docs:
     name: Check API Docs
     needs: build_and_deploy_dev
