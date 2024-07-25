@@ -11,6 +11,8 @@ jobs:
       contents: write
       packages: write
       actions: write
+    outputs:
+      COMMIT_SHA: ${{ steps.set_commit_sha.outputs.COMMIT_SHA }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,8 +20,11 @@ jobs:
           submodules: true
 
       - name: Set commit sha
+        id: set_commit_sha
         run: |
-          echo "COMMIT_SHA=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
+          COMMIT_SHA=$(git rev-parse --short $GITHUB_SHA)
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$COMMIT_SHA" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -55,6 +60,68 @@ jobs:
             APP_BUILD_TIME=${{env.BUILD_TIME}}
             APP_GIT_REPOSITORY=${{github.repository}}
           file: ./.docker/Dockerfile.dev
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64 # ,linux/arm64
           push: true
           tags: ghcr.io/${{ env.REPO_LC }}-dev:latest, ghcr.io/${{ env.REPO_LC }}-dev:${{ env.COMMIT_SHA }}
+
+  check_api_docs:
+    name: Check API Docs
+    needs: build_and_deploy_dev
+    env:
+      COMMIT_SHA: ${{ needs.build_and_deploy_dev.outputs.COMMIT_SHA }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Install mockery
+        run: go install github.com/vektra/mockery/v2@v2.43.2
+
+      - name: Install swagger
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Go generate
+        run: go generate
+
+      - name: Move swagger docs
+        run: mv ./docs/swagger.json ./docs/api-docs.json
+
+      - name: Get api docs artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GREEN_ECOLUTION_PAT }}
+        run: |
+          gh run download -R green-ecolution/green-ecolution-backend -n api-docs.json 
+
+      - name: Check API Docs exist
+        run: |
+          if [ ! -f ./api-docs.json ]; then
+            echo "api-docs.json not found"
+            touch api-docs.json
+          else
+            echo "api-docs.json found"
+          fi
+
+      - name: Check API Docs Diff
+        run: |
+          diff ./docs/api-docs.json ./api-docs.json && echo "up-to-date=true" >> $GITHUB_ENV || echo "up-to-date=false" >> $GITHUB_ENV
+
+      - name: Upload API Docs
+        if: env.up-to-date == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs.json
+          path: ./docs/api-docs.json
+
+      - name: Create PR in frontend repo
+        if: env.up-to-date == 'false'
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GREEN_ECOLUTION_PAT }}
+          repository: green-ecolution/green-ecolution-frontend
+          event-type: "api-docs-update"
+          client-payload: '{"hash": "${{ env.COMMIT_SHA }}"}'
