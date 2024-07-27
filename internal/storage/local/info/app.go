@@ -30,7 +30,7 @@ type InfoRepository struct {
 
 func init() {
 	if buildTime == "" || buildTime == "unknown" {
-		buildTime = time.Now().Format("2006-01-02T15:04:05-0700")
+		buildTime = time.Now().Format("2006-01-02T15:04:05Z")
 	}
 }
 
@@ -121,7 +121,7 @@ func (r *InfoRepository) getArch() string {
 }
 
 func getBuildTime() (time.Time, error) {
-	return time.Parse("2006-01-02T15:04:05-0700", buildTime)
+	return time.Parse("2006-01-02T15:04:05Z", buildTime)
 }
 
 func getGitRepository() (*url.URL, error) {

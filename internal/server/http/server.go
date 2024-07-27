@@ -34,7 +34,7 @@ func (s *Server) Run(ctx context.Context) error {
 		ErrorHandler: errorHandler,
 	})
 	app.Use(s.healthCheck())
-	app.Mount("/", s.router())
+	app.Mount("/api", s.router())
 
 	go func() {
 		<-ctx.Done()
@@ -44,7 +44,7 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
-	return app.Listen(s.cfg.Url.String())
+  return app.Listen(fmt.Sprintf(":%d", s.cfg.Port))
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {

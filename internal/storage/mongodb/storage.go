@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
 
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -14,15 +15,17 @@ import (
 )
 
 func NewMongoClient(ctx context.Context, cfg config.DatabaseConfig) (*mongo.Client, error) {
-	mongoUri := fmt.Sprintf("mongodb://%s:%s@%s:%d", cfg.User, cfg.Password, cfg.Host, cfg.Port)
+	log.Println("Trying to connect to MongoDB...")
+  escapedUser := url.QueryEscape(cfg.User)
+  escapedPassword := url.QueryEscape(cfg.Password)
+	mongoUri := fmt.Sprintf("mongodb://%s:%s@%s:%d", escapedUser, escapedPassword, cfg.Host, cfg.Port)
 
 	clientOptions := options.Client().ApplyURI(mongoUri)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
+    log.Println(err) 
 		return nil, storage.ErrMongoCannotCreateClient
 	}
-
-	log.Println("Trying to connect to MongoDB...")
 
 	ctx, cancel := context.WithTimeout(ctx, cfg.Timeout)
 	defer cancel()
