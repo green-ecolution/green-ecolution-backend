@@ -1,4 +1,4 @@
-name: "Deploy Pull Request"
+name: "Notify on Reviewer Needed"
 on:
   pull_request:
     types: [labeled]
