@@ -58,7 +58,7 @@ type MqttRxMetadata struct {
 	FrequencyOffset string
 	Location        MqttLocation
 	UplinkToken     string
-	RecievedAt      *time.Time
+	ReceivedAt      *time.Time
 }
 
 type MqttUplinkSettingsLora struct {

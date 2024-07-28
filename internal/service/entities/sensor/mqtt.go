@@ -58,7 +58,7 @@ type MqttRxMetadataResponse struct {
 	FrequencyOffset string                             `json:"frequency_offset"`
 	Location        MqttLocationResponse               `json:"location"`
 	UplinkToken     string                             `json:"uplink_token"`
-	RecievedAt      *time.Time                         `json:"recieved_at"`
+	ReceivedAt      *time.Time                         `json:"received_at"`
 } //@Name MqttRxMetadata
 
 type MqttUplinkSettingsLoraResponse struct {

@@ -60,7 +60,7 @@ type MqttRxMetadataEntity struct {
 	FrequencyOffset string                           `bson:"frequency_offset"`
 	Location        MqttLocationEntity               `bson:"location"`
 	UplinkToken     string                           `bson:"uplink_token"`
-	RecievedAt      *time.Time                       `bson:"recieved_at"`
+	ReceivedAt      *time.Time                       `bson:"received_at"`
 }
 
 type MqttUplinkSettingsLoraEntity struct {

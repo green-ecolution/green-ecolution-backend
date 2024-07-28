@@ -58,7 +58,7 @@ type MqttService interface {
 
 type TreeService interface {
 	Service
-	InsertTree(ctx context.Context, data tree.Tree) error
+	InsertTree(ctx context.Context, data *tree.Tree) error
 
 	GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error)
 	GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error)

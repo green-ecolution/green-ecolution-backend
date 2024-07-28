@@ -64,7 +64,7 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 	}, nil
 }
 
-func (r *InfoRepository) GetAppInfo(ctx context.Context) (*info.AppEntity, error) {
+func (r *InfoRepository) GetAppInfo(_ context.Context) (*info.AppEntity, error) {
 	hostname, err := r.getHostname()
 	if err != nil {
 		return nil, storage.ErrHostnameNotFound
@@ -152,12 +152,9 @@ func getInterface(localIP net.IP) (string, error) {
 		}
 
 		for _, addr := range address {
-			switch v := addr.(type) {
-			case *net.IPNet:
-				if v.IP.String() == localIP.String() {
-					return iface.Name, nil
-				}
-			}
+      if addr.(*net.IPNet).IP.String() == localIP.String() {
+        return iface.Name, nil
+      }
 		}
 	}
 

@@ -25,10 +25,10 @@ type TreeService struct {
 	sensorMapper mapper.MqttMapper
 }
 
-func NewTreeService(treeRepo storage.TreeRepository, sensorRepo storage.SensorRepository) *TreeService {
+func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRepository) *TreeService {
 	return &TreeService{
-		treeRepo:     treeRepo,
-		sensorRepo:   sensorRepo,
+		treeRepo:     repoTree,
+		sensorRepo:   repoSensor,
 		treeMapper:   &generated.TreeMapperImpl{},
 		sensorMapper: &generated.MqttMapperImpl{},
 	}
@@ -109,8 +109,8 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 	return response, nil
 }
 
-func (s *TreeService) InsertTree(ctx context.Context, data tree.Tree) error {
-	entity := s.treeMapper.ToEntity(&data)
+func (s *TreeService) InsertTree(ctx context.Context, data *tree.Tree) error {
+	entity := s.treeMapper.ToEntity(data)
 	err := s.treeRepo.Insert(ctx, entity)
 	if err != nil {
 		return handleError(err)

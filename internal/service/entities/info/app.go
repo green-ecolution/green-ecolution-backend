@@ -6,13 +6,13 @@ type AppInfoResponse struct {
 	GoVersion string         `json:"goVersion"`
 	Git       GitResponse    `json:"git"`
 	Server    ServerResponse `json:"server"`
-} //@Name AppInfo
+} // @Name AppInfo
 
 type GitResponse struct {
 	Branch     string `json:"branch"`
 	Commit     string `json:"commit"`
 	Repository string `json:"repository"`
-} //@Name GitInfo
+} // @Name GitInfo
 
 type ServerResponse struct {
 	OS        string `json:"os"`
@@ -23,4 +23,4 @@ type ServerResponse struct {
 	Port      int    `json:"port"`
 	Interface string `json:"interface"`
 	Uptime    string `json:"uptime"`
-} //@Name ServerInfo
+} // @Name ServerInfo
