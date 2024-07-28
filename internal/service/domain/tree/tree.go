@@ -3,7 +3,6 @@ package tree
 import (
 	"context"
 	"errors"
-	"log"
 	"sync"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
@@ -90,7 +89,6 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 				defer wg.Done()
 				data, err := s.fetchSensorData(ctx, treeID)
 				if err != nil {
-					log.Printf("Error fetching sensor data for tree %s: %v", treeID, err)
 					return
 				}
 				sensorData[treeID] = data

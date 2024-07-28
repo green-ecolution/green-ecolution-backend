@@ -3,7 +3,7 @@ package sensor
 import (
 	"context"
 	"encoding/json"
-	"log"
+	"log/slog"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/internal/mapper"
@@ -25,18 +25,18 @@ func NewMqttService(sensorRepository storage.SensorRepository) *MqttService {
 
 func (s *MqttService) HandleMessage(_ MQTT.Client, msg MQTT.Message) {
 	jsonStr := string(msg.Payload())
-	log.Printf("Received message: %s\n", jsonStr)
+  slog.Debug("Received message", "message", jsonStr)
 
 	var sensorData sensorResponse.MqttPayloadResponse
 	if err := json.Unmarshal([]byte(jsonStr), &sensorData); err != nil {
-		log.Printf("Error unmarshalling sensor data: %v\n", err)
+    slog.Error("Error unmarshalling sensor data", "error", err)
 		return
 	}
 
 	payloadEntity := s.mapper.ToEntity(
 		s.mapper.FromResponse(&sensorData),
 	)
-	log.Printf("Mapped entity: %v\n", payloadEntity)
+  slog.Debug("Mapped entity", "entity", payloadEntity)
 
 	entity := &sensorRepo.MqttEntity{
 		Data:   *payloadEntity,
@@ -44,7 +44,7 @@ func (s *MqttService) HandleMessage(_ MQTT.Client, msg MQTT.Message) {
 	}
 
 	if _, err := s.sensorRepo.Insert(context.Background(), entity); err != nil {
-		log.Printf("Error upserting sensor data: %v\n", err)
+    slog.Error("Error upserting sensor data", "error", err)
 		return
 	}
 }

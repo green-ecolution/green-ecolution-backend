@@ -2,7 +2,7 @@ package sensor
 
 import (
 	"context"
-	"log"
+	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/sensor"
@@ -59,14 +59,14 @@ func (r *SensorRepository) GetAllByTreeID(ctx context.Context, treeID string) ([
 	var data []*sensor.MqttEntity
 	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
-		log.Println(err)
+    slog.Error("Error while getting sensor data", "error", err)
 		return nil, storage.ErrMongoDataNotFound
 	}
 	defer cursor.Close(ctx)
 	for cursor.Next(ctx) {
 		var d *sensor.MqttEntity
 		if err := cursor.Decode(&d); err != nil {
-			log.Println(err)
+      slog.Error("Error while decoding sensor data", "error", err)
 			return nil, storage.ErrMongoDataNotFound
 		}
 		data = append(data, d)
