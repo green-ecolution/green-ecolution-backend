@@ -23,7 +23,7 @@ func NewMqttService(sensorRepository storage.SensorRepository) *MqttService {
 	return &MqttService{sensorRepo: sensorRepository, mapper: &generated.MqttMapperImpl{}}
 }
 
-func (s *MqttService) HandleMessage(client MQTT.Client, msg MQTT.Message) {
+func (s *MqttService) HandleMessage(_ MQTT.Client, msg MQTT.Message) {
 	jsonStr := string(msg.Payload())
 	log.Printf("Received message: %s\n", jsonStr)
 

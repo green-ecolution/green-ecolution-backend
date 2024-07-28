@@ -10,7 +10,7 @@ type Server struct {
 	OS        string
 	Arch      string
 	Hostname  string
-	Url       *url.URL
+	URL       *url.URL
 	IP        net.IP
 	Port      int
 	Interface string

@@ -24,13 +24,12 @@ func TestNewInfoService(t *testing.T) {
 }
 
 func TestGetAppInfo(t *testing.T) {
-
 	t.Run("should error if GetAppInfo return error", func(t *testing.T) {
 		// given
 		repo := storageMock.NewMockInfoRepository(t)
 		svc := NewInfoService(repo)
 		tests := map[error]service.ErrorCode{
-			storage.ErrIpNotFound:            service.InternalError,
+			storage.ErrIPNotFound:            service.InternalError,
 			storage.ErrIFacesNotFound:        service.InternalError,
 			storage.ErrIFacesAddressNotFound: service.InternalError,
 			storage.ErrHostnameNotFound:      service.InternalError,
@@ -75,7 +74,7 @@ func TestGetAppInfo(t *testing.T) {
 				OS:       "linux",
 				Arch:     "amd64",
 				Hostname: "localhost",
-				Url: &url.URL{
+				URL: &url.URL{
 					Scheme: "http",
 					Host:   "localhost:8080",
 				},
@@ -103,7 +102,7 @@ func TestGetAppInfo(t *testing.T) {
 				OS:       "linux",
 				Arch:     "amd64",
 				Hostname: "localhost",
-				Url: &url.URL{
+				URL: &url.URL{
 					Scheme: "http",
 					Host:   "localhost:8080",
 				},

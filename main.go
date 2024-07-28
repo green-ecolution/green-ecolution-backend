@@ -50,12 +50,12 @@ func main() {
 
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	dbRepo, err := mongodb.NewRepository(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	repositories := &storage.Repository{
@@ -79,7 +79,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		if err := httpServer.Run(ctx); err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 	}()
 

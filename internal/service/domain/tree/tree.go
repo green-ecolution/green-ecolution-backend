@@ -85,8 +85,8 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 
 	if withSensorData {
 		wg.Add(len(treeEntities))
-		for i, entity := range treeEntities {
-			go func(i int, entity *treeRepo.TreeEntity, treeID string) {
+		for i := range treeEntities {
+			go func(treeID string) {
 				defer wg.Done()
 				data, err := s.fetchSensorData(ctx, treeID)
 				if err != nil {
@@ -94,7 +94,7 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 					return
 				}
 				sensorData[treeID] = data
-			}(i, entity, treeData[i].ID)
+			}(treeData[i].ID)
 		}
 		wg.Wait()
 	}
@@ -188,9 +188,13 @@ func (s *TreeService) GetTreePredictionResponse(ctx context.Context, id string, 
 }
 
 func getHealth(humidity int) tree.PredictedHealth {
-	if humidity < 40 {
+	const (
+		ThresholdBad      = 40
+		ThresholdModerate = 70
+	)
+	if humidity < ThresholdBad {
 		return tree.HealthBad
-	} else if humidity < 70 {
+	} else if humidity < ThresholdModerate {
 		return tree.HealthModerate
 	}
 

@@ -18,7 +18,7 @@ type ServerResponse struct {
 	OS        string `json:"os"`
 	Arch      string `json:"arch"`
 	Hostname  string `json:"hostname"`
-	Url       string `json:"url"`
+	URL       string `json:"url"`
 	IP        string `json:"ip"`
 	Port      int    `json:"port"`
 	Interface string `json:"interface"`

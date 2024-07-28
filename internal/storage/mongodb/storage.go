@@ -16,14 +16,14 @@ import (
 
 func NewMongoClient(ctx context.Context, cfg *config.DatabaseConfig) (*mongo.Client, error) {
 	log.Println("Trying to connect to MongoDB...")
-  escapedUser := url.QueryEscape(cfg.User)
-  escapedPassword := url.QueryEscape(cfg.Password)
-	mongoUri := fmt.Sprintf("mongodb://%s:%s@%s:%d", escapedUser, escapedPassword, cfg.Host, cfg.Port)
+	escapedUser := url.QueryEscape(cfg.User)
+	escapedPassword := url.QueryEscape(cfg.Password)
+	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%d", escapedUser, escapedPassword, cfg.Host, cfg.Port)
 
-	clientOptions := options.Client().ApplyURI(mongoUri)
+	clientOptions := options.Client().ApplyURI(mongoURI)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-    log.Println(err) 
+		log.Println(err)
 		return nil, storage.ErrMongoCannotCreateClient
 	}
 
