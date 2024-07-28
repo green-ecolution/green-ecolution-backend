@@ -8,11 +8,14 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
+	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
 	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
@@ -43,19 +46,27 @@ func main() {
 	fmt.Printf("Version: %s\n", version)
 	if cfg.Development {
 		fmt.Println("Running in dev mode")
+    cfg.LogLevel = "debug"
 	}
+
+  logg := logger.CreateLogger(os.Stdout, cfg.LogFormat, cfg.LogLevel)
+  slog.SetDefault(logg)
+
+  slog.Info("Starting Green Space Management API")
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
-		log.Panic(err)
+    slog.Error("Error while creating local repository", "error", err)
+    return
 	}
 
 	dbRepo, err := mongodb.NewRepository(cfg)
 	if err != nil {
-		log.Panic(err)
+    slog.Error("Error while creating MongoDB repository", "error", err)
+    return
 	}
 
 	repositories := &storage.Repository{
@@ -79,7 +90,7 @@ func main() {
 	go func() {
 		defer wg.Done()
 		if err := httpServer.Run(ctx); err != nil {
-			log.Panic(err)
+      slog.Error("Error while running HTTP Server", "error", err)
 		}
 	}()
 
