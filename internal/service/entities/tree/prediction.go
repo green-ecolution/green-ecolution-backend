@@ -1,6 +1,6 @@
 package tree
 
-type PredictedHealthResponse = string //@Name PredictedHealth
+type PredictedHealthResponse = string // @Name PredictedHealth
 
 const (
 	HealthGood     PredictedHealthResponse = "good"
@@ -13,4 +13,4 @@ type SensorPredictionResponse struct {
 	Tree     *TreeResponse           `json:"tree"`
 	Health   PredictedHealthResponse `json:"health"`
 	Humidity int                     `json:"humidity"`
-} //@Name SensorPrediction
+} // @Name SensorPrediction

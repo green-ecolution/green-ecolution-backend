@@ -27,7 +27,7 @@ func NewInfoService(infoRepository storage.InfoRepository) *InfoService {
 func (s *InfoService) GetAppInfo(ctx context.Context) (*info.App, error) {
 	appInfo, err := s.infoRepository.GetAppInfo(ctx)
 	if err != nil {
-		if errors.Is(err, storage.ErrIpNotFound) {
+		if errors.Is(err, storage.ErrIPNotFound) {
 			return nil, service.NewError(service.InternalError, err.Error())
 		}
 		if errors.Is(err, storage.ErrIFacesNotFound) {

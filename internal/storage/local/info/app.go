@@ -64,7 +64,7 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 	}, nil
 }
 
-func (r *InfoRepository) GetAppInfo(ctx context.Context) (*info.AppEntity, error) {
+func (r *InfoRepository) GetAppInfo(_ context.Context) (*info.AppEntity, error) {
 	hostname, err := r.getHostname()
 	if err != nil {
 		return nil, storage.ErrHostnameNotFound
@@ -83,7 +83,7 @@ func (r *InfoRepository) GetAppInfo(ctx context.Context) (*info.AppEntity, error
 			OS:        r.getOS(),
 			Arch:      r.getArch(),
 			Hostname:  hostname,
-			Url:       r.getAppUrl(),
+			URL:       r.getAppURL(),
 			IP:        r.localIP,
 			Port:      r.getPort(),
 			Interface: r.localInterface,
@@ -104,8 +104,8 @@ func (r *InfoRepository) getPort() int {
 	return r.cfg.Port
 }
 
-func (r *InfoRepository) getAppUrl() *url.URL {
-	return r.cfg.Url
+func (r *InfoRepository) getAppURL() *url.URL {
+	return r.cfg.URL
 }
 
 func (r *InfoRepository) getUptime() time.Duration {
@@ -131,7 +131,7 @@ func getGitRepository() (*url.URL, error) {
 func getIP() (net.IP, error) {
 	conn, err := net.Dial("udp", "green-ecolution.de:80")
 	if err != nil {
-		return nil, storage.ErrIpNotFound
+		return nil, storage.ErrIPNotFound
 	}
 
 	defer conn.Close()
@@ -152,11 +152,8 @@ func getInterface(localIP net.IP) (string, error) {
 		}
 
 		for _, addr := range address {
-			switch v := addr.(type) {
-			case *net.IPNet:
-				if v.IP.String() == localIP.String() {
-					return iface.Name, nil
-				}
+			if addr.(*net.IPNet).IP.String() == localIP.String() {
+				return iface.Name, nil
 			}
 		}
 	}

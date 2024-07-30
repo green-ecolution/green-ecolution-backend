@@ -7,11 +7,11 @@ import (
 
 func (s *Server) healthCheck() func(c *fiber.Ctx) error {
 	return healthcheck.New(healthcheck.Config{
-		LivenessProbe: func(c *fiber.Ctx) bool {
+		LivenessProbe: func(_ *fiber.Ctx) bool {
 			return true
 		},
 		LivenessEndpoint: "/health",
-		ReadinessProbe: func(c *fiber.Ctx) bool {
+		ReadinessProbe: func(_ *fiber.Ctx) bool {
 			return s.services.AllServicesReady()
 		},
 		ReadinessEndpoint: "/ready",

@@ -28,11 +28,11 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	opts.SetUsername(m.cfg.MQTT.Username)
 	opts.SetPassword(m.cfg.MQTT.Password)
 
-	opts.OnConnect = func(client MQTT.Client) {
+	opts.OnConnect = func(_ MQTT.Client) {
 		log.Println("Connected to MQTT Broker")
 		m.svc.MqttService.SetConnected(true)
 	}
-	opts.OnConnectionLost = func(client MQTT.Client, err error) {
+	opts.OnConnectionLost = func(_ MQTT.Client, err error) {
 		log.Printf("Connection lost to MQTT Broker: %v\n", err)
 	}
 

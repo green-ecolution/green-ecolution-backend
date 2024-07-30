@@ -15,7 +15,7 @@ type HTTPError struct {
 	Code   int    `json:"code"`
 	Path   string `json:"path"`
 	Method string `json:"method"`
-} //@Name HTTPError
+} // @Name HTTPError
 
 type Server struct {
 	cfg      *config.Config
@@ -44,7 +44,7 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
-  return app.Listen(fmt.Sprintf(":%d", s.cfg.Port))
+	return app.Listen(fmt.Sprintf(":%d", s.cfg.Port))
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {

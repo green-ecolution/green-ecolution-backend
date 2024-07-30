@@ -5,7 +5,7 @@ type TreeLocationResponse struct {
 	Longitude      float64 `json:"longitude"`
 	Address        string  `json:"address"`
 	AdditionalInfo string  `json:"additional_info"`
-} //@Name TreeLocation
+} // @Name TreeLocation
 
 type TreeResponse struct {
 	ID       string               `json:"id"`
@@ -13,4 +13,4 @@ type TreeResponse struct {
 	TreeNum  int                  `json:"tree_num"`
 	Age      int                  `json:"age"`
 	Location TreeLocationResponse `json:"location"`
-} //@Name Tree
+} // @Name Tree

@@ -25,10 +25,10 @@ type TreeService struct {
 	sensorMapper mapper.MqttMapper
 }
 
-func NewTreeService(treeRepo storage.TreeRepository, sensorRepo storage.SensorRepository) *TreeService {
+func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRepository) *TreeService {
 	return &TreeService{
-		treeRepo:     treeRepo,
-		sensorRepo:   sensorRepo,
+		treeRepo:     repoTree,
+		sensorRepo:   repoSensor,
 		treeMapper:   &generated.TreeMapperImpl{},
 		sensorMapper: &generated.MqttMapperImpl{},
 	}
@@ -85,8 +85,8 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 
 	if withSensorData {
 		wg.Add(len(treeEntities))
-		for i, entity := range treeEntities {
-			go func(i int, entity *treeRepo.TreeEntity, treeID string) {
+		for i := range treeEntities {
+			go func(treeID string) {
 				defer wg.Done()
 				data, err := s.fetchSensorData(ctx, treeID)
 				if err != nil {
@@ -94,7 +94,7 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 					return
 				}
 				sensorData[treeID] = data
-			}(i, entity, treeData[i].ID)
+			}(treeData[i].ID)
 		}
 		wg.Wait()
 	}
@@ -109,8 +109,8 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 	return response, nil
 }
 
-func (s *TreeService) InsertTree(ctx context.Context, data tree.Tree) error {
-	entity := s.treeMapper.ToEntity(&data)
+func (s *TreeService) InsertTree(ctx context.Context, data *tree.Tree) error {
+	entity := s.treeMapper.ToEntity(data)
 	err := s.treeRepo.Insert(ctx, entity)
 	if err != nil {
 		return handleError(err)
@@ -188,9 +188,13 @@ func (s *TreeService) GetTreePredictionResponse(ctx context.Context, id string, 
 }
 
 func getHealth(humidity int) tree.PredictedHealth {
-	if humidity < 40 {
+	const (
+		ThresholdBad      = 40
+		ThresholdModerate = 70
+	)
+	if humidity < ThresholdBad {
 		return tree.HealthBad
-	} else if humidity < 70 {
+	} else if humidity < ThresholdModerate {
 		return tree.HealthModerate
 	}
 

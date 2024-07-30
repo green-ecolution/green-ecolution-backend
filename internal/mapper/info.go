@@ -7,8 +7,8 @@ import (
 )
 
 // goverter:converter
-// goverter:extend TimeToTime UrlToUrl TimeDurationToTimeDuration StringToTime StringToUrl StringToNetIP
-// goverter:extend StringToDuration TimeToString NetUrlToString NetIPToString TimeDurationToString
+// goverter:extend TimeToTime URLToURL TimeDurationToTimeDuration StringToTime StringToURL StringToNetIP
+// goverter:extend StringToDuration TimeToString NetURLToString NetIPToString TimeDurationToString
 type InfoMapper interface {
 	ToEntity(src *domain.App) *repo.AppEntity
 	FromEntity(src *repo.AppEntity) *domain.App

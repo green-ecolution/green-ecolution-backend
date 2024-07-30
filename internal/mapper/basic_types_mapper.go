@@ -10,7 +10,7 @@ func TimeToTime(t time.Time) time.Time {
 	return t
 }
 
-func UrlToUrl(u *url.URL) *url.URL {
+func URLToURL(u *url.URL) *url.URL {
 	return u
 }
 
@@ -23,7 +23,7 @@ func StringToTime(s string) time.Time {
 	return t
 }
 
-func StringToUrl(s string) *url.URL {
+func StringToURL(s string) *url.URL {
 	u, _ := url.Parse(s)
 	return u
 }
@@ -46,7 +46,7 @@ func TimeToString(t time.Time) string {
 	return t.Format(time.RFC3339)
 }
 
-func NetUrlToString(u *url.URL) string {
+func NetURLToString(u *url.URL) string {
 	return u.String()
 }
 
