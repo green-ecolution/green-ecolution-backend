@@ -9,7 +9,7 @@ func (s *Server) middleware() *fiber.App {
 	app := fiber.New()
 
 	app.Use(middleware.HealthCheck(s.services))
-  app.Use(middleware.HttpLogger())
+	app.Use(middleware.HTTPLogger())
 
 	return app
 }
