@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/joho/godotenv"
-  "github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 type DatabaseConfig struct {

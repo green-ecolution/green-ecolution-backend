@@ -24,7 +24,7 @@ func HandleError(err error) *fiber.Error {
 		case service.InternalError:
 			code = fiber.StatusInternalServerError
 		default:
-      slog.Debug("missing service error code", "code", svcErr.Code)
+			slog.Debug("missing service error code", "code", svcErr.Code)
 		}
 	}
 	return fiber.NewError(code, err.Error())

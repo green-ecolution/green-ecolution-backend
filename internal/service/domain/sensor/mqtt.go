@@ -25,18 +25,18 @@ func NewMqttService(sensorRepository storage.SensorRepository) *MqttService {
 
 func (s *MqttService) HandleMessage(_ MQTT.Client, msg MQTT.Message) {
 	jsonStr := string(msg.Payload())
-  slog.Debug("Received message", "message", jsonStr)
+	slog.Debug("Received message", "message", jsonStr)
 
 	var sensorData sensorResponse.MqttPayloadResponse
 	if err := json.Unmarshal([]byte(jsonStr), &sensorData); err != nil {
-    slog.Error("Error unmarshalling sensor data", "error", err)
+		slog.Error("Error unmarshalling sensor data", "error", err)
 		return
 	}
 
 	payloadEntity := s.mapper.ToEntity(
 		s.mapper.FromResponse(&sensorData),
 	)
-  slog.Debug("Mapped entity", "entity", payloadEntity)
+	slog.Debug("Mapped entity", "entity", payloadEntity)
 
 	entity := &sensorRepo.MqttEntity{
 		Data:   *payloadEntity,
@@ -44,7 +44,7 @@ func (s *MqttService) HandleMessage(_ MQTT.Client, msg MQTT.Message) {
 	}
 
 	if _, err := s.sensorRepo.Insert(context.Background(), entity); err != nil {
-    slog.Error("Error upserting sensor data", "error", err)
+		slog.Error("Error upserting sensor data", "error", err)
 		return
 	}
 }

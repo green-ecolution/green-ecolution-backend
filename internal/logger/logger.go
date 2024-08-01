@@ -52,5 +52,5 @@ func CreateLogger(out io.Writer, format LogFormat, level LogLevel) *slog.Logger 
 		handler = slog.NewTextHandler(out, options)
 	}
 
-  return slog.New(handler)
+	return slog.New(handler)
 }

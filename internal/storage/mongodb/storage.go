@@ -15,7 +15,7 @@ import (
 )
 
 func NewMongoClient(ctx context.Context, cfg *config.DatabaseConfig) (*mongo.Client, error) {
-  slog.Info("Trying to connect to MongoDB...")
+	slog.Info("Trying to connect to MongoDB...")
 	escapedUser := url.QueryEscape(cfg.User)
 	escapedPassword := url.QueryEscape(cfg.Password)
 	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%d", escapedUser, escapedPassword, cfg.Host, cfg.Port)
@@ -23,18 +23,18 @@ func NewMongoClient(ctx context.Context, cfg *config.DatabaseConfig) (*mongo.Cli
 	clientOptions := options.Client().ApplyURI(mongoURI)
 	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
-    slog.Error("Error while connecting to MongoDB", "error", err)
+		slog.Error("Error while connecting to MongoDB", "error", err)
 		return nil, storage.ErrMongoCannotCreateClient
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, cfg.Timeout)
 	defer cancel()
 	if err := client.Ping(ctx, nil); err != nil {
-    slog.Error("Error while pinging MongoDB", "error", err)
+		slog.Error("Error while pinging MongoDB", "error", err)
 		return nil, storage.ErrMongoCannotPingClient
 	}
 
-  slog.Info("Connected to MongoDB")
+	slog.Info("Connected to MongoDB")
 
 	return client, nil
 }

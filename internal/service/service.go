@@ -84,7 +84,7 @@ func (s *Services) AllServicesReady() bool {
 				return false
 			}
 		} else {
-      slog.Debug("Service does not implement the Service interface", "service", v.Field(i).Type().Name())
+			slog.Debug("Service does not implement the Service interface", "service", v.Field(i).Type().Name())
 			return false
 		}
 	}
