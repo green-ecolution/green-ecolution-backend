@@ -24,12 +24,12 @@ func GetAppInfo(svc service.InfoService) fiber.Handler {
 	var mapper info.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		info, err := svc.GetAppInfoResponse(c.Context())
+		domainInfo, err := svc.GetAppInfoResponse(c.Context())
 		if err != nil {
 			return handler.HandleError(err)
 		}
 
-		data := mapper.ToResponse(info)
-		return c.JSON(data)
+		response := mapper.ToResponse(domainInfo)
+		return c.JSON(response)
 	}
 }

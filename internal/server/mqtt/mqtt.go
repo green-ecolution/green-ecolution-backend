@@ -8,7 +8,6 @@ import (
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
-	sensorResponse "github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
@@ -61,8 +60,8 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	slog.Info("Shutting down MQTT Subscriber")
 }
 
-func (m *Mqtt) handleMqttMessage(client MQTT.Client, msg MQTT.Message) {
-	var sensorData sensorResponse.MqttPayloadResponse
+func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
+	var sensorData sensor.MqttPayloadResponse
 	if err := json.Unmarshal(msg.Payload(), &sensorData); err != nil {
 		slog.Error("Error unmarshalling sensor data: %v\n", err)
 		return

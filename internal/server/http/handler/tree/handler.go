@@ -25,13 +25,13 @@ func GetAllTree(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		trees, err := svc.GetAllTreesResponse(c.Context(), c.QueryBool("sensor_data"))
+		domainTree, err := svc.GetAllTreesResponse(c.Context(), c.QueryBool("sensor_data"))
 		if err != nil {
 			return handler.HandleError(err)
 		}
 
-		data := mapper.ToTreeSensorDataResponseList(trees)
-		return c.JSON(data)
+		response := mapper.ToTreeSensorDataResponseList(domainTree)
+		return c.JSON(response)
 	}
 }
 
@@ -53,13 +53,13 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		tree, err := svc.GetTreeByIDResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
+		domainTree, err := svc.GetTreeByIDResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
 		if err != nil {
 			return handler.HandleError(err)
 		}
 
-		data := mapper.ToTreeSensorDataResponse(tree)
-		return c.JSON(data)
+		response := mapper.ToTreeSensorDataResponse(domainTree)
+		return c.JSON(response)
 	}
 }
 
@@ -81,12 +81,12 @@ func GetTreePredictions(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		tree, err := svc.GetTreePredictionResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
+		domainTree, err := svc.GetTreePredictionResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
 		if err != nil {
 			return handler.HandleError(err)
 		}
 
-		data := mapper.ToTreeSensorPredictionResponse(tree)
-		return c.JSON(data)
+		response := mapper.ToTreeSensorPredictionResponse(domainTree)
+		return c.JSON(response)
 	}
 }
