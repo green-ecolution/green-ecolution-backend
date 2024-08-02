@@ -3,8 +3,10 @@ package tree
 import (
 	"context"
 
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/entities/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/entities/tree/generated"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -13,13 +15,14 @@ import (
 type TreeRepository struct {
 	client     *mongo.Client
 	collection *mongo.Collection
+	mapper     tree.TreeMongoMapper
 }
 
 func NewTreeRepository(client *mongo.Client, collection *mongo.Collection) *TreeRepository {
-	return &TreeRepository{client: client, collection: collection}
+	return &TreeRepository{client: client, collection: collection, mapper: &generated.TreeMongoMapperImpl{}}
 }
 
-func (r *TreeRepository) Insert(ctx context.Context, data *tree.TreeEntity) error {
+func (r *TreeRepository) Insert(ctx context.Context, data *domain.Tree) error {
 	_, err := r.collection.InsertOne(ctx, data)
 	if err != nil {
 		return storage.ErrMongoCannotUpsertData
@@ -28,7 +31,7 @@ func (r *TreeRepository) Insert(ctx context.Context, data *tree.TreeEntity) erro
 	return nil
 }
 
-func (r *TreeRepository) Get(ctx context.Context, id string) (*tree.TreeEntity, error) {
+func (r *TreeRepository) Get(ctx context.Context, id string) (*domain.Tree, error) {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -40,10 +43,11 @@ func (r *TreeRepository) Get(ctx context.Context, id string) (*tree.TreeEntity, 
 		return nil, storage.ErrMongoDataNotFound
 	}
 
-	return &data, nil
+	domainData := r.mapper.FromEntity(&data)
+	return domainData, nil
 }
 
-func (r *TreeRepository) GetAll(ctx context.Context) ([]*tree.TreeEntity, error) {
+func (r *TreeRepository) GetAll(ctx context.Context) ([]*domain.Tree, error) {
 	var data []*tree.TreeEntity
 	cursor, err := r.collection.Find(ctx, bson.D{})
 	if err != nil {
@@ -53,5 +57,6 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*tree.TreeEntity, error)
 		return nil, storage.ErrMongoDataNotFound
 	}
 
-	return data, nil
+	domainData := r.mapper.FromEntityList(data)
+	return domainData, nil
 }

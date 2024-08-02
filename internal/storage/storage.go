@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/info"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/sensor"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
 )
 
 var (
@@ -22,21 +22,21 @@ var (
 )
 
 type InfoRepository interface {
-	GetAppInfo(context.Context) (*info.AppEntity, error)
+	GetAppInfo(context.Context) (*info.App, error)
 }
 
 type SensorRepository interface {
-	Insert(ctx context.Context, data *sensor.MqttEntity) (*sensor.MqttEntity, error)
-	Get(ctx context.Context, id string) (*sensor.MqttEntity, error)
-	GetFirst(ctx context.Context) (*sensor.MqttEntity, error)
-	GetAllByTreeID(ctx context.Context, treeID string) ([]*sensor.MqttEntity, error)
-	GetLastByTreeID(ctx context.Context, treeID string) (*sensor.MqttEntity, error)
+	Insert(ctx context.Context, data *sensor.MqttPayload) (*sensor.MqttPayload, error)
+	Get(ctx context.Context, id string) (*sensor.MqttPayload, error)
+	GetFirst(ctx context.Context) (*sensor.MqttPayload, error)
+	GetAllByTreeID(ctx context.Context, treeID string) ([]*sensor.MqttPayload, error)
+	GetLastByTreeID(ctx context.Context, treeID string) (*sensor.MqttPayload, error)
 }
 
 type TreeRepository interface {
-	Insert(ctx context.Context, data *tree.TreeEntity) error
-	Get(ctx context.Context, id string) (*tree.TreeEntity, error)
-	GetAll(ctx context.Context) ([]*tree.TreeEntity, error)
+	Insert(ctx context.Context, data *tree.Tree) error
+	Get(ctx context.Context, id string) (*tree.Tree, error)
+	GetAll(ctx context.Context) ([]*tree.Tree, error)
 }
 
 type Repository struct {

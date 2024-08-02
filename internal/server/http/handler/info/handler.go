@@ -2,9 +2,10 @@ package info
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/info"
 )
 
 // @Summary		Get info about the app
@@ -20,11 +21,15 @@ import (
 // @Failure		500	{object}	HTTPError
 // @Router			/info [get]
 func GetAppInfo(svc service.InfoService) fiber.Handler {
+	var mapper info.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
+
 	return func(c *fiber.Ctx) error {
-		info, err := svc.GetAppInfoResponse(c.Context())
+		domainInfo, err := svc.GetAppInfoResponse(c.Context())
 		if err != nil {
 			return handler.HandleError(err)
 		}
-		return c.JSON(info)
+
+		response := mapper.ToResponse(domainInfo)
+		return c.JSON(response)
 	}
 }

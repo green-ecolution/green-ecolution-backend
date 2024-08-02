@@ -11,7 +11,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
-	infoRepo "github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/info"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -85,11 +84,11 @@ func TestGetAppInfo(t *testing.T) {
 			},
 		}
 
-		appInfoEntity := infoRepo.AppEntity{
+		givenAppInfo := info.App{
 			Version:   "1.0.0",
 			GoVersion: "1.16",
 			BuildTime: buildTime,
-			Git: infoRepo.GitEntity{
+			Git: info.Git{
 				Commit: "123456",
 				Branch: "main",
 				Repository: &url.URL{
@@ -98,7 +97,7 @@ func TestGetAppInfo(t *testing.T) {
 					Path:   "/green-ecolution/green-space-management",
 				},
 			},
-			Server: infoRepo.ServerEntity{
+			Server: info.Server{
 				OS:       "linux",
 				Arch:     "amd64",
 				Hostname: "localhost",
@@ -114,7 +113,7 @@ func TestGetAppInfo(t *testing.T) {
 		}
 
 		// when
-		repo.EXPECT().GetAppInfo(context.Background()).Return(&appInfoEntity, nil)
+		repo.EXPECT().GetAppInfo(context.Background()).Return(&givenAppInfo, nil)
 		appInfo, err := svc.GetAppInfo(context.Background())
 
 		// then

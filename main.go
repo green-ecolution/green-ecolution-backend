@@ -1,7 +1,9 @@
 //go:generate mockery
 //go:generate swag fmt
 //go:generate swag init --requiredByDefault
-//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/mapper
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/entities/...
 package main
 
 import (

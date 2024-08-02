@@ -7,11 +7,9 @@ import (
 	"log/slog"
 	"reflect"
 
-	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
-	infoResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/info"
-	treeResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/tree"
 )
 
 var (
@@ -47,12 +45,12 @@ const (
 type InfoService interface {
 	Service
 	GetAppInfo(context.Context) (*info.App, error)
-	GetAppInfoResponse(context.Context) (*infoResponse.AppInfoResponse, error)
+	GetAppInfoResponse(context.Context) (*info.App, error)
 }
 
 type MqttService interface {
 	Service
-	HandleMessage(client MQTT.Client, msg MQTT.Message)
+	HandleMessage(ctx context.Context, payload *sensor.MqttPayload) (*sensor.MqttPayload, error)
 	SetConnected(bool)
 }
 
@@ -60,9 +58,9 @@ type TreeService interface {
 	Service
 	InsertTree(ctx context.Context, data *tree.Tree) error
 
-	GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error)
-	GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error)
-	GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*treeResponse.TreeSensorPredictionResponse, error)
+	GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]*tree.TreeSensorData, error)
+	GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*tree.TreeSensorData, error)
+	GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*tree.TreeSensorPrediction, error)
 }
 
 type Service interface {
