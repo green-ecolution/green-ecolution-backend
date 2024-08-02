@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v11"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -27,11 +28,13 @@ type MQTTConfig struct {
 }
 
 type Config struct {
-	URL         *url.URL       `env:"APP_URL,expand" envDefault:"localhost:$PORT"`
-	Port        int            `env:"PORT" envDefault:"8000"`
-	Development bool           `env:"DEVELOPMENT" envDefault:"false"`
-	MQTT        MQTTConfig     `envPrefix:"MQTT_"`
-	Database    DatabaseConfig `envPrefix:"DB_"`
+	LogLevel    logger.LogLevel  `env:"LOG_LEVEL" envDefault:"info"`
+	LogFormat   logger.LogFormat `env:"LOG_FORMAT" envDefault:"text"`
+	URL         *url.URL         `env:"APP_URL,expand" envDefault:"localhost:$PORT"`
+	Port        int              `env:"PORT" envDefault:"8000"`
+	Development bool             `env:"DEVELOPMENT" envDefault:"false"`
+	MQTT        MQTTConfig       `envPrefix:"MQTT_"`
+	Database    DatabaseConfig   `envPrefix:"DB_"`
 }
 
 func GetAppConfig() (*Config, error) {

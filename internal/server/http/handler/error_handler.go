@@ -2,9 +2,9 @@ package handler
 
 import (
 	"errors"
+	"log/slog"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -24,7 +24,7 @@ func HandleError(err error) *fiber.Error {
 		case service.InternalError:
 			code = fiber.StatusInternalServerError
 		default:
-			log.Debugf("missing service error code %d", svcErr.Code)
+			slog.Debug("missing service error code", "code", svcErr.Code)
 		}
 	}
 	return fiber.NewError(code, err.Error())

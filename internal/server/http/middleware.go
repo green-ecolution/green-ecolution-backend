@@ -2,18 +2,14 @@ package http
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/healthcheck"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 )
 
-func (s *Server) healthCheck() func(c *fiber.Ctx) error {
-	return healthcheck.New(healthcheck.Config{
-		LivenessProbe: func(_ *fiber.Ctx) bool {
-			return true
-		},
-		LivenessEndpoint: "/health",
-		ReadinessProbe: func(_ *fiber.Ctx) bool {
-			return s.services.AllServicesReady()
-		},
-		ReadinessEndpoint: "/ready",
-	})
+func (s *Server) middleware() *fiber.App {
+	app := fiber.New()
+
+	app.Use(middleware.HealthCheck(s.services))
+	app.Use(middleware.HTTPLogger())
+
+	return app
 }

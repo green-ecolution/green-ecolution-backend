@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"log/slog"
 	"reflect"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -84,7 +84,7 @@ func (s *Services) AllServicesReady() bool {
 				return false
 			}
 		} else {
-			log.Printf("Service %s does not implement the Service interface", v.Field(i).Type().Name())
+			slog.Debug("Service does not implement the Service interface", "service", v.Field(i).Type().Name())
 			return false
 		}
 	}

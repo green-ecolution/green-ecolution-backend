@@ -2,7 +2,7 @@ package mqtt
 
 import (
 	"context"
-	"log"
+	"log/slog"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/config"
@@ -29,16 +29,17 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	opts.SetPassword(m.cfg.MQTT.Password)
 
 	opts.OnConnect = func(_ MQTT.Client) {
-		log.Println("Connected to MQTT Broker")
+		slog.Info("Connected to MQTT Broker")
 		m.svc.MqttService.SetConnected(true)
 	}
 	opts.OnConnectionLost = func(_ MQTT.Client, err error) {
-		log.Printf("Connection lost to MQTT Broker: %v\n", err)
+		slog.Error("Connection to MQTT Broker lost", "error", err)
+		m.svc.MqttService.SetConnected(false)
 	}
 
 	client := MQTT.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		log.Println(token.Error())
+		slog.Error("Error while connecting to MQTT Broker", "error", token.Error())
 		return
 	}
 
@@ -46,10 +47,10 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	go func(token MQTT.Token) {
 		_ = token.Wait()
 		if token.Error() != nil {
-			log.Println(token.Error())
+			slog.Error("Error while subscribing to MQTT Broker", "error", token.Error())
 		}
 	}(token)
 
 	<-ctx.Done()
-	log.Println("Shutting down MQTT Subscriber")
+	slog.Info("Shutting down MQTT Subscriber")
 }

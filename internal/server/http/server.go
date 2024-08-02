@@ -33,7 +33,7 @@ func (s *Server) Run(ctx context.Context) error {
 	app := fiber.New(fiber.Config{
 		ErrorHandler: errorHandler,
 	})
-	app.Use(s.healthCheck())
+	app.Mount("/", s.middleware())
 	app.Mount("/api", s.router())
 
 	go func() {
