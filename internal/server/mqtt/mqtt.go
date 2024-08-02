@@ -70,7 +70,7 @@ func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 	domainPayload := m.mapper.FromResponse(&sensorData)
 	_, err := m.svc.MqttService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
-	  slog.Error("Error handling message: %v\n", err)
+		slog.Error("Error handling message: %v\n", err)
 		return
 	}
 }
