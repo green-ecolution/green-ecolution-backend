@@ -7,29 +7,20 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
-	"github.com/green-ecolution/green-ecolution-backend/internal/mapper"
-	"github.com/green-ecolution/green-ecolution-backend/internal/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
-	treeResponse "github.com/green-ecolution/green-ecolution-backend/internal/service/entities/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sensorRepo "github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/sensor"
-	treeRepo "github.com/green-ecolution/green-ecolution-backend/internal/storage/entities/tree"
-	"github.com/jinzhu/copier"
+	"golang.org/x/sync/errgroup"
 )
 
 type TreeService struct {
-	treeRepo     storage.TreeRepository
-	sensorRepo   storage.SensorRepository
-	treeMapper   mapper.TreeMapper
-	sensorMapper mapper.MqttMapper
+	treeRepo   storage.TreeRepository
+	sensorRepo storage.SensorRepository
 }
 
 func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRepository) *TreeService {
 	return &TreeService{
-		treeRepo:     repoTree,
-		sensorRepo:   repoSensor,
-		treeMapper:   &generated.TreeMapperImpl{},
-		sensorMapper: &generated.MqttMapperImpl{},
+		treeRepo:   repoTree,
+		sensorRepo: repoSensor,
 	}
 }
 
@@ -39,18 +30,16 @@ func (s *TreeService) fetchSensorData(ctx context.Context, treeID string) ([]*se
 		return nil, err
 	}
 
-	return s.sensorMapper.FromEntityList(data), nil
+	return data, nil
 }
 
-func (s *TreeService) GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorDataResponse, error) {
-	treeEntity, err := s.treeRepo.Get(ctx, id)
+func (s *TreeService) GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*tree.TreeSensorData, error) {
+	treeData, err := s.treeRepo.Get(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	treeData := s.treeMapper.FromEntity(treeEntity)
 	var sensorData []*sensor.MqttPayload
-
 	if withSensorData {
 		data, err := s.fetchSensorData(ctx, id)
 		if err != nil {
@@ -59,22 +48,20 @@ func (s *TreeService) GetTreeByIDResponse(ctx context.Context, id string, withSe
 		sensorData = data
 	}
 
-	response := treeResponse.TreeSensorDataResponse{
-		Tree:       s.treeMapper.ToResponse(treeData),
-		SensorData: s.sensorMapper.ToResponseList(sensorData),
+	response := tree.TreeSensorData{
+		Tree:       treeData,
+		SensorData: sensorData,
 	}
 	return &response, nil
 }
 
-func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]treeResponse.TreeSensorDataResponse, error) {
-	treeEntities, err := s.treeRepo.GetAll(ctx)
+func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]*tree.TreeSensorData, error) {
+	treeData, err := s.treeRepo.GetAll(ctx)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	treeData := s.treeMapper.FromEntityList(treeEntities)
-
-	response := make([]treeResponse.TreeSensorDataResponse, len(treeData))
+	response := make([]*tree.TreeSensorData, len(treeData))
 	var (
 		sensorData map[string][]*sensor.MqttPayload
 		wg         sync.WaitGroup
@@ -83,8 +70,8 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 	sensorData = make(map[string][]*sensor.MqttPayload)
 
 	if withSensorData {
-		wg.Add(len(treeEntities))
-		for i := range treeEntities {
+		wg.Add(len(treeData))
+		for i := range treeData {
 			go func(treeID string) {
 				defer wg.Done()
 				data, err := s.fetchSensorData(ctx, treeID)
@@ -97,10 +84,13 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 		wg.Wait()
 	}
 
-	for i, t := range treeData {
-		response[i].Tree = s.treeMapper.ToResponse(t)
+	for i := range treeData {
+		response[i] = &tree.TreeSensorData{
+			Tree: treeData[i],
+		}
+
 		if withSensorData {
-			response[i].SensorData = s.sensorMapper.ToResponseList(sensorData[t.ID])
+			response[i].SensorData = sensorData[treeData[i].ID]
 		}
 	}
 
@@ -108,8 +98,7 @@ func (s *TreeService) GetAllTreesResponse(ctx context.Context, withSensorData bo
 }
 
 func (s *TreeService) InsertTree(ctx context.Context, data *tree.Tree) error {
-	entity := s.treeMapper.ToEntity(data)
-	err := s.treeRepo.Insert(ctx, entity)
+	err := s.treeRepo.Insert(ctx, data)
 	if err != nil {
 		return handleError(err)
 	}
@@ -120,52 +109,44 @@ func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil
 }
 
-func (s *TreeService) GetTreePredictionResponse(ctx context.Context, id string, withSensorData bool) (*treeResponse.TreeSensorPredictionResponse, error) {
-	var wg sync.WaitGroup
-	wg.Add(2)
+func (s *TreeService) GetTreePredictionResponse(ctx context.Context, id string, withSensorData bool) (*tree.TreeSensorPrediction, error) {
+	wg, errgroupCtx := errgroup.WithContext(ctx)
+	wg.SetLimit(2)
 
-	var treeEntity *treeRepo.TreeEntity
-	var treeEntityError error
-	var lastSensorEntity *sensorRepo.MqttEntity
-	var lastSensorEntityError error
+	var (
+		treeData   *tree.Tree
+		lastSensor *sensor.MqttPayload
+		err        error
+	)
 
-	go func() {
-		defer wg.Done()
-		treeEntity, treeEntityError = s.treeRepo.Get(ctx, id)
-	}()
+	wg.Go(func() (treeError error) {
+		treeData, treeError = s.treeRepo.Get(errgroupCtx, id)
+		return
+	})
 
-	go func() {
-		defer wg.Done()
-		lastSensorEntity, lastSensorEntityError = s.sensorRepo.GetLastByTreeID(ctx, id)
-	}()
+	wg.Go(func() (lastSensorError error) {
+		lastSensor, lastSensorError = s.sensorRepo.GetLastByTreeID(errgroupCtx, id)
+		return
+	})
 
-	wg.Wait()
-
-	err := errors.Join(treeEntityError, lastSensorEntityError)
-	if err != nil {
+	if err = wg.Wait(); err != nil {
 		return nil, handleError(err)
 	}
 
-	humidity := lastSensorEntity.Data.UplinkMessage.DecodedPayload.Humidity
-
-	var mappedTree tree.Tree
-	err = copier.Copy(&mappedTree, treeEntity)
-	if err != nil {
-		return nil, handleError(err)
-	}
+	humidity := lastSensor.UplinkMessage.DecodedPayload.Humidity
 
 	prediction := &tree.SensorPrediction{
-		SensorID: lastSensorEntity.Data.EndDeviceIDs.DeviceID,
+		SensorID: lastSensor.EndDeviceIDs.DeviceID,
 		Humidity: humidity,
 		Health:   getHealth(humidity),
-		Tree:     &mappedTree,
+		Tree:     treeData,
 	}
 
-	predictionResponse := &treeResponse.SensorPredictionResponse{
+	predictionResponse := &tree.SensorPrediction{
 		SensorID: prediction.SensorID,
 		Humidity: prediction.Humidity,
 		Health:   prediction.Health,
-		Tree:     s.treeMapper.ToResponse(prediction.Tree),
+		Tree:     prediction.Tree,
 	}
 
 	var rawSensorData []*sensor.MqttPayload
@@ -176,10 +157,10 @@ func (s *TreeService) GetTreePredictionResponse(ctx context.Context, id string, 
 		}
 	}
 
-	response := &treeResponse.TreeSensorPredictionResponse{
+	response := &tree.TreeSensorPrediction{
 		SensorPrediction: predictionResponse,
-		Tree:             s.treeMapper.ToResponse(&mappedTree),
-		SensorData:       s.sensorMapper.ToResponseList(rawSensorData),
+		Tree:             treeData,
+		SensorData:       rawSensorData,
 	}
 
 	return response, nil
