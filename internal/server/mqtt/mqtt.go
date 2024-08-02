@@ -44,7 +44,7 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 
 	client := MQTT.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		slog.Error("Error while connecting to MQTT Broker", "error", token.Error())
+		slog.Error("Error connecting to MQTT Broker", "error", token.Error())
 		return
 	}
 
@@ -63,14 +63,14 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 	var sensorData sensor.MqttPayloadResponse
 	if err := json.Unmarshal(msg.Payload(), &sensorData); err != nil {
-		slog.Error("Error unmarshalling sensor data: %v\n", err)
+		slog.Error("Error unmarshalling message", "error", err)
 		return
 	}
 
 	domainPayload := m.mapper.FromResponse(&sensorData)
 	_, err := m.svc.MqttService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
-		slog.Error("Error handling message: %v\n", err)
+		slog.Error("Error handling message", "error", err)
 		return
 	}
 }
