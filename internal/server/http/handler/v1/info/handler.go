@@ -11,7 +11,7 @@ import (
 // @Summary		Get info about the app
 // @Description	Get info about the app and the server
 // @Id				get-app-info
-// @Tags			v1,Info
+// @Tags			Info
 // @Produce		json
 // @Success		200	{object}	info.AppInfoResponse
 // @Failure		400	{object}	HTTPError

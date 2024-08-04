@@ -11,7 +11,7 @@ import (
 // @Summary		Get all trees
 // @Description	Get all trees
 // @Id				get-all-trees
-// @Tags			Trees,v1
+// @Tags			Trees
 // @Produce		json
 // @Param			sensor_data	query		boolean	false	"Get raw sensor data for each tree"
 // @Success		200			{object}	[]tree.TreeSensorDataResponse
@@ -38,7 +38,7 @@ func GetAllTree(svc service.TreeService) fiber.Handler {
 // @Summary		Get tree by ID
 // @Description	Get tree by ID
 // @Id				get-tree-by-id
-// @Tags			Trees,v1
+// @Tags			Trees
 // @Produce		json
 // @Param			treeID		path		string	true	"Tree ID"
 // @Param			sensor_data	query		boolean	false	"Get raw sensor data for each tree"
@@ -66,7 +66,7 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Summary		Get tree prediction by tree ID
 // @Description	Get tree prediction by tree ID
 // @Id				get-tree-prediction-by-id
-// @Tags			Trees,v1
+// @Tags			Trees
 // @Produce		json
 // @Param			treeID		path		string	true	"Tree ID"
 // @Param			sensor_data	query		boolean	false	"Get raw sensor data for each tree"
