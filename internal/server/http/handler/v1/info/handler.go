@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info/generated"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/error_handler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -26,7 +26,7 @@ func GetAppInfo(svc service.InfoService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		domainInfo, err := svc.GetAppInfoResponse(c.Context())
 		if err != nil {
-			return error_handler.HandleError(err)
+			return errorhandler.HandleError(err)
 		}
 
 		response := mapper.ToResponse(domainInfo)
