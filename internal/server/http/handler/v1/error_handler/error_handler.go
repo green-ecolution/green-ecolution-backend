@@ -1,4 +1,4 @@
-package handler
+package error_handler
 
 import (
 	"errors"

@@ -2,20 +2,15 @@ package http
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/info"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/tree"
+	v1 "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1"
 
-	"github.com/gofiber/swagger"
-	_ "github.com/green-ecolution/green-ecolution-backend/docs"
 )
 
 func (s *Server) router() *fiber.App {
 	app := fiber.New()
 
-	app.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-	app.Mount("/tree", tree.RegisterRoutes(s.services.TreeService))
 
-	app.Get("/swagger/*", swagger.HandlerDefault) // default
+  app.Mount("/v1", v1.V1Handler(s.services))
 
 	return app
 }
