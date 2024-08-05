@@ -1,7 +1,7 @@
 package sensor
 
 import (
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 

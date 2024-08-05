@@ -4,6 +4,12 @@
 //go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/...
 //go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/...
 //go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/entities/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree/mapper/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster/mapper/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle/mapper/...
+//go:generate go run github.com/jmattheis/goverter/cmd/goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed/mapper/...
 package main
 
 import (
@@ -26,7 +32,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth/keycloak"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	"github.com/jackc/pgx/v5"
 )
 
 var version = "develop"
@@ -64,13 +71,21 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
+	conn, err := pgx.Connect(ctx, fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password, cfg.Database.Name))
+	if err != nil {
+		slog.Error("Error while connecting to PostgreSQL", "error", err)
+		return
+	}
+	defer conn.Close(context.Background())
+	postgresRepo := postgres.NewRepository(conn)
+
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
 		slog.Error("Error while creating local repository", "error", err)
 		return
 	}
 
-	dbRepo, err := mongodb.NewRepository(cfg)
+	//	dbRepo, err := mongodb.NewRepository(cfg)
 	if err != nil {
 		slog.Error("Error while creating MongoDB repository", "error", err)
 		return
@@ -79,10 +94,10 @@ func main() {
 	keycloakRepo := keycloak.NewKeycloakRepository(&cfg.IdentityAuth)
 
 	repositories := &storage.Repository{
-		Info:   localRepo.Info,
-		Sensor: dbRepo.Sensor,
-		Tree:   dbRepo.Tree,
 		Auth:   keycloakRepo,
+		Info: localRepo.Info,
+		// Sensor: dbRepo.Sensor,
+		// Tree:   dbRepo.Tree,
 	}
 
 	services := domain.NewService(cfg, repositories)

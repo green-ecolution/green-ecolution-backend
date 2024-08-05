@@ -22,14 +22,11 @@ jobs:
         with:
           go-version: stable
 
-      - name: Install mockery
-        run: go install github.com/vektra/mockery/v2@v2.43.2
+      - name: Setup
+        run: make setup/ci
 
-      - name: Install swagger
-        run: go install github.com/swaggo/swag/cmd/swag@latest
-
-      - name: Go generate
-        run: go generate
+      - name: Generate
+        run: make generate
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6

@@ -28,6 +28,7 @@ linters-settings:
       - ifElseChain
       - octalLiteral
       - whyNoLint
+      - commentedOutCode
   gocyclo:
     min-complexity: 15
   gofmt:

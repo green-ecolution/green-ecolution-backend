@@ -270,3 +270,5 @@ data/mongo
 generated
 docs
 config.yaml
+bin
+_sqlc

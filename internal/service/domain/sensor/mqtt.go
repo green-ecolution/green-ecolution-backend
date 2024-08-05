@@ -3,7 +3,7 @@ package sensor
 import (
 	"context"
 
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -16,13 +16,10 @@ func NewMqttService(sensorRepository storage.SensorRepository) *MqttService {
 	return &MqttService{sensorRepo: sensorRepository}
 }
 
-func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.MqttPayload, error) {
-	data, err := s.sensorRepo.Insert(ctx, payload)
-	if err != nil {
-		return nil, err
-	}
+func (s *MqttService) HandleMessage(_ context.Context, _ *domain.MqttPayload) (*domain.MqttPayload, error) {
+	// TODO: Implement the business logic of HandleMessage
 
-	return data, nil
+	return nil, nil
 }
 
 func (s *MqttService) SetConnected(ready bool) {

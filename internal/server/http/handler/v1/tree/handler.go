@@ -3,8 +3,6 @@ package tree
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree/generated"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -23,16 +21,11 @@ import (
 // @Router			/v1/tree [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllTree(svc service.TreeService) fiber.Handler {
-	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
+	// var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		domainTree, err := svc.GetAllTreesResponse(c.Context(), c.QueryBool("sensor_data"))
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		response := mapper.ToTreeSensorDataResponseList(domainTree)
-		return c.JSON(response)
+		// TODO: Implement GetAllTree
+		return c.JSON([]tree.TreeSensorDataResponse{})
 	}
 }
 
@@ -51,17 +44,12 @@ func GetAllTree(svc service.TreeService) fiber.Handler {
 // @Failure		500			{object}	HTTPError
 // @Router			/v1/tree/{treeID} [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreeByID(svc service.TreeService) fiber.Handler {
-	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
+func GetTreeByID(_ service.TreeService) fiber.Handler {
+	// var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		domainTree, err := svc.GetTreeByIDResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		response := mapper.ToTreeSensorDataResponse(domainTree)
-		return c.JSON(response)
+		// TODO: Implement GetTreeByID
+		return c.JSON(tree.TreeSensorDataResponse{})
 	}
 }
 
@@ -80,16 +68,11 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Failure		500			{object}	HTTPError
 // @Router			/v1/tree/{treeID}/prediction [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreePredictions(svc service.TreeService) fiber.Handler {
-	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
+func GetTreePredictions(_ service.TreeService) fiber.Handler {
+	// var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
-		domainTree, err := svc.GetTreePredictionResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		response := mapper.ToTreeSensorPredictionResponse(domainTree)
-		return c.JSON(response)
+		// TODO: Implement GetTreePredictions
+		return c.JSON(tree.TreeSensorPredictionResponse{})
 	}
 }

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/config"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -64,7 +64,7 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 	}, nil
 }
 
-func (r *InfoRepository) GetAppInfo(_ context.Context) (*info.App, error) {
+func (r *InfoRepository) GetAppInfo(_ context.Context) (*entities.App, error) {
 	hostname, err := r.getHostname()
 	if err != nil {
 		return nil, storage.ErrHostnameNotFound
@@ -75,16 +75,16 @@ func (r *InfoRepository) GetAppInfo(_ context.Context) (*info.App, error) {
 		return nil, storage.ErrCannotGetAppURL
 	}
 
-	return &info.App{
+	return &entities.App{
 		Version:   version,
 		GoVersion: r.getGoVersion(),
 		BuildTime: r.buildTime,
-		Git: info.Git{
+		Git: entities.Git{
 			Branch:     gitBranch,
 			Commit:     gitCommit,
 			Repository: r.gitRepository,
 		},
-		Server: info.Server{
+		Server: entities.Server{
 			OS:        r.getOS(),
 			Arch:      r.getArch(),
 			Hostname:  hostname,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
@@ -19,7 +19,7 @@ func NewInfoService(infoRepository storage.InfoRepository) *InfoService {
 	}
 }
 
-func (s *InfoService) GetAppInfo(ctx context.Context) (*info.App, error) {
+func (s *InfoService) GetAppInfo(ctx context.Context) (*domain.App, error) {
 	appInfo, err := s.infoRepository.GetAppInfo(ctx)
 	if err != nil {
 		if errors.Is(err, storage.ErrIPNotFound) {
@@ -39,7 +39,7 @@ func (s *InfoService) GetAppInfo(ctx context.Context) (*info.App, error) {
 	return appInfo, nil
 }
 
-func (s *InfoService) GetAppInfoResponse(ctx context.Context) (*info.App, error) {
+func (s *InfoService) GetAppInfoResponse(ctx context.Context) (*domain.App, error) {
 	appInfo, err := s.GetAppInfo(ctx)
 	if err != nil {
 		return nil, err
