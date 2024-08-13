@@ -11,12 +11,14 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"net/url"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
 	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/docs"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
@@ -28,17 +30,23 @@ import (
 
 var version = "develop"
 
-//	@title			Green Space Management API
-//	@version		develop
-//	@description	This is the API for the Green Space Management System. It provides endpoints to get information about trees and sensors.
+func setSwaggerInfo(appURL *url.URL) {
+	docs.SwaggerInfo.Title = "Green Ecolution Management API"
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
+	docs.SwaggerInfo.Host = appURL.Host
+	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+}
+
 //	@termsOfService	http://swagger.io/terms/
 
 //	@contact.name	Green Ecolution
 //	@contact.url	https://green-ecolution.de
+//	@contact.email	info@green-ecolution.de
 
-//	@license.name	GPL-3.0
-//	@license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
-
+// @license.name	GPL-3.0
+// @license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
 func main() {
 	cfg, err := config.GetAppConfig()
 	if err != nil {
@@ -50,6 +58,8 @@ func main() {
 		fmt.Println("Running in dev mode")
 		cfg.LogLevel = "debug"
 	}
+
+	setSwaggerInfo(cfg.URL)
 
 	logg := logger.CreateLogger(os.Stdout, cfg.LogFormat, cfg.LogLevel)
 	slog.SetDefault(logg)

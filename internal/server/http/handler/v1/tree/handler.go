@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree/generated"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -20,14 +20,14 @@ import (
 // @Failure		403			{object}	HTTPError
 // @Failure		404			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
-// @Router			/tree [get]
+// @Router			/v1/tree [get]
 func GetAllTree(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
 		domainTree, err := svc.GetAllTreesResponse(c.Context(), c.QueryBool("sensor_data"))
 		if err != nil {
-			return handler.HandleError(err)
+			return errorhandler.HandleError(err)
 		}
 
 		response := mapper.ToTreeSensorDataResponseList(domainTree)
@@ -48,14 +48,14 @@ func GetAllTree(svc service.TreeService) fiber.Handler {
 // @Failure		403			{object}	HTTPError
 // @Failure		404			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
-// @Router			/tree/{treeID} [get]
+// @Router			/v1/tree/{treeID} [get]
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
 		domainTree, err := svc.GetTreeByIDResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
 		if err != nil {
-			return handler.HandleError(err)
+			return errorhandler.HandleError(err)
 		}
 
 		response := mapper.ToTreeSensorDataResponse(domainTree)
@@ -76,14 +76,14 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Failure		403			{object}	HTTPError
 // @Failure		404			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
-// @Router			/tree/{treeID}/prediction [get]
+// @Router			/v1/tree/{treeID}/prediction [get]
 func GetTreePredictions(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
 		domainTree, err := svc.GetTreePredictionResponse(c.Context(), c.Params("id"), c.QueryBool("sensor_data"))
 		if err != nil {
-			return handler.HandleError(err)
+			return errorhandler.HandleError(err)
 		}
 
 		response := mapper.ToTreeSensorPredictionResponse(domainTree)
