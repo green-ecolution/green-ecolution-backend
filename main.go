@@ -36,7 +36,7 @@ func setSwaggerInfo(appURL *url.URL) {
 	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
 	docs.SwaggerInfo.Host = appURL.Host
 	docs.SwaggerInfo.BasePath = "/api"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	docs.SwaggerInfo.Schemes = []string{"https"}
 }
 
 //	@title			Green Space Management API
