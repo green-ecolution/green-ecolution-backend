@@ -39,6 +39,9 @@ func setSwaggerInfo(appURL *url.URL) {
 	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 }
 
+//	@title			Green Space Management API
+//	@version		develop
+//	@description	This is the API for the Green Ecolution Management System.
 //	@termsOfService	http://swagger.io/terms/
 
 //	@contact.name	Green Ecolution
