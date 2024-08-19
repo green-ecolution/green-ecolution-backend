@@ -90,9 +90,9 @@ jobs:
         with:
           context: .
           build-args: |
-            APP_VERSION="${{env.RELEASE_VERSION}}" 
+            APP_VERSION=${{env.RELEASE_VERSION}}
             APP_GIT_COMMIT=${{env.COMMIT_SHA}}
-            APP_GIT_BRANCH="main"
+            APP_GIT_BRANCH=main
             APP_BUILD_TIME=${{env.BUILD_TIME}}
             APP_GIT_REPOSITORY=${{github.repository}}
           file: ./.docker/Dockerfile.prod

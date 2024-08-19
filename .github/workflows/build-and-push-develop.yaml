@@ -56,7 +56,7 @@ jobs:
           build-args: |
             APP_VERSION=development
             APP_GIT_COMMIT=${{env.COMMIT_SHA}}
-            APP_GIT_BRANCH="develop"
+            APP_GIT_BRANCH=develop
             APP_BUILD_TIME=${{env.BUILD_TIME}}
             APP_GIT_REPOSITORY=${{github.repository}}
           file: ./.docker/Dockerfile.dev
