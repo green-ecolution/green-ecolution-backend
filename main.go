@@ -23,6 +23,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth/keycloak"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb"
 )
@@ -74,10 +75,13 @@ func main() {
 		return
 	}
 
+	keycloakRepo := keycloak.NewKeycloakRepository(&cfg.IdentityAuth)
+
 	repositories := &storage.Repository{
 		Info:   localRepo.Info,
 		Sensor: dbRepo.Sensor,
 		Tree:   dbRepo.Tree,
+		Auth:   keycloakRepo,
 	}
 
 	services := domain.NewService(cfg, repositories)

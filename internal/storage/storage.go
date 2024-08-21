@@ -42,12 +42,12 @@ type TreeRepository interface {
 }
 
 type AuthRepository interface {
-  CreateUser(ctx context.Context, user *auth.User, password, role string) (*auth.User, error)
+	CreateUser(ctx context.Context, user *auth.User, password string, role *[]string) (*auth.User, error)
 }
 
 type Repository struct {
 	Info   InfoRepository
 	Sensor SensorRepository
 	Tree   TreeRepository
-  Auth   AuthRepository
+	Auth   AuthRepository
 }

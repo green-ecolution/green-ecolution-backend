@@ -31,10 +31,12 @@ func NewServer(cfg *config.Config, services *service.Services) *Server {
 
 func (s *Server) Run(ctx context.Context) error {
 	app := fiber.New(fiber.Config{
+		AppName:      s.cfg.Dashboard.Title,
+		ServerHeader: s.cfg.Dashboard.Title,
 		ErrorHandler: errorHandler,
 	})
-	app.Mount("/", s.middleware())
-	app.Mount("/api", s.router())
+
+	app.Mount("/", s.middleware(s.publicRoutes, s.privateRoutes))
 
 	go func() {
 		<-ctx.Done()
