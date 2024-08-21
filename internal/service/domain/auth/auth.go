@@ -20,6 +20,15 @@ func NewAuthService(repo storage.AuthRepository) service.AuthService {
 	}
 }
 
+func (s *AuthService) RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error) {
+  result, err := s.authRepository.RetrospectToken(ctx, token)
+  if err != nil {
+    return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to retrospect token").Error())
+  }
+
+  return result, nil
+}
+
 func (s *AuthService) Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error) {
 	validator := validator.New()
 	if err := validator.Struct(user); err != nil {

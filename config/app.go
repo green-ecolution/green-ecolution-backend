@@ -44,10 +44,11 @@ type DashboardConfig struct {
 }
 
 type KeyCloakConfig struct {
-	BaseURL      string `env:"BASE_URL"`
-	Realm        string `env:"REALM"`
-	ClientID     string `mapstructure:"client_id" env:"CLIENT_ID"`
-	ClientSecret string `mapstructure:"client_secret" env:"CLIENT_SECRET"`
+	BaseURL        string `env:"BASE_URL"`
+	Realm          string `env:"REALM"`
+	ClientID       string `mapstructure:"client_id" env:"CLIENT_ID"`
+	ClientSecret   string `mapstructure:"client_secret" env:"CLIENT_SECRET"`
+	RealmPublicKey string `mapstructure:"realm_public_key" env:"REALM_PUBLIC_KEY"`
 }
 
 type IdentityAuthConfig struct {

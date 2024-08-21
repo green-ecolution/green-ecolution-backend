@@ -68,6 +68,7 @@ type TreeService interface {
 type AuthService interface {
 	Service
 	Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error)
+  RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
 }
 
 type Service interface {
