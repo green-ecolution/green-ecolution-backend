@@ -70,6 +70,11 @@ func (r *InfoRepository) GetAppInfo(_ context.Context) (*info.App, error) {
 		return nil, storage.ErrHostnameNotFound
 	}
 
+	appURL, err := r.getAppURL()
+	if err != nil {
+		return nil, storage.ErrCannotGetAppURL
+	}
+
 	return &info.App{
 		Version:   version,
 		GoVersion: r.getGoVersion(),
@@ -83,7 +88,7 @@ func (r *InfoRepository) GetAppInfo(_ context.Context) (*info.App, error) {
 			OS:        r.getOS(),
 			Arch:      r.getArch(),
 			Hostname:  hostname,
-			URL:       r.getAppURL(),
+			URL:       appURL,
 			IP:        r.localIP,
 			Port:      r.getPort(),
 			Interface: r.localInterface,
@@ -101,11 +106,11 @@ func (r *InfoRepository) getHostname() (string, error) {
 }
 
 func (r *InfoRepository) getPort() int {
-	return r.cfg.Port
+	return r.cfg.Server.Port
 }
 
-func (r *InfoRepository) getAppURL() *url.URL {
-	return r.cfg.URL
+func (r *InfoRepository) getAppURL() (*url.URL, error) {
+	return url.Parse(r.cfg.Server.AppURL)
 }
 
 func (r *InfoRepository) getUptime() time.Duration {

@@ -44,7 +44,7 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
-	return app.Listen(fmt.Sprintf(":%d", s.cfg.Port))
+	return app.Listen(fmt.Sprintf(":%d", s.cfg.Server.Port))
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {

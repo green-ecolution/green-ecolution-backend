@@ -16,7 +16,7 @@ import (
 
 func NewMongoClient(ctx context.Context, cfg *config.DatabaseConfig) (*mongo.Client, error) {
 	slog.Info("Trying to connect to MongoDB...")
-	escapedUser := url.QueryEscape(cfg.User)
+	escapedUser := url.QueryEscape(cfg.Username)
 	escapedPassword := url.QueryEscape(cfg.Password)
 	mongoURI := fmt.Sprintf("mongodb://%s:%s@%s:%d", escapedUser, escapedPassword, cfg.Host, cfg.Port)
 
@@ -41,15 +41,15 @@ func NewMongoClient(ctx context.Context, cfg *config.DatabaseConfig) (*mongo.Cli
 
 func NewRepository(cfg *config.Config) (*storage.Repository, error) {
 	ctx := context.TODO()
-	mongoClient, err := NewMongoClient(ctx, &cfg.Database)
+	mongoClient, err := NewMongoClient(ctx, &cfg.Server.Database)
 	if err != nil {
 		return nil, err
 	}
 
-	sensorCollection := mongoClient.Database(cfg.Database.Name).Collection("sensors")
+	sensorCollection := mongoClient.Database(cfg.Server.Database.Name).Collection("sensors")
 	mongoSensorRepo := sensor.NewSensorRepository(mongoClient, sensorCollection)
 
-	treeCollection := mongoClient.Database(cfg.Database.Name).Collection("trees")
+	treeCollection := mongoClient.Database(cfg.Server.Database.Name).Collection("trees")
 	mongoTreeRepo := tree.NewTreeRepository(mongoClient, treeCollection)
 
 	return &storage.Repository{

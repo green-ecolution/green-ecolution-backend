@@ -1,19 +1,18 @@
 package config
 
 import (
-	"log"
-	"net/url"
+	"errors"
+	"log/slog"
 	"time"
 
-	"github.com/caarlos0/env/v11"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 type DatabaseConfig struct {
 	Host     string        `env:"HOST" envDefault:"localhost"`
 	Port     int           `env:"PORT" envDefault:"27017"`
-	User     string        `env:"USER" envDefault:"root"`
+	Username string        `env:"USER" envDefault:"root"`
 	Password string        `env:"PASSWORD" envDefault:"example"`
 	Name     string        `env:"NAME" envDefault:"green-space-management"`
 	Timeout  time.Duration `env:"TIMEOUT" envDefault:"10s"`
@@ -21,31 +20,59 @@ type DatabaseConfig struct {
 
 type MQTTConfig struct {
 	Broker   string `env:"BROKER" envDefault:"eu1.cloud.thethings.network:1883"`
-	ClientID string `env:"CLIENT_ID"`
+	ClientID string `mapstructure:"client_id" env:"CLIENT_ID"`
 	Username string `env:"USERNAME"`
 	Password string `env:"PASSWORD"`
 	Topic    string `env:"TOPIC"`
 }
 
-type Config struct {
-	LogLevel    logger.LogLevel  `env:"LOG_LEVEL" envDefault:"info"`
-	LogFormat   logger.LogFormat `env:"LOG_FORMAT" envDefault:"text"`
-	URL         *url.URL         `env:"APP_URL,expand" envDefault:"localhost:$PORT"`
-	Port        int              `env:"PORT" envDefault:"8000"`
-	Development bool             `env:"DEVELOPMENT" envDefault:"false"`
-	MQTT        MQTTConfig       `envPrefix:"MQTT_"`
-	Database    DatabaseConfig   `envPrefix:"DB_"`
+type LogConfig struct {
+	Level  logger.LogLevel
+	Format logger.LogFormat
 }
 
-func GetAppConfig() (*Config, error) {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found, use default values and environment variables")
+type ServerConfig struct {
+	Logs        LogConfig      `envPrefix:"LOGS"`
+	Database    DatabaseConfig `envPrefix:"DATABASE"`
+	Port        int            `env:"PORT" envDefault:"3000"`
+	Development bool           `env:"DEVELOPMENT" envDefault:"false"`
+	AppURL      string         `mapstructure:"app_url" env:"APP_URL" envDefault:"http://localhost:$PORT"`
+}
+
+type DashboardConfig struct {
+	Title string `env:"TITLE" envDefault:"Green Ecolution Dashboard"`
+}
+
+type Config struct {
+	Server    ServerConfig    `envPrefix:"GE_SERVER_"`
+	Dashboard DashboardConfig `envPrefix:"GE_DASHBOARD_"`
+	MQTT      MQTTConfig      `envPrefix:"GE_MQTT_"`
+}
+
+var (
+	ErrViperConfigFileNotFound = viper.ConfigFileNotFoundError{}
+	ErrViperConfigFileError    = errors.New("error loading config file with viper")
+	ErrEnvConfigError          = errors.New("error loading config from environment variables")
+)
+
+func InitConfig() (*Config, error) {
+	slog.Info("Loading config...")
+
+	cfg, err := InitViper()
+	if err != nil {
+		if errors.Is(err, ErrViperConfigFileNotFound) {
+			slog.Info("Config file not found, trying to load from environment variables")
+			cfg, err = InitEnv()
+			if err != nil {
+				slog.Error("Error loading config from environment variables", "error", err)
+				return nil, errors.Join(err, ErrEnvConfigError)
+			}
+		} else {
+			slog.Error("Error loading config file", "error", err)
+			return nil, err
+		}
 	}
 
-	var cfg Config
-	if err := env.Parse(&cfg); err != nil {
-		return nil, err
-	}
-
-	return &cfg, nil
+	slog.Info("Config loaded successfully")
+	return cfg, nil
 }

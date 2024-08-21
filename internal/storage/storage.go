@@ -14,6 +14,7 @@ var (
 	ErrIFacesNotFound        = errors.New("cant get interfaces")
 	ErrIFacesAddressNotFound = errors.New("cant get interfaces address")
 	ErrHostnameNotFound      = errors.New("cant get hostname")
+	ErrCannotGetAppURL       = errors.New("cannot get app url")
 
 	ErrMongoCannotCreateClient = errors.New("cannot create mongo client")
 	ErrMongoCannotPingClient   = errors.New("cannot ping mongo client")

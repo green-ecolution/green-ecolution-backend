@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"net/url"
 	"os"
 	"os/signal"
 	"sync"
@@ -30,15 +29,6 @@ import (
 
 var version = "develop"
 
-func setSwaggerInfo(appURL *url.URL) {
-	docs.SwaggerInfo.Title = "Green Ecolution Management API"
-	docs.SwaggerInfo.Version = version
-	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
-	docs.SwaggerInfo.Host = appURL.Host
-	docs.SwaggerInfo.BasePath = "/api"
-	docs.SwaggerInfo.Schemes = []string{"https"}
-}
-
 //	@title			Green Space Management API
 //	@version		develop
 //	@description	This is the API for the Green Ecolution Management System.
@@ -51,21 +41,21 @@ func setSwaggerInfo(appURL *url.URL) {
 // @license.name	GPL-3.0
 // @license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
 func main() {
-	cfg, err := config.GetAppConfig()
+	cfg, err := config.InitConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Printf("Version: %s\n", version)
-	if cfg.Development {
+	if cfg.Server.Development {
 		fmt.Println("Running in dev mode")
-		cfg.LogLevel = "debug"
+		cfg.Server.Logs.Level = "debug"
 	}
 
-	setSwaggerInfo(cfg.URL)
-
-	logg := logger.CreateLogger(os.Stdout, cfg.LogFormat, cfg.LogLevel)
+	logg := logger.CreateLogger(os.Stdout, cfg.Server.Logs.Format, cfg.Server.Logs.Level)
 	slog.SetDefault(logg)
+
+	setSwaggerInfo(cfg.Server.AppURL)
 
 	slog.Info("Starting Green Space Management API")
 
@@ -110,4 +100,15 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+func setSwaggerInfo(appURL string) {
+	slog.Info("Setting Swagger info")
+
+	docs.SwaggerInfo.Title = "Green Ecolution Management API"
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
+	docs.SwaggerInfo.Host = appURL
+	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.Schemes = []string{"https"}
 }
