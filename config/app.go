@@ -43,10 +43,22 @@ type DashboardConfig struct {
 	Title string `env:"TITLE" envDefault:"Green Ecolution Dashboard"`
 }
 
+type KeyCloakConfig struct {
+	BaseURL      string `env:"BASE_URL"`
+	Realm        string `env:"REALM"`
+	ClientID     string `mapstructure:"client_id" env:"CLIENT_ID"`
+	ClientSecret string `mapstructure:"client_secret" env:"CLIENT_SECRET"`
+}
+
+type IdentityAuthConfig struct {
+	KeyCloak KeyCloakConfig `envPrefix:"KEYCLOAK_"`
+}
+
 type Config struct {
-	Server    ServerConfig    `envPrefix:"GE_SERVER_"`
-	Dashboard DashboardConfig `envPrefix:"GE_DASHBOARD_"`
-	MQTT      MQTTConfig      `envPrefix:"GE_MQTT_"`
+	Server       ServerConfig       `envPrefix:"GE_SERVER_"`
+	Dashboard    DashboardConfig    `envPrefix:"GE_DASHBOARD_"`
+	MQTT         MQTTConfig         `envPrefix:"GE_MQTT_"`
+	IdentityAuth IdentityAuthConfig `mapstructure:"auth" envPrefix:"GE_AUTH_"`
 }
 
 var (
