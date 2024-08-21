@@ -11,9 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-
 func (r *KeycloakRepository) CreateUser(ctx context.Context, user *auth.User, password string, roles *[]string) (*auth.User, error) {
-  slog.Debug("Creating user in keycloak", "user", user)
+	slog.Debug("Creating user in keycloak", "user", user)
 	keyCloakUser := userToKeyCloakUser(user, password)
 
 	token, err := r.loginRestAPIClient(ctx)
@@ -57,11 +56,11 @@ func (r *KeycloakRepository) CreateUser(ctx context.Context, user *auth.User, pa
 
 func keyCloakUserToUser(user *gocloak.User) *auth.User {
 	return &auth.User{
-		ID:          *user.ID,
-		Username:    *user.Username,
-		FirstName:   *user.FirstName,
-		LastName:    *user.LastName,
-		Email:       *user.Email,
+		ID:        *user.ID,
+		Username:  *user.Username,
+		FirstName: *user.FirstName,
+		LastName:  *user.LastName,
+		Email:     *user.Email,
 	}
 }
 

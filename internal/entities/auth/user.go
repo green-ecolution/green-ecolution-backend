@@ -20,6 +20,6 @@ type User struct {
 
 type RegisterUser struct {
 	User     User
-	Password string    `validate:"required"`
-	Roles    *[]string 
+	Password string `validate:"required"`
+	Roles    *[]string
 }

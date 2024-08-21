@@ -8,15 +8,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-//	@Summary		Register a new user
-//	@Description	Register a new user
-//	@Tags			User
-//	@Accept			json
-//	@Produce		json
-//	@Success		201	{object}	auth.UserResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/user [post]
+// @Summary		Register a new user
+// @Description	Register a new user
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Success		201	{object}	auth.UserResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/user [post]
 func Register(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()

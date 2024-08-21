@@ -9,17 +9,17 @@ import (
 )
 
 func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error) {
-  client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 
-  rptResult, err := client.RetrospectToken(ctx, token, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
-  if err != nil {
-    return nil, errors.Wrap(err, "failed to retrospect token")
-  }
+	rptResult, err := client.RetrospectToken(ctx, token, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to retrospect token")
+	}
 
-  return &auth.IntroSpectTokenResult{
-    Active: rptResult.Active,
-    Exp:    rptResult.Exp,
-    AuthTime: rptResult.AuthTime,
-    Type:   rptResult.Type,
-  }, nil
+	return &auth.IntroSpectTokenResult{
+		Active:   rptResult.Active,
+		Exp:      rptResult.Exp,
+		AuthTime: rptResult.AuthTime,
+		Type:     rptResult.Type,
+	}, nil
 }
