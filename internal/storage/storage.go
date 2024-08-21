@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
@@ -40,8 +41,13 @@ type TreeRepository interface {
 	GetAll(ctx context.Context) ([]*tree.Tree, error)
 }
 
+type AuthRepository interface {
+  CreateUser(ctx context.Context, user *auth.User, password, role string) (*auth.User, error)
+}
+
 type Repository struct {
 	Info   InfoRepository
 	Sensor SensorRepository
 	Tree   TreeRepository
+  Auth   AuthRepository
 }
