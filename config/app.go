@@ -49,6 +49,14 @@ type KeyCloakConfig struct {
 	ClientID       string `mapstructure:"client_id" env:"CLIENT_ID"`
 	ClientSecret   string `mapstructure:"client_secret" env:"CLIENT_SECRET"`
 	RealmPublicKey string `mapstructure:"realm_public_key" env:"REALM_PUBLIC_KEY"`
+	Frontend       KeyCloakFrontendConfig
+}
+
+type KeyCloakFrontendConfig struct {
+	ClientID     string `mapstructure:"client_id" env:"FRONTEND_CLIENT_ID"`
+	ClientSecret string `mapstructure:"client_secret" env:"FRONTEND_CLIENT_SECRET"`
+	AuthURL      string `mapstructure:"auth_url" env:"FRONTEND_AUTH_URL"`
+	TokenURL     string `mapstructure:"token_url" env:"FRONTEND_TOKEN_URL"`
 }
 
 type IdentityAuthConfig struct {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -12,11 +13,15 @@ import (
 
 type AuthService struct {
 	authRepository storage.AuthRepository
+	validator      *validator.Validate
+	cfg            *config.Config
 }
 
-func NewAuthService(repo storage.AuthRepository) service.AuthService {
+func NewAuthService(repo storage.AuthRepository, cfg *config.Config) service.AuthService {
 	return &AuthService{
+		validator:      validator.New(),
 		authRepository: repo,
+		cfg:            cfg,
 	}
 }
 
@@ -30,8 +35,7 @@ func (s *AuthService) RetrospectToken(ctx context.Context, token string) (*auth.
 }
 
 func (s *AuthService) Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error) {
-	validator := validator.New()
-	if err := validator.Struct(user); err != nil {
+	if err := s.validator.Struct(user); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 

@@ -5,20 +5,22 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
-	"errors"
 
 	contribJwt "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	golangJwt "github.com/golang-jwt/jwt/v5"
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/pkg/errors"
 )
 
 func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) fiber.Handler {
 	base64Str := cfg.KeyCloak.RealmPublicKey
 	publicKey, err := parsePublicKey(base64Str)
 	if err != nil {
-		panic(err)
+    return func(c *fiber.Ctx) error {
+      return c.Status(fiber.StatusInternalServerError).SendString("failed to parse public key")
+    }
 	}
 
 	return contribJwt.New(contribJwt.Config{
@@ -61,7 +63,7 @@ func successHandler(c *fiber.Ctx, svc service.AuthService) error {
 
 	rptResult, err := svc.RetrospectToken(ctx, jwtToken.Raw)
 	if err != nil {
-		panic(err) // should not happen
+    return err
 	}
 
 	if !*rptResult.Active {
