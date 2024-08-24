@@ -8,18 +8,19 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-// @Summary		Get info about the app
-// @Description	Get info about the app and the server
-// @Id				get-app-info
-// @Tags			Info
-// @Produce		json
-// @Success		200	{object}	info.AppInfoResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/info [get]
+//	@Summary		Get info about the app
+//	@Description	Get info about the app and the server
+//	@Id				get-app-info
+//	@Tags			Info
+//	@Produce		json
+//	@Success		200	{object}	info.AppInfoResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/info [get]
+//	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAppInfo(svc service.InfoService) fiber.Handler {
 	var mapper info.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
 

@@ -13,6 +13,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -109,10 +110,21 @@ func main() {
 func setSwaggerInfo(appURL string) {
 	slog.Info("Setting Swagger info")
 
+	var schemes []string
+  var trimmedAppURL string
+  if strings.HasPrefix(appURL, "http://") {
+    schemes = []string{"http"}
+    trimmedAppURL = strings.TrimPrefix(appURL, "http://")
+	} else {
+    trimmedAppURL = strings.TrimPrefix(appURL, "https://")
+		schemes = []string{"https"}
+	}
+
+
 	docs.SwaggerInfo.Title = "Green Ecolution Management API"
 	docs.SwaggerInfo.Version = version
 	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
-	docs.SwaggerInfo.Host = appURL
+	docs.SwaggerInfo.Host = trimmedAppURL
 	docs.SwaggerInfo.BasePath = "/api"
-	docs.SwaggerInfo.Schemes = []string{"https"}
+	docs.SwaggerInfo.Schemes = schemes
 }
