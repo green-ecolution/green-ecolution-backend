@@ -11,15 +11,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-//	@Summary	Requst to login
-//	@Descriptio	Requst to login to the system. Returns a Login URL
-//	@Tags		Login
-//	@Produce	json
-//	@Param		redirect_url	query		string	true	"Redirect URL"
-//	@Success	200				{object}	auth.LoginResponse
-//	@Failure	400				{object}	HTTPError
-//	@Failure	500				{object}	HTTPError
-//	@Router		/v1/login [get]
+// @Summary	Requst to login
+// @Descriptio	Requst to login to the system. Returns a Login URL
+// @Tags		Login
+// @Produce	json
+// @Param		redirect_url	query		string	true	"Redirect URL"
+// @Success	200				{object}	auth.LoginResponse
+// @Failure	400				{object}	HTTPError
+// @Failure	500				{object}	HTTPError
+// @Router		/v1/login [get]
 func Login(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -47,17 +47,17 @@ func Login(svc service.AuthService) fiber.Handler {
 	}
 }
 
-//	@Summary	Requst to login
-//	@Descriptio	Requst a access token
-//	@Tags		Login
-//	@Accept		json
-//	@Produce	json
-//	@Param		body			body		auth.LoginTokenRequest	true	"Callback information"
-//	@Param		redirect_url	query		string					true	"Redirect URL"
-//	@Success	200				{object}	auth.ClientTokenResponse
-//	@Failure	400				{object}	HTTPError
-//	@Failure	500				{object}	HTTPError
-//	@Router		/v1/token [post]
+// @Summary	Requst to login
+// @Descriptio	Requst a access token
+// @Tags		Login
+// @Accept		json
+// @Produce	json
+// @Param		body			body		auth.LoginTokenRequest	true	"Callback information"
+// @Param		redirect_url	query		string					true	"Redirect URL"
+// @Success	200				{object}	auth.ClientTokenResponse
+// @Failure	400				{object}	HTTPError
+// @Failure	500				{object}	HTTPError
+// @Router		/v1/token [post]
 func RequestToken(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -66,14 +66,14 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
-    redirectURL, err := parseURL(c.Query("redirect_url"))
-    if err != nil {
-      return err
-    }
+		redirectURL, err := parseURL(c.Query("redirect_url"))
+		if err != nil {
+			return err
+		}
 
 		domainReq := domain.LoginCallback{
-			Code: req.Code,
-      RedirectURL: redirectURL,
+			Code:        req.Code,
+			RedirectURL: redirectURL,
 		}
 
 		token, err := svc.ClientTokenCallback(ctx, &domainReq)
@@ -92,16 +92,16 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 	}
 }
 
-//	@Summary		Register a new user
-//	@Description	Register a new user
-//	@Tags			User
-//	@Accept			json
-//	@Produce		json
-//	@Param			user	body		auth.RegisterUserRequest	true	"User information"
-//	@Success		201		{object}	auth.UserResponse
-//	@Failure		400		{object}	HTTPError
-//	@Failure		500		{object}	HTTPError
-//	@Router			/v1/user [post]
+// @Summary		Register a new user
+// @Description	Register a new user
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			user	body		auth.RegisterUserRequest	true	"User information"
+// @Success		201		{object}	auth.UserResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Router			/v1/user [post]
 func Register(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -147,5 +147,5 @@ func Register(svc service.AuthService) fiber.Handler {
 }
 
 func parseURL(rawURL string) (*url.URL, error) {
-  return url.ParseRequestURI(rawURL)
+	return url.ParseRequestURI(rawURL)
 }

@@ -11,7 +11,6 @@ type LoginResp struct {
 }
 
 type LoginCallback struct {
-  Code string `validate:"required"`
-  RedirectURL *url.URL 
+	Code        string `validate:"required"`
+	RedirectURL *url.URL
 }
-

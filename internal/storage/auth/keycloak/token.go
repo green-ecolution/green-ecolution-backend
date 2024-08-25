@@ -9,11 +9,11 @@ import (
 )
 
 var (
-  ErrInvalidToken = errors.New("invalid token")
-  ErrTokenExpired = errors.New("token expired")
-  ErrTokenNotActive = errors.New("token not active")
-  ErrTokenInvalidType = errors.New("token invalid type")
-) 
+	ErrInvalidToken     = errors.New("invalid token")
+	ErrTokenExpired     = errors.New("token expired")
+	ErrTokenNotActive   = errors.New("token not active")
+	ErrTokenInvalidType = errors.New("token invalid type")
+)
 
 func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error) {
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
@@ -32,29 +32,29 @@ func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) 
 }
 
 func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*auth.ClientToken, error) {
-  client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 
-  tokenOptions := gocloak.TokenOptions{
-    ClientID:     &r.cfg.KeyCloak.Frontend.ClientID,
-    ClientSecret: &r.cfg.KeyCloak.Frontend.ClientSecret,
-    Code:         &code,
-    GrantType:   gocloak.StringP("authorization_code"),
-    RedirectURI: &redirectURL,
-  }
+	tokenOptions := gocloak.TokenOptions{
+		ClientID:     &r.cfg.KeyCloak.Frontend.ClientID,
+		ClientSecret: &r.cfg.KeyCloak.Frontend.ClientSecret,
+		Code:         &code,
+		GrantType:    gocloak.StringP("authorization_code"),
+		RedirectURI:  &redirectURL,
+	}
 
-  token, err := client.GetToken(ctx, r.cfg.KeyCloak.Realm, tokenOptions)
-  if err != nil {
-    return nil, err
-  }
+	token, err := client.GetToken(ctx, r.cfg.KeyCloak.Realm, tokenOptions)
+	if err != nil {
+		return nil, err
+	}
 
-  return &auth.ClientToken{
-    AccessToken:  token.AccessToken,
-    RefreshToken: token.RefreshToken,
-    ExpiresIn:    token.ExpiresIn,
-    RefreshExpiresIn: token.RefreshExpiresIn,
-    TokenType: token.TokenType,
-    NotBeforePolicy: token.NotBeforePolicy,
-    SessionState: token.SessionState,
-    Scope: token.Scope,
-  }, nil
+	return &auth.ClientToken{
+		AccessToken:      token.AccessToken,
+		RefreshToken:     token.RefreshToken,
+		ExpiresIn:        token.ExpiresIn,
+		RefreshExpiresIn: token.RefreshExpiresIn,
+		TokenType:        token.TokenType,
+		NotBeforePolicy:  token.NotBeforePolicy,
+		SessionState:     token.SessionState,
+		Scope:            token.Scope,
+	}, nil
 }

@@ -67,8 +67,8 @@ type TreeService interface {
 
 type AuthService interface {
 	Service
-  LoginRequest(ctx context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error)
-  ClientTokenCallback(ctx context.Context, loginCallback *auth.LoginCallback) (*auth.ClientToken, error)
+	LoginRequest(ctx context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error)
+	ClientTokenCallback(ctx context.Context, loginCallback *auth.LoginCallback) (*auth.ClientToken, error)
 	Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error)
 	RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
 }

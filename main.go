@@ -111,15 +111,14 @@ func setSwaggerInfo(appURL string) {
 	slog.Info("Setting Swagger info")
 
 	var schemes []string
-  var trimmedAppURL string
-  if strings.HasPrefix(appURL, "http://") {
-    schemes = []string{"http"}
-    trimmedAppURL = strings.TrimPrefix(appURL, "http://")
+	var trimmedAppURL string
+	if strings.HasPrefix(appURL, "http://") {
+		schemes = []string{"http"}
+		trimmedAppURL = strings.TrimPrefix(appURL, "http://")
 	} else {
-    trimmedAppURL = strings.TrimPrefix(appURL, "https://")
+		trimmedAppURL = strings.TrimPrefix(appURL, "https://")
 		schemes = []string{"https"}
 	}
-
 
 	docs.SwaggerInfo.Title = "Green Ecolution Management API"
 	docs.SwaggerInfo.Version = version

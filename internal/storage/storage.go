@@ -44,7 +44,7 @@ type TreeRepository interface {
 type AuthRepository interface {
 	CreateUser(ctx context.Context, user *auth.User, password string, role *[]string) (*auth.User, error)
 	RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
-  GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*auth.ClientToken, error)
+	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*auth.ClientToken, error)
 }
 
 type Repository struct {

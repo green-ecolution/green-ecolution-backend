@@ -18,9 +18,9 @@ func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) f
 	base64Str := cfg.KeyCloak.RealmPublicKey
 	publicKey, err := parsePublicKey(base64Str)
 	if err != nil {
-    return func(c *fiber.Ctx) error {
-      return c.Status(fiber.StatusInternalServerError).SendString("failed to parse public key")
-    }
+		return func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusInternalServerError).SendString("failed to parse public key")
+		}
 	}
 
 	return contribJwt.New(contribJwt.Config{
@@ -63,7 +63,7 @@ func successHandler(c *fiber.Ctx, svc service.AuthService) error {
 
 	rptResult, err := svc.RetrospectToken(ctx, jwtToken.Raw)
 	if err != nil {
-    return err
+		return err
 	}
 
 	if !*rptResult.Active {

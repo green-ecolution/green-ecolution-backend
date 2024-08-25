@@ -25,6 +25,6 @@ func (s *Server) publicRoutes(app *fiber.App) {
 	grp := app.Group("/api/v1")
 	grp.Get("/swagger/*", swagger.HandlerDefault)
 	grp.Post("/user", auth.Register(s.services.AuthService))
-  grp.Get("/login", auth.Login(s.services.AuthService))
-  grp.Post("/token", auth.RequestToken(s.services.AuthService))
+	grp.Get("/login", auth.Login(s.services.AuthService))
+	grp.Post("/token", auth.RequestToken(s.services.AuthService))
 }
