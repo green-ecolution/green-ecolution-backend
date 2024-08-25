@@ -10,13 +10,13 @@ import (
 )
 
 func (s *AuthService) LoginRequest(_ context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error) {
-	loginURL, err := url.Parse(s.cfg.IdentityAuth.KeyCloak.Frontend.AuthURL)
+	loginURL, err := url.ParseRequestURI(s.cfg.KeyCloak.Frontend.AuthURL)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url in config").Error())
 	}
 
 	query := loginURL.Query()
-	query.Add("client_id", s.cfg.IdentityAuth.KeyCloak.Frontend.ClientID)
+	query.Add("client_id", s.cfg.KeyCloak.Frontend.ClientID)
 	query.Add("response_type", "code")
 	query.Add("redirect_uri", loginRequest.RedirectURL.String())
 

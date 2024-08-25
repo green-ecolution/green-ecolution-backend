@@ -10,10 +10,10 @@ import (
 type AuthService struct {
 	authRepository storage.AuthRepository
 	validator      *validator.Validate
-	cfg            *config.Config
+	cfg            *config.IdentityAuthConfig
 }
 
-func NewAuthService(repo storage.AuthRepository, cfg *config.Config) service.AuthService {
+func NewAuthService(repo storage.AuthRepository, cfg *config.IdentityAuthConfig) service.AuthService {
 	return &AuthService{
 		validator:      validator.New(),
 		authRepository: repo,
