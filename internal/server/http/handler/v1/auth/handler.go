@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"log"
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
@@ -23,9 +22,7 @@ import (
 func Login(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		redirectURLRaw := c.Query("redirect_url")
-		redirectURL, err := url.ParseRequestURI(redirectURLRaw)
-		log.Println(redirectURL)
+		redirectURL, err := url.ParseRequestURI(c.Query("redirect_url"))
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
@@ -36,7 +33,7 @@ func Login(svc service.AuthService) fiber.Handler {
 
 		resp, err := svc.LoginRequest(ctx, &req)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(service.NewError(service.InternalError, errors.Wrap(err, "failed to handle login request").Error()))
+			return err
 		}
 
 		response := auth.LoginResponse{
@@ -78,7 +75,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		token, err := svc.ClientTokenCallback(ctx, &domainReq)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(service.NewError(service.InternalError, errors.Wrap(err, "failed to handle token request").Error()))
+			return err
 		}
 
 		response := auth.ClientTokenResponse{
@@ -125,9 +122,7 @@ func Register(svc service.AuthService) fiber.Handler {
 
 		user, err := svc.Register(ctx, &domainUser)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": errors.Wrap(err, "failed to register user").Error(),
-			})
+			return err
 		}
 
 		response := auth.UserResponse{

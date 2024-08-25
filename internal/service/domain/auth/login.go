@@ -12,7 +12,7 @@ import (
 func (s *AuthService) LoginRequest(_ context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error) {
 	loginURL, err := url.Parse(s.cfg.IdentityAuth.KeyCloak.Frontend.AuthURL)
 	if err != nil {
-		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url").Error())
+		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url in config").Error())
 	}
 
 	query := loginURL.Query()
