@@ -11,6 +11,7 @@ import (
 	golangJwt "github.com/golang-jwt/jwt/v5"
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/enums"
 	"github.com/pkg/errors"
 )
 
@@ -58,7 +59,7 @@ func successHandler(c *fiber.Ctx, svc service.AuthService) error {
 	claims := jwtToken.Claims.(golangJwt.MapClaims)
 
 	ctx := c.Context()
-	contextWithClaims := context.WithValue(ctx, "claims", claims)
+	contextWithClaims := context.WithValue(ctx, enums.ContextKeyClaims, claims)
 	c.SetUserContext(contextWithClaims)
 
 	rptResult, err := svc.RetrospectToken(ctx, jwtToken.Raw)

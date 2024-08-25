@@ -13,7 +13,7 @@ import (
 
 func (r *KeycloakRepository) CreateUser(ctx context.Context, user *auth.User, password string, roles *[]string) (*auth.User, error) {
 	slog.Debug("Creating user in keycloak", "user", user)
-	keyCloakUser := userToKeyCloakUser(user, password)
+	keyCloakUser := userToKeyCloakUser(user)
 
 	token, err := r.loginRestAPIClient(ctx)
 	if err != nil {
@@ -26,8 +26,7 @@ func (r *KeycloakRepository) CreateUser(ctx context.Context, user *auth.User, pa
 		return nil, errors.Wrap(err, "failed to create user")
 	}
 
-	err = client.SetPassword(ctx, token.AccessToken, userID, r.cfg.KeyCloak.Realm, password, false)
-	if err != nil {
+	if err = client.SetPassword(ctx, token.AccessToken, userID, r.cfg.KeyCloak.Realm, password, false); err != nil {
 		return nil, errors.Wrap(err, "failed to set password")
 	}
 
@@ -41,8 +40,7 @@ func (r *KeycloakRepository) CreateUser(ctx context.Context, user *auth.User, pa
 		kcRoles = append(kcRoles, *roleKeyCloak)
 	}
 
-	err = client.AddRealmRoleToUser(ctx, token.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles)
-	if err != nil {
+	if err = client.AddRealmRoleToUser(ctx, token.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles); err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
 	}
 
@@ -64,7 +62,7 @@ func keyCloakUserToUser(user *gocloak.User) *auth.User {
 	}
 }
 
-func userToKeyCloakUser(user *auth.User, password string) *gocloak.User {
+func userToKeyCloakUser(user *auth.User) *gocloak.User {
 	attribute := make(map[string][]string)
 	attribute["phone_number"] = []string{user.PhoneNumber}
 	attribute["employee_id"] = []string{user.EmployeeID}

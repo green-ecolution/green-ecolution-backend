@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *AuthService) LoginRequest(ctx context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error) {
+func (s *AuthService) LoginRequest(_ context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error) {
 	loginURL, err := url.Parse(s.cfg.IdentityAuth.KeyCloak.Frontend.AuthURL)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url").Error())
@@ -19,7 +19,6 @@ func (s *AuthService) LoginRequest(ctx context.Context, loginRequest *auth.Login
 	query.Add("client_id", s.cfg.IdentityAuth.KeyCloak.Frontend.ClientID)
 	query.Add("response_type", "code")
 	query.Add("redirect_uri", loginRequest.RedirectURL.String())
-	//query.Add("scope", "openid")
 
 	loginURL.RawQuery = query.Encode()
 	resp := &auth.LoginResp{

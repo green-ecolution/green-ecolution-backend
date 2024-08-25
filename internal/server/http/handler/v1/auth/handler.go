@@ -24,14 +24,14 @@ func Login(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		redirectURLRaw := c.Query("redirect_url")
-		redirect_url, err := url.ParseRequestURI(redirectURLRaw)
-		log.Println(redirect_url)
+		redirectURL, err := url.ParseRequestURI(redirectURLRaw)
+		log.Println(redirectURL)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		req := domain.LoginRequest{
-			RedirectURL: redirect_url,
+			RedirectURL: redirectURL,
 		}
 
 		resp, err := svc.LoginRequest(ctx, &req)
