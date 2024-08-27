@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/config"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +17,7 @@ func TestRestrospectToken(t *testing.T) {
 		// given
 		token := "token"
 		identityConfig := &config.IdentityAuthConfig{}
-		expected := &auth.IntroSpectTokenResult{
+		expected := &entities.IntroSpectTokenResult{
 			Active:   utils.P(true),
 			Exp:      utils.P(123),
 			AuthTime: utils.P(123),

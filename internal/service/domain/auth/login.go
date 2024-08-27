@@ -4,12 +4,12 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 )
 
-func (s *AuthService) LoginRequest(_ context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error) {
+func (s *AuthService) LoginRequest(_ context.Context, loginRequest *domain.LoginRequest) (*domain.LoginResp, error) {
 	loginURL, err := url.ParseRequestURI(s.cfg.KeyCloak.Frontend.AuthURL)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url in config").Error())
@@ -21,14 +21,14 @@ func (s *AuthService) LoginRequest(_ context.Context, loginRequest *auth.LoginRe
 	query.Add("redirect_uri", loginRequest.RedirectURL.String())
 
 	loginURL.RawQuery = query.Encode()
-	resp := &auth.LoginResp{
+	resp := &domain.LoginResp{
 		LoginURL: loginURL,
 	}
 
 	return resp, nil
 }
 
-func (s *AuthService) ClientTokenCallback(ctx context.Context, loginCallback *auth.LoginCallback) (*auth.ClientToken, error) {
+func (s *AuthService) ClientTokenCallback(ctx context.Context, loginCallback *domain.LoginCallback) (*domain.ClientToken, error) {
 	if err := s.validator.Struct(loginCallback); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}

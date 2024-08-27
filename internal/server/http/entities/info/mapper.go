@@ -1,7 +1,7 @@
 package info
 
 import (
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
 // goverter:converter

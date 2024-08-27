@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
@@ -56,11 +56,11 @@ func TestGetAppInfo(t *testing.T) {
 		repo := storageMock.NewMockInfoRepository(t)
 		svc := NewInfoService(repo)
 		buildTime := time.Now()
-		expectedAppInfo := info.App{
+		expectedAppInfo := domain.App{
 			Version:   "1.0.0",
 			GoVersion: "1.16",
 			BuildTime: buildTime,
-			Git: info.Git{
+			Git: domain.Git{
 				Commit: "123456",
 				Branch: "main",
 				Repository: &url.URL{
@@ -69,7 +69,7 @@ func TestGetAppInfo(t *testing.T) {
 					Path:   "/green-ecolution/green-space-management",
 				},
 			},
-			Server: info.Server{
+			Server: domain.Server{
 				OS:       "linux",
 				Arch:     "amd64",
 				Hostname: "localhost",
@@ -84,11 +84,11 @@ func TestGetAppInfo(t *testing.T) {
 			},
 		}
 
-		givenAppInfo := info.App{
+		givenAppInfo := domain.App{
 			Version:   "1.0.0",
 			GoVersion: "1.16",
 			BuildTime: buildTime,
-			Git: info.Git{
+			Git: domain.Git{
 				Commit: "123456",
 				Branch: "main",
 				Repository: &url.URL{
@@ -97,7 +97,7 @@ func TestGetAppInfo(t *testing.T) {
 					Path:   "/green-ecolution/green-space-management",
 				},
 			},
-			Server: info.Server{
+			Server: domain.Server{
 				OS:       "linux",
 				Arch:     "amd64",
 				Hostname: "localhost",

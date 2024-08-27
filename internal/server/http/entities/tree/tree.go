@@ -8,9 +8,9 @@ type TreeLocationResponse struct {
 } // @Name TreeLocation
 
 type TreeResponse struct {
-	ID       string               `json:"id"`
+	ID       int32                `json:"id"`
 	Species  string               `json:"species"`
-	TreeNum  int                  `json:"tree_num"`
-	Age      int                  `json:"age"`
+	TreeNum  int32                `json:"tree_num"`
+	Age      int32                `json:"age"`
 	Location TreeLocationResponse `json:"location"`
 } // @Name Tree

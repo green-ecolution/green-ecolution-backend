@@ -3,12 +3,12 @@ package auth
 import (
 	"context"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 )
 
-func (s *AuthService) Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error) {
+func (s *AuthService) Register(ctx context.Context, user *domain.RegisterUser) (*domain.User, error) {
 	if err := s.validator.Struct(user); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}

@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 	ErrTokenInvalidType = errors.New("token invalid type")
 )
 
-func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error) {
+func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error) {
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 
 	rptResult, err := client.RetrospectToken(ctx, token, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm)
@@ -23,7 +23,7 @@ func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) 
 		return nil, err
 	}
 
-	return &auth.IntroSpectTokenResult{
+	return &entities.IntroSpectTokenResult{
 		Active:   rptResult.Active,
 		Exp:      rptResult.Exp,
 		AuthTime: rptResult.AuthTime,
@@ -31,7 +31,7 @@ func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) 
 	}, nil
 }
 
-func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*auth.ClientToken, error) {
+func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error) {
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 
 	tokenOptions := gocloak.TokenOptions{
@@ -47,7 +47,7 @@ func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, c
 		return nil, err
 	}
 
-	return &auth.ClientToken{
+	return &entities.ClientToken{
 		AccessToken:      token.AccessToken,
 		RefreshToken:     token.RefreshToken,
 		ExpiresIn:        token.ExpiresIn,

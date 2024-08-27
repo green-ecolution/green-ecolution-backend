@@ -85,8 +85,7 @@ func InitConfig() (*Config, error) {
 			slog.Info("Config file not found, trying to load from environment variables")
 			cfg, err = InitEnv()
 			if err != nil {
-				slog.Error("Error loading config from environment variables", "error", err)
-				return nil, errors.Join(err, ErrEnvConfigError)
+				slog.Warn("Error loading config from environment variables", "error", err)
 			}
 		} else {
 			slog.Error("Error loading config file", "error", err)

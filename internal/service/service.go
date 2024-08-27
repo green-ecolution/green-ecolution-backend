@@ -7,10 +7,7 @@ import (
 	"log/slog"
 	"reflect"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
 var (
@@ -46,31 +43,27 @@ const (
 
 type InfoService interface {
 	Service
-	GetAppInfo(context.Context) (*info.App, error)
-	GetAppInfoResponse(context.Context) (*info.App, error)
+	GetAppInfo(context.Context) (*domain.App, error)
+	GetAppInfoResponse(context.Context) (*domain.App, error)
 }
 
 type MqttService interface {
 	Service
-	HandleMessage(ctx context.Context, payload *sensor.MqttPayload) (*sensor.MqttPayload, error)
+	HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.MqttPayload, error)
 	SetConnected(bool)
 }
 
 type TreeService interface {
 	Service
-	InsertTree(ctx context.Context, data *tree.Tree) error
-
-	GetAllTreesResponse(ctx context.Context, withSensorData bool) ([]*tree.TreeSensorData, error)
-	GetTreeByIDResponse(ctx context.Context, id string, withSensorData bool) (*tree.TreeSensorData, error)
-	GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*tree.TreeSensorPrediction, error)
+	// TODO: Implement Functions
 }
 
 type AuthService interface {
 	Service
-	LoginRequest(ctx context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error)
-	ClientTokenCallback(ctx context.Context, loginCallback *auth.LoginCallback) (*auth.ClientToken, error)
-	Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error)
-	RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
+	LoginRequest(ctx context.Context, loginRequest *domain.LoginRequest) (*domain.LoginResp, error)
+	ClientTokenCallback(ctx context.Context, loginCallback *domain.LoginCallback) (*domain.ClientToken, error)
+	Register(ctx context.Context, user *domain.RegisterUser) (*domain.User, error)
+	RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error)
 }
 
 type Service interface {
