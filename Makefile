@@ -61,6 +61,7 @@ setup/ci:
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/swaggo/swag/cmd/swag@latest
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+	go install github.com/jmattheis/goverter/cmd/goverter@latest
 	go mod download
 
 .PHONY: clean
