@@ -19,3 +19,9 @@ type User struct {
 	EmailVerified bool
 	Avatar        *url.URL
 }
+
+type RegisterUser struct {
+	User     User
+	Password string `validate:"required"`
+	Roles    *[]string
+}

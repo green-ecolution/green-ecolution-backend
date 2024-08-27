@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
@@ -126,7 +126,7 @@ func Register(svc service.AuthService) fiber.Handler {
 		}
 
 		response := auth.UserResponse{
-			ID:            user.ID,
+			ID:            user.ID.String(),
 			CreatedAt:     user.CreatedAt,
 			Email:         user.Email,
 			FirstName:     user.FirstName,

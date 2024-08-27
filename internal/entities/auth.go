@@ -1,4 +1,6 @@
-package auth
+package entities
+
+import "net/url"
 
 type IntroSpectTokenResult struct {
 	Exp      *int
@@ -17,4 +19,17 @@ type ClientToken struct {
 	NotBeforePolicy  int
 	SessionState     string
 	Scope            string
+}
+
+type LoginRequest struct {
+	RedirectURL *url.URL
+}
+
+type LoginResp struct {
+	LoginURL *url.URL
+}
+
+type LoginCallback struct {
+	Code        string `validate:"required"`
+	RedirectURL *url.URL
 }

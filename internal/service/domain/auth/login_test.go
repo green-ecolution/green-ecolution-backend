@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/config"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +30,7 @@ func TestLoginRequest(t *testing.T) {
 		}
 
 		redirectURL, _ := url.Parse("http://localhost:3000/auth/callback")
-		loginRequest := &auth.LoginRequest{
+		loginRequest := &domain.LoginRequest{
 			RedirectURL: redirectURL,
 		}
 
@@ -41,7 +41,7 @@ func TestLoginRequest(t *testing.T) {
 		query.Add("redirect_uri", loginRequest.RedirectURL.String())
 		respURL.RawQuery = query.Encode()
 
-		expected := &auth.LoginResp{
+		expected := &domain.LoginResp{
 			LoginURL: respURL,
 		}
 
@@ -66,7 +66,7 @@ func TestLoginRequest(t *testing.T) {
 			},
 		}
 
-		loginRequest := &auth.LoginRequest{
+		loginRequest := &domain.LoginRequest{
 			RedirectURL: &url.URL{
 				Scheme: "http",
 				Host:   "localhost:3000",
@@ -89,7 +89,7 @@ func TestClientTokenCallback(t *testing.T) {
 	t.Run("should return client token", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		loginCallback := &auth.LoginCallback{
+		loginCallback := &domain.LoginCallback{
 			Code: "code",
 			RedirectURL: &url.URL{
 				Scheme: "http",
@@ -98,7 +98,7 @@ func TestClientTokenCallback(t *testing.T) {
 			},
 		}
 
-		expected := &auth.ClientToken{
+		expected := &domain.ClientToken{
 			AccessToken: "access_token",
 		}
 
@@ -117,7 +117,7 @@ func TestClientTokenCallback(t *testing.T) {
 	t.Run("should return error when validation error", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		loginCallback := &auth.LoginCallback{}
+		loginCallback := &domain.LoginCallback{}
 
 		repo := storageMock.NewMockAuthRepository(t)
 		svc := NewAuthService(repo, identityConfig)
@@ -132,7 +132,7 @@ func TestClientTokenCallback(t *testing.T) {
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		loginCallback := &auth.LoginCallback{
+		loginCallback := &domain.LoginCallback{
 			Code: "code",
 			RedirectURL: &url.URL{
 				Scheme: "http",

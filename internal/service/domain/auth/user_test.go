@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/config"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ func TestRegisterUser(t *testing.T) {
 	t.Run("should return result when success", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		inputUser := &auth.User{
+		inputUser := &entities.User{
 			Username:    "username",
 			Email:       "mail@foo.com",
 			PhoneNumber: "phoneNumber",
@@ -23,14 +24,14 @@ func TestRegisterUser(t *testing.T) {
 			LastName:    "lastName",
 			EmployeeID:  "employeeID",
 		}
-		input := &auth.RegisterUser{
+		input := &entities.RegisterUser{
 			User:     *inputUser,
 			Password: "password",
 			Roles:    &[]string{"viewer"},
 		}
 
-		expected := &auth.User{
-			ID:            "id",
+		expected := &entities.User{
+			ID:            uuid.MustParse("6be4c752-94df-4719-99b1-ce58253eaf75"),
 			CreatedAt:     time.Now(),
 			Username:      inputUser.Username,
 			FirstName:     inputUser.FirstName,
@@ -61,7 +62,7 @@ func TestRegisterUser(t *testing.T) {
 		svc := NewAuthService(repo, identityConfig)
 
 		// when
-		resp, err := svc.Register(context.Background(), &auth.RegisterUser{})
+		resp, err := svc.Register(context.Background(), &entities.RegisterUser{})
 
 		// then
 		assert.Error(t, err)
@@ -75,7 +76,7 @@ func TestRegisterUser(t *testing.T) {
 		svc := NewAuthService(repo, identityConfig)
 
 		// when
-		resp, err := svc.Register(context.Background(), &auth.RegisterUser{})
+		resp, err := svc.Register(context.Background(), &entities.RegisterUser{})
 
 		// then
 		assert.Error(t, err)

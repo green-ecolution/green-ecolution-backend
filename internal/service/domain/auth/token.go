@@ -3,12 +3,12 @@ package auth
 import (
 	"context"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 )
 
-func (s *AuthService) RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error) {
+func (s *AuthService) RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error) {
 	result, err := s.authRepository.RetrospectToken(ctx, token)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to retrospect token").Error())

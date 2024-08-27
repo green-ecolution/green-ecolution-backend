@@ -81,9 +81,9 @@ type FlowerbedRepository interface {
 }
 
 type AuthRepository interface {
-	CreateUser(ctx context.Context, user *auth.User, password string, role *[]string) (*auth.User, error)
-	RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
-	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*auth.ClientToken, error)
+	CreateUser(ctx context.Context, user *entities.User, password string, role *[]string) (*entities.User, error)
+	RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error)
+	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error)
 }
 
 type Repository struct {
