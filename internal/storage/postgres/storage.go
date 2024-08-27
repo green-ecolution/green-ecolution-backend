@@ -24,7 +24,6 @@ func NewRepository(conn sqlc.DBTX) *storage.Repository {
 		&treeMapper.InternalTreeRepoMapperImpl{},
 		&imgMapper.InternalImageRepoMapperImpl{},
 	)
-
 	treeRepo := tree.NewTreeRepository(querier, treeMappers)
 
 	tcMappers := treecluster.NewTreeClusterRepositoryMappers(
