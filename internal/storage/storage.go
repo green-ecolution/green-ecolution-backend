@@ -87,7 +87,7 @@ type AuthRepository interface {
 }
 
 type Repository struct {
-	Auth   AuthRepository
+	Auth        AuthRepository
 	Info        InfoRepository
 	Sensor      SensorRepository
 	Tree        TreeRepository
