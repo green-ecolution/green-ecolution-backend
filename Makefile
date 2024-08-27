@@ -143,6 +143,8 @@ tidy:
 
 .PHONY: lint
 lint:
+	@echo "Go fmt..."
+	go fmt ./...
 	@echo "Linting..."
 	golangci-lint run
 
@@ -150,3 +152,18 @@ lint:
 test:
 	@echo "Testing..."
 	go test ./...
+
+.PHONY: config/enc
+config/enc:
+	@echo "Encrypting config..."
+	sops -e config.yaml > config.enc.yaml
+
+.PHONY: config/dec
+config/dec:
+	@echo "Decrypting config..."
+	sops -d config.enc.yaml > config.yaml
+
+.PHONY: config/edit
+config/edit:
+	@echo "Editing config..."
+	sops edit config.enc.yaml
