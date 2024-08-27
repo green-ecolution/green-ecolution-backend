@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"reflect"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
@@ -17,6 +18,7 @@ var (
 	ErrIFacesNotFound        = errors.New("cant get interfaces")
 	ErrIFacesAddressNotFound = errors.New("cant get interfaces address")
 	ErrHostnameNotFound      = errors.New("cant get hostname")
+	ErrValidation            = errors.New("validation error")
 )
 
 type Error struct {
@@ -63,6 +65,14 @@ type TreeService interface {
 	GetTreePredictionResponse(ctx context.Context, treeID string, withSensorData bool) (*tree.TreeSensorPrediction, error)
 }
 
+type AuthService interface {
+	Service
+	LoginRequest(ctx context.Context, loginRequest *auth.LoginRequest) (*auth.LoginResp, error)
+	ClientTokenCallback(ctx context.Context, loginCallback *auth.LoginCallback) (*auth.ClientToken, error)
+	Register(ctx context.Context, user *auth.RegisterUser) (*auth.User, error)
+	RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
+}
+
 type Service interface {
 	Ready() bool
 }
@@ -71,6 +81,7 @@ type Services struct {
 	InfoService InfoService
 	MqttService MqttService
 	TreeService TreeService
+	AuthService AuthService
 }
 
 func (s *Services) AllServicesReady() bool {

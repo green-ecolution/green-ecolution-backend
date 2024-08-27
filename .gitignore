@@ -269,3 +269,4 @@ $RECYCLE.BIN/
 data/mongo
 generated
 docs
+config.yaml

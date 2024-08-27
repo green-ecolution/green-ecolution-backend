@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities/tree"
@@ -14,6 +15,7 @@ var (
 	ErrIFacesNotFound        = errors.New("cant get interfaces")
 	ErrIFacesAddressNotFound = errors.New("cant get interfaces address")
 	ErrHostnameNotFound      = errors.New("cant get hostname")
+	ErrCannotGetAppURL       = errors.New("cannot get app url")
 
 	ErrMongoCannotCreateClient = errors.New("cannot create mongo client")
 	ErrMongoCannotPingClient   = errors.New("cannot ping mongo client")
@@ -39,8 +41,15 @@ type TreeRepository interface {
 	GetAll(ctx context.Context) ([]*tree.Tree, error)
 }
 
+type AuthRepository interface {
+	CreateUser(ctx context.Context, user *auth.User, password string, role *[]string) (*auth.User, error)
+	RetrospectToken(ctx context.Context, token string) (*auth.IntroSpectTokenResult, error)
+	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*auth.ClientToken, error)
+}
+
 type Repository struct {
 	Info   InfoRepository
 	Sensor SensorRepository
 	Tree   TreeRepository
+	Auth   AuthRepository
 }

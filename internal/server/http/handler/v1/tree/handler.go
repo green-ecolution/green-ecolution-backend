@@ -21,6 +21,7 @@ import (
 // @Failure		404			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
 // @Router			/v1/tree [get]
+// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllTree(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
@@ -49,6 +50,7 @@ func GetAllTree(svc service.TreeService) fiber.Handler {
 // @Failure		404			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
 // @Router			/v1/tree/{treeID} [get]
+// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
@@ -77,6 +79,7 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Failure		404			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
 // @Router			/v1/tree/{treeID}/prediction [get]
+// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetTreePredictions(svc service.TreeService) fiber.Handler {
 	var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 

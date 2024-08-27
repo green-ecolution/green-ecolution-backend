@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
-	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -24,20 +24,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth/keycloak"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb"
 )
 
 var version = "develop"
-
-func setSwaggerInfo(appURL *url.URL) {
-	docs.SwaggerInfo.Title = "Green Ecolution Management API"
-	docs.SwaggerInfo.Version = version
-	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
-	docs.SwaggerInfo.Host = appURL.Host
-	docs.SwaggerInfo.BasePath = "/api"
-	docs.SwaggerInfo.Schemes = []string{"https"}
-}
 
 //	@title			Green Space Management API
 //	@version		develop
@@ -51,21 +43,21 @@ func setSwaggerInfo(appURL *url.URL) {
 // @license.name	GPL-3.0
 // @license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
 func main() {
-	cfg, err := config.GetAppConfig()
+	cfg, err := config.InitConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Printf("Version: %s\n", version)
-	if cfg.Development {
+	if cfg.Server.Development {
 		fmt.Println("Running in dev mode")
-		cfg.LogLevel = "debug"
+		cfg.Server.Logs.Level = "debug"
 	}
 
-	setSwaggerInfo(cfg.URL)
-
-	logg := logger.CreateLogger(os.Stdout, cfg.LogFormat, cfg.LogLevel)
+	logg := logger.CreateLogger(os.Stdout, cfg.Server.Logs.Format, cfg.Server.Logs.Level)
 	slog.SetDefault(logg)
+
+	setSwaggerInfo(cfg.Server.AppURL)
 
 	slog.Info("Starting Green Space Management API")
 
@@ -84,10 +76,13 @@ func main() {
 		return
 	}
 
+	keycloakRepo := keycloak.NewKeycloakRepository(&cfg.IdentityAuth)
+
 	repositories := &storage.Repository{
 		Info:   localRepo.Info,
 		Sensor: dbRepo.Sensor,
 		Tree:   dbRepo.Tree,
+		Auth:   keycloakRepo,
 	}
 
 	services := domain.NewService(cfg, repositories)
@@ -110,4 +105,25 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+func setSwaggerInfo(appURL string) {
+	slog.Info("Setting Swagger info")
+
+	var schemes []string
+	var trimmedAppURL string
+	if strings.HasPrefix(appURL, "http://") {
+		schemes = []string{"http"}
+		trimmedAppURL = strings.TrimPrefix(appURL, "http://")
+	} else {
+		trimmedAppURL = strings.TrimPrefix(appURL, "https://")
+		schemes = []string{"https"}
+	}
+
+	docs.SwaggerInfo.Title = "Green Ecolution Management API"
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
+	docs.SwaggerInfo.Host = trimmedAppURL
+	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.Schemes = schemes
 }

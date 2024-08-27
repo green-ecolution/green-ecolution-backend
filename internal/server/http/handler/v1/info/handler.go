@@ -20,6 +20,7 @@ import (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/info [get]
+// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAppInfo(svc service.InfoService) fiber.Handler {
 	var mapper info.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
 
