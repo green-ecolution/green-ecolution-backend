@@ -86,14 +86,11 @@ jobs:
         with:
           go-version: stable
 
-      - name: Install mockery
-        run: go install github.com/vektra/mockery/v2@v2.43.2
-
-      - name: Install swagger
-        run: go install github.com/swaggo/swag/cmd/swag@latest
+      - name: Install dependencies
+        run: make setup/ci
 
       - name: Go generate
-        run: go generate
+        run: make generate
 
       - name: Move swagger docs
         run: mv ./docs/swagger.json ./docs/api-docs.json

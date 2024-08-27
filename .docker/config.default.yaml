@@ -1,0 +1,36 @@
+dashboard:
+  title: Green Ecolution Dashboard
+
+server:
+  port: 3000
+  development: false
+  app_url: http://localhost:3030
+  logs:
+    level: info
+    format: text
+  database:
+    host: localhost
+    port: 5432
+    username: postgres
+    password: super_secret_password
+    name: green_ecolution_db
+
+auth:
+  keycloak:
+    baseurl: https://auth.green-ecolution.de
+    realm: green-ecolution-dev
+    client_id: green-ecolution-backend
+    client_secret: secret_secret_secret
+    realm_public_key: secret_secret_secret
+    frontend:
+      auth_url: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
+      token_url: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/token
+      client_id: green-ecolution-frontend
+      client_secret: secret_secret_secret
+
+mqtt:
+  broker: eu1.cloud.thethings.industries:1883
+  client_id: tree-sensor
+  username: sgr-students@zde
+  password: secret_secret_secret
+  topic: v3/sgr-students@zde/devices/tree-sensor/up

@@ -1,23 +1,18 @@
 #############################################
 # Preparer go
 #############################################
-FROM golang:1.22-alpine AS preparer_go
+FROM golang:1.23-alpine AS preparer_go
 
 ARG MOCKER_VERSION="v2.43.2"
 
 WORKDIR /app/build
 
 # install build dependencies
-RUN go install github.com/vektra/mockery/v2@${MOCKER_VERSION}
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-
-COPY ./go.mod ./go.sum ./
-RUN go mod download
+COPY ./Makefile ./go.mod ./go.sum ./
+RUN apk add --no-cache make git
+RUN make setup/ci
 
 COPY . .
-
-RUN go generate
-
 
 #############################################
 # Builder go
@@ -30,15 +25,12 @@ ARG APP_GIT_BRANCH="stage-deployment"
 ARG APP_GIT_REPOSITORY="https://github.com/green-ecolution/green-ecolution-backend"
 ARG APP_BUILD_TIME="unknown"
 
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags " \
-  -X main.version=$APP_VERSION \
-  -X github.com/green-ecolution/green-ecolution-backend/internal/storage/local/info.version=$APP_VERSION \
-  -X github.com/green-ecolution/green-ecolution-backend/internal/storage/local/info.gitCommit=$APP_GIT_COMMIT \
-  -X github.com/green-ecolution/green-ecolution-backend/internal/storage/local/info.gitBranch=$APP_GIT_BRANCH \
-  -X github.com/green-ecolution/green-ecolution-backend/internal/storage/local/info.gitRepository=$APP_GIT_REPOSITORY \
-  -X github.com/green-ecolution/green-ecolution-backend/internal/storage/local/info.buildTime=$APP_BUILD_TIME \
-  " -o /app/build/backend
-
+RUN make build \
+    APP_VERSION=${APP_VERSION} \
+    APP_GIT_COMMIT=${APP_GIT_COMMIT} \
+    APP_GIT_BRANCH=${APP_GIT_BRANCH} \
+    APP_GIT_REPOSITORY=${APP_GIT_REPOSITORY} \
+    APP_BUILD_TIME=${APP_BUILD_TIME}
 
 #############################################
 # Runner go
@@ -53,6 +45,7 @@ RUN adduser -D gorunner
 USER gorunner
 WORKDIR /app
 
-COPY --chown=gorunner:gorunner --from=builder /app/build/backend /app/backend
+COPY --chown=gorunner:gorunner --from=builder /app/build/.docker/config.default.yaml /app/config.yaml
+COPY --chown=gorunner:gorunner --from=builder /app/build/bin/green-ecolution-backend /app/backend
 
 ENTRYPOINT [ "/app/backend" ]

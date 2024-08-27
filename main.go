@@ -34,6 +34,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
 	"github.com/jackc/pgx/v5"
+	"github.com/spf13/viper"
 )
 
 var version = "develop"
@@ -56,6 +57,9 @@ func main() {
 	}
 
 	fmt.Printf("Version: %s\n", version)
+
+	fmt.Println("Server Port: ", viper.GetInt("server.port"))
+
 	if cfg.Server.Development {
 		fmt.Println("Running in dev mode")
 		cfg.Server.Logs.Level = "debug"

@@ -16,12 +16,7 @@ func InitViper() (*Config, error) {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			return nil, ErrViperConfigFileNotFound
-		} else {
-			slog.Error("Error reading config file", "error", err)
-			return nil, ErrViperConfigFileError
-		}
+		return nil, err
 	}
 
 	var cfg Config
