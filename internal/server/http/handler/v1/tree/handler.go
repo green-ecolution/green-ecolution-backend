@@ -20,7 +20,7 @@ import (
 // @Failure		500			{object}	HTTPError
 // @Router			/v1/tree [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllTree(svc service.TreeService) fiber.Handler {
+func GetAllTree(_ service.TreeService) fiber.Handler {
 	// var mapper tree.TreeHTTPMapper = &generated.TreeHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
