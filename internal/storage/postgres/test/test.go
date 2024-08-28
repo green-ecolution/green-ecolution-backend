@@ -9,6 +9,7 @@ import (
 
 	"github.com/docker/go-connections/nat"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 	"github.com/testcontainers/testcontainers-go"
@@ -26,7 +27,7 @@ var (
 	dbPort int
 )
 
-func SetupPostgresContainer() (func(), *sql.DB, error) {
+func SetupPostgresContainer() (func(), *pgx.Conn, error) {
 	slog.Info("Setting up postgres container")
 	ctx := context.Background()
 
@@ -81,27 +82,31 @@ func SetupPostgresContainer() (func(), *sql.DB, error) {
 	dbPort = p.Int()
 
 	dbUrl := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
+	pgxConn, err := pgx.Connect(ctx, dbUrl)
+	if err != nil {
+		return closeFunc, pgxConn, err
+	}
+
+	if err := pgxConn.Ping(ctx); err != nil {
+		slog.Error("Error pinging PostgreSQL", "error", err)
+		return closeFunc, pgxConn, err
+	}
+
 	db, err := sql.Open("pgx", dbUrl)
 	if err != nil {
 		slog.Error("Error connecting to PostgreSQL", "error", err)
-		return closeFunc, db, err
+		return closeFunc, pgxConn, err
 	}
-
-	if err := db.Ping(); err != nil {
-		slog.Error("Error pinging PostgreSQL", "error", err)
-		return closeFunc, db, err
-	}
-
 	execMigration(db)
 
-	return closeFunc, db, nil
+	return closeFunc, pgxConn, nil
 }
 
 func execMigration(db *sql.DB) error {
 	slog.Info("Executing migration")
 	// Execute migration with make migrate/up
 
-  rootDir := utils.RootDir()
+	rootDir := utils.RootDir()
 	migrationPath := fmt.Sprintf("%s/internal/storage/postgres/migrations/", rootDir)
 	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/", rootDir)
 
