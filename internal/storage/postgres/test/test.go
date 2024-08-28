@@ -27,7 +27,7 @@ var (
 	dbPort int
 )
 
-func SetupPostgresContainer() (func(), *pgx.Conn, error) {
+func SetupPostgresContainer(seedPath string) (func(), *pgx.Conn, error) {
 	slog.Info("Setting up postgres container")
 	ctx := context.Background()
 
@@ -97,18 +97,17 @@ func SetupPostgresContainer() (func(), *pgx.Conn, error) {
 		slog.Error("Error connecting to PostgreSQL", "error", err)
 		return closeFunc, pgxConn, err
 	}
-	execMigration(db)
+	execMigration(db, seedPath)
 
 	return closeFunc, pgxConn, nil
 }
 
-func execMigration(db *sql.DB) error {
+func execMigration(db *sql.DB, seedPath string) error {
 	slog.Info("Executing migration")
 	// Execute migration with make migrate/up
 
 	rootDir := utils.RootDir()
 	migrationPath := fmt.Sprintf("%s/internal/storage/postgres/migrations/", rootDir)
-	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/", rootDir)
 
 	if err := goose.Up(db, migrationPath); err != nil {
 		slog.Error("Error executing migration", "error", err)

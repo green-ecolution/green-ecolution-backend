@@ -65,10 +65,10 @@ func (r *ImageRepository) Create(ctx context.Context, image *entities.Image) (*e
 
 func (r *ImageRepository) Update(ctx context.Context, image *entities.Image) (*entities.Image, error) {
 	params := &sqlc.UpdateImageParams{
-		ID:  image.ID,
-		Url: image.URL,
-    Filename: image.Filename,
-    MimeType: image.MimeType,
+		ID:       image.ID,
+		Url:      image.URL,
+		Filename: image.Filename,
+		MimeType: image.MimeType,
 	}
 
 	if err := r.querier.UpdateImage(ctx, params); err != nil {
@@ -79,5 +79,5 @@ func (r *ImageRepository) Update(ctx context.Context, image *entities.Image) (*e
 }
 
 func (r *ImageRepository) Delete(ctx context.Context, id int32) error {
-  return r.querier.DeleteImage(ctx, id)
+	return r.querier.DeleteImage(ctx, id)
 }

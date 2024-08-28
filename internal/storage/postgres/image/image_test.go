@@ -2,12 +2,15 @@ package image
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/test"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -19,7 +22,9 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	close, db, err := test.SetupPostgresContainer()
+	rootDir := utils.RootDir()
+	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/image", rootDir)
+	close, db, err := test.SetupPostgresContainer(seedPath)
 	if err != nil {
 		slog.Error("Error setting up postgres container", "error", err)
 		panic(err)
@@ -32,7 +37,6 @@ func TestMain(m *testing.M) {
 }
 
 func TestImageRepository(t *testing.T) {
-
 	t.Run("GetAll", func(t *testing.T) {
 		// given
 		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
@@ -163,73 +167,93 @@ func TestImageRepository(t *testing.T) {
 			MimeType: utils.P("image/jpeg"),
 		}
 
-    // when
-    actual, err := repo.Update(context.Background(), image)
+		// when
+		actual, err := repo.Update(context.Background(), image)
 
-    // then
-    assert.NoError(t, err)
-    assert.NotNil(t, actual)
-    assert.NotNil(t, actual.CreatedAt)
-    assert.NotNil(t, actual.UpdatedAt)
-    assert.EqualValues(t, actual.ID, 1)
-    assert.EqualValues(t, actual.URL, image.URL)
-    assert.EqualValues(t, actual.Filename, image.Filename)
-    assert.EqualValues(t, actual.MimeType, image.MimeType)
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, actual)
+		assert.NotNil(t, actual.CreatedAt)
+		assert.NotNil(t, actual.UpdatedAt)
+		assert.EqualValues(t, actual.ID, 1)
+		assert.EqualValues(t, actual.URL, image.URL)
+		assert.EqualValues(t, actual.Filename, image.Filename)
+		assert.EqualValues(t, actual.MimeType, image.MimeType)
 	})
 
 	t.Run("Delete", func(t *testing.T) {
-    // given
-    repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
+		// given
+		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
 
-    // when
-    err := repo.Delete(context.Background(), 1)
+		// when
+		err := repo.Delete(context.Background(), 1)
 
-    // then
-    assert.NoError(t, err)
+		// then
+		assert.NoError(t, err)
 
-    // check if image was deleted
-    _, err = repo.GetByID(context.Background(), 1)
-    assert.Error(t, err)
+		// check if image was deleted
+		_, err = repo.GetByID(context.Background(), 1)
+		assert.Error(t, err)
 	})
 }
 
 func TestImageRepositoryErrors(t *testing.T) {
-  t.Run("call get by id with not existing id should return error", func(t *testing.T) {
-    // given
-    repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
+	t.Run("call get by id with not existing id should return error", func(t *testing.T) {
+		// given
+		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
 
-    // when
-    _, err := repo.GetByID(context.Background(), 999)
+		// when
+		_, err := repo.GetByID(context.Background(), 999)
 
-    // then
-    assert.Error(t, err)
-  })
+		// then
+		assert.Error(t, err)
+	})
 
-  t.Run("call update with not existing id should return error", func(t *testing.T) {
-    // given
-    repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-    image := &entities.Image{
-      ID:       999,
-      URL:      "http://example.com/image.jpg",
-      Filename: utils.P("image.jpg"),
-      MimeType: utils.P("image/jpeg"),
-    }
+	t.Run("call update with not existing id should return error", func(t *testing.T) {
+		// given
+		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
+		image := &entities.Image{
+			ID:       999,
+			URL:      "http://example.com/image.jpg",
+			Filename: utils.P("image.jpg"),
+			MimeType: utils.P("image/jpeg"),
+		}
 
-    // when
-    _, err := repo.Update(context.Background(), image)
+		// when
+		_, err := repo.Update(context.Background(), image)
 
-    // then
-    assert.Error(t, err)
-  })
+		// then
+		assert.Error(t, err)
+	})
 
-  t.Run("call delete with not existing id should not return error", func(t *testing.T) {
-    // given
-    repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
+	t.Run("call delete with not existing id should not return error", func(t *testing.T) {
+		// given
+		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
 
-    // when
-    err := repo.Delete(context.Background(), 999)
+		// when
+		err := repo.Delete(context.Background(), 999)
 
-    // then
-    assert.NoError(t, err)
-  })
+		// then
+		assert.NoError(t, err)
+	})
+}
+
+func TestNewImageRepositoryMappers(t *testing.T) {
+	type args struct {
+		iMapper mapper.InternalImageRepoMapper
+	}
+	tests := []struct {
+		name string
+		args args
+		want ImageRepositoryMappers
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewImageRepositoryMappers(tt.args.iMapper); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewImageRepositoryMappers() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
