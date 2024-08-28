@@ -17,3 +17,8 @@ packages:
       SensorRepository:
       TreeRepository:
       AuthRepository: 
+  github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc:
+    config: 
+      dir: ./internal/storage/postgres/_sqlc/_mock
+    interfaces:
+      Querier:

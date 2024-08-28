@@ -17,6 +17,7 @@ VALUES
 INSERT INTO sensors (id, status) VALUES (1, 'online');
 INSERT INTO sensors (id, status) VALUES (2, 'offline');
 INSERT INTO sensors (id, status) VALUES (3, 'unknown');
+INSERT INTO sensors (id, status) VALUES (4, 'online');
 
 INSERT INTO trees (tree_cluster_id, sensor_id, age, height_above_sea_level, planting_year, species, tree_number, latitude, longitude, geometry)
 VALUES 
