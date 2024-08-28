@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
 	"github.com/testcontainers/testcontainers-go"
@@ -30,7 +31,7 @@ func SetupPostgresContainer() (func(), *sql.DB, error) {
 	ctx := context.Background()
 
 	req := testcontainers.ContainerRequest{
-    Image:        "postgis/postgis",
+		Image:        "postgis/postgis",
 		ExposedPorts: []string{"5432/tcp", "55432/tcp"},
 		Env: map[string]string{
 			"POSTGRES_USER":     dbUsername,
@@ -40,10 +41,10 @@ func SetupPostgresContainer() (func(), *sql.DB, error) {
 		AutoRemove: true,
 		Cmd:        []string{"postgres", "-c", "fsync=off"},
 		WaitingFor: wait.ForSQL(nat.Port("5432/tcp"), "pgx", func(host string, port nat.Port) string {
-      return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUsername, dbPassword, host, port.Port(), dbName)
+			return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUsername, dbPassword, host, port.Port(), dbName)
 		}).
 			WithStartupTimeout(time.Second * 30).
-      WithPollInterval(time.Microsecond * 100).
+			WithPollInterval(time.Microsecond * 100).
 			WithQuery("SELECT 1"),
 	}
 
@@ -100,10 +101,19 @@ func execMigration(db *sql.DB) error {
 	slog.Info("Executing migration")
 	// Execute migration with make migrate/up
 
-  if err := goose.Up(db, "migrations"); err != nil {
-    slog.Error("Error executing migration", "error", err)
-    return err
-  }
+  rootDir := utils.RootDir()
+	migrationPath := fmt.Sprintf("%s/internal/storage/postgres/migrations/", rootDir)
+	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/", rootDir)
+
+	if err := goose.Up(db, migrationPath); err != nil {
+		slog.Error("Error executing migration", "error", err)
+		return err
+	}
+
+	if err := goose.Up(db, seedPath, goose.WithNoVersioning()); err != nil {
+		slog.Error("Error executing seed", "error", err)
+		return err
+	}
 
 	return nil
 }
