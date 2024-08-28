@@ -9,6 +9,7 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
 // goverter:ignoreMissing
 type InternalImageRepoMapper interface {
+  // goverter:map Url URL
 	FromSql(src *sqlc.Image) *entities.Image
 	FromSqlList(src []*sqlc.Image) []*entities.Image
 }

@@ -13,7 +13,7 @@ INSERT INTO images (
 
 -- name: UpdateImage :exec
 UPDATE images SET
-  url = $2
+  url = $2, filename = $3, mime_type = $4
 WHERE id = $1;
 
 -- name: DeleteImage :exec
