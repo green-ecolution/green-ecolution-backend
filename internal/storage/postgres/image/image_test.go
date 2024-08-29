@@ -14,23 +14,30 @@ import (
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/test"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
+  seedPath string
+  dbURL    string
 	querier sqlc.Querier
 )
 
 func TestMain(m *testing.M) {
 	rootDir := utils.RootDir()
-	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/image", rootDir)
-	close, db, err := test.SetupPostgresContainer(seedPath)
+	seedPath = fmt.Sprintf("%s/internal/storage/postgres/test/seed/image", rootDir)
+	close, url, err := test.SetupPostgresContainer(seedPath)
 	if err != nil {
 		slog.Error("Error setting up postgres container", "error", err)
 		panic(err)
 	}
 	defer close()
-
+  dbURL = *url
+  db, err := pgx.Connect(context.Background(), dbURL)
+  if err != nil {
+    os.Exit(1)
+  }
 	querier = sqlc.New(db)
 
 	os.Exit(m.Run())

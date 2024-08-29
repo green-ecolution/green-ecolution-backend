@@ -15,11 +15,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/test"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
 	querier      sqlc.Querier
+  seedPath     string
+  dbUrl        string
 	mapperRepo   SensorRepositoryMappers
 	defaultField struct {
 		querier                 sqlc.Querier
@@ -30,13 +33,18 @@ var (
 func TestMain(m *testing.M) {
 	rootDir := utils.RootDir()
 	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/sensor", rootDir)
-	close, db, err := test.SetupPostgresContainer(seedPath)
+	close, url, err := test.SetupPostgresContainer(seedPath)
 	if err != nil {
 		slog.Error("Error setting up postgres container", "error", err)
 		panic(err)
 	}
 	defer close()
 
+  dbUrl = *url
+  db, err := pgx.Connect(context.Background(), dbUrl)
+  if err != nil {
+    os.Exit(1)
+  }
 	querier = sqlc.New(db)
 	mapperRepo = SensorRepositoryMappers{
 		mapper: &generated.InternalSensorRepoMapperImpl{},
@@ -155,6 +163,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -213,6 +222,7 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -283,6 +293,7 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -362,6 +373,7 @@ func TestSensorRepository_GetSensorByStatus(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -399,6 +411,7 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -435,6 +448,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -484,6 +498,7 @@ func TestSensorRepository_Create(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -532,6 +547,7 @@ func TestSensorRepository_Update(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
@@ -573,6 +589,7 @@ func TestSensorRepository_Delete(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+    test.ResetDatabase(dbUrl, seedPath)
 		t.Run(tt.name, func(t *testing.T) {
 			r := &SensorRepository{
 				querier:                 tt.fields.querier,
