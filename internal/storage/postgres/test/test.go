@@ -27,7 +27,7 @@ var (
 	dbPort int
 )
 
-func SetupPostgresContainer(seedPath string) (func(), *pgx.Conn, error) {
+func SetupPostgresContainer(seedPath string) (func(), *string, error) {
 	slog.Info("Setting up postgres container")
 	ctx := context.Background()
 
@@ -84,22 +84,22 @@ func SetupPostgresContainer(seedPath string) (func(), *pgx.Conn, error) {
 	dbUrl := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
 	pgxConn, err := pgx.Connect(ctx, dbUrl)
 	if err != nil {
-		return closeFunc, pgxConn, err
+		return closeFunc, &dbUrl, err
 	}
 
 	if err := pgxConn.Ping(ctx); err != nil {
 		slog.Error("Error pinging PostgreSQL", "error", err)
-		return closeFunc, pgxConn, err
+		return closeFunc, &dbUrl, err
 	}
 
 	db, err := sql.Open("pgx", dbUrl)
 	if err != nil {
 		slog.Error("Error connecting to PostgreSQL", "error", err)
-		return closeFunc, pgxConn, err
+		return closeFunc, &dbUrl, err
 	}
 	execMigration(db, seedPath)
 
-	return closeFunc, pgxConn, nil
+	return closeFunc, &dbUrl, nil
 }
 
 func execMigration(db *sql.DB, seedPath string) error {
@@ -124,4 +124,36 @@ func execMigration(db *sql.DB, seedPath string) error {
 
 func dbUrl() string {
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
+}
+
+
+func ResetDatabase(dbUrl, seedPath string) error {
+  slog.Info("Resetting database")
+  db, err := sql.Open("pgx", dbUrl)
+  if err != nil {
+    return err
+  }
+
+  ClearDatabase(dbUrl)
+  execMigration(db, seedPath)
+
+  return nil
+}
+
+func ClearDatabase(dbUrl string) error {
+  slog.Info("Clearing database")
+  db, err := sql.Open("pgx", dbUrl)
+  if err != nil {
+    return err
+  }
+
+	rootDir := utils.RootDir()
+	migrationPath := fmt.Sprintf("%s/internal/storage/postgres/migrations/", rootDir)
+
+	if err := goose.Down(db, migrationPath); err != nil {
+    slog.Error("Error executing seed", "error", err)
+    return err
+  }
+
+  return nil
 }
