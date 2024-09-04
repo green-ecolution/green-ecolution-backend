@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
@@ -108,7 +107,7 @@ func TestLoginRequest(t *testing.T) {
 		}
 
 		redirectURL, _ := url.Parse("http://localhost:3000/auth/callback")
-		loginRequest := &domain.LoginRequest{
+		loginRequest := &entities.LoginRequest{
 			RedirectURL: redirectURL,
 		}
 
@@ -119,7 +118,7 @@ func TestLoginRequest(t *testing.T) {
 		query.Add("redirect_uri", loginRequest.RedirectURL.String())
 		respURL.RawQuery = query.Encode()
 
-		expected := &domain.LoginResp{
+		expected := &entities.LoginResp{
 			LoginURL: respURL,
 		}
 
@@ -145,7 +144,7 @@ func TestLoginRequest(t *testing.T) {
 			},
 		}
 
-		loginRequest := &domain.LoginRequest{
+		loginRequest := &entities.LoginRequest{
 			RedirectURL: &url.URL{
 				Scheme: "http",
 				Host:   "localhost:3000",
@@ -169,7 +168,7 @@ func TestClientTokenCallback(t *testing.T) {
 	t.Run("should return client token", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		loginCallback := &domain.LoginCallback{
+		loginCallback := &entities.LoginCallback{
 			Code: "code",
 			RedirectURL: &url.URL{
 				Scheme: "http",
@@ -178,7 +177,7 @@ func TestClientTokenCallback(t *testing.T) {
 			},
 		}
 
-		expected := &domain.ClientToken{
+		expected := &entities.ClientToken{
 			AccessToken: "access_token",
 		}
 
@@ -198,7 +197,7 @@ func TestClientTokenCallback(t *testing.T) {
 	t.Run("should return error when validation error", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		loginCallback := &domain.LoginCallback{}
+		loginCallback := &entities.LoginCallback{}
 
 		authRepo := storageMock.NewMockAuthRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
@@ -214,7 +213,7 @@ func TestClientTokenCallback(t *testing.T) {
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{}
-		loginCallback := &domain.LoginCallback{
+		loginCallback := &entities.LoginCallback{
 			Code: "code",
 			RedirectURL: &url.URL{
 				Scheme: "http",
