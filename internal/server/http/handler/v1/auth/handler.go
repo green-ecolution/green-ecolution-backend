@@ -83,7 +83,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 // @Success	200				{object}	auth.ClientTokenResponse
 // @Failure	400				{object}	HTTPError
 // @Failure	500				{object}	HTTPError
-// @Router		/v1/user/token [post]
+// @Router		/v1/user/login/token [post]
 func RequestToken(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
