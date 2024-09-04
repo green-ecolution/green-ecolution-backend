@@ -9,6 +9,7 @@ import (
 
 type AuthService struct {
 	authRepository storage.AuthRepository
+  userRepo       storage.UserRepository
 	validator      *validator.Validate
 	cfg            *config.IdentityAuthConfig
 }

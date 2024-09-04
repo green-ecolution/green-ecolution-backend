@@ -13,7 +13,7 @@ func (s *AuthService) Register(ctx context.Context, user *domain.RegisterUser) (
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	createdUser, err := s.authRepository.CreateUser(ctx, &user.User, user.Password, user.Roles)
+	createdUser, err := s.userRepo.Create(ctx, &user.User, user.Password, user.Roles)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to create user").Error())
 	}

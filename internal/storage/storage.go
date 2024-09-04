@@ -29,15 +29,10 @@ type InfoRepository interface {
 }
 
 type UserRepository interface {
-	BasicCrudRepository[entities.User]
-	GetByUsername(ctx context.Context, username string) (*entities.User, error)
-	GetByEmail(ctx context.Context, email string) (*entities.User, error)
+  Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error)
+  GetByAccessToken(ctx context.Context, token string) (*entities.User, error)
 
-	UpdatePassword(ctx context.Context, id int32, password string) error
-	Deactivate(ctx context.Context, id int32) error
-	Activate(ctx context.Context, id int32) error
-	AddRole(ctx context.Context, userID, roleID int32) error
-	RemoveRole(ctx context.Context, userID, roleID int32) error
+  RemoveSession(ctx context.Context, token string) error
 }
 
 type RoleRepository interface {
@@ -81,7 +76,6 @@ type FlowerbedRepository interface {
 }
 
 type AuthRepository interface {
-	CreateUser(ctx context.Context, user *entities.User, password string, role *[]string) (*entities.User, error)
 	RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error)
 	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error)
 }

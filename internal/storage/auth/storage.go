@@ -8,8 +8,10 @@ import (
 
 func NewRepository(cfg *config.IdentityAuthConfig) *storage.Repository {
 	authRepo := keycloak.NewKeycloakRepository(cfg)
+  userRepo := keycloak.NewUserRepository(cfg)
 
 	return &storage.Repository{
 		Auth: authRepo,
+    User: userRepo,
 	}
 }
