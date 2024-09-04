@@ -1,10 +1,13 @@
+#!make
+include .env
+
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := green-ecolution-backend
-APP_VERSION := 0.0.1
-APP_GIT_COMMIT := $(shell git rev-parse HEAD)
-APP_GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-APP_GIT_REPOSITORY := https://github.com/green-ecolution/green-ecolution-backend
-APP_BUILD_TIME := $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+APP_VERSION ?= 0.0.1
+APP_GIT_COMMIT ?= $(shell git rev-parse HEAD)
+APP_GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
+APP_GIT_REPOSITORY ?= https://github.com/green-ecolution/green-ecolution-backend
+APP_BUILD_TIME ?= $(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 define GOFLAGS
 -ldflags=" \
 	-s -w \
@@ -31,6 +34,21 @@ build/all: generate
 	@echo "Building for all..."
 	GOARCH=amd64 GOOS=darwin go build $(GOFLAGS) -o bin/$(BINARY_NAME)-darwin $(MAIN_PACKAGE_PATH)
 	GOARCH=amd64 GOOS=linux go build $(GOFLAGS) -o bin/$(BINARY_NAME)-linux $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=windows go build $(GOFLAGS) -o bin/$(BINARY_NAME)-windows $(MAIN_PACKAGE_PATH)
+
+.PHONY: build/darwin
+build/darwin: generate
+	@echo "Building for darwin..."
+	GOARCH=amd64 GOOS=darwin go build $(GOFLAGS) -o bin/$(BINARY_NAME)-darwin $(MAIN_PACKAGE_PATH)
+
+.PHONY: build/linux
+build/linux: generate
+	@echo "Building for linux..."
+	GOARCH=amd64 GOOS=linux go build $(GOFLAGS) -o bin/$(BINARY_NAME)-linux $(MAIN_PACKAGE_PATH)
+
+.PHONY: build/windows
+build/windows: generate
+	@echo "Building for windows..."
 	GOARCH=amd64 GOOS=windows go build $(GOFLAGS) -o bin/$(BINARY_NAME)-windows $(MAIN_PACKAGE_PATH)
 
 .PHONY: build
