@@ -1,5 +1,5 @@
-#!make
-include .env
+ENV ?= dev
+-include .env.$(ENV)
 
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := green-ecolution-backend
