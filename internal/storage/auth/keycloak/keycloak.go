@@ -23,7 +23,7 @@ func loginRestAPIClient(ctx context.Context, baseURL, clientID, clientSecret, re
 	client := gocloak.NewClient(baseURL)
 
 	token, err := client.LoginClient(ctx, clientID, clientSecret, realm)
-  if err != nil {
+	if err != nil {
 		return nil, errors.Wrap(err, "failed to login to keycloak")
 	}
 	return token, nil

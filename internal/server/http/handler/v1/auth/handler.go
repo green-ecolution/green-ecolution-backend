@@ -10,15 +10,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-// @Summary	Requst to login
-// @Descriptio	Requst to login to the system. Returns a Login URL
-// @Tags		Login
+// @Summary	Request to login
+// @Descriptio	Request to login to the system. Returns a Login URL
+// @Tags		User
 // @Produce	json
 // @Param		redirect_url	query		string	true	"Redirect URL"
 // @Success	200				{object}	auth.LoginResponse
 // @Failure	400				{object}	HTTPError
 // @Failure	500				{object}	HTTPError
-// @Router		/v1/login [get]
+// @Router		/v1/user/login [get]
 func Login(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -44,9 +44,38 @@ func Login(svc service.AuthService) fiber.Handler {
 	}
 }
 
-// @Summary	Requst to login
-// @Descriptio	Requst a access token
-// @Tags		Login
+// @Summary	Logout from the system
+// @Descriptio	Logout from the system
+// @Tags		User
+// @Param		body	body		auth.LogoutRequest	true	"Logout information"
+// @Success	200		{string}	string				"OK"
+// @Failure	400		{object}	HTTPError
+// @Failure	500		{object}	HTTPError
+// @Router		/v1/user/logout [post]
+func Logout(svc service.AuthService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		req := auth.LogoutRequest{}
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+		}
+
+		domainReq := domain.LogoutRequest{
+			RefreshToken: req.RefreshToken,
+		}
+
+		err := svc.LogoutRequest(ctx, &domainReq)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
+		}
+
+		return c.SendStatus(fiber.StatusOK)
+	}
+}
+
+// @Summary	Validate login code and request a access token
+// @Descriptio	Validate login code and request a access token
+// @Tags		User
 // @Accept		json
 // @Produce	json
 // @Param		body			body		auth.LoginTokenRequest	true	"Callback information"
@@ -54,7 +83,7 @@ func Login(svc service.AuthService) fiber.Handler {
 // @Success	200				{object}	auth.ClientTokenResponse
 // @Failure	400				{object}	HTTPError
 // @Failure	500				{object}	HTTPError
-// @Router		/v1/token [post]
+// @Router		/v1/user/token [post]
 func RequestToken(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()

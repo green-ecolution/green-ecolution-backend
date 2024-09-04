@@ -9,15 +9,16 @@ import (
 
 type AuthService struct {
 	authRepository storage.AuthRepository
-  userRepo       storage.UserRepository
+	userRepo       storage.UserRepository
 	validator      *validator.Validate
 	cfg            *config.IdentityAuthConfig
 }
 
-func NewAuthService(repo storage.AuthRepository, cfg *config.IdentityAuthConfig) service.AuthService {
+func NewAuthService(repo storage.AuthRepository, userRepo storage.UserRepository, cfg *config.IdentityAuthConfig) service.AuthService {
 	return &AuthService{
 		validator:      validator.New(),
 		authRepository: repo,
+		userRepo:       userRepo,
 		cfg:            cfg,
 	}
 }

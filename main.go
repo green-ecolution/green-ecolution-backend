@@ -95,10 +95,10 @@ func main() {
 		return
 	}
 
-  keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
+	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
 	repositories := &storage.Repository{
-		Auth:        keycloakRepo.Auth,
-    User:        keycloakRepo.User,
+		Auth: keycloakRepo.Auth,
+		User: keycloakRepo.User,
 
 		Info:        localRepo.Info,
 		Sensor:      postgresRepo.Sensor,

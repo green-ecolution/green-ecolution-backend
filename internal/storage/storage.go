@@ -29,10 +29,10 @@ type InfoRepository interface {
 }
 
 type UserRepository interface {
-  Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error)
-  GetByAccessToken(ctx context.Context, token string) (*entities.User, error)
+	Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error)
+	GetByAccessToken(ctx context.Context, token string) (*entities.User, error)
 
-  RemoveSession(ctx context.Context, token string) error
+	RemoveSession(ctx context.Context, token string) error
 }
 
 type RoleRepository interface {

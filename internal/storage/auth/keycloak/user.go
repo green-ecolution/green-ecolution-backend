@@ -15,23 +15,23 @@ import (
 )
 
 type UserRepository struct {
-  cfg *config.IdentityAuthConfig
+	cfg *config.IdentityAuthConfig
 }
 
 func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
-  return &UserRepository{
-    cfg: cfg,
-  }
+	return &UserRepository{
+		cfg: cfg,
+	}
 }
 
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error) {
 	slog.Debug("Creating user in keycloak", "user", user)
 	keyCloakUser := userToKeyCloakUser(user)
 
-  clientToken, err := loginRestAPIClient(ctx, r.cfg.KeyCloak.BaseURL, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
-  if err != nil {
-    return nil, err
-  }
+	clientToken, err := loginRestAPIClient(ctx, r.cfg.KeyCloak.BaseURL, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
+	if err != nil {
+		return nil, err
+	}
 
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, *keyCloakUser)
@@ -66,32 +66,32 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 }
 
 func (r *UserRepository) GetByAccessToken(ctx context.Context, token string) (*entities.User, error) {
-  client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-  kUser, err := client.GetUserInfo(ctx, token, r.cfg.KeyCloak.Realm)
-  if err != nil {
-    return nil, errors.Wrap(err, "failed to get user info from token")
-  }
+	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	kUser, err := client.GetUserInfo(ctx, token, r.cfg.KeyCloak.Realm)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get user info from token")
+	}
 
-  user := &entities.User{
-    Username: *kUser.PreferredUsername,
-    FirstName: *kUser.GivenName,
-    LastName: *kUser.FamilyName,
-    Email: *kUser.Email,
-    EmailVerified: *kUser.EmailVerified,
-    // TODO: Handle Additional Fields
-    // PhoneNumber: ...,
-    // EmployeeID: ...,
-  }
+	user := &entities.User{
+		Username:      *kUser.PreferredUsername,
+		FirstName:     *kUser.GivenName,
+		LastName:      *kUser.FamilyName,
+		Email:         *kUser.Email,
+		EmailVerified: *kUser.EmailVerified,
+		// TODO: Handle Additional Fields
+		// PhoneNumber: ...,
+		// EmployeeID: ...,
+	}
 
-  return user, nil
+	return user, nil
 }
 
 func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string) error {
-  client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-  if err := client.Logout(ctx, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm, refreshToken); err != nil {
-    return errors.Wrap(err, "failed to logout")
-  }
-  return nil
+	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	if err := client.Logout(ctx, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm, refreshToken); err != nil {
+		return errors.Wrap(err, "failed to logout")
+	}
+	return nil
 }
 
 func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
