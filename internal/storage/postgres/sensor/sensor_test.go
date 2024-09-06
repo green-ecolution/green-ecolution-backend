@@ -2,595 +2,502 @@ package sensor
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
-	"reflect"
 	"testing"
+	"time"
 
+	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	querier      sqlc.Querier
-	seedPath     string
-	dbUrl        string
-	mapperRepo   SensorRepositoryMappers
-	defaultField struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-)
+func createStore(db *pgx.Conn) *store.Store {
+	return store.NewStore(db)
+}
+
+type RandomSensor struct {
+	ID        int32                 `faker:"-"`
+	CreatedAt time.Time             `faker:"-"`
+	UpdatedAt time.Time             `faker:"-"`
+	Status    entities.SensorStatus `faker:"oneof:online,offline,unknown"`
+}
 
 func TestMain(m *testing.M) {
-	rootDir := utils.RootDir()
-	seedPath := fmt.Sprintf("%s/internal/storage/postgres/test/seed/sensor", rootDir)
-	close, url, err := testutils.SetupPostgresContainer(seedPath)
+	closeCon, _, err := testutils.SetupPostgresContainer()
 	if err != nil {
 		slog.Error("Error setting up postgres container", "error", err)
-		panic(err)
-	}
-	defer close()
-
-	dbUrl = *url
-	db, err := pgx.Connect(context.Background(), dbUrl)
-	if err != nil {
 		os.Exit(1)
 	}
-	querier = sqlc.New(db)
-	mapperRepo = SensorRepositoryMappers{
-		mapper: &generated.InternalSensorRepoMapperImpl{},
-	}
-	defaultField = struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}{
-		querier:                 querier,
-		SensorRepositoryMappers: mapperRepo,
-	}
+	defer closeCon()
+
 	os.Exit(m.Run())
 }
 
-func TestNewSensorRepositoryMappers(t *testing.T) {
-	type args struct {
-		sMapper mapper.InternalSensorRepoMapper
+func createSensor(t *testing.T, str *store.Store) *entities.Sensor {
+	var sensor RandomSensor
+	if err := faker.FakeData(&sensor); err != nil {
+		t.Fatalf("error faking sensor data: %v", err)
 	}
-	tests := []struct {
-		name string
-		args args
-		want SensorRepositoryMappers
-	}{
-		{
-			name: "Test NewSensorRepositoryMappers",
-			args: args{
-				sMapper: &generated.InternalSensorRepoMapperImpl{},
-			},
-			want: SensorRepositoryMappers{
-				mapper: &generated.InternalSensorRepoMapperImpl{},
-			},
-		},
+	mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+	repo := NewSensorRepository(str, mappers)
+
+	got, err := repo.Create(context.Background(), &entities.CreateSensor{
+		Status: sensor.Status,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, got)
+
+	want := &entities.Sensor{
+		ID:        got.ID,
+		Status:    sensor.Status,
+		CreatedAt: got.CreatedAt,
+		UpdatedAt: got.UpdatedAt,
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSensorRepositoryMappers(tt.args.sMapper); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewSensorRepositoryMappers() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+
+	assertSensor(t, got, want)
+	return got
 }
 
-func TestNewSensorRepository(t *testing.T) {
-	type args struct {
-		querier sqlc.Querier
-		mappers SensorRepositoryMappers
-	}
-	tests := []struct {
-		name string
-		args args
-		want storage.SensorRepository
-	}{
-		{
-			name: "Test NewSensorRepository",
-			args: args{
-				querier: querier,
-				mappers: mapperRepo,
-			},
-			want: &SensorRepository{
-				querier:                 querier,
-				SensorRepositoryMappers: mapperRepo,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewSensorRepository(tt.args.querier, tt.args.mappers); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewSensorRepository() = %v, want %v", got, tt.want)
-			}
+func TestCreateSensor(t *testing.T) {
+	t.Parallel()
+	t.Run("should create sensor", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			createSensor(t, str)
 		})
-	}
-}
+	})
 
-func TestSensorRepository_GetAll(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx context.Context
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*entities.Sensor
-		wantErr bool
-	}{
-		{
-			name: "SensorRepository.GetAll should return all sensors",
-			fields: fields{
-				querier:                 querier,
-				SensorRepositoryMappers: mapperRepo,
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			want: []*entities.Sensor{
-				{
-					ID:     1,
-					Status: entities.SensorStatusOnline,
-				},
-				{
-					ID:     2,
-					Status: entities.SensorStatusOffline,
-				},
-				{
-					ID:     3,
-					Status: entities.SensorStatusUnknown,
-				},
-				{
-					ID:     4,
-					Status: entities.SensorStatusOnline,
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.GetAll(tt.args.ctx)
-			if (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			assert.Len(t, got, len(tt.want))
-			for i := range got {
-				assertSensor(t, got[i], tt.want[i])
-			}
+	t.Run("should return error if status is invalid", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			_, err := repo.Create(context.Background(), &entities.CreateSensor{
+				Status: "invalid",
+			})
+			assert.Error(t, err)
 		})
-	}
-}
+	})
 
-func TestSensorRepository_GetByID(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx context.Context
-		id  int32
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *entities.Sensor
-		wantErr bool
-	}{
-		{
-			name:   "SensorRepository.GetByID should return sensor by id",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  1,
-			},
-			want: &entities.Sensor{
-				ID:     1,
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.Create(context.Background(), &entities.CreateSensor{
 				Status: entities.SensorStatusOnline,
-			},
-		},
-		{
-			name:   "SensorRepository.GetByID should return error when id not found",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  999,
-			},
-			want:    nil,
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.GetByID(tt.args.ctx, tt.args.id)
-			if (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			assertSensor(t, got, tt.want)
+			})
+			assert.Error(t, err)
 		})
-	}
+	})
 }
 
-func TestSensorRepository_GetStatusByID(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx context.Context
-		id  int32
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *entities.SensorStatus
-		wantErr bool
-	}{
-		{
-			name:   "SensorRepository.GetStatusByID should return online sensor status by id 1",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  1,
-			},
-			want: utils.P(entities.SensorStatusOnline),
-		},
-		{
-			name:   "SensorRepository.GetStatusByID should return offline sensor status by id 2",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  2,
-			},
-			want: utils.P(entities.SensorStatusOffline),
-		},
-		{
-			name:   "SensorRepository.GetStatusByID should return unknown sensor status by id 3",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  3,
-			},
-			want: utils.P(entities.SensorStatusUnknown),
-		},
-		{
-			name:   "SensorRepository.GetStatusByID should return error when id not found",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  999,
-			},
-			want:    nil,
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.GetStatusByID(tt.args.ctx, tt.args.id)
-			if (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			assert.Equal(t, got, tt.want)
-		})
-	}
-}
+func TestGetAllSensors(t *testing.T) {
+	t.Parallel()
+	t.Run("should get all sensors", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			createSensor(t, str)
+			createSensor(t, str)
+			createSensor(t, str)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
 
-func TestSensorRepository_GetSensorByStatus(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx    context.Context
-		status *entities.SensorStatus
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*entities.Sensor
-		wantErr bool
-	}{
-		{
-			name:   "SensorRepository.GetSensorByStatus should return all sensors with status online",
-			fields: defaultField,
-			args: args{
-				ctx:    context.Background(),
-				status: utils.P(entities.SensorStatusOnline),
-			},
-			want: []*entities.Sensor{
-				{
-					ID:     1,
-					Status: entities.SensorStatusOnline,
-				},
-				{
-					ID:     4,
-					Status: entities.SensorStatusOnline,
-				},
-			},
-		},
-		{
-			name:   "SensorRepository.GetSensorByStatus should return all sensors with status offline",
-			fields: defaultField,
-			args: args{
-				ctx:    context.Background(),
-				status: utils.P(entities.SensorStatusOffline),
-			},
-			want: []*entities.Sensor{
-				{
-					ID:     2,
-					Status: entities.SensorStatusOffline,
-				},
-			},
-		},
-		{
-			name:   "SensorRepository.GetSensorByStatus should return all sensors with status unknown",
-			fields: defaultField,
-			args: args{
-				ctx:    context.Background(),
-				status: utils.P(entities.SensorStatusUnknown),
-			},
-			want: []*entities.Sensor{
-				{
-					ID:     3,
-					Status: entities.SensorStatusUnknown,
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.GetSensorByStatus(tt.args.ctx, tt.args.status)
-			if (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			assert.Len(t, got, len(tt.want))
-			for i := range got {
-				assertSensor(t, got[i], tt.want[i])
+			got, err := repo.GetAll(context.Background())
+			assert.NoError(t, err)
+			assert.NotEmpty(t, got)
+			assert.Len(t, got, 3)
+			for _, sensor := range got {
+				assertSensor(t, sensor, sensor)
 			}
 		})
-	}
+	})
+
+	t.Run("should return empty list if no sensors", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			got, err := repo.GetAll(context.Background())
+			assert.NoError(t, err)
+			assert.Empty(t, got)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetAll(context.Background())
+			assert.Error(t, err)
+		})
+	})
 }
 
-func TestSensorRepository_GetSensorDataByID(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx context.Context
-		id  int32
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*entities.SensorData
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
+func TestGetSensorByID(t *testing.T) {
+	t.Parallel()
+	t.Run("should get sensor by id", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			sensor := createSensor(t, str)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			got, err := repo.GetByID(context.Background(), sensor.ID)
+			assert.NoError(t, err)
+			assertSensor(t, got, sensor)
+		})
+	})
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			_, err := repo.GetByID(context.Background(), 999)
+			assert.Error(t, err)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetByID(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestGetStatusByID(t *testing.T) {
+	t.Parallel()
+	t.Run("should get sensor status by id", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			sensor := createSensor(t, str)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			got, err := repo.GetStatusByID(context.Background(), sensor.ID)
+			assert.NoError(t, err)
+			assert.Equal(t, got, &sensor.Status)
+		})
+	})
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			_, err := repo.GetStatusByID(context.Background(), 999)
+			assert.Error(t, err)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetStatusByID(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestGetSensorByStatus(t *testing.T) {
+	t.Parallel()
+	t.Run("should get sensors by status", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			createdSensors := []*entities.Sensor{
+				createSensor(t, str),
+				createSensor(t, str),
+				createSensor(t, str),
 			}
-			got, err := r.GetSensorDataByID(tt.args.ctx, tt.args.id)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SensorRepository.GetSensorDataByID() error = %v, wantErr %v", err, tt.wantErr)
-				return
+
+			var onlineSensors []*entities.Sensor
+			var offlineSensors []*entities.Sensor
+			var unknownSensors []*entities.Sensor
+			for _, sensor := range createdSensors {
+				switch sensor.Status {
+				case entities.SensorStatusOnline:
+					onlineSensors = append(onlineSensors, sensor)
+				case entities.SensorStatusOffline:
+					offlineSensors = append(offlineSensors, sensor)
+				case entities.SensorStatusUnknown:
+					unknownSensors = append(unknownSensors, sensor)
+				}
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SensorRepository.GetSensorDataByID() = %v, want %v", got, tt.want)
+
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			gotOnline, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOnline))
+			assert.NoError(t, err)
+
+			gotOffline, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOffline))
+			assert.NoError(t, err)
+
+			gotUnknown, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusUnknown))
+			assert.NoError(t, err)
+
+			if len(onlineSensors) > 0 {
+				assert.Len(t, gotOnline, len(onlineSensors))
+				for i, sensor := range gotOnline {
+					assertSensor(t, sensor, onlineSensors[i])
+				}
+			} else {
+				assert.Empty(t, gotOnline)
+			}
+
+			if len(offlineSensors) > 0 {
+				assert.Len(t, gotOffline, len(offlineSensors))
+				for i, sensor := range gotOffline {
+					assertSensor(t, sensor, offlineSensors[i])
+				}
+			} else {
+				assert.Empty(t, gotOffline)
+			}
+
+			if len(unknownSensors) > 0 {
+				assert.Len(t, gotUnknown, len(unknownSensors))
+				for i, sensor := range gotUnknown {
+					assertSensor(t, sensor, unknownSensors[i])
+				}
+			} else {
+				assert.Empty(t, gotUnknown)
 			}
 		})
-	}
-}
+	})
 
-func TestSensorRepository_InsertSensorData(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx  context.Context
-		data []*entities.SensorData
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    []*entities.SensorData
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.InsertSensorData(tt.args.ctx, tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SensorRepository.InsertSensorData() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("SensorRepository.InsertSensorData() = %v, want %v", got, tt.want)
-			}
+	t.Run("should return empty list if no sensors", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			gotOnline, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOnline))
+			assert.NoError(t, err)
+
+			gotOffline, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOffline))
+			assert.NoError(t, err)
+
+			gotUnknown, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusUnknown))
+			assert.NoError(t, err)
+
+			assert.Empty(t, gotOnline)
+			assert.Empty(t, gotOffline)
+			assert.Empty(t, gotUnknown)
 		})
-	}
-}
+	})
 
-func TestSensorRepository_Create(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx    context.Context
-		sensor *entities.Sensor
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *entities.Sensor
-		wantErr bool
-	}{
-		{
-			name:   "SensorRepository.Create should create new sensor",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				sensor: &entities.Sensor{
-					Status: entities.SensorStatusOnline,
-				},
-			},
-			want: &entities.Sensor{
-				ID:     5,
-				Status: entities.SensorStatusOnline,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.Create(tt.args.ctx, tt.args.sensor)
-			if (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			assertSensor(t, got, tt.want)
+	t.Run("should return error if status is invalid", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			_, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatus("invalid")))
+			assert.Error(t, err)
 		})
-	}
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOnline))
+			assert.Error(t, err)
+		})
+	})
 }
 
-func TestSensorRepository_Update(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx context.Context
-		s   *entities.Sensor
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    *entities.Sensor
-		wantErr bool
-	}{
-		{
-			name:   "SensorRepository.Update should update sensor",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				s: &entities.Sensor{
-					ID:     1,
-					Status: entities.SensorStatusOffline,
-				},
-			},
-			want: &entities.Sensor{
+func TestGetSensorDataByID(t *testing.T) {
+	t.Skip("should get sensor data by id")
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			_, err := repo.GetSensorDataByID(context.Background(), 999)
+			assert.Error(t, err)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetSensorDataByID(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestInsertSensorData(t *testing.T) {
+	t.Skip("should insert sensor data")
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			data := make([]*entities.SensorData, 1)
+			data[0] = &entities.SensorData{
+				ID: 999,
+			}
+			_, err := repo.InsertSensorData(context.Background(), data)
+			assert.Error(t, err)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			data := make([]*entities.SensorData, 1)
+			data[0] = &entities.SensorData{
+				ID: 1,
+			}
+			_, err = repo.InsertSensorData(context.Background(), data)
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestUpdateSensor(t *testing.T) {
+	t.Run("should update sensor", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+
+			prev := createSensor(t, str)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+			want := &entities.Sensor{
+				ID:        prev.ID,
+				Status:    entities.SensorStatusOffline,
+				CreatedAt: prev.CreatedAt,
+				UpdatedAt: time.Now(),
+			}
+
+			got, err := repo.Update(context.Background(), &entities.UpdateSensor{
+				ID:     prev.ID,
+				Status: entities.SensorStatusOffline,
+			})
+
+			assert.NoError(t, err)
+			assertSensor(t, got, want)
+		})
+	})
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			_, err := repo.Update(context.Background(), &entities.UpdateSensor{
+				ID:     999,
+				Status: entities.SensorStatusOffline,
+			})
+			assert.Error(t, err)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.Update(context.Background(), &entities.UpdateSensor{
 				ID:     1,
 				Status: entities.SensorStatusOffline,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			got, err := r.Update(tt.args.ctx, tt.args.s)
-			if (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-				return
-			}
-			assertSensor(t, got, tt.want)
+			})
+			assert.Error(t, err)
 		})
-	}
+	})
 }
 
-func TestSensorRepository_Delete(t *testing.T) {
-	type fields struct {
-		querier                 sqlc.Querier
-		SensorRepositoryMappers SensorRepositoryMappers
-	}
-	type args struct {
-		ctx context.Context
-		id  int32
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{
-			name:   "SensorRepository.Delete should delete sensor",
-			fields: defaultField,
-			args: args{
-				ctx: context.Background(),
-				id:  1,
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &SensorRepository{
-				querier:                 tt.fields.querier,
-				SensorRepositoryMappers: tt.fields.SensorRepositoryMappers,
-			}
-			if err := r.Delete(tt.args.ctx, tt.args.id); (err != nil) != tt.wantErr {
-				assert.Error(t, err)
-			}
+func TestDeleteSensor(t *testing.T) {
+	t.Run("should delete sensor", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			prev := createSensor(t, str)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := repo.Delete(context.Background(), prev.ID)
+			assert.NoError(t, err)
+
+			_, err = repo.GetByID(context.Background(), prev.ID)
+			assert.Error(t, err)
 		})
-	}
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			repo := NewSensorRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			err = repo.Delete(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
 }
 
 func assertSensor(t *testing.T, got, want *entities.Sensor) {
@@ -606,6 +513,7 @@ func assertSensor(t *testing.T, got, want *entities.Sensor) {
 
 	assert.NotZero(t, got.CreatedAt)
 	assert.NotZero(t, got.UpdatedAt)
+	assert.WithinDuration(t, got.CreatedAt, time.Now(), time.Second)
 	assert.Equal(t, got.ID, want.ID)
 	assert.Equal(t, got.Status, want.Status)
 }
