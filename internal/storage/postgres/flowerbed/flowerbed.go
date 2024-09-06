@@ -261,6 +261,10 @@ func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
 	return r.querier.DeleteFlowerbed(ctx, id)
 }
 
+func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
+  return r.querier.ArchiveFlowerbed(ctx, id)
+}
+
 // Map sensor and images entity to domain flowerbed
 func mapSensorAndImages(ctx context.Context, r *FlowerbedRepository, f *entities.Flowerbed) error {
 	if err := mapImages(ctx, r, f); err != nil {

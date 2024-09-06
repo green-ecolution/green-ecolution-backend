@@ -19,10 +19,6 @@ import (
 	sensorMapperImpl "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
 )
 
-var (
-	dbURL string
-)
-
 type RandomFlowerbed struct {
 	ID             int32          `faker:"-"`
 	CreatedAt      time.Time      `faker:"-"`
@@ -87,15 +83,12 @@ func mapperRepo() FlowerbedMappers {
 }
 
 func TestMain(m *testing.M) {
-	closeCon, url, err := testutils.SetupPostgresContainer()
+	closeCon, _, err := testutils.SetupPostgresContainer()
 	if err != nil {
 		slog.Error("Error setting up postgres container", "error", err)
 		os.Exit(1)
 	}
 	defer closeCon()
-
-	dbURL = *url
-
 	initFaker()
 
 	os.Exit(m.Run())
@@ -423,15 +416,49 @@ func TestDelete(t *testing.T) {
 			assert.Error(t, err)
 		})
 	})
+}
 
-	t.Run("should not return error when flowerbed not found", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+func TestGetBySensorID(t *testing.T) {
+  t.Parallel()
+  t.Run("should get flowerbed by sensor id", func(t *testing.T) {
+    testutils.WithTx(t, func(querier *sqlc.Queries) {
+      want := createFlowerbed(t, querier)
 
-			err := repo.Delete(context.Background(), 999)
+      repo := NewFlowerbedRepository(querier, mapperRepo())
+      got, err := repo.GetSensorByFlowerbedID(context.Background(), want.Sensor.ID)
+
       assert.NoError(t, err)
-		})
-	})
+      assert.Equal(t, want.Sensor, got)
+    })
+  })
+
+  t.Run("should return error when flowerbed not found", func(t *testing.T) {
+    testutils.WithTx(t, func(querier *sqlc.Queries) {
+      repo := NewFlowerbedRepository(querier, mapperRepo())
+
+      _, err := repo.GetSensorByFlowerbedID(context.Background(), 999)
+      assert.Error(t, err)
+    })
+  })
+}
+
+
+func TestArchive(t *testing.T) {
+  t.Parallel()
+  t.Run("should archive flowerbed", func(t *testing.T) {
+    testutils.WithTx(t, func(querier *sqlc.Queries) {
+      want := createFlowerbed(t, querier)
+
+      repo := NewFlowerbedRepository(querier, mapperRepo())
+      err := repo.Archive(context.Background(), want.ID)
+
+      assert.NoError(t, err)
+
+      got, err := repo.GetByID(context.Background(), want.ID)
+      assert.NoError(t, err)
+      assert.True(t, got.Archived)
+    })
+  })
 }
 
 func assertFlowerbed(t *testing.T, got, want *entities.Flowerbed) {
