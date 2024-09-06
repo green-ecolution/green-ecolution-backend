@@ -151,7 +151,7 @@ func (r *TreeClusterRepository) UpdateLastWatered(ctx context.Context, id int32,
 	return nil
 }
 
-func UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error {
+func (r *TreeClusterRepository) UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error {
 	// TODO: implement
 
 	return nil

@@ -14,10 +14,11 @@ import (
 type EntityType string
 
 const (
-	Image     EntityType = "image"
-	Sensor    EntityType = "sensor"
-	Flowerbed EntityType = "flowerbed"
-  TreeCluster EntityType = "treecluster"
+	Sensor      EntityType = "sensor"
+	Image       EntityType = "image"
+	Flowerbed   EntityType = "flowerbed"
+	TreeCluster EntityType = "treecluster"
+	Tree        EntityType = "tree"
 )
 
 type Store struct {
@@ -54,10 +55,10 @@ func (s *Store) HandleError(err error) error {
 			return storage.ErrSensorNotFound
 		case Flowerbed:
 			slog.Error("Flowerbed not found", "error", err, "stack", errors.WithStack(err))
-      return storage.ErrFlowerbedNotFound
-    case TreeCluster:
-      slog.Error("TreeCluster not found", "error", err, "stack", errors.WithStack(err))
-      return storage.ErrTreeClusterNotFound
+			return storage.ErrFlowerbedNotFound
+		case TreeCluster:
+			slog.Error("TreeCluster not found", "error", err, "stack", errors.WithStack(err))
+			return storage.ErrTreeClusterNotFound
 		default:
 			slog.Error("Entity not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrEntityNotFound
@@ -98,4 +99,36 @@ func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error 
 
 func (s *Store) Close() {
 	s.db.Close(context.Background())
+}
+
+func (s *Store) CheckSensorExists(ctx context.Context, sensorID *int32) error {
+	if sensorID != nil {
+		_, err := s.GetSensorByID(ctx, *sensorID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return storage.ErrSensorNotFound
+			} else {
+				slog.Error("Error getting sensor by id", "error", err)
+				return s.HandleError(err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Store) CheckImageExists(ctx context.Context, imageID *int32) error {
+	if imageID != nil {
+		_, err := s.GetImageByID(ctx, *imageID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return storage.ErrImageNotFound
+			} else {
+				slog.Error("Error getting image by id", "error", err)
+				return s.HandleError(err)
+			}
+		}
+	}
+
+	return nil
 }

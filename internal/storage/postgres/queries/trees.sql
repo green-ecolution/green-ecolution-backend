@@ -31,6 +31,16 @@ UPDATE trees SET
   geometry = ST_GeomFromText($11, 4326)
 WHERE id = $1;
 
+-- name: LinkTreeImage :exec
+INSERT INTO tree_images (
+  tree_id, image_id
+) VALUES (
+  $1, $2
+);
+
+-- name: UnlinkTreeImage :exec
+DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2;
+
 -- name: UpdateTreeGeometry :exec
 UPDATE trees SET
   geometry = ST_GeomFromText($2, 4326)
