@@ -10,12 +10,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed/mapper"
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
 	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
+	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 )
 
 type FlowerbedRepository struct {
-	querier *sqlc.Queries
+	store *Store
 	FlowerbedMappers
 }
 
@@ -33,23 +35,24 @@ func NewFlowerbedMappers(fMapper mapper.InternalFlowerbedRepoMapper, iMapper img
 	}
 }
 
-func NewFlowerbedRepository(querier *sqlc.Queries, mappers FlowerbedMappers) storage.FlowerbedRepository {
+func NewFlowerbedRepository(store *Store, mappers FlowerbedMappers) storage.FlowerbedRepository {
+	store.SetEntityType(Flowerbed)
 	return &FlowerbedRepository{
-		querier:          querier,
+		store:            store,
 		FlowerbedMappers: mappers,
 	}
 }
 
 func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed, error) {
-	row, err := r.querier.GetAllFlowerbeds(ctx)
+	row, err := r.store.GetAllFlowerbeds(ctx)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	mapped := r.mapper.FromSqlList(row)
 	for _, f := range mapped {
 		if err := mapSensorAndImages(ctx, r, f); err != nil {
-			return nil, err
+			return nil, r.store.HandleError(err)
 		}
 	}
 
@@ -57,33 +60,36 @@ func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed
 }
 
 func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.Flowerbed, error) {
-	row, err := r.querier.GetFlowerbedByID(ctx, id)
+	row, err := r.store.GetFlowerbedByID(ctx, id)
 	if err != nil {
-		// TODO: Validate the error, it can also be a other error
-		return nil, storage.ErrEntityNotFound
+		return nil, r.store.HandleError(err)
 	}
 
 	f := r.mapper.FromSql(row)
 	if err := mapSensorAndImages(ctx, r, f); err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return f, nil
 }
 
 func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID int32) ([]*entities.Image, error) {
-	row, err := r.querier.GetAllImagesByFlowerbedID(ctx, flowerbedID)
+	row, err := r.store.GetAllImagesByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.imgMapper.FromSqlList(row), nil
 }
 
 func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
-	row, err := r.querier.GetSensorByFlowerbedID(ctx, flowerbedID)
+	row, err := r.store.GetSensorByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrSensorNotFound
+		} else {
+			return nil, r.store.HandleError(err)
+		}
 	}
 
 	return r.sensorMapper.FromSql(row), nil
@@ -103,22 +109,22 @@ func (r *FlowerbedRepository) Create(ctx context.Context, f *entities.CreateFlow
 	}
 
 	if f.SensorID != nil {
-		_, err := r.querier.GetSensorByID(ctx, *f.SensorID)
+		_, err := r.store.GetSensorByID(ctx, *f.SensorID)
 		if err != nil {
-			return nil, storage.ErrSensorNotFound
+			return nil, r.store.HandleError(err)
 		}
 	}
 
 	for _, imgID := range f.ImageIDs {
-		_, err := r.querier.GetImageByID(ctx, imgID)
+		_, err := r.store.GetImageByID(ctx, imgID)
 		if err != nil {
-			return nil, storage.ErrImageNotFound
+			return nil, r.store.HandleError(err)
 		}
 	}
 
-	row, err := r.querier.CreateFlowerbed(ctx, &params)
+	row, err := r.store.CreateFlowerbed(ctx, &params)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	for _, imgID := range f.ImageIDs {
@@ -126,8 +132,8 @@ func (r *FlowerbedRepository) Create(ctx context.Context, f *entities.CreateFlow
 			FlowerbedID: row,
 			ImageID:     imgID,
 		}
-		if err = r.querier.LinkFlowerbedImage(ctx, &params); err != nil {
-			return nil, err
+		if err = r.store.LinkFlowerbedImage(ctx, &params); err != nil {
+			return nil, r.store.HandleError(err)
 		}
 	}
 
@@ -137,17 +143,21 @@ func (r *FlowerbedRepository) Create(ctx context.Context, f *entities.CreateFlow
 func (r *FlowerbedRepository) Update(ctx context.Context, f *entities.UpdateFlowerbed) (*entities.Flowerbed, error) {
 	prev, err := r.GetByID(ctx, f.ID)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	var sensorID *int32
 	if f.SensorID != nil && prev.Sensor != nil {
 		newSensorID := utils.CompareAndUpdate(prev.Sensor.ID, f.SensorID)
 		sensorID = &newSensorID
-		_, err = r.querier.GetSensorByID(ctx, newSensorID) // Check if sensor exists
+		_, err = r.store.GetSensorByID(ctx, newSensorID) // Check if sensor exists
 		if err != nil {
-			slog.Error("failed to get sensor by id. No sensor will be set", "error", err)
-			sensorID = nil
+			if err == storage.ErrSensorNotFound {
+				slog.Error("failed to get sensor by id. No sensor will be set", "error", err)
+				sensorID = nil
+			} else {
+				return nil, r.store.HandleError(err)
+			}
 		}
 	} else if prev.Sensor != nil && f.SensorID == nil {
 		sensorID = &prev.Sensor.ID
@@ -158,9 +168,9 @@ func (r *FlowerbedRepository) Update(ctx context.Context, f *entities.UpdateFlow
 	}
 
 	for _, imgID := range f.ImageIDs {
-		_, err := r.querier.GetImageByID(ctx, imgID) // Check if image exists
+		_, err := r.store.GetImageByID(ctx, imgID) // Check if image exists
 		if err != nil {
-			return nil, storage.ErrImageNotFound
+			return nil, r.store.HandleError(err)
 		}
 	}
 
@@ -176,13 +186,13 @@ func (r *FlowerbedRepository) Update(ctx context.Context, f *entities.UpdateFlow
 		Latitude:       utils.CompareAndUpdate(prev.Latitude, f.Latitude),
 		Longitude:      utils.CompareAndUpdate(prev.Longitude, f.Longitude),
 	}
-	err = r.querier.UpdateFlowerbed(ctx, &params)
+	err = r.store.UpdateFlowerbed(ctx, &params)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	if err = r.updateImages(ctx, prev, f); err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.GetByID(ctx, f.ID)
@@ -193,47 +203,47 @@ func (r *FlowerbedRepository) updateImages(ctx context.Context, prev *entities.F
 		return nil
 	}
 
-  // Unlink the images that are not in the new list
-  for _, img := range prev.Images {
-    found := false
-    for _, newImgID := range f.ImageIDs {
-      if img.ID == newImgID {
-        found = true
-        break
-      }
-    }
+	// Unlink the images that are not in the new list
+	for _, img := range prev.Images {
+		found := false
+		for _, newImgID := range f.ImageIDs {
+			if img.ID == newImgID {
+				found = true
+				break
+			}
+		}
 
-    if !found {
-      args := sqlc.UnlinkFlowerbedImageParams{
-        FlowerbedID: f.ID,
-        ImageID:     img.ID,
-      }
-      if err := r.querier.UnlinkFlowerbedImage(ctx, &args); err != nil {
-        return errors.Wrap(err, "failed to unlink image")
-      }
-    }
-  }
+		if !found {
+			args := sqlc.UnlinkFlowerbedImageParams{
+				FlowerbedID: f.ID,
+				ImageID:     img.ID,
+			}
+			if err := r.store.UnlinkFlowerbedImage(ctx, &args); err != nil {
+				return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
+			}
+		}
+	}
 
-  // Link the images that are in the new list
-  for _, newImgID := range f.ImageIDs {
-    found := false
-    for _, img := range prev.Images {
-      if img.ID == newImgID {
-        found = true
-        break
-      }
-    }
+	// Link the images that are in the new list
+	for _, newImgID := range f.ImageIDs {
+		found := false
+		for _, img := range prev.Images {
+			if img.ID == newImgID {
+				found = true
+				break
+			}
+		}
 
-    if !found {
-      args := sqlc.LinkFlowerbedImageParams{
-        FlowerbedID: f.ID,
-        ImageID:     newImgID,
-      }
-      if err := r.querier.LinkFlowerbedImage(ctx, &args); err != nil {
-        return errors.Wrap(err, "failed to link image")
-      }
-    }
-  }
+		if !found {
+			args := sqlc.LinkFlowerbedImageParams{
+				FlowerbedID: f.ID,
+				ImageID:     newImgID,
+			}
+			if err := r.store.LinkFlowerbedImage(ctx, &args); err != nil {
+				return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
+			}
+		}
+	}
 
 	return nil
 }
@@ -241,7 +251,7 @@ func (r *FlowerbedRepository) updateImages(ctx context.Context, prev *entities.F
 func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
-		return errors.Wrap(err, "failed to get images")
+		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
 	}
 
 	for _, img := range images {
@@ -249,20 +259,20 @@ func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
 			FlowerbedID: id,
 			ImageID:     img.ID,
 		}
-		if err = r.querier.UnlinkFlowerbedImage(ctx, &args); err != nil {
-			return errors.Wrap(err, "failed to unlink image")
+		if err = r.store.UnlinkFlowerbedImage(ctx, &args); err != nil {
+			return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
 		}
 
-		if err = r.querier.DeleteImage(ctx, img.ID); err != nil {
-			return errors.Wrap(err, "failed to delete image")
+		if err = r.store.DeleteImage(ctx, img.ID); err != nil {
+			return r.store.HandleError(errors.Wrap(err, "failed to delete image"))
 		}
 	}
 
-	return r.querier.DeleteFlowerbed(ctx, id)
+	return r.store.DeleteFlowerbed(ctx, id)
 }
 
 func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
-  return r.querier.ArchiveFlowerbed(ctx, id)
+	return r.store.ArchiveFlowerbed(ctx, id)
 }
 
 // Map sensor and images entity to domain flowerbed
@@ -281,7 +291,7 @@ func mapSensorAndImages(ctx context.Context, r *FlowerbedRepository, f *entities
 func mapImages(ctx context.Context, r *FlowerbedRepository, f *entities.Flowerbed) error {
 	images, err := r.GetAllImagesByID(ctx, f.ID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get images")
+		return r.store.HandleError(err)
 	}
 	f.Images = images
 	return nil
@@ -290,7 +300,7 @@ func mapImages(ctx context.Context, r *FlowerbedRepository, f *entities.Flowerbe
 func mapSensor(ctx context.Context, r *FlowerbedRepository, f *entities.Flowerbed) error {
 	sensor, err := r.GetSensorByFlowerbedID(ctx, f.ID)
 	if err != nil {
-		return errors.Wrap(err, "failed to get sensor")
+		return r.store.HandleError(err)
 	}
 	f.Sensor = sensor
 	return nil

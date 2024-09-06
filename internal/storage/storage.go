@@ -14,11 +14,12 @@ var (
 	ErrHostnameNotFound      = errors.New("cant get hostname")
 	ErrCannotGetAppURL       = errors.New("cannot get app url")
 
-	ErrIDNotFound      = errors.New("entity id not found")
-	ErrIDAlreadyExists = errors.New("entity id already exists")
-	ErrEntityNotFound  = errors.New("entity not found")
-	ErrSensorNotFound  = errors.New("sensor not found")
-	ErrImageNotFound   = errors.New("image not found")
+	ErrIDNotFound        = errors.New("entity id not found")
+	ErrIDAlreadyExists   = errors.New("entity id already exists")
+	ErrEntityNotFound    = errors.New("entity not found")
+	ErrSensorNotFound    = errors.New("sensor not found")
+	ErrImageNotFound     = errors.New("image not found")
+	ErrFlowerbedNotFound = errors.New("flowerbed not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("recieve more rows then expected")

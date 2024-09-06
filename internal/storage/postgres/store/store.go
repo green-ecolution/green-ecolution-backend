@@ -16,6 +16,7 @@ type EntityType string
 const (
 	Image  EntityType = "image"
 	Sensor EntityType = "sensor"
+  Flowerbed EntityType = "flowerbed"
 )
 
 type Store struct {
@@ -24,12 +25,15 @@ type Store struct {
 	entityType EntityType
 }
 
-func NewStore(db *pgx.Conn, entityType EntityType) *Store {
+func NewStore(db *pgx.Conn) *Store {
 	return &Store{
 		Queries:    sqlc.New(db),
 		db:         db,
-		entityType: entityType,
 	}
+}
+
+func (s *Store) SetEntityType(entityType EntityType) {
+  s.entityType = entityType
 }
 
 func (s *Store) HandleError(err error) error {
@@ -47,6 +51,9 @@ func (s *Store) HandleError(err error) error {
 		case Sensor:
 			slog.Error("Sensor not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrSensorNotFound
+    case Flowerbed:
+      slog.Error("Flowerbed not found", "error", err, "stack", errors.WithStack(err))
+      return storage.ErrFlowerbedNotFound
 		default:
 			slog.Error("Entity not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrEntityNotFound
