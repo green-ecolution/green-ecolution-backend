@@ -40,10 +40,10 @@ type TreeCluster struct {
 
 type CreateTreeCluster struct {
 	WateringStatus *TreeClusterWateringStatus
-	MoistureLevel  *float64
+	MoistureLevel  float64
 	Region         string
 	Address        string
-	Description    *string
+	Description    string
 	Archived       bool
 	Latitude       float64
 	Longitude      float64
