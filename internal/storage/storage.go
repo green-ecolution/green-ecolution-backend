@@ -80,7 +80,7 @@ type TreeRepository interface {
 }
 
 type SensorRepository interface {
-	BasicCrudRepository[entities.Sensor, entities.Sensor, entities.Sensor]
+	BasicCrudRepository[entities.Sensor, entities.CreateSensor, entities.UpdateSensor]
 	GetStatusByID(ctx context.Context, id int32) (*entities.SensorStatus, error)
 	GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error)
 	GetSensorDataByID(ctx context.Context, id int32) ([]*entities.SensorData, error)

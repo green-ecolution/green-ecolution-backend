@@ -20,7 +20,7 @@ import (
 )
 
 func NewRepository(conn *pgx.Conn) *storage.Repository {
-  store := store.NewStore(conn)
+	store := store.NewStore(conn)
 	querier := sqlc.New(conn)
 
 	treeMappers := tree.NewTreeRepositoryMappers(

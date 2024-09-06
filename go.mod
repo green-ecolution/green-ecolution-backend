@@ -3,7 +3,6 @@ module github.com/green-ecolution/green-ecolution-backend
 go 1.22.4
 
 require (
-	github.com/DATA-DOG/go-txdb v0.2.0
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/docker/go-connections v0.5.0
 	github.com/eclipse/paho.mqtt.golang v1.4.3
