@@ -36,7 +36,7 @@ type CreateFlowerbed struct {
 }
 
 type UpdateFlowerbed struct {
-  ID             int32
+	ID             int32
 	Size           *float64
 	Description    *string
 	NumberOfPlants *int32
@@ -49,4 +49,3 @@ type UpdateFlowerbed struct {
 	SensorID       *int32
 	ImageIDs       []int32
 }
-

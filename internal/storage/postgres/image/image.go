@@ -7,10 +7,11 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type ImageRepository struct {
-	querier sqlc.Querier
+	querier *sqlc.Queries
 	ImageRepositoryMappers
 }
 
@@ -24,7 +25,7 @@ func NewImageRepositoryMappers(iMapper mapper.InternalImageRepoMapper) ImageRepo
 	}
 }
 
-func NewImageRepository(querier sqlc.Querier, mappers ImageRepositoryMappers) storage.ImageRepository {
+func NewImageRepository(querier *sqlc.Queries, mappers ImageRepositoryMappers) storage.ImageRepository {
 	return &ImageRepository{
 		querier:                querier,
 		ImageRepositoryMappers: mappers,
@@ -49,7 +50,7 @@ func (r *ImageRepository) GetByID(ctx context.Context, id int32) (*entities.Imag
 	return r.mapper.FromSql(row), nil
 }
 
-func (r *ImageRepository) Create(ctx context.Context, image *entities.Image) (*entities.Image, error) {
+func (r *ImageRepository) Create(ctx context.Context, image *entities.CreateImage) (*entities.Image, error) {
 	params := &sqlc.CreateImageParams{
 		Url:      image.URL,
 		Filename: image.Filename,
@@ -63,12 +64,25 @@ func (r *ImageRepository) Create(ctx context.Context, image *entities.Image) (*e
 	return r.GetByID(ctx, id)
 }
 
-func (r *ImageRepository) Update(ctx context.Context, image *entities.Image) (*entities.Image, error) {
+func (r *ImageRepository) Update(ctx context.Context, image *entities.UpdateImage) (*entities.Image, error) {
+	prev, err := r.GetByID(ctx, image.ID)
+	if err != nil {
+		return nil, storage.ErrImageNotFound
+	}
+
+	if !hasChanges(prev, image) {
+		return prev, nil
+	}
+
+  if image.URL == nil {
+    image.URL = &prev.URL
+  }
+
 	params := &sqlc.UpdateImageParams{
 		ID:       image.ID,
-		Url:      image.URL,
-		Filename: image.Filename,
-		MimeType: image.MimeType,
+		Url:      *image.URL,
+		Filename: utils.CompareAndUpdate(prev.Filename, &image.Filename),
+		MimeType: utils.CompareAndUpdate(prev.MimeType, &image.MimeType),
 	}
 
 	if err := r.querier.UpdateImage(ctx, params); err != nil {
@@ -80,4 +94,17 @@ func (r *ImageRepository) Update(ctx context.Context, image *entities.Image) (*e
 
 func (r *ImageRepository) Delete(ctx context.Context, id int32) error {
 	return r.querier.DeleteImage(ctx, id)
+}
+
+func hasChanges(p *entities.Image, u *entities.UpdateImage) bool {
+  var url string
+  if u.URL != nil {
+    url = *u.URL
+  } else {
+    url = p.URL
+  }
+
+  return (u.Filename != nil && *u.Filename != *p.Filename) ||
+    (u.MimeType != nil && *u.MimeType != *p.MimeType) ||
+    url != p.URL
 }

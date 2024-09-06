@@ -11,6 +11,7 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
+	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -176,16 +177,16 @@ func createFlowerbed(t *testing.T, querier *sqlc.Queries) *entities.Flowerbed {
 }
 
 func TestCreateFlowerbed(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 	t.Run("should create flowerbed", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			createFlowerbed(t, querier)
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			createFlowerbed(t, q)
 		})
 	})
 
 	t.Run("should return error when sensor not found", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 
 			sensorID := int32(999)
 			_, err := repo.Create(context.Background(), &entities.CreateFlowerbed{
@@ -198,9 +199,8 @@ func TestCreateFlowerbed(t *testing.T) {
 	})
 
 	t.Run("should return error when image not found", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 			imageID := int32(999)
 			_, err := repo.Create(context.Background(), &entities.CreateFlowerbed{
 				ImageIDs: []int32{imageID},
@@ -211,18 +211,31 @@ func TestCreateFlowerbed(t *testing.T) {
 
 		})
 	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.Create(context.Background(), &entities.CreateFlowerbed{
+				Size: 1.5,
+			})
+			assert.Error(t, err)
+		})
+	})
 }
 
 func TestGetAll(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 	t.Run("should get all flowerbeds", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			w1 := createFlowerbed(t, q)
+			w2 := createFlowerbed(t, q)
+			w3 := createFlowerbed(t, q)
 
-			w1 := createFlowerbed(t, querier)
-			w2 := createFlowerbed(t, querier)
-			w3 := createFlowerbed(t, querier)
-
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+			repo := NewFlowerbedRepository(q, mapperRepo())
 			got, err := repo.GetAll(context.Background())
 			assert.NoError(t, err)
 
@@ -234,8 +247,8 @@ func TestGetAll(t *testing.T) {
 	})
 
 	t.Run("should return empty list", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 
 			got, err := repo.GetAll(context.Background())
 
@@ -243,15 +256,27 @@ func TestGetAll(t *testing.T) {
 			assert.Empty(t, got)
 		})
 	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      repo := NewFlowerbedRepository(q, mapperRepo())
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.GetAll(context.Background())
+      assert.Error(t, err)
+    })
+  })
 }
 
 func TestGetByID(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 	t.Run("should get flowerbed by id", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			want := createFlowerbed(t, querier)
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			want := createFlowerbed(t, q)
 
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+			repo := NewFlowerbedRepository(q, mapperRepo())
 			got, err := repo.GetByID(context.Background(), want.ID)
 
 			assert.NoError(t, err)
@@ -260,20 +285,32 @@ func TestGetByID(t *testing.T) {
 	})
 
 	t.Run("should return error when flowerbed not found", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 
 			_, err := repo.GetByID(context.Background(), 999)
 			assert.Error(t, err)
 		})
 	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      repo := NewFlowerbedRepository(q, mapperRepo())
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.GetByID(context.Background(), 1)
+      assert.Error(t, err)
+    })
+  })
 }
 
 func TestUpdate(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 	t.Run("should update flowerbed", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			prev := createFlowerbed(t, querier)
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			prev := createFlowerbed(t, q)
 			want := prev
 			want.Images = []*entities.Image{
 				{
@@ -294,7 +331,7 @@ func TestUpdate(t *testing.T) {
 				},
 			}
 
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+			repo := NewFlowerbedRepository(q, mapperRepo())
 			got, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
 				ID:             want.ID,
 				Size:           &want.Size,
@@ -317,8 +354,8 @@ func TestUpdate(t *testing.T) {
 	})
 
 	t.Run("should only update fields that are not nil", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			prev := createFlowerbed(t, querier)
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			prev := createFlowerbed(t, q)
 
 			want := RandomFlowerbed{}
 			err := faker.FakeData(&want)
@@ -327,7 +364,7 @@ func TestUpdate(t *testing.T) {
 			}
 			want.ID = prev.ID
 
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+			repo := NewFlowerbedRepository(q, mapperRepo())
 			got, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
 				ID:             want.ID,
 				Size:           &want.Size,           // should update size
@@ -365,49 +402,61 @@ func TestUpdate(t *testing.T) {
 		})
 	})
 
-  t.Run("should return error when flowerbed not found", func(t *testing.T) {
-    testutils.WithTx(t, func(querier *sqlc.Queries) {
-      repo := NewFlowerbedRepository(querier, mapperRepo())
+	t.Run("should return error when flowerbed not found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 
-      _, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-        ID: 999,
-      })
-      assert.Error(t, err)
-    })
-  })
+			_, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
+				ID: 999,
+			})
+			assert.Error(t, err)
+		})
+	})
 
-  t.Run("should return error when sensor not found", func(t *testing.T) {
-    testutils.WithTx(t, func(querier *sqlc.Queries) {
-      repo := NewFlowerbedRepository(querier, mapperRepo())
+	t.Run("should return error when sensor not found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 
-      _, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-        ID:       1,
-        SensorID: new(int32),
-      })
-      assert.Error(t, err)
-    })
-  })
+			_, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
+				ID:       1,
+				SensorID: new(int32),
+			})
+			assert.Error(t, err)
+		})
+	})
 
-  t.Run("should return error when image not found", func(t *testing.T) {
-    testutils.WithTx(t, func(querier *sqlc.Queries) {
-      repo := NewFlowerbedRepository(querier, mapperRepo())
+	t.Run("should return error when image not found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
 
-      _, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-        ID:      1,
-        ImageIDs: []int32{999},
-      })
+			_, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
+				ID:       1,
+				ImageIDs: []int32{999},
+			})
+			assert.Error(t, err)
+		})
+	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      repo := NewFlowerbedRepository(q, mapperRepo())
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.Update(context.Background(), &entities.UpdateFlowerbed{ID: 1})
       assert.Error(t, err)
     })
   })
 }
 
 func TestDelete(t *testing.T) {
-  t.Parallel()
+	t.Parallel()
 	t.Run("should delete flowerbed", func(t *testing.T) {
-		testutils.WithTx(t, func(querier *sqlc.Queries) {
-			want := createFlowerbed(t, querier)
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			want := createFlowerbed(t, q)
 
-			repo := NewFlowerbedRepository(querier, mapperRepo())
+			repo := NewFlowerbedRepository(q, mapperRepo())
 			err := repo.Delete(context.Background(), want.ID)
 
 			assert.NoError(t, err)
@@ -416,47 +465,82 @@ func TestDelete(t *testing.T) {
 			assert.Error(t, err)
 		})
 	})
-}
 
-func TestGetBySensorID(t *testing.T) {
-  t.Parallel()
-  t.Run("should get flowerbed by sensor id", func(t *testing.T) {
-    testutils.WithTx(t, func(querier *sqlc.Queries) {
-      want := createFlowerbed(t, querier)
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      repo := NewFlowerbedRepository(q, mapperRepo())
 
-      repo := NewFlowerbedRepository(querier, mapperRepo())
-      got, err := repo.GetSensorByFlowerbedID(context.Background(), want.Sensor.ID)
-
+      err := db.Close(context.Background())
       assert.NoError(t, err)
-      assert.Equal(t, want.Sensor, got)
-    })
-  })
 
-  t.Run("should return error when flowerbed not found", func(t *testing.T) {
-    testutils.WithTx(t, func(querier *sqlc.Queries) {
-      repo := NewFlowerbedRepository(querier, mapperRepo())
-
-      _, err := repo.GetSensorByFlowerbedID(context.Background(), 999)
+      err = repo.Delete(context.Background(), 1)
       assert.Error(t, err)
     })
   })
 }
 
+func TestGetBySensorID(t *testing.T) {
+	t.Parallel()
+	t.Run("should get sensor by flowerbed id", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			want := createFlowerbed(t, q)
+
+			repo := NewFlowerbedRepository(q, mapperRepo())
+			got, err := repo.GetSensorByFlowerbedID(context.Background(), want.Sensor.ID)
+
+			assert.NoError(t, err)
+			assert.Equal(t, want.Sensor, got)
+		})
+	})
+
+	t.Run("should return error when flowerbed not found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			repo := NewFlowerbedRepository(q, mapperRepo())
+
+			_, err := repo.GetSensorByFlowerbedID(context.Background(), 999)
+			assert.Error(t, err)
+		})
+	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      repo := NewFlowerbedRepository(q, mapperRepo())
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.GetSensorByFlowerbedID(context.Background(), 1)
+      assert.Error(t, err)
+    })
+  })
+}
 
 func TestArchive(t *testing.T) {
-  t.Parallel()
-  t.Run("should archive flowerbed", func(t *testing.T) {
-    testutils.WithTx(t, func(querier *sqlc.Queries) {
-      want := createFlowerbed(t, querier)
+	t.Parallel()
+	t.Run("should archive flowerbed", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			want := createFlowerbed(t, q)
 
-      repo := NewFlowerbedRepository(querier, mapperRepo())
-      err := repo.Archive(context.Background(), want.ID)
+			repo := NewFlowerbedRepository(q, mapperRepo())
+			err := repo.Archive(context.Background(), want.ID)
 
+			assert.NoError(t, err)
+
+			got, err := repo.GetByID(context.Background(), want.ID)
+			assert.NoError(t, err)
+			assert.True(t, got.Archived)
+		})
+	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      repo := NewFlowerbedRepository(q, mapperRepo())
+
+      err := db.Close(context.Background())
       assert.NoError(t, err)
 
-      got, err := repo.GetByID(context.Background(), want.ID)
-      assert.NoError(t, err)
-      assert.True(t, got.Archived)
+      err = repo.Archive(context.Background(), 1)
+      assert.Error(t, err)
     })
   })
 }

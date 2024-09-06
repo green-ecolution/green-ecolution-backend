@@ -2,265 +2,337 @@ package image
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
-	"reflect"
 	"testing"
+	"time"
 
+	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
-	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/test"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-  seedPath string
-  dbURL    string
-	querier sqlc.Querier
+	dbURL string
 )
 
+type RandomImage struct {
+	ID        int32     `faker:"-"`
+	CreatedAt time.Time `faker:"-"`
+	UpdatedAt time.Time `faker:"-"`
+	URL       string    `faker:"url"`
+	Filename  *string   `faker:"word"`
+	MimeType  *string   `faker:"oneof:image/png,image/jpeg"`
+}
+
 func TestMain(m *testing.M) {
-	rootDir := utils.RootDir()
-	seedPath = fmt.Sprintf("%s/internal/storage/postgres/test/seed/image", rootDir)
-	close, url, err := test.SetupPostgresContainer(seedPath)
+	closeCon, _, err := testutils.SetupPostgresContainer()
 	if err != nil {
 		slog.Error("Error setting up postgres container", "error", err)
-		panic(err)
+		os.Exit(1)
 	}
-	defer close()
-  dbURL = *url
-  db, err := pgx.Connect(context.Background(), dbURL)
-  if err != nil {
-    os.Exit(1)
-  }
-	querier = sqlc.New(db)
+	defer closeCon()
 
 	os.Exit(m.Run())
 }
 
-func TestImageRepository(t *testing.T) {
-	t.Run("GetAll", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-		expected := []*entities.Image{
-			{
-				ID:       1,
-				URL:      "https://avatars.githubusercontent.com/u/165842746?s=96&v=4",
+func createImage(t *testing.T, querier *sqlc.Queries) *entities.Image {
+	var img entities.Image
+	if err := faker.FakeData(&img); err != nil {
+		t.Fatalf("error faking image data: %v", err)
+	}
+	mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+	repo := NewImageRepository(querier, mappers)
+
+	got, err := repo.Create(context.Background(), &entities.CreateImage{
+		URL:      img.URL,
+		Filename: img.Filename,
+		MimeType: img.MimeType,
+	})
+	assert.NoError(t, err)
+
+	assert.NotNil(t, got)
+	assert.NotZero(t, got.ID)
+	assert.Equal(t, img.URL, got.URL)
+	assert.Equal(t, img.Filename, got.Filename)
+	assert.Equal(t, img.MimeType, got.MimeType)
+	assert.NotZero(t, got.CreatedAt)
+	assert.NotZero(t, got.UpdatedAt)
+
+	return got
+}
+
+func TestCreateImage(t *testing.T) {
+	t.Parallel()
+	t.Run("should create image", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			createImage(t, q)
+		})
+	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+      repo := NewImageRepository(q, mappers)
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.Create(context.Background(), &entities.CreateImage{
+        URL: "https://image.com",
+      })
+      assert.Error(t, err)
+    })
+  })
+}
+
+func TestGetAllImages(t *testing.T) {
+	t.Parallel()
+	t.Run("should get all images", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			createImage(t, q)
+			createImage(t, q)
+			createImage(t, q)
+
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			got, err := repo.GetAll(context.Background())
+			assert.NoError(t, err)
+
+			assert.Len(t, got, 3)
+		})
+	})
+
+	t.Run("should return empty list if no images found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			got, err := repo.GetAll(context.Background())
+			assert.NoError(t, err)
+
+			assert.Len(t, got, 0)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+			_, err = repo.GetAll(context.Background())
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestGetImageByID(t *testing.T) {
+	t.Parallel()
+	t.Run("should get image by id", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			img := createImage(t, q)
+
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			got, err := repo.GetByID(context.Background(), img.ID)
+			assert.NoError(t, err)
+
+			assert.NotNil(t, got)
+			assertImage(t, img, got)
+		})
+	})
+
+	t.Run("should return error if image not found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			_, err := repo.GetByID(context.Background(), 999)
+			assert.Error(t, err)
+		})
+	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+      repo := NewImageRepository(q, mappers)
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.GetByID(context.Background(), 1)
+      assert.Error(t, err)
+    })
+  })
+}
+
+func TestUpdateImage(t *testing.T) {
+	t.Parallel()
+	t.Run("should update image", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			prev := createImage(t, q)
+			args := &entities.UpdateImage{
+				ID:       prev.ID,
+				Filename: utils.P("new-filename"),
+				MimeType: utils.P("image/jpeg"),
+				URL:      utils.P("https://new-url.com"),
+			}
+			want := &entities.Image{
+				ID:        prev.ID,
+				URL:       *args.URL,
+				Filename:  args.Filename,
+				MimeType:  args.MimeType,
+				CreatedAt: prev.CreatedAt,
+			}
+
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			got, err := repo.Update(context.Background(), args)
+			assert.NoError(t, err)
+
+			assert.NotNil(t, got)
+			assert.NotEqual(t, prev, got)
+			assertImage(t, want, got)
+		})
+	})
+
+	t.Run("should only update filled image fields", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			prev := createImage(t, q)
+			args := &entities.UpdateImage{
+				ID:       prev.ID,
+				Filename: utils.P("new-filename"),
+				MimeType: utils.P("image/jpeg"),
+				URL:      nil,
+			}
+			want := &entities.Image{
+				ID:        prev.ID,
+				URL:       prev.URL,
+				Filename:  args.Filename,
+				MimeType:  args.MimeType,
+				CreatedAt: prev.CreatedAt,
+			}
+
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			got, err := repo.Update(context.Background(), args)
+			assert.NoError(t, err)
+
+			assert.NotNil(t, got)
+			assert.NotEqual(t, prev, got)
+			assert.Equal(t, want.Filename, got.Filename)
+			assert.Equal(t, want.MimeType, got.MimeType)
+			assert.Equal(t, prev.URL, got.URL)
+		})
+	})
+
+	t.Run("should return error if image not found", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			img := createImage(t, q)
+			img.ID = 999
+			args := &entities.UpdateImage{
+				ID: img.ID,
+			}
+
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			_, err := repo.Update(context.Background(), args)
+			assert.Error(t, err)
+      assert.ErrorIs(t, err, storage.ErrImageNotFound)
+		})
+	})
+
+	t.Run("should not update if all fields are nil", func(t *testing.T) {
+		testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+			prev := createImage(t, q)
+			args := &entities.UpdateImage{
+				ID:       prev.ID,
+				URL:      nil,
 				Filename: nil,
 				MimeType: nil,
-			},
-			{
-				ID:       2,
-				URL:      "https://app.dev.green-ecolution.de/api/v1/images/avatar.png",
-				Filename: utils.P("avatar.png"),
-				MimeType: utils.P("image/png"),
-			},
-		}
-
-		// when
-		actual, err := repo.GetAll(context.Background())
-
-		// then
-		assert.NoError(t, err)
-		assert.Len(t, actual, len(expected))
-
-		for i, actual := range actual {
-			assert.NotNil(t, actual.CreatedAt)
-			assert.NotNil(t, actual.UpdatedAt)
-
-			assert.EqualValues(t, expected[i].ID, actual.ID)
-			assert.EqualValues(t, expected[i].URL, actual.URL)
-			assert.EqualValues(t, expected[i].Filename, actual.Filename)
-			assert.EqualValues(t, expected[i].MimeType, actual.MimeType)
-		}
-	})
-
-	t.Run("GetByID", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-		expectedID1 := entities.Image{
-			ID:       1,
-			URL:      "https://avatars.githubusercontent.com/u/165842746?s=96&v=4",
-			Filename: nil,
-			MimeType: nil,
-		}
-		expectedID2 := entities.Image{
-			ID:       2,
-			URL:      "https://app.dev.green-ecolution.de/api/v1/images/avatar.png",
-			Filename: utils.P("avatar.png"),
-			MimeType: utils.P("image/png"),
-		}
-
-		// when
-		actualID1, err1 := repo.GetByID(context.Background(), 1)
-		actualID2, err2 := repo.GetByID(context.Background(), 2)
-
-		// then
-		assert.NoError(t, err1)
-		assert.NotNil(t, actualID1)
-		assert.NotNil(t, actualID1.CreatedAt)
-		assert.NotNil(t, actualID1.UpdatedAt)
-		assert.EqualValues(t, expectedID1.ID, actualID1.ID)
-		assert.EqualValues(t, expectedID1.URL, actualID1.URL)
-		assert.EqualValues(t, expectedID1.Filename, actualID1.Filename)
-		assert.EqualValues(t, expectedID1.MimeType, actualID1.MimeType)
-
-		assert.NoError(t, err2)
-		assert.NotNil(t, actualID2)
-		assert.NotNil(t, actualID2.CreatedAt)
-		assert.NotNil(t, actualID2.UpdatedAt)
-		assert.EqualValues(t, expectedID2.ID, actualID2.ID)
-		assert.EqualValues(t, expectedID2.URL, actualID2.URL)
-		assert.EqualValues(t, expectedID2.Filename, actualID2.Filename)
-		assert.EqualValues(t, expectedID2.MimeType, actualID2.MimeType)
-	})
-
-	t.Run("Create", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-		newImage := &entities.Image{
-			URL:      "http://example.com/image.jpg",
-			Filename: utils.P("image.jpg"),
-			MimeType: utils.P("image/jpeg"),
-		}
-
-		// when
-		actual, err := repo.Create(context.Background(), newImage)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, actual)
-		assert.NotNil(t, actual.CreatedAt)
-		assert.NotNil(t, actual.UpdatedAt)
-		assert.EqualValues(t, actual.ID, 3)
-		assert.EqualValues(t, newImage.URL, actual.URL)
-		assert.EqualValues(t, newImage.Filename, actual.Filename)
-		assert.EqualValues(t, newImage.MimeType, actual.MimeType)
-	})
-
-	t.Run("create with null values for filename and mimetype", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-		newImage := &entities.Image{
-			URL: "http://example.com/image.jpg",
-		}
-
-		// when
-		actual, err := repo.Create(context.Background(), newImage)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, actual)
-		assert.NotNil(t, actual.CreatedAt)
-		assert.NotNil(t, actual.UpdatedAt)
-		assert.EqualValues(t, actual.ID, 4)
-		assert.EqualValues(t, newImage.URL, actual.URL)
-		assert.EqualValues(t, newImage.Filename, actual.Filename)
-		assert.EqualValues(t, newImage.MimeType, actual.MimeType)
-	})
-
-	t.Run("Update", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-		image := &entities.Image{
-			ID:       1,
-			URL:      "http://example.com/image.jpg",
-			Filename: utils.P("image.jpg"),
-			MimeType: utils.P("image/jpeg"),
-		}
-
-		// when
-		actual, err := repo.Update(context.Background(), image)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, actual)
-		assert.NotNil(t, actual.CreatedAt)
-		assert.NotNil(t, actual.UpdatedAt)
-		assert.EqualValues(t, actual.ID, 1)
-		assert.EqualValues(t, actual.URL, image.URL)
-		assert.EqualValues(t, actual.Filename, image.Filename)
-		assert.EqualValues(t, actual.MimeType, image.MimeType)
-	})
-
-	t.Run("Delete", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-
-		// when
-		err := repo.Delete(context.Background(), 1)
-
-		// then
-		assert.NoError(t, err)
-
-		// check if image was deleted
-		_, err = repo.GetByID(context.Background(), 1)
-		assert.Error(t, err)
-	})
-}
-
-func TestImageRepositoryErrors(t *testing.T) {
-	t.Run("call get by id with not existing id should return error", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-
-		// when
-		_, err := repo.GetByID(context.Background(), 999)
-
-		// then
-		assert.Error(t, err)
-	})
-
-	t.Run("call update with not existing id should return error", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-		image := &entities.Image{
-			ID:       999,
-			URL:      "http://example.com/image.jpg",
-			Filename: utils.P("image.jpg"),
-			MimeType: utils.P("image/jpeg"),
-		}
-
-		// when
-		_, err := repo.Update(context.Background(), image)
-
-		// then
-		assert.Error(t, err)
-	})
-
-	t.Run("call delete with not existing id should not return error", func(t *testing.T) {
-		// given
-		repo := NewImageRepository(querier, NewImageRepositoryMappers(&imgMapper.InternalImageRepoMapperImpl{}))
-
-		// when
-		err := repo.Delete(context.Background(), 999)
-
-		// then
-		assert.NoError(t, err)
-	})
-}
-
-func TestNewImageRepositoryMappers(t *testing.T) {
-	type args struct {
-		iMapper mapper.InternalImageRepoMapper
-	}
-	tests := []struct {
-		name string
-		args args
-		want ImageRepositoryMappers
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewImageRepositoryMappers(tt.args.iMapper); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewImageRepositoryMappers() = %v, want %v", got, tt.want)
 			}
+
+			want := &entities.Image{
+				ID:        prev.ID,
+				URL:       prev.URL,
+				Filename:  prev.Filename,
+				MimeType:  prev.MimeType,
+				CreatedAt: prev.CreatedAt,
+			}
+
+			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			repo := NewImageRepository(q, mappers)
+
+			got, err := repo.Update(context.Background(), args)
+			assert.NoError(t, err)
+			assertImage(t, want, got)
 		})
-	}
+	})
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+      repo := NewImageRepository(q, mappers)
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      _, err = repo.Update(context.Background(), &entities.UpdateImage{ID: 1})
+      assert.Error(t, err)
+    })
+  })
+}
+
+func TestDeleteImage(t *testing.T) {
+  t.Parallel()
+  t.Run("should delete image", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      img := createImage(t, q)
+
+      mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+      repo := NewImageRepository(q, mappers)
+
+      err := repo.Delete(context.Background(), img.ID)
+      assert.NoError(t, err)
+
+      _, err = repo.GetByID(context.Background(), img.ID)
+      assert.Error(t, err)
+    })
+  })
+
+  t.Run("should return error if query fails", func(t *testing.T) {
+    testutils.WithTx(t, func(q *sqlc.Queries, db *pgx.Conn) {
+      mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+      repo := NewImageRepository(q, mappers)
+
+      err := db.Close(context.Background())
+      assert.NoError(t, err)
+
+      err = repo.Delete(context.Background(), 1)
+      assert.Error(t, err)
+    })
+  })
+}
+
+func assertImage(t *testing.T, want, got *entities.Image) {
+	assert.Equal(t, want.ID, got.ID)
+	assert.Equal(t, want.URL, got.URL)
+	assert.Equal(t, want.Filename, got.Filename)
+	assert.Equal(t, want.MimeType, got.MimeType)
+	assert.Equal(t, want.CreatedAt, got.CreatedAt)
+	assert.NotZero(t, got.UpdatedAt)
 }
