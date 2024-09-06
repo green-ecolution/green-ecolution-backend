@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -119,7 +118,7 @@ func execMigration(db *sql.DB) error {
 }
 
 // WithTx Run tests with a transaction. This function will rollback the transaction after the test is done.
-func WithTx(t *testing.T, fn func(q *sqlc.Queries, db *pgx.Conn)) {
+func WithTx(t *testing.T, fn func(db *pgx.Conn)) {
 	ctx := context.Background()
 	dbURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
 	db, err := pgx.Connect(ctx, dbURL)
@@ -134,10 +133,13 @@ func WithTx(t *testing.T, fn func(q *sqlc.Queries, db *pgx.Conn)) {
 		panic(err)
 	}
 
-	defer db.Close(ctx)
-	querier := sqlc.New(tx)
-
-	fn(querier, db)
+	defer func(db *pgx.Conn, ctx context.Context) {
+		err := db.Close(ctx)
+		if err != nil {
+			panic(err)
+		}
+	}(db, ctx)
+	fn(db)
 
 	if !db.IsClosed() {
 		if err := tx.Rollback(ctx); err != nil {

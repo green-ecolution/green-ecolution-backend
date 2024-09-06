@@ -16,9 +16,15 @@ var (
 
 	ErrIDNotFound      = errors.New("entity id not found")
 	ErrIDAlreadyExists = errors.New("entity id already exists")
-  ErrEntityNotFound  = errors.New("entity not found")
+	ErrEntityNotFound  = errors.New("entity not found")
 	ErrSensorNotFound  = errors.New("sensor not found")
-  ErrImageNotFound   = errors.New("image not found")
+	ErrImageNotFound   = errors.New("image not found")
+
+	ErrUnknowError      = errors.New("unknown error")
+	ErrToManyRows       = errors.New("recieve more rows then expected")
+	ErrConnectionClosed = errors.New("connection is closed")
+	ErrTxClosed         = errors.New("transaction closed")
+	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")
 )
 
 type BasicCrudRepository[T any, C any, U any] interface {
@@ -47,7 +53,7 @@ type RoleRepository interface {
 }
 
 type ImageRepository interface {
-	BasicCrudRepository[entities.Image, entities.Image, entities.Image]
+	BasicCrudRepository[entities.Image, entities.CreateImage, entities.UpdateImage]
 }
 
 type VehicleRepository interface {
@@ -79,6 +85,7 @@ type FlowerbedRepository interface {
 	BasicCrudRepository[entities.Flowerbed, entities.CreateFlowerbed, entities.UpdateFlowerbed]
 	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
+	Archive(ctx context.Context, id int32) error
 }
 
 type AuthRepository interface {
