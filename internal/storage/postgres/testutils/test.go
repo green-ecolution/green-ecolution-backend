@@ -1,13 +1,15 @@
-package test
+package testutils
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
+	"testing"
 	"time"
 
 	"github.com/docker/go-connections/nat"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -27,7 +29,7 @@ var (
 	dbPort int
 )
 
-func SetupPostgresContainer(seedPath string) (func(), *string, error) {
+func SetupPostgresContainer() (close func(), url *string, err error) {
 	slog.Info("Setting up postgres container")
 	ctx := context.Background()
 
@@ -97,14 +99,13 @@ func SetupPostgresContainer(seedPath string) (func(), *string, error) {
 		slog.Error("Error connecting to PostgreSQL", "error", err)
 		return closeFunc, &dbUrl, err
 	}
-	execMigration(db, seedPath)
+	execMigration(db)
 
 	return closeFunc, &dbUrl, nil
 }
 
-func execMigration(db *sql.DB, seedPath string) error {
+func execMigration(db *sql.DB) error {
 	slog.Info("Executing migration")
-	// Execute migration with make migrate/up
 
 	rootDir := utils.RootDir()
 	migrationPath := fmt.Sprintf("%s/internal/storage/postgres/migrations/", rootDir)
@@ -114,46 +115,32 @@ func execMigration(db *sql.DB, seedPath string) error {
 		return err
 	}
 
-	if err := goose.Up(db, seedPath, goose.WithNoVersioning()); err != nil {
-		slog.Error("Error executing seed", "error", err)
-		return err
-	}
-
 	return nil
 }
 
-func dbUrl() string {
-	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
-}
+// Run tests with a transaction. This function will rollback the transaction after the test is done.
+func WithTx(t *testing.T, fn func(q *sqlc.Queries)) {
+	ctx := context.Background()
+	dbURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
+	db, err := pgx.Connect(ctx, dbURL)
+	if err != nil {
+		slog.Error("Error connecting to PostgreSQL", "error", err)
+		panic(err)
+	}
 
+	tx, err := db.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		slog.Error("Error connecting to PostgreSQL", "error", err)
+		panic(err)
+	}
 
-func ResetDatabase(dbUrl, seedPath string) error {
-  slog.Info("Resetting database")
-  db, err := sql.Open("pgx", dbUrl)
-  if err != nil {
-    return err
-  }
+	defer db.Close(ctx)
+	querier := sqlc.New(tx)
 
-  ClearDatabase(dbUrl)
-  execMigration(db, seedPath)
+	fn(querier)
 
-  return nil
-}
-
-func ClearDatabase(dbUrl string) error {
-  slog.Info("Clearing database")
-  db, err := sql.Open("pgx", dbUrl)
-  if err != nil {
-    return err
-  }
-
-	rootDir := utils.RootDir()
-	migrationPath := fmt.Sprintf("%s/internal/storage/postgres/migrations/", rootDir)
-
-	if err := goose.Down(db, migrationPath); err != nil {
-    slog.Error("Error executing seed", "error", err)
-    return err
-  }
-
-  return nil
+	if err := tx.Rollback(ctx); err != nil {
+		slog.Error("Error rolling back transaction", "error", err)
+		panic(err)
+	}
 }
