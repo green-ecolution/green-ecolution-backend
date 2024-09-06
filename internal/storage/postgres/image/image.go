@@ -27,7 +27,7 @@ func NewImageRepositoryMappers(iMapper mapper.InternalImageRepoMapper) ImageRepo
 }
 
 func NewImageRepository(store *Store, mappers ImageRepositoryMappers) storage.ImageRepository {
-  store.SetEntityType(Image)
+	store.SetEntityType(Image)
 	return &ImageRepository{
 		Store:                  store,
 		ImageRepositoryMappers: mappers,
@@ -68,9 +68,9 @@ func (r *ImageRepository) Create(ctx context.Context, image *entities.CreateImag
 
 func (r *ImageRepository) Update(ctx context.Context, image *entities.UpdateImage) (*entities.Image, error) {
 	prev, err := r.GetByID(ctx, image.ID)
-  if err != nil {
-    return nil, r.Store.HandleError(err)
-  }
+	if err != nil {
+		return nil, r.Store.HandleError(err)
+	}
 
 	if !hasChanges(prev, image) {
 		return prev, nil

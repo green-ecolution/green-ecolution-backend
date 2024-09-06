@@ -18,10 +18,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var (
-	dbURL string
-)
-
 type RandomImage struct {
 	ID        int32     `faker:"-"`
 	CreatedAt time.Time `faker:"-"`
