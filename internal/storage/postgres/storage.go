@@ -27,13 +27,13 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 		&treeMapper.InternalTreeRepoMapperImpl{},
 		&imgMapper.InternalImageRepoMapperImpl{},
 	)
-	treeRepo := tree.NewTreeRepository(querier, treeMappers)
+	treeRepo := tree.NewTreeRepository(store, treeMappers)
 
 	tcMappers := treecluster.NewTreeClusterRepositoryMappers(
 		&treeClusterMapper.InternalTreeClusterRepoMapperImpl{},
 		&sensorMapper.InternalSensorRepoMapperImpl{},
 	)
-	treeClusterRepo := treecluster.NewTreeClusterRepository(querier, tcMappers)
+	treeClusterRepo := treecluster.NewTreeClusterRepository(store, tcMappers)
 
 	imageMappers := image.NewImageRepositoryMappers(
 		&imgMapper.InternalImageRepoMapperImpl{},
