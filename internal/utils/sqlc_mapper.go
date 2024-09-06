@@ -12,6 +12,12 @@ func PgTimestampToTime(t pgtype.Timestamp) time.Time {
 	return t.Time
 }
 
+func TimeToPgTimestamp(t time.Time) pgtype.Timestamp {
+  return pgtype.Timestamp{
+    Time: t,
+  }
+}
+
 //nolint:gocritic
 func ConvertNullableImage(img sqlc.Image) *entities.Image {
 	if img.ID == 0 {
