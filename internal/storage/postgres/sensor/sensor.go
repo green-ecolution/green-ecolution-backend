@@ -111,7 +111,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 	return data, nil
 }
 
-func (r *SensorRepository) Create(ctx context.Context, sensor *entities.Sensor) (*entities.Sensor, error) {
+func (r *SensorRepository) Create(ctx context.Context, sensor *entities.CreateSensor) (*entities.Sensor, error) {
 	id, err := r.querier.CreateSensor(ctx, sqlc.SensorStatus(sensor.Status))
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func (r *SensorRepository) Create(ctx context.Context, sensor *entities.Sensor) 
 	return r.GetByID(ctx, id)
 }
 
-func (r *SensorRepository) Update(ctx context.Context, s *entities.Sensor) (*entities.Sensor, error) {
+func (r *SensorRepository) Update(ctx context.Context, s *entities.UpdateSensor) (*entities.Sensor, error) {
 	params := &sqlc.UpdateSensorParams{
 		ID:     s.ID,
 		Status: sqlc.SensorStatus(s.Status),
