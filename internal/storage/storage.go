@@ -14,12 +14,13 @@ var (
 	ErrHostnameNotFound      = errors.New("cant get hostname")
 	ErrCannotGetAppURL       = errors.New("cannot get app url")
 
-	ErrIDNotFound        = errors.New("entity id not found")
-	ErrIDAlreadyExists   = errors.New("entity id already exists")
-	ErrEntityNotFound    = errors.New("entity not found")
-	ErrSensorNotFound    = errors.New("sensor not found")
-	ErrImageNotFound     = errors.New("image not found")
-	ErrFlowerbedNotFound = errors.New("flowerbed not found")
+	ErrIDNotFound          = errors.New("entity id not found")
+	ErrIDAlreadyExists     = errors.New("entity id already exists")
+	ErrEntityNotFound      = errors.New("entity not found")
+	ErrSensorNotFound      = errors.New("sensor not found")
+	ErrImageNotFound       = errors.New("image not found")
+	ErrFlowerbedNotFound   = errors.New("flowerbed not found")
+	ErrTreeClusterNotFound = errors.New("treecluster not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("recieve more rows then expected")
@@ -68,7 +69,7 @@ type VehicleRepository interface {
 }
 
 type TreeClusterRepository interface {
-	BasicCrudRepository[entities.TreeCluster, entities.TreeCluster, entities.TreeCluster]
+	BasicCrudRepository[entities.TreeCluster, entities.CreateTreeCluster, entities.UpdateTreeCluster]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
 	Archive(ctx context.Context, id int32) error
 }

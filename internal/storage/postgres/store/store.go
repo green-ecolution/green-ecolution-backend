@@ -17,6 +17,7 @@ const (
 	Image     EntityType = "image"
 	Sensor    EntityType = "sensor"
 	Flowerbed EntityType = "flowerbed"
+  TreeCluster EntityType = "treecluster"
 )
 
 type Store struct {
@@ -53,7 +54,10 @@ func (s *Store) HandleError(err error) error {
 			return storage.ErrSensorNotFound
 		case Flowerbed:
 			slog.Error("Flowerbed not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrFlowerbedNotFound
+      return storage.ErrFlowerbedNotFound
+    case TreeCluster:
+      slog.Error("TreeCluster not found", "error", err, "stack", errors.WithStack(err))
+      return storage.ErrTreeClusterNotFound
 		default:
 			slog.Error("Entity not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrEntityNotFound
