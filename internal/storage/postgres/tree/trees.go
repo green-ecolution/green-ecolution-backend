@@ -76,16 +76,16 @@ func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*ent
 }
 
 func (r *TreeRepository) Create(ctx context.Context, tree *entities.CreateTree) (*entities.Tree, error) {
-  // check if sensor exists
-  var sensorID *int32
-  if err := r.store.CheckSensorExists(ctx, tree.SensorID); err != nil {
-    if errors.Is(err, storage.ErrSensorNotFound) {
-      slog.Error("failed to get sensor by id. No sensor will be set", "sensorID", *tree.SensorID, "error", err)
-      sensorID = nil
-    } else {
-      sensorID = tree.SensorID
-    }
-  }
+	// check if sensor exists
+	var sensorID *int32
+	if err := r.store.CheckSensorExists(ctx, tree.SensorID); err != nil {
+		if errors.Is(err, storage.ErrSensorNotFound) {
+			slog.Error("failed to get sensor by id. No sensor will be set", "sensorID", *tree.SensorID, "error", err)
+			sensorID = nil
+		} else {
+			sensorID = tree.SensorID
+		}
+	}
 
 	entity := sqlc.CreateTreeParams{
 		TreeClusterID:       &tree.TreeClusterID,
@@ -103,25 +103,24 @@ func (r *TreeRepository) Create(ctx context.Context, tree *entities.CreateTree) 
 		return nil, r.store.HandleError(err)
 	}
 
-
-  // Link images to tree
+	// Link images to tree
 	for _, img := range tree.ImageIDs {
-    if err := r.store.CheckImageExists(ctx, img); err != nil {
-      if errors.Is(err, storage.ErrImageNotFound) {
-        slog.Error("failed to get image by id. No image will be set", "imageID", img, "error", err)
-        continue
-      } else {
-        return nil, err
-      }
-    }
+		if err := r.store.CheckImageExists(ctx, img); err != nil {
+			if errors.Is(err, storage.ErrImageNotFound) {
+				slog.Error("failed to get image by id. No image will be set", "imageID", img, "error", err)
+				continue
+			} else {
+				return nil, err
+			}
+		}
 
-      params := sqlc.LinkTreeImageParams{
-      TreeID: id,
-      ImageID: *img,
-    }
-    if err = r.store.LinkTreeImage(ctx, &params); err != nil {
-      return nil, r.store.HandleError(err)
-    }
+		params := sqlc.LinkTreeImageParams{
+			TreeID:  id,
+			ImageID: *img,
+		}
+		if err = r.store.LinkTreeImage(ctx, &params); err != nil {
+			return nil, r.store.HandleError(err)
+		}
 	}
 
 	return r.GetByID(ctx, id)
@@ -129,11 +128,11 @@ func (r *TreeRepository) Create(ctx context.Context, tree *entities.CreateTree) 
 
 func (r *TreeRepository) Update(ctx context.Context, tree *entities.UpdateTree) (*entities.Tree, error) {
 	prev, err := r.GetByID(ctx, tree.ID)
-  if err != nil {
-    return nil, r.store.HandleError(err)
-  }
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
 
-  // Check if sensor exists and update sensorID
+	// Check if sensor exists and update sensorID
 	var sensorID *int32
 	if tree.SensorID != nil && prev.Sensor != nil {
 		newSensorID := utils.CompareAndUpdate(prev.Sensor.ID, tree.SensorID)
@@ -171,10 +170,10 @@ func (r *TreeRepository) Update(ctx context.Context, tree *entities.UpdateTree) 
 		return nil, r.store.HandleError(err)
 	}
 
-  // Update Images
-  if err := r.updateImages(ctx, prev, tree); err != nil {
-    return nil, r.store.HandleError(err)
-  }
+	// Update Images
+	if err := r.updateImages(ctx, prev, tree); err != nil {
+		return nil, r.store.HandleError(err)
+	}
 
 	return r.GetByID(ctx, tree.ID)
 }

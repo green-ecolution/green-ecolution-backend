@@ -9,9 +9,9 @@ SELECT sensors.* FROM sensors JOIN tree_clusters ON sensors.id = tree_clusters.s
 
 -- name: CreateTreeCluster :one
 INSERT INTO tree_clusters (
-  region, address, description, latitude, longitude
+  region, address, description, moisture_level, latitude, longitude
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 ) RETURNING id;
 
 -- name: UpdateTreeClusterWateringStatus :exec

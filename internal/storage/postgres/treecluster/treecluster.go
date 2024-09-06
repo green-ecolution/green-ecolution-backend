@@ -66,17 +66,14 @@ func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id
 }
 
 func (r *TreeClusterRepository) Create(ctx context.Context, tc *entities.CreateTreeCluster) (*entities.TreeCluster, error) {
-	var desc string // empty string or description
-	if tc.Description != nil {
-		desc = *tc.Description
-	}
 
 	entity := sqlc.CreateTreeClusterParams{
-		Region:      tc.Region,
-		Address:     tc.Address,
-		Description: desc,
-		Latitude:    tc.Latitude,
-		Longitude:   tc.Longitude,
+		Region:        tc.Region,
+		Address:       tc.Address,
+		Description:   tc.Description,
+		MoistureLevel: tc.MoistureLevel,
+		Latitude:      tc.Latitude,
+		Longitude:     tc.Longitude,
 	}
 
 	id, err := r.store.CreateTreeCluster(ctx, &entity)
@@ -84,16 +81,16 @@ func (r *TreeClusterRepository) Create(ctx context.Context, tc *entities.CreateT
 		return nil, r.store.HandleError(err)
 	}
 
-	if tc.MoistureLevel != nil {
-		r.UpdateMoistureLevel(ctx, id, *tc.MoistureLevel)
+	if tc.WateringStatus != nil && *tc.WateringStatus != entities.TreeClusterWateringStatusUnknown {
+		if err := r.UpdateWateringStatus(ctx, id, *tc.WateringStatus); err != nil {
+			return nil, err
+		}
 	}
 
-	if tc.WateringStatus != nil || *tc.WateringStatus != entities.TreeClusterWateringStatusUnknown {
-		r.UpdateWateringStatus(ctx, id, *tc.WateringStatus)
-	}
-
-	if tc.SoilCondition != nil || *tc.SoilCondition != entities.TreeSoilConditionUnknown {
-		r.UpdateSoilCondition(ctx, id, *tc.SoilCondition)
+	if tc.SoilCondition != nil && *tc.SoilCondition != entities.TreeSoilConditionUnknown {
+		if err := r.UpdateSoilCondition(ctx, id, *tc.SoilCondition); err != nil {
+			return nil, err
+		}
 	}
 
 	return r.GetByID(ctx, id)
@@ -178,20 +175,34 @@ func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.UpdateT
 	}
 
 	if tc.MoistureLevel != nil && prev.MoistureLevel != *tc.MoistureLevel {
-		r.UpdateMoistureLevel(ctx, tc.ID, *tc.MoistureLevel)
+		if err := r.UpdateMoistureLevel(ctx, tc.ID, *tc.MoistureLevel); err != nil {
+			return nil, err
+		}
 	}
 
 	if tc.WateringStatus != nil && prev.WateringStatus != *tc.WateringStatus {
-		r.UpdateWateringStatus(ctx, tc.ID, *tc.WateringStatus)
+	 if	err := r.UpdateWateringStatus(ctx, tc.ID, *tc.WateringStatus); err != nil {
+      return nil, err
+    }
 	}
 
 	if tc.SoilCondition != nil && prev.SoilCondition != *tc.SoilCondition {
-		r.UpdateSoilCondition(ctx, tc.ID, *tc.SoilCondition)
+    if err := r.UpdateSoilCondition(ctx, tc.ID, *tc.SoilCondition); err != nil {
+      return nil, err
+    }
 	}
 
 	if tc.LastWatered != nil && prev.LastWatered != *tc.LastWatered {
-		r.UpdateLastWatered(ctx, tc.ID, *tc.LastWatered)
+    if err := r.UpdateLastWatered(ctx, tc.ID, *tc.LastWatered); err != nil {
+      return nil, err
+    }
 	}
+
+  if tc.Archived != nil && prev.Archived != *tc.Archived && *tc.Archived {
+    if err := r.Archive(ctx, tc.ID); err != nil {
+      return nil, err
+    }
+  }
 
 	return r.GetByID(ctx, tc.ID)
 }
