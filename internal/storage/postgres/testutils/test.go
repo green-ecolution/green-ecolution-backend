@@ -118,8 +118,8 @@ func execMigration(db *sql.DB) error {
 	return nil
 }
 
-// Run tests with a transaction. This function will rollback the transaction after the test is done.
-func WithTx(t *testing.T, fn func(q *sqlc.Queries)) {
+// WithTx Run tests with a transaction. This function will rollback the transaction after the test is done.
+func WithTx(t *testing.T, fn func(q *sqlc.Queries, db *pgx.Conn)) {
 	ctx := context.Background()
 	dbURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
 	db, err := pgx.Connect(ctx, dbURL)
@@ -137,10 +137,12 @@ func WithTx(t *testing.T, fn func(q *sqlc.Queries)) {
 	defer db.Close(ctx)
 	querier := sqlc.New(tx)
 
-	fn(querier)
+	fn(querier, db)
 
-	if err := tx.Rollback(ctx); err != nil {
-		slog.Error("Error rolling back transaction", "error", err)
-		panic(err)
+	if !db.IsClosed() {
+		if err := tx.Rollback(ctx); err != nil {
+			slog.Error("Error rolling back transaction", "error", err)
+			panic(err)
+		}
 	}
 }

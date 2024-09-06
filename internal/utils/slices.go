@@ -23,21 +23,21 @@ func Map[T, K any](slice []T, fn func(T) K) []K {
 }
 
 func Reduce[T, K any](slice []T, fn func(K, T) K, initial K) K {
-  result := initial
+	result := initial
 
-  for _, item := range slice {
-    result = fn(result, item)
-  }
+	for _, item := range slice {
+		result = fn(result, item)
+	}
 
-  return result
+	return result
 }
 
 func Contains[T comparable](slice []T, item T) bool {
-  for _, i := range slice {
-    if i == item {
-      return true
-    }
-  }
+	for _, i := range slice {
+		if i == item {
+			return true
+		}
+	}
 
-  return false
+	return false
 }
