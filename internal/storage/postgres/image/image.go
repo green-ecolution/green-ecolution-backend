@@ -27,6 +27,7 @@ func NewImageRepositoryMappers(iMapper mapper.InternalImageRepoMapper) ImageRepo
 }
 
 func NewImageRepository(store *Store, mappers ImageRepositoryMappers) storage.ImageRepository {
+  store.SetEntityType(Image)
 	return &ImageRepository{
 		Store:                  store,
 		ImageRepositoryMappers: mappers,

@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 }
 
 func createStore(db *pgx.Conn) *store.Store {
-	return store.NewStore(db, store.Image)
+	return store.NewStore(db)
 }
 
 func createImage(t *testing.T, str *store.Store) *entities.Image {

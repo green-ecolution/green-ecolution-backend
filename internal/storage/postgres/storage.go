@@ -9,15 +9,18 @@ import (
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	treeMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 	treeClusterMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
 	vehicleMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle/mapper/generated"
+	"github.com/jackc/pgx/v5"
 )
 
-func NewRepository(conn sqlc.DBTX) *storage.Repository {
+func NewRepository(conn *pgx.Conn) *storage.Repository {
+  store := store.NewStore(conn)
 	querier := sqlc.New(conn)
 
 	treeMappers := tree.NewTreeRepositoryMappers(
@@ -35,7 +38,7 @@ func NewRepository(conn sqlc.DBTX) *storage.Repository {
 	imageMappers := image.NewImageRepositoryMappers(
 		&imgMapper.InternalImageRepoMapperImpl{},
 	)
-	imageRepo := image.NewImageRepository(querier, imageMappers)
+	imageRepo := image.NewImageRepository(store, imageMappers)
 
 	vehicleMappers := vehicle.NewVehicleRepositoryMappers(
 		&vehicleMapper.InternalVehicleRepoMapperImpl{},
@@ -52,7 +55,7 @@ func NewRepository(conn sqlc.DBTX) *storage.Repository {
 		&imgMapper.InternalImageRepoMapperImpl{},
 		&sensorMapper.InternalSensorRepoMapperImpl{},
 	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(querier, flowMappers)
+	flowerbedRepo := flowerbed.NewFlowerbedRepository(store, flowMappers)
 
 	return &storage.Repository{
 		Tree:        treeRepo,
