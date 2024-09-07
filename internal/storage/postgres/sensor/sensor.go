@@ -3,11 +3,11 @@ package sensor
 import (
 	"context"
 	"encoding/json"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
 	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/pkg/errors"
 )

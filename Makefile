@@ -78,12 +78,7 @@ clean:
 	rm -rf internal/service/_mock
 	rm -rf internal/storage/_mock
 	rm -rf internal/storage/postgres/_sqlc
-	rm -rf internal/storage/postgres/flowerbed/mapper/generated
-	rm -rf internal/storage/postgres/image/mapper/generated
-	rm -rf internal/storage/postgres/sensor/mapper/generated
-	rm -rf internal/storage/postgres/tree/mapper/generated
-	rm -rf internal/storage/postgres/treecluster/mapper/generated
-	rm -rf internal/storage/postgres/vehicle/mapper/generated
+	rm -rf internal/storage/postgres/mapper/generated
 
 .PHONY: run
 run: build

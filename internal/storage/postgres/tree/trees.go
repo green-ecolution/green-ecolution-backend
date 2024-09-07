@@ -2,15 +2,15 @@ package tree
 
 import (
 	"context"
+	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
 	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 )
 
@@ -20,14 +20,23 @@ type TreeRepository struct {
 }
 
 type TreeMappers struct {
-	mapper    mapper.InternalTreeRepoMapper
-	imgMapper imgMapper.InternalImageRepoMapper
+	mapper   imgMapper.InternalTreeRepoMapper
+	iMapper  imgMapper.InternalImageRepoMapper
+	sMapper  imgMapper.InternalSensorRepoMapper
+	tcMapper imgMapper.InternalTreeClusterRepoMapper
 }
 
-func NewTreeRepositoryMappers(treeMapper mapper.InternalTreeRepoMapper, imageMapper imgMapper.InternalImageRepoMapper) TreeMappers {
+func NewTreeRepositoryMappers(
+	tMapper imgMapper.InternalTreeRepoMapper,
+	iMapper imgMapper.InternalImageRepoMapper,
+	sMapper imgMapper.InternalSensorRepoMapper,
+	tcMapper imgMapper.InternalTreeClusterRepoMapper,
+) TreeMappers {
 	return TreeMappers{
-		mapper:    treeMapper,
-		imgMapper: imageMapper,
+		mapper:   tMapper,
+		iMapper:  iMapper,
+		sMapper:  sMapper,
+		tcMapper: tcMapper,
 	}
 }
 
@@ -45,7 +54,7 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 		return nil, r.store.HandleError(err)
 	}
 
-	return r.mapper.FromSqlTreeList(rows), nil
+	return r.mapper.FromSqlList(rows), nil
 }
 
 func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
@@ -54,7 +63,16 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 		return nil, r.store.HandleError(err)
 	}
 
-	return r.mapper.FromSqlTree(row), nil
+	t := r.mapper.FromSql(row)
+	if err := mapSensorAndImages(ctx, r, t); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	if err := mapTreeCluster(ctx, r, t); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	return r.mapper.FromSql(row), nil
 }
 
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
@@ -63,7 +81,7 @@ func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*e
 		return nil, r.store.HandleError(err)
 	}
 
-	return r.mapper.FromSqlTreeList(rows), nil
+	return r.mapper.FromSqlList(rows), nil
 }
 
 func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error) {
@@ -72,27 +90,17 @@ func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*ent
 		return nil, r.store.HandleError(err)
 	}
 
-	return r.imgMapper.FromSqlList(rows), nil
+	return r.iMapper.FromSqlList(rows), nil
 }
 
 func (r *TreeRepository) Create(ctx context.Context, tree *entities.CreateTree) (*entities.Tree, error) {
-	// check if sensor exists
-	var sensorID *int32
-	if err := r.store.CheckSensorExists(ctx, tree.SensorID); err != nil {
-		if errors.Is(err, storage.ErrSensorNotFound) {
-			slog.Error("failed to get sensor by id. No sensor will be set", "sensorID", *tree.SensorID, "error", err)
-			sensorID = nil
-		} else {
-			sensorID = tree.SensorID
-		}
-	}
 
 	entity := sqlc.CreateTreeParams{
 		TreeClusterID:       &tree.TreeClusterID,
 		Species:             tree.Species,
 		Age:                 tree.Age,
 		HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
-		SensorID:            sensorID,
+		SensorID:            tree.SensorID,
 		PlantingYear:        tree.PlantingYear,
 		Latitude:            tree.Latitude,
 		Longitude:           tree.Longitude,
@@ -139,7 +147,7 @@ func (r *TreeRepository) Update(ctx context.Context, tree *entities.UpdateTree) 
 		sensorID = &newSensorID
 		_, err = r.store.GetSensorByID(ctx, newSensorID) // Check if sensor exists
 		if err != nil {
-			if err == storage.ErrSensorNotFound {
+			if errors.Is(err, storage.ErrSensorNotFound) {
 				slog.Error("failed to get sensor by id. No sensor will be set", "error", err)
 				sensorID = nil
 			} else {
@@ -229,5 +237,71 @@ func (r *TreeRepository) updateImages(ctx context.Context, prev *entities.Tree, 
 		}
 	}
 
+	return nil
+}
+
+func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
+	row, err := r.store.GetSensorByTreeID(ctx, flowerbedID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrSensorNotFound
+		} else {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
+	return r.sMapper.FromSql(row), nil
+}
+
+func (r *TreeRepository) GetTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
+	row, err := r.store.GetTreeClusterByTreeID(ctx, treeID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrTreeClusterNotFound
+		} else {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
+	return r.tcMapper.FromSql(row), nil
+}
+
+// Map sensor and images entity to domain flowerbed
+func mapSensorAndImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	if err := mapImages(ctx, r, t); err != nil {
+		return err
+	}
+
+	if err := mapSensor(ctx, r, t); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func mapImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	images, err := r.GetAllImagesByID(ctx, t.ID)
+	if err != nil {
+		return r.store.HandleError(err)
+	}
+	t.Images = images
+	return nil
+}
+
+func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	sensor, err := r.GetSensorByTreeID(ctx, t.ID)
+	if err != nil {
+		return r.store.HandleError(err)
+	}
+	t.Sensor = sensor
+	return nil
+}
+
+func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	treeCluster, err := r.GetTreeClusterByTreeID(ctx, t.ID)
+	if err != nil {
+		return r.store.HandleError(err)
+	}
+	t.TreeCluster = treeCluster
 	return nil
 }

@@ -17,9 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	generated "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed/mapper/generated"
-	imgMapperImpl "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
-	sensorMapperImpl "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
+	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 )
 
 type RandomFlowerbed struct {
@@ -82,7 +80,7 @@ func initFaker() {
 }
 
 func mapperRepo() FlowerbedMappers {
-	return NewFlowerbedMappers(&generated.InternalFlowerbedRepoMapperImpl{}, &imgMapperImpl.InternalImageRepoMapperImpl{}, &sensorMapperImpl.InternalSensorRepoMapperImpl{})
+	return NewFlowerbedMappers(&mapper.InternalFlowerbedRepoMapperImpl{}, &mapper.InternalImageRepoMapperImpl{}, &mapper.InternalSensorRepoMapperImpl{})
 }
 
 func TestMain(m *testing.M) {
@@ -106,13 +104,13 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 	repo := NewFlowerbedRepository(str, mapperRepo())
 
 	// Create sensor
-	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&sensorMapperImpl.InternalSensorRepoMapperImpl{}))
+	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{}))
 	sensorArg := &entities.CreateSensor{
 		Status: want.Sensor.Status,
 	}
 	sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
-  assert.NoError(t, err)
-  want.Sensor.ID = sensorGot.ID
+	assert.NoError(t, err)
+	want.Sensor.ID = sensorGot.ID
 
 	// Create images
 	for i, img := range want.Images {
@@ -511,9 +509,9 @@ func TestGetBySensorID(t *testing.T) {
 
 			repo := NewFlowerbedRepository(str, mapperRepo())
 			got, err := repo.GetSensorByFlowerbedID(context.Background(), want.ID)
-    
+
 			assert.NoError(t, err)
-      assertSensor(t, got, want.Sensor)
+			assertSensor(t, got, want.Sensor)
 		})
 	})
 

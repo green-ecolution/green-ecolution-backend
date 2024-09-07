@@ -11,18 +11,14 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
+	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
-
-	imgMapperImpl "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
-	sensorMapperImpl "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
-	treeMapperImpl "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree/mapper/generated"
 )
 
 type randomTreeCluster struct {
@@ -131,7 +127,7 @@ func createStore(db *pgx.Conn) *store.Store {
 }
 
 func initMappers() TreeClusterMappers {
-	return NewTreeClusterRepositoryMappers(&generated.InternalTreeClusterRepoMapperImpl{}, &sensorMapperImpl.InternalSensorRepoMapperImpl{})
+	return NewTreeClusterRepositoryMappers(&mapper.InternalTreeClusterRepoMapperImpl{}, &mapper.InternalSensorRepoMapperImpl{})
 }
 
 func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
@@ -172,13 +168,18 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 
 	assertTreeCluster(t, &tc, got)
 
-	imgMappers := image.NewImageRepositoryMappers(&imgMapperImpl.InternalImageRepoMapperImpl{})
+	imgMappers := image.NewImageRepositoryMappers(&mapper.InternalImageRepoMapperImpl{})
 	imgRepo := image.NewImageRepository(str, imgMappers)
 
-	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&sensorMapperImpl.InternalSensorRepoMapperImpl{}))
+	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{}))
 
 	// Create trees
-	treeMappers := tree.NewTreeRepositoryMappers(&treeMapperImpl.InternalTreeRepoMapperImpl{}, &imgMapperImpl.InternalImageRepoMapperImpl{})
+	treeMappers := tree.NewTreeRepositoryMappers(
+		&mapper.InternalTreeRepoMapperImpl{},
+		&mapper.InternalImageRepoMapperImpl{},
+		&mapper.InternalSensorRepoMapperImpl{},
+		&mapper.InternalTreeClusterRepoMapperImpl{},
+	)
 	treeRepo := tree.NewTreeRepository(str, treeMappers)
 	for i, tree := range tc.Trees {
 		// Create Images
@@ -839,42 +840,52 @@ func TestDeleteTreeCluster(t *testing.T) {
 }
 
 func TestArchiveTreeCluster(t *testing.T) {
-  t.Parallel()
-  t.Run("should archive tree cluster by id", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      tc := createTreeCluster(t, str)
+	t.Parallel()
+	t.Run("should archive tree cluster by id", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
 
-      mappers := initMappers()
-      repo := NewTreeClusterRepository(str, mappers)
+			mappers := initMappers()
+			repo := NewTreeClusterRepository(str, mappers)
 
-      err := repo.Archive(context.Background(), tc.ID)
-      assert.NoError(t, err)
+			err := repo.Archive(context.Background(), tc.ID)
+			assert.NoError(t, err)
 
-      got, err := repo.GetByID(context.Background(), tc.ID)
-      assert.NoError(t, err)
-      assert.True(t, got.Archived)
-    })
-  })
+			got, err := repo.GetByID(context.Background(), tc.ID)
+			assert.NoError(t, err)
+			assert.True(t, got.Archived)
+		})
+	})
 
-  t.Run("should return error when query failed", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      tc := createTreeCluster(t, str)
+	t.Run("should return error when query failed", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
 
-      mappers := initMappers()
-      repo := NewTreeClusterRepository(str, mappers)
+			mappers := initMappers()
+			repo := NewTreeClusterRepository(str, mappers)
 
-      err := db.Close(context.Background())
-      assert.NoError(t, err)
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
 
-      err = repo.Archive(context.Background(), tc.ID)
-      assert.Error(t, err)
-    })
-  })
+			err = repo.Archive(context.Background(), tc.ID)
+			assert.Error(t, err)
+		})
+	})
 }
 
 func assertTreeCluster(t *testing.T, expected, actual *entities.TreeCluster) {
+	if expected == nil {
+		assert.Nil(t, expected)
+		return
+	}
+
+	if actual == nil {
+		assert.Nil(t, actual)
+		return
+	}
+
 	assert.NotNil(t, actual)
 	assert.NotZero(t, actual.ID)
 	assert.NotZero(t, actual.CreatedAt)
@@ -893,6 +904,16 @@ func assertTreeCluster(t *testing.T, expected, actual *entities.TreeCluster) {
 }
 
 func assertTree(t *testing.T, expected, actual *entities.Tree) {
+	if expected == nil {
+		assert.Nil(t, expected)
+		return
+	}
+
+	if actual == nil {
+		assert.Nil(t, actual)
+		return
+	}
+
 	assert.NotNil(t, actual)
 	assert.NotZero(t, actual.ID)
 	assert.NotZero(t, actual.CreatedAt)
@@ -912,6 +933,14 @@ func assertTree(t *testing.T, expected, actual *entities.Tree) {
 	assert.Equal(t, expected.TreeCluster.Latitude, actual.TreeCluster.Latitude)
 	assert.Equal(t, expected.TreeCluster.Longitude, actual.TreeCluster.Longitude)
 	assert.Equal(t, expected.TreeCluster.SoilCondition, actual.TreeCluster.SoilCondition)
+
+	assert.NotNil(t, actual.Sensor)
+	assertSensor(t, actual.Sensor, expected.Sensor)
+
+	assert.Len(t, actual.Images, len(expected.Images))
+	for i := range expected.Images {
+		assertImage(t, actual.Images[i], expected.Images[i])
+	}
 }
 
 func assertSensor(t *testing.T, got, want *entities.Sensor) {
@@ -930,4 +959,21 @@ func assertSensor(t *testing.T, got, want *entities.Sensor) {
 	assert.WithinDuration(t, got.CreatedAt, time.Now(), time.Second)
 	assert.Equal(t, got.ID, want.ID)
 	assert.Equal(t, got.Status, want.Status)
+}
+
+func assertImage(t *testing.T, got, want *entities.Image) {
+	if got == nil {
+		assert.Nil(t, got)
+		return
+	}
+
+	if want == nil {
+		assert.Nil(t, want)
+		return
+	}
+
+	assert.Equal(t, want.ID, got.ID)
+	assert.Equal(t, want.URL, got.URL)
+	assert.Equal(t, want.Filename, got.Filename)
+	assert.Equal(t, want.MimeType, got.MimeType)
 }

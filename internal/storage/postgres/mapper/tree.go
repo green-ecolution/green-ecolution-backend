@@ -7,8 +7,9 @@ import (
 
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
-// goverter:ignoreMissing
 type InternalTreeRepoMapper interface {
-	FromSqlTree(*sqlc.Tree) *entities.Tree
-	FromSqlTreeList([]*sqlc.Tree) []*entities.Tree
+	// goverter:ignore Sensor Images TreeCluster
+  // goverter:map TreeNumber Number
+	FromSql(*sqlc.Tree) *entities.Tree
+	FromSqlList([]*sqlc.Tree) []*entities.Tree
 }
