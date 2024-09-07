@@ -34,7 +34,7 @@ type randomTreeCluster struct {
 	Archived       bool                               `faker:"-"`
 	Latitude       float64                            `faker:"lat"`
 	Longitude      float64                            `faker:"long"`
-	Trees          []*randomTree                      `faker:"-"`
+	Trees          []*randomTree                      `faker:"randomTrees"`
 	SoilCondition  entities.TreeSoilCondition         `faker:"oneof:schluffig"`
 }
 
@@ -148,7 +148,6 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 		t.Fatalf("error faking tree cluster data: %v", err)
 	}
 
-	slog.Info("Creating tree cluster", "tc", rtc)
 	tc := entities.TreeCluster{
 		WateringStatus: rtc.WateringStatus,
 		MoistureLevel:  rtc.MoistureLevel,
@@ -180,15 +179,38 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 
 	assertTreeCluster(t, &tc, got)
 
+	// Map random trees to entities.Tree
+	for _, tree := range rtc.Trees {
+		sensor := entities.Sensor{
+			Status: tree.Sensor.Status,
+		}
+
+		images := utils.Map(tree.Images, func(img *randomImage) *entities.Image {
+			return &entities.Image{
+				URL:      img.URL,
+				Filename: img.Filename,
+				MimeType: img.MimeType,
+			}
+		})
+
+		t := entities.Tree{
+			TreeCluster:         got,
+			Age:                 tree.Age,
+			HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
+			PlantingYear:        tree.PlantingYear,
+			Species:             tree.Species,
+			Latitude:            tree.Latitude,
+			Longitude:           tree.Longitude,
+			Sensor:              &sensor,
+			Images:              images,
+		}
+		got.Trees = append(got.Trees, &t)
+	}
+
 	return got
 }
 
-func createTree(t *testing.T, str *store.Store, tc *entities.TreeCluster, hasSensor bool) *entities.Tree {
-	rt := randomTree{}
-	if err := faker.FakeData(&rt); err != nil {
-		t.Fatalf("error faking tree data: %v", err)
-	}
-
+func createTrees(t *testing.T, str *store.Store, tc *entities.TreeCluster) {
 	mappers := initMappers()
 	treeRepo := NewTreeRepository(str, mappers)
 
@@ -197,79 +219,87 @@ func createTree(t *testing.T, str *store.Store, tc *entities.TreeCluster, hasSen
 
 	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{}))
 
-	tree := entities.Tree{
-		TreeCluster:         tc,
-		Sensor:              &entities.Sensor{Status: entities.SensorStatusOnline},
-		Images:              []*entities.Image{},
-		Age:                 rt.Age,
-		HeightAboveSeaLevel: rt.HeightAboveSeaLevel,
-		PlantingYear:        rt.PlantingYear,
-		Species:             rt.Species,
-		Number:              rt.Number,
-		Latitude:            rt.Latitude,
-		Longitude:           rt.Longitude,
-	}
+	for i, tree := range tc.Trees {
+		// Create Images
+		for _, img := range tree.Images {
+			arg := &entities.CreateImage{
+				URL:      img.URL,
+				Filename: img.Filename,
+				MimeType: img.MimeType,
+			}
 
-	// Create Images
-	for _, img := range tree.Images {
-		arg := &entities.CreateImage{
-			URL:      img.URL,
-			Filename: img.Filename,
-			MimeType: img.MimeType,
+			imgGot, err := imgRepo.Create(context.Background(), arg)
+			assert.NoError(t, err)
+			assert.NotNil(t, imgGot)
+			assert.NotZero(t, imgGot.ID)
+			assert.NotZero(t, imgGot.CreatedAt)
+			assert.NotZero(t, imgGot.UpdatedAt)
+
+			img.ID = imgGot.ID
+			img.CreatedAt = imgGot.CreatedAt
+			img.UpdatedAt = imgGot.UpdatedAt
 		}
 
-		imgGot, err := imgRepo.Create(context.Background(), arg)
-		assert.NoError(t, err)
-		assert.NotNil(t, imgGot)
-		assert.NotZero(t, imgGot.ID)
-		assert.NotZero(t, imgGot.CreatedAt)
-		assert.NotZero(t, imgGot.UpdatedAt)
+		imgIds := utils.Map(tree.Images, func(img *entities.Image) *int32 {
+			return &img.ID
+		})
 
-		img.ID = imgGot.ID
-		img.CreatedAt = imgGot.CreatedAt
-		img.UpdatedAt = imgGot.UpdatedAt
-	}
+		// Create Sensor for every 2nd tree
+		var sensor *entities.Sensor
+		if i%2 == 0 {
+			sensorArg := &entities.CreateSensor{
+				Status: tree.Sensor.Status,
+			}
+			sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
+			assert.NoError(t, err)
+			assert.NotNil(t, sensorGot)
+			assert.NotZero(t, sensorGot.ID)
+			assert.NotZero(t, sensorGot.CreatedAt)
+			assert.NotZero(t, sensorGot.UpdatedAt)
 
-	imgIds := utils.Map(tree.Images, func(img *entities.Image) *int32 {
-		return &img.ID
-	})
-
-	// Create Sensor
-	var sensorID *int32
-	if hasSensor {
-		sensorArg := &entities.CreateSensor{
-			Status: tree.Sensor.Status,
+			sensor = sensorGot
 		}
-		sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
+
+		want := entities.Tree{
+			TreeCluster:         tc,
+			Age:                 tree.Age,
+			HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
+			PlantingYear:        tree.PlantingYear,
+			Species:             tree.Species,
+			Latitude:            tree.Latitude,
+			Longitude:           tree.Longitude,
+			Sensor:              sensor,
+			Images:              tree.Images,
+		}
+
+		var sensorID *int32
+		if sensor != nil {
+			sensorID = &sensor.ID
+		}
+		arg := &entities.CreateTree{
+			TreeClusterID:       tc.ID,
+			Age:                 tree.Age,
+			HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
+			PlantingYear:        tree.PlantingYear,
+			Species:             tree.Species,
+			Latitude:            tree.Latitude,
+			Longitude:           tree.Longitude,
+			SensorID:            sensorID,
+			ImageIDs:            imgIds,
+		}
+
+		treeGot, err := treeRepo.Create(context.Background(), arg)
 		assert.NoError(t, err)
-		assert.NotNil(t, sensorGot)
-		assert.NotZero(t, sensorGot.ID)
-		assert.NotZero(t, sensorGot.CreatedAt)
-		assert.NotZero(t, sensorGot.UpdatedAt)
+		assert.NotNil(t, treeGot)
+		assert.NotZero(t, treeGot.ID)
 
-		sensorID = &sensorGot.ID
+		want.ID = treeGot.ID
+		want.CreatedAt = treeGot.CreatedAt
+		want.UpdatedAt = time.Now()
+
+		assertTree(t, &want, treeGot)
+		tc.Trees[i] = treeGot
 	}
-
-	arg := &entities.CreateTree{
-		TreeClusterID:       tc.ID,
-		Age:                 tree.Age,
-		HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
-		PlantingYear:        tree.PlantingYear,
-		Species:             tree.Species,
-		Latitude:            tree.Latitude,
-		Longitude:           tree.Longitude,
-		SensorID:            sensorID,
-		ImageIDs:            imgIds,
-	}
-
-	treeGot, err := treeRepo.Create(context.Background(), arg)
-	assert.NoError(t, err)
-	assert.NotNil(t, treeGot)
-	assert.NotZero(t, treeGot.ID)
-
-	assertTree(t, &tree, treeGot)
-
-	return treeGot
 }
 
 func TestCreateTree(t *testing.T) {
@@ -277,8 +307,251 @@ func TestCreateTree(t *testing.T) {
 	t.Run("should create a tree", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
+			// Create a tree cluster
 			tc := createTreeCluster(t, str)
-			createTree(t, str, tc, true)
+
+			// Create a tree from the tree cluster
+			createTrees(t, str, tc)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.Create(context.Background(), &entities.CreateTree{
+				TreeClusterID: 1,
+				Age:           1,
+			})
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestGetAllTrees(t *testing.T) {
+	t.Parallel()
+	t.Run("should get all trees", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+			createTrees(t, str, tc)
+
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			got, err := repo.GetAll(context.Background())
+			assert.NoError(t, err)
+			assert.NotNil(t, got)
+
+			assert.NotEmpty(t, got)
+			assert.Len(t, got, len(tc.Trees))
+			for i, tree := range tc.Trees {
+				assertTree(t, tree, got[i])
+			}
+		})
+	})
+
+	t.Run("should return empty array if no trees found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			got, err := repo.GetAll(context.Background())
+			assert.NoError(t, err)
+			assert.Empty(t, got)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetAll(context.Background())
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestGetByID(t *testing.T) {
+	t.Parallel()
+	t.Run("should get tree by id", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+			createTrees(t, str, tc)
+
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			for _, tree := range tc.Trees {
+				got, err := repo.GetByID(context.Background(), tree.ID)
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
+
+				assertTree(t, tree, got)
+			}
+		})
+	})
+
+	t.Run("should return error if tree not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			got, err := repo.GetByID(context.Background(), 999)
+			assert.Error(t, err)
+			assert.Nil(t, got)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetByID(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestGetByTreeClusterID(t *testing.T) {
+	t.Parallel()
+	t.Run("should get trees by tree cluster id", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+			createTrees(t, str, tc)
+
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			got, err := repo.GetByTreeClusterID(context.Background(), tc.ID)
+			assert.NoError(t, err)
+			assert.NotNil(t, got)
+
+			assert.NotEmpty(t, got)
+			assert.Len(t, got, len(tc.Trees))
+			for i, tree := range tc.Trees {
+				assertTree(t, tree, got[i])
+			}
+		})
+	})
+
+	t.Run("should return empty array if no trees found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			got, err := repo.GetByTreeClusterID(context.Background(), 999)
+			assert.NoError(t, err)
+			assert.Empty(t, got)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.GetByTreeClusterID(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
+}
+
+func TestUpdateTree(t *testing.T) {
+	t.Parallel()
+	t.Run("should update tree", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+			createTrees(t, str, tc)
+
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			for _, tree := range tc.Trees {
+				tree.Age = 10
+				tree.HeightAboveSeaLevel = 10.1
+				tree.PlantingYear = 2025
+				tree.Species = "updated species"
+				tree.Latitude = 10.2
+				tree.Longitude = 10.3
+
+				arg := &entities.UpdateTree{
+					ID:                  tree.ID,
+					Age:                 utils.P(tree.Age),
+					HeightAboveSeaLevel: utils.P(tree.HeightAboveSeaLevel),
+					PlantingYear:        utils.P(tree.PlantingYear),
+					Species:             utils.P(tree.Species),
+					Latitude:            utils.P(tree.Latitude),
+					Longitude:           utils.P(tree.Longitude),
+				}
+
+				got, err := repo.Update(context.Background(), arg)
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
+
+				assertTree(t, tree, got)
+			}
+		})
+	})
+
+	t.Run("should return error if tree not found", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			arg := &entities.UpdateTree{
+				ID:  999,
+				Age: utils.P(int32(10)),
+			}
+
+			got, err := repo.Update(context.Background(), arg)
+			assert.Error(t, err)
+			assert.Nil(t, got)
+		})
+	})
+
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
+
+			arg := &entities.UpdateTree{
+				ID:  1,
+				Age: utils.P(int32(10)),
+			}
+
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
+
+			_, err = repo.Update(context.Background(), arg)
+			assert.Error(t, err)
 		})
 	})
 }
