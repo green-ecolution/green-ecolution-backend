@@ -8,11 +8,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
+	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/pkg/errors"
 )
 
 type SensorRepository struct {
-	querier sqlc.Querier
+	store *Store
 	SensorRepositoryMappers
 }
 
@@ -26,15 +27,15 @@ func NewSensorRepositoryMappers(sMapper mapper.InternalSensorRepoMapper) SensorR
 	}
 }
 
-func NewSensorRepository(querier sqlc.Querier, mappers SensorRepositoryMappers) storage.SensorRepository {
+func NewSensorRepository(store *Store, mappers SensorRepositoryMappers) storage.SensorRepository {
 	return &SensorRepository{
-		querier:                 querier,
+		store:                   store,
 		SensorRepositoryMappers: mappers,
 	}
 }
 
 func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, error) {
-	rows, err := r.querier.GetAllSensors(ctx)
+	rows, err := r.store.GetAllSensors(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +44,7 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, erro
 }
 
 func (r *SensorRepository) GetByID(ctx context.Context, id int32) (*entities.Sensor, error) {
-	row, err := r.querier.GetSensorByID(ctx, id)
+	row, err := r.store.GetSensorByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func (r *SensorRepository) GetStatusByID(ctx context.Context, id int32) (*entiti
 }
 
 func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error) {
-	row, err := r.querier.GetSensorByStatus(ctx, sqlc.SensorStatus(*status))
+	row, err := r.store.GetSensorByStatus(ctx, sqlc.SensorStatus(*status))
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +71,7 @@ func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entiti
 }
 
 func (r *SensorRepository) GetSensorDataByID(ctx context.Context, id int32) ([]*entities.SensorData, error) {
-	rows, err := r.querier.GetSensorDataBySensorID(ctx, id)
+	rows, err := r.store.GetSensorDataBySensorID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 			Data:     raw,
 		}
 
-		err = r.querier.InsertSensorData(ctx, params)
+		err = r.store.InsertSensorData(ctx, params)
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +113,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 }
 
 func (r *SensorRepository) Create(ctx context.Context, sensor *entities.CreateSensor) (*entities.Sensor, error) {
-	id, err := r.querier.CreateSensor(ctx, sqlc.SensorStatus(sensor.Status))
+	id, err := r.store.CreateSensor(ctx, sqlc.SensorStatus(sensor.Status))
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +126,7 @@ func (r *SensorRepository) Update(ctx context.Context, s *entities.UpdateSensor)
 		ID:     s.ID,
 		Status: sqlc.SensorStatus(s.Status),
 	}
-	err := r.querier.UpdateSensor(ctx, params)
+	err := r.store.UpdateSensor(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -134,5 +135,5 @@ func (r *SensorRepository) Update(ctx context.Context, s *entities.UpdateSensor)
 }
 
 func (r *SensorRepository) Delete(ctx context.Context, id int32) error {
-	return r.querier.DeleteSensor(ctx, id)
+	return r.store.DeleteSensor(ctx, id)
 }

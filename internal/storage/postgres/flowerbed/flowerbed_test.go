@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/jackc/pgx/v5"
@@ -105,10 +106,13 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 	repo := NewFlowerbedRepository(str, mapperRepo())
 
 	// Create sensor
-	status := sqlc.SensorStatus(want.Sensor.Status)
-	newSensorID, err := str.CreateSensor(context.Background(), status)
-	assert.NoError(t, err)
-	want.Sensor.ID = newSensorID
+	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&sensorMapperImpl.InternalSensorRepoMapperImpl{}))
+	sensorArg := &entities.CreateSensor{
+		Status: want.Sensor.Status,
+	}
+	sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
+  assert.NoError(t, err)
+  want.Sensor.ID = sensorGot.ID
 
 	// Create images
 	for i, img := range want.Images {
@@ -506,10 +510,10 @@ func TestGetBySensorID(t *testing.T) {
 			want := createFlowerbed(t, str)
 
 			repo := NewFlowerbedRepository(str, mapperRepo())
-			got, err := repo.GetSensorByFlowerbedID(context.Background(), want.Sensor.ID)
-
+			got, err := repo.GetSensorByFlowerbedID(context.Background(), want.ID)
+    
 			assert.NoError(t, err)
-			assert.Equal(t, want.Sensor, got)
+      assertSensor(t, got, want.Sensor)
 		})
 	})
 
