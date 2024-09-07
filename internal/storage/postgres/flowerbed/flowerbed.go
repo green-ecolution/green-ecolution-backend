@@ -83,8 +83,10 @@ func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID 
 }
 
 func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
+  slog.Info("Getting sensor by flowerbed id", "flowerbed_id", flowerbedID)
 	row, err := r.store.GetSensorByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
+    slog.Error("Error getting sensor by flowerbed id", "error", err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrSensorNotFound
 		} else {
@@ -152,7 +154,7 @@ func (r *FlowerbedRepository) Update(ctx context.Context, f *entities.UpdateFlow
 		sensorID = &newSensorID
 		_, err = r.store.GetSensorByID(ctx, newSensorID) // Check if sensor exists
 		if err != nil {
-			if err == storage.ErrSensorNotFound {
+			if errors.Is(err, storage.ErrSensorNotFound) {
 				slog.Error("failed to get sensor by id. No sensor will be set", "error", err)
 				sensorID = nil
 			} else {
