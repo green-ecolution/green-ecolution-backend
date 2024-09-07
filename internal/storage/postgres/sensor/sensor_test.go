@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper/generated"
+	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -44,7 +44,7 @@ func createSensor(t *testing.T, str *store.Store) *entities.Sensor {
 	if err := faker.FakeData(&sensor); err != nil {
 		t.Fatalf("error faking sensor data: %v", err)
 	}
-	mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+	mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 	repo := NewSensorRepository(str, mappers)
 
 	got, err := repo.Create(context.Background(), &entities.CreateSensor{
@@ -76,7 +76,7 @@ func TestCreateSensor(t *testing.T) {
 	t.Run("should return error if status is invalid", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			_, err := repo.Create(context.Background(), &entities.CreateSensor{
@@ -89,7 +89,7 @@ func TestCreateSensor(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -111,7 +111,7 @@ func TestGetAllSensors(t *testing.T) {
 			createSensor(t, str)
 			createSensor(t, str)
 			createSensor(t, str)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			got, err := repo.GetAll(context.Background())
@@ -127,7 +127,7 @@ func TestGetAllSensors(t *testing.T) {
 	t.Run("should return empty list if no sensors", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			got, err := repo.GetAll(context.Background())
@@ -139,7 +139,7 @@ func TestGetAllSensors(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -157,7 +157,7 @@ func TestGetSensorByID(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			sensor := createSensor(t, str)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			got, err := repo.GetByID(context.Background(), sensor.ID)
@@ -169,7 +169,7 @@ func TestGetSensorByID(t *testing.T) {
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			_, err := repo.GetByID(context.Background(), 999)
@@ -180,7 +180,7 @@ func TestGetSensorByID(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -198,7 +198,7 @@ func TestGetStatusByID(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			sensor := createSensor(t, str)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			got, err := repo.GetStatusByID(context.Background(), sensor.ID)
@@ -210,7 +210,7 @@ func TestGetStatusByID(t *testing.T) {
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			_, err := repo.GetStatusByID(context.Background(), 999)
@@ -221,7 +221,7 @@ func TestGetStatusByID(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -258,7 +258,7 @@ func TestGetSensorByStatus(t *testing.T) {
 				}
 			}
 
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			gotOnline, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOnline))
@@ -302,7 +302,7 @@ func TestGetSensorByStatus(t *testing.T) {
 	t.Run("should return empty list if no sensors", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			gotOnline, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatusOnline))
@@ -323,7 +323,7 @@ func TestGetSensorByStatus(t *testing.T) {
 	t.Run("should return error if status is invalid", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			_, err := repo.GetSensorByStatus(context.Background(), utils.P(entities.SensorStatus("invalid")))
@@ -334,7 +334,7 @@ func TestGetSensorByStatus(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -352,7 +352,7 @@ func TestGetSensorDataByID(t *testing.T) {
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			_, err := repo.GetSensorDataByID(context.Background(), 999)
@@ -363,7 +363,7 @@ func TestGetSensorDataByID(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -381,7 +381,7 @@ func TestInsertSensorData(t *testing.T) {
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			data := make([]*entities.SensorData, 1)
@@ -396,7 +396,7 @@ func TestInsertSensorData(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -418,7 +418,7 @@ func TestUpdateSensor(t *testing.T) {
 			str := createStore(db)
 
 			prev := createSensor(t, str)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 			want := &entities.Sensor{
 				ID:        prev.ID,
@@ -440,7 +440,7 @@ func TestUpdateSensor(t *testing.T) {
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			_, err := repo.Update(context.Background(), &entities.UpdateSensor{
@@ -454,7 +454,7 @@ func TestUpdateSensor(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -474,7 +474,7 @@ func TestDeleteSensor(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			prev := createSensor(t, str)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := repo.Delete(context.Background(), prev.ID)
@@ -488,7 +488,7 @@ func TestDeleteSensor(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewSensorRepositoryMappers(&generated.InternalSensorRepoMapperImpl{})
+			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())

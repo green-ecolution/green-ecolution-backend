@@ -2,14 +2,13 @@ package treecluster
 
 import (
 	"context"
+	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
 	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -19,11 +18,11 @@ type TreeClusterRepository struct {
 }
 
 type TreeClusterMappers struct {
-	mapper       mapper.InternalTreeClusterRepoMapper
+	mapper       sensorMapper.InternalTreeClusterRepoMapper
 	sensorMapper sensorMapper.InternalSensorRepoMapper
 }
 
-func NewTreeClusterRepositoryMappers(tcMapper mapper.InternalTreeClusterRepoMapper, sMapper sensorMapper.InternalSensorRepoMapper) TreeClusterMappers {
+func NewTreeClusterRepositoryMappers(tcMapper sensorMapper.InternalTreeClusterRepoMapper, sMapper sensorMapper.InternalSensorRepoMapper) TreeClusterMappers {
 	return TreeClusterMappers{
 		mapper:       tcMapper,
 		sensorMapper: sMapper,
@@ -181,28 +180,28 @@ func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.UpdateT
 	}
 
 	if tc.WateringStatus != nil && prev.WateringStatus != *tc.WateringStatus {
-	 if	err := r.UpdateWateringStatus(ctx, tc.ID, *tc.WateringStatus); err != nil {
-      return nil, err
-    }
+		if err := r.UpdateWateringStatus(ctx, tc.ID, *tc.WateringStatus); err != nil {
+			return nil, err
+		}
 	}
 
 	if tc.SoilCondition != nil && prev.SoilCondition != *tc.SoilCondition {
-    if err := r.UpdateSoilCondition(ctx, tc.ID, *tc.SoilCondition); err != nil {
-      return nil, err
-    }
+		if err := r.UpdateSoilCondition(ctx, tc.ID, *tc.SoilCondition); err != nil {
+			return nil, err
+		}
 	}
 
 	if tc.LastWatered != nil && prev.LastWatered != *tc.LastWatered {
-    if err := r.UpdateLastWatered(ctx, tc.ID, *tc.LastWatered); err != nil {
-      return nil, err
-    }
+		if err := r.UpdateLastWatered(ctx, tc.ID, *tc.LastWatered); err != nil {
+			return nil, err
+		}
 	}
 
-  if tc.Archived != nil && prev.Archived != *tc.Archived && *tc.Archived {
-    if err := r.Archive(ctx, tc.ID); err != nil {
-      return nil, err
-    }
-  }
+	if tc.Archived != nil && prev.Archived != *tc.Archived && *tc.Archived {
+		if err := r.Archive(ctx, tc.ID); err != nil {
+			return nil, err
+		}
+	}
 
 	return r.GetByID(ctx, tc.ID)
 }

@@ -2,14 +2,12 @@ package flowerbed
 
 import (
 	"context"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed/mapper"
-	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
-	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
 	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
@@ -23,11 +21,11 @@ type FlowerbedRepository struct {
 
 type FlowerbedMappers struct {
 	mapper       mapper.InternalFlowerbedRepoMapper
-	imgMapper    imgMapper.InternalImageRepoMapper
-	sensorMapper sensorMapper.InternalSensorRepoMapper
+	imgMapper    mapper.InternalImageRepoMapper
+	sensorMapper mapper.InternalSensorRepoMapper
 }
 
-func NewFlowerbedMappers(fMapper mapper.InternalFlowerbedRepoMapper, iMapper imgMapper.InternalImageRepoMapper, sMapper sensorMapper.InternalSensorRepoMapper) FlowerbedMappers {
+func NewFlowerbedMappers(fMapper mapper.InternalFlowerbedRepoMapper, iMapper mapper.InternalImageRepoMapper, sMapper mapper.InternalSensorRepoMapper) FlowerbedMappers {
 	return FlowerbedMappers{
 		mapper:       fMapper,
 		imgMapper:    iMapper,
@@ -83,10 +81,10 @@ func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID 
 }
 
 func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
-  slog.Info("Getting sensor by flowerbed id", "flowerbed_id", flowerbedID)
+	slog.Info("Getting sensor by flowerbed id", "flowerbed_id", flowerbedID)
 	row, err := r.store.GetSensorByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
-    slog.Error("Error getting sensor by flowerbed id", "error", err)
+		slog.Error("Error getting sensor by flowerbed id", "error", err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrSensorNotFound
 		} else {

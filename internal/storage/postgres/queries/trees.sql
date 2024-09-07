@@ -10,6 +10,12 @@ SELECT * FROM trees WHERE tree_cluster_id = $1;
 -- name: GetAllImagesByTreeID :many
 SELECT images.* FROM images JOIN tree_images ON images.id = tree_images.image_id WHERE tree_images.tree_id = $1;
 
+-- name: GetSensorByTreeID :one
+SELECT sensors.* FROM sensors JOIN trees ON sensors.id = trees.sensor_id WHERE trees.id = $1;
+
+-- name: GetTreeClusterByTreeID :one
+SELECT tree_clusters.* FROM tree_clusters JOIN trees ON tree_clusters.id = trees.tree_cluster_id WHERE trees.id = $1;
+
 -- name: CreateTree :one
 INSERT INTO trees (
   tree_cluster_id, sensor_id, age, height_above_sea_level, planting_year, species, tree_number, latitude, longitude, geometry

@@ -10,7 +10,7 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper/generated"
+	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -42,12 +42,16 @@ func createStore(db *pgx.Conn) *store.Store {
 	return store.NewStore(db)
 }
 
+func initMapper() ImageRepositoryMappers {
+	return NewImageRepositoryMappers(&mapper.InternalImageRepoMapperImpl{})
+}
+
 func createImage(t *testing.T, str *store.Store) *entities.Image {
 	var img entities.Image
 	if err := faker.FakeData(&img); err != nil {
 		t.Fatalf("error faking image data: %v", err)
 	}
-	mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+	mappers := initMapper()
 	repo := NewImageRepository(str, mappers)
 
 	got, err := repo.Create(context.Background(), &entities.CreateImage{
@@ -80,7 +84,7 @@ func TestCreateImage(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -103,7 +107,7 @@ func TestGetAllImages(t *testing.T) {
 			createImage(t, str)
 			createImage(t, str)
 
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			got, err := repo.GetAll(context.Background())
@@ -116,7 +120,7 @@ func TestGetAllImages(t *testing.T) {
 	t.Run("should return empty list if no images found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			got, err := repo.GetAll(context.Background())
@@ -129,7 +133,7 @@ func TestGetAllImages(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -147,7 +151,7 @@ func TestGetImageByID(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			img := createImage(t, str)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			got, err := repo.GetByID(context.Background(), img.ID)
@@ -161,7 +165,7 @@ func TestGetImageByID(t *testing.T) {
 	t.Run("should return error if image not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			_, err := repo.GetByID(context.Background(), 999)
@@ -173,7 +177,7 @@ func TestGetImageByID(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -205,7 +209,7 @@ func TestUpdateImage(t *testing.T) {
 				CreatedAt: prev.CreatedAt,
 			}
 
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			got, err := repo.Update(context.Background(), args)
@@ -235,7 +239,7 @@ func TestUpdateImage(t *testing.T) {
 				CreatedAt: prev.CreatedAt,
 			}
 
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			got, err := repo.Update(context.Background(), args)
@@ -258,7 +262,7 @@ func TestUpdateImage(t *testing.T) {
 				ID: img.ID,
 			}
 
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			_, err := repo.Update(context.Background(), args)
@@ -286,7 +290,7 @@ func TestUpdateImage(t *testing.T) {
 				CreatedAt: prev.CreatedAt,
 			}
 
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			got, err := repo.Update(context.Background(), args)
@@ -298,7 +302,7 @@ func TestUpdateImage(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			err := db.Close(context.Background())
@@ -317,7 +321,7 @@ func TestDeleteImage(t *testing.T) {
 			str := createStore(db)
 			img := createImage(t, str)
 
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			err := repo.Delete(context.Background(), img.ID)
@@ -331,7 +335,7 @@ func TestDeleteImage(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			mappers := NewImageRepositoryMappers(&generated.InternalImageRepoMapperImpl{})
+			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
 			err := db.Close(context.Background())
