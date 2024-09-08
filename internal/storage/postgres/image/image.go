@@ -7,12 +7,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type ImageRepository struct {
-	Store *Store
+	store *store.Store
 	ImageRepositoryMappers
 }
 
@@ -26,27 +26,27 @@ func NewImageRepositoryMappers(iMapper mapper.InternalImageRepoMapper) ImageRepo
 	}
 }
 
-func NewImageRepository(store *Store, mappers ImageRepositoryMappers) storage.ImageRepository {
-	store.SetEntityType(Image)
+func NewImageRepository(s *store.Store, mappers ImageRepositoryMappers) storage.ImageRepository {
+	s.SetEntityType(store.Image)
 	return &ImageRepository{
-		Store:                  store,
+		store:                  s,
 		ImageRepositoryMappers: mappers,
 	}
 }
 
 func (r *ImageRepository) GetAll(ctx context.Context) ([]*entities.Image, error) {
-	rows, err := r.Store.GetAllImages(ctx)
+	rows, err := r.store.GetAllImages(ctx)
 	if err != nil {
-		return nil, r.Store.HandleError(err)
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSqlList(rows), nil
 }
 
 func (r *ImageRepository) GetByID(ctx context.Context, id int32) (*entities.Image, error) {
-	row, err := r.Store.GetImageByID(ctx, id)
+	row, err := r.store.GetImageByID(ctx, id)
 	if err != nil {
-		return nil, r.Store.HandleError(err)
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -58,9 +58,9 @@ func (r *ImageRepository) Create(ctx context.Context, image *entities.CreateImag
 		Filename: image.Filename,
 		MimeType: image.MimeType,
 	}
-	id, err := r.Store.CreateImage(ctx, params)
+	id, err := r.store.CreateImage(ctx, params)
 	if err != nil {
-		return nil, r.Store.HandleError(err)
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.GetByID(ctx, id)
@@ -69,7 +69,7 @@ func (r *ImageRepository) Create(ctx context.Context, image *entities.CreateImag
 func (r *ImageRepository) Update(ctx context.Context, image *entities.UpdateImage) (*entities.Image, error) {
 	prev, err := r.GetByID(ctx, image.ID)
 	if err != nil {
-		return nil, r.Store.HandleError(err)
+		return nil, r.store.HandleError(err)
 	}
 
 	if !hasChanges(prev, image) {
@@ -87,15 +87,15 @@ func (r *ImageRepository) Update(ctx context.Context, image *entities.UpdateImag
 		MimeType: utils.CompareAndUpdate(prev.MimeType, &image.MimeType),
 	}
 
-	if err := r.Store.UpdateImage(ctx, params); err != nil {
-		return nil, r.Store.HandleError(err)
+	if err := r.store.UpdateImage(ctx, params); err != nil {
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.GetByID(ctx, image.ID)
 }
 
 func (r *ImageRepository) Delete(ctx context.Context, id int32) error {
-	return r.Store.DeleteImage(ctx, id)
+	return r.store.DeleteImage(ctx, id)
 }
 
 func hasChanges(p *entities.Image, u *entities.UpdateImage) bool {

@@ -2,18 +2,21 @@ package treecluster
 
 import (
 	"context"
-	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
+	"errors"
+	"log/slog"
 	"time"
+
+	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type TreeClusterRepository struct {
-	store *Store
+	store *store.Store
 	TreeClusterMappers
 }
 
@@ -29,10 +32,10 @@ func NewTreeClusterRepositoryMappers(tcMapper sensorMapper.InternalTreeClusterRe
 	}
 }
 
-func NewTreeClusterRepository(store *Store, mappers TreeClusterMappers) storage.TreeClusterRepository {
-	store.SetEntityType(TreeCluster)
+func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storage.TreeClusterRepository {
+	s.SetEntityType(store.TreeCluster)
 	return &TreeClusterRepository{
-		store:              store,
+		store:              s,
 		TreeClusterMappers: mappers,
 	}
 }
@@ -65,7 +68,6 @@ func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id
 }
 
 func (r *TreeClusterRepository) Create(ctx context.Context, tc *entities.CreateTreeCluster) (*entities.TreeCluster, error) {
-
 	entity := sqlc.CreateTreeClusterParams{
 		Region:        tc.Region,
 		Address:       tc.Address,
@@ -147,10 +149,11 @@ func (r *TreeClusterRepository) UpdateLastWatered(ctx context.Context, id int32,
 	return nil
 }
 
-func (r *TreeClusterRepository) UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error {
+func (r *TreeClusterRepository) UpdateGeometry(ctx context.Context, id int32, latitude, longitude float64) error {
 	// TODO: implement
+	slog.Info("Not implemented yet", "function", "UpdateGeometry", "context", ctx, "id", id, "latitude", latitude, "longitude", longitude)
 
-	return nil
+	return errors.New("not implemented")
 }
 
 func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.UpdateTreeCluster) (*entities.TreeCluster, error) {
@@ -159,6 +162,14 @@ func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.UpdateT
 		return nil, r.store.HandleError(err)
 	}
 
+	if err := r.updateEntity(ctx, prev, tc); err != nil {
+		return nil, err
+	}
+
+	return r.updateAttributes(ctx, prev, tc)
+}
+
+func (r *TreeClusterRepository) updateEntity(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
 	entity := sqlc.UpdateTreeClusterParams{
 		ID:          tc.ID,
 		Region:      utils.CompareAndUpdate(prev.Region, tc.Region),
@@ -168,42 +179,69 @@ func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.UpdateT
 		Longitude:   utils.CompareAndUpdate(prev.Longitude, tc.Longitude),
 	}
 
-	err = r.store.UpdateTreeCluster(ctx, &entity)
-	if err != nil {
-		return nil, err
+	return r.store.UpdateTreeCluster(ctx, &entity)
+}
+
+func (r *TreeClusterRepository) updateAttributes(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) (*entities.TreeCluster, error) {
+	updateFuncs := []func(context.Context, *entities.TreeCluster, *entities.UpdateTreeCluster) error{
+		r.UpdateMoistureLevelIfChanged,
+		r.UpdateWateringStatusIfChanged,
+		r.UpdateSoilConditionIfChanged,
+		r.UpdateLastWateredIfChanged,
+		r.ArchiveIfChanged,
 	}
 
-	if tc.MoistureLevel != nil && prev.MoistureLevel != *tc.MoistureLevel {
-		if err := r.UpdateMoistureLevel(ctx, tc.ID, *tc.MoistureLevel); err != nil {
-			return nil, err
-		}
-	}
-
-	if tc.WateringStatus != nil && prev.WateringStatus != *tc.WateringStatus {
-		if err := r.UpdateWateringStatus(ctx, tc.ID, *tc.WateringStatus); err != nil {
-			return nil, err
-		}
-	}
-
-	if tc.SoilCondition != nil && prev.SoilCondition != *tc.SoilCondition {
-		if err := r.UpdateSoilCondition(ctx, tc.ID, *tc.SoilCondition); err != nil {
-			return nil, err
-		}
-	}
-
-	if tc.LastWatered != nil && prev.LastWatered != *tc.LastWatered {
-		if err := r.UpdateLastWatered(ctx, tc.ID, *tc.LastWatered); err != nil {
-			return nil, err
-		}
-	}
-
-	if tc.Archived != nil && prev.Archived != *tc.Archived && *tc.Archived {
-		if err := r.Archive(ctx, tc.ID); err != nil {
+	for _, fn := range updateFuncs {
+		if err := fn(ctx, prev, tc); err != nil {
 			return nil, err
 		}
 	}
 
 	return r.GetByID(ctx, tc.ID)
+}
+
+func (r *TreeClusterRepository) UpdateMoistureLevelIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
+	if tc.MoistureLevel == nil {
+		return nil
+	}
+
+	return r.UpdateMoistureLevel(ctx, prev.ID, *tc.MoistureLevel)
+}
+
+func (r *TreeClusterRepository) UpdateWateringStatusIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
+	if tc.WateringStatus == nil {
+		return nil
+	}
+
+	return r.UpdateWateringStatus(ctx, prev.ID, *tc.WateringStatus)
+}
+
+func (r *TreeClusterRepository) UpdateSoilConditionIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
+	if tc.SoilCondition == nil {
+		return nil
+	}
+
+	return r.UpdateSoilCondition(ctx, prev.ID, *tc.SoilCondition)
+}
+
+func (r *TreeClusterRepository) UpdateLastWateredIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
+	if tc.LastWatered == nil {
+		return nil
+	}
+
+	return r.UpdateLastWatered(ctx, prev.ID, *tc.LastWatered)
+}
+
+func (r *TreeClusterRepository) ArchiveIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
+	if tc.Archived == nil {
+		return nil
+	}
+
+	if *tc.Archived {
+		return r.Archive(ctx, prev.ID)
+	}
+
+	return nil
 }
 
 func (r *TreeClusterRepository) Archive(ctx context.Context, id int32) error {

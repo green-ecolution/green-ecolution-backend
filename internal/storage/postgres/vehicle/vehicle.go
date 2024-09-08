@@ -9,11 +9,11 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
 type VehicleRepository struct {
-	store *Store
+	store *store.Store
 	VehicleRepositoryMappers
 }
 
@@ -27,9 +27,10 @@ func NewVehicleRepositoryMappers(vMapper mapper.InternalVehicleRepoMapper) Vehic
 	}
 }
 
-func NewVehicleRepository(store *Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
+func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
+	s.SetEntityType(store.Vehicle)
 	return &VehicleRepository{
-		store:                    store,
+		store:                    s,
 		VehicleRepositoryMappers: mappers,
 	}
 }
@@ -89,7 +90,7 @@ func (r *VehicleRepository) Update(ctx context.Context, vehicle *entities.Update
 		WaterCapacity: utils.CompareAndUpdate(prev.WaterCapacity, vehicle.WaterCapacity),
 	}
 
-	if err = r.store.UpdateVehicle(ctx, params); err != nil {
+	if err := r.store.UpdateVehicle(ctx, params); err != nil {
 		return nil, err
 	}
 

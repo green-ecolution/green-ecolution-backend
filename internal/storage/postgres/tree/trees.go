@@ -8,14 +8,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 )
 
 type TreeRepository struct {
-	store *Store
+	store *store.Store
 	TreeMappers
 }
 
@@ -40,10 +40,10 @@ func NewTreeRepositoryMappers(
 	}
 }
 
-func NewTreeRepository(store *Store, mappers TreeMappers) storage.TreeRepository {
-	store.SetEntityType(Tree)
+func NewTreeRepository(s *store.Store, mappers TreeMappers) storage.TreeRepository {
+	s.SetEntityType(store.Tree)
 	return &TreeRepository{
-		store:       store,
+		store:       s,
 		TreeMappers: mappers,
 	}
 }
@@ -104,7 +104,6 @@ func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*ent
 }
 
 func (r *TreeRepository) Create(ctx context.Context, tree *entities.CreateTree) (*entities.Tree, error) {
-
 	entity := sqlc.CreateTreeParams{
 		TreeClusterID:       &tree.TreeClusterID,
 		Species:             tree.Species,

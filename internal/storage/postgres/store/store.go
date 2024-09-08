@@ -19,6 +19,7 @@ const (
 	Flowerbed   EntityType = "flowerbed"
 	TreeCluster EntityType = "treecluster"
 	Tree        EntityType = "tree"
+	Vehicle     EntityType = "vehicle"
 )
 
 type Store struct {
@@ -43,7 +44,7 @@ func (s *Store) HandleError(err error) error {
 		return nil
 	}
 
-	slog.Error("An Error occured in database operation", "error", err, "entityType", s.entityType)
+	slog.Error("An Error occurred in database operation", "error", err, "entityType", s.entityType)
 	switch err {
 	case pgx.ErrNoRows:
 		switch s.entityType {
@@ -64,7 +65,7 @@ func (s *Store) HandleError(err error) error {
 			return storage.ErrEntityNotFound
 		}
 	case pgx.ErrTooManyRows:
-		slog.Error("Recieve more rows then expected", "error", err, "stack", errors.WithStack(err))
+		slog.Error("Receive more rows then expected", "error", err, "stack", errors.WithStack(err))
 		return storage.ErrToManyRows
 	case pgx.ErrTxClosed:
 		slog.Error("Connection is closed", "error", err, "stack", errors.WithStack(err))
@@ -80,7 +81,6 @@ func (s *Store) HandleError(err error) error {
 		slog.Error("Unknown error", "error", err, "stack", errors.WithStack(err))
 		return errors.Wrap(err, "unknown error in postgres store")
 	}
-
 }
 
 func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
@@ -91,8 +91,10 @@ func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error 
 	q := sqlc.New(tx)
 	err = fn(q)
 	if err != nil {
-		tx.Rollback(ctx)
-		return err
+		err = tx.Rollback(ctx)
+		if err != nil {
+			return err
+		}
 	}
 	return tx.Commit(ctx)
 }

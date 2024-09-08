@@ -24,7 +24,7 @@ var (
 	ErrTreeClusterNotFound = errors.New("treecluster not found")
 
 	ErrUnknowError      = errors.New("unknown error")
-	ErrToManyRows       = errors.New("recieve more rows then expected")
+	ErrToManyRows       = errors.New("receive more rows then expected")
 	ErrConnectionClosed = errors.New("connection is closed")
 	ErrTxClosed         = errors.New("transaction closed")
 	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")

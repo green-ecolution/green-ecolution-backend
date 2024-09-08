@@ -28,9 +28,12 @@ var (
 	dbPort int
 )
 
-func SetupPostgresContainer() (close func(), url *string, err error) {
+func SetupPostgresContainer() (shutdown func(), url *string, err error) {
 	slog.Info("Setting up postgres container")
 	ctx := context.Background()
+
+	startupTimeout := time.Second * 30
+	pollInterval := time.Microsecond * 100
 
 	req := testcontainers.ContainerRequest{
 		Image:        "postgis/postgis",
@@ -45,8 +48,8 @@ func SetupPostgresContainer() (close func(), url *string, err error) {
 		WaitingFor: wait.ForSQL(nat.Port("5432/tcp"), "pgx", func(host string, port nat.Port) string {
 			return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUsername, dbPassword, host, port.Port(), dbName)
 		}).
-			WithStartupTimeout(time.Second * 30).
-			WithPollInterval(time.Microsecond * 100).
+			WithStartupTimeout(startupTimeout).
+			WithPollInterval(pollInterval).
 			WithQuery("SELECT 1"),
 	}
 
@@ -82,25 +85,29 @@ func SetupPostgresContainer() (close func(), url *string, err error) {
 	}
 	dbPort = p.Int()
 
-	dbUrl := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
-	pgxConn, err := pgx.Connect(ctx, dbUrl)
+	dbURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
+	pgxConn, err := pgx.Connect(ctx, dbURL)
 	if err != nil {
-		return closeFunc, &dbUrl, err
+		return closeFunc, &dbURL, err
 	}
 
 	if err := pgxConn.Ping(ctx); err != nil {
 		slog.Error("Error pinging PostgreSQL", "error", err)
-		return closeFunc, &dbUrl, err
+		return closeFunc, &dbURL, err
 	}
 
-	db, err := sql.Open("pgx", dbUrl)
+	db, err := sql.Open("pgx", dbURL)
 	if err != nil {
 		slog.Error("Error connecting to PostgreSQL", "error", err)
-		return closeFunc, &dbUrl, err
+		return closeFunc, &dbURL, err
 	}
-	execMigration(db)
 
-	return closeFunc, &dbUrl, nil
+	if err = execMigration(db); err != nil {
+		slog.Error("Error executing migration", "error", err)
+		panic(err)
+	}
+
+	return closeFunc, &dbURL, nil
 }
 
 func execMigration(db *sql.DB) error {
@@ -118,7 +125,7 @@ func execMigration(db *sql.DB) error {
 }
 
 // WithTx Run tests with a transaction. This function will rollback the transaction after the test is done.
-func WithTx(t *testing.T, fn func(db *pgx.Conn)) {
+func WithTx(_ *testing.T, fn func(db *pgx.Conn)) {
 	ctx := context.Background()
 	dbURL := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUsername, dbPassword, dbName)
 	db, err := pgx.Connect(ctx, dbURL)

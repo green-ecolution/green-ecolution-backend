@@ -54,7 +54,12 @@ type RandomImage struct {
 }
 
 func initFaker() {
-	faker.AddProvider("randomImage", func(v reflect.Value) (interface{}, error) {
+	onErr := func(err error) {
+		slog.Error("Error faking data", "error", err)
+		os.Exit(1)
+	}
+
+	err := faker.AddProvider("randomImage", func(v reflect.Value) (interface{}, error) {
 		images := make([]*RandomImage, 3)
 		for i := 0; i < 3; i++ {
 			img := RandomImage{}
@@ -68,7 +73,11 @@ func initFaker() {
 		return images, nil
 	})
 
-	faker.AddProvider("randomSensor", func(v reflect.Value) (interface{}, error) {
+	if err != nil {
+		onErr(err)
+	}
+
+	err = faker.AddProvider("randomSensor", func(v reflect.Value) (interface{}, error) {
 		sensor := RandomSensor{}
 		err := faker.FakeData(&sensor)
 		if err != nil {
@@ -77,6 +86,11 @@ func initFaker() {
 
 		return &sensor, nil
 	})
+
+	if err != nil {
+		onErr(err)
+	}
+
 }
 
 func mapperRepo() FlowerbedMappers {
