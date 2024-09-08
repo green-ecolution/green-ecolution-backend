@@ -13,7 +13,7 @@ import (
 )
 
 type VehicleRepository struct {
-  store *Store
+	store *Store
 	VehicleRepositoryMappers
 }
 
@@ -29,7 +29,7 @@ func NewVehicleRepositoryMappers(vMapper mapper.InternalVehicleRepoMapper) Vehic
 
 func NewVehicleRepository(store *Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
 	return &VehicleRepository{
-    store: store,
+		store:                    store,
 		VehicleRepositoryMappers: mappers,
 	}
 }
@@ -77,10 +77,10 @@ func (r *VehicleRepository) Create(ctx context.Context, vehicle *entities.Create
 }
 
 func (r *VehicleRepository) Update(ctx context.Context, vehicle *entities.UpdateVehicle) (*entities.Vehicle, error) {
-  prev, err := r.GetByID(ctx, vehicle.ID)
-  if err != nil {
-    return nil, r.store.HandleError(err)
-  }
+	prev, err := r.GetByID(ctx, vehicle.ID)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
 
 	params := &sqlc.UpdateVehicleParams{
 		ID:            vehicle.ID,

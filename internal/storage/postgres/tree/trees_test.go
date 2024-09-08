@@ -547,32 +547,32 @@ func TestUpdateTree(t *testing.T) {
 		})
 	})
 
-  t.Run("should update tree cluster id", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      tc := createTreeCluster(t, str)
-      createTrees(t, str, tc)
+	t.Run("should update tree cluster id", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+			createTrees(t, str, tc)
 
-      tcNew := createTreeCluster(t, str)
+			tcNew := createTreeCluster(t, str)
 
-      mappers := initMappers()
-      repo := NewTreeRepository(str, mappers)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
 
-      for _, tree := range tc.Trees {
-        tree.TreeCluster = tcNew
-        arg := &entities.UpdateTree{
-          ID:            tree.ID,
-          TreeClusterID: utils.P(tcNew.ID),
-        }
+			for _, tree := range tc.Trees {
+				tree.TreeCluster = tcNew
+				arg := &entities.UpdateTree{
+					ID:            tree.ID,
+					TreeClusterID: utils.P(tcNew.ID),
+				}
 
-        got, err := repo.Update(context.Background(), arg)
-        assert.NoError(t, err)
-        assert.NotNil(t, got)
+				got, err := repo.Update(context.Background(), arg)
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
 
-        assertTree(t, tree, got)
-      }
-    })
-  })
+				assertTree(t, tree, got)
+			}
+		})
+	})
 
 	t.Run("should return error if tree not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
@@ -612,40 +612,40 @@ func TestUpdateTree(t *testing.T) {
 }
 
 func TestDeleteTree(t *testing.T) {
-  t.Parallel()
-  t.Run("should delete tree", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      tc := createTreeCluster(t, str)
-      createTrees(t, str, tc)
+	t.Parallel()
+	t.Run("should delete tree", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+			createTrees(t, str, tc)
 
-      mappers := initMappers()
-      repo := NewTreeRepository(str, mappers)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
 
-      for _, tree := range tc.Trees {
-        err := repo.Delete(context.Background(), tree.ID)
-        assert.NoError(t, err)
+			for _, tree := range tc.Trees {
+				err := repo.Delete(context.Background(), tree.ID)
+				assert.NoError(t, err)
 
-        got, err := repo.GetByID(context.Background(), tree.ID)
-        assert.Error(t, err)
-        assert.Nil(t, got)
-      }
-    })
-  })
+				got, err := repo.GetByID(context.Background(), tree.ID)
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			}
+		})
+	})
 
-  t.Run("should return error if query fails", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      mappers := initMappers()
-      repo := NewTreeRepository(str, mappers)
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			mappers := initMappers()
+			repo := NewTreeRepository(str, mappers)
 
-      err := db.Close(context.Background())
-      assert.NoError(t, err)
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
 
-      err = repo.Delete(context.Background(), 1)
-      assert.Error(t, err)
-    })
-  })
+			err = repo.Delete(context.Background(), 1)
+			assert.Error(t, err)
+		})
+	})
 }
 
 func assertTreeCluster(t *testing.T, expected, actual *entities.TreeCluster) {

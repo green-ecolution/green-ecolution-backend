@@ -14,14 +14,14 @@ type Vehicle struct {
 }
 
 type CreateVehicle struct {
-  NumberPlate   string
+	NumberPlate   string
 	Description   string
 	WaterCapacity float64
 }
 
 type UpdateVehicle struct {
-  ID            int32
-  NumberPlate   *string
-  Description   *string
-  WaterCapacity *float64
+	ID            int32
+	NumberPlate   *string
+	Description   *string
+	WaterCapacity *float64
 }
