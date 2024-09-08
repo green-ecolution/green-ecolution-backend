@@ -146,7 +146,7 @@ lint:
 .PHONY: test
 test:
 	@echo "Testing..."
-	go test ./...
+	go test -v -cover ./...
 
 .PHONY: config/enc
 config/enc:
