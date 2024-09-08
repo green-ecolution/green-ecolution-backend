@@ -71,7 +71,7 @@ type randomImage struct {
 }
 
 func initFaker() {
-	faker.AddProvider("randomTrees", func(v reflect.Value) (interface{}, error) {
+	err := faker.AddProvider("randomTrees", func(v reflect.Value) (interface{}, error) {
 		trees := make([]*randomTree, 10)
 		for i := 0; i < 10; i++ {
 			tree := randomTree{}
@@ -85,7 +85,12 @@ func initFaker() {
 		return trees, nil
 	})
 
-	faker.AddProvider("randomImages", func(v reflect.Value) (interface{}, error) {
+	if err != nil {
+		slog.Error("Error adding provider", "error", err)
+		return
+	}
+
+	err = faker.AddProvider("randomImages", func(v reflect.Value) (interface{}, error) {
 		images := make([]*randomImage, 3)
 		for i := 0; i < 3; i++ {
 			img := randomImage{}
@@ -99,7 +104,12 @@ func initFaker() {
 		return images, nil
 	})
 
-	faker.AddProvider("randomSensor", func(v reflect.Value) (interface{}, error) {
+	if err != nil {
+		slog.Error("Error adding provider", "error", err)
+		return
+	}
+
+	err = faker.AddProvider("randomSensor", func(v reflect.Value) (interface{}, error) {
 		sensor := randomSensor{}
 		err := faker.FakeData(&sensor)
 		if err != nil {
@@ -108,6 +118,11 @@ func initFaker() {
 
 		return &sensor, nil
 	})
+
+	if err != nil {
+		slog.Error("Error adding provider", "error", err)
+		return
+	}
 }
 
 func TestMain(m *testing.M) {

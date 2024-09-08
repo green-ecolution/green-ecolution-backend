@@ -14,7 +14,7 @@ import (
 )
 
 func NewRepository(conn *pgx.Conn) *storage.Repository {
-	store := store.NewStore(conn)
+	s := store.NewStore(conn)
 
 	treeMappers := tree.NewTreeRepositoryMappers(
 		&mapper.InternalTreeRepoMapperImpl{},
@@ -22,35 +22,35 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
-	treeRepo := tree.NewTreeRepository(store, treeMappers)
+	treeRepo := tree.NewTreeRepository(s, treeMappers)
 
 	tcMappers := treecluster.NewTreeClusterRepositoryMappers(
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 	)
-	treeClusterRepo := treecluster.NewTreeClusterRepository(store, tcMappers)
+	treeClusterRepo := treecluster.NewTreeClusterRepository(s, tcMappers)
 
 	imageMappers := image.NewImageRepositoryMappers(
 		&mapper.InternalImageRepoMapperImpl{},
 	)
-	imageRepo := image.NewImageRepository(store, imageMappers)
+	imageRepo := image.NewImageRepository(s, imageMappers)
 
 	vehicleMappers := vehicle.NewVehicleRepositoryMappers(
 		&mapper.InternalVehicleRepoMapperImpl{},
 	)
-	vehicleRepo := vehicle.NewVehicleRepository(store, vehicleMappers)
+	vehicleRepo := vehicle.NewVehicleRepository(s, vehicleMappers)
 
 	sensorMappers := sensor.NewSensorRepositoryMappers(
 		&mapper.InternalSensorRepoMapperImpl{},
 	)
-	sensorRepo := sensor.NewSensorRepository(store, sensorMappers)
+	sensorRepo := sensor.NewSensorRepository(s, sensorMappers)
 
 	flowMappers := flowerbed.NewFlowerbedMappers(
 		&mapper.InternalFlowerbedRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(store, flowMappers)
+	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowMappers)
 
 	return &storage.Repository{
 		Tree:        treeRepo,

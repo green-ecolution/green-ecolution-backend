@@ -8,12 +8,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	. "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/pkg/errors"
 )
 
 type SensorRepository struct {
-	store *Store
+	store *store.Store
 	SensorRepositoryMappers
 }
 
@@ -27,9 +27,10 @@ func NewSensorRepositoryMappers(sMapper mapper.InternalSensorRepoMapper) SensorR
 	}
 }
 
-func NewSensorRepository(store *Store, mappers SensorRepositoryMappers) storage.SensorRepository {
+func NewSensorRepository(s *store.Store, mappers SensorRepositoryMappers) storage.SensorRepository {
+	s.SetEntityType(store.Sensor)
 	return &SensorRepository{
-		store:                   store,
+		store:                   s,
 		SensorRepositoryMappers: mappers,
 	}
 }
