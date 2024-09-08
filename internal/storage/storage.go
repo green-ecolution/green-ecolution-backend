@@ -3,7 +3,6 @@ package storage
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
@@ -30,12 +29,12 @@ var (
 	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")
 )
 
-type BasicCrudRepository[T any, U any] interface {
+type BasicCrudRepository[T entities.Entities] interface {
 	GetAll(ctx context.Context) ([]*T, error)
 	GetByID(ctx context.Context, id int32) (*T, error)
 
-	Create(ctx context.Context, fn ...U) (*T, error)
-	Update(ctx context.Context, id int32, fn ...U) (*T, error)
+	Create(ctx context.Context, fn ...entities.EntityFunc[T]) (*T, error)
+	Update(ctx context.Context, id int32, fn ...entities.EntityFunc[T]) (*T, error)
 	Delete(ctx context.Context, id int32) error
 }
 
@@ -50,7 +49,6 @@ type UserRepository interface {
 }
 
 type RoleRepository interface {
-	BasicCrudRepository[entities.Role]
 	GetByName(ctx context.Context, name string) (*entities.Role, error)
 }
 
@@ -64,7 +62,7 @@ type VehicleRepository interface {
 }
 
 type TreeClusterRepository interface {
-	BasicCrudRepository[entities.TreeCluster, entities.EntityFunc[entities.TreeCluster]]
+	BasicCrudRepository[entities.TreeCluster]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
 	UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
 	Archive(ctx context.Context, id int32) error

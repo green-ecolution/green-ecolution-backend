@@ -12,7 +12,6 @@ import (
 	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
@@ -53,11 +52,11 @@ func createVehicle(t *testing.T, str *store.Store) *entities.Vehicle {
 	mappers := initMapper()
 	repo := NewVehicleRepository(str, mappers)
 
-	got, err := repo.Create(context.Background(), &entities.CreateVehicle{
-		NumberPlate:   v.NumberPlate,
-		Description:   v.Description,
-		WaterCapacity: v.WaterCapacity,
-	})
+	got, err := repo.Create(context.Background(),
+		WithNumberPlate(v.NumberPlate),
+		WithDescription(v.Description),
+		WithWaterCapacity(v.WaterCapacity),
+	)
 	if err != nil {
 		t.Fatalf("error creating vehicle: %v", err)
 	}
@@ -91,11 +90,7 @@ func TestCreateVehicle(t *testing.T) {
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
-			_, err = repo.Create(context.Background(), &entities.CreateVehicle{
-				NumberPlate:   "AB1234",
-				Description:   "This is a vehicle",
-				WaterCapacity: 100.0,
-			})
+			_, err = repo.Create(context.Background())
 			assert.Error(t, err)
 		})
 	})
@@ -245,14 +240,12 @@ func TestUpdateVehicle(t *testing.T) {
 			v.Description = "Updated description"
 			v.WaterCapacity = 200.0
 			v.NumberPlate = "CD5678"
-			args := &entities.UpdateVehicle{
-				ID:            v.ID,
-				Description:   utils.P(v.Description),
-				WaterCapacity: utils.P(v.WaterCapacity),
-				NumberPlate:   utils.P(v.NumberPlate),
-			}
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), v.ID,
+				WithNumberPlate(v.NumberPlate),
+				WithDescription(v.Description),
+				WithWaterCapacity(v.WaterCapacity),
+			)
 			assert.NoError(t, err)
 			assertVehicle(t, got, v)
 		})
@@ -266,15 +259,8 @@ func TestUpdateVehicle(t *testing.T) {
 			repo := NewVehicleRepository(str, mappers)
 
 			v.Description = "Updated description"
+			got, err := repo.Update(context.Background(), v.ID, WithDescription(v.Description))
 
-			args := &entities.UpdateVehicle{
-				ID:            v.ID,
-				Description:   utils.P(v.Description),
-				WaterCapacity: nil,
-				NumberPlate:   nil,
-			}
-
-			got, err := repo.Update(context.Background(), args)
 			assert.NoError(t, err)
 			assertVehicle(t, got, v)
 		})
@@ -288,15 +274,8 @@ func TestUpdateVehicle(t *testing.T) {
 			repo := NewVehicleRepository(str, mappers)
 
 			v.WaterCapacity = 200.0
+			got, err := repo.Update(context.Background(), v.ID, WithWaterCapacity(v.WaterCapacity))
 
-			args := &entities.UpdateVehicle{
-				ID:            v.ID,
-				Description:   nil,
-				WaterCapacity: utils.P(v.WaterCapacity),
-				NumberPlate:   nil,
-			}
-
-			got, err := repo.Update(context.Background(), args)
 			assert.NoError(t, err)
 			assertVehicle(t, got, v)
 		})
@@ -310,15 +289,8 @@ func TestUpdateVehicle(t *testing.T) {
 			repo := NewVehicleRepository(str, mappers)
 
 			v.NumberPlate = "CD5678"
+			got, err := repo.Update(context.Background(), v.ID, WithNumberPlate(v.NumberPlate))
 
-			args := &entities.UpdateVehicle{
-				ID:            v.ID,
-				Description:   nil,
-				WaterCapacity: nil,
-				NumberPlate:   utils.P(v.NumberPlate),
-			}
-
-			got, err := repo.Update(context.Background(), args)
 			assert.NoError(t, err)
 			assertVehicle(t, got, v)
 		})
@@ -327,15 +299,11 @@ func TestUpdateVehicle(t *testing.T) {
 	t.Run("should return error if vehicle not found", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			v := createVehicle(t, str)
 			mappers := initMapper()
+
 			repo := NewVehicleRepository(str, mappers)
+			_, err := repo.Update(context.Background(), 999)
 
-			v.ID = 999
-
-			_, err := repo.Update(context.Background(), &entities.UpdateVehicle{
-				ID: v.ID,
-			})
 			assert.Error(t, err)
 		})
 	})
@@ -350,9 +318,7 @@ func TestUpdateVehicle(t *testing.T) {
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Update(context.Background(), &entities.UpdateVehicle{
-				ID: v.ID,
-			})
+			_, err = repo.Update(context.Background(), v.ID)
 			assert.Error(t, err)
 		})
 	})
