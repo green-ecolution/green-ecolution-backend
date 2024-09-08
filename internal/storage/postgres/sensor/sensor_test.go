@@ -47,9 +47,7 @@ func createSensor(t *testing.T, str *store.Store) *entities.Sensor {
 	mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 	repo := NewSensorRepository(str, mappers)
 
-	got, err := repo.Create(context.Background(), &entities.CreateSensor{
-		Status: sensor.Status,
-	})
+	got, err := repo.Create(context.Background(), WithStatus(sensor.Status))
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 
@@ -79,9 +77,7 @@ func TestCreateSensor(t *testing.T) {
 			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
-			_, err := repo.Create(context.Background(), &entities.CreateSensor{
-				Status: "invalid",
-			})
+			_, err := repo.Create(context.Background(), WithStatus("invalid"))
 			assert.Error(t, err)
 		})
 	})
@@ -95,9 +91,7 @@ func TestCreateSensor(t *testing.T) {
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Create(context.Background(), &entities.CreateSensor{
-				Status: entities.SensorStatusOnline,
-			})
+			_, err = repo.Create(context.Background(), WithStatus(entities.SensorStatusOnline))
 			assert.Error(t, err)
 		})
 	})
@@ -427,10 +421,7 @@ func TestUpdateSensor(t *testing.T) {
 				UpdatedAt: time.Now(),
 			}
 
-			got, err := repo.Update(context.Background(), &entities.UpdateSensor{
-				ID:     prev.ID,
-				Status: entities.SensorStatusOffline,
-			})
+			got, err := repo.Update(context.Background(), want.ID, WithStatus(want.Status))
 
 			assert.NoError(t, err)
 			assertSensor(t, got, want)
@@ -443,10 +434,7 @@ func TestUpdateSensor(t *testing.T) {
 			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
-			_, err := repo.Update(context.Background(), &entities.UpdateSensor{
-				ID:     999,
-				Status: entities.SensorStatusOffline,
-			})
+			_, err := repo.Update(context.Background(), 999)
 			assert.Error(t, err)
 		})
 	})
@@ -454,16 +442,14 @@ func TestUpdateSensor(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
+      s := createSensor(t, str)
 			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Update(context.Background(), &entities.UpdateSensor{
-				ID:     1,
-				Status: entities.SensorStatusOffline,
-			})
+			_, err = repo.Update(context.Background(), s.ID)
 			assert.Error(t, err)
 		})
 	})
