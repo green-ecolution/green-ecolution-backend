@@ -12,3 +12,16 @@ type Vehicle struct {
 	Description   string
 	WaterCapacity float64
 }
+
+type CreateVehicle struct {
+  NumberPlate   string
+	Description   string
+	WaterCapacity float64
+}
+
+type UpdateVehicle struct {
+  ID            int32
+  NumberPlate   *string
+  Description   *string
+  WaterCapacity *float64
+}
