@@ -54,14 +54,14 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 		return nil, r.store.HandleError(err)
 	}
 
-  t := r.mapper.FromSqlList(rows)
-  for _, tree := range t {
-    if err := r.mapFields(ctx, tree); err != nil {
-      return nil, r.store.HandleError(err)
-    }
-  }
+	t := r.mapper.FromSqlList(rows)
+	for _, tree := range t {
+		if err := r.mapFields(ctx, tree); err != nil {
+			return nil, r.store.HandleError(err)
+		}
+	}
 
-  return t, nil
+	return t, nil
 }
 
 func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
@@ -71,11 +71,11 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	}
 
 	t := r.mapper.FromSql(row)
-  if err := r.mapFields(ctx, t); err != nil {
-    return nil, r.store.HandleError(err)
-  }
+	if err := r.mapFields(ctx, t); err != nil {
+		return nil, r.store.HandleError(err)
+	}
 
-  return t, nil
+	return t, nil
 }
 
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
@@ -84,14 +84,14 @@ func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*e
 		return nil, r.store.HandleError(err)
 	}
 
-  t := r.mapper.FromSqlList(rows)
-  for _, tree := range t {
-    if err := r.mapFields(ctx, tree); err != nil {
-      return nil, r.store.HandleError(err)
-    }
-  }
+	t := r.mapper.FromSqlList(rows)
+	for _, tree := range t {
+		if err := r.mapFields(ctx, tree); err != nil {
+			return nil, r.store.HandleError(err)
+		}
+	}
 
-  return t, nil
+	return t, nil
 }
 
 func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error) {
@@ -181,6 +181,8 @@ func (r *TreeRepository) Update(ctx context.Context, tree *entities.UpdateTree) 
 		PlantingYear:        utils.CompareAndUpdate(prev.PlantingYear, tree.PlantingYear),
 		Latitude:            utils.CompareAndUpdate(prev.Latitude, tree.Latitude),
 		Longitude:           utils.CompareAndUpdate(prev.Longitude, tree.Longitude),
+		TreeNumber:          utils.CompareAndUpdate(prev.Number, tree.Number),
+		TreeClusterID:       utils.P(utils.CompareAndUpdate(prev.TreeCluster.ID, tree.TreeClusterID)),
 	}
 
 	err = r.store.UpdateTree(ctx, &entity)
@@ -197,6 +199,24 @@ func (r *TreeRepository) Update(ctx context.Context, tree *entities.UpdateTree) 
 }
 
 func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
+	images, err := r.GetAllImagesByID(ctx, id)
+	if err != nil {
+		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
+	}
+
+	for _, img := range images {
+		args := sqlc.UnlinkTreeImageParams{
+			TreeID:  id,
+			ImageID: img.ID,
+		}
+		if err = r.store.UnlinkTreeImage(ctx, &args); err != nil {
+			return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
+		}
+
+		if err = r.store.DeleteImage(ctx, img.ID); err != nil {
+			return r.store.HandleError(errors.Wrap(err, "failed to delete image"))
+		}
+	}
 	return r.store.DeleteTree(ctx, id)
 }
 
@@ -290,7 +310,7 @@ func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error 
 		return r.store.HandleError(err)
 	}
 
-  return nil
+	return nil
 }
 
 func mapImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
@@ -305,11 +325,11 @@ func mapImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 	sensor, err := r.GetSensorByTreeID(ctx, t.ID)
 	if err != nil {
-    if errors.Is(err, storage.ErrSensorNotFound) {
-      // If sensor is not found, set sensor to nil
-      t.Sensor = nil
-      return nil
-    } 
+		if errors.Is(err, storage.ErrSensorNotFound) {
+			// If sensor is not found, set sensor to nil
+			t.Sensor = nil
+			return nil
+		}
 		return r.store.HandleError(err)
 	}
 	t.Sensor = sensor

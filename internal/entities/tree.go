@@ -41,8 +41,9 @@ type UpdateTree struct {
 	SensorID            *int32
 	ImageIDs            []*int32
 	PlantingYear        *int32
-	Latitude            *float64
 	Number              *int32
+  TreeClusterID       *int32
+	Latitude            *float64
 	Longitude           *float64
 }
 
