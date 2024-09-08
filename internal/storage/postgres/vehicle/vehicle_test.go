@@ -287,12 +287,12 @@ func TestUpdateVehicle(t *testing.T) {
 			mappers := initMapper()
 			repo := NewVehicleRepository(str, mappers)
 
-      v.WaterCapacity = 200.0
+			v.WaterCapacity = 200.0
 
 			args := &entities.UpdateVehicle{
 				ID:            v.ID,
-        Description:   nil,
-        WaterCapacity: utils.P(v.WaterCapacity),
+				Description:   nil,
+				WaterCapacity: utils.P(v.WaterCapacity),
 				NumberPlate:   nil,
 			}
 
@@ -309,13 +309,13 @@ func TestUpdateVehicle(t *testing.T) {
 			mappers := initMapper()
 			repo := NewVehicleRepository(str, mappers)
 
-      v.NumberPlate = "CD5678"
+			v.NumberPlate = "CD5678"
 
 			args := &entities.UpdateVehicle{
 				ID:            v.ID,
-        Description:   nil,
-        WaterCapacity: nil,
-        NumberPlate:   utils.P(v.NumberPlate),
+				Description:   nil,
+				WaterCapacity: nil,
+				NumberPlate:   utils.P(v.NumberPlate),
 			}
 
 			got, err := repo.Update(context.Background(), args)
@@ -359,36 +359,36 @@ func TestUpdateVehicle(t *testing.T) {
 }
 
 func TestDeleteVehicle(t *testing.T) {
-  t.Parallel()
-  t.Run("should delete vehicle", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      v := createVehicle(t, str)
-      mappers := initMapper()
-      repo := NewVehicleRepository(str, mappers)
+	t.Parallel()
+	t.Run("should delete vehicle", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			v := createVehicle(t, str)
+			mappers := initMapper()
+			repo := NewVehicleRepository(str, mappers)
 
-      err := repo.Delete(context.Background(), v.ID)
-      assert.NoError(t, err)
+			err := repo.Delete(context.Background(), v.ID)
+			assert.NoError(t, err)
 
-      _, err = repo.GetByID(context.Background(), v.ID)
-      assert.Error(t, err)
-    })
-  })
+			_, err = repo.GetByID(context.Background(), v.ID)
+			assert.Error(t, err)
+		})
+	})
 
-  t.Run("should return error if query fails", func(t *testing.T) {
-    testutils.WithTx(t, func(db *pgx.Conn) {
-      str := createStore(db)
-      v := createVehicle(t, str)
-      mappers := initMapper()
-      repo := NewVehicleRepository(str, mappers)
+	t.Run("should return error if query fails", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			v := createVehicle(t, str)
+			mappers := initMapper()
+			repo := NewVehicleRepository(str, mappers)
 
-      err := db.Close(context.Background())
-      assert.NoError(t, err)
+			err := db.Close(context.Background())
+			assert.NoError(t, err)
 
-      err = repo.Delete(context.Background(), v.ID)
-      assert.Error(t, err)
-    })
-  })
+			err = repo.Delete(context.Background(), v.ID)
+			assert.Error(t, err)
+		})
+	})
 }
 
 func assertVehicle(t *testing.T, got *entities.Vehicle, want *entities.Vehicle) {

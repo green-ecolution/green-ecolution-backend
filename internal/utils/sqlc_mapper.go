@@ -13,9 +13,9 @@ func PgTimestampToTime(t pgtype.Timestamp) time.Time {
 }
 
 func TimeToPgTimestamp(t time.Time) pgtype.Timestamp {
-  return pgtype.Timestamp{
-    Time: t,
-  }
+	return pgtype.Timestamp{
+		Time: t,
+	}
 }
 
 //nolint:gocritic

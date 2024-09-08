@@ -67,11 +67,11 @@ type VehicleRepository interface {
 type TreeClusterRepository interface {
 	BasicCrudRepository[entities.TreeCluster, entities.CreateTreeCluster, entities.UpdateTreeCluster]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
-  UpdateSoilCondition(ctx context.Context, id int32, soilCondition entities.TreeSoilCondition) error
-  UpdateWateringStatus(ctx context.Context, id int32, wateringStatus entities.TreeClusterWateringStatus) error
-  UpdateMoistureLevel(ctx context.Context, id int32, moistureLevel float64) error
-  UpdateLastWatered(ctx context.Context, id int32, lastWatered time.Time) error
-  UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
+	UpdateSoilCondition(ctx context.Context, id int32, soilCondition entities.TreeSoilCondition) error
+	UpdateWateringStatus(ctx context.Context, id int32, wateringStatus entities.TreeClusterWateringStatus) error
+	UpdateMoistureLevel(ctx context.Context, id int32, moistureLevel float64) error
+	UpdateLastWatered(ctx context.Context, id int32, lastWatered time.Time) error
+	UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
 	Archive(ctx context.Context, id int32) error
 }
 

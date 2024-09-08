@@ -3,8 +3,8 @@ package postgres
 import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed"
-	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
+	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
@@ -19,8 +19,8 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 	treeMappers := tree.NewTreeRepositoryMappers(
 		&mapper.InternalTreeRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
-    &mapper.InternalSensorRepoMapperImpl{},
-    &mapper.InternalTreeClusterRepoMapperImpl{},
+		&mapper.InternalSensorRepoMapperImpl{},
+		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
 	treeRepo := tree.NewTreeRepository(store, treeMappers)
 
