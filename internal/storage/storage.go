@@ -65,7 +65,7 @@ type ImageRepository interface {
 }
 
 type VehicleRepository interface {
-	BasicCrudRepository[entities.Vehicle, entities.Vehicle, entities.Vehicle]
+	BasicCrudRepository[entities.Vehicle, entities.CreateVehicle, entities.UpdateVehicle]
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
 }
 
