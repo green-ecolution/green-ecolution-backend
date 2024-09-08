@@ -119,10 +119,7 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 
 	// Create sensor
 	sensorRepo := sensor.NewSensorRepository(str, sensor.NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{}))
-	sensorArg := &entities.CreateSensor{
-		Status: want.Sensor.Status,
-	}
-	sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
+	sensorGot, err := sensorRepo.Create(context.Background(), sensor.WithStatus(want.Sensor.Status))
 	assert.NoError(t, err)
 	want.Sensor.ID = sensorGot.ID
 
@@ -139,18 +136,19 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 		assert.NoError(t, err)
 	}
 
-	got, err := repo.Create(context.Background(), &entities.CreateFlowerbed{
-		Size:           want.Size,
-		Description:    want.Description,
-		NumberOfPlants: want.NumberOfPlants,
-		MoistureLevel:  want.MoistureLevel,
-		Region:         want.Region,
-		Address:        want.Address,
-		Latitude:       want.Latitude,
-		Longitude:      want.Longitude,
-		SensorID:       &want.Sensor.ID,
-		ImageIDs:       []int32{want.Images[0].ID, want.Images[1].ID, want.Images[2].ID},
-	})
+	got, err := repo.Create(context.Background(),
+		WithSize(want.Size),
+		WithDescription(want.Description),
+		WithNumberOfPlants(want.NumberOfPlants),
+		WithMoistureLevel(want.MoistureLevel),
+		WithRegion(want.Region),
+		WithAddress(want.Address),
+		WithArchived(want.Archived),
+		WithLatitude(want.Latitude),
+		WithLongitude(want.Longitude),
+		WithSensor(&entities.Sensor{ID: want.Sensor.ID}),
+		WithImages(want.Images),
+	)
 	assert.NoError(t, err)
 	want.ID = got.ID
 
