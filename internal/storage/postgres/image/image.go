@@ -2,13 +2,13 @@ package image
 
 import (
 	"context"
+	"log/slog"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type ImageRepository struct {
@@ -34,79 +34,27 @@ func NewImageRepository(s *store.Store, mappers ImageRepositoryMappers) storage.
 	}
 }
 
-func (r *ImageRepository) GetAll(ctx context.Context) ([]*entities.Image, error) {
-	rows, err := r.store.GetAllImages(ctx)
-	if err != nil {
-		return nil, r.store.HandleError(err)
+func WithURL(url string) entities.EntityFunc[entities.Image] {
+	return func(i *entities.Image) {
+		slog.Debug("updating url", "url", url)
+		i.URL = url
 	}
-
-	return r.mapper.FromSqlList(rows), nil
 }
 
-func (r *ImageRepository) GetByID(ctx context.Context, id int32) (*entities.Image, error) {
-	row, err := r.store.GetImageByID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
+func WithFilename(filename *string) entities.EntityFunc[entities.Image] {
+	return func(i *entities.Image) {
+		slog.Debug("updating filename", "filename", filename)
+		i.Filename = filename
 	}
-
-	return r.mapper.FromSql(row), nil
 }
 
-func (r *ImageRepository) Create(ctx context.Context, image *entities.CreateImage) (*entities.Image, error) {
-	params := &sqlc.CreateImageParams{
-		Url:      image.URL,
-		Filename: image.Filename,
-		MimeType: image.MimeType,
+func WithMimeType(mimeType *string) entities.EntityFunc[entities.Image] {
+	return func(i *entities.Image) {
+		slog.Debug("updating mime type", "mime type", mimeType)
+		i.MimeType = mimeType
 	}
-	id, err := r.store.CreateImage(ctx, params)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	return r.GetByID(ctx, id)
-}
-
-func (r *ImageRepository) Update(ctx context.Context, image *entities.UpdateImage) (*entities.Image, error) {
-	prev, err := r.GetByID(ctx, image.ID)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	if !hasChanges(prev, image) {
-		return prev, nil
-	}
-
-	if image.URL == nil {
-		image.URL = &prev.URL
-	}
-
-	params := &sqlc.UpdateImageParams{
-		ID:       image.ID,
-		Url:      *image.URL,
-		Filename: utils.CompareAndUpdate(prev.Filename, &image.Filename),
-		MimeType: utils.CompareAndUpdate(prev.MimeType, &image.MimeType),
-	}
-
-	if err := r.store.UpdateImage(ctx, params); err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	return r.GetByID(ctx, image.ID)
 }
 
 func (r *ImageRepository) Delete(ctx context.Context, id int32) error {
 	return r.store.DeleteImage(ctx, id)
-}
-
-func hasChanges(p *entities.Image, u *entities.UpdateImage) bool {
-	var url string
-	if u.URL != nil {
-		url = *u.URL
-	} else {
-		url = p.URL
-	}
-
-	return (u.Filename != nil && *u.Filename != *p.Filename) ||
-		(u.MimeType != nil && *u.MimeType != *p.MimeType) ||
-		url != p.URL
 }
