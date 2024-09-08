@@ -146,6 +146,11 @@ lint:
 .PHONY: test
 test:
 	@echo "Testing..."
+	go test -cover ./...
+
+.PHONY: test/verbose
+test:
+	@echo "Testing..."
 	go test -v -cover ./...
 
 .PHONY: config/enc
