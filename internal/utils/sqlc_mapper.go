@@ -12,9 +12,13 @@ func PgTimestampToTime(t pgtype.Timestamp) time.Time {
 	return t.Time
 }
 
-func TimeToPgTimestamp(t time.Time) pgtype.Timestamp {
+func TimeToPgTimestamp(t *time.Time) pgtype.Timestamp {
+  if t == nil {
+    return pgtype.Timestamp{}
+  }
+
 	return pgtype.Timestamp{
-		Time: t,
+		Time: *t,
 	}
 }
 

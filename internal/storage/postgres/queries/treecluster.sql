@@ -9,35 +9,10 @@ SELECT sensors.* FROM sensors JOIN tree_clusters ON sensors.id = tree_clusters.s
 
 -- name: CreateTreeCluster :one
 INSERT INTO tree_clusters (
-  region, address, description, moisture_level, latitude, longitude
+  region, address, description, moisture_level, latitude, longitude, watering_status, soil_condition
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4, $5, $6, $7, $8
 ) RETURNING id;
-
--- name: UpdateTreeClusterWateringStatus :exec
-UPDATE tree_clusters SET
-  watering_status = $2
-WHERE id = $1;
-
--- name: UpdateTreeClusterMoistureLevel :exec
-UPDATE tree_clusters SET
-  moisture_level = $2
-WHERE id = $1;
-
--- name: UpdateTreeClusterSoilCondition :exec
-UPDATE tree_clusters SET
-  soil_condition = $2
-WHERE id = $1;
-
--- name: UpdateTreeClusterLastWatered :exec
-UPDATE tree_clusters SET
-  last_watered = $2
-WHERE id = $1;
-
--- name: UpdateTreeClusterGeometry :exec
-UPDATE tree_clusters SET
-  geometry = ST_SetSRID(ST_MakePoint($2, $3), 4326)
-WHERE id = $1;
 
 -- name: UpdateTreeCluster :exec
 UPDATE tree_clusters SET
@@ -45,7 +20,12 @@ UPDATE tree_clusters SET
   address = $3,
   description = $4,
   latitude = $5,
-  longitude = $6
+  longitude = $6,
+  moisture_level = $7,
+  watering_status = $8,
+  soil_condition = $9,
+  last_watered = $10,
+  archived = $11
 WHERE id = $1;
 
 -- name: ArchiveTreeCluster :exec

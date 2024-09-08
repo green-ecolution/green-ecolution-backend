@@ -30,12 +30,12 @@ var (
 	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")
 )
 
-type BasicCrudRepository[T any, C any, U any] interface {
+type BasicCrudRepository[T any, U any] interface {
 	GetAll(ctx context.Context) ([]*T, error)
 	GetByID(ctx context.Context, id int32) (*T, error)
 
-	Create(ctx context.Context, c *C) (*T, error)
-	Update(ctx context.Context, u *U) (*T, error)
+	Create(ctx context.Context, fn ...U) (*T, error)
+	Update(ctx context.Context, id int32, fn ...U) (*T, error)
 	Delete(ctx context.Context, id int32) error
 }
 
@@ -46,43 +46,38 @@ type InfoRepository interface {
 type UserRepository interface {
 	Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error)
 	GetByAccessToken(ctx context.Context, token string) (*entities.User, error)
-
 	RemoveSession(ctx context.Context, token string) error
 }
 
 type RoleRepository interface {
-	BasicCrudRepository[entities.Role, entities.Role, entities.Role]
+	BasicCrudRepository[entities.Role]
 	GetByName(ctx context.Context, name string) (*entities.Role, error)
 }
 
 type ImageRepository interface {
-	BasicCrudRepository[entities.Image, entities.CreateImage, entities.UpdateImage]
+	BasicCrudRepository[entities.Image]
 }
 
 type VehicleRepository interface {
-	BasicCrudRepository[entities.Vehicle, entities.CreateVehicle, entities.UpdateVehicle]
+	BasicCrudRepository[entities.Vehicle]
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
 }
 
 type TreeClusterRepository interface {
-	BasicCrudRepository[entities.TreeCluster, entities.CreateTreeCluster, entities.UpdateTreeCluster]
+	BasicCrudRepository[entities.TreeCluster, entities.EntityFunc[entities.TreeCluster]]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
-	UpdateSoilCondition(ctx context.Context, id int32, soilCondition entities.TreeSoilCondition) error
-	UpdateWateringStatus(ctx context.Context, id int32, wateringStatus entities.TreeClusterWateringStatus) error
-	UpdateMoistureLevel(ctx context.Context, id int32, moistureLevel float64) error
-	UpdateLastWatered(ctx context.Context, id int32, lastWatered time.Time) error
 	UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
 	Archive(ctx context.Context, id int32) error
 }
 
 type TreeRepository interface {
-	BasicCrudRepository[entities.Tree, entities.CreateTree, entities.UpdateTree]
+	BasicCrudRepository[entities.Tree]
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 }
 
 type SensorRepository interface {
-	BasicCrudRepository[entities.Sensor, entities.CreateSensor, entities.UpdateSensor]
+	BasicCrudRepository[entities.Sensor]
 	GetStatusByID(ctx context.Context, id int32) (*entities.SensorStatus, error)
 	GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error)
 	GetSensorDataByID(ctx context.Context, id int32) ([]*entities.SensorData, error)
@@ -90,7 +85,7 @@ type SensorRepository interface {
 }
 
 type FlowerbedRepository interface {
-	BasicCrudRepository[entities.Flowerbed, entities.CreateFlowerbed, entities.UpdateFlowerbed]
+	BasicCrudRepository[entities.Flowerbed]
 	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 	Archive(ctx context.Context, id int32) error

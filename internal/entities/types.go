@@ -9,15 +9,6 @@ type Entities interface {
 		Tree
 }
 
-type UpdateEntity interface {
-	UpdateSensor |
-		UpdateFlowerbed |
-		UpdateImage |
-		UpdateVehicle |
-		UpdateTreeCluster |
-		UpdateTree
-}
-
 type CreateEntity interface {
 	CreateSensor |
 		CreateFlowerbed |
@@ -26,3 +17,5 @@ type CreateEntity interface {
 		CreateTreeCluster |
 		CreateTree
 }
+
+type EntityFunc[T Entities] func(*T)

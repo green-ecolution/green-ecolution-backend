@@ -2,7 +2,6 @@ package treecluster
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"time"
 
@@ -10,9 +9,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type TreeClusterRepository struct {
@@ -40,208 +37,81 @@ func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storag
 	}
 }
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, error) {
-	rows, err := r.store.GetAllTreeClusters(ctx)
-	if err != nil {
-		return nil, r.store.HandleError(err)
+func WithRegion(region string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting region to %s", region)
+		tc.Region = region
 	}
-
-	return r.mapper.FromSqlList(rows), nil
 }
 
-func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {
-	row, err := r.store.GetTreeClusterByID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
+func WithAddress(address string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting address to %s", address)
+		tc.Address = address
 	}
-
-	return r.mapper.FromSql(row), nil
 }
 
-func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error) {
-	row, err := r.store.GetSensorByTreeClusterID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
+func WithDescription(description string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting description to %s", description)
+		tc.Description = description
 	}
-
-	return r.sensorMapper.FromSql(row), nil
 }
 
-func (r *TreeClusterRepository) Create(ctx context.Context, tc *entities.CreateTreeCluster) (*entities.TreeCluster, error) {
-	entity := sqlc.CreateTreeClusterParams{
-		Region:        tc.Region,
-		Address:       tc.Address,
-		Description:   tc.Description,
-		MoistureLevel: tc.MoistureLevel,
-		Latitude:      tc.Latitude,
-		Longitude:     tc.Longitude,
+func WithLatitude(latitude float64) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting latitude to %f", latitude)
+		tc.Latitude = latitude
 	}
-
-	id, err := r.store.CreateTreeCluster(ctx, &entity)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	if tc.WateringStatus != nil && *tc.WateringStatus != entities.TreeClusterWateringStatusUnknown {
-		if err := r.UpdateWateringStatus(ctx, id, *tc.WateringStatus); err != nil {
-			return nil, err
-		}
-	}
-
-	if tc.SoilCondition != nil && *tc.SoilCondition != entities.TreeSoilConditionUnknown {
-		if err := r.UpdateSoilCondition(ctx, id, *tc.SoilCondition); err != nil {
-			return nil, err
-		}
-	}
-
-	return r.GetByID(ctx, id)
 }
 
-func (r *TreeClusterRepository) UpdateSoilCondition(ctx context.Context, id int32, soilCondition entities.TreeSoilCondition) error {
-	args := sqlc.UpdateTreeClusterSoilConditionParams{
-		ID:            id,
-		SoilCondition: sqlc.TreeSoilCondition(soilCondition),
+func WithLongitude(longitude float64) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting longitude to %f", longitude)
+		tc.Longitude = longitude
 	}
-	err := r.store.UpdateTreeClusterSoilCondition(ctx, &args)
-	if err != nil {
-		return r.store.HandleError(err)
-	}
-
-	return nil
 }
 
-func (r *TreeClusterRepository) UpdateWateringStatus(ctx context.Context, id int32, wateringStatus entities.TreeClusterWateringStatus) error {
-	args := sqlc.UpdateTreeClusterWateringStatusParams{
-		ID:             id,
-		WateringStatus: sqlc.TreeClusterWateringStatus(wateringStatus),
+func WithMoistureLevel(moistureLevel float64) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting moistureLevel to %f", moistureLevel)
+		tc.MoistureLevel = moistureLevel
 	}
-	err := r.store.UpdateTreeClusterWateringStatus(ctx, &args)
-	if err != nil {
-		return r.store.HandleError(err)
-	}
-
-	return nil
 }
 
-func (r *TreeClusterRepository) UpdateMoistureLevel(ctx context.Context, id int32, moistureLevel float64) error {
-	args := sqlc.UpdateTreeClusterMoistureLevelParams{
-		ID:            id,
-		MoistureLevel: moistureLevel,
+func WithWateringStatus(wateringStatus entities.TreeClusterWateringStatus) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting wateringStatus to %s", wateringStatus)
+		tc.WateringStatus = wateringStatus
 	}
-	err := r.store.UpdateTreeClusterMoistureLevel(ctx, &args)
-	if err != nil {
-		return r.store.HandleError(err)
-	}
-
-	return nil
 }
 
-func (r *TreeClusterRepository) UpdateLastWatered(ctx context.Context, id int32, lastWatered time.Time) error {
-	args := sqlc.UpdateTreeClusterLastWateredParams{
-		ID:          id,
-		LastWatered: utils.TimeToPgTimestamp(lastWatered),
+func WithSoilCondition(soilCondition entities.TreeSoilCondition) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting soilCondition to %s", soilCondition)
+		tc.SoilCondition = soilCondition
 	}
-	err := r.store.UpdateTreeClusterLastWatered(ctx, &args)
-	if err != nil {
-		return r.store.HandleError(err)
-	}
-
-	return nil
 }
 
-func (r *TreeClusterRepository) UpdateGeometry(ctx context.Context, id int32, latitude, longitude float64) error {
-	// TODO: implement
-	slog.Info("Not implemented yet", "function", "UpdateGeometry", "context", ctx, "id", id, "latitude", latitude, "longitude", longitude)
-
-	return errors.New("not implemented")
+func WithLastWatered(lastWatered time.Time) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting lastWatered to %s", lastWatered)
+		tc.LastWatered = &lastWatered
+	}
 }
 
-func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.UpdateTreeCluster) (*entities.TreeCluster, error) {
-	prev, err := r.GetByID(ctx, tc.ID)
-	if err != nil {
-		return nil, r.store.HandleError(err)
+func WithArchived(archived bool) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updateting archived to %t", archived)
+		tc.Archived = archived
 	}
-
-	if err := r.updateEntity(ctx, prev, tc); err != nil {
-		return nil, err
-	}
-
-	return r.updateAttributes(ctx, prev, tc)
 }
 
-func (r *TreeClusterRepository) updateEntity(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
-	entity := sqlc.UpdateTreeClusterParams{
-		ID:          tc.ID,
-		Region:      utils.CompareAndUpdate(prev.Region, tc.Region),
-		Address:     utils.CompareAndUpdate(prev.Address, tc.Address),
-		Description: utils.CompareAndUpdate(prev.Description, tc.Description),
-		Latitude:    utils.CompareAndUpdate(prev.Latitude, tc.Latitude),
-		Longitude:   utils.CompareAndUpdate(prev.Longitude, tc.Longitude),
-	}
-
-	return r.store.UpdateTreeCluster(ctx, &entity)
-}
-
-func (r *TreeClusterRepository) updateAttributes(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) (*entities.TreeCluster, error) {
-	updateFuncs := []func(context.Context, *entities.TreeCluster, *entities.UpdateTreeCluster) error{
-		r.UpdateMoistureLevelIfChanged,
-		r.UpdateWateringStatusIfChanged,
-		r.UpdateSoilConditionIfChanged,
-		r.UpdateLastWateredIfChanged,
-		r.ArchiveIfChanged,
-	}
-
-	for _, fn := range updateFuncs {
-		if err := fn(ctx, prev, tc); err != nil {
-			return nil, err
-		}
-	}
-
-	return r.GetByID(ctx, tc.ID)
-}
-
-func (r *TreeClusterRepository) UpdateMoistureLevelIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
-	if tc.MoistureLevel == nil {
-		return nil
-	}
-
-	return r.UpdateMoistureLevel(ctx, prev.ID, *tc.MoistureLevel)
-}
-
-func (r *TreeClusterRepository) UpdateWateringStatusIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
-	if tc.WateringStatus == nil {
-		return nil
-	}
-
-	return r.UpdateWateringStatus(ctx, prev.ID, *tc.WateringStatus)
-}
-
-func (r *TreeClusterRepository) UpdateSoilConditionIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
-	if tc.SoilCondition == nil {
-		return nil
-	}
-
-	return r.UpdateSoilCondition(ctx, prev.ID, *tc.SoilCondition)
-}
-
-func (r *TreeClusterRepository) UpdateLastWateredIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
-	if tc.LastWatered == nil {
-		return nil
-	}
-
-	return r.UpdateLastWatered(ctx, prev.ID, *tc.LastWatered)
-}
-
-func (r *TreeClusterRepository) ArchiveIfChanged(ctx context.Context, prev *entities.TreeCluster, tc *entities.UpdateTreeCluster) error {
-	if tc.Archived == nil {
-		return nil
-	}
-
-	if *tc.Archived {
-		return r.Archive(ctx, prev.ID)
-	}
-
-	return nil
+func WithTrees(trees []*entities.Tree) entities.EntityFunc[entities.TreeCluster] {
+  return func(tc *entities.TreeCluster) {
+    slog.Debug("updateting trees to %v", trees)
+    tc.Trees = trees
+  }
 }
 
 func (r *TreeClusterRepository) Archive(ctx context.Context, id int32) error {

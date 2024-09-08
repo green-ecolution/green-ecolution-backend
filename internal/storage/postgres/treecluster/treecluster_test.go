@@ -152,36 +152,42 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 	}
 
 	slog.Info("Creating tree cluster", "tc", rtc)
-	tc := entities.TreeCluster{
+
+	mappers := initMappers()
+	repo := NewTreeClusterRepository(str, mappers)
+
+	got, err := repo.Create(context.Background(),
+		WithWateringStatus(rtc.WateringStatus),
+		WithMoistureLevel(rtc.MoistureLevel),
+		WithRegion(rtc.Region),
+		WithAddress(rtc.Address),
+		WithDescription(rtc.Description),
+		WithLatitude(rtc.Latitude),
+		WithLongitude(rtc.Longitude),
+		WithSoilCondition(rtc.SoilCondition),
+	)
+	want := &entities.TreeCluster{
+		ID:             got.ID,
+		CreatedAt:      got.CreatedAt,
+		UpdatedAt:      got.UpdatedAt,
 		WateringStatus: rtc.WateringStatus,
+		LastWatered:    nil,
 		MoistureLevel:  rtc.MoistureLevel,
 		Region:         rtc.Region,
 		Address:        rtc.Address,
 		Description:    rtc.Description,
+		Archived:       false,
 		Latitude:       rtc.Latitude,
 		Longitude:      rtc.Longitude,
 		SoilCondition:  rtc.SoilCondition,
 	}
 
-	mappers := initMappers()
-	repo := NewTreeClusterRepository(str, mappers)
-
-	got, err := repo.Create(context.Background(), &entities.CreateTreeCluster{
-		WateringStatus: &tc.WateringStatus,
-		MoistureLevel:  tc.MoistureLevel,
-		Region:         tc.Region,
-		Address:        tc.Address,
-		Description:    tc.Description,
-		Latitude:       tc.Latitude,
-		Longitude:      tc.Longitude,
-		SoilCondition:  &tc.SoilCondition,
-	})
 	assert.NoError(t, err)
 
 	assert.NotNil(t, got)
 	assert.NotZero(t, got.ID)
 
-	assertTreeCluster(t, &tc, got)
+	assertTreeCluster(t, want, got)
 
 	imgMappers := image.NewImageRepositoryMappers(&mapper.InternalImageRepoMapperImpl{})
 	imgRepo := image.NewImageRepository(str, imgMappers)
@@ -290,16 +296,16 @@ func TestCreateTreeCluster(t *testing.T) {
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
 
-			got, err := repo.Create(context.Background(), &entities.CreateTreeCluster{
-				WateringStatus: &tc.WateringStatus,
-				MoistureLevel:  tc.MoistureLevel,
-				Region:         tc.Region,
-				Address:        tc.Address,
-				Description:    tc.Description,
-				Latitude:       tc.Latitude,
-				Longitude:      tc.Longitude,
-				SoilCondition:  &tc.SoilCondition,
-			})
+			got, err := repo.Create(context.Background(),
+				WithWateringStatus(rtc.WateringStatus),
+				WithMoistureLevel(rtc.MoistureLevel),
+				WithRegion(rtc.Region),
+				WithAddress(rtc.Address),
+				WithDescription(rtc.Description),
+				WithLatitude(rtc.Latitude),
+				WithLongitude(rtc.Longitude),
+				WithSoilCondition(rtc.SoilCondition),
+			)
 			assert.NoError(t, err)
 
 			assert.NotNil(t, got)
@@ -312,37 +318,12 @@ func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should return error when creating tree cluster with invalid watering status", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			rtc := randomTreeCluster{}
-			if err := faker.FakeData(&rtc); err != nil {
-				t.Fatalf("error faking tree cluster data: %v", err)
-			}
-
-			rtc.WateringStatus = "invalid"
-			slog.Info("Creating tree cluster", "tc", rtc)
-			tc := entities.TreeCluster{
-				WateringStatus: rtc.WateringStatus,
-				MoistureLevel:  rtc.MoistureLevel,
-				Region:         rtc.Region,
-				Address:        rtc.Address,
-				Description:    rtc.Description,
-				Latitude:       rtc.Latitude,
-				Longitude:      rtc.Longitude,
-				SoilCondition:  rtc.SoilCondition,
-			}
-
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
 
-			_, err := repo.Create(context.Background(), &entities.CreateTreeCluster{
-				WateringStatus: &tc.WateringStatus,
-				MoistureLevel:  tc.MoistureLevel,
-				Region:         tc.Region,
-				Address:        tc.Address,
-				Description:    tc.Description,
-				Latitude:       tc.Latitude,
-				Longitude:      tc.Longitude,
-				SoilCondition:  &tc.SoilCondition,
-			})
+			_, err := repo.Create(context.Background(),
+				WithWateringStatus("invalid"),
+			)
 			assert.Error(t, err)
 		})
 	})
@@ -350,37 +331,12 @@ func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should return error when creating tree cluster with invalid soil condition", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			rtc := randomTreeCluster{}
-			if err := faker.FakeData(&rtc); err != nil {
-				t.Fatalf("error faking tree cluster data: %v", err)
-			}
-
-			rtc.SoilCondition = "invalid"
-			slog.Info("Creating tree cluster", "tc", rtc)
-			tc := entities.TreeCluster{
-				WateringStatus: rtc.WateringStatus,
-				MoistureLevel:  rtc.MoistureLevel,
-				Region:         rtc.Region,
-				Address:        rtc.Address,
-				Description:    rtc.Description,
-				Latitude:       rtc.Latitude,
-				Longitude:      rtc.Longitude,
-				SoilCondition:  rtc.SoilCondition,
-			}
-
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
 
-			_, err := repo.Create(context.Background(), &entities.CreateTreeCluster{
-				WateringStatus: &tc.WateringStatus,
-				MoistureLevel:  tc.MoistureLevel,
-				Region:         tc.Region,
-				Address:        tc.Address,
-				Description:    tc.Description,
-				Latitude:       tc.Latitude,
-				Longitude:      tc.Longitude,
-				SoilCondition:  &tc.SoilCondition,
-			})
+			_, err := repo.Create(context.Background(), 
+        WithSoilCondition("invalid"),
+        )
 			assert.Error(t, err)
 		})
 	})
@@ -388,39 +344,13 @@ func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should return error when query failed", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-			rtc := randomTreeCluster{}
-			if err := faker.FakeData(&rtc); err != nil {
-				t.Fatalf("error faking tree cluster data: %v", err)
-			}
-
-			slog.Info("Creating tree cluster", "tc", rtc)
-			tc := entities.TreeCluster{
-				WateringStatus: rtc.WateringStatus,
-				MoistureLevel:  rtc.MoistureLevel,
-				Region:         rtc.Region,
-				Address:        rtc.Address,
-				Description:    rtc.Description,
-				Latitude:       rtc.Latitude,
-				Longitude:      rtc.Longitude,
-				SoilCondition:  rtc.SoilCondition,
-			}
-
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Create(context.Background(), &entities.CreateTreeCluster{
-				WateringStatus: &tc.WateringStatus,
-				MoistureLevel:  tc.MoistureLevel,
-				Region:         tc.Region,
-				Address:        tc.Address,
-				Description:    tc.Description,
-				Latitude:       tc.Latitude,
-				Longitude:      tc.Longitude,
-				SoilCondition:  &tc.SoilCondition,
-			})
+			_, err = repo.Create(context.Background())
 			assert.Error(t, err)
 		})
 	})
@@ -576,17 +506,6 @@ func TestUpdateTreeCluster(t *testing.T) {
 
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID:             tc.ID,
-				WateringStatus: utils.P(entities.TreeClusterWateringStatusGood),
-				MoistureLevel:  utils.P(0.5),
-				Region:         utils.P("new region"),
-				Address:        utils.P("new address"),
-				Description:    utils.P("new description"),
-				Latitude:       utils.P(1.0),
-				Longitude:      utils.P(1.0),
-				SoilCondition:  utils.P(entities.TreeSoilConditionSchluffig),
-			}
 			want := &entities.TreeCluster{
 				ID:             tc.ID,
 				CreatedAt:      tc.CreatedAt,
@@ -603,7 +522,16 @@ func TestUpdateTreeCluster(t *testing.T) {
 				SoilCondition:  entities.TreeSoilConditionSchluffig,
 			}
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), tc.ID,
+				WithWateringStatus(entities.TreeClusterWateringStatusGood),
+				WithMoistureLevel(0.5),
+				WithRegion("new region"),
+				WithAddress("new address"),
+				WithDescription("new description"),
+				WithLatitude(1.0),
+				WithLongitude(1.0),
+				WithSoilCondition(entities.TreeSoilConditionSchluffig),
+			)
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 			assertTreeCluster(t, want, got)
@@ -617,19 +545,6 @@ func TestUpdateTreeCluster(t *testing.T) {
 
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID:             tc.ID,
-				WateringStatus: utils.P(entities.TreeClusterWateringStatusGood),
-				LastWatered:    nil,
-				MoistureLevel:  nil,
-				Region:         nil,
-				Address:        nil,
-				Description:    nil,
-				Archived:       nil,
-				Latitude:       nil,
-				Longitude:      nil,
-				SoilCondition:  nil,
-			}
 			want := &entities.TreeCluster{
 				ID:             tc.ID,
 				CreatedAt:      tc.CreatedAt,
@@ -646,7 +561,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 				SoilCondition:  tc.SoilCondition,
 			}
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), tc.ID, WithWateringStatus(entities.TreeClusterWateringStatusGood))
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 			assertTreeCluster(t, want, got)
@@ -660,19 +575,6 @@ func TestUpdateTreeCluster(t *testing.T) {
 
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID:             tc.ID,
-				MoistureLevel:  utils.P(0.5),
-				LastWatered:    nil,
-				WateringStatus: nil,
-				Region:         nil,
-				Address:        nil,
-				Description:    nil,
-				Archived:       nil,
-				Latitude:       nil,
-				Longitude:      nil,
-				SoilCondition:  nil,
-			}
 
 			want := &entities.TreeCluster{
 				ID:             tc.ID,
@@ -690,7 +592,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 				SoilCondition:  tc.SoilCondition,
 			}
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), tc.ID, WithMoistureLevel(0.5))
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 			assertTreeCluster(t, want, got)
@@ -704,19 +606,6 @@ func TestUpdateTreeCluster(t *testing.T) {
 
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID:             tc.ID,
-				MoistureLevel:  utils.P(0.5),
-				LastWatered:    nil,
-				WateringStatus: nil,
-				Region:         utils.P("new region"),
-				Address:        nil,
-				Description:    nil,
-				Archived:       nil,
-				Latitude:       nil,
-				Longitude:      nil,
-				SoilCondition:  utils.P(entities.TreeSoilConditionSchluffig),
-			}
 
 			want := &entities.TreeCluster{
 				ID:             tc.ID,
@@ -734,7 +623,11 @@ func TestUpdateTreeCluster(t *testing.T) {
 				SoilCondition:  entities.TreeSoilConditionSchluffig,
 			}
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), tc.ID,
+				WithMoistureLevel(0.5),
+				WithRegion("new region"),
+				WithSoilCondition(entities.TreeSoilConditionSchluffig),
+			)
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 			assertTreeCluster(t, want, got)
@@ -748,19 +641,6 @@ func TestUpdateTreeCluster(t *testing.T) {
 
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID:             tc.ID,
-				MoistureLevel:  utils.P(0.5),
-				LastWatered:    nil,
-				WateringStatus: utils.P(entities.TreeClusterWateringStatusBad),
-				Region:         nil,
-				Address:        nil,
-				Description:    nil,
-				Archived:       utils.P(true),
-				Latitude:       nil,
-				Longitude:      nil,
-				SoilCondition:  nil,
-			}
 
 			want := &entities.TreeCluster{
 				ID:             tc.ID,
@@ -778,10 +658,29 @@ func TestUpdateTreeCluster(t *testing.T) {
 				SoilCondition:  tc.SoilCondition,
 			}
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), tc.ID,
+				WithWateringStatus(entities.TreeClusterWateringStatusBad),
+				WithMoistureLevel(0.5),
+				WithArchived(true),
+			)
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 			assertTreeCluster(t, want, got)
+		})
+	})
+
+	t.Run("should not update tree cluster when no fields are provided", func(t *testing.T) {
+		testutils.WithTx(t, func(db *pgx.Conn) {
+			str := createStore(db)
+			tc := createTreeCluster(t, str)
+
+			mappers := initMappers()
+			repo := NewTreeClusterRepository(str, mappers)
+
+			got, err := repo.Update(context.Background(), tc.ID)
+			assert.NoError(t, err)
+			assert.NotNil(t, got)
+			assertTreeCluster(t, tc, got)
 		})
 	})
 
@@ -790,11 +689,8 @@ func TestUpdateTreeCluster(t *testing.T) {
 			str := createStore(db)
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID: 999,
-			}
 
-			_, err := repo.Update(context.Background(), args)
+			_, err := repo.Update(context.Background(), 999)
 			assert.Error(t, err)
 		})
 	})
@@ -806,14 +702,11 @@ func TestUpdateTreeCluster(t *testing.T) {
 
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
-			args := &entities.UpdateTreeCluster{
-				ID: tc.ID,
-			}
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Update(context.Background(), args)
+			_, err = repo.Update(context.Background(), tc.ID)
 			assert.Error(t, err)
 		})
 	})
