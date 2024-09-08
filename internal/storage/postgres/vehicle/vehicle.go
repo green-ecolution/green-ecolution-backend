@@ -35,24 +35,24 @@ func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) stor
 }
 
 func WithNumberPlate(numberPlate string) entities.EntityFunc[entities.Vehicle] {
-  return func(v *entities.Vehicle) {
-    slog.Debug("updateting number plate to %s", numberPlate)
-    v.NumberPlate = numberPlate
-  }
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating number", "number", numberPlate)
+		v.NumberPlate = numberPlate
+	}
 }
 
 func WithDescription(description string) entities.EntityFunc[entities.Vehicle] {
-  return func(v *entities.Vehicle) {
-    slog.Debug("updateting description to %s", description)
-    v.Description = description
-  }
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating description", "description", description)
+		v.Description = description
+	}
 }
 
 func WithWaterCapacity(waterCapacity float64) entities.EntityFunc[entities.Vehicle] {
-  return func(v *entities.Vehicle) {
-    slog.Debug("updateting water capacity to %d", waterCapacity)
-    v.WaterCapacity = waterCapacity
-  }
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating water capacity", "water capacity", waterCapacity)
+		v.WaterCapacity = waterCapacity
+	}
 }
 
 func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
