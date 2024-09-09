@@ -83,13 +83,13 @@ func (s *Store) HandleError(err error) error {
 	}
 }
 
-func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
+func (s *Store) WithTx(ctx context.Context, fn func(tx pgx.Tx) error) error {
 	tx, err := s.db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return err
 	}
-	q := sqlc.New(tx)
-	err = fn(q)
+
+	err = fn(tx)
 	if err != nil {
 		err = tx.Rollback(ctx)
 		if err != nil {
