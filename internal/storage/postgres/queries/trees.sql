@@ -47,6 +47,9 @@ INSERT INTO tree_images (
 -- name: UnlinkTreeImage :exec
 DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2;
 
+-- name: UnlinkAllTreeImages :exec
+DELETE FROM tree_images WHERE tree_id = $1;
+
 -- name: UpdateTreeGeometry :exec
 UPDATE trees SET
   geometry = ST_GeomFromText($2, 4326)

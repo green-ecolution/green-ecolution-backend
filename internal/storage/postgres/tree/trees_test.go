@@ -181,16 +181,17 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 	mapper := treeClusterMappers()
 	repo := treecluster.NewTreeClusterRepository(str, mapper)
 
-	got, err := repo.Create(context.Background(), &entities.CreateTreeCluster{
-		WateringStatus: &tc.WateringStatus,
-		MoistureLevel:  tc.MoistureLevel,
-		Region:         tc.Region,
-		Address:        tc.Address,
-		Description:    tc.Description,
-		Latitude:       tc.Latitude,
-		Longitude:      tc.Longitude,
-		SoilCondition:  &tc.SoilCondition,
-	})
+	got, err := repo.Create(context.Background(),
+		treecluster.WithWateringStatus(rtc.WateringStatus),
+		treecluster.WithMoistureLevel(rtc.MoistureLevel),
+		treecluster.WithRegion(rtc.Region),
+		treecluster.WithAddress(rtc.Address),
+		treecluster.WithDescription(rtc.Description),
+		treecluster.WithLatitude(rtc.Latitude),
+		treecluster.WithLongitude(rtc.Longitude),
+		treecluster.WithSoilCondition(rtc.SoilCondition),
+	)
+
 	assert.NoError(t, err)
 
 	assert.NotNil(t, got)
@@ -241,13 +242,11 @@ func createTrees(t *testing.T, str *store.Store, tc *entities.TreeCluster) {
 	for i, tree := range tc.Trees {
 		// Create Images
 		for _, img := range tree.Images {
-			arg := &entities.CreateImage{
-				URL:      img.URL,
-				Filename: img.Filename,
-				MimeType: img.MimeType,
-			}
-
-			imgGot, err := imgRepo.Create(context.Background(), arg)
+			imgGot, err := imgRepo.Create(context.Background(),
+				image.WithURL(img.URL),
+				image.WithFilename(img.Filename),
+				image.WithMimeType(img.MimeType),
+			)
 			assert.NoError(t, err)
 			assert.NotNil(t, imgGot)
 			assert.NotZero(t, imgGot.ID)
@@ -259,24 +258,19 @@ func createTrees(t *testing.T, str *store.Store, tc *entities.TreeCluster) {
 			img.UpdatedAt = imgGot.UpdatedAt
 		}
 
-		imgIds := utils.Map(tree.Images, func(img *entities.Image) *int32 {
-			return &img.ID
-		})
-
 		// Create Sensor for every 2nd tree
-		var sensor *entities.Sensor
+		var s *entities.Sensor
 		if i%2 == 0 {
-			sensorArg := &entities.CreateSensor{
-				Status: tree.Sensor.Status,
-			}
-			sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
+			sensorGot, err := sensorRepo.Create(context.Background(),
+				sensor.WithStatus(tree.Sensor.Status),
+			)
 			assert.NoError(t, err)
 			assert.NotNil(t, sensorGot)
 			assert.NotZero(t, sensorGot.ID)
 			assert.NotZero(t, sensorGot.CreatedAt)
 			assert.NotZero(t, sensorGot.UpdatedAt)
 
-			sensor = sensorGot
+			s = sensorGot
 		}
 
 		want := entities.Tree{
@@ -287,27 +281,21 @@ func createTrees(t *testing.T, str *store.Store, tc *entities.TreeCluster) {
 			Species:             tree.Species,
 			Latitude:            tree.Latitude,
 			Longitude:           tree.Longitude,
-			Sensor:              sensor,
+			Sensor:              s,
 			Images:              tree.Images,
 		}
 
-		var sensorID *int32
-		if sensor != nil {
-			sensorID = &sensor.ID
-		}
-		arg := &entities.CreateTree{
-			TreeClusterID:       tc.ID,
-			Age:                 tree.Age,
-			HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
-			PlantingYear:        tree.PlantingYear,
-			Species:             tree.Species,
-			Latitude:            tree.Latitude,
-			Longitude:           tree.Longitude,
-			SensorID:            sensorID,
-			ImageIDs:            imgIds,
-		}
-
-		treeGot, err := treeRepo.Create(context.Background(), arg)
+		treeGot, err := treeRepo.Create(context.Background(),
+			WithTreeCluster(tc),
+			WithAge(tree.Age),
+			WithHeightAboveSeaLevel(tree.HeightAboveSeaLevel),
+			WithPlantingYear(tree.PlantingYear),
+			WithSpecies(tree.Species),
+			WithLatitude(tree.Latitude),
+			WithLongitude(tree.Longitude),
+			WithSensor(s),
+			WithImages(tree.Images),
+		)
 		assert.NoError(t, err)
 		assert.NotNil(t, treeGot)
 		assert.NotZero(t, treeGot.ID)
@@ -343,10 +331,7 @@ func TestCreateTree(t *testing.T) {
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Create(context.Background(), &entities.CreateTree{
-				TreeClusterID: 1,
-				Age:           1,
-			})
+			_, err = repo.Create(context.Background())
 			assert.Error(t, err)
 		})
 	})
@@ -519,17 +504,14 @@ func TestUpdateTree(t *testing.T) {
 				tree.Latitude = 10.2
 				tree.Longitude = 10.3
 
-				arg := &entities.UpdateTree{
-					ID:                  tree.ID,
-					Age:                 utils.P(tree.Age),
-					HeightAboveSeaLevel: utils.P(tree.HeightAboveSeaLevel),
-					PlantingYear:        utils.P(tree.PlantingYear),
-					Species:             utils.P(tree.Species),
-					Latitude:            utils.P(tree.Latitude),
-					Longitude:           utils.P(tree.Longitude),
-				}
-
-				got, err := repo.Update(context.Background(), arg)
+				got, err := repo.Update(context.Background(), tree.ID,
+					WithAge(tree.Age),
+					WithHeightAboveSeaLevel(tree.HeightAboveSeaLevel),
+					WithPlantingYear(tree.PlantingYear),
+					WithSpecies(tree.Species),
+					WithLatitude(tree.Latitude),
+					WithLongitude(tree.Longitude),
+				)
 				assert.NoError(t, err)
 				assert.NotNil(t, got)
 
@@ -551,13 +533,10 @@ func TestUpdateTree(t *testing.T) {
 				tree.Age = 10
 				tree.HeightAboveSeaLevel = 10.1
 
-				arg := &entities.UpdateTree{
-					ID:                  tree.ID,
-					Age:                 utils.P(tree.Age),
-					HeightAboveSeaLevel: utils.P(tree.HeightAboveSeaLevel),
-				}
-
-				got, err := repo.Update(context.Background(), arg)
+				got, err := repo.Update(context.Background(), tree.ID,
+					WithAge(tree.Age),
+					WithHeightAboveSeaLevel(tree.HeightAboveSeaLevel),
+				)
 				assert.NoError(t, err)
 				assert.NotNil(t, got)
 
@@ -578,13 +557,7 @@ func TestUpdateTree(t *testing.T) {
 			repo := NewTreeRepository(str, mappers)
 
 			for _, tree := range tc.Trees {
-				tree.TreeCluster = tcNew
-				arg := &entities.UpdateTree{
-					ID:            tree.ID,
-					TreeClusterID: utils.P(tcNew.ID),
-				}
-
-				got, err := repo.Update(context.Background(), arg)
+				got, err := repo.Update(context.Background(), tree.ID, WithTreeCluster(tcNew))
 				assert.NoError(t, err)
 				assert.NotNil(t, got)
 
@@ -599,12 +572,7 @@ func TestUpdateTree(t *testing.T) {
 			mappers := initMappers()
 			repo := NewTreeRepository(str, mappers)
 
-			arg := &entities.UpdateTree{
-				ID:  999,
-				Age: utils.P(int32(10)),
-			}
-
-			got, err := repo.Update(context.Background(), arg)
+			got, err := repo.Update(context.Background(), 999)
 			assert.Error(t, err)
 			assert.Nil(t, got)
 		})
@@ -615,16 +583,12 @@ func TestUpdateTree(t *testing.T) {
 			str := createStore(db)
 			mappers := initMappers()
 			repo := NewTreeRepository(str, mappers)
-
-			arg := &entities.UpdateTree{
-				ID:  1,
-				Age: utils.P(int32(10)),
-			}
+			tc := createTreeCluster(t, str)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Update(context.Background(), arg)
+			_, err = repo.Update(context.Background(), tc.Trees[0].ID)
 			assert.Error(t, err)
 		})
 	})

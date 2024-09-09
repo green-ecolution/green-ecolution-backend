@@ -129,7 +129,7 @@ func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int3
 	}
 
 	for _, img := range images {
-		if err := r.unlinkFlowerbedImages(ctx, id, img.ID); err != nil {
+		if err := r.UnlinkImages(ctx, id, img.ID); err != nil {
 			return r.store.HandleError(errors.Wrap(err, "failed to unlink images"))
 		}
 	}
@@ -137,7 +137,7 @@ func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int3
   return r.Delete(ctx, id)
 }
 
-func (r *FlowerbedRepository) unlinkFlowerbedImages(ctx context.Context, id int32, imageID int32) error {
+func (r *FlowerbedRepository) UnlinkImages(ctx context.Context, id int32, imageID int32) error {
 	args := sqlc.UnlinkFlowerbedImageParams{
 		FlowerbedID: id,
 		ImageID:     imageID,
@@ -145,7 +145,7 @@ func (r *FlowerbedRepository) unlinkFlowerbedImages(ctx context.Context, id int3
 	return r.store.UnlinkFlowerbedImage(ctx, &args)
 }
 
-func (r *FlowerbedRepository) unlinkAllFlowerbedImages(ctx context.Context, id int32) error {
+func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) error {
 	return r.store.UnlinkAllFlowerbedImages(ctx, id)
 }
 
