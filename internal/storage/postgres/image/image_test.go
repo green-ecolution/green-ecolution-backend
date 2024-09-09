@@ -54,11 +54,11 @@ func createImage(t *testing.T, str *store.Store) *entities.Image {
 	mappers := initMapper()
 	repo := NewImageRepository(str, mappers)
 
-	got, err := repo.Create(context.Background(), &entities.CreateImage{
-		URL:      img.URL,
-		Filename: img.Filename,
-		MimeType: img.MimeType,
-	})
+	got, err := repo.Create(context.Background(),
+		WithURL(img.URL),
+		WithFilename(img.Filename),
+		WithMimeType(img.MimeType),
+	)
 	assert.NoError(t, err)
 
 	assert.NotNil(t, got)
@@ -90,9 +90,9 @@ func TestCreateImage(t *testing.T) {
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Create(context.Background(), &entities.CreateImage{
-				URL: "https://image.com",
-			})
+			_, err = repo.Create(context.Background(),
+				WithURL("https://example.com"),
+			)
 			assert.Error(t, err)
 		})
 	})
@@ -195,24 +195,22 @@ func TestUpdateImage(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			prev := createImage(t, str)
-			args := &entities.UpdateImage{
-				ID:       prev.ID,
-				Filename: utils.P("new-filename"),
-				MimeType: utils.P("image/jpeg"),
-				URL:      utils.P("https://new-url.com"),
-			}
 			want := &entities.Image{
 				ID:        prev.ID,
-				URL:       *args.URL,
-				Filename:  args.Filename,
-				MimeType:  args.MimeType,
+				URL:       "https://example.com",
+				Filename:  utils.P("new-filename"),
+				MimeType:  utils.P("image/jpeg"),
 				CreatedAt: prev.CreatedAt,
 			}
 
 			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), prev.ID,
+				WithURL("https://example.com"),
+				WithFilename(utils.P("new-filename")),
+				WithMimeType(utils.P("image/jpeg")),
+			)
 			assert.NoError(t, err)
 
 			assert.NotNil(t, got)
@@ -225,24 +223,20 @@ func TestUpdateImage(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			prev := createImage(t, str)
-			args := &entities.UpdateImage{
-				ID:       prev.ID,
-				Filename: utils.P("new-filename"),
-				MimeType: utils.P("image/jpeg"),
-				URL:      nil,
-			}
 			want := &entities.Image{
 				ID:        prev.ID,
 				URL:       prev.URL,
-				Filename:  args.Filename,
-				MimeType:  args.MimeType,
+				Filename:  utils.P("new-filename"),
+				MimeType:  prev.MimeType,
 				CreatedAt: prev.CreatedAt,
 			}
 
 			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), prev.ID,
+				WithFilename(utils.P("new-filename")),
+			)
 			assert.NoError(t, err)
 
 			assert.NotNil(t, got)
@@ -258,14 +252,10 @@ func TestUpdateImage(t *testing.T) {
 			str := createStore(db)
 			img := createImage(t, str)
 			img.ID = 999
-			args := &entities.UpdateImage{
-				ID: img.ID,
-			}
-
 			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
-			_, err := repo.Update(context.Background(), args)
+			_, err := repo.Update(context.Background(), img.ID)
 			assert.Error(t, err)
 			assert.ErrorIs(t, err, storage.ErrImageNotFound)
 		})
@@ -275,13 +265,6 @@ func TestUpdateImage(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
 			prev := createImage(t, str)
-			args := &entities.UpdateImage{
-				ID:       prev.ID,
-				URL:      nil,
-				Filename: nil,
-				MimeType: nil,
-			}
-
 			want := &entities.Image{
 				ID:        prev.ID,
 				URL:       prev.URL,
@@ -293,7 +276,7 @@ func TestUpdateImage(t *testing.T) {
 			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
 
-			got, err := repo.Update(context.Background(), args)
+			got, err := repo.Update(context.Background(), prev.ID)
 			assert.NoError(t, err)
 			assertImage(t, want, got)
 		})
@@ -304,11 +287,12 @@ func TestUpdateImage(t *testing.T) {
 			str := createStore(db)
 			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
+      img := createImage(t, str)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Update(context.Background(), &entities.UpdateImage{ID: 1})
+			_, err = repo.Update(context.Background(), img.ID)
 			assert.Error(t, err)
 		})
 	})
