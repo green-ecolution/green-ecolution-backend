@@ -442,7 +442,7 @@ func TestUpdateSensor(t *testing.T) {
 	t.Run("should return error if query fails", func(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := createStore(db)
-      s := createSensor(t, str)
+			s := createSensor(t, str)
 			mappers := NewSensorRepositoryMappers(&mapper.InternalSensorRepoMapperImpl{})
 			repo := NewSensorRepository(str, mappers)
 
