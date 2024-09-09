@@ -39,6 +39,19 @@ func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.Entity
 	return r.GetByID(ctx, *id)
 }
 
+func (r *FlowerbedRepository) CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {
+  entity, err := r.Create(ctx, fFn...)
+  if err != nil {
+    return nil, err
+  }
+    
+  if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
+    return nil, err
+  }
+
+  return entity, nil
+}
+
 func (r *FlowerbedRepository) createEntity(ctx context.Context, entity *entities.Flowerbed) (*int32, error) {
 	args := sqlc.CreateFlowerbedParams{
 		SensorID:       &entity.Sensor.ID,

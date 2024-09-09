@@ -119,6 +119,10 @@ func WithSensorID(id int32) entities.EntityFunc[entities.Flowerbed] {
 }
 
 func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
+	return r.store.DeleteFlowerbed(ctx, id)
+}
+
+func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
 		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
@@ -130,7 +134,7 @@ func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
 		}
 	}
 
-	return r.store.DeleteFlowerbed(ctx, id)
+  return r.Delete(ctx, id)
 }
 
 func (r *FlowerbedRepository) unlinkFlowerbedImages(ctx context.Context, id int32, imageID int32) error {
