@@ -10,16 +10,3 @@ type Image struct {
 	Filename  *string
 	MimeType  *string
 }
-
-type CreateImage struct {
-	URL      string
-	Filename *string
-	MimeType *string
-}
-
-type UpdateImage struct {
-	ID       int32
-	URL      *string
-	Filename *string
-	MimeType *string
-}

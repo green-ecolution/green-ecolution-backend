@@ -9,13 +9,4 @@ type Entities interface {
 		Tree
 }
 
-type CreateEntity interface {
-	CreateSensor |
-		CreateFlowerbed |
-		CreateImage |
-		CreateVehicle |
-		CreateTreeCluster |
-		CreateTree
-}
-
 type EntityFunc[T Entities] func(*T)

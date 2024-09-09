@@ -37,29 +37,3 @@ type TreeCluster struct {
 	Trees          []*Tree
 	SoilCondition  TreeSoilCondition
 }
-
-type CreateTreeCluster struct {
-	WateringStatus *TreeClusterWateringStatus
-	MoistureLevel  float64
-	Region         string
-	Address        string
-	Description    string
-	Archived       bool
-	Latitude       float64
-	Longitude      float64
-	SoilCondition  *TreeSoilCondition
-}
-
-type UpdateTreeCluster struct {
-	ID             int32
-	WateringStatus *TreeClusterWateringStatus
-	LastWatered    *time.Time
-	MoistureLevel  *float64
-	Region         *string
-	Address        *string
-	Description    *string
-	Archived       *bool
-	Latitude       *float64
-	Longitude      *float64
-	SoilCondition  *TreeSoilCondition
-}
