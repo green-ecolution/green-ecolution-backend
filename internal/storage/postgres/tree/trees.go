@@ -100,9 +100,9 @@ func WithTreeCluster(treeCluster *entities.TreeCluster) entities.EntityFunc[enti
 }
 
 func WithImages(images []*entities.Image) entities.EntityFunc[entities.Tree] {
-  return func(t *entities.Tree) {
-    t.Images = images
-  }
+	return func(t *entities.Tree) {
+		t.Images = images
+	}
 }
 
 func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
@@ -128,14 +128,14 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 }
 
 func (r *TreeRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
-	if err := r.UnlinkAllTreeImages(ctx, id); err != nil {
+	if err := r.UnlinkAllImages(ctx, id); err != nil {
 		return r.store.HandleError(errors.Wrap(err, "failed to unlink images"))
 	}
 
 	return r.Delete(ctx, id)
 }
 
-func (r *TreeRepository) UnlinkTreeImage(ctx context.Context, treeID, imageID int32) error {
+func (r *TreeRepository) UnlinkImage(ctx context.Context, treeID, imageID int32) error {
 	args := sqlc.UnlinkTreeImageParams{
 		TreeID:  treeID,
 		ImageID: imageID,
@@ -143,7 +143,7 @@ func (r *TreeRepository) UnlinkTreeImage(ctx context.Context, treeID, imageID in
 	return r.store.UnlinkTreeImage(ctx, &args)
 }
 
-func (r *TreeRepository) UnlinkAllTreeImages(ctx context.Context, treeID int32) error {
+func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) error {
 	return r.store.UnlinkAllTreeImages(ctx, treeID)
 }
 

@@ -287,7 +287,7 @@ func TestUpdateImage(t *testing.T) {
 			str := createStore(db)
 			mappers := initMapper()
 			repo := NewImageRepository(str, mappers)
-      img := createImage(t, str)
+			img := createImage(t, str)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)

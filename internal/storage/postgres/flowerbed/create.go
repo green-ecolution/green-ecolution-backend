@@ -19,7 +19,7 @@ func defaultFlowerbed() *entities.Flowerbed {
 		Latitude:       0,
 		Longitude:      0,
 		Images:         make([]*entities.Image, 0),
-    Archived:       false,
+		Archived:       false,
 	}
 }
 
@@ -40,16 +40,16 @@ func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.Entity
 }
 
 func (r *FlowerbedRepository) CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {
-  entity, err := r.Create(ctx, fFn...)
-  if err != nil {
-    return nil, err
-  }
-    
-  if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
-    return nil, err
-  }
+	entity, err := r.Create(ctx, fFn...)
+	if err != nil {
+		return nil, err
+	}
 
-  return entity, nil
+	if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
+		return nil, err
+	}
+
+	return entity, nil
 }
 
 func (r *FlowerbedRepository) createEntity(ctx context.Context, entity *entities.Flowerbed) (*int32, error) {
@@ -81,7 +81,7 @@ func (r *FlowerbedRepository) handleImages(ctx context.Context, flowerbedID int3
 		}
 	}
 
-  return nil
+	return nil
 }
 
 func (r *FlowerbedRepository) linkImages(ctx context.Context, flowerbedID int32, imgID int32) error {

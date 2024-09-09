@@ -65,13 +65,6 @@ type TreeClusterRepository interface {
 	BasicCrudRepository[entities.TreeCluster]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
 	UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
-
-  UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-  DeleteAndUnlinkImages(ctx context.Context, id int32) error
-  UnlinkAllImages(ctx context.Context, id int32) error
-  UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
-
-  CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.TreeCluster]) (*entities.TreeCluster, error)
 	Archive(ctx context.Context, id int32) error
 }
 
@@ -79,6 +72,11 @@ type TreeRepository interface {
 	BasicCrudRepository[entities.Tree]
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
+	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+	DeleteAndUnlinkImages(ctx context.Context, id int32) error
+	UnlinkAllImages(ctx context.Context, id int32) error
+	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
+	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 }
 
 type SensorRepository interface {
@@ -94,11 +92,11 @@ type FlowerbedRepository interface {
 	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 
-  CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-  UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-  DeleteAndUnlinkImages(ctx context.Context, id int32) error
-  UnlinkAllImages(ctx context.Context, id int32) error
-  UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
+	CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
+	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
+	DeleteAndUnlinkImages(ctx context.Context, id int32) error
+	UnlinkAllImages(ctx context.Context, id int32) error
+	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
 	Archive(ctx context.Context, id int32) error
 }
 

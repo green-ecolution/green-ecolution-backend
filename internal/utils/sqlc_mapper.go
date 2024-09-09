@@ -13,9 +13,9 @@ func PgTimestampToTime(t pgtype.Timestamp) time.Time {
 }
 
 func TimeToPgTimestamp(t *time.Time) pgtype.Timestamp {
-  if t == nil {
-    return pgtype.Timestamp{}
-  }
+	if t == nil {
+		return pgtype.Timestamp{}
+	}
 
 	return pgtype.Timestamp{
 		Time: *t,

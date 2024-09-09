@@ -25,7 +25,6 @@ func (r *TreeClusterRepository) Update(ctx context.Context, id int32, tcFn ...en
 		return nil, err
 	}
 
-
 	return tc, nil
 }
 
@@ -53,4 +52,3 @@ func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.T
 
 	return r.store.UpdateTreeCluster(ctx, &args)
 }
-

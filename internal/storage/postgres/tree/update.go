@@ -57,7 +57,7 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 }
 
 func (r *TreeRepository) updateImages(ctx context.Context, tree *entities.Tree) error {
-	if err := r.UnlinkAllTreeImages(ctx, tree.ID); err != nil {
+	if err := r.UnlinkAllImages(ctx, tree.ID); err != nil {
 		return err
 	}
 

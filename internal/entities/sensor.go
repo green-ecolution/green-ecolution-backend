@@ -15,7 +15,7 @@ type Sensor struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Status    SensorStatus
-	Data []*SensorData
+	Data      []*SensorData
 }
 
 type SensorData struct {

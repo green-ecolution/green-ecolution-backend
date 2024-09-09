@@ -456,7 +456,7 @@ func TestUpdate(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := store.NewStore(db)
 			repo := NewFlowerbedRepository(str, mapperRepo())
-      f := createFlowerbed(t, str)
+			f := createFlowerbed(t, str)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
