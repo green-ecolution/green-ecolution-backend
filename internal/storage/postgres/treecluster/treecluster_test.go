@@ -16,7 +16,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
@@ -151,6 +150,34 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 		t.Fatalf("error faking tree cluster data: %v", err)
 	}
 
+	trees := make([]*entities.Tree, len(rtc.Trees))
+	for i, tree := range rtc.Trees {
+		images := make([]*entities.Image, len(tree.Images))
+		for j, img := range tree.Images {
+			images[j] = &entities.Image{
+				ID:       img.ID,
+				URL:      img.URL,
+				Filename: img.Filename,
+				MimeType: img.MimeType,
+			}
+		}
+		sen := entities.Sensor{
+			ID:     tree.Sensor.ID,
+			Status: tree.Sensor.Status,
+		}
+		trees[i] = &entities.Tree{
+			Age:                 tree.Age,
+			HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
+			PlantingYear:        tree.PlantingYear,
+			Species:             tree.Species,
+			Latitude:            tree.Latitude,
+			Longitude:           tree.Longitude,
+			Number:              tree.Number,
+			Sensor:              &sen,
+			Images:              images,
+		}
+	}
+
 	slog.Info("Creating tree cluster", "tc", rtc)
 
 	mappers := initMappers()
@@ -180,6 +207,7 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 		Latitude:       rtc.Latitude,
 		Longitude:      rtc.Longitude,
 		SoilCondition:  rtc.SoilCondition,
+		Trees:          trees,
 	}
 
 	assert.NoError(t, err)
@@ -202,16 +230,14 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
 	treeRepo := tree.NewTreeRepository(str, treeMappers)
-	for i, tree := range tc.Trees {
+	for i, tr := range want.Trees {
 		// Create Images
-		for _, img := range tree.Images {
-			arg := &entities.CreateImage{
-				URL:      img.URL,
-				Filename: img.Filename,
-				MimeType: img.MimeType,
-			}
-
-			imgGot, err := imgRepo.Create(context.Background(), arg)
+		for _, img := range tr.Images {
+			imgGot, err := imgRepo.Create(context.Background(),
+				image.WithURL(img.URL),
+				image.WithFilename(img.Filename),
+				image.WithMimeType(img.MimeType),
+			)
 			assert.NoError(t, err)
 			assert.NotNil(t, imgGot)
 			assert.NotZero(t, imgGot.ID)
@@ -223,42 +249,34 @@ func createTreeCluster(t *testing.T, str *store.Store) *entities.TreeCluster {
 			img.UpdatedAt = imgGot.UpdatedAt
 		}
 
-		imgIds := utils.Map(tree.Images, func(img *entities.Image) *int32 {
-			return &img.ID
-		})
-
 		// Create every second sensor
-		var sensorID *int32
-		sensorArg := &entities.CreateSensor{
-			Status: tree.Sensor.Status,
-		}
+		var s *entities.Sensor
 		if i%2 == 0 {
-			sensorGot, err := sensorRepo.Create(context.Background(), sensorArg)
+			sensorGot, err := sensorRepo.Create(context.Background(), sensor.WithStatus(tr.Sensor.Status))
 			assert.NoError(t, err)
 			assert.NotNil(t, sensorGot)
 			assert.NotZero(t, sensorGot.ID)
 			assert.NotZero(t, sensorGot.CreatedAt)
 			assert.NotZero(t, sensorGot.UpdatedAt)
 
-			sensorID = &sensorGot.ID
+			s = sensorGot
 		}
 
-		arg := &entities.CreateTree{
-			TreeClusterID:       got.ID,
-			Age:                 tree.Age,
-			HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
-			PlantingYear:        tree.PlantingYear,
-			Species:             tree.Species,
-			Latitude:            tree.Latitude,
-			Longitude:           tree.Longitude,
-			SensorID:            sensorID,
-			ImageIDs:            imgIds,
-		}
-
-		treeGot, err := treeRepo.Create(context.Background(), arg)
+		treeGot, err := treeRepo.Create(context.Background(),
+			tree.WithTreeCluster(want),
+			tree.WithAge(tr.Age),
+			tree.WithHeightAboveSeaLevel(tr.HeightAboveSeaLevel),
+			tree.WithPlantingYear(tr.PlantingYear),
+			tree.WithSpecies(tr.Species),
+			tree.WithTreeNumber(tr.Number),
+			tree.WithLatitude(tr.Latitude),
+			tree.WithLongitude(tr.Longitude),
+			tree.WithSensor(s),
+			tree.WithImages(tr.Images),
+		)
 		assert.NoError(t, err)
 		assert.NotNil(t, treeGot)
-		assertTree(t, tree, treeGot)
+		assertTree(t, tr, treeGot)
 	}
 
 	return got
@@ -334,9 +352,9 @@ func TestCreateTreeCluster(t *testing.T) {
 			mappers := initMappers()
 			repo := NewTreeClusterRepository(str, mappers)
 
-			_, err := repo.Create(context.Background(), 
-        WithSoilCondition("invalid"),
-        )
+			_, err := repo.Create(context.Background(),
+				WithSoilCondition("invalid"),
+			)
 			assert.Error(t, err)
 		})
 	})
