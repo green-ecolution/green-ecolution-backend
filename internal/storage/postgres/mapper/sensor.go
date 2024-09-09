@@ -10,9 +10,11 @@ import (
 
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend MapSensorStatus
 type InternalSensorRepoMapper interface {
+  // goverter:ignore Data
 	FromSql(src *sqlc.Sensor) *entities.Sensor
 	FromSqlList(src []*sqlc.Sensor) []*entities.Sensor
 

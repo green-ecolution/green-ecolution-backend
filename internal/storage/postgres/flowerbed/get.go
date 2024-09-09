@@ -15,14 +15,7 @@ func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed
 		return nil, r.store.HandleError(err)
 	}
 
-	mapped := r.mapper.FromSqlList(row)
-	for _, f := range mapped {
-		if err := r.mapSensorAndImages(ctx, f); err != nil {
-			return nil, r.store.HandleError(err)
-		}
-	}
-
-	return mapped, nil
+  return r.mapper.FromSqlList(row), nil
 }
 
 func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.Flowerbed, error) {
@@ -31,12 +24,7 @@ func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.
 		return nil, r.store.HandleError(err)
 	}
 
-	f := r.mapper.FromSql(row)
-	if err := r.mapSensorAndImages(ctx, f); err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	return f, nil
+  return r.mapper.FromSql(row), nil
 }
 
 func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID int32) ([]*entities.Image, error) {
@@ -61,33 +49,3 @@ func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flower
 	return r.sensorMapper.FromSql(row), nil
 }
 
-// Map sensor and images entity to domain flowerbed
-func (r *FlowerbedRepository) mapSensorAndImages(ctx context.Context, f *entities.Flowerbed) error {
-	if err := r.mapImages(ctx, f); err != nil {
-		return err
-	}
-
-	if err := r.mapSensor(ctx, f); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *FlowerbedRepository) mapImages(ctx context.Context, f *entities.Flowerbed) error {
-	images, err := r.GetAllImagesByID(ctx, f.ID)
-	if err != nil {
-		return r.store.HandleError(err)
-	}
-	f.Images = images
-	return nil
-}
-
-func (r *FlowerbedRepository) mapSensor(ctx context.Context, f *entities.Flowerbed) error {
-	sensor, err := r.GetSensorByFlowerbedID(ctx, f.ID)
-	if err != nil {
-		return r.store.HandleError(err)
-	}
-	f.Sensor = sensor
-	return nil
-}

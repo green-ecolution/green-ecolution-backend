@@ -72,6 +72,8 @@ type TreeRepository interface {
 	BasicCrudRepository[entities.Tree]
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
+  GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
+
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error

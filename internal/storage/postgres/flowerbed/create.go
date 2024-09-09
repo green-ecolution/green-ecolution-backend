@@ -9,7 +9,7 @@ import (
 
 func defaultFlowerbed() *entities.Flowerbed {
 	return &entities.Flowerbed{
-		Sensor:         nil,
+		Sensor:         &entities.Sensor{},
 		Size:           0,
 		Description:    "",
 		NumberOfPlants: 0,

@@ -12,6 +12,15 @@ func PgTimestampToTime(t pgtype.Timestamp) time.Time {
 	return t.Time
 }
 
+func PgTimestampToTimePtr(t pgtype.Timestamp) *time.Time {
+	time := t.Time
+	if time.IsZero() {
+		return nil
+	}
+
+	return &t.Time
+}
+
 func TimeToPgTimestamp(t *time.Time) pgtype.Timestamp {
 	if t == nil {
 		return pgtype.Timestamp{}

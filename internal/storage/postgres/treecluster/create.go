@@ -33,13 +33,13 @@ func (r *TreeClusterRepository) Create(ctx context.Context, tcFn ...entities.Ent
 		return nil, r.store.HandleError(err)
 	}
 
-	entity.ID = *id
-	r.handleCreateTree(ctx, id, entity)
+	entity.ID = id
+	r.handleCreateTree(ctx, &id, entity)
 
-	return r.GetByID(ctx, *id)
+	return r.GetByID(ctx, id)
 }
 
-func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entities.TreeCluster) (*int32, error) {
+func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entities.TreeCluster) (int32, error) {
 	args := sqlc.CreateTreeClusterParams{
 		Region:         entity.Region,
 		Address:        entity.Address,
@@ -51,12 +51,7 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 		SoilCondition:  sqlc.TreeSoilCondition(entity.SoilCondition),
 	}
 
-	id, err := r.store.CreateTreeCluster(ctx, &args)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	return &id, nil
+	return r.store.CreateTreeCluster(ctx, &args)
 }
 
 func (r *TreeClusterRepository) handleCreateTree(ctx context.Context, tcID *int32, entity *entities.TreeCluster) error {
