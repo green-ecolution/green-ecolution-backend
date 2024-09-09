@@ -6,7 +6,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-
 func (r *ImageRepository) GetAll(ctx context.Context) ([]*entities.Image, error) {
 	rows, err := r.store.GetAllImages(ctx)
 	if err != nil {
