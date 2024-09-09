@@ -124,6 +124,7 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 	want.Sensor.ID = sensorGot.ID
 
 	// Create images
+	entityImages := make([]*entities.Image, len(want.Images))
 	for i, img := range want.Images {
 		args := sqlc.CreateImageParams{
 			Url:      img.URL,
@@ -132,6 +133,13 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 		}
 		imgID, err := str.CreateImage(context.Background(), &args)
 		want.Images[i].ID = imgID
+
+		entityImages[i] = &entities.Image{
+			ID:       imgID,
+			URL:      img.URL,
+			Filename: img.Filename,
+			MimeType: img.MimeType,
+		}
 
 		assert.NoError(t, err)
 	}
@@ -147,7 +155,7 @@ func createFlowerbed(t *testing.T, str *store.Store) *entities.Flowerbed {
 		WithLatitude(want.Latitude),
 		WithLongitude(want.Longitude),
 		WithSensor(&entities.Sensor{ID: want.Sensor.ID}),
-		WithImages(want.Images),
+		WithImages(entityImages),
 	)
 	assert.NoError(t, err)
 	want.ID = got.ID
@@ -206,9 +214,7 @@ func TestCreateFlowerbed(t *testing.T) {
 			repo := NewFlowerbedRepository(str, mapperRepo())
 
 			sensorID := int32(999)
-			_, err := repo.Create(context.Background(), &entities.CreateFlowerbed{
-				SensorID: &sensorID,
-			})
+			_, err := repo.Create(context.Background(), WithSensor(&entities.Sensor{ID: sensorID}))
 			assert.Error(t, err)
 
 			// FIXME: Check if entity is not created
@@ -220,9 +226,7 @@ func TestCreateFlowerbed(t *testing.T) {
 			str := store.NewStore(db)
 			repo := NewFlowerbedRepository(str, mapperRepo())
 			imageID := int32(999)
-			_, err := repo.Create(context.Background(), &entities.CreateFlowerbed{
-				ImageIDs: []int32{imageID},
-			})
+			_, err := repo.Create(context.Background(), WithImages([]*entities.Image{{ID: imageID}}))
 			assert.Error(t, err)
 
 			// FIXME: Check if entity is not created
@@ -238,9 +242,7 @@ func TestCreateFlowerbed(t *testing.T) {
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Create(context.Background(), &entities.CreateFlowerbed{
-				Size: 1.5,
-			})
+			_, err = repo.Create(context.Background())
 			assert.Error(t, err)
 		})
 	})
@@ -358,20 +360,19 @@ func TestUpdate(t *testing.T) {
 			}
 
 			repo := NewFlowerbedRepository(str, mapperRepo())
-			got, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-				ID:             want.ID,
-				Size:           &want.Size,
-				Description:    &want.Description,
-				NumberOfPlants: &want.NumberOfPlants,
-				MoistureLevel:  &want.MoistureLevel,
-				Region:         &want.Region,
-				Address:        &want.Address,
-				Archived:       &want.Archived,
-				Latitude:       &want.Latitude,
-				Longitude:      &want.Longitude,
-				SensorID:       &want.Sensor.ID,
-				ImageIDs:       []int32{want.Images[0].ID, want.Images[1].ID}, // should remove the third image
-			})
+			got, err := repo.Update(context.Background(), want.ID,
+				WithAddress(want.Address),
+				WithArchived(want.Archived),
+				WithDescription(want.Description),
+				WithLatitude(want.Latitude),
+				WithLongitude(want.Longitude),
+				WithMoistureLevel(want.MoistureLevel),
+				WithNumberOfPlants(want.NumberOfPlants),
+				WithRegion(want.Region),
+				WithSensor(&entities.Sensor{ID: want.Sensor.ID}),
+				WithSize(want.Size),
+				WithImages(want.Images),
+			)
 
 			assert.NoError(t, err)
 			assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
@@ -392,20 +393,10 @@ func TestUpdate(t *testing.T) {
 			want.ID = prev.ID
 
 			repo := NewFlowerbedRepository(str, mapperRepo())
-			got, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-				ID:             want.ID,
-				Size:           &want.Size,           // should update size
-				Description:    &want.Description,    // should update description
-				NumberOfPlants: &want.NumberOfPlants, // should update number of plants
-				MoistureLevel:  nil,                  // should not update moisture level
-				Region:         nil,                  // should not update region
-				Address:        nil,                  // should not update address
-				Archived:       nil,                  // should not update archived
-				Latitude:       nil,                  // should not update location
-				Longitude:      nil,                  // should not update location
-				SensorID:       nil,                  // should not update sensor
-				ImageIDs:       nil,                  // should not update images
-			})
+			got, err := repo.Update(context.Background(), want.ID,
+				WithAddress(want.Address),
+				WithDescription(want.Description),
+			)
 
 			assert.NoError(t, err)
 			assert.WithinDuration(t, time.Now(), got.UpdatedAt, time.Second)
@@ -434,9 +425,7 @@ func TestUpdate(t *testing.T) {
 			str := store.NewStore(db)
 			repo := NewFlowerbedRepository(str, mapperRepo())
 
-			_, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-				ID: 999,
-			})
+			_, err := repo.Update(context.Background(), 999)
 			assert.Error(t, err)
 		})
 	})
@@ -445,11 +434,9 @@ func TestUpdate(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := store.NewStore(db)
 			repo := NewFlowerbedRepository(str, mapperRepo())
+			f := createFlowerbed(t, str)
 
-			_, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-				ID:       1,
-				SensorID: new(int32),
-			})
+			_, err := repo.Update(context.Background(), f.ID, WithSensor(&entities.Sensor{ID: 999}))
 			assert.Error(t, err)
 		})
 	})
@@ -458,11 +445,9 @@ func TestUpdate(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := store.NewStore(db)
 			repo := NewFlowerbedRepository(str, mapperRepo())
+			f := createFlowerbed(t, str)
 
-			_, err := repo.Update(context.Background(), &entities.UpdateFlowerbed{
-				ID:       1,
-				ImageIDs: []int32{999},
-			})
+			_, err := repo.Update(context.Background(), f.ID, WithImages([]*entities.Image{{ID: 999}}))
 			assert.Error(t, err)
 		})
 	})
@@ -471,11 +456,12 @@ func TestUpdate(t *testing.T) {
 		testutils.WithTx(t, func(db *pgx.Conn) {
 			str := store.NewStore(db)
 			repo := NewFlowerbedRepository(str, mapperRepo())
+      f := createFlowerbed(t, str)
 
 			err := db.Close(context.Background())
 			assert.NoError(t, err)
 
-			_, err = repo.Update(context.Background(), &entities.UpdateFlowerbed{ID: 1})
+			_, err = repo.Update(context.Background(), f.ID)
 			assert.Error(t, err)
 		})
 	})
