@@ -55,6 +55,17 @@ setup:
 	go install github.com/jmattheis/goverter/cmd/goverter@latest
 	go mod download
 
+.PHONY: setup/macos
+setup/macos:
+	@echo "Installing..."
+	brew install goose
+	brew install sqlc
+	go install github.com/air-verse/air@latest
+	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
+	go install github.com/swaggo/swag/cmd/swag@latest
+	go install github.com/jmattheis/goverter/cmd/goverter@latest
+	go mod download
+
 .PHONY: setup/ci
 setup/ci:
 	@echo "Installing..."
