@@ -30,7 +30,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth/keycloak"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
 	"github.com/jackc/pgx/v5"
@@ -95,10 +95,11 @@ func main() {
 		return
 	}
 
-	keycloakRepo := keycloak.NewKeycloakRepository(&cfg.IdentityAuth)
-
+	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
 	repositories := &storage.Repository{
-		Auth:        keycloakRepo,
+		Auth: keycloakRepo.Auth,
+		User: keycloakRepo.User,
+
 		Info:        localRepo.Info,
 		Sensor:      postgresRepo.Sensor,
 		Tree:        postgresRepo.Tree,

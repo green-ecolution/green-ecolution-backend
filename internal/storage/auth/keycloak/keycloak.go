@@ -19,10 +19,10 @@ func NewKeycloakRepository(cfg *config.IdentityAuthConfig) storage.AuthRepositor
 	}
 }
 
-func (r *KeycloakRepository) loginRestAPIClient(ctx context.Context) (*gocloak.JWT, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+func loginRestAPIClient(ctx context.Context, baseURL, clientID, clientSecret, realm string) (*gocloak.JWT, error) {
+	client := gocloak.NewClient(baseURL)
 
-	token, err := client.LoginClient(ctx, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
+	token, err := client.LoginClient(ctx, clientID, clientSecret, realm)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to login to keycloak")
 	}

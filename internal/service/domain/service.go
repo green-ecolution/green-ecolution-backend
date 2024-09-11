@@ -10,11 +10,11 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
-func NewService(cfg *config.Config, repositories *storage.Repository) *service.Services {
+func NewService(cfg *config.Config, repos *storage.Repository) *service.Services {
 	return &service.Services{
-		InfoService: info.NewInfoService(repositories.Info),
-		MqttService: sensor.NewMqttService(repositories.Sensor),
-		TreeService: tree.NewTreeService(repositories.Tree, repositories.Sensor),
-		AuthService: auth.NewAuthService(repositories.Auth, &cfg.IdentityAuth),
+		InfoService: info.NewInfoService(repos.Info),
+		MqttService: sensor.NewMqttService(repos.Sensor),
+		TreeService: tree.NewTreeService(repos.Tree, repos.Sensor),
+		AuthService: auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
 	}
 }

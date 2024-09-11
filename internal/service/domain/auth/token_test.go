@@ -24,11 +24,12 @@ func TestRestrospectToken(t *testing.T) {
 			Type:     utils.P("token"),
 		}
 
-		repo := storageMock.NewMockAuthRepository(t)
-		svc := NewAuthService(repo, identityConfig)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		// when
-		repo.EXPECT().RetrospectToken(context.Background(), token).Return(expected, nil)
+		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(expected, nil)
 		resp, err := svc.RetrospectToken(context.Background(), token)
 
 		// then
@@ -41,11 +42,12 @@ func TestRestrospectToken(t *testing.T) {
 		token := "token"
 		identityConfig := &config.IdentityAuthConfig{}
 
-		repo := storageMock.NewMockAuthRepository(t)
-		svc := NewAuthService(repo, identityConfig)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		// when
-		repo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New("failed to retrospect token"))
+		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New("failed to retrospect token"))
 		_, err := svc.RetrospectToken(context.Background(), token)
 
 		// then
