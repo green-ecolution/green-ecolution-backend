@@ -50,9 +50,9 @@ type TreeUpdateRequest struct {
 } // @Name TreeUpdate
 
 type TreeAddImagesRequest struct {
-  ImageIDs []*int32 `json:"image_ids,omitempty"`
+	ImageIDs []*int32 `json:"image_ids,omitempty"`
 } // @Name TreeAddImages
 
 type TreeAddSensorRequest struct {
-  SensorID *int32 `json:"sensor_id,omitempty"`
+	SensorID *int32 `json:"sensor_id,omitempty"`
 } // @Name TreeAddSensor
