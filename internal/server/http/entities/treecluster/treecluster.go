@@ -73,5 +73,5 @@ type TreeClusterUpdateRequest struct {
 } // @Name TreeClusterUpdate
 
 type TreeClusterAddTreesRequest struct {
-  TreeIDs []*int32 `json:"tree_ids,omitempty"`
+	TreeIDs []*int32 `json:"tree_ids,omitempty"`
 } // @Name TreeClusterAddTrees
