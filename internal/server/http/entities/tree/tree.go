@@ -48,3 +48,11 @@ type TreeUpdateRequest struct {
 	Latitude            float64 `json:"latitude,omitempty"`
 	Longitude           float64 `json:"longitude,omitempty"`
 } // @Name TreeUpdate
+
+type TreeAddImagesRequest struct {
+  ImageIDs []*int32 `json:"image_ids,omitempty"`
+} // @Name TreeAddImages
+
+type TreeAddSensorRequest struct {
+  SensorID *int32 `json:"sensor_id,omitempty"`
+} // @Name TreeAddSensor
