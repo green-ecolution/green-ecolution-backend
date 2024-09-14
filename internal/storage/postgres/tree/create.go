@@ -31,7 +31,7 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 	if err != nil {
 		return nil, r.store.HandleError(err)
 	}
-  entity.ID = id
+	entity.ID = id
 
 	return r.GetByID(ctx, id)
 }

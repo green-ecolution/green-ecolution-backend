@@ -6,7 +6,6 @@ require (
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/docker/go-connections v0.5.0
 	github.com/eclipse/paho.mqtt.golang v1.4.3
-	github.com/go-faker/faker/v4 v4.5.0
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/gofiber/contrib/jwt v1.0.10
 	github.com/gofiber/fiber/v2 v2.52.5

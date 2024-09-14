@@ -146,4 +146,3 @@ func (r *TreeRepository) UnlinkImage(ctx context.Context, treeID, imageID int32)
 func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) error {
 	return r.store.UnlinkAllTreeImages(ctx, treeID)
 }
-
