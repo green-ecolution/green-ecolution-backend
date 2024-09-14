@@ -11,7 +11,7 @@ import (
 // @Id				get-all-sensors
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	[]sensor.SensorResponse
+// @Success		200	{object}	[]sensor.SensorListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -19,6 +19,9 @@ import (
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor [get]
 // @Param			status			query	string	false	"Sensor Status"
+// @Param			sensor_id		path	string	true	"Sensor ID"
+// @Param			page			query	string	false	"Page"
+// @Param			limit			query	string	false	"Limit"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -51,9 +54,9 @@ func GetSensorByID(_ service.Service) fiber.Handler {
 // @Summary		Get sensor data by ID
 // @Description	Get sensor data by ID
 // @Id				get-sensor-data-by-id
-// @Tags			Sensor Data
+// @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorDataResponse
+// @Success		200	{object}	sensor.SensorDataListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -65,6 +68,7 @@ func GetSensorByID(_ service.Service) fiber.Handler {
 // @Param			limit			query	string	false	"Limit"
 // @Param			start_time		query	string	false	"Start time"
 // @Param			end_time		query	string	false	"End time"
+// @Param			treecluster_id	query	string	false	"TreeCluster ID"
 // @Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
 func GetSensorDataByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -78,7 +82,7 @@ func GetSensorDataByID(_ service.Service) fiber.Handler {
 // @Id				create-sensor
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorDataResponse
+// @Success		200	{object}	sensor.SensorResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -99,7 +103,7 @@ func CreateSensor(_ service.Service) fiber.Handler {
 // @Id				update-sensor
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorDataResponse
+// @Success		200	{object}	sensor.SensorResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -131,32 +135,6 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 // @Param			sensor_id		path	string	true	"Sensor ID"
 // @Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
 func DeleteSensor(_ service.Service) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendString("Not implemented")
-	}
-}
-
-// @Summary		Get sensor data by TreeCluster ID
-// @Description	Get sensor data by TreeCluster ID
-// @Id				get-sensor-data-by-treecluster-id
-// @Tags			Sensor Data
-// @Produce		json
-// @Success		200	{object}	sensor.SensorDataResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/{sensor_id}/data/{treecluster_id} [get]
-// @Param			sensor_id		path	string	true	"Sensor ID"
-// @Param			treecluster_id	path	string	true	"TreeCluster ID"
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			start_time		query	string	false	"Start time"
-// @Param			end_time		query	string	false	"End time"
-// @Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
-func GetSensorDataByTreeclusterID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.SendString("Not implemented")
