@@ -15,7 +15,20 @@ func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed
 		return nil, r.store.HandleError(err)
 	}
 
-  return r.mapper.FromSqlList(row), nil
+  data := r.mapper.FromSqlList(row)
+  for _, f := range data {
+    f.Sensor, err = r.GetSensorByFlowerbedID(ctx, f.ID)
+    if err != nil {
+      return nil, err
+    }
+
+    f.Images, err = r.GetAllImagesByID(ctx, f.ID)
+    if err != nil {
+      return nil, err
+    }
+  }
+
+  return data, nil
 }
 
 func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.Flowerbed, error) {
@@ -24,7 +37,18 @@ func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.
 		return nil, r.store.HandleError(err)
 	}
 
-  return r.mapper.FromSql(row), nil
+  data := r.mapper.FromSql(row)
+  data.Sensor, err = r.GetSensorByFlowerbedID(ctx, id)
+  if err != nil {
+    return nil, err
+  }
+
+  data.Images, err = r.GetAllImagesByID(ctx, id)
+  if err != nil {
+    return nil, err
+  }
+
+  return data, nil
 }
 
 func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID int32) ([]*entities.Image, error) {

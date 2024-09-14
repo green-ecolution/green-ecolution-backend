@@ -89,3 +89,52 @@ func (r *TreeRepository) GetTreeClusterByTreeID(ctx context.Context, treeID int3
 
 	return r.tcMapper.FromSql(row), nil
 }
+
+// Map sensor, images and tree cluster entity to domain flowerbed
+func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error {
+	if err := mapImages(ctx, r, t); err != nil {
+		return r.store.HandleError(err)
+	}
+
+	if err := mapSensor(ctx, r, t); err != nil {
+		return r.store.HandleError(err)
+	}
+
+	if err := mapTreeCluster(ctx, r, t); err != nil {
+		return r.store.HandleError(err)
+	}
+
+	return nil
+}
+
+func mapImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	images, err := r.GetAllImagesByID(ctx, t.ID)
+	if err != nil {
+		return r.store.HandleError(err)
+	}
+	t.Images = images
+	return nil
+}
+
+func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	sensor, err := r.GetSensorByTreeID(ctx, t.ID)
+	if err != nil {
+		if errors.Is(err, storage.ErrSensorNotFound) {
+			// If sensor is not found, set sensor to nil
+			t.Sensor = nil
+			return nil
+		}
+		return r.store.HandleError(err)
+	}
+	t.Sensor = sensor
+	return nil
+}
+
+func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	treeCluster, err := r.GetTreeClusterByTreeID(ctx, t.ID)
+	if err != nil {
+		return r.store.HandleError(err)
+	}
+	t.TreeCluster = treeCluster
+	return nil
+}
