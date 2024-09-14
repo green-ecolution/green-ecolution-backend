@@ -65,9 +65,8 @@ func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flower
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrSensorNotFound
-		} else {
-			return nil, r.store.HandleError(err)
 		}
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.sensorMapper.FromSql(row), nil

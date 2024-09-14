@@ -35,7 +35,6 @@ func NewImageRepository(s *store.Store, mappers ImageRepositoryMappers) storage.
 
 func WithURL(url string) entities.EntityFunc[entities.Image] {
 	return func(i *entities.Image) {
-		slog.Debug("updating url", "url", url)
 		i.URL = url
 	}
 }
