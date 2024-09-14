@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/auth"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
@@ -28,8 +28,7 @@ func (s *Server) publicRoutes(app *fiber.App) {
 
 	grp := app.Group("/api/v1")
 	grp.Get("/swagger/*", swagger.HandlerDefault)
-	grp.Post("/user", auth.Register(s.services.AuthService))
-	grp.Post("/user/logout", auth.Logout(s.services.AuthService))
-	grp.Get("/user/login", auth.Login(s.services.AuthService))
-	grp.Post("/user/login/token", auth.RequestToken(s.services.AuthService))
+	grp.Post("/user/logout", user.Logout(s.services.AuthService))
+	grp.Get("/user/login", user.Login(s.services.AuthService))
+	grp.Post("/user/login/token", user.RequestToken(s.services.AuthService))
 }
