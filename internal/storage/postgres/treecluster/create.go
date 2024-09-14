@@ -19,6 +19,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 		SoilCondition:  entities.TreeSoilConditionUnknown,
 		Archived:       false,
 		LastWatered:    nil,
+		Trees:          make([]*entities.Tree, 0),
 	}
 }
 
@@ -32,9 +33,7 @@ func (r *TreeClusterRepository) Create(ctx context.Context, tcFn ...entities.Ent
 	if err != nil {
 		return nil, r.store.HandleError(err)
 	}
-
 	entity.ID = id
-	r.handleCreateTree(ctx, &id, entity)
 
 	return r.GetByID(ctx, id)
 }
@@ -52,34 +51,4 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 	}
 
 	return r.store.CreateTreeCluster(ctx, &args)
-}
-
-func (r *TreeClusterRepository) handleCreateTree(ctx context.Context, tcID *int32, entity *entities.TreeCluster) error {
-	for _, tree := range entity.Trees {
-		if tree.ID <= 0 {
-			treeID, err := r.createTree(ctx, &entity.ID, tree)
-			if err != nil {
-				return err
-			}
-			tree.ID = treeID
-		}
-	}
-
-	return nil
-}
-
-func (r *TreeClusterRepository) createTree(ctx context.Context, tcID *int32, tree *entities.Tree) (int32, error) {
-
-	entity := sqlc.CreateTreeParams{
-		TreeClusterID:       tcID,
-		Species:             tree.Species,
-		Age:                 tree.Age,
-		HeightAboveSeaLevel: tree.HeightAboveSeaLevel,
-		SensorID:            &tree.Sensor.ID,
-		PlantingYear:        tree.PlantingYear,
-		Latitude:            tree.Latitude,
-		Longitude:           tree.Longitude,
-	}
-
-	return r.store.CreateTree(ctx, &entity)
 }
