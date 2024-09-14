@@ -5,10 +5,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.InfoService) *fiber.App {
+func RegisterRoutes(svc service.TreeService) *fiber.App {
 	app := fiber.New()
 
-	app.Get("/", GetAppInfo(svc))
+	app.Get("/", GetAllTrees(svc))
+  app.Get("/:id", GetTreeByID(svc))
+  app.Patch("/:id", UpdateTree(svc))
+	app.Post("/", CreateTree(svc))
+	app.Delete("/", DeleteTree(svc))
 
 	return app
 }
