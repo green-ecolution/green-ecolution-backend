@@ -71,3 +71,7 @@ type TreeClusterUpdateRequest struct {
 	TreeIDs        []*int32                  `json:"tree_ids,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
 } // @Name TreeClusterUpdate
+
+type TreeClusterAddTreesRequest struct {
+  TreeIDs []*int32 `json:"tree_ids,omitempty"`
+} // @Name TreeClusterAddTrees
