@@ -114,4 +114,3 @@ func DeleteTree(svc service.TreeService) fiber.Handler {
 		return c.JSON(tree.TreeResponse{})
 	}
 }
-
