@@ -13,8 +13,7 @@ func PgTimestampToTime(t pgtype.Timestamp) time.Time {
 }
 
 func PgTimestampToTimePtr(t pgtype.Timestamp) *time.Time {
-	time := t.Time
-	if time.IsZero() {
+	if t.Time.IsZero() {
 		return nil
 	}
 

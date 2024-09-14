@@ -137,7 +137,7 @@ func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int3
 	return r.Delete(ctx, id)
 }
 
-func (r *FlowerbedRepository) UnlinkImage(ctx context.Context, id int32, imageID int32) error {
+func (r *FlowerbedRepository) UnlinkImage(ctx context.Context, id, imageID int32) error {
 	args := sqlc.UnlinkFlowerbedImageParams{
 		FlowerbedID: id,
 		ImageID:     imageID,

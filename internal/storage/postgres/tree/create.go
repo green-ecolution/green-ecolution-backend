@@ -75,7 +75,7 @@ func (r *TreeRepository) handleImages(ctx context.Context, treeID int32, images 
 	return nil
 }
 
-func (r *TreeRepository) linkImages(ctx context.Context, treeID int32, imgID int32) error {
+func (r *TreeRepository) linkImages(ctx context.Context, treeID, imgID int32) error {
 	params := sqlc.LinkTreeImageParams{
 		TreeID:  treeID,
 		ImageID: imgID,

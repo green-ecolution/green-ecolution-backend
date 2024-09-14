@@ -84,7 +84,7 @@ func (r *FlowerbedRepository) handleImages(ctx context.Context, flowerbedID int3
 	return nil
 }
 
-func (r *FlowerbedRepository) linkImages(ctx context.Context, flowerbedID int32, imgID int32) error {
+func (r *FlowerbedRepository) linkImages(ctx context.Context, flowerbedID, imgID int32) error {
 	params := sqlc.LinkFlowerbedImageParams{
 		FlowerbedID: flowerbedID,
 		ImageID:     imgID,

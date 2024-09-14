@@ -28,7 +28,10 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	}
 
 	entity.ID = id
-	r.InsertSensorData(ctx, entity.Data)
+	_, err = r.InsertSensorData(ctx, entity.Data)
+	if err != nil {
+		return nil, err
+	}
 
 	return r.GetByID(ctx, id)
 }
