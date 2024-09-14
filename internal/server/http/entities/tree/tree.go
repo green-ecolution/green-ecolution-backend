@@ -2,8 +2,6 @@ package tree
 
 import (
 	"time"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/sensor"
 )
 
 type TreeResponse struct {
@@ -11,7 +9,7 @@ type TreeResponse struct {
 	CreatedAt     time.Time              `json:"created_at,omitempty"`
 	UpdatedAt     time.Time              `json:"updated_at,omitempty"`
 	TreeClusterID *int32                 `json:"tree_cluster_id,omitempty"`
-	Sensor        *sensor.SensorResponse `json:"sensor,omitempty"`
+	// Sensor        *sensor.SensorResponse `json:"sensor,omitempty"`
 	// Images              []*ImageResponse `json:"images,omitempty"`
 	Age                 int32   `json:"age,omitempty"`
 	HeightAboveSeaLevel float64 `json:"height_above_sea_level,omitempty"`
