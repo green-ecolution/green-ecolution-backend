@@ -13,7 +13,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp := app.Group("/api/v1")
 
 	grp.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-  grp.Mount("/cluster", treecluster.RegisterRoutes(s.services.TreeService)) // TODO: Change to treecluster service
+	grp.Mount("/cluster", treecluster.RegisterRoutes(s.services.TreeService)) // TODO: Change to treecluster service
 }
 
 func (s *Server) publicRoutes(app *fiber.App) {
