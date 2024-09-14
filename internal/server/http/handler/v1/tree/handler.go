@@ -84,7 +84,7 @@ func CreateTree(_ service.TreeService) fiber.Handler {
 //	@Failure		403	{object}	HTTPError
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
-//	@Router			/v1/tree/{tree_id} [patch]
+//	@Router			/v1/tree/{tree_id} [put]
 //	@Param			Authorization	header	string					true	"Insert your access token"	default(Bearer <Add access token here>)
 //	@Param			tree_id			path	string					false	"Tree ID"
 //	@Param			body			body	tree.TreeUpdateRequest	true	"Tree to update"
