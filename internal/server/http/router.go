@@ -13,7 +13,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp := app.Group("/api/v1")
 
 	grp.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-  grp.Mount("/sensor", sensor.RegisterRoutes(s.services.MqttService))
+	grp.Mount("/sensor", sensor.RegisterRoutes(s.services.MqttService))
 }
 
 func (s *Server) publicRoutes(app *fiber.App) {
