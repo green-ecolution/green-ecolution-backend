@@ -132,10 +132,55 @@ func DeleteTreeCluster(svc service.Service) fiber.Handler {
 //	@Param			limit			query	string	false	"Limit"
 //	@Param			age				query	string	false	"Age"
 //	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllTreesInTreeCluster(svc service.Service) fiber.Handler {
+func GetTreesInTreeCluster(svc service.Service) fiber.Handler {
 	// TODO: Change response @Success to tree.TreeListResponse
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.JSON(tree.TreeResponse{})
 	}
 }
+
+//	@Summary		Add trees to tree cluster
+//	@Description	Add trees to tree cluster
+//	@Id				add-trees-to-tree-cluster
+//	@Tags			Tree Cluster
+//	@Produce		json
+//	@Success		200	{object}	treecluster.TreeClusterResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/cluster/{treecluster_id}/trees [post]
+//	@Param			treecluster_id	path	string									true	"Tree Cluster ID"
+//	@Param			body			body	treecluster.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
+//	@Param			Authorization	header	string									true	"Insert your access token"	default(Bearer <Add access token here>)
+func AddTreesToTreeCluster(svc service.Service) fiber.Handler {
+  return func(c *fiber.Ctx) error {
+    // TODO: Implement
+    return c.JSON(treecluster.TreeClusterResponse{})
+  }
+}
+
+//	@Summary		Remove trees from tree cluster
+//	@Description	Remove trees from tree cluster
+//	@Id				remove-trees-from-tree-cluster
+//	@Tags			Tree Cluster
+//	@Produce		json
+//	@Success		200	{object}	treecluster.TreeClusterResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/cluster/{treecluster_id}/trees/{tree_id} [delete]
+//	@Param			treecluster_id	path	string	true	"Tree Cluster ID"
+//	@Param			tree_id			path	string	true	"Tree ID"
+//	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+func RemoveTreesFromTreeCluster(svc service.Service) fiber.Handler {
+  return func(c *fiber.Ctx) error {
+    // TODO: Implement
+    return c.JSON(treecluster.TreeClusterResponse{})
+  }
+}
+
