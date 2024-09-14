@@ -11,7 +11,6 @@ func RegisterRoutes(svc service.Service) *fiber.App {
 	app.Get("/", GetAllSensor(svc))
 	app.Get("/:id", GetSensorByID(svc))
 	app.Get("/:id/data", GetSensorDataByID(svc))
-	app.Get("/:id/data/:tc_id", GetSensorDataByTreeclusterID(svc))
 
 	app.Post("/", CreateSensor(svc))
 	app.Patch("/:id", UpdateSensor(svc))
