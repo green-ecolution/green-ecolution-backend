@@ -24,7 +24,7 @@ import (
 // @Param			age				query	string	false	"Age"
 // @Param			treecluster_id	query	string	false	"Tree Cluster ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllTrees(svc service.TreeService) fiber.Handler {
+func GetAllTrees(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.JSON(tree.TreeResponse{})
@@ -45,7 +45,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Router			/v1/tree/{tree_id} [get]
 // @Param			tree_id			path	string	false	"Tree ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreeByID(svc service.TreeService) fiber.Handler {
+func GetTreeByID(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.JSON(tree.TreeResponse{})
@@ -66,7 +66,7 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Router			/v1/tree [post]
 // @Param			Authorization	header	string					true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			body			body	tree.TreeCreateRequest	true	"Tree to create"
-func CreateTree(svc service.TreeService) fiber.Handler {
+func CreateTree(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.JSON(tree.TreeResponse{})
@@ -88,7 +88,7 @@ func CreateTree(svc service.TreeService) fiber.Handler {
 // @Param			Authorization	header	string					true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			tree_id			path	string					false	"Tree ID"
 // @Param			body			body	tree.TreeUpdateRequest	true	"Tree to update"
-func UpdateTree(svc service.TreeService) fiber.Handler {
+func UpdateTree(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.JSON(tree.TreeResponse{})
@@ -108,7 +108,7 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [delete]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func DeleteTree(svc service.TreeService) fiber.Handler {
+func DeleteTree(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.JSON(tree.TreeResponse{})
