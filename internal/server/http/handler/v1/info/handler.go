@@ -23,7 +23,7 @@ import (
 // @Router			/v1/info [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAppInfo(svc service.InfoService) fiber.Handler {
-	var mapper mapper.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
+	var m mapper.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
 		domainInfo, err := svc.GetAppInfoResponse(c.Context())
@@ -31,7 +31,7 @@ func GetAppInfo(svc service.InfoService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		response := mapper.ToResponse(domainInfo)
+		response := m.ToResponse(domainInfo)
 		return c.JSON(response)
 	}
 }
