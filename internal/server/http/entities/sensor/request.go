@@ -6,7 +6,6 @@ type SensorCreateRequest struct {
 } // @Name SensorCreateRequest
 
 type SensorUpdateRequest struct {
-  Status SensorStatus `json:"status"`
-  Type   string       `json:"type"`
+	Status SensorStatus `json:"status"`
+	Type   string       `json:"type"`
 } // @Name SensorUpdateRequest
-
