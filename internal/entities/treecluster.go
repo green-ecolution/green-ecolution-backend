@@ -15,6 +15,10 @@ type TreeSoilCondition string
 
 const (
 	TreeSoilConditionSchluffig TreeSoilCondition = "schluffig"
+	TreeSoilConditionSandig    TreeSoilCondition = "sandig"
+	TreeSoilConditionLehmig    TreeSoilCondition = "lehmig"
+	TreeSoilConditionTonig     TreeSoilCondition = "tonig"
+	TreeSoilConditionUnknown   TreeSoilCondition = "unknown"
 )
 
 type TreeCluster struct {
@@ -22,7 +26,7 @@ type TreeCluster struct {
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	WateringStatus TreeClusterWateringStatus
-	LastWatered    time.Time
+	LastWatered    *time.Time
 	MoistureLevel  float64
 	Region         string
 	Address        string

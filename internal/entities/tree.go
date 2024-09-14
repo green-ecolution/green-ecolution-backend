@@ -19,8 +19,3 @@ type Tree struct {
 	Latitude            float64
 	Longitude           float64
 }
-
-type TreeWithImages struct {
-	Tree
-	Image []*Image
-}

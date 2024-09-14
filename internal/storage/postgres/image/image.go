@@ -2,15 +2,16 @@ package image
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
 type ImageRepository struct {
-	querier sqlc.Querier
+	store *store.Store
 	ImageRepositoryMappers
 }
 
@@ -24,58 +25,34 @@ func NewImageRepositoryMappers(iMapper mapper.InternalImageRepoMapper) ImageRepo
 	}
 }
 
-func NewImageRepository(querier sqlc.Querier, mappers ImageRepositoryMappers) storage.ImageRepository {
+func NewImageRepository(s *store.Store, mappers ImageRepositoryMappers) storage.ImageRepository {
+	s.SetEntityType(store.Image)
 	return &ImageRepository{
-		querier:                querier,
+		store:                  s,
 		ImageRepositoryMappers: mappers,
 	}
 }
 
-func (r *ImageRepository) GetAll(ctx context.Context) ([]*entities.Image, error) {
-	rows, err := r.querier.GetAllImages(ctx)
-	if err != nil {
-		return nil, err
+func WithURL(url string) entities.EntityFunc[entities.Image] {
+	return func(i *entities.Image) {
+		i.URL = url
 	}
-
-	return r.mapper.FromSqlList(rows), nil
 }
 
-func (r *ImageRepository) GetByID(ctx context.Context, id int32) (*entities.Image, error) {
-	row, err := r.querier.GetImageByID(ctx, id)
-	if err != nil {
-		return nil, err
+func WithFilename(filename *string) entities.EntityFunc[entities.Image] {
+	return func(i *entities.Image) {
+		slog.Debug("updating filename", "filename", filename)
+		i.Filename = filename
 	}
-
-	return r.mapper.FromSql(row), nil
 }
 
-func (r *ImageRepository) Create(ctx context.Context, image *entities.Image) (*entities.Image, error) {
-	params := &sqlc.CreateImageParams{
-		Url:      image.URL,
-		Filename: image.Filename,
-		MimeType: image.MimeType,
+func WithMimeType(mimeType *string) entities.EntityFunc[entities.Image] {
+	return func(i *entities.Image) {
+		slog.Debug("updating mime type", "mime type", mimeType)
+		i.MimeType = mimeType
 	}
-	id, err := r.querier.CreateImage(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.GetByID(ctx, id)
-}
-
-func (r *ImageRepository) Update(ctx context.Context, image *entities.Image) (*entities.Image, error) {
-	params := &sqlc.UpdateImageParams{
-		ID:  image.ID,
-		Url: image.URL,
-	}
-
-	if err := r.querier.UpdateImage(ctx, params); err != nil {
-		return nil, err
-	}
-
-	return r.GetByID(ctx, image.ID)
 }
 
 func (r *ImageRepository) Delete(ctx context.Context, id int32) error {
-	return r.querier.DeleteImage(ctx, id)
+	return r.store.DeleteImage(ctx, id)
 }

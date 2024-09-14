@@ -17,6 +17,15 @@ INSERT INTO flowerbeds (
   $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromText($10, 4326)
 ) RETURNING id;
 
+-- name: LinkFlowerbedImage :exec
+INSERT INTO flowerbed_images (flowerbed_id, image_id) VALUES ($1, $2);
+
+-- name: UnlinkFlowerbedImage :exec
+DELETE FROM flowerbed_images WHERE flowerbed_id = $1 AND image_id = $2;
+
+-- name: UnlinkAllFlowerbedImages :exec
+DELETE FROM flowerbed_images WHERE flowerbed_id = $1;
+
 -- name: UpdateFlowerbed :exec
 UPDATE flowerbeds SET
   sensor_id = $2,

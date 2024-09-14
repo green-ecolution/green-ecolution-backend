@@ -107,12 +107,7 @@ clean:
 	rm -rf internal/service/_mock
 	rm -rf internal/storage/_mock
 	rm -rf internal/storage/postgres/_sqlc
-	rm -rf internal/storage/postgres/flowerbed/mapper/generated
-	rm -rf internal/storage/postgres/image/mapper/generated
-	rm -rf internal/storage/postgres/sensor/mapper/generated
-	rm -rf internal/storage/postgres/tree/mapper/generated
-	rm -rf internal/storage/postgres/treecluster/mapper/generated
-	rm -rf internal/storage/postgres/vehicle/mapper/generated
+	rm -rf internal/storage/postgres/mapper/generated
 
 .PHONY: run
 run: build
@@ -180,7 +175,12 @@ lint:
 .PHONY: test
 test:
 	@echo "Testing..."
-	go test ./...
+	go test -cover ./...
+
+.PHONY: test/verbose
+test:
+	@echo "Testing..."
+	go test -v -cover ./...
 
 .PHONY: config/enc
 config/enc:

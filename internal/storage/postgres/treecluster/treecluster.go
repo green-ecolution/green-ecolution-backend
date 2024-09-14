@@ -2,102 +2,122 @@ package treecluster
 
 import (
 	"context"
+	"log/slog"
+	"time"
+
+	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor/mapper"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
 type TreeClusterRepository struct {
-	querier sqlc.Querier
+	store *store.Store
 	TreeClusterMappers
 }
 
 type TreeClusterMappers struct {
-	mapper       mapper.InternalTreeClusterRepoMapper
+	mapper       sensorMapper.InternalTreeClusterRepoMapper
 	sensorMapper sensorMapper.InternalSensorRepoMapper
 }
 
-func NewTreeClusterRepositoryMappers(tcMapper mapper.InternalTreeClusterRepoMapper, sMapper sensorMapper.InternalSensorRepoMapper) TreeClusterMappers {
+func NewTreeClusterRepositoryMappers(tcMapper sensorMapper.InternalTreeClusterRepoMapper, sMapper sensorMapper.InternalSensorRepoMapper) TreeClusterMappers {
 	return TreeClusterMappers{
 		mapper:       tcMapper,
 		sensorMapper: sMapper,
 	}
 }
 
-func NewTreeClusterRepository(querier sqlc.Querier, mappers TreeClusterMappers) storage.TreeClusterRepository {
+func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storage.TreeClusterRepository {
+	s.SetEntityType(store.TreeCluster)
 	return &TreeClusterRepository{
-		querier:            querier,
+		store:              s,
 		TreeClusterMappers: mappers,
 	}
 }
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, error) {
-	rows, err := r.querier.GetAllTreeClusters(ctx)
-	if err != nil {
-		return nil, err
+func WithRegion(region string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating region", "region", region)
+		tc.Region = region
 	}
-
-	return r.mapper.FromSqlList(rows), nil
 }
 
-func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {
-	row, err := r.querier.GetTreeClusterByID(ctx, id)
-	if err != nil {
-		return nil, err
+func WithAddress(address string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating address", "address", address)
+		tc.Address = address
 	}
-
-	return r.mapper.FromSql(row), nil
 }
 
-func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error) {
-	row, err := r.querier.GetSensorByTreeClusterID(ctx, id)
-	if err != nil {
-		return nil, err
+func WithDescription(description string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating description", "description", description)
+		tc.Description = description
 	}
-
-	return r.sensorMapper.FromSql(row), nil
 }
 
-func (r *TreeClusterRepository) Create(ctx context.Context, tc *entities.TreeCluster) (*entities.TreeCluster, error) {
-	entity := sqlc.CreateTreeClusterParams{
-		Region:    tc.Region,
-		Address:   tc.Address,
-		Latitude:  tc.Latitude,
-		Longitude: tc.Longitude,
+func WithLatitude(latitude float64) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating latitude", "latitude", latitude)
+		tc.Latitude = latitude
 	}
-
-	id, err := r.querier.CreateTreeCluster(ctx, &entity)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.GetByID(ctx, id)
 }
 
-func (r *TreeClusterRepository) Update(ctx context.Context, tc *entities.TreeCluster) (*entities.TreeCluster, error) {
-	entity := sqlc.UpdateTreeClusterParams{
-		ID:        tc.ID,
-		Region:    tc.Region,
-		Address:   tc.Address,
-		Latitude:  tc.Latitude,
-		Longitude: tc.Longitude,
+func WithLongitude(longitude float64) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating longitude", "longitude", longitude)
+		tc.Longitude = longitude
 	}
+}
 
-	err := r.querier.UpdateTreeCluster(ctx, &entity)
-	if err != nil {
-		return nil, err
+func WithMoistureLevel(moistureLevel float64) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating moistureLevel", "moistureLevel", moistureLevel)
+		tc.MoistureLevel = moistureLevel
 	}
+}
 
-	return r.GetByID(ctx, tc.ID)
+func WithWateringStatus(wateringStatus entities.TreeClusterWateringStatus) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating wateringStatus", "wateringStatus", wateringStatus)
+		tc.WateringStatus = wateringStatus
+	}
+}
+
+func WithSoilCondition(soilCondition entities.TreeSoilCondition) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating soilCondition", "soilCondition", soilCondition)
+		tc.SoilCondition = soilCondition
+	}
+}
+
+func WithLastWatered(lastWatered time.Time) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating lastWatered", "lastWatered", lastWatered)
+		tc.LastWatered = &lastWatered
+	}
+}
+
+func WithArchived(archived bool) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating archived", "archived", archived)
+		tc.Archived = archived
+	}
+}
+
+func WithTrees(trees []*entities.Tree) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		slog.Debug("updating trees", "trees", trees)
+		tc.Trees = trees
+	}
 }
 
 func (r *TreeClusterRepository) Archive(ctx context.Context, id int32) error {
-	return r.querier.ArchiveTreeCluster(ctx, id)
+	return r.store.ArchiveTreeCluster(ctx, id)
 }
 
 func (r *TreeClusterRepository) Delete(ctx context.Context, id int32) error {
-	return r.querier.DeleteTreeCluster(ctx, id)
+	return r.store.DeleteTreeCluster(ctx, id)
 }

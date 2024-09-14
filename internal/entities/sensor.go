@@ -15,11 +15,7 @@ type Sensor struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Status    SensorStatus
-}
-
-type SensorWithData struct {
-	Sensor
-	Data []*SensorData
+	Data      []*SensorData
 }
 
 type SensorData struct {

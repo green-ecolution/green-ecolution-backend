@@ -16,11 +16,7 @@ type Flowerbed struct {
 	Address        string
 	Sensor         *Sensor
 	Images         []*Image
+	Archived       bool
 	Latitude       float64
 	Longitude      float64
-}
-
-type PlantingAreaWithImages struct {
-	Flowerbed
-	Image []*Image
 }

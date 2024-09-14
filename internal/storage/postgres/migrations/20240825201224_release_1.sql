@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS tree_clusters (
   soil_condition tree_soil_condition NOT NULL DEFAULT 'unknown',
   latitude FLOAT NOT NULL,
   longitude FLOAT NOT NULL,
-  geometry GEOMETRY(Point, 4326) NOT NULL
+  geometry GEOMETRY(Point, 4326)
 );
 
 CREATE TYPE sensor_status AS ENUM ('online', 'offline', 'unknown');
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS trees (
   tree_number INT NOT NULL,
   latitude FLOAT NOT NULL,
   longitude FLOAT NOT NULL,
-  geometry GEOMETRY(Point, 4326) NOT NULL,
+  geometry GEOMETRY(Point, 4326),
   FOREIGN KEY (sensor_id) REFERENCES sensors(id),
   FOREIGN KEY (tree_cluster_id) REFERENCES tree_clusters(id)
 );
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS flowerbeds (
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   latitude FLOAT NOT NULL,
   longitude FLOAT NOT NULL,
-  geometry GEOMETRY(Polygon, 4326) NOT NULL
+  geometry GEOMETRY(Polygon, 4326)
 );
 
 CREATE TABLE IF NOT EXISTS flowerbed_images (

@@ -7,8 +7,8 @@ import (
 
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
-// goverter:ignoreMissing
-type InternalImageRepoMapper interface {
-	FromSql(src *sqlc.Image) *entities.Image
-	FromSqlList(src []*sqlc.Image) []*entities.Image
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
+type InternalVehicleRepoMapper interface {
+	FromSql(src *sqlc.Vehicle) *entities.Vehicle
+	FromSqlList(src []*sqlc.Vehicle) []*entities.Vehicle
 }

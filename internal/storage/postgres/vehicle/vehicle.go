@@ -2,15 +2,17 @@ package vehicle
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle/mapper"
+	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
 type VehicleRepository struct {
-	querier sqlc.Querier
+	store *store.Store
 	VehicleRepositoryMappers
 }
 
@@ -24,71 +26,35 @@ func NewVehicleRepositoryMappers(vMapper mapper.InternalVehicleRepoMapper) Vehic
 	}
 }
 
-func NewVehicleRepository(querier sqlc.Querier, mappers VehicleRepositoryMappers) storage.VehicleRepository {
+func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
+	s.SetEntityType(store.Vehicle)
 	return &VehicleRepository{
-		querier:                  querier,
+		store:                    s,
 		VehicleRepositoryMappers: mappers,
 	}
 }
 
-func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, error) {
-	rows, err := r.querier.GetAllVehicles(ctx)
-	if err != nil {
-		return nil, err
+func WithNumberPlate(numberPlate string) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating number", "number", numberPlate)
+		v.NumberPlate = numberPlate
 	}
-
-	return r.mapper.FromSqlList(rows), nil
 }
 
-func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
-	row, err := r.querier.GetVehicleByID(ctx, id)
-	if err != nil {
-		return nil, err
+func WithDescription(description string) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating description", "description", description)
+		v.Description = description
 	}
-
-	return r.mapper.FromSql(row), nil
 }
 
-func (r *VehicleRepository) GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error) {
-	row, err := r.querier.GetVehicleByPlate(ctx, plate)
-	if err != nil {
-		return nil, err
+func WithWaterCapacity(waterCapacity float64) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating water capacity", "water capacity", waterCapacity)
+		v.WaterCapacity = waterCapacity
 	}
-
-	return r.mapper.FromSql(row), nil
-}
-
-func (r *VehicleRepository) Create(ctx context.Context, vehicle *entities.Vehicle) (*entities.Vehicle, error) {
-	params := &sqlc.CreateVehicleParams{
-		NumberPlate:   vehicle.NumberPlate,
-		Description:   vehicle.Description,
-		WaterCapacity: vehicle.WaterCapacity,
-	}
-
-	id, err := r.querier.CreateVehicle(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.GetByID(ctx, id)
-}
-
-func (r *VehicleRepository) Update(ctx context.Context, vehicle *entities.Vehicle) (*entities.Vehicle, error) {
-	params := &sqlc.UpdateVehicleParams{
-		ID:            vehicle.ID,
-		NumberPlate:   vehicle.NumberPlate,
-		Description:   vehicle.Description,
-		WaterCapacity: vehicle.WaterCapacity,
-	}
-
-	err := r.querier.UpdateVehicle(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.GetByID(ctx, vehicle.ID)
 }
 
 func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
-	return r.querier.DeleteVehicle(ctx, id)
+	return r.store.DeleteVehicle(ctx, id)
 }
