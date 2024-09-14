@@ -115,9 +115,9 @@ func DeleteTree(_ service.TreeService) fiber.Handler {
 	}
 }
 
-// @Summary		Get sensors of a tree
-// @Description	Get sensors of a tree
-// @Id				get-tree-sensors
+// @Summary		Get sensor of a tree
+// @Description	Get sensor of a tree
+// @Id				get-tree-sensor
 // @Tags			Tree Sensor
 // @Produce		json
 // @Success		200	{object}	tree.TreeResponse
@@ -126,7 +126,7 @@ func DeleteTree(_ service.TreeService) fiber.Handler {
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/sensors [get]
+// @Router			/v1/tree/{tree_id}/sensor [get]
 // @Param			tree_id			path	string	false	"Tree ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetTreeSensor(_ service.TreeService) fiber.Handler {
@@ -148,7 +148,7 @@ func GetTreeSensor(_ service.TreeService) fiber.Handler {
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/sensors [post]
+// @Router			/v1/tree/{tree_id}/sensor [post]
 // @Param			tree_id			path	string						false	"Tree ID"
 // @Param			body			body	tree.TreeAddSensorRequest	true	"Sensor to add"
 // @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
@@ -170,7 +170,7 @@ func AddTreeSensor(_ service.TreeService) fiber.Handler {
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/sensors/{sensor_id} [delete]
+// @Router			/v1/tree/{tree_id}/sensor/{sensor_id} [delete]
 // @Param			tree_id			path	string	false	"Tree ID"
 // @Param			sensor_id		path	string	false	"Sensor ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
