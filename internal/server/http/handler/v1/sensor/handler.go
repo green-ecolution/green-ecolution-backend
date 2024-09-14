@@ -18,6 +18,7 @@ import (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor [get]
+// @Param			status			query	string	false	"Sensor Status"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
