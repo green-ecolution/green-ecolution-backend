@@ -22,7 +22,7 @@ import (
 //	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement GetAll
+		// TODO: Implement
 		return c.JSON([]sensor.SensorResponse{})
 	}
 }
@@ -43,7 +43,7 @@ func GetAllSensor(_ service.Service) fiber.Handler {
 //	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetSensorByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement GetByID
+		// TODO: Implement
 		return c.JSON(sensor.SensorResponse{})
 	}
 }
@@ -68,7 +68,7 @@ func GetSensorByID(_ service.Service) fiber.Handler {
 //	@Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
 func GetSensorDataByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement GetByID
+		// TODO: Implement
 		return c.JSON(sensor.SensorDataResponse{})
 	}
 }
@@ -89,7 +89,7 @@ func GetSensorDataByID(_ service.Service) fiber.Handler {
 //	@Param			body			body	sensor.SensorCreateRequest	true	"Sensor to create"
 func CreateSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement GetByID
+		// TODO: Implement
 		return c.JSON(sensor.SensorDataResponse{})
 	}
 }
@@ -111,7 +111,28 @@ func CreateSensor(_ service.Service) fiber.Handler {
 //	@Param			body			body	sensor.SensorUpdateRequest	true	"Sensor information to update"
 func UpdateSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement GetByID
+		// TODO: Implement
 		return c.JSON(sensor.SensorDataResponse{})
 	}
+}
+
+//	@Summary		Delete sensor
+//	@Description	Delete sensor
+//	@Id				delete-sensor
+//	@Tags			Sensor
+//	@Produce		json
+//	@Success		200	
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/sensor/{sensor_id} [delete]
+//	@Param			sensor_id		path	string	true	"Sensor ID"
+//	@Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
+func DeleteSensor(_ service.Service) fiber.Handler {
+  return func(c *fiber.Ctx) error {
+    // TODO: Implement
+    return c.SendString("Not implemented")
+  }
 }
