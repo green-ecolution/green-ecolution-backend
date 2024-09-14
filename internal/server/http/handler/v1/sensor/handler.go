@@ -109,7 +109,7 @@ func CreateSensor(_ service.Service) fiber.Handler {
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/{sensor_id} [patch]
+// @Router			/v1/sensor/{sensor_id} [put]
 // @Param			sensor_id		path	string						true	"Sensor ID"
 // @Param			Authorization	header	string						false	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			body			body	sensor.SensorUpdateRequest	true	"Sensor information to update"

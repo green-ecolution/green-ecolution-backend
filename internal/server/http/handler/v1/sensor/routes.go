@@ -13,7 +13,7 @@ func RegisterRoutes(svc service.Service) *fiber.App {
 	app.Get("/:id/data", GetSensorDataByID(svc))
 
 	app.Post("/", CreateSensor(svc))
-	app.Patch("/:id", UpdateSensor(svc))
+	app.Put("/:id", UpdateSensor(svc))
 	app.Delete("/:id", DeleteSensor(svc))
 
 	return app
