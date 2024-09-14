@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 )
 
@@ -13,7 +13,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp := app.Group("/api/v1")
 
 	grp.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-	grp.Mount("/tree", tree.RegisterRoutes(s.services.TreeService))
+	grp.Mount("/sensor", sensor.RegisterRoutes(s.services.MqttService))
 }
 
 func (s *Server) publicRoutes(app *fiber.App) {

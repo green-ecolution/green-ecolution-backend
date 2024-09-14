@@ -2,8 +2,9 @@ package info
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info/generated"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
@@ -22,7 +23,7 @@ import (
 // @Router			/v1/info [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAppInfo(svc service.InfoService) fiber.Handler {
-	var mapper info.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
+	var mapper mapper.InfoHTTPMapper = &generated.InfoHTTPMapperImpl{}
 
 	return func(c *fiber.Ctx) error {
 		domainInfo, err := svc.GetAppInfoResponse(c.Context())
