@@ -9,7 +9,7 @@ func RegisterRoutes(svc service.AuthService) *fiber.App {
 	app := fiber.New()
 
 	app.Post("/", GetAllUserRoles(svc))
-  app.Get("/:id", GetRoleByID(svc))
+	app.Get("/:id", GetRoleByID(svc))
 
 	return app
 }

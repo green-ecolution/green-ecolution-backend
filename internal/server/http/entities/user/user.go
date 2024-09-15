@@ -45,4 +45,3 @@ type UserUpdateRequest struct {
 	PhoneNumber string `json:"phone_number,omitempty"`
 	Avatar      string `json:"avatar_url,omitempty"`
 } // @Name UserUpdate
-
