@@ -188,7 +188,7 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllUsers(svc service.AuthService) fiber.Handler {
+func GetAllUsers(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
@@ -205,7 +205,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 // @Param			user_id	path		string	true	"User ID"
 // @Router			/v1/user/{user_id} [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetUserByID(svc service.AuthService) fiber.Handler {
+func GetUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
@@ -224,7 +224,7 @@ func GetUserByID(svc service.AuthService) fiber.Handler {
 // @Param			user	body		user.UserUpdateRequest	true	"User information"
 // @Router			/v1/user/{user_id} [put]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func UpdateUserByID(svc service.AuthService) fiber.Handler {
+func UpdateUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
@@ -241,7 +241,7 @@ func UpdateUserByID(svc service.AuthService) fiber.Handler {
 // @Param			user_id	path		string	true	"User ID"
 // @Router			/v1/user/{user_id} [delete]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func DeleteUserByID(svc service.AuthService) fiber.Handler {
+func DeleteUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
@@ -259,7 +259,7 @@ func DeleteUserByID(svc service.AuthService) fiber.Handler {
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user/{user_id}/roles [get]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetUserRoles(svc service.AuthService) fiber.Handler {
+func GetUserRoles(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
