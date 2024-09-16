@@ -1,9 +1,7 @@
-package user
+package entities
 
 import (
 	"time"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/pagination"
 )
 
 type UserResponse struct {
@@ -20,8 +18,8 @@ type UserResponse struct {
 } // @Name User
 
 type UserListResponse struct {
-	Data       []UserResponse        `json:"data"`
-	Pagination pagination.Pagination `json:"pagination"`
+	Data       []UserResponse `json:"data"`
+	Pagination Pagination     `json:"pagination"`
 } // @Name UserList
 
 type UserRegisterRequest struct {

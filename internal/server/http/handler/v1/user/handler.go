@@ -5,9 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/auth"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/role"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/user"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 )
@@ -17,7 +15,7 @@ import (
 // @Tags		User
 // @Produce	json
 // @Param		redirect_url	query		string	true	"Redirect URL"
-// @Success	200				{object}	auth.LoginResponse
+// @Success	200				{object}	entities.LoginResponse
 // @Failure	400				{object}	HTTPError
 // @Failure	500				{object}	HTTPError
 // @Router		/v1/user/login [get]
@@ -38,7 +36,7 @@ func Login(svc service.AuthService) fiber.Handler {
 			return err
 		}
 
-		response := auth.LoginResponse{
+		response := entities.LoginResponse{
 			LoginURL: resp.LoginURL.String(),
 		}
 
@@ -49,15 +47,15 @@ func Login(svc service.AuthService) fiber.Handler {
 // @Summary	Logout from the system
 // @Descriptio	Logout from the system
 // @Tags		User
-// @Param		body	body		auth.LogoutRequest	true	"Logout information"
-// @Success	200		{string}	string				"OK"
+// @Param		body	body		entities.LogoutRequest	true	"Logout information"
+// @Success	200		{string}	string					"OK"
 // @Failure	400		{object}	HTTPError
 // @Failure	500		{object}	HTTPError
 // @Router		/v1/user/logout [post]
 func Logout(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		req := auth.LogoutRequest{}
+		req := entities.LogoutRequest{}
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
@@ -80,16 +78,16 @@ func Logout(svc service.AuthService) fiber.Handler {
 // @Tags		User
 // @Accept		json
 // @Produce	json
-// @Param		body			body		auth.LoginTokenRequest	true	"Callback information"
-// @Param		redirect_url	query		string					true	"Redirect URL"
-// @Success	200				{object}	auth.ClientTokenResponse
+// @Param		body			body		entities.LoginTokenRequest	true	"Callback information"
+// @Param		redirect_url	query		string						true	"Redirect URL"
+// @Success	200				{object}	entities.ClientTokenResponse
 // @Failure	400				{object}	HTTPError
 // @Failure	500				{object}	HTTPError
 // @Router		/v1/user/login/token [post]
 func RequestToken(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		req := auth.LoginTokenRequest{}
+		req := entities.LoginTokenRequest{}
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
@@ -109,7 +107,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 			return err
 		}
 
-		response := auth.ClientTokenResponse{
+		response := entities.ClientTokenResponse{
 			AccessToken:  token.AccessToken,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
@@ -125,8 +123,8 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 // @Tags			User
 // @Accept			json
 // @Produce		json
-// @Param			user	body		user.UserRegisterRequest	true	"User information"
-// @Success		201		{object}	user.UserResponse
+// @Param			user	body		entities.UserRegisterRequest	true	"User information"
+// @Success		201		{object}	entities.UserResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Router			/v1/user [post]
@@ -134,7 +132,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 func Register(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		req := user.UserRegisterRequest{}
+		req := entities.UserRegisterRequest{}
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": errors.Wrap(err, "failed to parse request").Error(),
@@ -157,7 +155,7 @@ func Register(svc service.AuthService) fiber.Handler {
 			return err
 		}
 
-		response := user.UserResponse{
+		response := entities.UserResponse{
 			ID:            u.ID.String(),
 			CreatedAt:     u.CreatedAt,
 			Email:         u.Email,
@@ -181,7 +179,7 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Description	Get all users
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	user.UserListResponse
+// @Success		200		{object}	entities.UserListResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Param			page	query		string	false	"Page"
@@ -198,7 +196,7 @@ func GetAllUsers(_ service.AuthService) fiber.Handler {
 // @Description	Get a user by ID
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	user.UserResponse
+// @Success		200		{object}	entities.UserResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		404		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
@@ -216,12 +214,12 @@ func GetUserByID(_ service.AuthService) fiber.Handler {
 // @Tags			User
 // @Accept			json
 // @Produce		json
-// @Success		200		{object}	user.UserResponse
+// @Success		200		{object}	entities.UserResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		404		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string					true	"User ID"
-// @Param			user	body		user.UserUpdateRequest	true	"User information"
+// @Param			user_id	path		string						true	"User ID"
+// @Param			user	body		entities.UserUpdateRequest	true	"User information"
 // @Router			/v1/user/{user_id} [put]
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func UpdateUserByID(_ service.AuthService) fiber.Handler {
@@ -251,7 +249,7 @@ func DeleteUserByID(_ service.AuthService) fiber.Handler {
 // @Description	Get user roles
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	role.RoleListResponse
+// @Success		200		{object}	entities.RoleListResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Param			user_id	path		string	true	"User ID"

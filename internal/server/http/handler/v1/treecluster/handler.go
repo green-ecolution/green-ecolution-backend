@@ -2,8 +2,7 @@ package treecluster
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/treecluster"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -12,7 +11,7 @@ import (
 // @Id				get-all-tree-clusters
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterListResponse
+// @Success		200	{object}	entities.TreeClusterListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -26,7 +25,7 @@ import (
 func GetAllTreeClusters(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterListResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -35,7 +34,7 @@ func GetAllTreeClusters(_ service.Service) fiber.Handler {
 // @Id				get-tree-cluster-by-id
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterResponse
+// @Success		200	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -47,7 +46,7 @@ func GetAllTreeClusters(_ service.Service) fiber.Handler {
 func GetTreeClusterByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -56,19 +55,19 @@ func GetTreeClusterByID(_ service.Service) fiber.Handler {
 // @Id				create-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterResponse
+// @Success		200	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [post]
-// @Param			body			body	treecluster.TreeClusterCreateRequest	true	"Tree Cluster Create Request"
-// @Param			Authorization	header	string									true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			body			body	entities.TreeClusterCreateRequest	true	"Tree Cluster Create Request"
+// @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
 func CreateTreeCluster(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -77,20 +76,20 @@ func CreateTreeCluster(_ service.Service) fiber.Handler {
 // @Id				update-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterResponse
+// @Success		200	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [put]
-// @Param			cluster_id		path	string									true	"Tree Cluster ID"
-// @Param			body			body	treecluster.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
-// @Param			Authorization	header	string									true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id		path	string								true	"Tree Cluster ID"
+// @Param			body			body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
+// @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
 func UpdateTreeCluster(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -99,7 +98,7 @@ func UpdateTreeCluster(_ service.Service) fiber.Handler {
 // @Id				delete-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterResponse
+// @Success		200	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -111,7 +110,7 @@ func UpdateTreeCluster(_ service.Service) fiber.Handler {
 func DeleteTreeCluster(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -120,7 +119,7 @@ func DeleteTreeCluster(_ service.Service) fiber.Handler {
 // @Id				get-all-trees-in-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -133,10 +132,10 @@ func DeleteTreeCluster(_ service.Service) fiber.Handler {
 // @Param			age				query	string	false	"Age"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetTreesInTreeCluster(_ service.Service) fiber.Handler {
-	// TODO: Change response @Success to tree.TreeListResponse
+	// TODO: Change response @Success to entities.TreeListResponse
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -145,20 +144,20 @@ func GetTreesInTreeCluster(_ service.Service) fiber.Handler {
 // @Id				add-trees-to-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterResponse
+// @Success		200	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id}/trees [post]
-// @Param			cluster_id		path	string									true	"Tree Cluster ID"
-// @Param			body			body	treecluster.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
-// @Param			Authorization	header	string									true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id		path	string								true	"Tree Cluster ID"
+// @Param			body			body	entities.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
+// @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
 func AddTreesToTreeCluster(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -167,7 +166,7 @@ func AddTreesToTreeCluster(_ service.Service) fiber.Handler {
 // @Id				remove-trees-from-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	treecluster.TreeClusterResponse
+// @Success		200	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -180,6 +179,6 @@ func AddTreesToTreeCluster(_ service.Service) fiber.Handler {
 func RemoveTreesFromTreeCluster(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(treecluster.TreeClusterResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }

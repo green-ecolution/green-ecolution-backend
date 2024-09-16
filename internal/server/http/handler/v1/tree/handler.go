@@ -2,7 +2,7 @@ package tree
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
@@ -12,7 +12,7 @@ import (
 // @Id				get-all-trees
 // @Tags			Tree
 // @Produce		json
-// @Success		200	{object}	tree.TreeListResponse
+// @Success		200	{object}	entities.TreeListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -27,7 +27,7 @@ import (
 func GetAllTrees(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -36,7 +36,7 @@ func GetAllTrees(_ service.TreeService) fiber.Handler {
 // @Id				get-trees
 // @Tags			Tree
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -48,7 +48,7 @@ func GetAllTrees(_ service.TreeService) fiber.Handler {
 func GetTreeByID(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -57,19 +57,19 @@ func GetTreeByID(_ service.TreeService) fiber.Handler {
 // @Id				create-tree
 // @Tags			Tree
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [post]
-// @Param			Authorization	header	string					true	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			body			body	tree.TreeCreateRequest	true	"Tree to create"
+// @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			body			body	entities.TreeCreateRequest	true	"Tree to create"
 func CreateTree(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -78,20 +78,20 @@ func CreateTree(_ service.TreeService) fiber.Handler {
 // @Id				update-tree
 // @Tags			Tree
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [put]
-// @Param			Authorization	header	string					true	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			tree_id			path	string					false	"Tree ID"
-// @Param			body			body	tree.TreeUpdateRequest	true	"Tree to update"
+// @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id			path	string						false	"Tree ID"
+// @Param			body			body	entities.TreeUpdateRequest	true	"Tree to update"
 func UpdateTree(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -111,7 +111,7 @@ func UpdateTree(_ service.TreeService) fiber.Handler {
 func DeleteTree(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -120,7 +120,7 @@ func DeleteTree(_ service.TreeService) fiber.Handler {
 // @Id				get-tree-sensor
 // @Tags			Tree Sensor
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -133,7 +133,7 @@ func GetTreeSensor(_ service.TreeService) fiber.Handler {
 	// TODO: Change @Success to return sensor.SensorResponse
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -142,20 +142,20 @@ func GetTreeSensor(_ service.TreeService) fiber.Handler {
 // @Id				add-sensor-to-tree
 // @Tags			Tree Sensor
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/sensor [post]
-// @Param			tree_id			path	string						false	"Tree ID"
-// @Param			body			body	tree.TreeAddSensorRequest	true	"Sensor to add"
-// @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id			path	string							false	"Tree ID"
+// @Param			body			body	entities.TreeAddSensorRequest	true	"Sensor to add"
+// @Param			Authorization	header	string							true	"Insert your access token"	default(Bearer <Add access token here>)
 func AddTreeSensor(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -164,7 +164,7 @@ func AddTreeSensor(_ service.TreeService) fiber.Handler {
 // @Id				remove-sensor-from-tree
 // @Tags			Tree Sensor
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -177,7 +177,7 @@ func AddTreeSensor(_ service.TreeService) fiber.Handler {
 func RemoveTreeSensor(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -186,7 +186,7 @@ func RemoveTreeSensor(_ service.TreeService) fiber.Handler {
 // @Id				get-tree-images
 // @Tags			Tree Images
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -201,7 +201,7 @@ func GetTreeImages(_ service.TreeService) fiber.Handler {
 	// TODO: Change @Success to return image.ImageResponse
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -210,20 +210,20 @@ func GetTreeImages(_ service.TreeService) fiber.Handler {
 // @Id				add-images-to-tree
 // @Tags			Tree Images
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/images [post]
-// @Param			tree_id			path	string						false	"Tree ID"
-// @Param			body			body	tree.TreeAddImagesRequest	true	"Images to add"
-// @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id			path	string							false	"Tree ID"
+// @Param			body			body	entities.TreeAddImagesRequest	true	"Images to add"
+// @Param			Authorization	header	string							true	"Insert your access token"	default(Bearer <Add access token here>)
 func AddTreeImage(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -232,7 +232,7 @@ func AddTreeImage(_ service.TreeService) fiber.Handler {
 // @Id				remove-image-from-tree
 // @Tags			Tree Images
 // @Produce		json
-// @Success		200	{object}	tree.TreeResponse
+// @Success		200	{object}	entities.TreeResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -245,6 +245,6 @@ func AddTreeImage(_ service.TreeService) fiber.Handler {
 func RemoveTreeImage(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(tree.TreeResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }

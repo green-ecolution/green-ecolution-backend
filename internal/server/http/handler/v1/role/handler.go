@@ -2,7 +2,7 @@ package role
 
 import (
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/role"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -10,7 +10,7 @@ import (
 // @Description	Get all user roles
 // @Tags			Role
 // @Produce		json
-// @Success		200		{object}	role.RoleListResponse
+// @Success		200		{object}	entities.RoleListResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Param			page	query		string	false	"Page"
@@ -27,7 +27,7 @@ func GetAllUserRoles(_ service.AuthService) fiber.Handler {
 // @Description	Get a role by ID
 // @Tags			Role
 // @Produce		json
-// @Success		200	{object}	role.RoleResponse
+// @Success		200	{object}	entities.RoleResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError

@@ -1,4 +1,4 @@
-package pagination
+package entities
 
 type Pagination struct {
 	Total       int32  `json:"total_records"`

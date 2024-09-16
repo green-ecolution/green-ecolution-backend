@@ -1,9 +1,7 @@
-package sensor
+package entities
 
 import (
 	"time"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/pagination"
 )
 
 type SensorStatus string // @Name SensorStatus
@@ -23,8 +21,8 @@ type SensorResponse struct {
 } // @Name Sensor
 
 type SensorListResponse struct {
-	Data       []*SensorResponse     `json:"data,omitempty"`
-	Pagination pagination.Pagination `json:"pagination"`
+	Data       []*SensorResponse `json:"data,omitempty"`
+	Pagination Pagination        `json:"pagination"`
 } // @Name SensorList
 
 type SensorDataResponse struct {
@@ -39,7 +37,7 @@ type SensorDataResponse struct {
 
 type SensorDataListResponse struct {
 	Data       []*SensorDataResponse `json:"data,omitempty"`
-	Pagination pagination.Pagination `json:"pagination"`
+	Pagination Pagination            `json:"pagination"`
 } // @Name SensorDataList
 
 type SensorCreateRequest struct {

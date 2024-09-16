@@ -1,10 +1,7 @@
-package treecluster
+package entities
 
 import (
 	"time"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/pagination"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/tree"
 )
 
 type TreeClusterWateringStatus string // @Name WateringStatus
@@ -35,13 +32,13 @@ type TreeClusterResponse struct {
 	Archived       bool                      `json:"archived,omitempty"`
 	Latitude       float64                   `json:"latitude,omitempty"`
 	Longitude      float64                   `json:"longitude,omitempty"`
-	Trees          []*tree.TreeResponse      `json:"trees,omitempty"`
+	Trees          []*TreeResponse           `json:"trees,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
 } // @Name TreeCluster
 
 type TreeClusterListResponse struct {
 	Data       []*TreeClusterResponse `json:"data,omitempty"`
-	Pagination *pagination.Pagination `json:"pagination,omitempty"`
+	Pagination *Pagination            `json:"pagination,omitempty"`
 } // @Name TreeClusterList
 
 type TreeClusterCreateRequest struct {

@@ -1,17 +1,15 @@
-package tree
+package entities
 
 import (
 	"time"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/pagination"
 )
 
 type TreeResponse struct {
-	ID            int32     `json:"id,omitempty"`
-	CreatedAt     time.Time `json:"created_at,omitempty"`
-	UpdatedAt     time.Time `json:"updated_at,omitempty"`
-	TreeClusterID *int32    `json:"tree_cluster_id,omitempty"`
-	// Sensor        *sensor.SensorResponse `json:"sensor,omitempty"`
+	ID            int32           `json:"id,omitempty"`
+	CreatedAt     time.Time       `json:"created_at,omitempty"`
+	UpdatedAt     time.Time       `json:"updated_at,omitempty"`
+	TreeClusterID *int32          `json:"tree_cluster_id,omitempty"`
+	Sensor        *SensorResponse `json:"sensor,omitempty"`
 	// Images              []*ImageResponse `json:"images,omitempty"`
 	Age                 int32   `json:"age,omitempty"`
 	HeightAboveSeaLevel float64 `json:"height_above_sea_level,omitempty"`
@@ -23,8 +21,8 @@ type TreeResponse struct {
 } // @Name Tree
 
 type TreeListResponse struct {
-	Data       []*TreeResponse       `json:"data,omitempty"`
-	Pagination pagination.Pagination `json:"pagination,omitempty"`
+	Data       []*TreeResponse `json:"data,omitempty"`
+	Pagination Pagination      `json:"pagination,omitempty"`
 } // @Name TreeList
 
 type TreeCreateRequest struct {

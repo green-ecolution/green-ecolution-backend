@@ -2,7 +2,7 @@ package sensor
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/sensor"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -11,7 +11,7 @@ import (
 // @Id				get-all-sensors
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	[]sensor.SensorListResponse
+// @Success		200	{object}	[]entities.SensorListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -26,7 +26,7 @@ import (
 func GetAllSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON([]sensor.SensorResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -35,7 +35,7 @@ func GetAllSensor(_ service.Service) fiber.Handler {
 // @Id				get-sensor-by-id
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorResponse
+// @Success		200	{object}	entities.SensorResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -47,7 +47,7 @@ func GetAllSensor(_ service.Service) fiber.Handler {
 func GetSensorByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(sensor.SensorResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -56,7 +56,7 @@ func GetSensorByID(_ service.Service) fiber.Handler {
 // @Id				get-sensor-data-by-id
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorDataListResponse
+// @Success		200	{object}	entities.SensorDataListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -73,7 +73,7 @@ func GetSensorByID(_ service.Service) fiber.Handler {
 func GetSensorDataByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(sensor.SensorDataResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -82,19 +82,19 @@ func GetSensorDataByID(_ service.Service) fiber.Handler {
 // @Id				create-sensor
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorResponse
+// @Success		200	{object}	entities.SensorResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor/ [post]
-// @Param			Authorization	header	string						false	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			body			body	sensor.SensorCreateRequest	true	"Sensor to create"
+// @Param			Authorization	header	string							false	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			body			body	entities.SensorCreateRequest	true	"Sensor to create"
 func CreateSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(sensor.SensorDataResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
@@ -103,20 +103,20 @@ func CreateSensor(_ service.Service) fiber.Handler {
 // @Id				update-sensor
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	sensor.SensorResponse
+// @Success		200	{object}	entities.SensorResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor/{sensor_id} [put]
-// @Param			sensor_id		path	string						true	"Sensor ID"
-// @Param			Authorization	header	string						false	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			body			body	sensor.SensorUpdateRequest	true	"Sensor information to update"
+// @Param			sensor_id		path	string							true	"Sensor ID"
+// @Param			Authorization	header	string							false	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			body			body	entities.SensorUpdateRequest	true	"Sensor information to update"
 func UpdateSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.JSON(sensor.SensorDataResponse{})
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
