@@ -3,9 +3,11 @@ package http
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 )
 
@@ -13,7 +15,11 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp := app.Group("/api/v1")
 
 	grp.Mount("/info", info.RegisterRoutes(s.services.InfoService))
+	grp.Mount("/cluster", treecluster.RegisterRoutes(s.services.TreeService)) // TODO: Change to treecluster service
 	grp.Mount("/tree", tree.RegisterRoutes(s.services.TreeService))
+	grp.Mount("/sensor", sensor.RegisterRoutes(s.services.MqttService))
+	grp.Mount("/user", user.RegisterRoutes(s.services.AuthService))
+	grp.Mount("/role", user.RegisterRoutes(s.services.AuthService))
 }
 
 func (s *Server) publicRoutes(app *fiber.App) {
@@ -24,8 +30,7 @@ func (s *Server) publicRoutes(app *fiber.App) {
 
 	grp := app.Group("/api/v1")
 	grp.Get("/swagger/*", swagger.HandlerDefault)
-	grp.Post("/user", auth.Register(s.services.AuthService))
-	grp.Post("/user/logout", auth.Logout(s.services.AuthService))
-	grp.Get("/user/login", auth.Login(s.services.AuthService))
-	grp.Post("/user/login/token", auth.RequestToken(s.services.AuthService))
+	grp.Post("/user/logout", user.Logout(s.services.AuthService))
+	grp.Get("/user/login", user.Login(s.services.AuthService))
+	grp.Post("/user/login/token", user.RequestToken(s.services.AuthService))
 }

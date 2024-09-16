@@ -8,9 +8,19 @@ import (
 func RegisterRoutes(svc service.TreeService) *fiber.App {
 	app := fiber.New()
 
-	app.Get("/", GetAllTree(svc))
+	app.Get("/", GetAllTrees(svc))
 	app.Get("/:id", GetTreeByID(svc))
-	app.Get("/:id/prediction", GetTreePredictions(svc))
+	app.Put("/:id", UpdateTree(svc))
+	app.Post("/", CreateTree(svc))
+	app.Delete("/", DeleteTree(svc))
+
+	app.Get("/:id/images", GetTreeImages(svc))
+	app.Post("/:id/images", AddTreeImage(svc))
+	app.Delete("/:id/images/:image_id", RemoveTreeImage(svc))
+
+	app.Get("/:id/sensor", GetTreeSensor(svc))
+	app.Post("/:id/sensor", AddTreeSensor(svc))
+	app.Delete("/:id/sensor/:sensor_id", RemoveTreeSensor(svc))
 
 	return app
 }
