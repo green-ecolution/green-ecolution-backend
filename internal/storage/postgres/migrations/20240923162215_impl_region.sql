@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE region (
+CREATE TABLE regions (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -12,23 +12,27 @@ CREATE TABLE region (
 -- +goose StatementBegin
 ALTER TABLE tree_clusters DROP COLUMN region;
 ALTER TABLE tree_clusters ADD COLUMN region_id INT;
-ALTER TABLE tree_clusters ADD FOREIGN KEY (region_id) REFERENCES region(id);
+ALTER TABLE tree_clusters ADD FOREIGN KEY (region_id) REFERENCES regions(id);
 
 ALTER TABLE flowerbeds DROP COLUMN region;
 ALTER TABLE flowerbeds ADD COLUMN region_id INT;
-ALTER TABLE flowerbeds ADD FOREIGN KEY (region_id) REFERENCES region(id);
+ALTER TABLE flowerbeds ADD FOREIGN KEY (region_id) REFERENCES regions(id);
 -- +goose StatementEnd
 
 CREATE TRIGGER update_region_updated_at
-BEFORE UPDATE ON images
+BEFORE UPDATE ON regions
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
 -- +goose Down
 -- +goose StatementBegin
 ALTER TABLE tree_clusters DROP COLUMN region_id;
-ALTER TABLE flowerbeds DROP COLUMN region_id;
+ALTER TABLE tree_clusters ADD COLUMN region TEXT NOT NULL;
 
-DROP TRIGGER IF EXISTS update_region_updated_at ON region;
-DROP TABLE IF EXISTS region;
+
+ALTER TABLE flowerbeds DROP COLUMN region_id;
+ALTER TABLE flowerbeds ADD COLUMN region TEXT NOT NULL;
+
+DROP TRIGGER IF EXISTS update_region_updated_at ON regions;
+DROP TABLE IF EXISTS regions;
 -- +goose StatementEnd
