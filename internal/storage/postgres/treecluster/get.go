@@ -12,7 +12,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 		return nil, r.store.HandleError(err)
 	}
 
-  // TODO: Parse entites like flowerbeds
+	// TODO: Parse entites like flowerbeds
 
 	return r.mapper.FromSqlList(rows), nil
 }

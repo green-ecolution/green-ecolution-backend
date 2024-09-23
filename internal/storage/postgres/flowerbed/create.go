@@ -30,13 +30,13 @@ func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.Entity
 		fn(entity)
 	}
 
-  if entity.Region == nil || entity.Region.ID == 0 {
-    region, err := r.getRegion(ctx, entity)
-    if err != nil {
-      return nil, err
-    }
-    entity.Region = region
-  }
+	if entity.Region == nil || entity.Region.ID == 0 {
+		region, err := r.getRegion(ctx, entity)
+		if err != nil {
+			return nil, err
+		}
+		entity.Region = region
+	}
 
 	id, err := r.createEntity(ctx, entity)
 	if err != nil {

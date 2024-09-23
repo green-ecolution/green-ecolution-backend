@@ -78,13 +78,13 @@ func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flower
 }
 
 func (r *FlowerbedRepository) GetRegionByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Region, error) {
-  row, err := r.store.GetRegionByFlowerbedID(ctx, flowerbedID)
-  if err != nil {
-    if errors.Is(err, pgx.ErrNoRows) {
-      return nil, storage.ErrRegionNotFound
-    }
-    return nil, r.store.HandleError(err)
-  }
+	row, err := r.store.GetRegionByFlowerbedID(ctx, flowerbedID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrRegionNotFound
+		}
+		return nil, r.store.HandleError(err)
+	}
 
-  return r.regionMapper.FromSql(row), nil
+	return r.regionMapper.FromSql(row), nil
 }

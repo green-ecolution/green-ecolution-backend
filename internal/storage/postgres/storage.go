@@ -27,7 +27,7 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 	tcMappers := treecluster.NewTreeClusterRepositoryMappers(
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
-    &mapper.InternalRegionRepoMapperImpl{},
+		&mapper.InternalRegionRepoMapperImpl{},
 	)
 	treeClusterRepo := treecluster.NewTreeClusterRepository(s, tcMappers)
 
@@ -50,7 +50,7 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 		&mapper.InternalFlowerbedRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
-    &mapper.InternalRegionRepoMapperImpl{},
+		&mapper.InternalRegionRepoMapperImpl{},
 	)
 	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowMappers)
 
