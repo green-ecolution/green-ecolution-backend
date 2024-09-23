@@ -46,9 +46,6 @@ type TreeClusterCreateRequest struct {
 	Region         string                    `json:"region,omitempty"`
 	Address        string                    `json:"address,omitempty"`
 	Description    string                    `json:"description,omitempty"`
-	Archived       bool                      `json:"archived,omitempty"`
-	Latitude       float64                   `json:"latitude,omitempty"`
-	Longitude      float64                   `json:"longitude,omitempty"`
 	TreeIDs        []*int32                  `json:"tree_ids,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
 } // @Name TreeClusterCreate
