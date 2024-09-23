@@ -19,12 +19,18 @@ type TreeClusterRepository struct {
 type TreeClusterMappers struct {
 	mapper       sensorMapper.InternalTreeClusterRepoMapper
 	sensorMapper sensorMapper.InternalSensorRepoMapper
+	regionMapper sensorMapper.InternalRegionRepoMapper
 }
 
-func NewTreeClusterRepositoryMappers(tcMapper sensorMapper.InternalTreeClusterRepoMapper, sMapper sensorMapper.InternalSensorRepoMapper) TreeClusterMappers {
+func NewTreeClusterRepositoryMappers(
+	tcMapper sensorMapper.InternalTreeClusterRepoMapper,
+	sMapper sensorMapper.InternalSensorRepoMapper,
+	rMapper sensorMapper.InternalRegionRepoMapper,
+) TreeClusterMappers {
 	return TreeClusterMappers{
 		mapper:       tcMapper,
 		sensorMapper: sMapper,
+		regionMapper: rMapper,
 	}
 }
 
