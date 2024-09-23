@@ -69,7 +69,7 @@ func WithMoistureLevel(moistureLevel float64) entities.EntityFunc[entities.Flowe
 	}
 }
 
-func WithRegionID(region *entities.Region) entities.EntityFunc[entities.Flowerbed] {
+func WithRegion(region *entities.Region) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Region = region
 	}
