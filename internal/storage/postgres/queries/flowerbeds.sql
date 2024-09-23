@@ -10,6 +10,9 @@ SELECT sensors.* FROM sensors JOIN flowerbeds ON sensors.id = flowerbeds.sensor_
 -- name: GetAllImagesByFlowerbedID :many
 SELECT images.* FROM images JOIN flowerbed_images ON images.id = flowerbed_images.image_id WHERE flowerbed_images.flowerbed_id = $1;
 
+-- name: GetRegionByFlowerbedID :one
+SELECT regions.* FROM regions JOIN flowerbeds ON regions.id = flowerbeds.region_id WHERE flowerbeds.id = $1;
+
 -- name: CreateFlowerbed :one
 INSERT INTO flowerbeds (
   sensor_id, size, description, number_of_plants, moisture_level, region_id, address, latitude, longitude, geometry

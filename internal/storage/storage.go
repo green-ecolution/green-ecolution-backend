@@ -21,6 +21,7 @@ var (
 	ErrImageNotFound       = errors.New("image not found")
 	ErrFlowerbedNotFound   = errors.New("flowerbed not found")
 	ErrTreeClusterNotFound = errors.New("treecluster not found")
+  ErrRegionNotFound      = errors.New("region not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")

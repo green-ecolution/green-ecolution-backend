@@ -47,7 +47,7 @@ func (r *FlowerbedRepository) updateEntity(ctx context.Context, f *entities.Flow
 		Description:    f.Description,
 		NumberOfPlants: f.NumberOfPlants,
 		MoistureLevel:  f.MoistureLevel,
-		Region:         f.Region,
+		RegionID:       &f.Region.ID,
 		Address:        f.Address,
 		Latitude:       f.Latitude,
 		Longitude:      f.Longitude,

@@ -38,7 +38,7 @@ func (r *TreeClusterRepository) UpdateGeometry(ctx context.Context, id int32, la
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {
 	args := sqlc.UpdateTreeClusterParams{
 		ID:             tc.ID,
-		Region:         tc.Region,
+		RegionID:       &tc.Region.ID,
 		Address:        tc.Address,
 		Description:    tc.Description,
 		Latitude:       tc.Latitude,

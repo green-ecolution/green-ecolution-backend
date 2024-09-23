@@ -12,7 +12,7 @@ type Flowerbed struct {
 	Description    string
 	NumberOfPlants int32
 	MoistureLevel  float64
-	Region         string
+	Region         *Region
 	Address        string
 	Sensor         *Sensor
 	Images         []*Image

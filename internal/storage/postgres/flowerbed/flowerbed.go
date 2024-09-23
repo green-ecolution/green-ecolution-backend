@@ -20,13 +20,20 @@ type FlowerbedMappers struct {
 	mapper       mapper.InternalFlowerbedRepoMapper
 	imgMapper    mapper.InternalImageRepoMapper
 	sensorMapper mapper.InternalSensorRepoMapper
+	regionMapper mapper.InternalRegionRepoMapper
 }
 
-func NewFlowerbedMappers(fMapper mapper.InternalFlowerbedRepoMapper, iMapper mapper.InternalImageRepoMapper, sMapper mapper.InternalSensorRepoMapper) FlowerbedMappers {
+func NewFlowerbedMappers(
+	fMapper mapper.InternalFlowerbedRepoMapper,
+	iMapper mapper.InternalImageRepoMapper,
+	sMapper mapper.InternalSensorRepoMapper,
+	rMapper mapper.InternalRegionRepoMapper,
+) FlowerbedMappers {
 	return FlowerbedMappers{
 		mapper:       fMapper,
 		imgMapper:    iMapper,
 		sensorMapper: sMapper,
+		regionMapper: rMapper,
 	}
 }
 
@@ -62,7 +69,7 @@ func WithMoistureLevel(moistureLevel float64) entities.EntityFunc[entities.Flowe
 	}
 }
 
-func WithRegion(region string) entities.EntityFunc[entities.Flowerbed] {
+func WithRegionID(region *entities.Region) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Region = region
 	}

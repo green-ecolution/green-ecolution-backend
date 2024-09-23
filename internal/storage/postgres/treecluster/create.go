@@ -9,7 +9,7 @@ import (
 
 func defaultTreeCluster() *entities.TreeCluster {
 	return &entities.TreeCluster{
-		Region:         "",
+		Region:         &entities.Region{},
 		Address:        "",
 		Description:    "",
 		MoistureLevel:  0,
@@ -40,7 +40,7 @@ func (r *TreeClusterRepository) Create(ctx context.Context, tcFn ...entities.Ent
 
 func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entities.TreeCluster) (int32, error) {
 	args := sqlc.CreateTreeClusterParams{
-		Region:         entity.Region,
+		RegionID:       &entity.Region.ID,
 		Address:        entity.Address,
 		Description:    entity.Description,
 		Latitude:       entity.Latitude,

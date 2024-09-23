@@ -49,6 +49,7 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 		&mapper.InternalFlowerbedRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
+    &mapper.InternalRegionRepoMapperImpl{},
 	)
 	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowMappers)
 

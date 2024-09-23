@@ -7,9 +7,7 @@ import (
 
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
-// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
-type InternalFlowerbedRepoMapper interface {
-	// goverter:ignore Sensor Images Region
-	FromSql(src *sqlc.Flowerbed) *entities.Flowerbed
-	FromSqlList(src []*sqlc.Flowerbed) []*entities.Flowerbed
+type InternalRegionRepoMapper interface {
+	FromSql(src *sqlc.Region) *entities.Region
+	FromSqlList(src []*sqlc.Region) []*entities.Region
 }

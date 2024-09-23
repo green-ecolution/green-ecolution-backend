@@ -2,7 +2,6 @@ package treecluster
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
@@ -37,79 +36,68 @@ func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storag
 	}
 }
 
-func WithRegion(region string) entities.EntityFunc[entities.TreeCluster] {
+func WithRegion(region *entities.Region) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating region", "region", region)
 		tc.Region = region
 	}
 }
 
 func WithAddress(address string) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating address", "address", address)
 		tc.Address = address
 	}
 }
 
 func WithDescription(description string) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating description", "description", description)
 		tc.Description = description
 	}
 }
 
 func WithLatitude(latitude float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating latitude", "latitude", latitude)
 		tc.Latitude = latitude
 	}
 }
 
 func WithLongitude(longitude float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating longitude", "longitude", longitude)
 		tc.Longitude = longitude
 	}
 }
 
 func WithMoistureLevel(moistureLevel float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating moistureLevel", "moistureLevel", moistureLevel)
 		tc.MoistureLevel = moistureLevel
 	}
 }
 
 func WithWateringStatus(wateringStatus entities.TreeClusterWateringStatus) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating wateringStatus", "wateringStatus", wateringStatus)
 		tc.WateringStatus = wateringStatus
 	}
 }
 
 func WithSoilCondition(soilCondition entities.TreeSoilCondition) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating soilCondition", "soilCondition", soilCondition)
 		tc.SoilCondition = soilCondition
 	}
 }
 
 func WithLastWatered(lastWatered time.Time) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating lastWatered", "lastWatered", lastWatered)
 		tc.LastWatered = &lastWatered
 	}
 }
 
 func WithArchived(archived bool) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating archived", "archived", archived)
 		tc.Archived = archived
 	}
 }
 
 func WithTrees(trees []*entities.Tree) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		slog.Debug("updating trees", "trees", trees)
 		tc.Trees = trees
 	}
 }
