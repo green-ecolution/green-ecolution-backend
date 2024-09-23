@@ -5,19 +5,29 @@ INSERT INTO images (url, filename, mime_type) VALUES ('https://app.dev.green-eco
 
 INSERT INTO vehicles (id, number_plate, description, water_capacity) VALUES (1, 'B-1234', 'Test vehicle 1', 100.0);
 INSERT INTO vehicles (id, number_plate, description, water_capacity) VALUES (2, 'B-5678', 'Test vehicle 2', 150.0);
+ALTER SEQUENCE vehicles_id_seq RESTART WITH 3;
 
 INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('95b69b4c-b38b-4394-9520-496879b67791', 1);
 INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('d2563a8e-a608-4039-8718-25fc3c1d8e57', 2);
 
-INSERT INTO tree_clusters (id, watering_status, moisture_level, region, address, description, soil_condition, latitude, longitude, geometry)
+INSERT INTO regions (id, name, geometry) VALUES (
+  1,
+  'Flensburg Stadt',
+  ST_MakePolygon(ST_GeomFromText('LINESTRING(9.423171323013623 54.801337080406093, 9.423358138065359 54.801229397592124, 9.424946066005113 54.800529452307963, 9.425039473530978 54.799560277287128, 9.428215329410481 54.797137238059484, 9.431484592815853 54.795467948759949, 9.432231853022795 54.793960144335557, 9.432792298178002 54.790836656266599, 9.43503407879883 54.787820645701181, 9.4380231196266 54.783673263833371, 9.436528599212716 54.780064156902284, 9.432325260548666 54.776346978804867, 9.422050432703211 54.774030303741604, 9.411495382280155 54.776508602346915, 9.403555742581393 54.781303140360336, 9.400566701753624 54.787335908734057, 9.403555742581393 54.795414099570323, 9.408599748978252 54.799775651522374, 9.423171323013623 54.80133708040609)'))
+);
+ALTER SEQUENCE regions_id_seq RESTART WITH 2;
+
+INSERT INTO tree_clusters (id, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
 VALUES 
-  (1, 'good', 0.75, 'Mürwik', 'Solitüde Strand', 'Alle Bäume am Strand', 'sandig', 54.820940, 9.489022, ST_SetSRID(ST_MakePoint(54.820940, 9.489022), 4326)),
-  (2, 'moderate', 0.5, 'Jürgensby', 'Ulmenstraße', 'Bäume beim Sankt-Jürgen-Platz', 'schluffig', 54.78805731048199, 9.44400186680097, ST_SetSRID(ST_MakePoint(54.78805731048199, 9.44400186680097), 4326));
+  (1, 'good', 0.75, 1, 'Solitüde Strand', 'Alle Bäume am Strand', 'sandig', 54.820940, 9.489022, ST_SetSRID(ST_MakePoint(54.820940, 9.489022), 4326)),
+  (2, 'moderate', 0.5, 1, 'Ulmenstraße', 'Bäume beim Sankt-Jürgen-Platz', 'schluffig', 54.78805731048199, 9.44400186680097, ST_SetSRID(ST_MakePoint(54.78805731048199, 9.44400186680097), 4326));
+ALTER SEQUENCE tree_clusters_id_seq RESTART WITH 3;
 
 INSERT INTO sensors (id, status) VALUES (1, 'online');
 INSERT INTO sensors (id, status) VALUES (2, 'offline');
 INSERT INTO sensors (id, status) VALUES (3, 'unknown');
 INSERT INTO sensors (id, status) VALUES (4, 'online');
+ALTER SEQUENCE sensors_id_seq RESTART WITH 5;
 
 INSERT INTO trees (tree_cluster_id, sensor_id, age, height_above_sea_level, planting_year, species, tree_number, latitude, longitude, geometry)
 VALUES 
