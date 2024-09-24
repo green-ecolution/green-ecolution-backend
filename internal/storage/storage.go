@@ -43,6 +43,10 @@ type InfoRepository interface {
 	GetAppInfo(context.Context) (*entities.App, error)
 }
 
+type RegionRepository interface {
+  BasicCrudRepository[entities.Region]
+}
+
 type UserRepository interface {
 	Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error)
 	GetByAccessToken(ctx context.Context, token string) (*entities.User, error)
