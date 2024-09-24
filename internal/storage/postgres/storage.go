@@ -5,6 +5,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
 	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/region"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
@@ -54,6 +55,11 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 	)
 	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowMappers)
 
+	regionMappers := region.NewRegionMappers(
+		&mapper.InternalRegionRepoMapperImpl{},
+	)
+	regionRepo := region.NewRegionRepository(s, regionMappers)
+
 	return &storage.Repository{
 		Tree:        treeRepo,
 		TreeCluster: treeClusterRepo,
@@ -61,5 +67,6 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 		Vehicle:     vehicleRepo,
 		Sensor:      sensorRepo,
 		Flowerbed:   flowerbedRepo,
+		Region:      regionRepo,
 	}
 }

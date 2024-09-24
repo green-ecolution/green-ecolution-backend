@@ -82,6 +82,7 @@ type Services struct {
 	MqttService MqttService
 	TreeService TreeService
 	AuthService AuthService
+  RegionService RegionService
 }
 
 func (s *Services) AllServicesReady() bool {

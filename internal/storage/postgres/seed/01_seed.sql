@@ -72,9 +72,12 @@ DELETE FROM tree_clusters WHERE id = 2;
 DELETE FROM sensor_data WHERE sensor_id = 1;
 DELETE FROM sensor_data WHERE sensor_id = 2;
 DELETE FROM sensor_data WHERE sensor_id = 3;
+DELETE FROM sensor_data WHERE sensor_id = 4;
+DELETE FROM sensor_data WHERE sensor_id = 5;
 
 DELETE FROM sensors WHERE id = 1;
 DELETE FROM sensors WHERE id = 2;
 DELETE FROM sensors WHERE id = 3;
 
+DELETE FROM regions WHERE id = 1; 
 -- +goose StatementEnd

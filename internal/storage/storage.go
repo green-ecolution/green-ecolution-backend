@@ -123,4 +123,5 @@ type Repository struct {
 	Vehicle     VehicleRepository
 	TreeCluster TreeClusterRepository
 	Flowerbed   FlowerbedRepository
+  Region      RegionRepository
 }

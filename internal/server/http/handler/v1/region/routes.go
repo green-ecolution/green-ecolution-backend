@@ -8,7 +8,7 @@ import (
 func RegisterRoutes(svc service.RegionService) *fiber.App {
 	app := fiber.New()
 
-	app.Post("/", GetAllRegions(svc))
+	app.Get("/", GetAllRegions(svc))
 	app.Get("/:id", GetRegionByID(svc))
 
 	return app
