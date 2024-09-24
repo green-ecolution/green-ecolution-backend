@@ -28,7 +28,7 @@ type TreeCluster struct {
 	WateringStatus TreeClusterWateringStatus
 	LastWatered    *time.Time
 	MoistureLevel  float64
-	Region         string
+	Region         *Region
 	Address        string
 	Description    string
 	Archived       bool
