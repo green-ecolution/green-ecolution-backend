@@ -67,6 +67,12 @@ type AuthService interface {
 	RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error)
 }
 
+type RegionService interface {
+  Service
+  GetAll(ctx context.Context) ([]*domain.Region, error)
+  GetByID(ctx context.Context, id int32) (*domain.Region, error)
+}
+
 type Service interface {
 	Ready() bool
 }
