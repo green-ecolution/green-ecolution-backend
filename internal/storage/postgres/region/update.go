@@ -26,9 +26,9 @@ func (r *RegionRepository) Update(ctx context.Context, id int32, vFn ...entities
 
 func (r *RegionRepository) updateEntity(ctx context.Context, vehicle *entities.Region) error {
 	params := sqlc.UpdateRegionParams{
-		ID:            vehicle.ID,
-    Name:          vehicle.Name,
+		ID:   vehicle.ID,
+		Name: vehicle.Name,
 	}
 
-  return r.store.UpdateRegion(ctx, &params)
+	return r.store.UpdateRegion(ctx, &params)
 }

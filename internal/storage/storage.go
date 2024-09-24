@@ -44,7 +44,7 @@ type InfoRepository interface {
 }
 
 type RegionRepository interface {
-  BasicCrudRepository[entities.Region]
+	BasicCrudRepository[entities.Region]
 }
 
 type UserRepository interface {
@@ -123,5 +123,5 @@ type Repository struct {
 	Vehicle     VehicleRepository
 	TreeCluster TreeClusterRepository
 	Flowerbed   FlowerbedRepository
-  Region      RegionRepository
+	Region      RegionRepository
 }

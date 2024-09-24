@@ -22,12 +22,12 @@ import (
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllRegions(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    r, err := svc.GetAll(c.Context())
-    if err != nil {
+		r, err := svc.GetAll(c.Context())
+		if err != nil {
 			return errorhandler.HandleError(err)
-    }
+		}
 
-    return c.JSON(r)
+		return c.JSON(r)
 	}
 }
 
@@ -44,16 +44,18 @@ func GetAllRegions(svc service.RegionService) fiber.Handler {
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetRegionByID(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    id, err := strconv.Atoi(c.Params("id"))
-    if err != nil {
-      return errorhandler.HandleError(err)
-    }
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
-    r, err := svc.GetByID(c.Context(), int32(id))
-    if err != nil {
-      return errorhandler.HandleError(err)
-    }
+		// linter complains about overflows, but we are sure that the ID is not going to be bigger than int32
+		//nolint: gosec
+		r, err := svc.GetByID(c.Context(), int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
-    return c.JSON(r)
+		return c.JSON(r)
 	}
 }

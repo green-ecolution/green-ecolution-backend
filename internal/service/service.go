@@ -68,9 +68,9 @@ type AuthService interface {
 }
 
 type RegionService interface {
-  Service
-  GetAll(ctx context.Context) ([]*domain.Region, error)
-  GetByID(ctx context.Context, id int32) (*domain.Region, error)
+	Service
+	GetAll(ctx context.Context) ([]*domain.Region, error)
+	GetByID(ctx context.Context, id int32) (*domain.Region, error)
 }
 
 type Service interface {
@@ -78,11 +78,11 @@ type Service interface {
 }
 
 type Services struct {
-	InfoService InfoService
-	MqttService MqttService
-	TreeService TreeService
-	AuthService AuthService
-  RegionService RegionService
+	InfoService   InfoService
+	MqttService   MqttService
+	TreeService   TreeService
+	AuthService   AuthService
+	RegionService RegionService
 }
 
 func (s *Services) AllServicesReady() bool {

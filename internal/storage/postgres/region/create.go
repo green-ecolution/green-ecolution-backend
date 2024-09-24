@@ -9,7 +9,7 @@ import (
 
 func defaultRegion() *entities.Region {
 	return &entities.Region{
-    Name:        "",
+		Name: "",
 	}
 }
 
@@ -30,7 +30,7 @@ func (r *RegionRepository) Create(ctx context.Context, vFn ...entities.EntityFun
 
 func (r *RegionRepository) createEntity(ctx context.Context, entity *entities.Region) (*int32, error) {
 	args := sqlc.CreateRegionParams{
-    Name: entity.Name,
+		Name: entity.Name,
 	}
 
 	id, err := r.store.CreateRegion(ctx, &args)

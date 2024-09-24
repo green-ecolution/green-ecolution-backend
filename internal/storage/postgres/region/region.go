@@ -35,7 +35,7 @@ func NewRegionRepository(s *store.Store, mappers RegionMappers) storage.RegionRe
 
 func WithName(name string) entities.EntityFunc[entities.Region] {
 	return func(v *entities.Region) {
-    v.Name = name
+		v.Name = name
 	}
 }
 
