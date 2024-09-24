@@ -55,6 +55,7 @@ type MqttService interface {
 
 type TreeService interface {
 	Service
+	ImportTree(ctx context.Context, row [][]string) error
 	// TODO: Implement Functions
 }
 
