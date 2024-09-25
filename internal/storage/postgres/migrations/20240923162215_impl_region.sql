@@ -5,7 +5,7 @@ CREATE TABLE regions (
   name VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  geometry GEOMETRY(Polygon, 4326)
+  geometry GEOMETRY(MultiPolygon, 4326)
 );
 -- +goose StatementEnd
 
@@ -27,11 +27,11 @@ EXECUTE FUNCTION update_updated_at_column();
 -- +goose Down
 -- +goose StatementBegin
 ALTER TABLE tree_clusters DROP COLUMN region_id;
-ALTER TABLE tree_clusters ADD COLUMN region TEXT NOT NULL;
+ALTER TABLE tree_clusters ADD COLUMN region TEXT;
 
 
 ALTER TABLE flowerbeds DROP COLUMN region_id;
-ALTER TABLE flowerbeds ADD COLUMN region TEXT NOT NULL;
+ALTER TABLE flowerbeds ADD COLUMN region TEXT;
 
 DROP TRIGGER IF EXISTS update_region_updated_at ON regions;
 DROP TABLE IF EXISTS regions;
