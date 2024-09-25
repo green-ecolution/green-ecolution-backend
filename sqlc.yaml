@@ -12,4 +12,12 @@ sql:
         emit_pointers_for_null_types: true
         emit_result_struct_pointers: true
         emit_params_struct_pointers: true
+        overrides:
+          - db_type: "geometry"
+            go_type: 
+              import: "github.com/twpayne/go-geos"
+              package: "geos"
+              pointer: true
+              type: "Geom"
+            nullable: true
 

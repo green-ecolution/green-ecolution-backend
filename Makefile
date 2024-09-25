@@ -32,29 +32,29 @@ all: build
 .PHONY: build/all
 build/all: generate
 	@echo "Building for all..."
-	GOARCH=amd64 GOOS=darwin go build $(GOFLAGS) -o bin/$(BINARY_NAME)-darwin $(MAIN_PACKAGE_PATH)
-	GOARCH=amd64 GOOS=linux go build $(GOFLAGS) -o bin/$(BINARY_NAME)-linux $(MAIN_PACKAGE_PATH)
-	GOARCH=amd64 GOOS=windows go build $(GOFLAGS) -o bin/$(BINARY_NAME)-windows $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=darwin CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME)-darwin $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME)-linux $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=windows CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME)-windows $(MAIN_PACKAGE_PATH)
 
 .PHONY: build/darwin
 build/darwin: generate
 	@echo "Building for darwin..."
-	GOARCH=amd64 GOOS=darwin go build $(GOFLAGS) -o bin/$(BINARY_NAME)-darwin $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=darwin CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME)-darwin $(MAIN_PACKAGE_PATH)
 
 .PHONY: build/linux
 build/linux: generate
 	@echo "Building for linux..."
-	GOARCH=amd64 GOOS=linux go build $(GOFLAGS) -o bin/$(BINARY_NAME)-linux $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=linux CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME)-linux $(MAIN_PACKAGE_PATH)
 
 .PHONY: build/windows
 build/windows: generate
 	@echo "Building for windows..."
-	GOARCH=amd64 GOOS=windows go build $(GOFLAGS) -o bin/$(BINARY_NAME)-windows $(MAIN_PACKAGE_PATH)
+	GOARCH=amd64 GOOS=windows CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME)-windows $(MAIN_PACKAGE_PATH)
 
 .PHONY: build
 build: generate
 	@echo "Building..."
-	go build $(GOFLAGS) -o bin/$(BINARY_NAME) $(MAIN_PACKAGE_PATH)
+	CGO_ENABLED=1 go build $(GOFLAGS) -o bin/$(BINARY_NAME) $(MAIN_PACKAGE_PATH)
 
 .PHONY: generate
 generate:

@@ -67,15 +67,22 @@ type AuthService interface {
 	RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error)
 }
 
+type RegionService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.Region, error)
+	GetByID(ctx context.Context, id int32) (*domain.Region, error)
+}
+
 type Service interface {
 	Ready() bool
 }
 
 type Services struct {
-	InfoService InfoService
-	MqttService MqttService
-	TreeService TreeService
-	AuthService AuthService
+	InfoService   InfoService
+	MqttService   MqttService
+	TreeService   TreeService
+	AuthService   AuthService
+	RegionService RegionService
 }
 
 func (s *Services) AllServicesReady() bool {

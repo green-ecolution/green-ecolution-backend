@@ -2,7 +2,6 @@ package flowerbed
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -28,14 +27,6 @@ func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.Entity
 	entity := defaultFlowerbed()
 	for _, fn := range fFn {
 		fn(entity)
-	}
-
-	if entity.Region == nil || entity.Region.ID == 0 {
-		region, err := r.getRegion(ctx, entity)
-		if err != nil {
-			return nil, err
-		}
-		entity.Region = region
 	}
 
 	id, err := r.createEntity(ctx, entity)
@@ -99,14 +90,4 @@ func (r *FlowerbedRepository) linkImages(ctx context.Context, flowerbedID, imgID
 		ImageID:     imgID,
 	}
 	return r.store.LinkFlowerbedImage(ctx, &params)
-}
-
-func (r *FlowerbedRepository) getRegion(ctx context.Context, entity *entities.Flowerbed) (*entities.Region, error) {
-	p := fmt.Sprintf("POINT(%f %f)", entity.Latitude, entity.Longitude)
-	region, err := r.store.GetRegionByPoint(ctx, p)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.regionMapper.FromSql(region), nil
 }

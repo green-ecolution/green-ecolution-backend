@@ -30,6 +30,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
 	"github.com/jackc/pgx/v5"
 	"github.com/spf13/viper"
+	"github.com/twpayne/go-geos"
+	pgxgeos "github.com/twpayne/pgx-geos"
 )
 
 var version = "develop"
@@ -76,6 +78,11 @@ func main() {
 		return
 	}
 	defer conn.Close(context.Background())
+
+	if err := pgxgeos.Register(ctx, conn, geos.NewContext()); err != nil {
+		slog.Error("Error while registering GEOS", "error", err)
+		return
+	}
 	postgresRepo := postgres.NewRepository(conn)
 
 	localRepo, err := local.NewRepository(cfg)
@@ -102,6 +109,7 @@ func main() {
 		Vehicle:     postgresRepo.Vehicle,
 		Flowerbed:   postgresRepo.Flowerbed,
 		Image:       postgresRepo.Image,
+		Region:      postgresRepo.Region,
 	}
 
 	services := domain.NewService(cfg, repositories)

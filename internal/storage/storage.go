@@ -43,6 +43,12 @@ type InfoRepository interface {
 	GetAppInfo(context.Context) (*entities.App, error)
 }
 
+type RegionRepository interface {
+	BasicCrudRepository[entities.Region]
+	GetByName(ctx context.Context, name string) (*entities.Region, error)
+	GetByPoint(ctx context.Context, latitude, longitude float64) (*entities.Region, error)
+}
+
 type UserRepository interface {
 	Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error)
 	GetByAccessToken(ctx context.Context, token string) (*entities.User, error)
@@ -119,4 +125,5 @@ type Repository struct {
 	Vehicle     VehicleRepository
 	TreeCluster TreeClusterRepository
 	Flowerbed   FlowerbedRepository
+	Region      RegionRepository
 }
