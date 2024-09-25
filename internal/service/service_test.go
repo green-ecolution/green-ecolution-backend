@@ -14,13 +14,13 @@ func TestAllServiceReady(t *testing.T) {
 		mqttSvc := serviceMock.NewMockMqttService(t)
 		treeSvc := serviceMock.NewMockTreeService(t)
 		authSvc := serviceMock.NewMockAuthService(t)
-    regionSvc := serviceMock.NewMockRegionService(t)
+		regionSvc := serviceMock.NewMockRegionService(t)
 		svc := Services{
-			InfoService: infoSvc,
-			MqttService: mqttSvc,
-			TreeService: treeSvc,
-			AuthService: authSvc,
-      RegionService: regionSvc,
+			InfoService:   infoSvc,
+			MqttService:   mqttSvc,
+			TreeService:   treeSvc,
+			AuthService:   authSvc,
+			RegionService: regionSvc,
 		}
 
 		// when
@@ -28,7 +28,7 @@ func TestAllServiceReady(t *testing.T) {
 		mqttSvc.EXPECT().Ready().Return(true)
 		treeSvc.EXPECT().Ready().Return(true)
 		authSvc.EXPECT().Ready().Return(true)
-    regionSvc.EXPECT().Ready().Return(true)
+		regionSvc.EXPECT().Ready().Return(true)
 
 		ready := svc.AllServicesReady()
 
