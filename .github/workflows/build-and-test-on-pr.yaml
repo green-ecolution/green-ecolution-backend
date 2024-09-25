@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Dependencies
+        run: sudo apt-get update && sudo apt-get install -y make build-essential libgeos-dev
+
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v5
         with:
