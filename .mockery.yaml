@@ -8,6 +8,7 @@ packages:
       MqttService:
       TreeService:
       AuthService:
+      RegionService:
       Service:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
