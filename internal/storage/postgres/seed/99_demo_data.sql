@@ -10,13 +10,6 @@ ALTER SEQUENCE vehicles_id_seq RESTART WITH 3;
 INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('95b69b4c-b38b-4394-9520-496879b67791', 1);
 INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('d2563a8e-a608-4039-8718-25fc3c1d8e57', 2);
 
-INSERT INTO regions (id, name, geometry) VALUES (
-  1,
-  'Flensburg Stadt',
-  ST_MakePolygon(ST_GeomFromText('LINESTRING(9.423171323013623 54.801337080406093, 9.423358138065359 54.801229397592124, 9.424946066005113 54.800529452307963, 9.425039473530978 54.799560277287128, 9.428215329410481 54.797137238059484, 9.431484592815853 54.795467948759949, 9.432231853022795 54.793960144335557, 9.432792298178002 54.790836656266599, 9.43503407879883 54.787820645701181, 9.4380231196266 54.783673263833371, 9.436528599212716 54.780064156902284, 9.432325260548666 54.776346978804867, 9.422050432703211 54.774030303741604, 9.411495382280155 54.776508602346915, 9.403555742581393 54.781303140360336, 9.400566701753624 54.787335908734057, 9.403555742581393 54.795414099570323, 9.408599748978252 54.799775651522374, 9.423171323013623 54.80133708040609)'))
-);
-ALTER SEQUENCE regions_id_seq RESTART WITH 2;
-
 INSERT INTO tree_clusters (id, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
 VALUES 
   (1, 'good', 0.75, 1, 'Solitüde Strand', 'Alle Bäume am Strand', 'sandig', 54.820940, 9.489022, ST_SetSRID(ST_MakePoint(54.820940, 9.489022), 4326)),
@@ -54,30 +47,10 @@ VALUES
 
 -- +goose Down
 -- +goose StatementBegin
-DELETE FROM images WHERE url = 'https://avatars.githubusercontent.com/u/165842746?s=96&v=4';
-DELETE FROM images WHERE url = 'https://app.dev.green-ecolution.de/api/v1/images/avatar.png';
-
-DELETE FROM user_vehicles WHERE user_id = '95b69b4c-b38b-4394-9520-496879b67791';
-DELETE FROM user_vehicles WHERE user_id = 'd2563a8e-a608-4039-8718-25fc3c1d8e57';
-
-DELETE FROM vehicles WHERE number_plate = 'B-1234';
-DELETE FROM vehicles WHERE number_plate = 'B-5678';
-
-DELETE FROM trees WHERE tree_cluster_id = 1;
-DELETE FROM trees WHERE tree_cluster_id = 2;
-
-DELETE FROM tree_clusters WHERE id = 1;
-DELETE FROM tree_clusters WHERE id = 2;
-
-DELETE FROM sensor_data WHERE sensor_id = 1;
-DELETE FROM sensor_data WHERE sensor_id = 2;
-DELETE FROM sensor_data WHERE sensor_id = 3;
-DELETE FROM sensor_data WHERE sensor_id = 4;
-DELETE FROM sensor_data WHERE sensor_id = 5;
-
-DELETE FROM sensors WHERE id = 1;
-DELETE FROM sensors WHERE id = 2;
-DELETE FROM sensors WHERE id = 3;
-
-DELETE FROM regions WHERE id = 1; 
+DELETE FROM images;
+DELETE FROM vehicles;
+DELETE FROM trees;
+DELETE FROM tree_clusters;
+DELETE FROM sensor_data;
+DELETE FROM sensors;
 -- +goose StatementEnd
