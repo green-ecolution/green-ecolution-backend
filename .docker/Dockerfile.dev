@@ -9,7 +9,7 @@ WORKDIR /app/build
 
 # install build dependencies
 COPY ./Makefile ./go.mod ./go.sum ./
-RUN apk add --no-cache make git
+RUN apk add --no-cache make git geos-dev build-base
 RUN make setup/ci
 
 COPY . .
