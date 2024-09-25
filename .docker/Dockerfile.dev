@@ -35,13 +35,14 @@ RUN make build \
 #############################################
 # Runner go
 #############################################
-FROM alpine:3.18 AS runner
+FROM alpine:3.20 AS runner
 
 ENV DEVELOPMENT=true
 ENV PORT=3000
 EXPOSE 3000
 
 RUN adduser -D gorunner
+RUN apk add --no-cache geos
 
 USER gorunner
 WORKDIR /app
