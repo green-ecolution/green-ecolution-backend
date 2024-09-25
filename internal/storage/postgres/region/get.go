@@ -35,3 +35,13 @@ func (r *RegionRepository) GetByName(ctx context.Context, plate string) (*entiti
 
 	return r.mapper.FromSql(row), nil
 }
+
+func (r *RegionRepository) GetByPoint(ctx context.Context, latitude, longitude float64) (*entities.Region, error) {
+	p := fmt.Sprintf("POINT(%f %f)", latitude, longitude)
+	region, err := r.store.GetRegionByPoint(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.mapper.FromSql(region), nil
+}
