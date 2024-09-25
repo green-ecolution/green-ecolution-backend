@@ -18,7 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
+      - name: Setup Dependencies
+        run: sudo apt-get update && sudo apt-get install -y make build-essential libgeos-dev
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
           go-version: stable
 

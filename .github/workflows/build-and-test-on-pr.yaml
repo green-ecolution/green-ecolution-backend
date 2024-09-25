@@ -14,7 +14,7 @@ jobs:
       - name: Setup Dependencies
         run: sudo apt-get update && sudo apt-get install -y make build-essential libgeos-dev
 
-      - name: Setup Go ${{ matrix.go-version }}
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: stable
