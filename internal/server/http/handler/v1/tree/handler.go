@@ -41,13 +41,16 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
       return errorhandler.HandleError(err)
     }
 
-    data := make([]entities.TreeResponse, len(domainData))
+    data := make([]*entities.TreeResponse, len(domainData))
     for i, domain := range domainData {
-      data[i] = *treeMapper.FromResponse(domain)
+      data[i] = treeMapper.FromResponse(domain)
       data[i].Sensor = sensorMapper.FromResponse(domain.Sensor)
     }
 
-    return c.JSON(data)
+    return c.JSON(entities.TreeListResponse{
+      Data:       data,
+      Pagination: entities.Pagination{}, // TODO: Handle pagination
+    })
 	}
 }
 
