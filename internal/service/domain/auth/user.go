@@ -54,7 +54,7 @@ func (s *AuthService) ClientTokenCallback(ctx context.Context, loginCallback *do
 	return token, nil
 }
 
-func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.LogoutRequest) error {
+func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.Logout) error {
 	if err := s.validator.Struct(logoutRequest); err != nil {
 		return service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
