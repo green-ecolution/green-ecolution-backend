@@ -1,10 +1,19 @@
 package tree
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+	treeMapper   = generated.TreeHTTPMapperImpl{}
+	sensorMapper = generated.SensorHTTPMapperImpl{}
 )
 
 // @Summary		Get all trees
@@ -24,10 +33,23 @@ import (
 // @Param			age				query	string	false	"Age"
 // @Param			treecluster_id	query	string	false	"Tree Cluster ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllTrees(_ service.TreeService) fiber.Handler {
+func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		domainData, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := make([]*entities.TreeResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = mapTreeToDto(domain)
+		}
+
+		return c.JSON(entities.TreeListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
@@ -45,10 +67,22 @@ func GetAllTrees(_ service.TreeService) fiber.Handler {
 // @Router			/v1/tree/{tree_id} [get]
 // @Param			tree_id			path	string	false	"Tree ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreeByID(_ service.TreeService) fiber.Handler {
+func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
+
+		domainData, err := svc.GetByID(ctx, id)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapTreeToDto(domainData)
+
+		return c.JSON(data)
 	}
 }
 
@@ -247,4 +281,11 @@ func RemoveTreeImage(_ service.TreeService) fiber.Handler {
 		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
+}
+
+func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
+	dto := treeMapper.FromResponse(t)
+	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
+
+	return dto
 }

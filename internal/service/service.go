@@ -55,7 +55,8 @@ type MqttService interface {
 
 type TreeService interface {
 	Service
-	// TODO: Implement Functions
+	GetAll(ctx context.Context) ([]*domain.Tree, error)
+	GetByID(ctx context.Context, id int) (*domain.Tree, error)
 }
 
 type AuthService interface {

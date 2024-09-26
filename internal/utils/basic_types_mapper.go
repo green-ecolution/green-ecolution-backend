@@ -10,6 +10,10 @@ func TimeToTime(t time.Time) time.Time {
 	return t
 }
 
+func TimeToTimePtr(t *time.Time) *time.Time {
+	return t
+}
+
 func URLToURL(u *url.URL) *url.URL {
 	return u
 }
