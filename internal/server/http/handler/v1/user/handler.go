@@ -60,7 +60,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
-		domainReq := domain.LogoutRequest{
+		domainReq := domain.Logout{
 			RefreshToken: req.RefreshToken,
 		}
 
