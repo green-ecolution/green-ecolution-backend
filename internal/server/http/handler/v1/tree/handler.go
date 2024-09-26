@@ -1,12 +1,19 @@
 package tree
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+  treeMapper = generated.TreeHTTPMapperImpl{}
+  sensorMapper = generated.SensorHTTPMapperImpl{}
 )
 
 // @Summary		Get all trees
@@ -34,12 +41,10 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
       return errorhandler.HandleError(err)
     }
 
-    tMapper := generated.TreeHTTPMapperImpl{}
-    sMapper := generated.SensorHTTPMapperImpl{}
     data := make([]entities.TreeResponse, len(domainData))
     for i, domain := range domainData {
-      data[i] = *tMapper.FromResponse(domain)
-      data[i].Sensor = sMapper.FromResponse(domain.Sensor)
+      data[i] = *treeMapper.FromResponse(domain)
+      data[i].Sensor = sensorMapper.FromResponse(domain.Sensor)
     }
 
     return c.JSON(data)
@@ -60,10 +65,23 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Router			/v1/tree/{tree_id} [get]
 // @Param			tree_id			path	string	false	"Tree ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreeByID(_ service.TreeService) fiber.Handler {
+func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+    ctx := c.Context()
+    id, err := strconv.Atoi(c.Params("id"))
+    if err != nil {
+      return err
+    }
+
+    domainData, err := svc.GetByID(ctx, id)
+    if err != nil {
+      return errorhandler.HandleError(err)
+    }
+
+    data := *treeMapper.FromResponse(domainData)
+    data.Sensor = sensorMapper.FromResponse(domainData.Sensor)
+
+    return c.JSON(data)
 	}
 }
 
