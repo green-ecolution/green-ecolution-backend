@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
@@ -43,8 +44,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 
     data := make([]*entities.TreeResponse, len(domainData))
     for i, domain := range domainData {
-      data[i] = treeMapper.FromResponse(domain)
-      data[i].Sensor = sensorMapper.FromResponse(domain.Sensor)
+      data[i] = mapTreeToDto(domain)
     }
 
     return c.JSON(entities.TreeListResponse{
@@ -81,8 +81,7 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
       return errorhandler.HandleError(err)
     }
 
-    data := *treeMapper.FromResponse(domainData)
-    data.Sensor = sensorMapper.FromResponse(domainData.Sensor)
+    data := mapTreeToDto(domainData)
 
     return c.JSON(data)
 	}
@@ -283,4 +282,11 @@ func RemoveTreeImage(_ service.TreeService) fiber.Handler {
 		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
+}
+
+func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
+  dto := treeMapper.FromResponse(t)
+  dto.Sensor = sensorMapper.FromResponse(t.Sensor)
+
+  return dto
 }
