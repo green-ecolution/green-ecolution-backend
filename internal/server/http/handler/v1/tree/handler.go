@@ -13,8 +13,8 @@ import (
 )
 
 var (
-  treeMapper = generated.TreeHTTPMapperImpl{}
-  sensorMapper = generated.SensorHTTPMapperImpl{}
+	treeMapper   = generated.TreeHTTPMapperImpl{}
+	sensorMapper = generated.SensorHTTPMapperImpl{}
 )
 
 // @Summary		Get all trees
@@ -36,21 +36,21 @@ var (
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    ctx := c.Context()
-    domainData, err := svc.GetAll(ctx)
-    if err != nil {
-      return errorhandler.HandleError(err)
-    }
+		ctx := c.Context()
+		domainData, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
-    data := make([]*entities.TreeResponse, len(domainData))
-    for i, domain := range domainData {
-      data[i] = mapTreeToDto(domain)
-    }
+		data := make([]*entities.TreeResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = mapTreeToDto(domain)
+		}
 
-    return c.JSON(entities.TreeListResponse{
-      Data:       data,
-      Pagination: entities.Pagination{}, // TODO: Handle pagination
-    })
+		return c.JSON(entities.TreeListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
@@ -70,20 +70,20 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    ctx := c.Context()
-    id, err := strconv.Atoi(c.Params("id"))
-    if err != nil {
-      return err
-    }
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
 
-    domainData, err := svc.GetByID(ctx, id)
-    if err != nil {
-      return errorhandler.HandleError(err)
-    }
+		domainData, err := svc.GetByID(ctx, id)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
-    data := mapTreeToDto(domainData)
+		data := mapTreeToDto(domainData)
 
-    return c.JSON(data)
+		return c.JSON(data)
 	}
 }
 
@@ -285,8 +285,8 @@ func RemoveTreeImage(_ service.TreeService) fiber.Handler {
 }
 
 func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
-  dto := treeMapper.FromResponse(t)
-  dto.Sensor = sensorMapper.FromResponse(t.Sensor)
+	dto := treeMapper.FromResponse(t)
+	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
 
-  return dto
+	return dto
 }

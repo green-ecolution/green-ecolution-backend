@@ -21,23 +21,22 @@ func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRe
 	}
 }
 
-
 func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
-  trees, err := s.treeRepo.GetAll(ctx)
-  if err != nil {
-    return nil, handleError(err)
-  }
+	trees, err := s.treeRepo.GetAll(ctx)
+	if err != nil {
+		return nil, handleError(err)
+	}
 
-  return trees, nil
+	return trees, nil
 }
 
 func (s *TreeService) GetByID(ctx context.Context, id int) (*entities.Tree, error) {
-  tree, err := s.treeRepo.GetByID(ctx, int32(id))
-  if err != nil {
-    return nil, handleError(err)
-  }
+	tree, err := s.treeRepo.GetByID(ctx, int32(id))
+	if err != nil {
+		return nil, handleError(err)
+	}
 
-  return tree, nil
+	return tree, nil
 }
 
 func handleError(err error) error {

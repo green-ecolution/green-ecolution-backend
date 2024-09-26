@@ -10,7 +10,7 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
 // goverter:extend MapWateringStatus MapSoilCondition
 type TreeClusterHTTPMapper interface {
-  // goverter:ignore Region Trees
+	// goverter:ignore Region Trees
 	FormResponse(*domain.TreeCluster) *entities.TreeClusterResponse
 }
 
