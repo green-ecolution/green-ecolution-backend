@@ -32,7 +32,7 @@ func GetAllRegions(svc service.RegionService) fiber.Handler {
 
 		dto := utils.Map(r, func(region *domain.Region) *entities.RegionResponse {
 			return &entities.RegionResponse{
-				ID:   strconv.Itoa(int(region.ID)),
+				ID:   region.ID,
 				Name: region.Name,
 			}
 		})
