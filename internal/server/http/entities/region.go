@@ -1,7 +1,7 @@
 package entities
 
 type RegionResponse struct {
-	ID   string `json:"id"`
+	ID   int32  `json:"id"`
 	Name string `json:"name"`
 } // @Name Region
 
