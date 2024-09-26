@@ -2,7 +2,9 @@ package tree
 
 import (
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
@@ -24,10 +26,23 @@ import (
 // @Param			age				query	string	false	"Age"
 // @Param			treecluster_id	query	string	false	"Tree Cluster ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllTrees(_ service.TreeService) fiber.Handler {
+func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+    ctx := c.Context()
+    domainData, err := svc.GetAll(ctx)
+    if err != nil {
+      return errorhandler.HandleError(err)
+    }
+
+    tMapper := generated.TreeHTTPMapperImpl{}
+    sMapper := generated.SensorHTTPMapperImpl{}
+    data := make([]entities.TreeResponse, len(domainData))
+    for i, domain := range domainData {
+      data[i] = *tMapper.FromResponse(domain)
+      data[i].Sensor = sMapper.FromResponse(domain.Sensor)
+    }
+
+    return c.JSON(data)
 	}
 }
 
