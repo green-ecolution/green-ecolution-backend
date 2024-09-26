@@ -4,9 +4,11 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 // @Summary		Get all regions
@@ -22,12 +24,23 @@ import (
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func GetAllRegions(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		r, err := svc.GetAll(c.Context())
+		ctx := c.Context()
+		r, err := svc.GetAll(ctx)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
 
-		return c.JSON(r)
+		dto := utils.Map(r, func(region *domain.Region) *entities.RegionResponse {
+			return &entities.RegionResponse{
+				ID:   strconv.Itoa(int(region.ID)),
+				Name: region.Name,
+			}
+		})
+
+		return c.JSON(entities.RegionListResponse{
+			Regions:    dto,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
