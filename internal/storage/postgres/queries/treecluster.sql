@@ -10,6 +10,9 @@ SELECT sensors.* FROM sensors JOIN tree_clusters ON sensors.id = tree_clusters.s
 -- name: GetRegionByTreeClusterID :one
 SELECT regions.* FROM regions JOIN tree_clusters ON regions.id = tree_clusters.region_id WHERE tree_clusters.id = $1;
 
+-- name: GetLinkedTreesByTreeClusterID :many
+SELECT trees.* FROM trees JOIN tree_clusters ON trees.tree_cluster_id = tree_clusters.id WHERE tree_clusters.id = $1;
+
 -- name: CreateTreeCluster :one
 INSERT INTO tree_clusters (
   name, region_id, address, description, moisture_level, latitude, longitude, watering_status, soil_condition

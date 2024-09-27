@@ -4,10 +4,9 @@ import (
 	"context"
 	"time"
 
-	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
@@ -17,20 +16,23 @@ type TreeClusterRepository struct {
 }
 
 type TreeClusterMappers struct {
-	mapper       sensorMapper.InternalTreeClusterRepoMapper
-	sensorMapper sensorMapper.InternalSensorRepoMapper
-	regionMapper sensorMapper.InternalRegionRepoMapper
+	mapper       mapper.InternalTreeClusterRepoMapper
+	sensorMapper mapper.InternalSensorRepoMapper
+	regionMapper mapper.InternalRegionRepoMapper
+	treeMapper   mapper.InternalTreeRepoMapper
 }
 
 func NewTreeClusterRepositoryMappers(
-	tcMapper sensorMapper.InternalTreeClusterRepoMapper,
-	sMapper sensorMapper.InternalSensorRepoMapper,
-	rMapper sensorMapper.InternalRegionRepoMapper,
+	tcMapper mapper.InternalTreeClusterRepoMapper,
+	sMapper mapper.InternalSensorRepoMapper,
+	rMapper mapper.InternalRegionRepoMapper,
+	tMapper mapper.InternalTreeRepoMapper,
 ) TreeClusterMappers {
 	return TreeClusterMappers{
 		mapper:       tcMapper,
 		sensorMapper: sMapper,
 		regionMapper: rMapper,
+		treeMapper:   tMapper,
 	}
 }
 

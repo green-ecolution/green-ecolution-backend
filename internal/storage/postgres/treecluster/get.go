@@ -21,6 +21,11 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 		if err != nil {
 			return nil, err
 		}
+
+		f.Trees, err = r.GetLinkedTreesByTreeClusterID(ctx, f.ID)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return data, nil
@@ -32,7 +37,18 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 		return nil, r.store.HandleError(err)
 	}
 
-	return r.mapper.FromSql(row), nil
+	data := r.mapper.FromSql(row)
+	data.Region, err = r.GetRegionByTreeClusterID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	data.Trees, err = r.GetLinkedTreesByTreeClusterID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error) {
@@ -54,4 +70,17 @@ func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id
 	}
 
 	return r.regionMapper.FromSql(row), nil
+}
+
+func (r *TreeClusterRepository) GetLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	rows, err := r.store.GetLinkedTreesByTreeClusterID(ctx, id)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrRegionNotFound
+		}
+		return nil, r.store.HandleError(err)
+	}
+
+	return r.treeMapper.FromSqlList(rows), nil
 }
