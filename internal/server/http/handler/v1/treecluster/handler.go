@@ -14,7 +14,6 @@ import (
 
 var (
 	treeClusterMapper = generated.TreeClusterHTTPMapperImpl{}
-	treeMapper        = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all tree clusters
@@ -222,13 +221,15 @@ func RemoveTreesFromTreeCluster(_ service.Service) fiber.Handler {
 
 func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
 	dto := treeClusterMapper.FormResponse(t)
-	responses := make([]*entities.TreeResponse, len(t.Trees))
 
-	for i, tree := range t.Trees {
-		responses[i] = treeMapper.FromResponse(tree)
+	if t.Region != nil {
+		dto.Region = entities.RegionResponse{
+			ID:   t.Region.ID,
+			Name: t.Region.Name,
+		}
+	} else {
+		dto.Region = entities.RegionResponse{}
 	}
-
-	dto.Trees = responses
 
 	return dto
 }
