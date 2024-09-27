@@ -221,14 +221,13 @@ func RemoveTreesFromTreeCluster(_ service.Service) fiber.Handler {
 
 func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
 	dto := treeClusterMapper.FormResponse(t)
+	dto.Region = entities.RegionResponse{}
 
 	if t.Region != nil {
 		dto.Region = entities.RegionResponse{
 			ID:   t.Region.ID,
 			Name: t.Region.Name,
 		}
-	} else {
-		dto.Region = entities.RegionResponse{}
 	}
 
 	return dto
