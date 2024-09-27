@@ -2,8 +2,11 @@ package treecluster
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, error) {
@@ -12,9 +15,15 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 		return nil, r.store.HandleError(err)
 	}
 
-	// TODO: Parse entites like flowerbeds
+	data := r.mapper.FromSqlList(rows)
+	for _, f := range data {
+		f.Region, err = r.GetRegionByTreeClusterID(ctx, f.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
 
-	return r.mapper.FromSqlList(rows), nil
+	return data, nil
 }
 
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {
@@ -35,11 +44,14 @@ func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id
 	return r.sensorMapper.FromSql(row), nil
 }
 
-func mapTrees(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
-	treeCluster, err := r.GetTreeClusterByTreeID(ctx, t.ID)
+func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error) {
+	row, err := r.store.GetRegionByTreeClusterID(ctx, id)
 	if err != nil {
-		return r.store.HandleError(err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrRegionNotFound
+		}
+		return nil, r.store.HandleError(err)
 	}
-	t.TreeCluster = treeCluster
-	return nil
+
+	return r.regionMapper.FromSql(row), nil
 }

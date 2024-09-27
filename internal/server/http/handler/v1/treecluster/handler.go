@@ -1,13 +1,20 @@
 package treecluster
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+	treeClusterMapper = generated.TreeClusterHTTPMapperImpl{}
+	treeMapper        = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all tree clusters
@@ -34,7 +41,14 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
+		for i, cluster := range domainData {
+			fmt.Printf("TreeCluster %d: %+v\n", i, *cluster)
+		}
+
 		data := make([]*entities.TreeClusterResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = mapTreeClusterToDto(domain)
+		}
 
 		return c.JSON(entities.TreeClusterListResponse{
 			Data: data,
@@ -64,7 +78,8 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 			return err
 		}
 
-		data, err := svc.GetByID(ctx, id)
+		data, err := svc.GetByID(ctx, int32(id))
+
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -203,4 +218,17 @@ func RemoveTreesFromTreeCluster(_ service.Service) fiber.Handler {
 		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
+}
+
+func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
+	dto := treeClusterMapper.FormResponse(t)
+	responses := make([]*entities.TreeResponse, len(t.Trees))
+
+	for i, tree := range t.Trees {
+		responses[i] = treeMapper.FromResponse(tree)
+	}
+
+	dto.Trees = responses
+
+	return dto
 }
