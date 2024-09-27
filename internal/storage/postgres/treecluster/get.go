@@ -34,3 +34,12 @@ func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id
 
 	return r.sensorMapper.FromSql(row), nil
 }
+
+func mapTrees(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
+	treeCluster, err := r.GetTreeClusterByTreeID(ctx, t.ID)
+	if err != nil {
+		return r.store.HandleError(err)
+	}
+	t.TreeCluster = treeCluster
+	return nil
+}

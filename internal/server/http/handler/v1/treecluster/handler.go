@@ -1,8 +1,12 @@
 package treecluster
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -22,10 +26,19 @@ import (
 // @Param			limit			query	string	false	"Limit"
 // @Param			status			query	string	false	"Status"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllTreeClusters(_ service.Service) fiber.Handler {
+func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		domainData, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := make([]*entities.TreeClusterResponse, len(domainData))
+
+		return c.JSON(entities.TreeClusterListResponse{
+			Data: data,
+		})
 	}
 }
 
@@ -43,10 +56,19 @@ func GetAllTreeClusters(_ service.Service) fiber.Handler {
 // @Router			/v1/cluster/{cluster_id} [get]
 // @Param			cluster_id		path	string	true	"Tree Cluster ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreeClusterByID(_ service.Service) fiber.Handler {
+func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return err
+		}
+
+		data, err := svc.GetByID(ctx, id)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		return c.JSON(data)
 	}
 }
 

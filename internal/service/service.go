@@ -74,16 +74,23 @@ type RegionService interface {
 	GetByID(ctx context.Context, id int32) (*domain.Region, error)
 }
 
+type TreeClusterService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
+	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
+}
+
 type Service interface {
 	Ready() bool
 }
 
 type Services struct {
-	InfoService   InfoService
-	MqttService   MqttService
-	TreeService   TreeService
-	AuthService   AuthService
-	RegionService RegionService
+	InfoService        InfoService
+	MqttService        MqttService
+	TreeService        TreeService
+	AuthService        AuthService
+	RegionService      RegionService
+	TreeClusterService TreeClusterService
 }
 
 func (s *Services) AllServicesReady() bool {
