@@ -51,7 +51,8 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 		}
 
 		return c.JSON(entities.TreeClusterListResponse{
-			Data: data,
+			Data:       data,
+			Pagination: &entities.Pagination{}, // TODO: Handle pagination
 		})
 	}
 }
@@ -197,7 +198,6 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 func GetTreesInTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	// TODO: Change response @Success to entities.TreeListResponse
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
