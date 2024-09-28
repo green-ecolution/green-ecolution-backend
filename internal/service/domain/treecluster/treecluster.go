@@ -40,7 +40,7 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 	return treeCluster, nil
 }
 
-func (s *TreeClusterService) Create(ctx context.Context, req *entities.TreeClusterCreateRequest) (*domain.TreeCluster, error) {
+func (s *TreeClusterService) Create(_ context.Context, req *entities.TreeClusterCreateRequest) (*domain.TreeCluster, error) {
 	return nil, service.NewError(service.InternalError, "Not implemented")
 }
 
