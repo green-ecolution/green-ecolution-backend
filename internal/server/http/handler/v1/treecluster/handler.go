@@ -104,10 +104,24 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 // @Router			/v1/cluster [post]
 // @Param			body			body	entities.TreeClusterCreateRequest	true	"Tree Cluster Create Request"
 // @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
-func CreateTreeCluster(_ service.Service) fiber.Handler {
+func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		fmt.Println("hallo")
+
+		var req entities.TreeClusterCreateRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainData, err := svc.Create(ctx, &req)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapTreeClusterToDto(domainData)
+
+		return c.JSON(data)
 	}
 }
 
