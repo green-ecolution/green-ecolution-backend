@@ -107,7 +107,6 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		fmt.Println("hallo")
 
 		var req entities.TreeClusterCreateRequest
 		if err := c.BodyParser(&req); err != nil {

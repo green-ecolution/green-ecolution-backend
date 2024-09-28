@@ -30,7 +30,7 @@ func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 	return trees, nil
 }
 
-func (s *TreeService) GetByID(ctx context.Context, id int) (*entities.Tree, error) {
+func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
 	tree, err := s.treeRepo.GetByID(ctx, int32(id))
 	if err != nil {
 		return nil, handleError(err)

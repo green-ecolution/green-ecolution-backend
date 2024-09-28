@@ -75,7 +75,7 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 			return err
 		}
 
-		domainData, err := svc.GetByID(ctx, id)
+		domainData, err := svc.GetByID(ctx, int32(id))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
