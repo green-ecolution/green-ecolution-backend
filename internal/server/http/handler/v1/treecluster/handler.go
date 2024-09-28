@@ -139,7 +139,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Param			cluster_id		path	string								true	"Tree Cluster ID"
 // @Param			body			body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
 // @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
-func UpdateTreeCluster(_ service.Service) fiber.Handler {
+func UpdateTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -160,10 +160,20 @@ func UpdateTreeCluster(_ service.Service) fiber.Handler {
 // @Router			/v1/cluster/{cluster_id} [delete]
 // @Param			cluster_id		path	string	true	"Tree Cluster ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func DeleteTreeCluster(_ service.Service) fiber.Handler {
+func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("treecluster_id"))
+		if err != nil {
+			return err
+		}
+
+		err = svc.Delete(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return nil
 	}
 }
 
@@ -184,7 +194,7 @@ func DeleteTreeCluster(_ service.Service) fiber.Handler {
 // @Param			limit			query	string	false	"Limit"
 // @Param			age				query	string	false	"Age"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetTreesInTreeCluster(_ service.Service) fiber.Handler {
+func GetTreesInTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	// TODO: Change response @Success to entities.TreeListResponse
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -207,7 +217,7 @@ func GetTreesInTreeCluster(_ service.Service) fiber.Handler {
 // @Param			cluster_id		path	string								true	"Tree Cluster ID"
 // @Param			body			body	entities.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
 // @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
-func AddTreesToTreeCluster(_ service.Service) fiber.Handler {
+func AddTreesToTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -229,7 +239,7 @@ func AddTreesToTreeCluster(_ service.Service) fiber.Handler {
 // @Param			cluster_id		path	string	true	"Tree Cluster ID"
 // @Param			tree_id			path	string	true	"Tree ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func RemoveTreesFromTreeCluster(_ service.Service) fiber.Handler {
+func RemoveTreesFromTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
 		return c.SendStatus(fiber.StatusNotImplemented)

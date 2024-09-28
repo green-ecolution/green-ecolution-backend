@@ -80,6 +80,7 @@ type TreeClusterService interface {
 	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
 	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
 	Create(ctx context.Context, req *entities.TreeClusterCreateRequest) (*domain.TreeCluster, error)
+	Delete(ctx context.Context, id int32) error
 }
 
 type Service interface {

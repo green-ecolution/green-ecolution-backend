@@ -44,6 +44,20 @@ func (s *TreeClusterService) Create(ctx context.Context, req *entities.TreeClust
 	return nil, service.NewError(service.InternalError, "Not implemented")
 }
 
+func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
+	_, err := s.treeClusterRepo.GetByID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+
+	err = s.treeClusterRepo.Delete(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+
+	return nil
+}
+
 func handleError(err error) error {
 	if errors.Is(err, storage.ErrEntityNotFound) {
 		return service.NewError(service.NotFound, err.Error())
