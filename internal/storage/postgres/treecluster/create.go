@@ -8,6 +8,7 @@ import (
 )
 
 func defaultTreeCluster() *entities.TreeCluster {
+	name := ""
 	return &entities.TreeCluster{
 		Region:         &entities.Region{},
 		Address:        "",
@@ -20,6 +21,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 		Archived:       false,
 		LastWatered:    nil,
 		Trees:          make([]*entities.Tree, 0),
+		Name:           &name,
 	}
 }
 
@@ -48,6 +50,7 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 		MoistureLevel:  entity.MoistureLevel,
 		WateringStatus: sqlc.TreeClusterWateringStatus(entity.WateringStatus),
 		SoilCondition:  sqlc.TreeSoilCondition(entity.SoilCondition),
+		Name:           entity.Name,
 	}
 
 	return r.store.CreateTreeCluster(ctx, &args)

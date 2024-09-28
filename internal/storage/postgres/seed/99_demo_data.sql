@@ -10,10 +10,10 @@ ALTER SEQUENCE vehicles_id_seq RESTART WITH 3;
 INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('95b69b4c-b38b-4394-9520-496879b67791', 1);
 INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('d2563a8e-a608-4039-8718-25fc3c1d8e57', 2);
 
-INSERT INTO tree_clusters (id, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
+INSERT INTO tree_clusters (id, name, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
 VALUES 
-  (1, 'good', 0.75, 1, 'Solitüde Strand', 'Alle Bäume am Strand', 'sandig', 54.820940, 9.489022, ST_SetSRID(ST_MakePoint(54.820940, 9.489022), 4326)),
-  (2, 'moderate', 0.5, 1, 'Ulmenstraße', 'Bäume beim Sankt-Jürgen-Platz', 'schluffig', 54.78805731048199, 9.44400186680097, ST_SetSRID(ST_MakePoint(54.78805731048199, 9.44400186680097), 4326));
+  (1, 'Gruppe: Solitüde Strand', 'good', 0.75, 1, 'Solitüde Strand', 'Alle Bäume am Strand', 'sandig', 54.820940, 9.489022, ST_SetSRID(ST_MakePoint(54.820940, 9.489022), 4326)),
+  (2, 'Gruppe: Sankt-Jürgen-Platz', 'moderate', 0.5, 1, 'Ulmenstraße', 'Bäume beim Sankt-Jürgen-Platz', 'schluffig', 54.78805731048199, 9.44400186680097, ST_SetSRID(ST_MakePoint(54.78805731048199, 9.44400186680097), 4326));
 ALTER SEQUENCE tree_clusters_id_seq RESTART WITH 3;
 
 INSERT INTO sensors (id, status) VALUES (1, 'online');
