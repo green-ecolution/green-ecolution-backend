@@ -19,6 +19,6 @@ func NewService(cfg *config.Config, repos *storage.Repository) *service.Services
 		TreeService:        tree.NewTreeService(repos.Tree, repos.Sensor),
 		AuthService:        auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
 		RegionService:      region.NewRegionService(repos.Region),
-		TreeClusterService: treecluster.NewTreeClusterService(repos.TreeCluster, repos.Region),
+		TreeClusterService: treecluster.NewTreeClusterService(repos.TreeCluster, repos.Region, repos.Tree),
 	}
 }
