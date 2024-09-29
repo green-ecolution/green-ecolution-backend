@@ -56,7 +56,7 @@ func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (float
 		return 0, 0, errors.New("empty geometry")
 	}
 
-	return g.Y(), g.X(), nil
+	return g.X(), g.Y(), nil
 }
 
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {

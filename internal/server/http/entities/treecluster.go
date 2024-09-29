@@ -26,7 +26,7 @@ type TreeClusterResponse struct {
 	WateringStatus TreeClusterWateringStatus `json:"watering_status,omitempty"`
 	LastWatered    *time.Time                `json:"last_watered,omitempty"`
 	MoistureLevel  float64                   `json:"moisture_level,omitempty"`
-	Region         RegionResponse            `json:"region,omitempty"`
+	Region         *RegionResponse           `json:"region,omitempty"`
 	Address        string                    `json:"address,omitempty"`
 	Description    string                    `json:"description,omitempty"`
 	Archived       bool                      `json:"archived,omitempty"`
