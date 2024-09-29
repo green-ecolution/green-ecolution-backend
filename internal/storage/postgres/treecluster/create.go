@@ -20,6 +20,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 		Archived:       false,
 		LastWatered:    nil,
 		Trees:          make([]*entities.Tree, 0),
+		Name:           "",
 	}
 }
 
@@ -48,6 +49,7 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 		MoistureLevel:  entity.MoistureLevel,
 		WateringStatus: sqlc.TreeClusterWateringStatus(entity.WateringStatus),
 		SoilCondition:  sqlc.TreeSoilCondition(entity.SoilCondition),
+		Name:           entity.Name,
 	}
 
 	return r.store.CreateTreeCluster(ctx, &args)

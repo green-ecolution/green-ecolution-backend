@@ -36,4 +36,5 @@ type TreeCluster struct {
 	Longitude      float64
 	Trees          []*Tree
 	SoilCondition  TreeSoilCondition
+	Name           string
 }

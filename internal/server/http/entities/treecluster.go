@@ -34,6 +34,7 @@ type TreeClusterResponse struct {
 	Longitude      float64                   `json:"longitude,omitempty"`
 	Trees          []*TreeResponse           `json:"trees,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
+	Name           string                    `json:"name,omitempty"`
 } // @Name TreeCluster
 
 type TreeClusterListResponse struct {
@@ -48,6 +49,7 @@ type TreeClusterCreateRequest struct {
 	Description    string                    `json:"description,omitempty"`
 	TreeIDs        []*int32                  `json:"tree_ids,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
+	Name           string                    `json:"name,omitempty"`
 } // @Name TreeClusterCreate
 
 type TreeClusterUpdateRequest struct {
@@ -62,6 +64,7 @@ type TreeClusterUpdateRequest struct {
 	Longitude      float64                   `json:"longitude,omitempty"`
 	TreeIDs        []*int32                  `json:"tree_ids,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
+	Name           string                    `json:"name,omitempty"`
 } // @Name TreeClusterUpdate
 
 type TreeClusterAddTreesRequest struct {
