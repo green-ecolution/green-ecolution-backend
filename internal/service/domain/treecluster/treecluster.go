@@ -50,6 +50,11 @@ func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 
+	err = s.treeRepo.UnlinkTreeClusterID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+
 	err = s.treeClusterRepo.Delete(ctx, id)
 	if err != nil {
 		return handleError(err)
