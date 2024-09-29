@@ -43,33 +43,97 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
-	var region *domain.Region
-	var lat, long float64
 	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
 
 	if len(tc.TreeIDs) > 0 {
-		for i, treeID := range tc.TreeIDs {
-			treeIDs[i] = *treeID
+		for i, id := range tc.TreeIDs {
+			treeIDs[i] = *id
 		}
-
-		var err error
-		lat, long, err = s.treeRepo.GetCenterPoint(ctx, treeIDs)
+		geomFn, err := s.prepareGeom(ctx, treeIDs)
 		if err != nil {
 			return nil, err
 		}
-		fn = append(fn, treecluster.WithLatitude(&lat), treecluster.WithLongitude(&long))
-
-		region, err = s.regionRepo.GetByPoint(ctx, lat, long)
-		if err != nil {
-			return nil, err
-		}
-		fn = append(fn, treecluster.WithRegion(region))
+		fn = append(fn, geomFn...)
 	}
 
 	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description))
 
 	c, err := s.treeClusterRepo.Create(ctx, fn...)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
+		return nil, handleError(err)
+	}
+
+	return c, nil
+}
+
+func (s *TreeClusterService) prepareGeom(ctx context.Context, treeIDs []int32) ([]domain.EntityFunc[domain.TreeCluster], error) {
+	lat, long, err := s.calculateCenterPoint(ctx, treeIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	region, err := s.getRegionByPoint(ctx, lat, long)
+	if err != nil {
+		return nil, err
+	}
+
+	fn := []domain.EntityFunc[domain.TreeCluster]{
+		treecluster.WithLatitude(&lat),
+		treecluster.WithLongitude(&long),
+		treecluster.WithRegion(region),
+	}
+
+	return fn, nil
+
+}
+
+func (s *TreeClusterService) calculateCenterPoint(ctx context.Context, treeIDs []int32) (float64, float64, error) {
+	lat, long, err := s.treeRepo.GetCenterPoint(ctx, treeIDs)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return lat, long, nil
+}
+
+func (s *TreeClusterService) getRegionByPoint(ctx context.Context, lat, long float64) (*domain.Region, error) {
+	region, err := s.regionRepo.GetByPoint(ctx, lat, long)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return region, nil
+}
+
+func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
+	treeIDs := make([]int32, len(tc.TreeIDs))
+	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
+
+	if len(tc.TreeIDs) > 0 {
+		for i, id := range tc.TreeIDs {
+			treeIDs[i] = *id
+		}
+		geomFn, err := s.prepareGeom(ctx, treeIDs)
+		if err != nil {
+			return nil, err
+		}
+		fn = append(fn, geomFn...)
+	}
+
+	fn = append(fn,
+		treecluster.WithName(tc.Name),
+		treecluster.WithAddress(tc.Address),
+		treecluster.WithDescription(tc.Description),
+		treecluster.WithArchived(tc.Archived),
+		treecluster.WithSoilCondition(tc.SoilCondition),
+	)
+
+	c, err := s.treeClusterRepo.Update(ctx, id, fn...)
 	if err != nil {
 		return nil, handleError(err)
 	}
