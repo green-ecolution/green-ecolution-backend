@@ -57,3 +57,6 @@ WHERE id = $1;
 
 -- name: DeleteTree :exec
 DELETE FROM trees WHERE id = $1;
+
+-- name: UnlinkTreeClusterID :exec
+UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;

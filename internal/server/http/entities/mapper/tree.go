@@ -12,6 +12,7 @@ type TreeHTTPMapper interface {
 	// goverter:map TreeCluster TreeClusterID
 	// goverter:ignore Sensor
 	FromResponse(*domain.Tree) *entities.TreeResponse
+	FromResponseList([]*domain.Tree) []*entities.TreeResponse
 }
 
 func MapTreeClusterToID(treeCluster *domain.TreeCluster) *int32 {

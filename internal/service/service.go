@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 )
 
 var (
@@ -56,7 +57,7 @@ type MqttService interface {
 type TreeService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.Tree, error)
-	GetByID(ctx context.Context, id int) (*domain.Tree, error)
+	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
 }
 
 type AuthService interface {
@@ -74,16 +75,25 @@ type RegionService interface {
 	GetByID(ctx context.Context, id int32) (*domain.Region, error)
 }
 
+type TreeClusterService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
+	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
+	Create(ctx context.Context, req *entities.TreeClusterCreateRequest) (*domain.TreeCluster, error)
+	Delete(ctx context.Context, id int32) error
+}
+
 type Service interface {
 	Ready() bool
 }
 
 type Services struct {
-	InfoService   InfoService
-	MqttService   MqttService
-	TreeService   TreeService
-	AuthService   AuthService
-	RegionService RegionService
+	InfoService        InfoService
+	MqttService        MqttService
+	TreeService        TreeService
+	AuthService        AuthService
+	RegionService      RegionService
+	TreeClusterService TreeClusterService
 }
 
 func (s *Services) AllServicesReady() bool {
