@@ -96,7 +96,7 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 // @Id				create-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	entities.TreeClusterResponse
+// @Success		201	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -122,7 +122,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		}
 
 		data := mapTreeClusterToDto(domainData)
-		return c.JSON(data)
+		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
 
