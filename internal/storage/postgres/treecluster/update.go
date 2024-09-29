@@ -39,6 +39,5 @@ func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.T
 		Archived:       tc.Archived,
 	}
 
-
 	return r.store.UpdateTreeCluster(ctx, &args)
 }

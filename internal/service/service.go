@@ -79,7 +79,7 @@ type TreeClusterService interface {
 	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
 	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
 	Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error)
-  Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
+	Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
 	Delete(ctx context.Context, id int32) error
 }
 

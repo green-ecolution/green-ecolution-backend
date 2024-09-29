@@ -89,11 +89,10 @@ func (s *TreeClusterService) prepareGeom(ctx context.Context, treeIDs []int32) (
 	}
 
 	return fn, nil
-
 }
 
-func (s *TreeClusterService) calculateCenterPoint(ctx context.Context, treeIDs []int32) (float64, float64, error) {
-	lat, long, err := s.treeRepo.GetCenterPoint(ctx, treeIDs)
+func (s *TreeClusterService) calculateCenterPoint(ctx context.Context, treeIDs []int32) (lat, long float64, err error) {
+	lat, long, err = s.treeRepo.GetCenterPoint(ctx, treeIDs)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -114,10 +113,10 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.Tr
 	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
 
-  // Unlink all trees from the tree cluster
-  if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
-    return nil, handleError(err)
-  }
+	// Unlink all trees from the tree cluster
+	if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
+		return nil, handleError(err)
+	}
 
 	if len(tc.TreeIDs) > 0 {
 		for i, id := range tc.TreeIDs {

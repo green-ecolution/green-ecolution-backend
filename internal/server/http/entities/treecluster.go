@@ -30,8 +30,8 @@ type TreeClusterResponse struct {
 	Address        string                    `json:"address,omitempty"`
 	Description    string                    `json:"description,omitempty"`
 	Archived       bool                      `json:"archived,omitempty"`
-	Latitude       *float64                   `json:"latitude,omitempty"`
-	Longitude      *float64                   `json:"longitude,omitempty"`
+	Latitude       *float64                  `json:"latitude,omitempty"`
+	Longitude      *float64                  `json:"longitude,omitempty"`
 	Trees          []*TreeResponse           `json:"trees,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
 	Name           string                    `json:"name,omitempty"`

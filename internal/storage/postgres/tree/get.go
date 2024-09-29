@@ -40,7 +40,7 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	return t, nil
 }
 
-func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (float64, float64, error) {
+func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, long float64, err error) {
 	geoStr, err := r.store.CalculateGroupedCentroids(ctx, ids)
 	if err != nil {
 		return 0, 0, err

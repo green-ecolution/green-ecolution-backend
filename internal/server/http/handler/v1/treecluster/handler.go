@@ -114,8 +114,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-
-    domainReq := treeClusterMapper.FromCreateRequest(&req)
+		domainReq := treeClusterMapper.FromCreateRequest(&req)
 		domainData, err := svc.Create(ctx, domainReq)
 		if err != nil {
 			return errorhandler.HandleError(err)
@@ -143,25 +142,25 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
 func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    ctx := c.Context()
-    id, err := strconv.Atoi(c.Params("treecluster_id"))
-    if err != nil {
-      return errorhandler.HandleError(err)
-    }
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("treecluster_id"))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
 		var req entities.TreeClusterUpdateRequest
 		if err = c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-    domainReq := treeClusterMapper.FromUpdateRequest(&req)
-    domainData, err := svc.Update(ctx, int32(id), domainReq)
-    if err != nil {
-      return errorhandler.HandleError(err)
-    }
+		domainReq := treeClusterMapper.FromUpdateRequest(&req)
+		domainData, err := svc.Update(ctx, int32(id), domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
-    data := mapTreeClusterToDto(domainData)
-    return c.JSON(data)
+		data := mapTreeClusterToDto(domainData)
+		return c.JSON(data)
 	}
 }
 

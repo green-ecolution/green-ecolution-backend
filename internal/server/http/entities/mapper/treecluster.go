@@ -13,8 +13,8 @@ type TreeClusterHTTPMapper interface {
 	// goverter:ignore Region Trees
 	FormResponse(*domain.TreeCluster) *entities.TreeClusterResponse
 
-  FromCreateRequest(*entities.TreeClusterCreateRequest) *domain.TreeClusterCreate
-  FromUpdateRequest(*entities.TreeClusterUpdateRequest) *domain.TreeClusterUpdate
+	FromCreateRequest(*entities.TreeClusterCreateRequest) *domain.TreeClusterCreate
+	FromUpdateRequest(*entities.TreeClusterUpdateRequest) *domain.TreeClusterUpdate
 }
 
 func MapWateringStatus(status domain.TreeClusterWateringStatus) entities.TreeClusterWateringStatus {
