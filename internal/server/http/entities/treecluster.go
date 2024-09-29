@@ -43,8 +43,6 @@ type TreeClusterListResponse struct {
 } // @Name TreeClusterList
 
 type TreeClusterCreateRequest struct {
-	WateringStatus TreeClusterWateringStatus `json:"watering_status,omitempty"`
-	Region         string                    `json:"region,omitempty"`
 	Address        string                    `json:"address,omitempty"`
 	Description    string                    `json:"description,omitempty"`
 	TreeIDs        []*int32                  `json:"tree_ids,omitempty"`
@@ -53,15 +51,11 @@ type TreeClusterCreateRequest struct {
 } // @Name TreeClusterCreate
 
 type TreeClusterUpdateRequest struct {
-	WateringStatus TreeClusterWateringStatus `json:"watering_status,omitempty"`
 	LastWatered    time.Time                 `json:"last_watered,omitempty"`
 	MoistureLevel  float64                   `json:"moisture_level,omitempty"`
-	Region         string                    `json:"region,omitempty"`
 	Address        string                    `json:"address,omitempty"`
 	Description    string                    `json:"description,omitempty"`
 	Archived       bool                      `json:"archived,omitempty"`
-	Latitude       float64                   `json:"latitude,omitempty"`
-	Longitude      float64                   `json:"longitude,omitempty"`
 	TreeIDs        []*int32                  `json:"tree_ids,omitempty"`
 	SoilCondition  TreeSoilCondition         `json:"soil_condition,omitempty"`
 	Name           string                    `json:"name,omitempty"`
