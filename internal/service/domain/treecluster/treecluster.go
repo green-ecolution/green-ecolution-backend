@@ -50,6 +50,7 @@ func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 
+	// TODO: Add a transaction to undo this change if an error occurs.
 	err = s.treeRepo.UnlinkTreeClusterID(ctx, id)
 	if err != nil {
 		return handleError(err)
