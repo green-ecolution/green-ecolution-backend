@@ -114,6 +114,11 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.Tr
 	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
 
+  // Unlink all trees from the tree cluster
+  if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
+    return nil, handleError(err)
+  }
+
 	if len(tc.TreeIDs) > 0 {
 		for i, id := range tc.TreeIDs {
 			treeIDs[i] = *id
