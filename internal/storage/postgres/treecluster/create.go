@@ -8,7 +8,6 @@ import (
 )
 
 func defaultTreeCluster() *entities.TreeCluster {
-	name := ""
 	return &entities.TreeCluster{
 		Region:         &entities.Region{},
 		Address:        "",
@@ -21,7 +20,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 		Archived:       false,
 		LastWatered:    nil,
 		Trees:          make([]*entities.Tree, 0),
-		Name:           &name,
+		Name:           "",
 	}
 }
 

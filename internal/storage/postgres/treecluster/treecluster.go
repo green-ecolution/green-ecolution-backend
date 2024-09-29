@@ -44,7 +44,7 @@ func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storag
 
 func WithName(name string) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
-		tc.Name = &name
+		tc.Name = name
 	}
 }
 
