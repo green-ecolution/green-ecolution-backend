@@ -32,8 +32,8 @@ type TreeCluster struct {
 	Address        string
 	Description    string
 	Archived       bool
-	Latitude       float64
-	Longitude      float64
+	Latitude       *float64
+	Longitude      *float64
 	Trees          []*Tree
 	SoilCondition  TreeSoilCondition
 	Name           string

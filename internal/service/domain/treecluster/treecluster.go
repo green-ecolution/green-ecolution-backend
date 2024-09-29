@@ -43,36 +43,40 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
-  treeIDs := make([]int32, len(tc.TreeIDs))
-  for i, treeID := range tc.TreeIDs {
-    treeIDs[i] = *treeID
-  }
+	var region *domain.Region
+	var lat, long float64
+	treeIDs := make([]int32, len(tc.TreeIDs))
+	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
 
-	lat, long, err := s.treeRepo.GetCenterPoint(ctx, treeIDs)
-	if err != nil {
-		return nil, err
+	if len(tc.TreeIDs) > 0 {
+		for i, treeID := range tc.TreeIDs {
+			treeIDs[i] = *treeID
+		}
+
+		var err error
+		lat, long, err = s.treeRepo.GetCenterPoint(ctx, treeIDs)
+		if err != nil {
+			return nil, err
+		}
+		fn = append(fn, treecluster.WithLatitude(&lat), treecluster.WithLongitude(&long))
+
+		region, err = s.regionRepo.GetByPoint(ctx, lat, long)
+		if err != nil {
+			return nil, err
+		}
+		fn = append(fn, treecluster.WithRegion(region))
 	}
 
-	region, err := s.regionRepo.GetByPoint(ctx, lat, long)
-	if err != nil {
-		return nil, err
-	}
+	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description))
 
-	c, err := s.treeClusterRepo.Create(ctx,
-		treecluster.WithName(tc.Name),
-		treecluster.WithAddress(tc.Address),
-		treecluster.WithDescription(tc.Description),
-		treecluster.WithLatitude(lat),
-		treecluster.WithLongitude(long),
-		treecluster.WithRegion(region),
-	)
+	c, err := s.treeClusterRepo.Create(ctx, fn...)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-  if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
-    return nil, handleError(err)
-  }
+	if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
+		return nil, handleError(err)
+	}
 
 	return c, nil
 }

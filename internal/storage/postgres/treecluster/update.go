@@ -32,14 +32,13 @@ func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.T
 		RegionID:       &tc.Region.ID,
 		Address:        tc.Address,
 		Description:    tc.Description,
-		Latitude:       tc.Latitude,
-		Longitude:      tc.Longitude,
 		MoistureLevel:  tc.MoistureLevel,
 		WateringStatus: sqlc.TreeClusterWateringStatus(tc.WateringStatus),
 		SoilCondition:  sqlc.TreeSoilCondition(tc.SoilCondition),
 		LastWatered:    utils.TimeToPgTimestamp(tc.LastWatered),
 		Archived:       tc.Archived,
 	}
+
 
 	return r.store.UpdateTreeCluster(ctx, &args)
 }
