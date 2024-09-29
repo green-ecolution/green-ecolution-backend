@@ -38,3 +38,11 @@ type TreeCluster struct {
 	SoilCondition  TreeSoilCondition
 	Name           string
 }
+
+type TreeClusterCreate struct {
+	Address       string
+	Description   string
+	Name          string
+	SoilCondition TreeSoilCondition
+	TreeIDs      []*int32
+}

@@ -72,7 +72,6 @@ type VehicleRepository interface {
 type TreeClusterRepository interface {
 	BasicCrudRepository[entities.TreeCluster]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
-	UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
 	Archive(ctx context.Context, id int32) error
 }
 
@@ -88,6 +87,8 @@ type TreeRepository interface {
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
 	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+  UpdateTreeClusterID(ctx context.Context, treeIDs []int32, treeClusterID *int32) error
+  GetCenterPoint(ctx context.Context, id []int32) (float64, float64, error)
 }
 
 type SensorRepository interface {

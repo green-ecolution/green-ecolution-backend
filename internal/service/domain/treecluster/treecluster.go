@@ -5,20 +5,22 @@ import (
 	"errors"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 )
 
 type TreeClusterService struct {
 	treeClusterRepo storage.TreeClusterRepository
 	treeRepo        storage.TreeRepository
+	regionRepo      storage.RegionRepository
 }
 
-func NewTreeClusterService(treeClusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository) service.TreeClusterService {
+func NewTreeClusterService(treeClusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) service.TreeClusterService {
 	return &TreeClusterService{
 		treeClusterRepo: treeClusterRepo,
 		treeRepo:        treeRepo,
+		regionRepo:      regionRepo,
 	}
 }
 
@@ -40,8 +42,39 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 	return treeCluster, nil
 }
 
-func (s *TreeClusterService) Create(_ context.Context, _ *entities.TreeClusterCreateRequest) (*domain.TreeCluster, error) {
-	return nil, service.NewError(service.InternalError, "Not implemented")
+func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
+  treeIDs := make([]int32, len(tc.TreeIDs))
+  for i, treeID := range tc.TreeIDs {
+    treeIDs[i] = *treeID
+  }
+
+	lat, long, err := s.treeRepo.GetCenterPoint(ctx, treeIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	region, err := s.regionRepo.GetByPoint(ctx, lat, long)
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := s.treeClusterRepo.Create(ctx,
+		treecluster.WithName(tc.Name),
+		treecluster.WithAddress(tc.Address),
+		treecluster.WithDescription(tc.Description),
+		treecluster.WithLatitude(lat),
+		treecluster.WithLongitude(long),
+		treecluster.WithRegion(region),
+	)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+  if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
+    return nil, handleError(err)
+  }
+
+	return c, nil
 }
 
 func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {

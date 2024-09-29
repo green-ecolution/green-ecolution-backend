@@ -114,13 +114,14 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		domainData, err := svc.Create(ctx, &req)
+
+    domainReq := treeClusterMapper.FromCreateRequest(&req)
+		domainData, err := svc.Create(ctx, domainReq)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
 
 		data := mapTreeClusterToDto(domainData)
-
 		return c.JSON(data)
 	}
 }

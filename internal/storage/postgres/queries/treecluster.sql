@@ -42,3 +42,4 @@ WHERE id = $1;
 
 -- name: DeleteTreeCluster :exec
 DELETE FROM tree_clusters WHERE id = $1;
+

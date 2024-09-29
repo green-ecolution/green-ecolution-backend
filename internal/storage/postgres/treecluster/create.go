@@ -9,10 +9,10 @@ import (
 
 func defaultTreeCluster() *entities.TreeCluster {
 	return &entities.TreeCluster{
-		Region:         &entities.Region{},
-		Address:        "",
-		Description:    "",
-		MoistureLevel:  0,
+		Region:        &entities.Region{},
+		Address:       "",
+		Description:   "",
+		MoistureLevel: 0,
 		Latitude:       54.7752933631787,
 		Longitude:      9.451569031678723,
 		WateringStatus: entities.TreeClusterWateringStatusUnknown,
