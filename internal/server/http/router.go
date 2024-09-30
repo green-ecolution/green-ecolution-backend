@@ -11,7 +11,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
-	"log"
 )
 
 func (s *Server) privateRoutes(app *fiber.App) {

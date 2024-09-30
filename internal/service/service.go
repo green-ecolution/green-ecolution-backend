@@ -55,11 +55,11 @@ type MqttService interface {
 
 type TreeService interface {
 	Service
-	ImportTree(ctx context.Context, row [][]string) error
+	ImportTree(ctx context.Context, trees []*domain.Tree) error
 
 	GetAll(ctx context.Context) ([]*domain.Tree, error)
 	GetByID(ctx context.Context, id int) (*domain.Tree, error)
-// TODO: Implement Functions
+	// TODO: Implement Functions
 }
 
 type AuthService interface {
