@@ -37,6 +37,9 @@ UPDATE trees SET
   geometry = ST_GeomFromText($11, 4326)
 WHERE id = $1;
 
+-- name: UpdateTreeClusterID :exec
+UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
+
 -- name: LinkTreeImage :exec
 INSERT INTO tree_images (
   tree_id, image_id
@@ -60,3 +63,6 @@ DELETE FROM trees WHERE id = $1;
 
 -- name: UnlinkTreeClusterID :exec
 UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
+
+-- name: CalculateGroupedCentroids :one
+SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE id = ANY($1::int[]);

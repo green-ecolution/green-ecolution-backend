@@ -2,9 +2,11 @@ package region
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *RegionRepository) GetAll(ctx context.Context) ([]*entities.Region, error) {
@@ -37,9 +39,12 @@ func (r *RegionRepository) GetByName(ctx context.Context, plate string) (*entiti
 }
 
 func (r *RegionRepository) GetByPoint(ctx context.Context, latitude, longitude float64) (*entities.Region, error) {
-	p := fmt.Sprintf("POINT(%f %f)", latitude, longitude)
+	p := fmt.Sprintf("POINT(%f %f)", longitude, latitude)
 	region, err := r.store.GetRegionByPoint(ctx, p)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
 		return nil, err
 	}
 

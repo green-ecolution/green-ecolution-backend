@@ -42,8 +42,8 @@ CREATE TABLE IF NOT EXISTS tree_clusters (
   description TEXT NOT NULL,
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   soil_condition tree_soil_condition NOT NULL DEFAULT 'unknown',
-  latitude FLOAT NOT NULL,
-  longitude FLOAT NOT NULL,
+  latitude FLOAT,
+  longitude FLOAT,
   geometry GEOMETRY(Point, 4326)
 );
 

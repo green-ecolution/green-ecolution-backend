@@ -96,7 +96,7 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 // @Id				create-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	{object}	entities.TreeClusterResponse
+// @Success		201	{object}	entities.TreeClusterResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -114,14 +114,14 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		domainData, err := svc.Create(ctx, &req)
+		domainReq := treeClusterMapper.FromCreateRequest(&req)
+		domainData, err := svc.Create(ctx, domainReq)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
 
 		data := mapTreeClusterToDto(domainData)
-
-		return c.JSON(data)
+		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
 
@@ -140,10 +140,27 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Param			cluster_id		path	string								true	"Tree Cluster ID"
 // @Param			body			body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
 // @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
-func UpdateTreeCluster(_ service.TreeClusterService) fiber.Handler {
+func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("treecluster_id"))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		var req entities.TreeClusterUpdateRequest
+		if err = c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := treeClusterMapper.FromUpdateRequest(&req)
+		domainData, err := svc.Update(ctx, int32(id), domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapTreeClusterToDto(domainData)
+		return c.JSON(data)
 	}
 }
 
@@ -250,7 +267,7 @@ func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
 	dto := treeClusterMapper.FormResponse(t)
 
 	if t.Region != nil {
-		dto.Region = entities.RegionResponse{
+		dto.Region = &entities.RegionResponse{
 			ID:   t.Region.ID,
 			Name: t.Region.Name,
 		}

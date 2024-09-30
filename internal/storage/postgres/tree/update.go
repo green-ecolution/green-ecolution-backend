@@ -39,6 +39,15 @@ func (r *TreeRepository) UpdateWithImages(ctx context.Context, id int32, tFn ...
 	return r.GetByID(ctx, id)
 }
 
+func (r *TreeRepository) UpdateTreeClusterID(ctx context.Context, treeIDs []int32, treeClusterID *int32) error {
+	args := &sqlc.UpdateTreeClusterIDParams{
+		Column1:       treeIDs,
+		TreeClusterID: treeClusterID,
+	}
+
+	return r.store.UpdateTreeClusterID(ctx, args)
+}
+
 func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) error {
 	args := sqlc.UpdateTreeParams{
 		ID:                  t.ID,

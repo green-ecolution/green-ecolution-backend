@@ -15,10 +15,17 @@ SELECT trees.* FROM trees JOIN tree_clusters ON trees.tree_cluster_id = tree_clu
 
 -- name: CreateTreeCluster :one
 INSERT INTO tree_clusters (
-  name, region_id, address, description, moisture_level, latitude, longitude, watering_status, soil_condition
+  name, region_id, address, description, moisture_level, watering_status, soil_condition
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9
+  $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id;
+
+-- name: SetTreeClusterLocation :exec
+UPDATE tree_clusters SET
+  latitude = $2,
+  longitude = $3,
+  geometry = ST_SetSRID(ST_MakePoint($2, $3), 4326)
+WHERE id = $1;
 
 -- name: UpdateTreeCluster :exec
 UPDATE tree_clusters SET
@@ -26,13 +33,11 @@ UPDATE tree_clusters SET
   region_id = $3,
   address = $4,
   description = $5,
-  latitude = $6,
-  longitude = $7,
-  moisture_level = $8,
-  watering_status = $9,
-  soil_condition = $10,
-  last_watered = $11,
-  archived = $12
+  moisture_level = $6,
+  watering_status = $7,
+  soil_condition = $8,
+  last_watered = $9,
+  archived = $10
 WHERE id = $1;
 
 -- name: ArchiveTreeCluster :exec
@@ -42,3 +47,4 @@ WHERE id = $1;
 
 -- name: DeleteTreeCluster :exec
 DELETE FROM tree_clusters WHERE id = $1;
+

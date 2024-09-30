@@ -68,13 +68,13 @@ func WithDescription(description string) entities.EntityFunc[entities.TreeCluste
 	}
 }
 
-func WithLatitude(latitude float64) entities.EntityFunc[entities.TreeCluster] {
+func WithLatitude(latitude *float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
 		tc.Latitude = latitude
 	}
 }
 
-func WithLongitude(longitude float64) entities.EntityFunc[entities.TreeCluster] {
+func WithLongitude(longitude *float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
 		tc.Longitude = longitude
 	}

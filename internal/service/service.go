@@ -8,7 +8,6 @@ import (
 	"reflect"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 )
 
 var (
@@ -79,7 +78,8 @@ type TreeClusterService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
 	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
-	Create(ctx context.Context, req *entities.TreeClusterCreateRequest) (*domain.TreeCluster, error)
+	Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error)
+	Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
 	Delete(ctx context.Context, id int32) error
 }
 
