@@ -14,7 +14,7 @@ type TreeResponse struct {
 	Readonly     bool    `json:"readonly,omitempty"`
 	PlantingYear int32   `json:"planting_year,omitempty"`
 	Species      string  `json:"species,omitempty"`
-	Number       string  `json:"number,omitempty"`
+	Number       string  `json:"tree_number,omitempty"`
 	Latitude     float64 `json:"latitude,omitempty"`
 	Longitude    float64 `json:"longitude,omitempty"`
 } // @Name Tree
@@ -29,7 +29,7 @@ type TreeCreateRequest struct {
 	Readonly      bool    `json:"readonly,omitempty"`
 	PlantingYear  int32   `json:"planting_year,omitempty"`
 	Species       string  `json:"species,omitempty"`
-	Number        string  `json:"number,omitempty"`
+	Number        string  `json:"tree_number,omitempty"`
 	Latitude      float64 `json:"latitude,omitempty"`
 	Longitude     float64 `json:"longitude,omitempty"`
 } // @Name TreeCreate
@@ -39,7 +39,7 @@ type TreeUpdateRequest struct {
 	Readonly      bool    `json:"readonly,omitempty"`
 	PlantingYear  int32   `json:"planting_year,omitempty"`
 	Species       string  `json:"species,omitempty"`
-	Number        string  `json:"number,omitempty"`
+	Number        string  `json:"tree_number,omitempty"`
 	Latitude      float64 `json:"latitude,omitempty"`
 	Longitude     float64 `json:"longitude,omitempty"`
 } // @Name TreeUpdate
