@@ -68,6 +68,13 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 		return nil, handleError(err)
 	}
 
+	trees, err := s.treeRepo.GetByTreeClusterID(ctx, c.ID)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	c.Trees = trees
+
 	return c, nil
 }
 
