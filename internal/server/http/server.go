@@ -55,12 +55,12 @@ func errorHandler(c *fiber.Ctx, err error) error {
 	var e *fiber.Error
 	if errors.As(err, &e) {
 		code = e.Code
-		return c.Status(code).JSON(HTTPError{
-			e.Message,
-			e.Code,
-			c.Path(),
-			c.Method(),
-		})
 	}
-	return nil
+
+	return c.Status(code).JSON(HTTPError{
+		Error:  err.Error(),
+		Code:   code,
+		Path:   c.Path(),
+		Method: c.Method(),
+	})
 }
