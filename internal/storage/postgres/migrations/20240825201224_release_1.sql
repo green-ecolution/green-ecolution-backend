@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS trees (
   height_above_sea_level FLOAT NOT NULL,
   planting_year INT NOT NULL,
   species TEXT NOT NULL,
-  tree_number INT NOT NULL,
+  tree_number TEXT NOT NULL,
   latitude FLOAT NOT NULL,
   longitude FLOAT NOT NULL,
   geometry GEOMETRY(Point, 4326),

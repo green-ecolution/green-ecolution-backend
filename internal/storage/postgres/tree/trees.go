@@ -51,15 +51,9 @@ func WithSpecies(species string) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithAge(age int32) entities.EntityFunc[entities.Tree] {
+func WithReadonly(readonly bool) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
-		t.Age = age
-	}
-}
-
-func WithHeightAboveSeaLevel(height float64) entities.EntityFunc[entities.Tree] {
-	return func(t *entities.Tree) {
-		t.HeightAboveSeaLevel = height
+		t.Readonly = readonly
 	}
 }
 
@@ -87,7 +81,7 @@ func WithLongitude(long float64) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithTreeNumber(number int32) entities.EntityFunc[entities.Tree] {
+func WithTreeNumber(number string) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.Number = number
 	}
