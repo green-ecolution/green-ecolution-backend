@@ -50,15 +50,17 @@ func (s *Server) Run(ctx context.Context) error {
 }
 
 func errorHandler(c *fiber.Ctx, err error) error {
-	c.Status(fiber.StatusInternalServerError)
+	code := fiber.StatusInternalServerError
+
 	var e *fiber.Error
 	if errors.As(err, &e) {
-		return c.JSON(HTTPError{
-			e.Message,
-			e.Code,
-			c.Path(),
-			c.Method(),
-		})
+		code = e.Code
 	}
-	return nil
+
+	return c.Status(code).JSON(HTTPError{
+		Error:  err.Error(),
+		Code:   code,
+		Path:   c.Path(),
+		Method: c.Method(),
+	})
 }
