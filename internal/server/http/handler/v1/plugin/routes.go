@@ -5,10 +5,10 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.RegionService) *fiber.App {
+func RegisterRoutes(svc service.AuthService) *fiber.App {
 	app := fiber.New()
 
-  app.Post("/register", registerPlugin())
+  app.Post("/register", registerPlugin(svc))
 
   app.Use("/:plugin", newPluginMiddleware())
   app.Post("/:plugin/heartbeat", pluginHeartbeat())
