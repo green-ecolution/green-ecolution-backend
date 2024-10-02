@@ -1,27 +1,30 @@
 package plugin
 
 import (
-	"fmt"
-	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	csvimport "github.com/green-ecolution/green-ecolution-backend/plugin/csv_import"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
+func getPluginFiles(c *fiber.Ctx) error {
+	url, err := url.Parse("http://localhost:3000")
+	if err != nil {
+		return err
+	}
 
-func getPluginFiles() *fiber.App { 
-  app := fiber.New()
-  dir, err := csvimport.F.ReadDir("dist") 
-  if err != nil {
-    fmt.Printf("Error: %v\n", err)
-  }
-  fmt.Printf("csvimport.F: %v\n", dir)
-	app.Use(filesystem.New(filesystem.Config{
-		Root: http.FS(csvimport.F),
-    PathPrefix: "dist",
-    Browse: true,
-	}))
+	plugin := c.Params("plugin")
 
-  return app
+	reverseProxy := httputil.ReverseProxy{
+		Rewrite: func(r *httputil.ProxyRequest) {
+			r.SetURL(url)
+			r.Out.Host = r.In.Host
+			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin, "/api/v1/demo_plugin", 1)
+			r.SetXForwarded()
+		},
+	}
+
+	return adaptor.HTTPHandler(&reverseProxy)(c)
 }

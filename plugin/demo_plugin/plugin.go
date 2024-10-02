@@ -1,4 +1,4 @@
-package csvimport
+package demoplugin
 
 import "embed"
 
