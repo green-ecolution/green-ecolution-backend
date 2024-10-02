@@ -1,21 +1,14 @@
 package plugin
 
 import (
-	"net/url"
 	"sync"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-type Plugin struct {
-	Name          string
-	Path          url.URL
-	LastHeartbeat time.Time
-}
-
 var pluginMutex sync.RWMutex
-var registeredPlugins = make(map[string]Plugin)
+var registeredPlugins = make(map[string]entities.Plugin)
 
 func newPluginMiddleware() fiber.Handler {
 

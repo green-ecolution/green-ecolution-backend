@@ -27,7 +27,7 @@ type RegisterUser struct {
 }
 
 type AuthPlugin struct {
-  Name string
-  Username string
-  Password string
+	Name     string
+	Username string
+	Password string
 }

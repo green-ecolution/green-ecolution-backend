@@ -55,7 +55,7 @@ func (w *PluginWorker) Run(ctx context.Context) error {
 			pluginMutex.Lock()
 			for name, plugin := range registeredPlugins {
 				if time.Since(plugin.LastHeartbeat) > w.cfg.timeout {
-          slog.Info("Removing plugin due to timeout", "plugin", name)
+					slog.Info("Removing plugin due to timeout", "plugin", name)
 					delete(registeredPlugins, name)
 				}
 			}
@@ -63,4 +63,3 @@ func (w *PluginWorker) Run(ctx context.Context) error {
 		}
 	}
 }
-

@@ -5,6 +5,7 @@ import (
 	"embed"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,8 +16,8 @@ import (
 var f embed.FS
 
 var (
-  username = "demo_plugin"
-  password = "demo_plugin"
+	username = "demo_plugin"
+	password = "demo_plugin"
 )
 
 func DemoPluginStart(ctx context.Context) {
@@ -47,15 +48,23 @@ func DemoPluginStart(ctx context.Context) {
 		WithPluginPath(pluginPath),
 		WithHost(hostPath),
 	)
-  if err != nil {
-    panic(err)
-  }
-  
-  if err := worker.Register(ctx, username, password); err != nil {
-    panic(err)
-  }
+	if err != nil {
+		panic(err)
+	}
 
-  if err := worker.Run(ctx); err != nil {
-    slog.Error("Failed to send heartbeat", "error", err)
-  }
+	time.Sleep(3 * time.Second)
+
+	token, err := worker.Register(ctx, username, password)
+	if err != nil {
+		panic(err)
+	}
+
+	err = worker.GetTrees(ctx, token.AccessToken)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := worker.Run(ctx); err != nil {
+		slog.Error("Failed to send heartbeat", "error", err)
+	}
 }

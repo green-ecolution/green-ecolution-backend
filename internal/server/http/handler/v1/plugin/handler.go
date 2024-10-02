@@ -10,8 +10,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -32,41 +32,27 @@ func getPluginFiles(c *fiber.Ctx) error {
 	return adaptor.HTTPHandler(&reverseProxy)(c)
 }
 
-type PluginRegisterRequest struct {
-	Name string `json:"name"`
-	Path string `json:"path"`
-	Auth struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	} `json:"auth"`
-}
-
-type PluginRegisterResponse struct {
-	Success bool   `json:"success"`
-	Token   entities.ClientTokenResponse `json:"token"`
-}
-
 func registerPlugin(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req PluginRegisterRequest
+		var req entities.PluginRegisterRequest
 		if err := c.BodyParser(&req); err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 		}
 
-    if req.Auth.Username == "" || req.Auth.Password == "" {
-      return c.Status(fiber.StatusBadRequest).SendString("Username or password is empty")
-    } 
+		if req.Auth.Username == "" || req.Auth.Password == "" {
+			return c.Status(fiber.StatusBadRequest).SendString("Username or password is empty")
+		}
 
-    // Authenticate the plugin
-    token, err := svc.AuthPlugin(c.Context(), &domain.AuthPlugin{
-      Username: req.Auth.Username,
-      Password: req.Auth.Password,
-    })
-    if err != nil {
-      return err
-    }
+		// Authenticate the plugin
+		token, err := svc.AuthPlugin(c.Context(), &domain.AuthPlugin{
+			Username: req.Auth.Username,
+			Password: req.Auth.Password,
+		})
+		if err != nil {
+			return err
+		}
 
 		path, err := url.Parse(req.Path)
 		if err != nil {
@@ -81,7 +67,7 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusForbidden).SendString("plugin already registered")
 		}
 
-		registeredPlugins[req.Name] = Plugin{
+		registeredPlugins[req.Name] = domain.Plugin{
 			Name:          req.Name,
 			Path:          *path,
 			LastHeartbeat: time.Now(),
