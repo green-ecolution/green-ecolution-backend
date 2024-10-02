@@ -20,6 +20,9 @@ INSERT INTO tree_clusters (
   $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id;
 
+-- name: LinkTreesToTreeCluster :exec
+UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
+
 -- name: SetTreeClusterLocation :exec
 UPDATE tree_clusters SET
   latitude = $2,

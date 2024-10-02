@@ -47,13 +47,24 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
 
 	if len(tc.TreeIDs) > 0 {
+		trees := make([]*domain.Tree, len(tc.TreeIDs))
+
 		for i, id := range tc.TreeIDs {
 			treeIDs[i] = *id
+
+			var err error
+			trees[i], err = s.treeRepo.GetByID(ctx, *id)
+			if err != nil {
+				return nil, handleError(err)
+			}
 		}
+
 		geomFn, err := s.prepareGeom(ctx, treeIDs)
 		if err != nil {
 			return nil, err
 		}
+
+		fn = append(fn, treecluster.WithTrees(trees))
 		fn = append(fn, geomFn...)
 	}
 

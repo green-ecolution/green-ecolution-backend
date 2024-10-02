@@ -5,6 +5,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func defaultTreeCluster() *entities.TreeCluster {
@@ -60,6 +61,17 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 		return -1, err
 	}
 
+	if len(entity.Trees) > 0 {
+		treeIDs := utils.Map(entity.Trees, func(t *entities.Tree) int32 {
+			return t.ID
+		})
+
+		err = r.LinkTreesToCluster(ctx, id, treeIDs)
+		if err != nil {
+			return -1, err
+		}
+	}
+
 	if entity.Latitude != nil && entity.Longitude != nil {
 		err = r.store.SetTreeClusterLocation(ctx, &sqlc.SetTreeClusterLocationParams{
 			ID:        id,
@@ -72,4 +84,12 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 	}
 
 	return id, nil
+}
+
+func (r *TreeClusterRepository) LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error {
+	args := &sqlc.LinkTreesToTreeClusterParams{
+		Column1:       treeIDs,
+		TreeClusterID: &treeClusterID,
+	}
+	return r.store.LinkTreesToTreeCluster(ctx, args)
 }
