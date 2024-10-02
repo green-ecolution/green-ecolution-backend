@@ -11,8 +11,17 @@ func RegisterRoutes(svc service.AuthService) *fiber.App {
 	app.Post("/register", registerPlugin(svc))
 
 	app.Use("/:plugin", newPluginMiddleware())
-	app.Post("/:plugin/heartbeat", pluginHeartbeat())
+  app.Post("/:plugin/heartbeat", pluginHeartbeat())
 	app.Use("/:plugin", getPluginFiles)
 
 	return app
+}
+
+func RegisterPrivateRoutes(svc service.AuthService) *fiber.App {
+  app := fiber.New()
+
+  app.Get("/", getPluginsList())
+  app.Get("/:plugin", getPluginInfo())
+
+  return app
 }

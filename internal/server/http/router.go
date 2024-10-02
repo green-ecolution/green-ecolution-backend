@@ -23,6 +23,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp.Mount("/user", user.RegisterRoutes(s.services.AuthService))
 	grp.Mount("/role", user.RegisterRoutes(s.services.AuthService))
 	grp.Mount("/region", region.RegisterRoutes(s.services.RegionService))
+	grp.Mount("/plugin", plugin.RegisterPrivateRoutes(s.services.AuthService))
 }
 
 func (s *Server) publicRoutes(app *fiber.App) {
