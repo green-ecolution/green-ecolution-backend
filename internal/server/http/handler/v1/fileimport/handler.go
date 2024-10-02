@@ -210,8 +210,8 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, tra
 	}
 
 	treeNumberIdx := headerIndexMap[expectedCSVHeaders[2]]
-	treeNumber, err := strconv.Atoi(row[treeNumberIdx])
-	if err != nil {
+	treeNumber := row[treeNumberIdx]
+	if treeNumber == "" {
 		return nil, errorhandler.HandleError(errors.New("invalid 'TreeNumber' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
@@ -251,7 +251,7 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, tra
 	}
 
 	tree := &domain.Tree{
-		Number:       int32(treeNumber),
+		Number:       treeNumber,
 		Species:      species,
 		Latitude:     points[0].Y, // WGS84 Latitude
 		Longitude:    points[0].X, // WGS84 Longitude
