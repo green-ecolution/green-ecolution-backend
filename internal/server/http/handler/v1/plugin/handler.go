@@ -9,22 +9,18 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
-	"github.com/spf13/viper"
 )
 
 func getPluginFiles(c *fiber.Ctx) error {
-	url, err := url.Parse(viper.GetString("server.app_url"))
-	if err != nil {
-		return err
-	}
-
-	plugin := c.Params("plugin")
+	pluginMutex.RLock()
+	plugin := registeredPlugins[c.Params("plugin")]
+  pluginMutex.RUnlock()
 
 	reverseProxy := httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
-			r.SetURL(url)
+			r.SetURL(plugin.Path)
 			r.Out.Host = r.In.Host
-			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin, "/api/v1/demo_plugin", 1)
+			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin.Name, plugin.Path.String(), 1)
 			r.SetXForwarded()
 		},
 	}
@@ -34,7 +30,6 @@ func getPluginFiles(c *fiber.Ctx) error {
 
 type PluginRegisterRequest struct {
 	Name string `json:"name"`
-	Host string `json:"host"`
 	Path string `json:"path"`
 }
 
@@ -47,6 +42,12 @@ func registerPlugin() fiber.Handler {
 			})
 		}
 
+		path, err := url.Parse(req.Path)
+		if err != nil {
+			slog.Error("Failed to parse plugin path", "error", err)
+			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse plugin path")
+		}
+
 		pluginMutex.Lock()
 		defer pluginMutex.Unlock()
 
@@ -56,12 +57,11 @@ func registerPlugin() fiber.Handler {
 
 		registeredPlugins[req.Name] = Plugin{
 			Name:          req.Name,
-			Path:          req.Path,
-			Host:          req.Host,
+			Path:          path,
 			LastHeartbeat: time.Now(),
 		}
 
-    slog.Info("Plugin registered", "plugin", req.Name)
+		slog.Info("Plugin registered", "plugin", req.Name)
 		return c.Status(fiber.StatusOK).SendString("Plugin registered")
 	}
 }
