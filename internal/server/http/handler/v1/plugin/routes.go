@@ -8,7 +8,10 @@ import (
 func RegisterRoutes(svc service.RegionService) *fiber.App {
 	app := fiber.New()
 
+  app.Post("/register", registerPlugin())
+
   app.Use("/:plugin", newPluginMiddleware())
+  app.Post("/:plugin/heartbeat", pluginHeartbeat())
   app.Use("/:plugin", getPluginFiles)
 
 	return app
