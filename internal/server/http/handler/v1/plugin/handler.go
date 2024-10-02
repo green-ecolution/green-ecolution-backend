@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http/httputil"
 	"net/url"
@@ -9,16 +10,19 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
 func getPluginFiles(c *fiber.Ctx) error {
 	pluginMutex.RLock()
 	plugin := registeredPlugins[c.Params("plugin")]
-  pluginMutex.RUnlock()
+	pluginMutex.RUnlock()
 
 	reverseProxy := httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
-			r.SetURL(plugin.Path)
+			r.SetURL(&plugin.Path)
 			r.Out.Host = r.In.Host
 			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin.Name, plugin.Path.String(), 1)
 			r.SetXForwarded()
@@ -31,9 +35,18 @@ func getPluginFiles(c *fiber.Ctx) error {
 type PluginRegisterRequest struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
+	Auth struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	} `json:"auth"`
 }
 
-func registerPlugin() fiber.Handler {
+type PluginRegisterResponse struct {
+	Success bool   `json:"success"`
+	Token   entities.ClientTokenResponse `json:"token"`
+}
+
+func registerPlugin(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req PluginRegisterRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -41,6 +54,19 @@ func registerPlugin() fiber.Handler {
 				"error": err.Error(),
 			})
 		}
+
+    if req.Auth.Username == "" || req.Auth.Password == "" {
+      return c.Status(fiber.StatusBadRequest).SendString("Username or password is empty")
+    } 
+
+    // Authenticate the plugin
+    token, err := svc.AuthPlugin(c.Context(), &domain.AuthPlugin{
+      Username: req.Auth.Username,
+      Password: req.Auth.Password,
+    })
+    if err != nil {
+      return err
+    }
 
 		path, err := url.Parse(req.Path)
 		if err != nil {
@@ -57,12 +83,21 @@ func registerPlugin() fiber.Handler {
 
 		registeredPlugins[req.Name] = Plugin{
 			Name:          req.Name,
-			Path:          path,
+			Path:          *path,
 			LastHeartbeat: time.Now(),
 		}
 
 		slog.Info("Plugin registered", "plugin", req.Name)
-		return c.Status(fiber.StatusOK).SendString("Plugin registered")
+		slog.Debug("Plugin registered", "plugin", fmt.Sprintf("%+v", registeredPlugins[req.Name]))
+
+		response := entities.ClientTokenResponse{
+			AccessToken:  token.AccessToken,
+			ExpiresIn:    token.ExpiresIn,
+			RefreshToken: token.RefreshToken,
+			TokenType:    token.TokenType,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
 	}
 }
 
@@ -71,9 +106,9 @@ func pluginHeartbeat() fiber.Handler {
 		pluginMutex.Lock()
 		defer pluginMutex.Unlock()
 
-		registeredPlugins[c.Params("plugin")] = Plugin{
-			LastHeartbeat: time.Now(),
-		}
+		plugin := registeredPlugins[c.Params("plugin")]
+		plugin.LastHeartbeat = time.Now()
+		registeredPlugins[c.Params("plugin")] = plugin
 
 		return c.Status(fiber.StatusOK).SendString("Heartbeat received")
 	}

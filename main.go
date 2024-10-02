@@ -28,6 +28,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	demoplugin "github.com/green-ecolution/green-ecolution-backend/plugin/demo_plugin"
 	"github.com/jackc/pgx/v5"
 	"github.com/spf13/viper"
 	"github.com/twpayne/go-geos"
@@ -117,7 +118,7 @@ func main() {
 	mqttServer := mqtt.NewMqtt(cfg, services)
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(3)
 
 	go func() {
 		defer wg.Done()
@@ -129,6 +130,11 @@ func main() {
 		if err := httpServer.Run(ctx); err != nil {
 			slog.Error("Error while running HTTP Server", "error", err)
 		}
+	}()
+
+	go func() {
+		defer wg.Done()
+		demoplugin.DemoPluginStart(ctx)
 	}()
 
 	wg.Wait()

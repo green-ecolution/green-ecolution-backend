@@ -10,7 +10,7 @@ import (
 
 type Plugin struct {
 	Name          string
-	Path          *url.URL
+	Path          url.URL
 	LastHeartbeat time.Time
 }
 
