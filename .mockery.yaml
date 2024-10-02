@@ -7,6 +7,7 @@ packages:
       InfoService:
       MqttService:
       TreeService:
+      TreeClusterService:
       AuthService:
       RegionService:
       Service:
@@ -19,3 +20,4 @@ packages:
       TreeRepository:
       AuthRepository: 
       UserRepository:
+      RegionRepository:

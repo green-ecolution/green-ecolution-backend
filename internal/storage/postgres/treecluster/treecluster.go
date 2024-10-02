@@ -4,10 +4,9 @@ import (
 	"context"
 	"time"
 
-	sensorMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
@@ -17,20 +16,23 @@ type TreeClusterRepository struct {
 }
 
 type TreeClusterMappers struct {
-	mapper       sensorMapper.InternalTreeClusterRepoMapper
-	sensorMapper sensorMapper.InternalSensorRepoMapper
-	regionMapper sensorMapper.InternalRegionRepoMapper
+	mapper       mapper.InternalTreeClusterRepoMapper
+	sensorMapper mapper.InternalSensorRepoMapper
+	regionMapper mapper.InternalRegionRepoMapper
+	treeMapper   mapper.InternalTreeRepoMapper
 }
 
 func NewTreeClusterRepositoryMappers(
-	tcMapper sensorMapper.InternalTreeClusterRepoMapper,
-	sMapper sensorMapper.InternalSensorRepoMapper,
-	rMapper sensorMapper.InternalRegionRepoMapper,
+	tcMapper mapper.InternalTreeClusterRepoMapper,
+	sMapper mapper.InternalSensorRepoMapper,
+	rMapper mapper.InternalRegionRepoMapper,
+	tMapper mapper.InternalTreeRepoMapper,
 ) TreeClusterMappers {
 	return TreeClusterMappers{
 		mapper:       tcMapper,
 		sensorMapper: sMapper,
 		regionMapper: rMapper,
+		treeMapper:   tMapper,
 	}
 }
 
@@ -39,6 +41,12 @@ func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storag
 	return &TreeClusterRepository{
 		store:              s,
 		TreeClusterMappers: mappers,
+	}
+}
+
+func WithName(name string) entities.EntityFunc[entities.TreeCluster] {
+	return func(tc *entities.TreeCluster) {
+		tc.Name = name
 	}
 }
 
@@ -60,13 +68,13 @@ func WithDescription(description string) entities.EntityFunc[entities.TreeCluste
 	}
 }
 
-func WithLatitude(latitude float64) entities.EntityFunc[entities.TreeCluster] {
+func WithLatitude(latitude *float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
 		tc.Latitude = latitude
 	}
 }
 
-func WithLongitude(longitude float64) entities.EntityFunc[entities.TreeCluster] {
+func WithLongitude(longitude *float64) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
 		tc.Longitude = longitude
 	}

@@ -18,24 +18,26 @@ SELECT tree_clusters.* FROM tree_clusters JOIN trees ON tree_clusters.id = trees
 
 -- name: CreateTree :one
 INSERT INTO trees (
-  tree_cluster_id, sensor_id, age, height_above_sea_level, planting_year, species, tree_number, latitude, longitude, geometry
+  tree_cluster_id, sensor_id, planting_year, species, tree_number, latitude, longitude, readonly, geometry
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromText($10, 4326)
+  $1, $2, $3, $4, $5, $6, $7, $8, ST_GeomFromText($9, 4326)
 ) RETURNING id;
 
 -- name: UpdateTree :exec
 UPDATE trees SET
   tree_cluster_id = $2,
   sensor_id = $3,
-  age = $4,
-  height_above_sea_level = $5,
-  planting_year = $6,
-  species = $7,
-  tree_number = $8,
-  latitude = $9,
-  longitude = $10,
-  geometry = ST_GeomFromText($11, 4326)
+  planting_year = $4,
+  species = $5,
+  tree_number = $6,
+  latitude = $7,
+  longitude = $8,
+  readonly = $9,
+  geometry = ST_GeomFromText($10, 4326)
 WHERE id = $1;
+
+-- name: UpdateTreeClusterID :exec
+UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
 
 -- name: LinkTreeImage :exec
 INSERT INTO tree_images (
@@ -57,3 +59,9 @@ WHERE id = $1;
 
 -- name: DeleteTree :exec
 DELETE FROM trees WHERE id = $1;
+
+-- name: UnlinkTreeClusterID :exec
+UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
+
+-- name: CalculateGroupedCentroids :one
+SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE id = ANY($1::int[]);

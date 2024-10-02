@@ -17,7 +17,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp := app.Group("/api/v1")
 
 	grp.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-	grp.Mount("/cluster", treecluster.RegisterRoutes(s.services.TreeService)) // TODO: Change to treecluster service
+	grp.Mount("/cluster", treecluster.RegisterRoutes(s.services.TreeClusterService))
 	grp.Mount("/tree", tree.RegisterRoutes(s.services.TreeService))
 	grp.Mount("/sensor", sensor.RegisterRoutes(s.services.MqttService))
 	grp.Mount("/user", user.RegisterRoutes(s.services.AuthService))

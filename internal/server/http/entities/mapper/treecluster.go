@@ -8,10 +8,13 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
-// goverter:extend MapWateringStatus MapSoilCondition
+// goverter:extend MapWateringStatus MapSoilCondition MapSoilConditionReq
 type TreeClusterHTTPMapper interface {
 	// goverter:ignore Region Trees
 	FormResponse(*domain.TreeCluster) *entities.TreeClusterResponse
+
+	FromCreateRequest(*entities.TreeClusterCreateRequest) *domain.TreeClusterCreate
+	FromUpdateRequest(*entities.TreeClusterUpdateRequest) *domain.TreeClusterUpdate
 }
 
 func MapWateringStatus(status domain.TreeClusterWateringStatus) entities.TreeClusterWateringStatus {
@@ -20,4 +23,8 @@ func MapWateringStatus(status domain.TreeClusterWateringStatus) entities.TreeClu
 
 func MapSoilCondition(condition domain.TreeSoilCondition) entities.TreeSoilCondition {
 	return entities.TreeSoilCondition(condition)
+}
+
+func MapSoilConditionReq(condition entities.TreeSoilCondition) domain.TreeSoilCondition {
+	return domain.TreeSoilCondition(condition)
 }

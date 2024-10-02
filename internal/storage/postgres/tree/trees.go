@@ -51,15 +51,9 @@ func WithSpecies(species string) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithAge(age int32) entities.EntityFunc[entities.Tree] {
+func WithReadonly(readonly bool) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
-		t.Age = age
-	}
-}
-
-func WithHeightAboveSeaLevel(height float64) entities.EntityFunc[entities.Tree] {
-	return func(t *entities.Tree) {
-		t.HeightAboveSeaLevel = height
+		t.Readonly = readonly
 	}
 }
 
@@ -87,7 +81,7 @@ func WithLongitude(long float64) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithTreeNumber(number int32) entities.EntityFunc[entities.Tree] {
+func WithTreeNumber(number string) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.Number = number
 	}
@@ -145,4 +139,8 @@ func (r *TreeRepository) UnlinkImage(ctx context.Context, treeID, imageID int32)
 
 func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) error {
 	return r.store.UnlinkAllTreeImages(ctx, treeID)
+}
+
+func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error {
+	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
 }

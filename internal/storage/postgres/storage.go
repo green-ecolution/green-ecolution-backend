@@ -29,6 +29,7 @@ func NewRepository(conn *pgx.Conn) *storage.Repository {
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalRegionRepoMapperImpl{},
+		&mapper.InternalTreeRepoMapperImpl{},
 	)
 	treeClusterRepo := treecluster.NewTreeClusterRepository(s, tcMappers)
 

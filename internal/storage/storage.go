@@ -22,6 +22,7 @@ var (
 	ErrFlowerbedNotFound   = errors.New("flowerbed not found")
 	ErrTreeClusterNotFound = errors.New("treecluster not found")
 	ErrRegionNotFound      = errors.New("region not found")
+	ErrTreeNotFound        = errors.New("tree not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")
@@ -71,7 +72,6 @@ type VehicleRepository interface {
 type TreeClusterRepository interface {
 	BasicCrudRepository[entities.TreeCluster]
 	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
-	UpdateGeometry(ctx context.Context, id int32, latitude float64, longitude float64) error
 	Archive(ctx context.Context, id int32) error
 }
 
@@ -84,8 +84,11 @@ type TreeRepository interface {
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
+	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
 	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+	UpdateTreeClusterID(ctx context.Context, treeIDs []int32, treeClusterID *int32) error
+	GetCenterPoint(ctx context.Context, id []int32) (float64, float64, error)
 }
 
 type SensorRepository interface {

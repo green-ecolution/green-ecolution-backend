@@ -2,8 +2,6 @@ package treecluster
 
 import (
 	"context"
-	"errors"
-	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -28,21 +26,12 @@ func (r *TreeClusterRepository) Update(ctx context.Context, id int32, tcFn ...en
 	return tc, nil
 }
 
-func (r *TreeClusterRepository) UpdateGeometry(ctx context.Context, id int32, latitude, longitude float64) error {
-	// TODO: implement
-	slog.Info("Not implemented yet", "function", "UpdateGeometry", "context", ctx, "id", id, "latitude", latitude, "longitude", longitude)
-
-	return errors.New("not implemented")
-}
-
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {
 	args := sqlc.UpdateTreeClusterParams{
 		ID:             tc.ID,
 		RegionID:       &tc.Region.ID,
 		Address:        tc.Address,
 		Description:    tc.Description,
-		Latitude:       tc.Latitude,
-		Longitude:      tc.Longitude,
 		MoistureLevel:  tc.MoistureLevel,
 		WateringStatus: sqlc.TreeClusterWateringStatus(tc.WateringStatus),
 		SoilCondition:  sqlc.TreeSoilCondition(tc.SoilCondition),

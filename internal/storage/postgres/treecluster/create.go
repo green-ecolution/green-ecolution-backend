@@ -5,21 +5,23 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func defaultTreeCluster() *entities.TreeCluster {
 	return &entities.TreeCluster{
-		Region:         &entities.Region{},
+		Region:         nil,
 		Address:        "",
 		Description:    "",
 		MoistureLevel:  0,
-		Latitude:       54.7752933631787,
-		Longitude:      9.451569031678723,
+		Latitude:       nil,
+		Longitude:      nil,
 		WateringStatus: entities.TreeClusterWateringStatusUnknown,
 		SoilCondition:  entities.TreeSoilConditionUnknown,
 		Archived:       false,
 		LastWatered:    nil,
 		Trees:          make([]*entities.Tree, 0),
+		Name:           "",
 	}
 }
 
@@ -39,16 +41,55 @@ func (r *TreeClusterRepository) Create(ctx context.Context, tcFn ...entities.Ent
 }
 
 func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entities.TreeCluster) (int32, error) {
+	var region *int32
+	if entity.Region != nil {
+		region = &entity.Region.ID
+	}
+
 	args := sqlc.CreateTreeClusterParams{
-		RegionID:       &entity.Region.ID,
+		RegionID:       region,
 		Address:        entity.Address,
 		Description:    entity.Description,
-		Latitude:       entity.Latitude,
-		Longitude:      entity.Longitude,
 		MoistureLevel:  entity.MoistureLevel,
 		WateringStatus: sqlc.TreeClusterWateringStatus(entity.WateringStatus),
 		SoilCondition:  sqlc.TreeSoilCondition(entity.SoilCondition),
+		Name:           entity.Name,
 	}
 
-	return r.store.CreateTreeCluster(ctx, &args)
+	id, err := r.store.CreateTreeCluster(ctx, &args)
+	if err != nil {
+		return -1, err
+	}
+
+	if len(entity.Trees) > 0 {
+		treeIDs := utils.Map(entity.Trees, func(t *entities.Tree) int32 {
+			return t.ID
+		})
+
+		err = r.LinkTreesToCluster(ctx, id, treeIDs)
+		if err != nil {
+			return -1, err
+		}
+	}
+
+	if entity.Latitude != nil && entity.Longitude != nil {
+		err = r.store.SetTreeClusterLocation(ctx, &sqlc.SetTreeClusterLocationParams{
+			ID:        id,
+			Latitude:  entity.Latitude,
+			Longitude: entity.Longitude,
+		})
+		if err != nil {
+			return -1, err
+		}
+	}
+
+	return id, nil
+}
+
+func (r *TreeClusterRepository) LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error {
+	args := &sqlc.LinkTreesToTreeClusterParams{
+		Column1:       treeIDs,
+		TreeClusterID: &treeClusterID,
+	}
+	return r.store.LinkTreesToTreeCluster(ctx, args)
 }

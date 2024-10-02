@@ -58,8 +58,7 @@ type TreeService interface {
 	ImportTree(ctx context.Context, trees []*domain.Tree) error
 
 	GetAll(ctx context.Context) ([]*domain.Tree, error)
-	GetByID(ctx context.Context, id int) (*domain.Tree, error)
-	// TODO: Implement Functions
+	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
 }
 
 type AuthService interface {
@@ -77,16 +76,26 @@ type RegionService interface {
 	GetByID(ctx context.Context, id int32) (*domain.Region, error)
 }
 
+type TreeClusterService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
+	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
+	Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error)
+	Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
+	Delete(ctx context.Context, id int32) error
+}
+
 type Service interface {
 	Ready() bool
 }
 
 type Services struct {
-	InfoService   InfoService
-	MqttService   MqttService
-	TreeService   TreeService
-	AuthService   AuthService
-	RegionService RegionService
+	InfoService        InfoService
+	MqttService        MqttService
+	TreeService        TreeService
+	AuthService        AuthService
+	RegionService      RegionService
+	TreeClusterService TreeClusterService
 }
 
 func (s *Services) AllServicesReady() bool {

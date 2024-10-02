@@ -32,8 +32,28 @@ type TreeCluster struct {
 	Address        string
 	Description    string
 	Archived       bool
-	Latitude       float64
-	Longitude      float64
+	Latitude       *float64
+	Longitude      *float64
 	Trees          []*Tree
 	SoilCondition  TreeSoilCondition
+	Name           string
+}
+
+type TreeClusterCreate struct {
+	Address       string
+	Description   string
+	Name          string
+	SoilCondition TreeSoilCondition
+	TreeIDs       []*int32
+}
+
+type TreeClusterUpdate struct {
+	Address       string
+	Archived      bool
+	Description   string
+	LastWatered   time.Time
+	MoistureLevel float64
+	SoilCondition TreeSoilCondition
+	TreeIDs       []*int32
+	Name          string
 }
