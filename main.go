@@ -28,7 +28,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
-	demoplugin "github.com/green-ecolution/green-ecolution-backend/plugin/demo_plugin"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
@@ -138,11 +137,6 @@ func main() {
 		if err := httpServer.Run(ctx); err != nil {
 			slog.Error("Error while running HTTP Server", "error", err)
 		}
-	}()
-
-	go func() {
-		defer wg.Done()
-		demoplugin.DemoPluginStart(ctx)
 	}()
 
 	wg.Wait()
