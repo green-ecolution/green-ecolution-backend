@@ -1,4 +1,4 @@
-package plugin
+package demo
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -8,8 +8,6 @@ import (
 func RegisterRoutes(svc service.RegionService) *fiber.App {
 	app := fiber.New()
 
-  app.Use("/:plugin", newPluginMiddleware())
-  app.Use("/:plugin", getPluginFiles)
-
+  app.Mount("/", getPluginFiles())
 	return app
 }
