@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/fileimport"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/demo"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/plugin"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
@@ -39,4 +40,5 @@ func (s *Server) publicRoutes(app *fiber.App) {
 	grp.Get("/swagger/*", swagger.HandlerDefault)
 	grp.Mount("/user", user.RegisterPublicRoutes(s.services.AuthService))
   grp.Mount("/plugin", plugin.RegisterRoutes(s.services.RegionService))
+  grp.Mount("/demo_plugin", demo.RegisterRoutes(s.services.RegionService))
 }
