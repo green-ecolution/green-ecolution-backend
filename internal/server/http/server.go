@@ -4,9 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/plugin"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
@@ -35,8 +38,16 @@ func (s *Server) Run(ctx context.Context) error {
 		ServerHeader: s.cfg.Dashboard.Title,
 		ErrorHandler: errorHandler,
 	})
+	pluginCleanup := plugin.NewPluginWorker(
+		plugin.WithTimeout(15 * time.Second),
+	)
 
 	app.Mount("/", s.middleware(s.publicRoutes, s.privateRoutes))
+
+	go func() {
+    err := pluginCleanup.Run(ctx)
+    slog.Error("Error while running plugin cleanup", "error", err)
+	}()
 
 	go func() {
 		<-ctx.Done()
