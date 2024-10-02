@@ -45,8 +45,8 @@ func (s *Server) Run(ctx context.Context) error {
 	app.Mount("/", s.middleware(s.publicRoutes, s.privateRoutes))
 
 	go func() {
-    err := pluginCleanup.Run(ctx)
-    slog.Error("Error while running plugin cleanup", "error", err)
+		err := pluginCleanup.Run(ctx)
+		slog.Error("Error while running plugin cleanup", "error", err)
 	}()
 
 	go func() {
