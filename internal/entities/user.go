@@ -25,3 +25,9 @@ type RegisterUser struct {
 	Password string `validate:"required"`
 	Roles    []string
 }
+
+type AuthPlugin struct {
+  Name string
+  Username string
+  Password string
+}
