@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"net/url"
 	"sync"
 	"time"
 
@@ -9,8 +10,7 @@ import (
 
 type Plugin struct {
 	Name          string
-	Path          string
-	Host          string
+	Path          *url.URL
 	LastHeartbeat time.Time
 }
 
