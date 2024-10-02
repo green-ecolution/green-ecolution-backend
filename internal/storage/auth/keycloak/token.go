@@ -3,6 +3,7 @@ package keycloak
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -81,11 +82,13 @@ func (r *KeycloakRepository) RefreshToken(ctx context.Context, refreshToken stri
 func (r *KeycloakRepository) GetAccessTokenFromPassword(ctx context.Context, user, password string) (*entities.ClientToken, error) {
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 
+	fmt.Printf("user: %s, password: %s\n", user, password)
+
 	tokenOptions := gocloak.TokenOptions{
 		ClientID:     &r.cfg.KeyCloak.Frontend.ClientID,
 		ClientSecret: &r.cfg.KeyCloak.Frontend.ClientSecret,
-    Username:    &user,
-    Password:    &password,
+		Username:     &user,
+		Password:     &password,
 		GrantType:    gocloak.StringP("password"),
 	}
 
