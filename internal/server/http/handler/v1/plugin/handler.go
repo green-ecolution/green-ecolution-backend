@@ -16,9 +16,9 @@ import (
 )
 
 func getPluginFiles(c *fiber.Ctx) error {
-	pluginMutex.RLock()
+	// pluginMutex.RLock()
 	plugin := registeredPlugins[c.Params("plugin")]
-	pluginMutex.RUnlock()
+	// pluginMutex.RUnlock()
 
 	reverseProxy := httputil.ReverseProxy{
 		Rewrite: func(r *httputil.ProxyRequest) {
@@ -72,8 +72,8 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse plugin path")
 		}
 
-		pluginMutex.Lock()
-		defer pluginMutex.Unlock()
+		// pluginMutex.Lock()
+		// defer pluginMutex.Unlock()
 
 		if _, ok := registeredPlugins[req.Name]; ok {
 			return c.Status(fiber.StatusForbidden).SendString("plugin already registered")
@@ -117,8 +117,8 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 //	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
 func pluginHeartbeat() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		pluginMutex.Lock()
-		defer pluginMutex.Unlock()
+		// pluginMutex.Lock()
+		// defer pluginMutex.Unlock()
 
 		plugin := registeredPlugins[c.Params("plugin")]
 		plugin.LastHeartbeat = time.Now()
@@ -142,8 +142,8 @@ func pluginHeartbeat() fiber.Handler {
 //	@Router			/v1/plugin [get]
 func GetPluginsList() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		pluginMutex.RLock()
-		defer pluginMutex.RUnlock()
+		// pluginMutex.RLock()
+		// defer pluginMutex.RUnlock()
 
 		plugins := make([]entities.PluginResponse, 0, len(registeredPlugins))
 		for _, plugin := range registeredPlugins {
@@ -177,8 +177,8 @@ func GetPluginsList() fiber.Handler {
 //	@Param			plugin_name	path	string	true	"Name of the plugin"
 func GetPluginInfo() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		pluginMutex.RLock()
-		defer pluginMutex.RUnlock()
+		// pluginMutex.RLock()
+		// defer pluginMutex.RUnlock()
 
 		plugin, ok := registeredPlugins[c.Params("plugin")]
 		if !ok {
