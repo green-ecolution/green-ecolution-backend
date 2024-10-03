@@ -18,8 +18,8 @@ type PluginWorker struct {
 type PluginWorkerOption func(*PluginWorkerConfig)
 
 var defaultPluginWorkerConfig = PluginWorkerConfig{
-	timeout:  5 * time.Second,
-	interval: 1 * time.Second,
+	timeout:  5 * time.Minute,
+    interval: 1 * time.Minute,
 }
 
 func WithTimeout(timeout time.Duration) PluginWorkerOption {
@@ -52,14 +52,14 @@ func (w *PluginWorker) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			pluginMutex.Lock()
+			// pluginMutex.Lock()
 			for name, plugin := range registeredPlugins {
 				if time.Since(plugin.LastHeartbeat) > w.cfg.timeout {
 					slog.Info("Removing plugin due to timeout", "plugin", name)
 					delete(registeredPlugins, name)
 				}
 			}
-			pluginMutex.Unlock()
+			// pluginMutex.Unlock()
 		}
 	}
 }
