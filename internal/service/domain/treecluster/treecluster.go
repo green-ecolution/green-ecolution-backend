@@ -45,10 +45,9 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
 	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
+	trees := make([]*domain.Tree, len(tc.TreeIDs))
 
 	if len(tc.TreeIDs) > 0 {
-		trees := make([]*domain.Tree, len(tc.TreeIDs))
-
 		for i, id := range tc.TreeIDs {
 			treeIDs[i] = *id
 
@@ -64,11 +63,10 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 			return nil, err
 		}
 
-		fn = append(fn, treecluster.WithTrees(trees))
 		fn = append(fn, geomFn...)
 	}
 
-	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description))
+	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description), treecluster.WithTrees(trees))
 
 	c, err := s.treeClusterRepo.Create(ctx, fn...)
 	if err != nil {
