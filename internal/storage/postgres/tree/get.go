@@ -40,6 +40,22 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	return t, nil
 }
 
+func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error) {
+	rows, err := r.store.GetTreesByIDs(ctx, ids)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	t := r.mapper.FromSqlList(rows)
+	for _, tree := range t {
+		if err := r.mapFields(ctx, tree); err != nil {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
+	return t, nil
+}
+
 func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, long float64, err error) {
 	geoStr, err := r.store.CalculateGroupedCentroids(ctx, ids)
 	if err != nil {
@@ -120,9 +136,7 @@ func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error 
 		return r.store.HandleError(err)
 	}
 
-	if err := mapTreeCluster(ctx, r, t); err != nil {
-		return r.store.HandleError(err)
-	}
+	_ = mapTreeCluster(ctx, r, t)
 
 	return nil
 }

@@ -58,6 +58,9 @@ func (s *Store) HandleError(err error) error {
 		case Flowerbed:
 			slog.Error("Flowerbed not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrFlowerbedNotFound
+		case Tree:
+			slog.Error("Tree not found", "error", err, "stack", errors.WithStack(err))
+			return storage.ErrTreeNotFound
 		case TreeCluster:
 			slog.Error("TreeCluster not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrTreeClusterNotFound

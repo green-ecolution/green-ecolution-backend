@@ -45,28 +45,13 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
 	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
-	trees := make([]*domain.Tree, len(tc.TreeIDs))
-
-	if len(tc.TreeIDs) > 0 {
-		for i, id := range tc.TreeIDs {
-			treeIDs[i] = *id
-
-			var err error
-			trees[i], err = s.treeRepo.GetByID(ctx, *id)
-			if err != nil {
-				return nil, handleError(err)
-			}
-		}
-
-		geomFn, err := s.prepareGeom(ctx, treeIDs)
-		if err != nil {
-			return nil, err
-		}
-
-		fn = append(fn, geomFn...)
+	treeFn, err := s.prepareTrees(ctx, tc.TreeIDs)
+	if err != nil {
+		return nil, err
 	}
 
-	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description), treecluster.WithTrees(trees))
+	fn = append(fn, treeFn...)
+	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description))
 
 	c, err := s.treeClusterRepo.Create(ctx, fn...)
 	if err != nil {
@@ -89,17 +74,12 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.Tr
 		return nil, handleError(err)
 	}
 
-	if len(tc.TreeIDs) > 0 {
-		for i, id := range tc.TreeIDs {
-			treeIDs[i] = *id
-		}
-		geomFn, err := s.prepareGeom(ctx, treeIDs)
-		if err != nil {
-			return nil, err
-		}
-		fn = append(fn, geomFn...)
+	treeFn, err := s.prepareTrees(ctx, tc.TreeIDs)
+	if err != nil {
+		return nil, err
 	}
 
+	fn = append(fn, treeFn...)
 	fn = append(fn,
 		treecluster.WithName(tc.Name),
 		treecluster.WithAddress(tc.Address),
@@ -150,6 +130,34 @@ func handleError(err error) error {
 	}
 
 	return service.NewError(service.InternalError, err.Error())
+}
+
+func (s *TreeClusterService) prepareTrees(ctx context.Context, ids []*int32) ([]domain.EntityFunc[domain.TreeCluster], error) {
+	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
+	treeIDs := make([]int32, len(ids))
+	for i, id := range ids {
+		treeIDs[i] = *id
+	}
+
+	var err error
+	trees, err := s.treeRepo.GetTreesByIDs(ctx, treeIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	fn = append(fn, treecluster.WithTrees(trees))
+
+	if len(trees) > 0 {
+		geomFn, err := s.prepareGeom(ctx, treeIDs)
+		if err != nil {
+			return nil, err
+		}
+		fn = append(fn, geomFn...)
+	} else {
+		fn = append(fn, treecluster.WithLatitude(nil), treecluster.WithLongitude(nil), treecluster.WithRegion(nil))
+	}
+
+	return fn, nil
 }
 
 func (s *TreeClusterService) prepareGeom(ctx context.Context, treeIDs []int32) ([]domain.EntityFunc[domain.TreeCluster], error) {

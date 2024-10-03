@@ -30,6 +30,13 @@ UPDATE tree_clusters SET
   geometry = ST_SetSRID(ST_MakePoint($2, $3), 4326)
 WHERE id = $1;
 
+-- name: RemoveTreeClusterLocation :exec
+UPDATE tree_clusters SET
+  latitude = NULL,
+  longitude = NULL,
+  geometry = NULL
+WHERE id = $1;
+
 -- name: UpdateTreeCluster :exec
 UPDATE tree_clusters SET
   name = $2,
