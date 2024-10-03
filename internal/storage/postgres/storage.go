@@ -11,10 +11,10 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewRepository(conn *pgx.Conn) *storage.Repository {
+func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	s := store.NewStore(conn)
 
 	treeMappers := tree.NewTreeRepositoryMappers(
