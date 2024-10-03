@@ -140,7 +140,7 @@ func pluginHeartbeat() fiber.Handler {
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
 //	@Router			/v1/plugin [get]
-func getPluginsList() fiber.Handler {
+func GetPluginsList() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		pluginMutex.RLock()
 		defer pluginMutex.RUnlock()
@@ -175,7 +175,7 @@ func getPluginsList() fiber.Handler {
 //	@Failure		500	{object}	HTTPError
 //	@Router			/v1/plugin/{plugin_name} [get]
 //	@Param			plugin_name	path	string	true	"Name of the plugin"
-func getPluginInfo() fiber.Handler {
+func GetPluginInfo() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		pluginMutex.RLock()
 		defer pluginMutex.RUnlock()
