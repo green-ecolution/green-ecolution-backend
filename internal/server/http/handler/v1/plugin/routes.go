@@ -20,8 +20,8 @@ func RegisterRoutes(svc service.AuthService) *fiber.App {
 func RegisterPrivateRoutes(svc service.AuthService) *fiber.App {
   app := fiber.New()
 
-  app.Get("/", getPluginsList())
-  app.Get("/:plugin", getPluginInfo())
+  app.Get("/", GetPluginsList())
+  app.Get("/:plugin", GetPluginInfo())
 
   return app
 }
