@@ -1,25 +1,25 @@
 package plugin
 
 import (
-	"sync"
+	// "sync"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-var pluginMutex sync.RWMutex
+// var pluginMutex sync.RWMutex
 var registeredPlugins = make(map[string]entities.Plugin)
 
 func newPluginMiddleware() fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		pluginMutex.RLock()
+		// pluginMutex.RLock()
 		if _, ok := registeredPlugins[c.Params("plugin")]; !ok {
-			pluginMutex.RUnlock()
+			// pluginMutex.RUnlock()
 			return c.Status(fiber.StatusNotFound).SendString("plugin not found")
 		}
 
-		pluginMutex.RUnlock()
+		// pluginMutex.RUnlock()
 		return c.Next()
 	}
 }
