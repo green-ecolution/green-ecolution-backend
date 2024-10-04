@@ -18,7 +18,7 @@ type TreeResponse struct {
 	Latitude       float64        `json:"latitude,omitempty"`
 	Longitude      float64        `json:"longitude,omitempty"`
 	WateringStatus WateringStatus `json:"watering_status,omitempty"`
-	// Description    string         `json:"description,omitempty" validate:"optional"`
+	Description    string         `json:"description,omitempty" validate:"optional"`
 } // @Name Tree
 
 type TreeListResponse struct {

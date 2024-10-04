@@ -70,6 +70,7 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 		TreeNumber:     t.Number,
 		TreeClusterID:  treeClusterID,
 		WateringStatus: sqlc.WateringStatus(t.WateringStatus),
+		Description:    t.Description,
 	}
 
 	return r.store.UpdateTree(ctx, &args)

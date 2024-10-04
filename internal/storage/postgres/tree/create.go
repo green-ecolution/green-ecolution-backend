@@ -19,6 +19,7 @@ func defaultTree() entities.Tree {
 		Longitude:      0,
 		Images:         nil,
 		WateringStatus: entities.WateringStatusUnknown,
+		Description:    "",
 	}
 }
 
@@ -69,6 +70,7 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 		Latitude:       entity.Latitude,
 		Longitude:      entity.Longitude,
 		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
+		Description:    entity.Description,
 	}
 
 	return r.store.CreateTree(ctx, &args)
