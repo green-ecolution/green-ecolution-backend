@@ -80,6 +80,7 @@ type TreeRepository interface {
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
+	GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error)
 
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
