@@ -42,11 +42,8 @@ type TreeClusterCreateRequest struct {
 } // @Name TreeClusterCreate
 
 type TreeClusterUpdateRequest struct {
-	LastWatered   time.Time         `json:"last_watered,omitempty"`
-	MoistureLevel float64           `json:"moisture_level,omitempty"`
 	Address       string            `json:"address,omitempty"`
 	Description   string            `json:"description,omitempty"`
-	Archived      bool              `json:"archived,omitempty"`
 	TreeIDs       []*int32          `json:"tree_ids,omitempty"`
 	SoilCondition TreeSoilCondition `json:"soil_condition,omitempty"`
 	Name          string            `json:"name,omitempty"`
