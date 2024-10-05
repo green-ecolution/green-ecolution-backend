@@ -99,6 +99,12 @@ func WithImages(images []*entities.Image) entities.EntityFunc[entities.Tree] {
 	}
 }
 
+func WithWateringStatus(wateringStatus entities.WateringStatus) entities.EntityFunc[entities.Tree] {
+	return func(tc *entities.Tree) {
+		tc.WateringStatus = wateringStatus
+	}
+}
+
 func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
