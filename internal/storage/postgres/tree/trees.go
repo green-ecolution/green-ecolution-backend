@@ -53,7 +53,7 @@ func WithSpecies(species string) entities.EntityFunc[entities.Tree] {
 
 func WithDescription(description string) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
-		t.Description = &description
+		t.Description = description
 	}
 }
 
