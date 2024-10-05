@@ -26,14 +26,14 @@ CREATE TABLE IF NOT EXISTS user_vehicles (
   FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
 );
 
-CREATE TYPE tree_cluster_watering_status AS ENUM ('good', 'moderate', 'bad', 'unknown');
+CREATE TYPE watering_status AS ENUM ('good', 'moderate', 'bad', 'unknown');
 CREATE TYPE tree_soil_condition AS ENUM ('schluffig', 'sandig', 'lehmig', 'tonig', 'unknown');
 
 CREATE TABLE IF NOT EXISTS tree_clusters (
   id SERIAL PRIMARY KEY,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  watering_status tree_cluster_watering_status NOT NULL DEFAULT 'unknown',
+  watering_status watering_status NOT NULL DEFAULT 'unknown',
   last_watered TIMESTAMP,
   -- last_watered_by_vehicle INT,
   moisture_level FLOAT NOT NULL,
@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS trees (
   tree_number TEXT NOT NULL,
   latitude FLOAT NOT NULL,
   longitude FLOAT NOT NULL,
+  watering_status watering_status NOT NULL DEFAULT 'unknown',
   geometry GEOMETRY(Point, 4326),
   FOREIGN KEY (sensor_id) REFERENCES sensors(id),
   FOREIGN KEY (tree_cluster_id) REFERENCES tree_clusters(id)
@@ -186,6 +187,6 @@ DROP TABLE IF EXISTS sensor_mesurements;
 DROP TABLE IF EXISTS sensors;
 DROP TABLE IF EXISTS images;
 
-DROP TYPE IF EXISTS tree_cluster_watering_status;
+DROP TYPE IF EXISTS watering_status;
 DROP TYPE IF EXISTS sensor_status;
 DROP TYPE IF EXISTS tree_soil_condition;
