@@ -18,3 +18,12 @@ type Tree struct {
 	Latitude     float64
 	Longitude    float64
 }
+type TreeCreate struct {
+	TreeClusterID *int32
+	Readonly      bool
+	PlantingYear  int32
+	Species       string
+	Number        string
+	Latitude      float64
+	Longitude     float64
+}
