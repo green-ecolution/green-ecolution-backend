@@ -8,6 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/pkg/errors"
 )
 
@@ -24,11 +25,11 @@ const (
 
 type Store struct {
 	*sqlc.Queries
-	db         *pgx.Conn
+	db         *pgxpool.Pool
 	entityType EntityType
 }
 
-func NewStore(db *pgx.Conn) *Store {
+func NewStore(db *pgxpool.Pool) *Store {
 	return &Store{
 		Queries: sqlc.New(db),
 		db:      db,
@@ -57,6 +58,9 @@ func (s *Store) HandleError(err error) error {
 		case Flowerbed:
 			slog.Error("Flowerbed not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrFlowerbedNotFound
+		case Tree:
+			slog.Error("Tree not found", "error", err, "stack", errors.WithStack(err))
+			return storage.ErrTreeNotFound
 		case TreeCluster:
 			slog.Error("TreeCluster not found", "error", err, "stack", errors.WithStack(err))
 			return storage.ErrTreeClusterNotFound
@@ -100,7 +104,7 @@ func (s *Store) WithTx(ctx context.Context, fn func(tx pgx.Tx) error) error {
 }
 
 func (s *Store) Close() {
-	s.db.Close(context.Background())
+	s.db.Close()
 }
 
 func (s *Store) CheckSensorExists(ctx context.Context, sensorID *int32) error {

@@ -29,6 +29,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
 	"github.com/twpayne/go-geos"
 	pgxgeos "github.com/twpayne/pgx-geos"
@@ -72,28 +73,30 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	conn, err := pgx.Connect(ctx, fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Server.Database.Host, cfg.Server.Database.Port, cfg.Server.Database.Username, cfg.Server.Database.Password, cfg.Server.Database.Name))
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Server.Database.Host, cfg.Server.Database.Port, cfg.Server.Database.Username, cfg.Server.Database.Password, cfg.Server.Database.Name)
+
+	pgxConfig, err := pgxpool.ParseConfig(connStr)
+	if err != nil {
+		slog.Error("Error while parsing PostgreSQL connection string", "error", err)
+		return
+	}
+
+	pgxConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		return pgxgeos.Register(ctx, conn, geos.NewContext())
+	}
+
+	pool, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		slog.Error("Error while connecting to PostgreSQL", "error", err)
 		return
 	}
-	defer conn.Close(context.Background())
+	defer pool.Close()
 
-	if err := pgxgeos.Register(ctx, conn, geos.NewContext()); err != nil {
-		slog.Error("Error while registering GEOS", "error", err)
-		return
-	}
-	postgresRepo := postgres.NewRepository(conn)
+	postgresRepo := postgres.NewRepository(pool)
 
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
 		slog.Error("Error while creating local repository", "error", err)
-		return
-	}
-
-	//	dbRepo, err := mongodb.NewRepository(cfg)
-	if err != nil {
-		slog.Error("Error while creating MongoDB repository", "error", err)
 		return
 	}
 

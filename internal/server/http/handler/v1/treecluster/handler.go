@@ -1,7 +1,6 @@
 package treecluster
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -39,10 +38,6 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 		domainData, err := svc.GetAll(ctx)
 		if err != nil {
 			return errorhandler.HandleError(err)
-		}
-
-		for i, cluster := range domainData {
-			fmt.Printf("TreeCluster %d: %+v\n", i, *cluster)
 		}
 
 		data := make([]*entities.TreeClusterResponse, len(domainData))
@@ -273,9 +268,7 @@ func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
 		}
 	}
 
-	if len(t.Trees) != 0 {
-		dto.Trees = treeMapper.FromResponseList(t.Trees)
-	}
+	dto.Trees = treeMapper.FromResponseList(t.Trees)
 
 	return dto
 }
