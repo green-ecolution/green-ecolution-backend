@@ -21,9 +21,9 @@ SELECT tree_clusters.* FROM tree_clusters JOIN trees ON tree_clusters.id = trees
 
 -- name: CreateTree :one
 INSERT INTO trees (
-  tree_cluster_id, sensor_id, planting_year, species, tree_number, latitude, longitude, readonly, geometry
+  tree_cluster_id, sensor_id, planting_year, species, tree_number, latitude, longitude, readonly, watering_status, geometry
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, ST_GeomFromText($9, 4326)
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, ST_GeomFromText($10, 4326)
 ) RETURNING id;
 
 -- name: UpdateTree :exec
@@ -36,6 +36,7 @@ UPDATE trees SET
   latitude = $7,
   longitude = $8,
   readonly = $9,
+  watering_status = $10,
   geometry = ST_GeomFromText($10, 4326)
 WHERE id = $1;
 

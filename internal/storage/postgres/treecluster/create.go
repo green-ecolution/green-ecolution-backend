@@ -16,7 +16,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 		MoistureLevel:  0,
 		Latitude:       nil,
 		Longitude:      nil,
-		WateringStatus: entities.TreeClusterWateringStatusUnknown,
+		WateringStatus: entities.WateringStatusUnknown,
 		SoilCondition:  entities.TreeSoilConditionUnknown,
 		Archived:       false,
 		LastWatered:    nil,
@@ -51,7 +51,7 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 		Address:        entity.Address,
 		Description:    entity.Description,
 		MoistureLevel:  entity.MoistureLevel,
-		WateringStatus: sqlc.TreeClusterWateringStatus(entity.WateringStatus),
+		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
 		SoilCondition:  sqlc.TreeSoilCondition(entity.SoilCondition),
 		Name:           entity.Name,
 	}

@@ -17,8 +17,8 @@ type TreeClusterHTTPMapper interface {
 	FromUpdateRequest(*entities.TreeClusterUpdateRequest) *domain.TreeClusterUpdate
 }
 
-func MapWateringStatus(status domain.TreeClusterWateringStatus) entities.TreeClusterWateringStatus {
-	return entities.TreeClusterWateringStatus(status)
+func MapWateringStatus(status domain.WateringStatus) entities.WateringStatus {
+	return entities.WateringStatus(status)
 }
 
 func MapSoilCondition(condition domain.TreeSoilCondition) entities.TreeSoilCondition {
