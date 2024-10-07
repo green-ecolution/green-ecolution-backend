@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
-	"log/slog"
 )
 
 type TreeService struct {
@@ -36,12 +36,12 @@ func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 }
 
 func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
-	tree, err := s.treeRepo.GetByID(ctx, id)
+	t, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return tree, nil
+	return t, nil
 }
 
 func handleError(err error) error {
@@ -56,43 +56,55 @@ func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil && s.sensorRepo != nil
 }
 
-func (s *TreeService) ImportTree(ctx context.Context, trees []*domain.Tree) error {
-	var createQueue, updateQueue, deleteQueue []*domain.Tree
+func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.Tree) error {
+	var createQueue, updateQueue, deleteQueue []*entities.Tree
 
 	for i, csvTree := range trees {
-		slog.Info("Coordinates: Latitude: %.6f, Longitude: %.6f\n", csvTree.Latitude, csvTree.Longitude)
+		// Log coordinates of the current tree
+		slog.Info("Processing tree coordinates",
+			"index", i+1,
+			"latitude", csvTree.Latitude,
+			"longitude", csvTree.Longitude)
 
 		existingTree, err := s.treeRepo.GetByCoordinates(ctx, csvTree.Latitude, csvTree.Longitude)
 		if err != nil || existingTree == nil {
-			slog.Info("Error finding tree by coordinates: %v", err)
+			slog.Warn("Tree not found or error occurred",
+				"index", i+1,
+				"latitude", csvTree.Latitude,
+				"longitude", csvTree.Longitude,
+				"error", err)
 			createQueue = append(createQueue, csvTree)
-			slog.Info("Tree %d queued for later creation", i+1)
+			slog.Info("Tree queued for creation", "index", i+1)
 			continue
 		}
 
 		if existingTree.Readonly {
-			result := fmt.Sprintf("Tree %d (Latitude: %.6f, Longitude: %.6f) is read-only and cannot be overwritten. Please delete it manually.",
-				i+1, csvTree.Latitude, csvTree.Longitude)
-			slog.Error(result)
-			return handleError(errors.New(result))
+			slog.Error("Tree is read-only and cannot be overwritten",
+				"index", i+1,
+				"latitude", csvTree.Latitude,
+				"longitude", csvTree.Longitude)
+			return handleError(fmt.Errorf("tree %d (latitude: %.6f, longitude: %.6f) is read-only and cannot be overwritten. Please delete it manually",
+				i+1, csvTree.Latitude, csvTree.Longitude))
 		}
 
 		if existingTree.PlantingYear == csvTree.PlantingYear {
 			updateQueue = append(updateQueue, csvTree)
-			slog.Info("Tree %d queued for update", i+1)
+			slog.Info("Tree queued for update", "index", i+1)
 		} else {
 			deleteQueue = append(deleteQueue, existingTree)
 			createQueue = append(createQueue, csvTree)
-			slog.Info("Tree %d queued for deletion and recreation", i+1)
+			slog.Info("Tree queued for deletion and recreation", "index", i+1)
 		}
 	}
 
 	if err := s.processDeleteQueue(ctx, deleteQueue); err != nil {
 		return handleError(err)
 	}
+
 	if err := s.processUpdateQueue(ctx, updateQueue); err != nil {
 		return handleError(err)
 	}
+
 	if err := s.processCreateQueue(ctx, createQueue); err != nil {
 		return handleError(err)
 	}
@@ -100,22 +112,27 @@ func (s *TreeService) ImportTree(ctx context.Context, trees []*domain.Tree) erro
 	return nil
 }
 
-func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*domain.Tree) error {
+func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*entities.Tree) error {
 	for i, treeToDelete := range deleteQueue {
 		err := s.treeRepo.DeleteAndUnlinkImages(ctx, treeToDelete.ID)
 		if err != nil {
-			result := fmt.Sprintf("Error deleting tree %d: %v", i+1, err)
-			slog.Error(result)
-			return handleError(errors.New(result))
+			slog.Error("Error deleting tree",
+				"index", i+1,
+				"tree_id", treeToDelete.ID,
+				"error", err)
+			return handleError(fmt.Errorf("error deleting tree %d: %w", i+1, err))
 		}
 		if treeToDelete.Sensor != nil {
-			slog.Warn("Tree %d (Latitude: %.6f, Longitude: %.6f) is being replaced, sensors are now unlinked.",
-				i+1, treeToDelete.Latitude, treeToDelete.Longitude)
+			slog.Warn("Tree is being replaced, sensors are now unlinked.",
+				"index", i+1,
+				"latitude", treeToDelete.Latitude,
+				"longitude", treeToDelete.Longitude)
 		}
 	}
 	return nil
 }
-func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*domain.Tree) error {
+
+func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*entities.Tree) error {
 	for i, treeToUpdate := range updateQueue {
 		_, err := s.treeRepo.Update(ctx, treeToUpdate.ID,
 			tree.WithTreeNumber(treeToUpdate.Number),
@@ -124,23 +141,34 @@ func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*dom
 			tree.WithLongitude(treeToUpdate.Longitude),
 		)
 		if err != nil {
-			result := fmt.Sprintf("Error updating tree %d: %v", i+1, err)
-			slog.Error(result)
-			return handleError(errors.New(result))
+			slog.Error("Error updating tree",
+				"index", i+1,
+				"tree_id", treeToUpdate.ID,
+				"error", err)
+			return handleError(err)
 		}
-		slog.Info("Tree %d updated successfully", i+1)
+		slog.Info("Tree updated successfully",
+			"index", i+1,
+			"tree_id", treeToUpdate.ID)
 	}
 	return nil
 }
-func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*domain.Tree) error {
+
+func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*entities.Tree) error {
 	for i, newTree := range createQueue {
 		if newTree == nil {
-			slog.Error("newTree is nil")
+			slog.Error("newTree is nil", "index", i)
 			continue
 		}
-		info := fmt.Sprintf("Creating tree with Species: %s, Number: %v, Latitude: %.6f, Longitude: %.6f, PlantingYear: %d\n",
-			newTree.Species, newTree.Number, newTree.Latitude, newTree.Longitude, newTree.PlantingYear)
-		slog.Info(info)
+
+		slog.Info("Creating tree",
+			"Species", newTree.Species,
+			"Number", newTree.Number,
+			"Latitude", newTree.Latitude,
+			"Longitude", newTree.Longitude,
+			"PlantingYear", newTree.PlantingYear,
+		)
+
 		_, err := s.treeRepo.Create(ctx,
 			tree.WithSpecies(newTree.Species),
 			tree.WithTreeNumber(newTree.Number),
@@ -148,12 +176,13 @@ func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*dom
 			tree.WithLongitude(newTree.Longitude),
 			tree.WithPlantingYear(newTree.PlantingYear),
 		)
+
 		if err != nil {
-			result := fmt.Sprintf("Error creating tree %d: %v", i+1, err)
-			slog.Error(result)
-			return handleError(errors.New(result))
+			slog.Error("Error creating tree", "index", i+1, "error", err)
+			return handleError(fmt.Errorf("error creating tree %d: %w", i+1, err))
 		}
-		slog.Info("Tree %d created successfully", i+1)
+
+		slog.Info("Tree created successfully", "index", i+1)
 	}
 	return nil
 }
