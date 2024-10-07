@@ -135,8 +135,8 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 
 	rows, err := r.ReadAll()
 	if err != nil {
-		slog.Error("Failed to read CSV: %v", err)
-		return err
+		slog.Error("Failed to read CSV", "error", err)
+		return errorhandler.HandleError(err)
 	}
 	if len(rows) < headerRowIndex+2 {
 		return errorhandler.HandleError(errors.New("CSV file has no data"))
@@ -144,14 +144,14 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 
 	//transformer, err := proj.NewEPSGTransformer(31467, 4326)
 	//if err != nil {
-	//	slog.Error("Error creating transformer: %v", err)
+	//	slog.Error("Error creating transformer", "error", err)
 	//}
 
 	// Create the header map
 	headerIndexMap, err := createHeaderIndexMap(expectedCSVHeaders)
 	if err != nil {
-		slog.Error("Error:", err)
-		return err
+		slog.Error("Error creating header index map", "error", err)
+		return errorhandler.HandleError(err)
 	}
 
 	var trees []*domain.Tree
@@ -164,17 +164,16 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 		//tree, err := parseRowToTree(rowIndex, row, headerIndexMap, &transformer)
 		tree, err := parseRowToTree(rowIndex, row, headerIndexMap)
 		if err != nil {
-			slog.Error("Failed to parse row %d: %v", i+2, err)
-			return err
+			slog.Error("Failed to parse row", "row", i+2, "error", err)
+			return errorhandler.HandleError(err)
 		}
 
 		trees = append(trees, tree)
 	}
 	err = svc.ImportTree(ctx, trees)
 	if err != nil {
-		return err
+		return errorhandler.HandleError(err)
 	}
-
 	return nil
 }
 
