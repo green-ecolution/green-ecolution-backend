@@ -9,15 +9,16 @@ import (
 
 func defaultTree() entities.Tree {
 	return entities.Tree{
-		TreeCluster:  nil,
-		Species:      "",
-		Number:       "",
-		Readonly:     false,
-		Sensor:       nil,
-		PlantingYear: 0,
-		Latitude:     0,
-		Longitude:    0,
-		Images:       nil,
+		TreeCluster:    nil,
+		Species:        "",
+		Number:         "",
+		Readonly:       false,
+		Sensor:         nil,
+		PlantingYear:   0,
+		Latitude:       0,
+		Longitude:      0,
+		Images:         nil,
+		WateringStatus: entities.WateringStatusUnknown,
 	}
 }
 
@@ -51,13 +52,14 @@ func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entitie
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
 	args := sqlc.CreateTreeParams{
-		TreeClusterID: &entity.TreeCluster.ID,
-		Species:       entity.Species,
-		Readonly:      entity.Readonly,
-		SensorID:      &entity.Sensor.ID,
-		PlantingYear:  entity.PlantingYear,
-		Latitude:      entity.Latitude,
-		Longitude:     entity.Longitude,
+		TreeClusterID:  &entity.TreeCluster.ID,
+		Species:        entity.Species,
+		Readonly:       entity.Readonly,
+		SensorID:       &entity.Sensor.ID,
+		PlantingYear:   entity.PlantingYear,
+		Latitude:       entity.Latitude,
+		Longitude:      entity.Longitude,
+		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
 	}
 
 	return r.store.CreateTree(ctx, &args)

@@ -15,8 +15,8 @@ type InternalTreeClusterRepoMapper interface {
 	FromSqlList([]*sqlc.TreeCluster) []*entities.TreeCluster
 }
 
-func MapWateringStatus(status sqlc.TreeClusterWateringStatus) entities.TreeClusterWateringStatus {
-	return entities.TreeClusterWateringStatus(status)
+func MapWateringStatus(status sqlc.WateringStatus) entities.WateringStatus {
+	return entities.WateringStatus(status)
 }
 
 func MapSoilCondition(condition sqlc.TreeSoilCondition) entities.TreeSoilCondition {

@@ -86,7 +86,7 @@ func WithMoistureLevel(moistureLevel float64) entities.EntityFunc[entities.TreeC
 	}
 }
 
-func WithWateringStatus(wateringStatus entities.TreeClusterWateringStatus) entities.EntityFunc[entities.TreeCluster] {
+func WithWateringStatus(wateringStatus entities.WateringStatus) entities.EntityFunc[entities.TreeCluster] {
 	return func(tc *entities.TreeCluster) {
 		tc.WateringStatus = wateringStatus
 	}
