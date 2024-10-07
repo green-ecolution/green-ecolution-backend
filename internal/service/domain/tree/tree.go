@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
@@ -36,12 +35,12 @@ func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 }
 
 func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
-	tree, err := s.treeRepo.GetByID(ctx, id)
+	t, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return tree, nil
+	return t, nil
 }
 
 func handleError(err error) error {
@@ -56,8 +55,8 @@ func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil && s.sensorRepo != nil
 }
 
-func (s *TreeService) ImportTree(ctx context.Context, trees []*domain.Tree) error {
-	var createQueue, updateQueue, deleteQueue []*domain.Tree
+func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.Tree) error {
+	var createQueue, updateQueue, deleteQueue []*entities.Tree
 
 	for i, csvTree := range trees {
 		// Log coordinates of the current tree
@@ -112,7 +111,7 @@ func (s *TreeService) ImportTree(ctx context.Context, trees []*domain.Tree) erro
 	return nil
 }
 
-func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*domain.Tree) error {
+func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*entities.Tree) error {
 	for i, treeToDelete := range deleteQueue {
 		err := s.treeRepo.DeleteAndUnlinkImages(ctx, treeToDelete.ID)
 		if err != nil {
@@ -132,7 +131,7 @@ func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*dom
 	return nil
 }
 
-func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*domain.Tree) error {
+func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*entities.Tree) error {
 	for i, treeToUpdate := range updateQueue {
 		_, err := s.treeRepo.Update(ctx, treeToUpdate.ID,
 			tree.WithTreeNumber(treeToUpdate.Number),
@@ -154,7 +153,7 @@ func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*dom
 	return nil
 }
 
-func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*domain.Tree) error {
+func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*entities.Tree) error {
 	for i, newTree := range createQueue {
 		if newTree == nil {
 			slog.Error("newTree is nil", "index", i)
