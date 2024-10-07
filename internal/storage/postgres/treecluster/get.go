@@ -17,10 +17,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 
 	data := r.mapper.FromSqlList(rows)
 	for _, f := range data {
-		f.Region, err = r.GetRegionByTreeClusterID(ctx, f.ID)
-		if err != nil {
-			return nil, err
-		}
+		f.Region, _ = r.GetRegionByTreeClusterID(ctx, f.ID) // Error can be ignored when region is not found
 
 		f.Trees, err = r.GetLinkedTreesByTreeClusterID(ctx, f.ID)
 		if err != nil {
@@ -79,7 +76,7 @@ func (r *TreeClusterRepository) GetLinkedTreesByTreeClusterID(ctx context.Contex
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, storage.ErrTreeNotFound
+			return []*entities.Tree{}, nil
 		}
 		return nil, r.store.HandleError(err)
 	}

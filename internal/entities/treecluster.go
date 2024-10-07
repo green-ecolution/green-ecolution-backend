@@ -40,10 +40,7 @@ type TreeClusterCreate struct {
 
 type TreeClusterUpdate struct {
 	Address       string
-	Archived      bool
 	Description   string
-	LastWatered   time.Time
-	MoistureLevel float64
 	SoilCondition TreeSoilCondition
 	TreeIDs       []*int32
 	Name          string
