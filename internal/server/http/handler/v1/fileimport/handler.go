@@ -4,16 +4,17 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"log/slog"
 	"mime/multipart"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
 var expectedCSVHeaders = []string{"Area", "Street", "TreeNumber", "Species", "Latitude", "Longitude", "PlantingYear"}
