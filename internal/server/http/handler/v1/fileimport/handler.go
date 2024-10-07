@@ -224,8 +224,8 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*d
 	tree := &domain.Tree{
 		Number:       treeNumber,
 		Species:      species,
-		Latitude:     latitude,  //points[0].Y, // WGS84 Latitude
-		Longitude:    longitude, //points[0].X, // WGS84 Longitude
+		Latitude:     latitude,  // points[0].Y, // WGS84 Latitude
+		Longitude:    longitude, // points[0].X, // WGS84 Longitude
 		PlantingYear: int32(plantingYear),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
