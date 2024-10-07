@@ -8,7 +8,6 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
-	"github.com/omniscale/go-proj/v2"
 	"log"
 	"log/slog"
 	"mime/multipart"
@@ -143,10 +142,10 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 		return errorhandler.HandleError(errors.New("CSV file has no data"))
 	}
 
-	transformer, err := proj.NewEPSGTransformer(31467, 4326)
-	if err != nil {
-		slog.Error("Error creating transformer: %v", err)
-	}
+	//transformer, err := proj.NewEPSGTransformer(31467, 4326)
+	//if err != nil {
+	//	slog.Error("Error creating transformer: %v", err)
+	//}
 
 	// Create the header map
 	headerIndexMap, err := createHeaderIndexMap(expectedCSVHeaders)
@@ -162,7 +161,8 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 			return errorhandler.HandleError(errors.New("invalid CSV format at row " + strconv.Itoa(rowIndex)))
 		}
 
-		tree, err := parseRowToTree(rowIndex, row, headerIndexMap, &transformer)
+		//tree, err := parseRowToTree(rowIndex, row, headerIndexMap, &transformer)
+		tree, err := parseRowToTree(rowIndex, row, headerIndexMap)
 		if err != nil {
 			slog.Error("Failed to parse row %d: %v", i+2, err)
 			return err
@@ -196,7 +196,8 @@ func createHeaderIndexMap(headers []string) (map[string]int, error) {
 	return headerIndexMap, nil
 }
 
-func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, transformer *proj.Transformer) (*domain.Tree, error) {
+//func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, transformer *proj.Transformer) (*domain.Tree, error) {
+func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*domain.Tree, error) {
 	areaIdx := headerIndexMap[expectedCSVHeaders[0]]
 	area := row[areaIdx]
 	if area == "" {
@@ -235,14 +236,14 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, tra
 		return nil, errorhandler.HandleError(errors.New("invalid 'Longitude' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
-	// Convert Gauß-Krüger coordinates to WGS84 using the transformer
-	points := []proj.Coord{
-		proj.XY(latitude, longitude),
-	}
+	//TODO: Convert Gauß-Krüger coordinates to WGS84 using the transformer
+	//points := []proj.Coord{
+	//	proj.XY(latitude, longitude),
+	//}
 
-	if err := transformer.Transform(points); err != nil {
-		return nil, errorhandler.HandleError(errors.New("failed to transform coordinates from Gauß-Krüger to WGS84 at row: " + strconv.Itoa(rowIdx)))
-	}
+	//if err := transformer.Transform(points); err != nil {
+	//	return nil, errorhandler.HandleError(errors.New("failed to transform coordinates from Gauß-Krüger to WGS84 at row: " + strconv.Itoa(rowIdx)))
+	//}
 
 	plantingYearIdx := headerIndexMap[expectedCSVHeaders[6]]
 	plantingYear, err := strconv.Atoi(row[plantingYearIdx])
@@ -253,8 +254,8 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, tra
 	tree := &domain.Tree{
 		Number:       treeNumber,
 		Species:      species,
-		Latitude:     points[0].Y, // WGS84 Latitude
-		Longitude:    points[0].X, // WGS84 Longitude
+		Latitude:     latitude,  //points[0].Y, // WGS84 Latitude
+		Longitude:    longitude, //points[0].X, // WGS84 Longitude
 		PlantingYear: int32(plantingYear),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
