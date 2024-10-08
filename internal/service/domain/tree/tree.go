@@ -3,11 +3,11 @@ package tree
 import (
 	"context"
 	"errors"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	tree "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 )
 
 type TreeService struct {
@@ -34,12 +34,12 @@ func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 }
 
 func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
-	tree, err := s.treeRepo.GetByID(ctx, id)
+	tr, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return tree, nil
+	return tr, nil
 }
 
 func handleError(err error) error {
@@ -53,7 +53,7 @@ func handleError(err error) error {
 func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil && s.sensorRepo != nil
 }
-func (s *TreeService) Create(ctx context.Context, treeCreate *domain.TreeCreate) (*domain.Tree, error) {
+func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
 	if treeCreate.PlantingYear == 0 {
 		return nil, handleError(errors.New("plantingYear cannot be null or zero"))
 	}
@@ -67,13 +67,13 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *domain.TreeCreate)
 		return nil, handleError(errors.New("latitude and Longitude cannot be null or zero"))
 	}
 
-	fn := make([]domain.EntityFunc[domain.Tree], 0)
+	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if treeCreate.TreeClusterID != nil {
-		treeClusterId, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
+		treeClusterID, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
 		if err != nil {
 			return nil, handleError(err)
 		}
-		fn = append(fn, tree.WithTreeCluster(treeClusterId))
+		fn = append(fn, tree.WithTreeCluster(treeClusterID))
 	}
 	fn = append(fn,
 		tree.WithReadonly(treeCreate.Readonly),
