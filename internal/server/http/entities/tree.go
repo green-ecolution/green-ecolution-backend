@@ -26,13 +26,15 @@ type TreeListResponse struct {
 } // @Name TreeList
 
 type TreeCreateRequest struct {
-	TreeClusterID *int32  `json:"tree_cluster_id,omitempty"`
+  TreeClusterID *int32  `json:"tree_cluster_id,omitempty" validate:"optional"`
 	Readonly      bool    `json:"readonly,omitempty"`
 	PlantingYear  int32   `json:"planting_year,omitempty"`
 	Species       string  `json:"species,omitempty"`
 	Number        string  `json:"tree_number,omitempty"`
 	Latitude      float64 `json:"latitude,omitempty"`
 	Longitude     float64 `json:"longitude,omitempty"`
+  SensorID      *int32  `json:"sensor_id,omitempty" validate:"optional"`
+  Description   string  `json:"description,omitempty" validate:"optional"`
 } // @Name TreeCreate
 
 type TreeUpdateRequest struct {
