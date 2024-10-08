@@ -8,6 +8,7 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
+// goverter:extend MapWateringStatus
 type InternalTreeRepoMapper interface {
 	// goverter:ignore Sensor Images TreeCluster
 	// goverter:map TreeNumber Number

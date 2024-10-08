@@ -43,7 +43,6 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
-	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
 	treeFn, err := s.prepareTrees(ctx, tc.TreeIDs)
 	if err != nil {
@@ -58,22 +57,11 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 		return nil, handleError(err)
 	}
 
-	if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
-		return nil, handleError(err)
-	}
-
 	return c, nil
 }
 
 func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
-	treeIDs := make([]int32, len(tc.TreeIDs))
 	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
-
-	// TODO: Add a transaction to undo this change if an error occurs.
-	if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
-		return nil, handleError(err)
-	}
-
 	treeFn, err := s.prepareTrees(ctx, tc.TreeIDs)
 	if err != nil {
 		return nil, err
@@ -84,16 +72,11 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.Tr
 		treecluster.WithName(tc.Name),
 		treecluster.WithAddress(tc.Address),
 		treecluster.WithDescription(tc.Description),
-		treecluster.WithArchived(tc.Archived),
 		treecluster.WithSoilCondition(tc.SoilCondition),
 	)
 
 	c, err := s.treeClusterRepo.Update(ctx, id, fn...)
 	if err != nil {
-		return nil, handleError(err)
-	}
-
-	if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
 		return nil, handleError(err)
 	}
 
