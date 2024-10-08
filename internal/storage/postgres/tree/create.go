@@ -51,11 +51,20 @@ func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entitie
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
+	var treeClusterID *int32
+	if entity.TreeCluster != nil {
+		treeClusterID = &entity.TreeCluster.ID
+	}
+
+	var sensorID *int32
+	if entity.Sensor != nil {
+		sensorID = &entity.Sensor.ID
+	}
 	args := sqlc.CreateTreeParams{
-		TreeClusterID:  &entity.TreeCluster.ID,
+		TreeClusterID:  treeClusterID,
 		Species:        entity.Species,
 		Readonly:       entity.Readonly,
-		SensorID:       &entity.Sensor.ID,
+		SensorID:       sensorID,
 		PlantingYear:   entity.PlantingYear,
 		Latitude:       entity.Latitude,
 		Longitude:      entity.Longitude,
