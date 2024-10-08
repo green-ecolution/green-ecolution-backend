@@ -84,6 +84,11 @@ type TreeClusterService interface {
 	Delete(ctx context.Context, id int32) error
 }
 
+type SensorService interface {
+  Service
+  GetAll(ctx context.Context) ([]*domain.Sensor, error)
+}
+
 type Service interface {
 	Ready() bool
 }
@@ -95,6 +100,7 @@ type Services struct {
 	AuthService        AuthService
 	RegionService      RegionService
 	TreeClusterService TreeClusterService
+  SensorService     SensorService
 }
 
 func (s *Services) AllServicesReady() bool {
