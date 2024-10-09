@@ -92,3 +92,15 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	}
 	return updatedTree, nil
 }
+
+func (s *TreeService) Delete(ctx context.Context, id int32) error {
+	_, err := s.treeRepo.GetByID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+	err = s.treeRepo.DeleteAndUnlinkImages(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+	return nil
+}
