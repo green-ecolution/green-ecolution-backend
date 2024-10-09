@@ -12,7 +12,7 @@ func RegisterRoutes(svc service.TreeService) *fiber.App {
 	app.Get("/:id", GetTreeByID(svc))
 	app.Put("/:id", UpdateTree(svc))
 	app.Post("/", CreateTree(svc))
-	app.Delete("/", DeleteTree(svc))
+	app.Delete("/:id", DeleteTree(svc))
 
 	app.Get("/:id/images", GetTreeImages(svc))
 	app.Post("/:id/images", AddTreeImage(svc))

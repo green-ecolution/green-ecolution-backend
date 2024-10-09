@@ -55,6 +55,18 @@ func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil && s.sensorRepo != nil
 }
 
+func (s *TreeService) Delete(ctx context.Context, id int32) error {
+	_, err := s.treeRepo.GetByID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+	err = s.treeRepo.DeleteAndUnlinkImages(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+	return nil
+}
+
 func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpdate) (*entities.Tree, error) {
 	currentTree, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
