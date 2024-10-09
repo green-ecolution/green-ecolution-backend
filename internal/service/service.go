@@ -85,8 +85,8 @@ type TreeClusterService interface {
 }
 
 type SensorService interface {
-  Service
-  GetAll(ctx context.Context) ([]*domain.Sensor, error)
+	Service
+	GetAll(ctx context.Context) ([]*domain.Sensor, error)
 }
 
 type Service interface {
@@ -100,7 +100,7 @@ type Services struct {
 	AuthService        AuthService
 	RegionService      RegionService
 	TreeClusterService TreeClusterService
-  SensorService     SensorService
+	SensorService      SensorService
 }
 
 func (s *Services) AllServicesReady() bool {

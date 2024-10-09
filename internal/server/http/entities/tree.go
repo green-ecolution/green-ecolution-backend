@@ -39,7 +39,7 @@ type TreeCreateRequest struct {
 } // @Name TreeCreate
 
 type TreeUpdateRequest struct {
-  TreeClusterID *int32  `json:"tree_cluster_id,omitempty" validate:"optional"`
+	TreeClusterID *int32  `json:"tree_cluster_id,omitempty" validate:"optional"`
 	Readonly      bool    `json:"readonly,omitempty"`
 	PlantingYear  int32   `json:"planting_year,omitempty"`
 	Species       string  `json:"species,omitempty"`

@@ -9,24 +9,23 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
-
 type SensorService struct {
 	sensorRepo storage.SensorRepository
 }
 
 func NewSensorService(sensorRepo storage.SensorRepository) service.SensorService {
-  return &SensorService{
-    sensorRepo: sensorRepo,
-  }
+	return &SensorService{
+		sensorRepo: sensorRepo,
+	}
 }
 
 func (s *SensorService) GetAll(ctx context.Context) ([]*entities.Sensor, error) {
-  sensors, err := s.sensorRepo.GetAll(ctx)
-  if err != nil {
-    return nil, handleError(err)
-  }
+	sensors, err := s.sensorRepo.GetAll(ctx)
+	if err != nil {
+		return nil, handleError(err)
+	}
 
-  return sensors, nil
+	return sensors, nil
 }
 
 func (s *SensorService) Ready() bool {
