@@ -36,8 +36,7 @@ UPDATE trees SET
   latitude = $7,
   longitude = $8,
   readonly = $9,
-  watering_status = $10,
-  geometry = ST_GeomFromText($10, 4326)
+  watering_status = $10
 WHERE id = $1;
 
 -- name: UpdateTreeClusterID :exec
