@@ -89,3 +89,15 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 	return newTree, nil
 }
+
+func (s *TreeService) Delete(ctx context.Context, id int32) error {
+	_, err := s.treeRepo.GetByID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+	err = s.treeRepo.DeleteAndUnlinkImages(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+	return nil
+}
