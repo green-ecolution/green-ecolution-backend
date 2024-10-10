@@ -29,7 +29,7 @@ var (
 // @Param			page			query	string	false	"Page"
 // @Param			limit			query	string	false	"Limit"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllSensor(svc service.SensorService) fiber.Handler {
+func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		domainData, err := svc.GetAll(ctx)

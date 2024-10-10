@@ -8,7 +8,7 @@ import (
 func RegisterRoutes(svc service.SensorService) *fiber.App {
 	app := fiber.New()
 
-	app.Get("/", GetAllSensor(svc))
+	app.Get("/", GetAllSensors(svc))
 	app.Get("/:id", GetSensorByID(svc))
 	app.Get("/:id/data", GetSensorDataByID(svc))
 
