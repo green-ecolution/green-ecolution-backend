@@ -10,6 +10,7 @@ packages:
       TreeClusterService:
       AuthService:
       RegionService:
+      SensorService:
       Service:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
