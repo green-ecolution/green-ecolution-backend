@@ -186,7 +186,7 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		return nil
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 
