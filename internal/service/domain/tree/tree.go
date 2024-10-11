@@ -2,8 +2,10 @@ package tree
 
 import (
 	"context"
-	"errors"
 	"fmt"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/pkg/errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -15,6 +17,7 @@ type TreeService struct {
 	treeRepo        storage.TreeRepository
 	sensorRepo      storage.SensorRepository
 	treeClusterRepo storage.TreeClusterRepository
+	validator       *validator.Validate
 }
 
 func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRepository, treeClusterRepo storage.TreeClusterRepository) service.TreeService {
@@ -22,6 +25,7 @@ func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRe
 		treeRepo:        repoTree,
 		sensorRepo:      repoSensor,
 		treeClusterRepo: treeClusterRepo,
+		validator:       validator.New(),
 	}
 }
 
@@ -88,6 +92,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	if err != nil {
 		return nil, handleError(err)
 	}
+	// TODO: update the coordinates of the tree cluster.
 	return newTree, nil
 }
 
@@ -100,10 +105,18 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 	if err != nil {
 		return handleError(err)
 	}
+	// TODO: update the coordinates of the tree cluster.
 	return nil
 }
 
 func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpdate) (*entities.Tree, error) {
+	err := s.validator.RegisterValidation("not-zero", notZero)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	if err := s.validator.Struct(tu); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
 	currentTree, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
@@ -113,6 +126,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
 	}
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
+
 	if tu.TreeClusterID != nil {
 		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
 		if err != nil {
@@ -120,23 +134,19 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		}
 		fn = append(fn, tree.WithTreeCluster(treeCluster))
 	}
-	if tu.PlantingYear != 0 {
-		fn = append(fn, tree.WithPlantingYear(tu.PlantingYear))
-	}
-	if tu.Species != "" {
-		fn = append(fn, tree.WithSpecies(tu.Species))
-	}
-	if tu.Number != "" {
-		fn = append(fn, tree.WithTreeNumber(tu.Number))
-	}
-	if tu.Latitude != 0 && tu.Longitude != 0 {
-		fn = append(fn, tree.WithLatitude(tu.Latitude), tree.WithLongitude(tu.Longitude))
-	}
-
+	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),
+		tree.WithSpecies(tu.Species),
+		tree.WithTreeNumber(tu.Number),
+		tree.WithLatitude(tu.Latitude),
+		tree.WithLongitude(tu.Longitude))
 	updatedTree, err := s.treeRepo.Update(ctx, id, fn...)
-
 	if err != nil {
 		return nil, handleError(err)
 	}
+	// TODO: If a new tree cluster has been provided, update the coordinates of both the old tree cluster and the new one.
 	return updatedTree, nil
+}
+func notZero(fl validator.FieldLevel) bool {
+	value := fl.Field().Float()
+	return value != 0
 }

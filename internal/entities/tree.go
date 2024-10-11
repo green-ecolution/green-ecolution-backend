@@ -30,11 +30,10 @@ type TreeCreate struct {
 }
 
 type TreeUpdate struct {
-	TreeClusterID *int32
-	Readonly      bool
-	PlantingYear  int32
-	Species       string
-	Number        string
-	Latitude      float64
-	Longitude     float64
+	TreeClusterID *int32  `validate:"omitempty,gt=0"`
+	PlantingYear  int32   `validate:"omitempty,gt=0"`
+	Species       string  `validate:"omitempty"`
+	Number        string  `validate:"omitempty"`
+	Latitude      float64 `validate:"not-zero"`
+	Longitude     float64 `validate:"not-zero"`
 }
