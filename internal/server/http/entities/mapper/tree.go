@@ -14,6 +14,7 @@ type TreeHTTPMapper interface {
 	FromResponse(*domain.Tree) *entities.TreeResponse
 	FromResponseList([]*domain.Tree) []*entities.TreeResponse
 	FromUpdateRequest(*entities.TreeUpdateRequest) *domain.TreeUpdate
+	FromCreateRequest(*entities.TreeCreateRequest) *domain.TreeCreate
 }
 
 func MapTreeClusterToID(treeCluster *domain.TreeCluster) *int32 {

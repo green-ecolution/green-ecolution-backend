@@ -54,6 +54,42 @@ func handleError(err error) error {
 func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil && s.sensorRepo != nil
 }
+func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
+	if treeCreate.PlantingYear == 0 {
+		return nil, handleError(errors.New("plantingYear cannot be null or zero"))
+	}
+	if treeCreate.Species == "" {
+		return nil, handleError(errors.New("species (Gattung) cannot be null or empty"))
+	}
+	if treeCreate.Number == "" {
+		return nil, handleError(errors.New("tree Number (Baum Nr) cannot be null or empty"))
+	}
+	if treeCreate.Latitude == 0 || treeCreate.Longitude == 0 {
+		return nil, handleError(errors.New("latitude and Longitude cannot be null or zero"))
+	}
+
+	fn := make([]entities.EntityFunc[entities.Tree], 0)
+	if treeCreate.TreeClusterID != nil {
+		treeClusterID, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		fn = append(fn, tree.WithTreeCluster(treeClusterID))
+	}
+	fn = append(fn,
+		tree.WithReadonly(treeCreate.Readonly),
+		tree.WithPlantingYear(treeCreate.PlantingYear),
+		tree.WithSpecies(treeCreate.Species),
+		tree.WithTreeNumber(treeCreate.Number),
+		tree.WithLatitude(treeCreate.Latitude),
+		tree.WithLongitude(treeCreate.Longitude),
+	)
+	newTree, err := s.treeRepo.Create(ctx, fn...)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	return newTree, nil
+}
 
 func (s *TreeService) Delete(ctx context.Context, id int32) error {
 	_, err := s.treeRepo.GetByID(ctx, id)

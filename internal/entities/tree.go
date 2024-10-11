@@ -19,6 +19,15 @@ type Tree struct {
 	Longitude      float64
 	WateringStatus WateringStatus
 }
+type TreeCreate struct {
+	TreeClusterID *int32
+	Readonly      bool
+	PlantingYear  int32
+	Species       string
+	Number        string
+	Latitude      float64
+	Longitude     float64
+}
 
 type TreeUpdate struct {
 	TreeClusterID *int32

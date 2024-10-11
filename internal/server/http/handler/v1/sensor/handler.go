@@ -2,8 +2,15 @@ package sensor
 
 import (
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+	sensorMapper = generated.SensorHTTPMapperImpl{}
 )
 
 // @Summary		Get all sensors
@@ -11,7 +18,7 @@ import (
 // @Id				get-all-sensors
 // @Tags			Sensor
 // @Produce		json
-// @Success		200	{object}	[]entities.SensorListResponse
+// @Success		200	{object}	entities.SensorListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -19,14 +26,26 @@ import (
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor [get]
 // @Param			status			query	string	false	"Sensor Status"
-// @Param			sensor_id		path	string	true	"Sensor ID"
 // @Param			page			query	string	false	"Page"
 // @Param			limit			query	string	false	"Limit"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func GetAllSensor(_ service.Service) fiber.Handler {
+func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		domainData, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := make([]*entities.SensorResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = mapToDto(domain)
+		}
+
+		return c.JSON(entities.SensorListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle Pagination
+		})
 	}
 }
 
@@ -139,4 +158,9 @@ func DeleteSensor(_ service.Service) fiber.Handler {
 		// TODO: Implement
 		return c.SendString("Not implemented")
 	}
+}
+
+func mapToDto(t *domain.Sensor) *entities.SensorResponse {
+	dto := sensorMapper.FromResponse(t)
+	return dto
 }
