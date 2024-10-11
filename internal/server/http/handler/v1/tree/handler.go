@@ -100,10 +100,22 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Router			/v1/tree [post]
 // @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			body			body	entities.TreeCreateRequest	true	"Tree to create"
-func CreateTree(_ service.TreeService) fiber.Handler {
+func CreateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		var req entities.TreeCreateRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := treeMapper.FromCreateRequest(&req)
+		domainData, err := svc.Create(ctx, domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapTreeToDto(domainData)
+		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
 

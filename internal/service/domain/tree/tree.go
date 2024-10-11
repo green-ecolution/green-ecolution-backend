@@ -7,17 +7,20 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 )
 
 type TreeService struct {
-	treeRepo   storage.TreeRepository
-	sensorRepo storage.SensorRepository
+	treeRepo        storage.TreeRepository
+	sensorRepo      storage.SensorRepository
+	treeClusterRepo storage.TreeClusterRepository
 }
 
-func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRepository) service.TreeService {
+func NewTreeService(repoTree storage.TreeRepository, repoSensor storage.SensorRepository, treeClusterRepo storage.TreeClusterRepository) service.TreeService {
 	return &TreeService{
-		treeRepo:   repoTree,
-		sensorRepo: repoSensor,
+		treeRepo:        repoTree,
+		sensorRepo:      repoSensor,
+		treeClusterRepo: treeClusterRepo,
 	}
 }
 
@@ -31,12 +34,12 @@ func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 }
 
 func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {
-	tree, err := s.treeRepo.GetByID(ctx, id)
+	tr, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return tree, nil
+	return tr, nil
 }
 
 func handleError(err error) error {
@@ -49,6 +52,42 @@ func handleError(err error) error {
 
 func (s *TreeService) Ready() bool {
 	return s.treeRepo != nil && s.sensorRepo != nil
+}
+func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
+	if treeCreate.PlantingYear == 0 {
+		return nil, handleError(errors.New("plantingYear cannot be null or zero"))
+	}
+	if treeCreate.Species == "" {
+		return nil, handleError(errors.New("species (Gattung) cannot be null or empty"))
+	}
+	if treeCreate.Number == "" {
+		return nil, handleError(errors.New("tree Number (Baum Nr) cannot be null or empty"))
+	}
+	if treeCreate.Latitude == 0 || treeCreate.Longitude == 0 {
+		return nil, handleError(errors.New("latitude and Longitude cannot be null or zero"))
+	}
+
+	fn := make([]entities.EntityFunc[entities.Tree], 0)
+	if treeCreate.TreeClusterID != nil {
+		treeClusterID, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		fn = append(fn, tree.WithTreeCluster(treeClusterID))
+	}
+	fn = append(fn,
+		tree.WithReadonly(treeCreate.Readonly),
+		tree.WithPlantingYear(treeCreate.PlantingYear),
+		tree.WithSpecies(treeCreate.Species),
+		tree.WithTreeNumber(treeCreate.Number),
+		tree.WithLatitude(treeCreate.Latitude),
+		tree.WithLongitude(treeCreate.Longitude),
+	)
+	newTree, err := s.treeRepo.Create(ctx, fn...)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	return newTree, nil
 }
 
 func (s *TreeService) Delete(ctx context.Context, id int32) error {

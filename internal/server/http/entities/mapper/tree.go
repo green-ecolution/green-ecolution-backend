@@ -13,6 +13,7 @@ type TreeHTTPMapper interface {
 	// goverter:ignore Sensor
 	FromResponse(*domain.Tree) *entities.TreeResponse
 	FromResponseList([]*domain.Tree) []*entities.TreeResponse
+	FromCreateRequest(*entities.TreeCreateRequest) *domain.TreeCreate
 }
 
 func MapTreeClusterToID(treeCluster *domain.TreeCluster) *int32 {
