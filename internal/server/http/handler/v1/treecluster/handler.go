@@ -164,7 +164,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Id				delete-tree-cluster
 // @Tags			Tree Cluster
 // @Produce		json
-// @Success		200	
+// @Success		204
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
