@@ -51,6 +51,12 @@ func WithSpecies(species string) entities.EntityFunc[entities.Tree] {
 	}
 }
 
+func WithDescription(description string) entities.EntityFunc[entities.Tree] {
+	return func(t *entities.Tree) {
+		t.Description = description
+	}
+}
+
 func WithReadonly(readonly bool) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.Readonly = readonly
