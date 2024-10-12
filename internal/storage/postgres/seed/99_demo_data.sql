@@ -36,7 +36,7 @@ VALUES
   (2, 2, 2020, 'Quercus robur', 1008, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326), false, 'bad', ''),
   (2, NULL, 2021, 'Quercus robur', 1009, 54.78836553796373, 9.444075995492044, ST_SetSRID(ST_MakePoint(54.78836553796373, 9.444075995492044), 4326), false, 'unknown', ''),
   (2, NULL, 2022, 'Quercus robur', 1010, 54.787768612518455, 9.443996361187065, ST_SetSRID(ST_MakePoint(54.787768612518455, 9.443996361187065), 4326), false, 'good', ''),
-  (2, NULL, 2022, 'Quercus robur', 1011, 54.77933725347423, 9.426465409018832, ST_SetSRID(ST_MakePoint(54.77933725347423, 9.426465409018832), 4326), true, 'moderate', ''),
+  (NULL, NULL, 2022, 'Quercus robur', 1011, 54.77933725347423, 9.426465409018832, ST_SetSRID(ST_MakePoint(54.77933725347423, 9.426465409018832), 4326), true, 'moderate', ''),
   (NULL, NULL, 2024, 'Tilia cordata', 1012, 54.782528, 9.424376, ST_SetSRID(ST_MakePoint(54.782528, 9.424376), 4326), true, 'bad', 'Dieser Baum wurde im August das lezte mal gestuzt'),
   (NULL, NULL, 2024, 'Tilia x vulgaris', 1013, 54.782667, 9.424816, ST_SetSRID(ST_MakePoint(54.782667, 9.424816), 4326), true, 'bad', ''),
   (NULL, NULL, 2024, 'Tilia x vulgaris', 1014, 54.782925, 9.425931, ST_SetSRID(ST_MakePoint(54.782925, 9.425931), 4326), true, 'good', ''),
