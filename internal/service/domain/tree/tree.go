@@ -104,10 +104,16 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 
-	treeClusterID := treeEntity.TreeCluster.ID
 	if err := s.treeRepo.Delete(ctx, id); err != nil {
 		return handleError(err)
 	}
 
-	return s.locator.UpdateCluster(ctx, treeClusterID)
+	if treeEntity.TreeCluster != nil {
+		treeClusterID := treeEntity.TreeCluster.ID
+		if err := s.locator.UpdateCluster(ctx, treeClusterID); err != nil {
+			return handleError(err)
+		}
+	}
+
+	return nil
 }
