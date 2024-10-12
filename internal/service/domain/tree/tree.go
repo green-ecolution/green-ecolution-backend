@@ -105,12 +105,12 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 }
 
 func (s *TreeService) Delete(ctx context.Context, id int32) error {
-	tree, err := s.treeRepo.GetByID(ctx, id)
+	treeEntity, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
 		return handleError(err)
 	}
 
-	treeClusterID := tree.TreeCluster.ID
+	treeClusterID := treeEntity.TreeCluster.ID
 	if err := s.treeRepo.Delete(ctx, id); err != nil {
 		return handleError(err)
 	}

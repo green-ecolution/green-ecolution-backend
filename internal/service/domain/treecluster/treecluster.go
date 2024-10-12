@@ -18,16 +18,16 @@ type TreeClusterService struct {
 }
 
 func NewTreeClusterService(
-  treeClusterRepo storage.TreeClusterRepository,
-  treeRepo storage.TreeRepository,
-  regionRepo storage.RegionRepository,
-  locator *GeoClusterLocator,
+	treeClusterRepo storage.TreeClusterRepository,
+	treeRepo storage.TreeRepository,
+	regionRepo storage.RegionRepository,
+	locator *GeoClusterLocator,
 ) service.TreeClusterService {
 	return &TreeClusterService{
 		treeClusterRepo: treeClusterRepo,
 		treeRepo:        treeRepo,
 		regionRepo:      regionRepo,
-    locator:         locator,
+		locator:         locator,
 	}
 }
 
