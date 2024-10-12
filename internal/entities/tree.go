@@ -34,6 +34,6 @@ type TreeUpdate struct {
 	PlantingYear  int32   `validate:"omitempty,gt=0"`
 	Species       string  `validate:"omitempty"`
 	Number        string  `validate:"omitempty"`
-	Latitude      float64 `validate:"not-zero"`
-	Longitude     float64 `validate:"not-zero"`
+	Latitude      float64 `validate:"omitempty,min=-90,max=90"`
+	Longitude     float64 `validate:"omitempty,min=-180,max=180"`
 }

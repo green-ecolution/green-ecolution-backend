@@ -110,10 +110,6 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 }
 
 func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpdate) (*entities.Tree, error) {
-	err := s.validator.RegisterValidation("not-zero", notZero)
-	if err != nil {
-		return nil, handleError(err)
-	}
 	if err := s.validator.Struct(tu); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
@@ -145,8 +141,4 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	}
 	// TODO: If a new tree cluster has been provided, update the coordinates of both the old tree cluster and the new one.
 	return updatedTree, nil
-}
-func notZero(fl validator.FieldLevel) bool {
-	value := fl.Field().Float()
-	return value != 0
 }
