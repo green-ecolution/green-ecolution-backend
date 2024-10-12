@@ -19,12 +19,13 @@ type Tree struct {
 	Longitude      float64
 	WateringStatus WateringStatus
 }
+
 type TreeCreate struct {
 	TreeClusterID *int32
 	Readonly      bool
-	PlantingYear  int32
-	Species       string
-	Number        string
-	Latitude      float64
-	Longitude     float64
+	PlantingYear  int32   `validate:"required"`
+	Species       string  `validate:"required"`
+	Number        string  `validate:"required"`
+	Latitude      float64 `validate:"required,max=90,min=-90"`
+	Longitude     float64 `validate:"required,max=180,min=-180"`
 }
