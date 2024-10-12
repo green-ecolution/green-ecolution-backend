@@ -18,6 +18,7 @@ type Tree struct {
 	Latitude       float64
 	Longitude      float64
 	WateringStatus WateringStatus
+	Description    string
 }
 
 type TreeCreate struct {
@@ -28,4 +29,5 @@ type TreeCreate struct {
 	Number        string  `validate:"required"`
 	Latitude      float64 `validate:"required,max=90,min=-90"`
 	Longitude     float64 `validate:"required,max=180,min=-180"`
+	Description   string
 }
