@@ -160,7 +160,7 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 // @Id				delete-tree
 // @Tags			Tree
 // @Produce		json
-// @Success		200
+// @Success		204
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -180,7 +180,7 @@ func DeleteTree(svc service.TreeService) fiber.Handler {
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
-		return nil
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 

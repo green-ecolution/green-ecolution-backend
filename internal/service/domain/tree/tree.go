@@ -91,9 +91,11 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	if err != nil {
 		return nil, handleError(err)
 	}
+
 	if err = s.locator.UpdateCluster(ctx, *treeCreate.TreeClusterID); err != nil {
 		return nil, handleError(err)
 	}
+
 	return newTree, nil
 }
 
@@ -102,11 +104,15 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 	if err != nil {
 		return handleError(err)
 	}
-	treeClusterID := treeEntity.TreeCluster.ID
 	if err := s.treeRepo.Delete(ctx, id); err != nil {
 		return handleError(err)
 	}
-	return s.locator.UpdateCluster(ctx, treeClusterID)
+	if treeEntity.TreeCluster != nil {
+		if err := s.locator.UpdateCluster(ctx, treeEntity.TreeCluster.ID); err != nil {
+			return handleError(err)
+		}
+	}
+	return nil
 }
 
 func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpdate) (*entities.Tree, error) {
@@ -121,7 +127,6 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	if currentTree.Readonly {
 		return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
 	}
-	var oldTreeCluster = currentTree.TreeCluster.ID
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if tu.TreeClusterID != nil {
 		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
@@ -140,13 +145,15 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	if err != nil {
 		return nil, handleError(err)
 	}
-	err = s.locator.UpdateCluster(ctx, oldTreeCluster)
-	if err != nil {
-		return nil, handleError(err)
+	if currentTree.TreeCluster != nil {
+		if err = s.locator.UpdateCluster(ctx, currentTree.TreeCluster.ID); err != nil {
+			return nil, handleError(err)
+		}
 	}
-	err = s.locator.UpdateCluster(ctx, updatedTree.TreeCluster.ID)
-	if err != nil {
-		return nil, handleError(err)
+	if updatedTree.TreeCluster != nil {
+		if err = s.locator.UpdateCluster(ctx, updatedTree.TreeCluster.ID); err != nil {
+			return nil, handleError(err)
+		}
 	}
 	return updatedTree, nil
 }
