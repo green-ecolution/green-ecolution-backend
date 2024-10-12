@@ -2,6 +2,7 @@ package treecluster
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -25,6 +26,7 @@ func NewLocationUpdate(clusterRepo storage.TreeClusterRepository, treeRepo stora
 
 // UpdateCluster updates the center point of a cluster based on the center point of its trees
 func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID int32) error {
+	slog.Debug("Updating cluster location", "clusterID", clusterID)
 	cluster, err := s.clusterRepo.GetByID(ctx, clusterID)
 	if err != nil {
 		return err
