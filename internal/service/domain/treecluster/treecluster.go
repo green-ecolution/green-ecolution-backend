@@ -17,12 +17,17 @@ type TreeClusterService struct {
 	locator         *GeoClusterLocator
 }
 
-func NewTreeClusterService(treeClusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) service.TreeClusterService {
+func NewTreeClusterService(
+  treeClusterRepo storage.TreeClusterRepository,
+  treeRepo storage.TreeRepository,
+  regionRepo storage.RegionRepository,
+  locator *GeoClusterLocator,
+) service.TreeClusterService {
 	return &TreeClusterService{
 		treeClusterRepo: treeClusterRepo,
 		treeRepo:        treeRepo,
 		regionRepo:      regionRepo,
-		locator:         NewLocationUpdate(treeClusterRepo, treeRepo, regionRepo),
+    locator:         locator,
 	}
 }
 
