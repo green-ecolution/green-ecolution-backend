@@ -59,6 +59,9 @@ type TreeService interface {
 
 	GetAll(ctx context.Context) ([]*domain.Tree, error)
 	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
+	Update(ctx context.Context, id int32, tc *domain.TreeUpdate) (*domain.Tree, error)
+	Create(ctx context.Context, treeCreate *domain.TreeCreate) (*domain.Tree, error)
+	Delete(ctx context.Context, id int32) error
 }
 
 type AuthService interface {
@@ -85,6 +88,11 @@ type TreeClusterService interface {
 	Delete(ctx context.Context, id int32) error
 }
 
+type SensorService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.Sensor, error)
+}
+
 type Service interface {
 	Ready() bool
 }
@@ -96,6 +104,7 @@ type Services struct {
 	AuthService        AuthService
 	RegionService      RegionService
 	TreeClusterService TreeClusterService
+	SensorService      SensorService
 }
 
 func (s *Services) AllServicesReady() bool {

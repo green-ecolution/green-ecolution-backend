@@ -100,10 +100,22 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Router			/v1/tree [post]
 // @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			body			body	entities.TreeCreateRequest	true	"Tree to create"
-func CreateTree(_ service.TreeService) fiber.Handler {
+func CreateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		var req entities.TreeCreateRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := treeMapper.FromCreateRequest(&req)
+		domainData, err := svc.Create(ctx, domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapTreeToDto(domainData)
+		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
 
@@ -122,10 +134,24 @@ func CreateTree(_ service.TreeService) fiber.Handler {
 // @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			tree_id			path	string						false	"Tree ID"
 // @Param			body			body	entities.TreeUpdateRequest	true	"Tree to update"
-func UpdateTree(_ service.TreeService) fiber.Handler {
+func UpdateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		var req entities.TreeUpdateRequest
+		if err = c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		domainReq := treeMapper.FromUpdateRequest(&req)
+		domainData, err := svc.Update(ctx, int32(id), domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		data := mapTreeToDto(domainData)
+		return c.JSON(data)
 	}
 }
 
@@ -134,18 +160,27 @@ func UpdateTree(_ service.TreeService) fiber.Handler {
 // @Id				delete-tree
 // @Tags			Tree
 // @Produce		json
-// @Success		200
+// @Success		204
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/tree [delete]
+// @Router			/v1/tree/{tree_id} [delete]
+// @Param			tree_id			path	string	false	"Tree ID"
 // @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
-func DeleteTree(_ service.TreeService) fiber.Handler {
+func DeleteTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		err = svc.Delete(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 

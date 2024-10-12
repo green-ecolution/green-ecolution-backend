@@ -3,6 +3,7 @@ package treecluster
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -14,13 +15,20 @@ type TreeClusterService struct {
 	treeClusterRepo storage.TreeClusterRepository
 	treeRepo        storage.TreeRepository
 	regionRepo      storage.RegionRepository
+	locator         *GeoClusterLocator
 }
 
-func NewTreeClusterService(treeClusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) service.TreeClusterService {
+func NewTreeClusterService(
+	treeClusterRepo storage.TreeClusterRepository,
+	treeRepo storage.TreeRepository,
+	regionRepo storage.RegionRepository,
+	locator *GeoClusterLocator,
+) service.TreeClusterService {
 	return &TreeClusterService{
 		treeClusterRepo: treeClusterRepo,
 		treeRepo:        treeRepo,
 		regionRepo:      regionRepo,
+		locator:         locator,
 	}
 }
 
@@ -43,22 +51,38 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
-	treeIDs := make([]int32, len(tc.TreeIDs))
-	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
-	treeFn, err := s.prepareTrees(ctx, tc.TreeIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	fn = append(fn, treeFn...)
-	fn = append(fn, treecluster.WithName(tc.Name), treecluster.WithAddress(tc.Address), treecluster.WithDescription(tc.Description))
-
-	c, err := s.treeClusterRepo.Create(ctx, fn...)
+	trees, err := s.getTrees(ctx, tc.TreeIDs)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
+	visitedClusters := make(map[int32]bool)
+	for _, tree := range trees {
+		if tree.TreeCluster != nil && tree.TreeCluster.ID != 0 {
+			if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
+				slog.Debug("Tree already visited", "treeID", tree.ID)
+				continue
+			}
+
+			slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
+			if err = s.locator.UpdateCluster(ctx, tree.TreeCluster.ID); err != nil {
+				return nil, handleError(err)
+			}
+			visitedClusters[tree.TreeCluster.ID] = true
+		}
+	}
+
+	c, err := s.treeClusterRepo.Create(ctx,
+		treecluster.WithName(tc.Name),
+		treecluster.WithAddress(tc.Address),
+		treecluster.WithDescription(tc.Description),
+		treecluster.WithTrees(trees),
+	)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	if err = s.locator.UpdateCluster(ctx, c.ID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -66,34 +90,24 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 }
 
 func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
-	treeIDs := make([]int32, len(tc.TreeIDs))
-	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
-
-	// TODO: Add a transaction to undo this change if an error occurs.
-	if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
+	trees, err := s.getTrees(ctx, tc.TreeIDs)
+	if err != nil {
 		return nil, handleError(err)
 	}
 
-	treeFn, err := s.prepareTrees(ctx, tc.TreeIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	fn = append(fn, treeFn...)
-	fn = append(fn,
+	c, err := s.treeClusterRepo.Update(ctx, id,
+		treecluster.WithTrees(trees),
 		treecluster.WithName(tc.Name),
 		treecluster.WithAddress(tc.Address),
 		treecluster.WithDescription(tc.Description),
-		treecluster.WithArchived(tc.Archived),
 		treecluster.WithSoilCondition(tc.SoilCondition),
 	)
 
-	c, err := s.treeClusterRepo.Update(ctx, id, fn...)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	if err = s.treeRepo.UpdateTreeClusterID(ctx, treeIDs, &c.ID); err != nil {
+	if err = s.locator.UpdateCluster(ctx, id); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -106,7 +120,6 @@ func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 
-	// TODO: Add a transaction to undo this change if an error occurs.
 	err = s.treeRepo.UnlinkTreeClusterID(ctx, id)
 	if err != nil {
 		return handleError(err)
@@ -125,6 +138,7 @@ func (s *TreeClusterService) Ready() bool {
 }
 
 func handleError(err error) error {
+	// TODO: Rollback the transaction if an error occurs.
 	if errors.Is(err, storage.ErrEntityNotFound) {
 		return service.NewError(service.NotFound, err.Error())
 	}
@@ -132,8 +146,7 @@ func handleError(err error) error {
 	return service.NewError(service.InternalError, err.Error())
 }
 
-func (s *TreeClusterService) prepareTrees(ctx context.Context, ids []*int32) ([]domain.EntityFunc[domain.TreeCluster], error) {
-	fn := make([]domain.EntityFunc[domain.TreeCluster], 0)
+func (s *TreeClusterService) getTrees(ctx context.Context, ids []*int32) ([]*domain.Tree, error) {
 	treeIDs := make([]int32, len(ids))
 	for i, id := range ids {
 		treeIDs[i] = *id
@@ -145,55 +158,5 @@ func (s *TreeClusterService) prepareTrees(ctx context.Context, ids []*int32) ([]
 		return nil, err
 	}
 
-	fn = append(fn, treecluster.WithTrees(trees))
-
-	if len(trees) > 0 {
-		geomFn, err := s.prepareGeom(ctx, treeIDs)
-		if err != nil {
-			return nil, err
-		}
-		fn = append(fn, geomFn...)
-	} else {
-		fn = append(fn, treecluster.WithLatitude(nil), treecluster.WithLongitude(nil), treecluster.WithRegion(nil))
-	}
-
-	return fn, nil
-}
-
-func (s *TreeClusterService) prepareGeom(ctx context.Context, treeIDs []int32) ([]domain.EntityFunc[domain.TreeCluster], error) {
-	lat, long, err := s.calculateCenterPoint(ctx, treeIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	region, err := s.getRegionByPoint(ctx, lat, long)
-	if err != nil {
-		return nil, err
-	}
-
-	fn := []domain.EntityFunc[domain.TreeCluster]{
-		treecluster.WithLatitude(&lat),
-		treecluster.WithLongitude(&long),
-		treecluster.WithRegion(region),
-	}
-
-	return fn, nil
-}
-
-func (s *TreeClusterService) calculateCenterPoint(ctx context.Context, treeIDs []int32) (lat, long float64, err error) {
-	lat, long, err = s.treeRepo.GetCenterPoint(ctx, treeIDs)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return lat, long, nil
-}
-
-func (s *TreeClusterService) getRegionByPoint(ctx context.Context, lat, long float64) (*domain.Region, error) {
-	region, err := s.regionRepo.GetByPoint(ctx, lat, long)
-	if err != nil {
-		return nil, handleError(err)
-	}
-
-	return region, nil
+	return trees, nil
 }
