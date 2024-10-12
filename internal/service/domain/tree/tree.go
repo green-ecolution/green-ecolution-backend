@@ -69,7 +69,7 @@ func (s *TreeService) Ready() bool {
 
 func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
 	if err := s.validator.Struct(treeCreate); err != nil {
-		return nil, handleError(err) // TODO: map validator errors
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if treeCreate.TreeClusterID != nil {
@@ -121,8 +121,8 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	if currentTree.Readonly {
 		return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
 	}
+	var oldTreeCluster = currentTree.TreeCluster.ID
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
-
 	if tu.TreeClusterID != nil {
 		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
 		if err != nil {
@@ -134,11 +134,19 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		tree.WithSpecies(tu.Species),
 		tree.WithTreeNumber(tu.Number),
 		tree.WithLatitude(tu.Latitude),
-		tree.WithLongitude(tu.Longitude))
+		tree.WithLongitude(tu.Longitude),
+		tree.WithDescription(tu.Description))
 	updatedTree, err := s.treeRepo.Update(ctx, id, fn...)
 	if err != nil {
 		return nil, handleError(err)
 	}
-	// TODO: If a new tree cluster has been provided, update the coordinates of both the old tree cluster and the new one.
+	err = s.locator.UpdateCluster(ctx, oldTreeCluster)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	err = s.locator.UpdateCluster(ctx, updatedTree.TreeCluster.ID)
+	if err != nil {
+		return nil, handleError(err)
+	}
 	return updatedTree, nil
 }
