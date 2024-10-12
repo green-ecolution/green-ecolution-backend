@@ -57,6 +57,7 @@ type TreeService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.Tree, error)
 	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
+	Update(ctx context.Context, id int32, tc *domain.TreeUpdate) (*domain.Tree, error)
 	Create(ctx context.Context, treeCreate *domain.TreeCreate) (*domain.Tree, error)
 	Delete(ctx context.Context, id int32) error
 }

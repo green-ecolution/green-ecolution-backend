@@ -134,10 +134,24 @@ func CreateTree(svc service.TreeService) fiber.Handler {
 // @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			tree_id			path	string						false	"Tree ID"
 // @Param			body			body	entities.TreeUpdateRequest	true	"Tree to update"
-func UpdateTree(_ service.TreeService) fiber.Handler {
+func UpdateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		var req entities.TreeUpdateRequest
+		if err = c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+		domainReq := treeMapper.FromUpdateRequest(&req)
+		domainData, err := svc.Update(ctx, int32(id), domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		data := mapTreeToDto(domainData)
+		return c.JSON(data)
 	}
 }
 

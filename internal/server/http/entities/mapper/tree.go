@@ -13,6 +13,7 @@ type TreeHTTPMapper interface {
 	// goverter:ignore Sensor
 	FromResponse(*domain.Tree) *entities.TreeResponse
 	FromResponseList([]*domain.Tree) []*entities.TreeResponse
+	FromUpdateRequest(*entities.TreeUpdateRequest) *domain.TreeUpdate
 	FromCreateRequest(*entities.TreeCreateRequest) *domain.TreeCreate
 }
 

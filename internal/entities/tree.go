@@ -23,11 +23,21 @@ type Tree struct {
 
 type TreeCreate struct {
 	TreeClusterID *int32
-	Readonly      bool
+	Readonly      bool    `validate:"omitempty"`
 	PlantingYear  int32   `validate:"required"`
 	Species       string  `validate:"required"`
 	Number        string  `validate:"required"`
 	Latitude      float64 `validate:"required,max=90,min=-90"`
 	Longitude     float64 `validate:"required,max=180,min=-180"`
-	Description   string
+	Description   string  `validate:"omitempty"`
+}
+
+type TreeUpdate struct {
+	TreeClusterID *int32  `validate:"omitempty,gt=0"`
+	PlantingYear  int32   `validate:"omitempty,gt=0"`
+	Species       string  `validate:"omitempty"`
+	Number        string  `validate:"omitempty"`
+	Latitude      float64 `validate:"omitempty,min=-90,max=90"`
+	Longitude     float64 `validate:"omitempty,min=-180,max=180"`
+	Description   string  `validate:"omitempty"`
 }
