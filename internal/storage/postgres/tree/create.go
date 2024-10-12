@@ -70,7 +70,7 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 		Latitude:       entity.Latitude,
 		Longitude:      entity.Longitude,
 		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
-		Description:    entity.Description,
+		Description:    &entity.Description,
 	}
 
 	return r.store.CreateTree(ctx, &args)
