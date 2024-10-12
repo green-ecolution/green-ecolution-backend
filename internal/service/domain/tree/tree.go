@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/treecluster"
@@ -16,6 +17,7 @@ type TreeService struct {
 	sensorRepo      storage.SensorRepository
 	treeClusterRepo storage.TreeClusterRepository
 	locator         *treecluster.GeoClusterLocator
+	validator       *validator.Validate
 }
 
 func NewTreeService(
@@ -29,6 +31,7 @@ func NewTreeService(
 		sensorRepo:      repoSensor,
 		treeClusterRepo: treeClusterRepo,
 		locator:         geoClusterLocator,
+		validator:       validator.New(),
 	}
 }
 
@@ -63,17 +66,8 @@ func (s *TreeService) Ready() bool {
 }
 
 func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
-	if treeCreate.PlantingYear == 0 {
-		return nil, handleError(errors.New("planting year cannot be null or zero"))
-	}
-	if treeCreate.Species == "" {
-		return nil, handleError(errors.New("species cannot be null or empty"))
-	}
-	if treeCreate.Number == "" {
-		return nil, handleError(errors.New("tree number cannot be null or empty"))
-	}
-	if treeCreate.Latitude == 0 || treeCreate.Longitude == 0 {
-		return nil, handleError(errors.New("latitude and longitude cannot be null or zero"))
+	if err := s.validator.Struct(treeCreate); err != nil {
+		return nil, handleError(err) // TODO: map validator errors
 	}
 
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
