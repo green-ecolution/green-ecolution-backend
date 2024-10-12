@@ -3,6 +3,7 @@ package treecluster
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -53,6 +54,22 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 	trees, err := s.getTrees(ctx, tc.TreeIDs)
 	if err != nil {
 		return nil, handleError(err)
+	}
+
+	visitedClusters := make(map[int32]bool)
+	for _, tree := range trees {
+		if tree.TreeCluster != nil && tree.TreeCluster.ID != 0 {
+			if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
+				slog.Debug("Tree already visited", "treeID", tree.ID)
+				continue
+			}
+
+			slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
+			if err = s.locator.UpdateCluster(ctx, tree.TreeCluster.ID); err != nil {
+				return nil, handleError(err)
+			}
+			visitedClusters[tree.TreeCluster.ID] = true
+		}
 	}
 
 	c, err := s.treeClusterRepo.Create(ctx,
