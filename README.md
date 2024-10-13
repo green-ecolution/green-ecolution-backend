@@ -1,4 +1,18 @@
-# Green Ecolution - green space management
+# Green Ecolution Backend
+Smart irrigation is needed to save water, staff and costs.
+
+This project is the server-side for Green Ecolution. For Frontend please refer to [Green Ecolution Frontend](https://github.com/green-ecolution/green-ecolution-frontend)
+The backend provides an interface to interact between the website and the database.
+The backend retains data about
+- trees
+- tree clusters
+- beds
+- sensors
+
+In the current setup sensors are connected to an ESP32 with an integrated LoRaWAN module.
+Sensor data is send using LoraWAN to a MQTT-Gateway and then to the server to further process the data.
+
+While the project is created in collaboration with the local green space management (TBZ Flensburg) this software aims to be applicable for other cities.
 
 - [Roadmap](https://github.com/orgs/green-ecolution/projects/5/views/3)
 
@@ -45,25 +59,40 @@ Inside the `internal` folder, there is a `server` package that contains the serv
 - [Golang](https://go.dev/) as the main programming language
 - [Air](https://github.com/air-verse/air) for live reload
 - [Mockery](https://github.com/vektra/mockery) for mocking interfaces. Use version `v2.43.2`
+- [Make](https://www.gnu.org/software/make/) to execute Makefile
+- [docker](https://github.com/docker) for containers
+- [docker-compose](https://github.com/docker/compose) to manage containers
 
 ### Setup
 
-To enable live reload, you need to install [Air](https://github.com/air-verse/air). Air is a command-line utility for Go applications that monitors changes in the file system and restarts the application. To mock interfaces, you need to install [Mockery](https://github.com/vektra/mockery). Mockery is a tool for generating mocks for interfaces in Go. Inside the project folder, there is a `.env.example` file. You need to create a `.env` file with the same content and fill in the environment variables.
+To download all needed tools use
+```bash
+make setup
+```
 
+Then to generate code use
+```bash
+make generate
+```
+
+To run a local database you can use a preconfigured .yaml file. 
+```bash
+docker compose up -d
+```
 ### Run
 
 To run the project, you need to execute the following command:
 
-**Use air for live reload**
+**With live reload**
 
 ```bash
-air
+make run/live
 ```
 
-**Without air**
+**Without live reload**
 
 ```bash
-go run main.go
+make run
 ```
 
 ### Test
@@ -82,3 +111,17 @@ go test ./...
 ```
 
 **NOTE:** Mockery is used to generate mocks for interfaces. The mocks are generated in the `_mocks` folder. To specify the output folder or to add created interfaces to the mocks, you can edit the `mockery.yml` file. The `mockery.yml` file is used to configure the behavior of Mockery. Running `go generate` will execute Mockery and generate the mocks. Also when running Air, the mocks will be generated automatically.
+
+### How to contribute
+
+If you want to contribute to the project please follow this guideline:
+
+- Fork the project.
+- Create a topic branch from develop.
+- Make some commits to improve the project.
+- Push this branch to your GitHub project.
+- Open a Pull Request on GitHub.
+- Discuss, and optionally continue committing.
+- The project owner merges or closes the Pull Request.
+
+Please refer to naming conventions for branches [Medium Article](https://medium.com/@abhay.pixolo/naming-conventions-for-git-branches-a-cheatsheet-8549feca2534).
