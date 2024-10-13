@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -34,6 +35,7 @@ var headerRowIndex = 0
 // @Param			Authorization	header		string	true	"Insert your access token"	default(Bearer <Add access token here>)
 // @Param			file			formData	file	true	"CSV file to import"
 func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
+  start := time.Now()
 	return func(c *fiber.Ctx) error {
 		fileHeader, err := c.FormFile("file")
 		if err != nil {
@@ -42,11 +44,11 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 			})
 		}
 
-		// if !isCSVFile(fileHeader) {
-		// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-		// 		"error": "Uploaded file is not a valid CSV file",
-		// 	})
-		// }
+		if !isCSVFile(fileHeader) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Uploaded file is not a valid CSV file",
+			})
+		}
 
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -85,6 +87,8 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 			})
 		}
 
+    elapsed := time.Since(start)
+    slog.Info("Importing trees from CSV took", "time", elapsed)
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
@@ -93,7 +97,7 @@ func isCSVFile(fileHeader *multipart.FileHeader) bool {
 	// Check the file extension
 	ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
 	slog.Debug("File extension", "ext", ext, "content-type", fileHeader.Header.Get("Content-Type"))
-	return ext != ".csv" || fileHeader.Header.Get("Content-Type") != "text/csv"
+	return ext == ".csv" || fileHeader.Header.Get("Content-Type") == "text/csv"
 }
 
 func validateCSV(file multipart.File) error {

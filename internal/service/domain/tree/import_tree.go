@@ -49,10 +49,6 @@ func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.TreeImpo
 		}
 	}
 
-	fmt.Println("deleteQueue", deleteQueue)
-	fmt.Println("createQueue", createQueue)
-	fmt.Println("updateQueue", updateQueue)
-
 	if err := s.processDeleteQueue(ctx, deleteQueue); err != nil {
 		return handleError(err)
 	}
@@ -90,7 +86,7 @@ func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*ent
 
 func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*entities.TreeImport) error {
 	for i, treeToUpdate := range updateQueue {
-		_, err := s.Update(ctx, treeToUpdate.TreeID, s.convertImportTreeToTreeUpdate(ctx, treeToUpdate))
+		_, err := s.Update(ctx, treeToUpdate.TreeID, s.convertImportTreeToTreeUpdate(treeToUpdate))
 		if err != nil {
 			slog.Error("Error updating tree",
 				"index", i+1,
@@ -118,7 +114,7 @@ func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*ent
 			"Longitude", newTree.Longitude,
 			"PlantingYear", newTree.PlantingYear,
 		)
-		_, err := s.Create(ctx, s.convertImportTreeToTreeCreate(ctx, newTree))
+		_, err := s.Create(ctx, s.convertImportTreeToTreeCreate(newTree))
 		if err != nil {
 			slog.Error("Error creating tree", "index", i+1, "error", err)
 			return handleError(fmt.Errorf("error creating tree %d: %w", i+1, err))
@@ -128,7 +124,7 @@ func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*ent
 	return nil
 }
 
-func (s *TreeService) convertImportTreeToTreeUpdate(ctx context.Context, tree *entities.TreeImport) *entities.TreeUpdate {
+func (s *TreeService) convertImportTreeToTreeUpdate(tree *entities.TreeImport) *entities.TreeUpdate {
 	treeUpdate := &entities.TreeUpdate{
 		PlantingYear: tree.PlantingYear,
 		Species:      tree.Species,
@@ -139,13 +135,14 @@ func (s *TreeService) convertImportTreeToTreeUpdate(ctx context.Context, tree *e
 	return treeUpdate
 }
 
-func (s *TreeService) convertImportTreeToTreeCreate(ctx context.Context, tree *entities.TreeImport) *entities.TreeCreate {
+func (s *TreeService) convertImportTreeToTreeCreate(tree *entities.TreeImport) *entities.TreeCreate {
 	treeCreate := &entities.TreeCreate{
 		PlantingYear: tree.PlantingYear,
 		Species:      tree.Species,
 		Number:       tree.Number,
 		Latitude:     tree.Latitude,
 		Longitude:    tree.Longitude,
+		Readonly:     true,
 		Description:  "Dieser Baum wurde importiert",
 	}
 	return treeCreate
