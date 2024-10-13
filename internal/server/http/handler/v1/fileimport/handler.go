@@ -87,19 +87,13 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
     return c.SendStatus(fiber.StatusNoContent)
 	}
 }
+
 func isCSVFile(fileHeader *multipart.FileHeader) bool {
 	// Check the file extension
 	ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
-	if ext != ".csv" {
-		return false
-	}
-	// Check the MIME type (could be "text/csv" or "application/vnd.ms-excel")
-	if fileHeader.Header.Get("Content-Type") != "text/csv" && fileHeader.Header.Get("Content-Type") != "application/vnd.ms-excel" {
-		return false
-	}
-
-	return true
+  return ext != ".csv" || fileHeader.Header.Get("Content-Type") != "text/csv" 
 }
+
 func validateCSV(file multipart.File) error {
 	reader := csv.NewReader(file)
 	headers, err := reader.Read()
@@ -133,6 +127,7 @@ func validateHeaders(headers []string) bool {
 	}
 	return true
 }
+
 func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeService) error {
 	r := csv.NewReader(file)
 	r.LazyQuotes = true
@@ -141,19 +136,23 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 		slog.Error("Failed to read CSV", "error", err)
 		return errorhandler.HandleError(err)
 	}
+
 	if len(rows) < headerRowIndex+2 {
 		return errorhandler.HandleError(errors.New("CSV file has no data"))
 	}
+
 	// transformer, err := proj.NewEPSGTransformer(31467, 4326)
 	// if err != nil {
 	// slog.Error("Error creating transformer", "error", err)
 	// }
 	// Create the header map
+
 	headerIndexMap, err := createHeaderIndexMap(expectedCSVHeaders)
 	if err != nil {
 		slog.Error("Error creating header index map", "error", err)
 		return errorhandler.HandleError(err)
 	}
+
 	var trees []*domain.TreeImport
 	for i, row := range rows[headerRowIndex+1:] {
 		rowIndex := headerRowIndex + i + 1
@@ -161,13 +160,14 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 			return errorhandler.HandleError(errors.New("invalid CSV format at row " + strconv.Itoa(rowIndex)))
 		}
 		// tree, err := parseRowToTree(rowIndex, row, headerIndexMap, &transformer)
-		tree, err := parseRowToTree(rowIndex, row, headerIndexMap)
+    tree, err := parseRowToTree(rowIndex, row, headerIndexMap)
 		if err != nil {
 			slog.Error("Failed to parse row", "row", i+2, "error", err)
 			return errorhandler.HandleError(err)
 		}
 		trees = append(trees, tree)
 	}
+
 	err = svc.ImportTree(ctx, trees)
 	if err != nil {
 		return errorhandler.HandleError(err)
@@ -199,22 +199,28 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*d
 	if treeNumber == "" {
 		return nil, errorhandler.HandleError(errors.New("invalid 'TreeNumber' value at row: " + strconv.Itoa(rowIdx)))
 	}
+
 	// Read 'Species' from the row using the header index map
 	speciesIdx := headerIndexMap[expectedCSVHeaders[1]]
 	species := row[speciesIdx]
+
 	if species == "" {
 		return nil, errorhandler.HandleError(errors.New("invalid 'Species' value at row: " + strconv.Itoa(rowIdx)))
 	}
+
 	latitudeIdx := headerIndexMap[expectedCSVHeaders[2]]
 	longitudeIdx := headerIndexMap[expectedCSVHeaders[3]]
+
 	latitude, err := strconv.ParseFloat(row[latitudeIdx], 64)
 	if err != nil {
 		return nil, errorhandler.HandleError(errors.New("invalid 'Latitude' value at row: " + strconv.Itoa(rowIdx)))
 	}
+
 	longitude, err := strconv.ParseFloat(row[longitudeIdx], 64)
 	if err != nil {
 		return nil, errorhandler.HandleError(errors.New("invalid 'Longitude' value at row: " + strconv.Itoa(rowIdx)))
 	}
+
 	// TODO: Convert Gauß-Krüger coordinates to WGS84 using the transformer
 	// points := []proj.Coord{
 	//	proj.XY(latitude, longitude),
@@ -223,6 +229,7 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*d
 	// if err := transformer.Transform(points); err != nil {
 	// return nil, errorhandler.HandleError(errors.New("failed to transform coordinates from Gauß-Krüger to WGS84 at row: " + strconv.Itoa(rowIdx)))
 	// }
+
 	plantingYearIdx := headerIndexMap[expectedCSVHeaders[4]]
 	plantingYear, err := strconv.Atoi(row[plantingYearIdx])
 	if err != nil {
