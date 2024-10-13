@@ -8,10 +8,10 @@ type TreeSoilCondition string // @Name SoilCondition
 
 const (
 	TreeSoilConditionSchluffig TreeSoilCondition = "schluffig"
-  TreeSoilConditionSandig    TreeSoilCondition = "sandig"
-  TreeSoilConditionLehmig    TreeSoilCondition = "lehmig"
-  TreeSoilConditionTonig     TreeSoilCondition = "tonig"
-  TreeSoilConditionUnknown   TreeSoilCondition = "unknown"
+	TreeSoilConditionSandig    TreeSoilCondition = "sandig"
+	TreeSoilConditionLehmig    TreeSoilCondition = "lehmig"
+	TreeSoilConditionTonig     TreeSoilCondition = "tonig"
+	TreeSoilConditionUnknown   TreeSoilCondition = "unknown"
 )
 
 type TreeClusterResponse struct {
@@ -19,7 +19,7 @@ type TreeClusterResponse struct {
 	CreatedAt      time.Time         `json:"created_at"`
 	UpdatedAt      time.Time         `json:"updated_at"`
 	WateringStatus WateringStatus    `json:"watering_status"`
-  LastWatered    *time.Time        `json:"last_watered,omitempty" validate:"optional"`
+	LastWatered    *time.Time        `json:"last_watered,omitempty" validate:"optional"`
 	MoistureLevel  float64           `json:"moisture_level"`
 	Region         *RegionResponse   `json:"region,omitempty" validate:"optional"`
 	Address        string            `json:"address"`
