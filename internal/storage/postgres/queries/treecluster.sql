@@ -20,6 +20,9 @@ INSERT INTO tree_clusters (
   $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id;
 
+-- name: GetTreeClusterByAddress :one
+SELECT * FROM tree_clusters WHERE address = $1 LIMIT 1;
+
 -- name: LinkTreesToTreeCluster :exec
 UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
 

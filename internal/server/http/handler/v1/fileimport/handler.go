@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -17,7 +16,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-var expectedCSVHeaders = []string{"Area", "Street", "TreeNumber", "Species", "Latitude", "Longitude", "PlantingYear"}
+var expectedCSVHeaders = []string{"TreeNumber", "Species", "Latitude", "Longitude", "PlantingYear", "Street"}
 var headerRowIndex = 0
 
 func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
@@ -138,7 +137,7 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 		slog.Error("Error creating header index map", "error", err)
 		return errorhandler.HandleError(err)
 	}
-	var trees []*domain.Tree
+	var trees []*domain.TreeImport
 	for i, row := range rows[headerRowIndex+1:] {
 		rowIndex := headerRowIndex + i + 1
 		if len(row) < len(expectedCSVHeaders) {
@@ -177,30 +176,20 @@ func createHeaderIndexMap(headers []string) (map[string]int, error) {
 }
 
 // func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, transformer *proj.Transformer) (*domain.Tree, error) {
-func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*domain.Tree, error) {
-	areaIdx := headerIndexMap[expectedCSVHeaders[0]]
-	area := row[areaIdx]
-	if area == "" {
-		return nil, errorhandler.HandleError(errors.New("invalid 'Area' value at row: " + strconv.Itoa(rowIdx)))
-	}
-	streetIdx := headerIndexMap[expectedCSVHeaders[1]]
-	street := row[streetIdx]
-	if street == "" {
-		return nil, errorhandler.HandleError(errors.New("invalid 'Street' value at row: " + strconv.Itoa(rowIdx)))
-	}
-	treeNumberIdx := headerIndexMap[expectedCSVHeaders[2]]
+func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*domain.TreeImport, error) {
+	treeNumberIdx := headerIndexMap[expectedCSVHeaders[0]]
 	treeNumber := row[treeNumberIdx]
 	if treeNumber == "" {
 		return nil, errorhandler.HandleError(errors.New("invalid 'TreeNumber' value at row: " + strconv.Itoa(rowIdx)))
 	}
 	// Read 'Species' from the row using the header index map
-	speciesIdx := headerIndexMap[expectedCSVHeaders[3]]
+	speciesIdx := headerIndexMap[expectedCSVHeaders[1]]
 	species := row[speciesIdx]
 	if species == "" {
 		return nil, errorhandler.HandleError(errors.New("invalid 'Species' value at row: " + strconv.Itoa(rowIdx)))
 	}
-	latitudeIdx := headerIndexMap[expectedCSVHeaders[4]]
-	longitudeIdx := headerIndexMap[expectedCSVHeaders[5]]
+	latitudeIdx := headerIndexMap[expectedCSVHeaders[2]]
+	longitudeIdx := headerIndexMap[expectedCSVHeaders[3]]
 	latitude, err := strconv.ParseFloat(row[latitudeIdx], 64)
 	if err != nil {
 		return nil, errorhandler.HandleError(errors.New("invalid 'Latitude' value at row: " + strconv.Itoa(rowIdx)))
@@ -217,19 +206,25 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*d
 	// if err := transformer.Transform(points); err != nil {
 	// return nil, errorhandler.HandleError(errors.New("failed to transform coordinates from Gauß-Krüger to WGS84 at row: " + strconv.Itoa(rowIdx)))
 	// }
-	plantingYearIdx := headerIndexMap[expectedCSVHeaders[6]]
+	plantingYearIdx := headerIndexMap[expectedCSVHeaders[4]]
 	plantingYear, err := strconv.Atoi(row[plantingYearIdx])
 	if err != nil {
 		return nil, errorhandler.HandleError(errors.New("invalid 'PlantingYear' value at row: " + strconv.Itoa(rowIdx)))
 	}
-	tree := &domain.Tree{
+
+	streetIdx := headerIndexMap[expectedCSVHeaders[5]]
+	street := row[streetIdx]
+	if street == "" {
+		return nil, errorhandler.HandleError(errors.New("invalid 'Street' value at row: " + strconv.Itoa(rowIdx)))
+	}
+
+	tree := &domain.TreeImport{
 		Number:       treeNumber,
 		Species:      species,
 		Latitude:     latitude,  // points[0].Y, // WGS84 Latitude
 		Longitude:    longitude, // points[0].X, // WGS84 Longitude
 		PlantingYear: int32(plantingYear),
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
+		Street:       street,
 	}
 	return tree, nil
 }
