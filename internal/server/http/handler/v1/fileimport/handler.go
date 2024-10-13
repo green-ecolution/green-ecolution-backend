@@ -19,6 +19,19 @@ import (
 var expectedCSVHeaders = []string{"TreeNumber", "Species", "Latitude", "Longitude", "PlantingYear", "Street"}
 var headerRowIndex = 0
 
+//	@Summary		Import trees from a CSV file
+//	@Description	Import trees from a CSV file
+//	@Id				import-trees-from-csv
+//	@Tags			File Import
+//	@Success		204
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/import/csv [post]
+//	@Param			Authorization	header		string	true	"Insert your access token"	default(Bearer <Add access token here>)
+//	@Param			file			formData	file	true	"CSV file to import"
 func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		fileHeader, err := c.FormFile("file")
@@ -27,17 +40,20 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 				"error": "Failed to retrieve file",
 			})
 		}
+
 		if !isCSVFile(fileHeader) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Uploaded file is not a valid CSV file",
 			})
 		}
+
 		file, err := fileHeader.Open()
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Failed to open uploaded file",
 			})
 		}
+
 		defer func(file multipart.File) {
 			err := file.Close()
 			if err != nil {
@@ -52,12 +68,14 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 				"details": err.Error(),
 			})
 		}
+
 		// Reset file cursor to the beginning before processing
 		if _, err := file.Seek(0, 0); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Failed to reset file cursor",
 			})
 		}
+
 		if err := processCSVFile(c.Context(), file, svc); err != nil {
 			slog.Error("Error processing csv file:", "error", err)
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -65,9 +83,8 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 				"err":   err.Error(),
 			})
 		}
-		return c.JSON(fiber.Map{
-			"message": "File uploaded and processed successfully",
-		})
+
+    return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 func isCSVFile(fileHeader *multipart.FileHeader) bool {
