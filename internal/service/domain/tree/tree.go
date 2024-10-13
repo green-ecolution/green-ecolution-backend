@@ -72,6 +72,7 @@ func (s *TreeService) Ready() bool {
 }
 
 func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
+	fmt.Printf("TreeCreate: %+v\n", treeCreate)
 	if err := s.validator.Struct(treeCreate); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}

@@ -11,6 +11,7 @@ import (
 func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.TreeImport) error {
 	var deleteQueue []*entities.Tree
 	var createQueue, updateQueue []*entities.TreeImport
+
 	for i, csvTree := range trees {
 		slog.Info("Processing tree coordinates",
 			"index", i+1,
@@ -47,6 +48,10 @@ func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.TreeImpo
 			slog.Info("Tree queued for deletion and recreation", "index", i+1)
 		}
 	}
+
+	fmt.Println("deleteQueue", deleteQueue)
+	fmt.Println("createQueue", createQueue)
+	fmt.Println("updateQueue", updateQueue)
 
 	if err := s.processDeleteQueue(ctx, deleteQueue); err != nil {
 		return handleError(err)
@@ -122,6 +127,7 @@ func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*ent
 	}
 	return nil
 }
+
 func (s *TreeService) convertImportTreeToTreeUpdate(ctx context.Context, tree *entities.TreeImport) *entities.TreeUpdate {
 	treeUpdate := &entities.TreeUpdate{
 		PlantingYear: tree.PlantingYear,
@@ -129,13 +135,6 @@ func (s *TreeService) convertImportTreeToTreeUpdate(ctx context.Context, tree *e
 		Number:       tree.Number,
 		Latitude:     tree.Latitude,
 		Longitude:    tree.Longitude,
-	}
-	treeCluster, err := s.treeClusterRepo.GetByAddress(ctx, tree.Street)
-	if err != nil {
-		return nil
-	}
-	if treeCluster != nil {
-		treeUpdate.TreeClusterID = &treeCluster.ID
 	}
 	return treeUpdate
 }
@@ -147,13 +146,7 @@ func (s *TreeService) convertImportTreeToTreeCreate(ctx context.Context, tree *e
 		Number:       tree.Number,
 		Latitude:     tree.Latitude,
 		Longitude:    tree.Longitude,
-	}
-	treeCluster, err := s.treeClusterRepo.GetByAddress(ctx, tree.Street)
-	if err != nil {
-		return nil
-	}
-	if treeCluster != nil {
-		treeCreate.TreeClusterID = &treeCluster.ID
+		Description:  "Dieser Baum wurde importiert",
 	}
 	return treeCreate
 }

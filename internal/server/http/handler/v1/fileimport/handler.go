@@ -14,24 +14,25 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/omniscale/go-proj/v2"
 )
 
-var expectedCSVHeaders = []string{"TreeNumber", "Species", "Latitude", "Longitude", "PlantingYear", "Street"}
+var expectedCSVHeaders = []string{"Gebiet", "Straße", "BaumNr.", "Gattung/Art", "Hochwert", "Rechtswert", "Pflanzjahr"}
 var headerRowIndex = 0
 
-//	@Summary		Import trees from a CSV file
-//	@Description	Import trees from a CSV file
-//	@Id				import-trees-from-csv
-//	@Tags			File Import
-//	@Success		204
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/import/csv [post]
-//	@Param			Authorization	header		string	true	"Insert your access token"	default(Bearer <Add access token here>)
-//	@Param			file			formData	file	true	"CSV file to import"
+// @Summary		Import trees from a CSV file
+// @Description	Import trees from a CSV file
+// @Id				import-trees-from-csv
+// @Tags			File Import
+// @Success		204
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/import/csv [post]
+// @Param			Authorization	header		string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			file			formData	file	true	"CSV file to import"
 func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		fileHeader, err := c.FormFile("file")
@@ -41,11 +42,11 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 			})
 		}
 
-		if !isCSVFile(fileHeader) {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Uploaded file is not a valid CSV file",
-			})
-		}
+		// if !isCSVFile(fileHeader) {
+		// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		// 		"error": "Uploaded file is not a valid CSV file",
+		// 	})
+		// }
 
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -84,14 +85,15 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 			})
 		}
 
-    return c.SendStatus(fiber.StatusNoContent)
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 
 func isCSVFile(fileHeader *multipart.FileHeader) bool {
 	// Check the file extension
 	ext := strings.ToLower(filepath.Ext(fileHeader.Filename))
-  return ext != ".csv" || fileHeader.Header.Get("Content-Type") != "text/csv" 
+	slog.Debug("File extension", "ext", ext, "content-type", fileHeader.Header.Get("Content-Type"))
+	return ext != ".csv" || fileHeader.Header.Get("Content-Type") != "text/csv"
 }
 
 func validateCSV(file multipart.File) error {
@@ -141,12 +143,12 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 		return errorhandler.HandleError(errors.New("CSV file has no data"))
 	}
 
-	// transformer, err := proj.NewEPSGTransformer(31467, 4326)
-	// if err != nil {
-	// slog.Error("Error creating transformer", "error", err)
-	// }
-	// Create the header map
+	transformer, err := proj.NewEPSGTransformer(31467, 4326)
+	if err != nil {
+		slog.Error("Error creating transformer", "error", err)
+	}
 
+	// Create the header map
 	headerIndexMap, err := createHeaderIndexMap(expectedCSVHeaders)
 	if err != nil {
 		slog.Error("Error creating header index map", "error", err)
@@ -159,8 +161,8 @@ func processCSVFile(ctx context.Context, file multipart.File, svc service.TreeSe
 		if len(row) < len(expectedCSVHeaders) {
 			return errorhandler.HandleError(errors.New("invalid CSV format at row " + strconv.Itoa(rowIndex)))
 		}
-		// tree, err := parseRowToTree(rowIndex, row, headerIndexMap, &transformer)
-    tree, err := parseRowToTree(rowIndex, row, headerIndexMap)
+		// tree, err := parseRowToTree(rowIndex, row, headerIndexMap)
+		tree, err := parseRowToTree(rowIndex, row, headerIndexMap, transformer)
 		if err != nil {
 			slog.Error("Failed to parse row", "row", i+2, "error", err)
 			return errorhandler.HandleError(err)
@@ -192,63 +194,76 @@ func createHeaderIndexMap(headers []string) (map[string]int, error) {
 	return headerIndexMap, nil
 }
 
-// func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, transformer *proj.Transformer) (*domain.Tree, error) {
-func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*domain.TreeImport, error) {
-	treeNumberIdx := headerIndexMap[expectedCSVHeaders[0]]
-	treeNumber := row[treeNumberIdx]
-	if treeNumber == "" {
-		return nil, errorhandler.HandleError(errors.New("invalid 'TreeNumber' value at row: " + strconv.Itoa(rowIdx)))
+func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int, transformer proj.Transformer) (*domain.TreeImport, error) {
+	areaIdx := headerIndexMap[expectedCSVHeaders[0]]
+	area := row[areaIdx]
+	if area == "" {
+		return nil, errorhandler.HandleError(errors.New("invalid 'Gebiet' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
 	// Read 'Species' from the row using the header index map
-	speciesIdx := headerIndexMap[expectedCSVHeaders[1]]
+	streetIdx := headerIndexMap[expectedCSVHeaders[1]]
+	street := row[streetIdx]
+
+	if street == "" {
+		return nil, errorhandler.HandleError(errors.New("invalid 'Straße' value at row: " + strconv.Itoa(rowIdx)))
+	}
+
+	treeNumberIdx := headerIndexMap[expectedCSVHeaders[2]]
+	treeNumber := row[treeNumberIdx]
+
+	if treeNumber == "" {
+		return nil, errorhandler.HandleError(errors.New("invalid 'BaumNr.' value at row: " + strconv.Itoa(rowIdx)))
+	}
+
+	// Read 'Species' from the row using the header index map
+	speciesIdx := headerIndexMap[expectedCSVHeaders[3]]
 	species := row[speciesIdx]
 
-	if species == "" {
-		return nil, errorhandler.HandleError(errors.New("invalid 'Species' value at row: " + strconv.Itoa(rowIdx)))
+	// if species == "" {
+	// 	return nil, errorhandler.HandleError(errors.New("invalid 'Gattung/Art' value at row: " + strconv.Itoa(rowIdx)))
+	// }
+
+	latitudeIdx := headerIndexMap[expectedCSVHeaders[4]]
+	longitudeIdx := headerIndexMap[expectedCSVHeaders[5]]
+
+	latitude, err := strconv.ParseFloat(strings.Replace(row[latitudeIdx], ",", ".", -1), 64)
+	if err != nil {
+		slog.Debug("Error", "error", err, "row", row, "latitudeIdx", latitudeIdx, "row[latitudeIdx]", row[latitudeIdx])
+		return nil, errorhandler.HandleError(errors.New("invalid 'Hochwert' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
-	latitudeIdx := headerIndexMap[expectedCSVHeaders[2]]
-	longitudeIdx := headerIndexMap[expectedCSVHeaders[3]]
-
-	latitude, err := strconv.ParseFloat(row[latitudeIdx], 64)
+	longitude, err := strconv.ParseFloat(strings.Replace(row[longitudeIdx], ",", ".", -1), 64)
 	if err != nil {
-		return nil, errorhandler.HandleError(errors.New("invalid 'Latitude' value at row: " + strconv.Itoa(rowIdx)))
-	}
-
-	longitude, err := strconv.ParseFloat(row[longitudeIdx], 64)
-	if err != nil {
-		return nil, errorhandler.HandleError(errors.New("invalid 'Longitude' value at row: " + strconv.Itoa(rowIdx)))
+		slog.Debug("Error", "error", err, "row", row, "longitudeIdx", longitudeIdx, "row[longitudeIdx]", row[longitudeIdx])
+		return nil, errorhandler.HandleError(errors.New("invalid 'Rechtswert' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
 	// TODO: Convert Gauß-Krüger coordinates to WGS84 using the transformer
-	// points := []proj.Coord{
-	//	proj.XY(latitude, longitude),
-	// }
-
-	// if err := transformer.Transform(points); err != nil {
-	// return nil, errorhandler.HandleError(errors.New("failed to transform coordinates from Gauß-Krüger to WGS84 at row: " + strconv.Itoa(rowIdx)))
-	// }
-
-	plantingYearIdx := headerIndexMap[expectedCSVHeaders[4]]
-	plantingYear, err := strconv.Atoi(row[plantingYearIdx])
-	if err != nil {
-		return nil, errorhandler.HandleError(errors.New("invalid 'PlantingYear' value at row: " + strconv.Itoa(rowIdx)))
+	points := []proj.Coord{
+		proj.XY(latitude, longitude),
 	}
 
-	streetIdx := headerIndexMap[expectedCSVHeaders[5]]
-	street := row[streetIdx]
-	if street == "" {
-		return nil, errorhandler.HandleError(errors.New("invalid 'Street' value at row: " + strconv.Itoa(rowIdx)))
+	if err = transformer.Transform(points); err != nil {
+		return nil, errorhandler.HandleError(errors.New("failed to transform coordinates from Gauß-Krüger to WGS84 at row: " + strconv.Itoa(rowIdx)))
+	}
+
+	plantingYearIdx := headerIndexMap[expectedCSVHeaders[6]]
+	plantingYear, err := strconv.Atoi(row[plantingYearIdx])
+	if err != nil {
+		return nil, errorhandler.HandleError(errors.New("invalid 'Pflanzjahr' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
 	tree := &domain.TreeImport{
+		Area:         area,
 		Number:       treeNumber,
 		Species:      species,
-		Latitude:     latitude,  // points[0].Y, // WGS84 Latitude
-		Longitude:    longitude, // points[0].X, // WGS84 Longitude
+		Latitude:     points[0].X, // WGS84 Latitude
+		Longitude:    points[0].Y, // WGS84 Longitude
 		PlantingYear: int32(plantingYear),
 		Street:       street,
 	}
+
+	slog.Debug("Tree", "tree", tree)
 	return tree, nil
 }
