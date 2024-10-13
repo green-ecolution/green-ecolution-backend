@@ -25,9 +25,12 @@ func NewLocationUpdate(clusterRepo storage.TreeClusterRepository, treeRepo stora
 }
 
 // UpdateCluster updates the center point of a cluster based on the center point of its trees
-func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID int32) error {
+func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID *int32) error {
 	slog.Debug("Updating cluster location", "clusterID", clusterID)
-	cluster, err := s.clusterRepo.GetByID(ctx, clusterID)
+	if clusterID == nil {
+		return nil
+	}
+	cluster, err := s.clusterRepo.GetByID(ctx, *clusterID)
 	if err != nil {
 		return err
 	}
@@ -46,7 +49,7 @@ func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID int32) 
 		return err
 	}
 
-	_, err = s.clusterRepo.Update(ctx, clusterID,
+	_, err = s.clusterRepo.Update(ctx, *clusterID,
 		treecluster.WithLatitude(&lat),
 		treecluster.WithLongitude(&long),
 		treecluster.WithRegion(region),

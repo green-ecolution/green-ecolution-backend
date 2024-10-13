@@ -65,7 +65,7 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 			}
 
 			slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
-			if err = s.locator.UpdateCluster(ctx, tree.TreeCluster.ID); err != nil {
+			if err = s.locator.UpdateCluster(ctx, &tree.TreeCluster.ID); err != nil {
 				return nil, handleError(err)
 			}
 			visitedClusters[tree.TreeCluster.ID] = true
@@ -82,7 +82,7 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 		return nil, handleError(err)
 	}
 
-	if err = s.locator.UpdateCluster(ctx, c.ID); err != nil {
+	if err = s.locator.UpdateCluster(ctx, &c.ID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -107,7 +107,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.Tr
 		return nil, handleError(err)
 	}
 
-	if err = s.locator.UpdateCluster(ctx, id); err != nil {
+	if err = s.locator.UpdateCluster(ctx, &id); err != nil {
 		return nil, handleError(err)
 	}
 
