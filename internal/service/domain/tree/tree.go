@@ -72,7 +72,6 @@ func (s *TreeService) Ready() bool {
 }
 
 func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
-	fmt.Printf("TreeCreate: %+v\n", treeCreate)
 	if err := s.validator.Struct(treeCreate); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
@@ -128,10 +127,12 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	if err != nil {
 		return nil, handleError(err)
 	}
+
 	// Check if the tree is readonly (imported from csv)
-	if currentTree.Readonly {
-		return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
-	}
+	// if currentTree.Readonly {
+	// 	return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
+	// }
+
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if tu.TreeClusterID != nil {
 		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)

@@ -30,14 +30,15 @@ func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.TreeImpo
 			continue
 		}
 
-		if existingTree.Readonly {
-			slog.Error("Tree is read-only and cannot be overwritten",
-				"index", i+1,
-				"latitude", csvTree.Latitude,
-				"longitude", csvTree.Longitude)
-			return handleError(fmt.Errorf("tree %d (latitude: %.6f, longitude: %.6f) is read-only and cannot be overwritten. Please delete it manually",
-				i+1, csvTree.Latitude, csvTree.Longitude))
-		}
+		// if existingTree.Readonly {
+		// 	slog.Error("Tree is read-only and cannot be overwritten",
+		// 		"index", i+1,
+		// 		"latitude", csvTree.Latitude,
+		// 		"longitude", csvTree.Longitude)
+		// 	return handleError(fmt.Errorf("tree %d (latitude: %.6f, longitude: %.6f) is read-only and cannot be overwritten. Please delete it manually",
+		// 		i+1, csvTree.Latitude, csvTree.Longitude))
+		// }
+
 		if existingTree.PlantingYear == csvTree.PlantingYear {
 			csvTree.TreeID = existingTree.ID
 			updateQueue = append(updateQueue, csvTree)
