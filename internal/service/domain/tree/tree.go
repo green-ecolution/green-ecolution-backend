@@ -97,7 +97,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		return nil, handleError(err)
 	}
 
-	if err = s.locator.UpdateCluster(ctx, *treeCreate.TreeClusterID); err != nil {
+	if err = s.locator.UpdateCluster(ctx, treeCreate.TreeClusterID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -113,7 +113,7 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 	if treeEntity.TreeCluster != nil {
-		if err := s.locator.UpdateCluster(ctx, treeEntity.TreeCluster.ID); err != nil {
+		if err := s.locator.UpdateCluster(ctx, &treeEntity.TreeCluster.ID); err != nil {
 			return handleError(err)
 		}
 	}
@@ -151,12 +151,12 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, handleError(err)
 	}
 	if currentTree.TreeCluster != nil {
-		if err = s.locator.UpdateCluster(ctx, currentTree.TreeCluster.ID); err != nil {
+		if err = s.locator.UpdateCluster(ctx, &currentTree.TreeCluster.ID); err != nil {
 			return nil, handleError(err)
 		}
 	}
 	if updatedTree.TreeCluster != nil {
-		if err = s.locator.UpdateCluster(ctx, updatedTree.TreeCluster.ID); err != nil {
+		if err = s.locator.UpdateCluster(ctx, &updatedTree.TreeCluster.ID); err != nil {
 			return nil, handleError(err)
 		}
 	}
