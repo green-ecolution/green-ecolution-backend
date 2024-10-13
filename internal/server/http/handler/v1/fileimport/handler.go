@@ -3,7 +3,6 @@ package fileimport
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
 	"io"
 	"log/slog"
 	"mime/multipart"
@@ -32,6 +31,8 @@ const (
 // @Id				import-trees-from-csv
 // @Tags			File Import
 // @Success		204
+// @Accept			multipart/form-data
+// @Produce		json
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -94,7 +95,7 @@ func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 		}
 
 		elapsed := time.Since(start)
-		fmt.Println("Importing trees from CSV took", elapsed)
+		slog.Info("Imported trees from CSV", "elapsed", elapsed)
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
