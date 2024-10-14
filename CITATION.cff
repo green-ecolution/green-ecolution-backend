@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: "Green Ecolution"
+message: "If you use this software, please cite it as below."
+authors:
+  - affiliation: Flensburg University of Applied Sciences
+    family-names: "Cedrik"
+    given-names: "Hoffmann"
+version: 1.0.0
+date-released: 2024-10-22
+repository-code: "https://github.com/green-ecolution/green-ecolution-backend"
