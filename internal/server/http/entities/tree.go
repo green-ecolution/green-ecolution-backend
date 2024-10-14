@@ -5,55 +5,55 @@ import (
 )
 
 type TreeResponse struct {
-	ID            int32           `json:"id,omitempty"`
-	CreatedAt     time.Time       `json:"created_at,omitempty"`
-	UpdatedAt     time.Time       `json:"updated_at,omitempty"`
-	TreeClusterID *int32          `json:"tree_cluster_id,omitempty" validate:"optional"`
-	Sensor        *SensorResponse `json:"sensor,omitempty" validate:"optional"`
-	// Images              []*ImageResponse `json:"images,omitempty"`
-	Readonly       bool           `json:"readonly,omitempty"`
-	PlantingYear   int32          `json:"planting_year,omitempty"`
-	Species        string         `json:"species,omitempty"`
-	Number         string         `json:"tree_number,omitempty"`
-	Latitude       float64        `json:"latitude,omitempty"`
-	Longitude      float64        `json:"longitude,omitempty"`
-	WateringStatus WateringStatus `json:"watering_status,omitempty"`
-	Description    string         `json:"description,omitempty" validate:"optional"`
+	ID            int32           `json:"id"`
+	CreatedAt     time.Time       `json:"created_at"`
+	UpdatedAt     time.Time       `json:"updated_at"`
+	TreeClusterID *int32          `json:"tree_cluster_id" validate:"optional"`
+	Sensor        *SensorResponse `json:"sensor" validate:"optional"`
+	// Images              []*ImageResponse `json:"images"`
+	Readonly       bool           `json:"readonly"`
+	PlantingYear   int32          `json:"planting_year"`
+	Species        string         `json:"species"`
+	Number         string         `json:"tree_number"`
+	Latitude       float64        `json:"latitude"`
+	Longitude      float64        `json:"longitude"`
+	WateringStatus WateringStatus `json:"watering_status"`
+	Description    string         `json:"description"`
 } // @Name Tree
 
 type TreeListResponse struct {
 	Data       []*TreeResponse `json:"data,omitempty"`
-	Pagination Pagination      `json:"pagination,omitempty"`
+	Pagination Pagination      `json:"pagination"`
 } // @Name TreeList
 
 type TreeCreateRequest struct {
-	TreeClusterID *int32  `json:"tree_cluster_id,omitempty" validate:"optional"`
-	Readonly      bool    `json:"readonly,omitempty"`
-	PlantingYear  int32   `json:"planting_year,omitempty"`
-	Species       string  `json:"species,omitempty"`
-	Number        string  `json:"tree_number,omitempty"`
-	Latitude      float64 `json:"latitude,omitempty"`
-	Longitude     float64 `json:"longitude,omitempty"`
-	SensorID      *int32  `json:"sensor_id,omitempty" validate:"optional"`
-	Description   string  `json:"description,omitempty" validate:"optional"`
+	TreeClusterID *int32  `json:"tree_cluster_id" validate:"optional"`
+	Readonly      bool    `json:"readonly"`
+	PlantingYear  int32   `json:"planting_year"`
+	Species       string  `json:"species"`
+	Number        string  `json:"tree_number"`
+	Latitude      float64 `json:"latitude"`
+	Longitude     float64 `json:"longitude"`
+	SensorID      *int32  `json:"sensor_id" validate:"optional"`
+	Description   string  `json:"description"`
 } // @Name TreeCreate
 
 type TreeUpdateRequest struct {
-	TreeClusterID *int32  `json:"tree_cluster_id,omitempty" validate:"optional"`
-	Readonly      bool    `json:"readonly,omitempty"`
-	PlantingYear  int32   `json:"planting_year,omitempty"`
-	Species       string  `json:"species,omitempty"`
-	Number        string  `json:"tree_number,omitempty"`
-	Latitude      float64 `json:"latitude,omitempty"`
-	Longitude     float64 `json:"longitude,omitempty"`
-	SensorID      *int32  `json:"sensor_id,omitempty" validate:"optional"`
-	Description   string  `json:"description,omitempty" validate:"optional"`
+	TreeClusterID *int32  `json:"tree_cluster_id" validate:"optional"`
+	Readonly      bool    `json:"readonly"`
+	PlantingYear  int32   `json:"planting_year"`
+	Species       string  `json:"species"`
+	Number        string  `json:"tree_number"`
+	Latitude      float64 `json:"latitude"`
+	Longitude     float64 `json:"longitude"`
+	SensorID      *int32  `json:"sensor_id" validate:"optional"`
+	Description   string  `json:"description"`
 } // @Name TreeUpdate
 
 type TreeAddImagesRequest struct {
-	ImageIDs []*int32 `json:"image_ids,omitempty"`
+	ImageIDs []*int32 `json:"image_ids"`
 } // @Name TreeAddImages
 
 type TreeAddSensorRequest struct {
-	SensorID *int32 `json:"sensor_id,omitempty"`
+	SensorID *int32 `json:"sensor_id"`
 } // @Name TreeAddSensor
