@@ -1,12 +1,14 @@
-# Green Ecolution Backend
-Smart irrigation is needed to save water, staff and costs.
+<p>
+  <a href=""><img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white"/></a>
+</p>
 
-This project is the server-side for Green Ecolution. For Frontend please refer to [Green Ecolution Frontend](https://github.com/green-ecolution/green-ecolution-frontend)
-The backend provides an interface to interact between the website and the database.
-The backend retains data about
+# Green Ecolution Backend
+![image](https://github.com/user-attachments/assets/c69e28cd-44ec-44e7-8d64-447bad7f4fd9)
+
+Smart irrigation is needed to save water, staff and costs. This project is the server-side for Green Ecolution. For Frontend please refer to [Green Ecolution Frontend](https://github.com/green-ecolution/green-ecolution-frontend). The backend provides an interface to interact between the website and the database. The backend retains data about
 - trees
 - tree clusters
-- beds
+- flowerbeds
 - sensors
 
 In the current setup sensors are connected to an ESP32 with an integrated LoRaWAN module.
