@@ -1,6 +1,10 @@
 name: Build and Push Docker Image Staging
 "on":
   workflow_dispatch:
+    inputs:
+      version:
+        description: "The release version"
+        required: true
   push:
     branches:
       - release/*
