@@ -106,6 +106,7 @@ VALUES
 -- +goose Down
 -- +goose StatementBegin
 DELETE FROM images;
+DELETE FROM user_vehicles;
 DELETE FROM vehicles;
 DELETE FROM trees;
 DELETE FROM tree_clusters;
