@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/fileimport"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
@@ -22,6 +23,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp.Mount("/user", user.RegisterRoutes(s.services.AuthService))
 	grp.Mount("/role", user.RegisterRoutes(s.services.AuthService))
 	grp.Mount("/region", region.RegisterRoutes(s.services.RegionService))
+	grp.Mount("/import", fileimport.RegisterRoutes(s.services.TreeService))
 }
 
 func (s *Server) publicRoutes(app *fiber.App) {

@@ -55,6 +55,8 @@ type MqttService interface {
 
 type TreeService interface {
 	Service
+	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
+
 	GetAll(ctx context.Context) ([]*domain.Tree, error)
 	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
 	Update(ctx context.Context, id int32, tc *domain.TreeUpdate) (*domain.Tree, error)

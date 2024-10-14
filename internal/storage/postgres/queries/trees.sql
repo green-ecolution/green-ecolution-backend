@@ -10,6 +10,9 @@ SELECT * FROM trees WHERE id = ANY($1::int[]);
 -- name: GetTreesByTreeClusterID :many
 SELECT * FROM trees WHERE tree_cluster_id = $1;
 
+-- name: GetTreeByCoordinates :one
+SELECT * FROM trees WHERE latitude = $1 AND longitude = $2 LIMIT 1;
+
 -- name: GetAllImagesByTreeID :many
 SELECT images.* FROM images JOIN tree_images ON images.id = tree_images.image_id WHERE tree_images.tree_id = $1;
 

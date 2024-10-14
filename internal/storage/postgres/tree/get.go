@@ -3,6 +3,8 @@ package tree
 import (
 	"context"
 
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/jackc/pgx/v5"
@@ -89,6 +91,22 @@ func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*e
 	}
 
 	return t, nil
+}
+
+func (r *TreeRepository) GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Tree, error) {
+	params := sqlc.GetTreeByCoordinatesParams{
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+	row, err := r.store.GetTreeByCoordinates(ctx, &params)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	tree := r.mapper.FromSql(row)
+	if err := r.mapFields(ctx, tree); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	return tree, nil
 }
 
 func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error) {

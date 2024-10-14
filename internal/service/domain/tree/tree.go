@@ -17,6 +17,7 @@ import (
 type TreeService struct {
 	treeRepo        storage.TreeRepository
 	sensorRepo      storage.SensorRepository
+	ImageRepo       storage.ImageRepository
 	treeClusterRepo storage.TreeClusterRepository
 	locator         *treecluster.GeoClusterLocator
 	validator       *validator.Validate
@@ -25,12 +26,15 @@ type TreeService struct {
 func NewTreeService(
 	repoTree storage.TreeRepository,
 	repoSensor storage.SensorRepository,
+	repoImage storage.ImageRepository,
 	treeClusterRepo storage.TreeClusterRepository,
 	geoClusterLocator *treecluster.GeoClusterLocator,
 ) service.TreeService {
 	return &TreeService{
+
 		treeRepo:        repoTree,
 		sensorRepo:      repoSensor,
+		ImageRepo:       repoImage,
 		treeClusterRepo: treeClusterRepo,
 		locator:         geoClusterLocator,
 		validator:       validator.New(),
@@ -123,10 +127,12 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	if err != nil {
 		return nil, handleError(err)
 	}
+
 	// Check if the tree is readonly (imported from csv)
-	if currentTree.Readonly {
-		return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
-	}
+	// if currentTree.Readonly {
+	// 	return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
+	// }
+
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if tu.TreeClusterID != nil {
 		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
