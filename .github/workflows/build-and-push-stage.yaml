@@ -116,10 +116,10 @@ jobs:
         run: make generate
 
       - name: Move swagger docs
-        run: mv ./docs/swagger.json ./docs/api-docs.json
+        run: mv ./docs/swagger.json ./docs/api-docs-stage.json
 
       - name: Upload API Docs
         uses: actions/upload-artifact@v4
         with:
           name: api-docs-stage.json
-          path: ./docs/api-docs.json
+          path: ./docs/api-docs-stage.json
