@@ -16,8 +16,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Extract branch name
         shell: bash
@@ -45,9 +43,6 @@ jobs:
         run: |
           echo "RELEASE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -73,7 +68,6 @@ jobs:
           echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >>${GITHUB_ENV}
 
       - name: Build and push Version
-        if: github.event_name == 'push'
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -84,34 +78,44 @@ jobs:
             APP_BUILD_TIME=${{env.BUILD_TIME}}
             APP_GIT_REPOSITORY=${{github.repository}}
           file: ./.docker/Dockerfile.stage
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ghcr.io/${{ env.REPO_LC }}-stage:${{ env.RELEASE_VERSION }}-preview, ghcr.io/${{ env.REPO_LC }}-stage:latest, ghcr.io/${{ env.REPO_LC }}-stage:${{ env.COMMIT_SHA }}
 
-      - name: Build and push Version
-        if: github.event_name == 'workflow_dispatch'
-        uses: docker/build-push-action@v5
+      - name: Notify management repo to update submodules
+        uses: peter-evans/repository-dispatch@v3
         with:
-          context: .
-          build-args: |
-            APP_VERSION=${{env.COMMIT_SHA}}-stage
-            APP_GIT_COMMIT=${{env.COMMIT_SHA}}
-            APP_GIT_BRANCH=${{steps.extract_branch.outputs.branch}}
-            APP_BUILD_TIME=${{env.BUILD_TIME}}
-          file: ./.docker/Dockerfile.stage
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ghcr.io/${{ env.REPO_LC }}-stage:latest, ghcr.io/${{ env.REPO_LC }}-stage:${{ env.COMMIT_SHA }}
+          token: ${{ secrets.GREEN_ECOLUTION_PAT }}
+          repository: green-ecolution/green-ecolution-management
+          event-type: "update-submodules-staging"
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ env.COMMIT_SHA }}", "version": "${{ env.RELEASE_VERSION }}"}'
 
-      - name: Delete tag
-        uses: dev-drprasad/delete-tag-and-release@v1.1
+  upload_api_docs_stage:
+    name: Upload API Docs Stage
+    needs: build_and_deploy_stage
+    env:
+      COMMIT_SHA: ${{ needs.build_and_deploy_stage.outputs.COMMIT_SHA }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
         with:
-          tag_name: stage-deployment  
-          delete_release: false
-          github_token: ${{ secrets.GITHUB_TOKEN }} 
+          go-version: stable
 
-      - name: Create tag
-        run: git tag -fa 'stage-deployment' -m "Update tag to commit ${{ env.COMMIT_SHA }}"
+      - name: Install dependencies
+        run: make setup/ci
 
-      - name: Push tag
-        run: git push origin stage-deployment
+      - name: Go generate
+        run: make generate
+
+      - name: Move swagger docs
+        run: mv ./docs/swagger.json ./docs/api-docs.json
+
+      - name: Upload API Docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs-stage.json
+          path: ./docs/api-docs.json

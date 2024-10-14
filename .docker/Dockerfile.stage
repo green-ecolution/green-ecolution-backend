@@ -9,7 +9,7 @@ WORKDIR /app/build
 
 # install build dependencies
 COPY ./Makefile ./go.mod ./go.sum ./
-RUN apk add --no-cache make git
+RUN apk add --no-cache make git geos-dev build-base proj-dev
 RUN make setup/ci
 
 COPY . .
@@ -41,6 +41,7 @@ ENV PORT=3000
 EXPOSE 3000
 
 RUN adduser -D gorunner
+RUN apk add --no-cache geos proj
 
 USER gorunner
 WORKDIR /app
