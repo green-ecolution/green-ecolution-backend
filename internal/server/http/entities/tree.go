@@ -22,7 +22,7 @@ type TreeResponse struct {
 } // @Name Tree
 
 type TreeListResponse struct {
-	Data       []*TreeResponse `json:"data,omitempty"`
+	Data       []*TreeResponse `json:"data"`
 	Pagination Pagination      `json:"pagination"`
 } // @Name TreeList
 
