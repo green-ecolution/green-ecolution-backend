@@ -92,7 +92,7 @@ jobs:
           token: ${{ secrets.GREEN_ECOLUTION_PAT }}
           repository: green-ecolution/green-ecolution-management
           event-type: "update-submodules-staging"
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ env.COMMIT_SHA }}", "version": "${{ env.RELEASE_VERSION }}"}'
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ env.COMMIT_SHA }}", "version": "${{ env.RELEASE_VERSION }}", "from": "backend"}'
 
   upload_api_docs_stage:
     name: Upload API Docs Stage
