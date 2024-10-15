@@ -75,6 +75,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	if err := s.validator.Struct(treeCreate); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
+
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if treeCreate.TreeClusterID != nil {
 		treeClusterID, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
@@ -83,6 +84,15 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		}
 		fn = append(fn, tree.WithTreeCluster(treeClusterID))
 	}
+
+	if treeCreate.SensorID != nil {
+		sensorID, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		fn = append(fn, tree.WithSensor(sensorID))
+	}
+
 	fn = append(fn,
 		tree.WithReadonly(treeCreate.Readonly),
 		tree.WithPlantingYear(treeCreate.PlantingYear),

@@ -61,6 +61,7 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	if entity.Sensor != nil {
 		sensorID = &entity.Sensor.ID
 	}
+
 	args := sqlc.CreateTreeParams{
 		TreeClusterID:  treeClusterID,
 		Species:        entity.Species,
@@ -74,7 +75,20 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 		TreeNumber:     entity.Number,
 	}
 
-	return r.store.CreateTree(ctx, &args)
+	id, err := r.store.CreateTree(ctx, &args)
+	if err != nil {
+		return -1, err
+	}
+
+  if err := r.store.SetTreeLocation(ctx, &sqlc.SetTreeLocationParams{
+		ID:        id,
+		Latitude:  entity.Latitude,
+		Longitude: entity.Longitude,
+	}); err != nil {
+		return -1, err
+	}
+
+	return id, nil
 }
 
 func (r *TreeRepository) handleImages(ctx context.Context, treeID int32, images []*entities.Image) error {
