@@ -80,7 +80,7 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 		return -1, err
 	}
 
-  if err := r.store.SetTreeLocation(ctx, &sqlc.SetTreeLocationParams{
+	if err := r.store.SetTreeLocation(ctx, &sqlc.SetTreeLocationParams{
 		ID:        id,
 		Latitude:  entity.Latitude,
 		Longitude: entity.Longitude,

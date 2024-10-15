@@ -145,12 +145,23 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if tu.TreeClusterID != nil {
-		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
+		var treeCluster *entities.TreeCluster
+		treeCluster, err = s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
 		if err != nil {
 			return nil, handleError(fmt.Errorf("failed to find TreeCluster with ID %d: %w", *tu.TreeClusterID, err))
 		}
 		fn = append(fn, tree.WithTreeCluster(treeCluster))
 	}
+
+	if tu.SensorID != nil {
+		var sensor *entities.Sensor
+		sensor, err = s.sensorRepo.GetByID(ctx, *tu.SensorID)
+		if err != nil {
+			return nil, handleError(fmt.Errorf("failed to find Sensor with ID %d: %w", *tu.SensorID, err))
+		}
+		fn = append(fn, tree.WithSensor(sensor))
+	}
+
 	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),
 		tree.WithSpecies(tu.Species),
 		tree.WithTreeNumber(tu.Number),

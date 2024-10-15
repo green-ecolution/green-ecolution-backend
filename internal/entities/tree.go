@@ -35,6 +35,7 @@ type TreeCreate struct {
 
 type TreeUpdate struct {
 	TreeClusterID *int32
+	SensorID      *int32
 	PlantingYear  int32 `validate:"gt=0"`
 	Species       string
 	Number        string
