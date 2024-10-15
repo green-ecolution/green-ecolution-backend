@@ -151,7 +151,9 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			return nil, handleError(fmt.Errorf("failed to find TreeCluster with ID %d: %w", *tu.TreeClusterID, err))
 		}
 		fn = append(fn, tree.WithTreeCluster(treeCluster))
-	}
+	} else {
+    fn = append(fn, tree.WithTreeCluster(nil))
+  }
 
 	if tu.SensorID != nil {
 		var sensor *entities.Sensor
@@ -160,7 +162,9 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			return nil, handleError(fmt.Errorf("failed to find Sensor with ID %d: %w", *tu.SensorID, err))
 		}
 		fn = append(fn, tree.WithSensor(sensor))
-	}
+	} else {
+    fn = append(fn, tree.WithSensor(nil))
+  }
 
 	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),
 		tree.WithSpecies(tu.Species),
