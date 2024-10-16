@@ -285,7 +285,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
-		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (interface{}, error) {
+		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (any, error) {
 			return token, nil
 		})
 
@@ -302,7 +302,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
-		data, err, _ := group.Do(sub, func() (interface{}, error) {
+		data, err, _ := group.Do(sub, func() (any, error) {
 			return svc.RefreshToken(ctx, req.RefreshToken)
 		})
 		if err != nil {
