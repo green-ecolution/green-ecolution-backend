@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -19,7 +18,6 @@ func (s *AuthService) RetrospectToken(ctx context.Context, token string) (*domai
 }
 
 func (s *AuthService) RefreshToken(ctx context.Context, token string) (*domain.ClientToken, error) {
-	fmt.Println("refresh token", token)
 	result, err := s.authRepository.RefreshToken(ctx, token)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to refresh token").Error())

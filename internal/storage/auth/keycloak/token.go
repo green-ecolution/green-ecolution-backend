@@ -3,7 +3,6 @@ package keycloak
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -62,14 +61,10 @@ func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, c
 
 func (r *KeycloakRepository) RefreshToken(ctx context.Context, refreshToken string) (*entities.ClientToken, error) {
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-
-	fmt.Println("refresh token", refreshToken)
 	token, err := client.RefreshToken(ctx, refreshToken, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("refresh token new", token)
 
 	return &entities.ClientToken{
 		AccessToken:      token.AccessToken,
