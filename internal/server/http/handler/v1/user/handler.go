@@ -285,6 +285,10 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
+		if req.RefreshToken == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
+		}
+
 		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (any, error) {
 			return token, nil
 		})
