@@ -28,10 +28,10 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [get]
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			status			query	string	false	"Status"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			status	query	string	false	"Status"
+// @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -64,8 +64,8 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [get]
-// @Param			cluster_id		path	string	true	"Tree Cluster ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Security		Keycloak
 func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -98,8 +98,8 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [post]
-// @Param			body			body	entities.TreeClusterCreateRequest	true	"Tree Cluster Create Request"
-// @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			body	body	entities.TreeClusterCreateRequest	true	"Tree Cluster Create Request"
+// @Security		Keycloak
 func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -132,9 +132,9 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [put]
-// @Param			cluster_id		path	string								true	"Tree Cluster ID"
-// @Param			body			body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
-// @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id	path	string								true	"Tree Cluster ID"
+// @Param			body		body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
+// @Security		Keycloak
 func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -171,8 +171,8 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [delete]
-// @Param			cluster_id		path	string	true	"Tree Cluster ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Security		Keycloak
 func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -202,11 +202,11 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id}/trees [get]
-// @Param			cluster_id		path	string	true	"Tree Cluster ID"
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			age				query	string	false	"Age"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Param			page		query	string	false	"Page"
+// @Param			limit		query	string	false	"Limit"
+// @Param			age			query	string	false	"Age"
+// @Security		Keycloak
 func GetTreesInTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	// TODO: Change response @Success to entities.TreeListResponse
 	return func(c *fiber.Ctx) error {
@@ -226,9 +226,9 @@ func GetTreesInTreeCluster(_ service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id}/trees [post]
-// @Param			cluster_id		path	string								true	"Tree Cluster ID"
-// @Param			body			body	entities.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
-// @Param			Authorization	header	string								true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id	path	string								true	"Tree Cluster ID"
+// @Param			body		body	entities.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
+// @Security		Keycloak
 func AddTreesToTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -248,9 +248,9 @@ func AddTreesToTreeCluster(_ service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id}/trees/{tree_id} [delete]
-// @Param			cluster_id		path	string	true	"Tree Cluster ID"
-// @Param			tree_id			path	string	true	"Tree ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Param			tree_id		path	string	true	"Tree ID"
+// @Security		Keycloak
 func RemoveTreesFromTreeCluster(_ service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
