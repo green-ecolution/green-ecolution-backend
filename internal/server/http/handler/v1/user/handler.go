@@ -130,7 +130,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Router			/v1/user [post]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func Register(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -187,7 +187,7 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Param			page	query		string	false	"Page"
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetAllUsers(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -204,7 +204,7 @@ func GetAllUsers(_ service.AuthService) fiber.Handler {
 // @Failure		500		{object}	HTTPError
 // @Param			user_id	path		string	true	"User ID"
 // @Router			/v1/user/{user_id} [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -223,7 +223,7 @@ func GetUserByID(_ service.AuthService) fiber.Handler {
 // @Param			user_id	path		string						true	"User ID"
 // @Param			user	body		entities.UserUpdateRequest	true	"User information"
 // @Router			/v1/user/{user_id} [put]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func UpdateUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -240,7 +240,7 @@ func UpdateUserByID(_ service.AuthService) fiber.Handler {
 // @Failure		500		{object}	HTTPError
 // @Param			user_id	path		string	true	"User ID"
 // @Router			/v1/user/{user_id} [delete]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func DeleteUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -258,7 +258,7 @@ func DeleteUserByID(_ service.AuthService) fiber.Handler {
 // @Param			page	query		string	false	"Page"
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user/{user_id}/roles [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetUserRoles(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)

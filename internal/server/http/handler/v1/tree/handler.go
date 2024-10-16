@@ -65,8 +65,8 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [get]
-// @Param			tree_id			path	string	false	"Tree ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id	path	string	false	"Tree ID"
+// @Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -98,8 +98,8 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [post]
-// @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			body			body	entities.TreeCreateRequest	true	"Tree to create"
+// @Security		Keycloak
+// @Param			body	body	entities.TreeCreateRequest	true	"Tree to create"
 func CreateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -131,9 +131,9 @@ func CreateTree(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [put]
-// @Param			Authorization	header	string						true	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			tree_id			path	string						false	"Tree ID"
-// @Param			body			body	entities.TreeUpdateRequest	true	"Tree to update"
+// @Security		Keycloak
+// @Param			tree_id	path	string						false	"Tree ID"
+// @Param			body	body	entities.TreeUpdateRequest	true	"Tree to update"
 func UpdateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -167,8 +167,8 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [delete]
-// @Param			tree_id			path	string	false	"Tree ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id	path	string	false	"Tree ID"
+// @Security		Keycloak
 func DeleteTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -196,8 +196,8 @@ func DeleteTree(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/sensor [get]
-// @Param			tree_id			path	string	false	"Tree ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id	path	string	false	"Tree ID"
+// @Security		Keycloak
 func GetTreeSensor(_ service.TreeService) fiber.Handler {
 	// TODO: Change @Success to return sensor.SensorResponse
 	return func(c *fiber.Ctx) error {
@@ -218,9 +218,9 @@ func GetTreeSensor(_ service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/sensor [post]
-// @Param			tree_id			path	string							false	"Tree ID"
-// @Param			body			body	entities.TreeAddSensorRequest	true	"Sensor to add"
-// @Param			Authorization	header	string							true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id	path	string							false	"Tree ID"
+// @Param			body	body	entities.TreeAddSensorRequest	true	"Sensor to add"
+// @Security		Keycloak
 func AddTreeSensor(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -240,9 +240,9 @@ func AddTreeSensor(_ service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/sensor/{sensor_id} [delete]
-// @Param			tree_id			path	string	false	"Tree ID"
-// @Param			sensor_id		path	string	false	"Sensor ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id		path	string	false	"Tree ID"
+// @Param			sensor_id	path	string	false	"Sensor ID"
+// @Security		Keycloak
 func RemoveTreeSensor(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -262,10 +262,10 @@ func RemoveTreeSensor(_ service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/images [get]
-// @Param			tree_id			path	string	false	"Tree ID"
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id	path	string	false	"Tree ID"
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Security		Keycloak
 func GetTreeImages(_ service.TreeService) fiber.Handler {
 	// TODO: Change @Success to return image.ImageResponse
 	return func(c *fiber.Ctx) error {
@@ -286,9 +286,9 @@ func GetTreeImages(_ service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/images [post]
-// @Param			tree_id			path	string							false	"Tree ID"
-// @Param			body			body	entities.TreeAddImagesRequest	true	"Images to add"
-// @Param			Authorization	header	string							true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id	path	string							false	"Tree ID"
+// @Param			body	body	entities.TreeAddImagesRequest	true	"Images to add"
+// @Security		Keycloak
 func AddTreeImage(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -308,9 +308,9 @@ func AddTreeImage(_ service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id}/images/{image_id} [delete]
-// @Param			tree_id			path	string	false	"Tree ID"
-// @Param			image_id		path	string	false	"Image ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			tree_id		path	string	false	"Tree ID"
+// @Param			image_id	path	string	false	"Image ID"
+// @Security		Keycloak
 func RemoveTreeImage(_ service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement

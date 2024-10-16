@@ -39,8 +39,8 @@ const (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/import/csv [post]
-// @Param			Authorization	header		string	true	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			file			formData	file	true	"CSV file to import"
+// @Security		Keycloak
+// @Param			file	formData	file	true	"CSV file to import"
 func ImportTreesFromCSV(svc service.TreeService) fiber.Handler {
 	start := time.Now()
 	return func(c *fiber.Ctx) error {
