@@ -46,8 +46,13 @@ var version = "develop"
 //	@contact.url	https://green-ecolution.de
 //	@contact.email	info@green-ecolution.de
 
-// @license.name	GPL-3.0
-// @license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
+// @license.name							GPL-3.0
+// @license.url							https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
+// @securitydefinitions.oauth2.password	Keycloak
+// @tokenUrl								https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/token
+// @authUrl								https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
+// @in										header
+// @name									Authorization
 func main() {
 	cfg, err := config.InitConfig()
 	if err != nil {

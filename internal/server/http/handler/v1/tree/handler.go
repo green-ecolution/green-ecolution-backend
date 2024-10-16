@@ -32,7 +32,7 @@ var (
 // @Param			limit			query	string	false	"Limit"
 // @Param			age				query	string	false	"Age"
 // @Param			treecluster_id	query	string	false	"Tree Cluster ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()

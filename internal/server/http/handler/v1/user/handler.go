@@ -4,10 +4,12 @@ import (
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/singleflight"
 )
 
 // @Summary	Request to login
@@ -260,5 +262,61 @@ func DeleteUserByID(_ service.AuthService) fiber.Handler {
 func GetUserRoles(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
+	}
+}
+
+var group singleflight.Group
+
+// @Summary		Refresh token
+// @Description	Refresh token
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			body	body		entities.RefreshTokenRequest	true	"Refresh token information"
+// @Success		200		{object}	entities.RoleListResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Router			/v1/user/token/refresh [post]
+func RefreshToken(svc service.AuthService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		req := entities.RefreshTokenRequest{}
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+		}
+
+		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (interface{}, error) {
+			return token, nil
+		})
+
+		var sub string
+		if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok {
+			if e, ok := claims["sub"]; ok {
+				if e, ok := e.(string); ok {
+					sub = e
+				}
+			}
+		}
+
+		if sub == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+		}
+
+		data, err, _ := group.Do(sub, func() (interface{}, error) {
+			return svc.RefreshToken(ctx, req.RefreshToken)
+		})
+		if err != nil {
+			return err
+		}
+
+		token := data.(*domain.ClientToken)
+		response := entities.ClientTokenResponse{
+			AccessToken:  token.AccessToken,
+			ExpiresIn:    token.ExpiresIn,
+			RefreshToken: token.RefreshToken,
+			TokenType:    token.TokenType,
+		}
+
+		return c.JSON(response)
 	}
 }
