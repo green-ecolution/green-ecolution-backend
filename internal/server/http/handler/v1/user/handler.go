@@ -273,7 +273,7 @@ var group singleflight.Group
 // @Accept			json
 // @Produce		json
 // @Param			body	body		entities.RefreshTokenRequest	true	"Refresh token information"
-// @Success		200		{object}	entities.RoleListResponse
+// @Success		200		{object}	entities.ClientTokenResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Router			/v1/user/token/refresh [post]
