@@ -19,6 +19,7 @@ packages:
       InfoRepository:
       SensorRepository:
       TreeRepository:
+      TreeClusterRepository:
       AuthRepository: 
       UserRepository:
       RegionRepository:
