@@ -58,3 +58,22 @@ func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, c
 		Scope:            token.Scope,
 	}, nil
 }
+
+func (r *KeycloakRepository) RefreshToken(ctx context.Context, refreshToken string) (*entities.ClientToken, error) {
+	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	token, err := client.RefreshToken(ctx, refreshToken, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entities.ClientToken{
+		AccessToken:      token.AccessToken,
+		RefreshToken:     token.RefreshToken,
+		ExpiresIn:        token.ExpiresIn,
+		RefreshExpiresIn: token.RefreshExpiresIn,
+		TokenType:        token.TokenType,
+		NotBeforePolicy:  token.NotBeforePolicy,
+		SessionState:     token.SessionState,
+		Scope:            token.Scope,
+	}, nil
+}

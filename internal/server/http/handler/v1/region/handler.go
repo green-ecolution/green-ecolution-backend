@@ -21,7 +21,7 @@ import (
 // @Param			page	query		string	false	"Page"
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/region [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetAllRegions(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -54,7 +54,7 @@ func GetAllRegions(svc service.RegionService) fiber.Handler {
 // @Failure		500	{object}	HTTPError
 // @Param			id	path		string	true	"Region ID"
 // @Router			/v1/region/{id} [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetRegionByID(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.0.0] - 2024-10-22
+
 ### Added
 
 - Initial release
@@ -29,5 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Use pgxpool for concurrency-safe connection pool for pgx (#94)
 
-[Unreleased]: https://github.com/green-ecolution/green-ecolution-backend/compare/dfdebe...HEAD
+[Unreleased]: https://github.com/green-ecolution/green-ecolution-backend/compare/v1.0.0...HEAD
+[v1.0.0]: https://github.com/green-ecolution/green-ecolution-backend/compare/dfdebe...v1.0.0
 
