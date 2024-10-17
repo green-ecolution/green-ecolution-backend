@@ -16,3 +16,12 @@ func (s *AuthService) RetrospectToken(ctx context.Context, token string) (*domai
 
 	return result, nil
 }
+
+func (s *AuthService) RefreshToken(ctx context.Context, token string) (*domain.ClientToken, error) {
+	result, err := s.authRepository.RefreshToken(ctx, token)
+	if err != nil {
+		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to refresh token").Error())
+	}
+
+	return result, nil
+}

@@ -4,10 +4,12 @@ import (
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/singleflight"
 )
 
 // @Summary	Request to login
@@ -128,7 +130,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Router			/v1/user [post]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func Register(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -185,7 +187,7 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Param			page	query		string	false	"Page"
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetAllUsers(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -202,7 +204,7 @@ func GetAllUsers(_ service.AuthService) fiber.Handler {
 // @Failure		500		{object}	HTTPError
 // @Param			user_id	path		string	true	"User ID"
 // @Router			/v1/user/{user_id} [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -221,7 +223,7 @@ func GetUserByID(_ service.AuthService) fiber.Handler {
 // @Param			user_id	path		string						true	"User ID"
 // @Param			user	body		entities.UserUpdateRequest	true	"User information"
 // @Router			/v1/user/{user_id} [put]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func UpdateUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -238,7 +240,7 @@ func UpdateUserByID(_ service.AuthService) fiber.Handler {
 // @Failure		500		{object}	HTTPError
 // @Param			user_id	path		string	true	"User ID"
 // @Router			/v1/user/{user_id} [delete]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func DeleteUserByID(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
@@ -256,9 +258,69 @@ func DeleteUserByID(_ service.AuthService) fiber.Handler {
 // @Param			page	query		string	false	"Page"
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user/{user_id}/roles [get]
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetUserRoles(_ service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
+	}
+}
+
+var group singleflight.Group
+
+// @Summary		Refresh token
+// @Description	Refresh token
+// @Tags			User
+// @Accept			json
+// @Produce		json
+// @Param			body	body		entities.RefreshTokenRequest	true	"Refresh token information"
+// @Success		200		{object}	entities.ClientTokenResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Router			/v1/user/token/refresh [post]
+func RefreshToken(svc service.AuthService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		req := entities.RefreshTokenRequest{}
+		if err := c.BodyParser(&req); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+		}
+
+		if req.RefreshToken == "" {
+			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
+		}
+
+		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (any, error) {
+			return token, nil
+		})
+
+		var sub string
+		if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok {
+			if e, ok := claims["sub"]; ok {
+				if e, ok := e.(string); ok {
+					sub = e
+				}
+			}
+		}
+
+		if sub == "" {
+			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+		}
+
+		data, err, _ := group.Do(sub, func() (any, error) {
+			return svc.RefreshToken(ctx, req.RefreshToken)
+		})
+		if err != nil {
+			return err
+		}
+
+		token := data.(*domain.ClientToken)
+		response := entities.ClientTokenResponse{
+			AccessToken:  token.AccessToken,
+			ExpiresIn:    token.ExpiresIn,
+			RefreshToken: token.RefreshToken,
+			TokenType:    token.TokenType,
+		}
+
+		return c.JSON(response)
 	}
 }

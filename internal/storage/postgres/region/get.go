@@ -12,10 +12,8 @@ import (
 func (r *RegionRepository) GetAll(ctx context.Context) ([]*entities.Region, error) {
 	rows, err := r.store.GetAllRegions(ctx)
 	if err != nil {
-		fmt.Printf("error: %v\n", err)
 		return nil, err
 	}
-	fmt.Printf("rows: %v\n", rows)
 
 	return r.mapper.FromSqlList(rows), nil
 }

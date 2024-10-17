@@ -23,3 +23,7 @@ type ClientTokenResponse struct {
 	SessionState     string `json:"session_state"`
 	Scope            string `json:"scope"`
 } // @Name ClientToken
+
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+} // @Name RefreshTokenRequest

@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"database/sql"
 	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -45,46 +44,8 @@ func (s *Store) HandleError(err error) error {
 		return nil
 	}
 
-	slog.Error("An Error occurred in database operation", "error", err, "entityType", s.entityType)
-	switch err {
-	case pgx.ErrNoRows:
-		switch s.entityType {
-		case Image:
-			slog.Error("Image not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrImageNotFound
-		case Sensor:
-			slog.Error("Sensor not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrSensorNotFound
-		case Flowerbed:
-			slog.Error("Flowerbed not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrFlowerbedNotFound
-		case Tree:
-			slog.Error("Tree not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrTreeNotFound
-		case TreeCluster:
-			slog.Error("TreeCluster not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrTreeClusterNotFound
-		default:
-			slog.Error("Entity not found", "error", err, "stack", errors.WithStack(err))
-			return storage.ErrEntityNotFound
-		}
-	case pgx.ErrTooManyRows:
-		slog.Error("Receive more rows then expected", "error", err, "stack", errors.WithStack(err))
-		return storage.ErrToManyRows
-	case pgx.ErrTxClosed:
-		slog.Error("Connection is closed", "error", err, "stack", errors.WithStack(err))
-		return storage.ErrTxClosed
-	case pgx.ErrTxCommitRollback:
-		slog.Error("Transaction cannot commit or rollback", "error", err, "stack", errors.WithStack(err))
-		return storage.ErrTxCommitRollback
-	case sql.ErrConnDone:
-		slog.Error("Connection is closed", "error", err, "stack", errors.WithStack(err))
-		return storage.ErrConnectionClosed
-
-	default:
-		slog.Error("Unknown error", "error", err, "stack", errors.WithStack(err))
-		return errors.Wrap(err, "unknown error in postgres store")
-	}
+	slog.Error("An Error occurred in database operation", "error", err)
+	return err
 }
 
 func (s *Store) WithTx(ctx context.Context, fn func(tx pgx.Tx) error) error {

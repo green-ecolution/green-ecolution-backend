@@ -75,6 +75,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	if err := s.validator.Struct(treeCreate); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
+
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if treeCreate.TreeClusterID != nil {
 		treeClusterID, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
@@ -83,6 +84,15 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		}
 		fn = append(fn, tree.WithTreeCluster(treeClusterID))
 	}
+
+	if treeCreate.SensorID != nil {
+		sensorID, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
+		if err != nil {
+			return nil, handleError(err)
+		}
+		fn = append(fn, tree.WithSensor(sensorID))
+	}
+
 	fn = append(fn,
 		tree.WithReadonly(treeCreate.Readonly),
 		tree.WithPlantingYear(treeCreate.PlantingYear),
@@ -135,12 +145,27 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if tu.TreeClusterID != nil {
-		treeCluster, err := s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
+		var treeCluster *entities.TreeCluster
+		treeCluster, err = s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
 		if err != nil {
 			return nil, handleError(fmt.Errorf("failed to find TreeCluster with ID %d: %w", *tu.TreeClusterID, err))
 		}
 		fn = append(fn, tree.WithTreeCluster(treeCluster))
+	} else {
+		fn = append(fn, tree.WithTreeCluster(nil))
 	}
+
+	if tu.SensorID != nil {
+		var sensor *entities.Sensor
+		sensor, err = s.sensorRepo.GetByID(ctx, *tu.SensorID)
+		if err != nil {
+			return nil, handleError(fmt.Errorf("failed to find Sensor with ID %d: %w", *tu.SensorID, err))
+		}
+		fn = append(fn, tree.WithSensor(sensor))
+	} else {
+		fn = append(fn, tree.WithSensor(nil))
+	}
+
 	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),
 		tree.WithSpecies(tu.Species),
 		tree.WithTreeNumber(tu.Number),

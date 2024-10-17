@@ -32,6 +32,9 @@ func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) f
 		SuccessHandler: func(c *fiber.Ctx) error {
 			return successHandler(c, svc)
 		},
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
+			return c.Status(fiber.StatusUnauthorized).SendString(err.Error())
+		},
 	})
 }
 
