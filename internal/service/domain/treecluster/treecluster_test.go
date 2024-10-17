@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
@@ -127,6 +128,76 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		assert.Nil(t, clusters)
 		assert.EqualError(t, err, "500: " + expectedError.Error())
 	})
+}
+
+func TestTreeClusterService_Delete(t *testing.T) {
+	ctx := context.Background()
+
+	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+	treeRepo := storageMock.NewMockTreeRepository(t)
+	regionRepo := storageMock.NewMockRegionRepository(t)
+	locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+	svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
+
+    t.Run("should successfully delete a tree cluster", func(t *testing.T) {
+        id := int32(1)
+
+        clusterRepo.EXPECT().GetByID(ctx, id).Return(&entities.TreeCluster{}, nil)
+        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
+        clusterRepo.EXPECT().Delete(ctx, id).Return(nil)
+
+		// when
+        err := svc.Delete(ctx, id)
+
+		// then
+        assert.NoError(t, err)
+    })
+
+	t.Run("should return error if tree cluster not found", func(t *testing.T) {
+		id := int32(2)
+
+		expectedError := storage.ErrEntityNotFound
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+
+		// when
+        err := svc.Delete(ctx, id)
+		
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "404: " + expectedError.Error())
+	})
+
+	t.Run("should return error if unlinking tree cluster ID fails", func(t *testing.T) {
+        id := int32(3)
+        expectedError := errors.New("failed to unlink")
+
+        clusterRepo.EXPECT().GetByID(ctx, id).Return(&entities.TreeCluster{}, nil)
+        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedError)
+
+        // when
+        err := svc.Delete(ctx, id)
+
+		// then
+        assert.Error(t, err)
+		assert.EqualError(t, err, "500: " + expectedError.Error())
+    })
+
+	t.Run("should return error if deleting tree cluster fails", func(t *testing.T) {
+        id := int32(4)
+        expectedError := errors.New("failed to delete")
+
+        // Set expectations
+        clusterRepo.EXPECT().GetByID(ctx, id).Return(&entities.TreeCluster{}, nil)
+        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
+		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedError)
+
+        // when
+        err := svc.Delete(ctx, id)
+
+        // then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "500: " + expectedError.Error())
+    })
 }
 
 func TestReady(t *testing.T) {
