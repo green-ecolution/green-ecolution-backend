@@ -310,7 +310,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return svc.RefreshToken(ctx, req.RefreshToken)
 		})
 		if err != nil {
-			return err
+			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.InternalError, errors.Wrap(err, "failed to refresh token").Error()))
 		}
 
 		token := data.(*domain.ClientToken)
