@@ -44,7 +44,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 				Species:      "Pine",
 				Number:       "T002",
 				Latitude:     9.446700,
-				Longitude:    54.801510,
+				Longitude:    9.446700,
 				Description:  "A young pine tree",
 				PlantingYear: 2023,
 				Readonly:     true,
@@ -61,8 +61,8 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 				Description:    "Test description",
 				SoilCondition:  entities.TreeSoilConditionLehmig,
 				Archived:       false,
-				Latitude:       nil,
-				Longitude:      nil,
+				Latitude:       float64Ptr(9.446741),
+				Longitude:      float64Ptr(54.801539),
 				Trees:         expectedTrees,
 			},
 			{
@@ -126,6 +126,101 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, clusters)
+		assert.EqualError(t, err, "500: " + expectedError.Error())
+	})
+}
+
+func TestTreeClusterService_GetByID(t *testing.T) {
+	ctx := context.Background()
+
+	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+	treeRepo := storageMock.NewMockTreeRepository(t)
+	regionRepo := storageMock.NewMockRegionRepository(t)
+	locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+	svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
+
+	t.Run("should return tree cluster when found", func(t *testing.T) {
+		id := int32(1)
+		now := time.Now()
+		expectedTrees := []*entities.Tree{
+			{
+				ID:           1,
+				CreatedAt:    now,
+				UpdatedAt:    now,
+				Species:      "Oak",
+				Number:       "T001",
+				Latitude:     9.446741,
+				Longitude:    54.801539,
+				Description:  "A mature oak tree",
+				PlantingYear: 2023,
+				Readonly:     true,
+			},
+			{
+				ID:           2,
+				CreatedAt:    now,
+				UpdatedAt:    now,
+				Species:      "Pine",
+				Number:       "T002",
+				Latitude:     9.446700,
+				Longitude:    54.801510,
+				Description:  "A young pine tree",
+				PlantingYear: 2023,
+				Readonly:     true,
+			},
+		}
+
+		expectedCluster := &entities.TreeCluster{
+			ID:             id,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+			Name:           "Cluster 1",
+			Address:        "123 Main St",
+			Description:    "Test description",
+			SoilCondition:  entities.TreeSoilConditionLehmig,
+			Archived:       false,
+			Latitude:       float64Ptr(9.446741),
+			Longitude:      float64Ptr(54.801539),
+			Trees:         expectedTrees,
+		}
+
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(expectedCluster, nil)
+
+		// when
+		cluster, err := svc.GetByID(ctx, id)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedCluster, cluster)
+	})
+
+	t.Run("should return error if tree cluster not found", func(t *testing.T) {
+		id := int32(2)
+
+		expectedError := storage.ErrEntityNotFound
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+
+		// when
+		cluster, err := svc.GetByID(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, cluster)
+		assert.EqualError(t, err, "404: " + expectedError.Error())
+	})
+
+	t.Run("should return error for unexpected repository error", func(t *testing.T) {
+		id := int32(3)
+		expectedError := errors.New("unexpected error")
+
+		// Set expectation for GetByID
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+
+		// when
+		cluster, err := svc.GetByID(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, cluster)
 		assert.EqualError(t, err, "500: " + expectedError.Error())
 	})
 }
@@ -226,4 +321,8 @@ func TestReady(t *testing.T) {
 		// then
 		assert.False(t, ready)
 	})
+}
+
+func float64Ptr(f float64) *float64 {
+	return &f
 }
