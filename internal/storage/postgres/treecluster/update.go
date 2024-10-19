@@ -44,14 +44,14 @@ func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.T
 		Name:           tc.Name,
 	}
 
+	if err := r.store.UnlinkTreeClusterID(ctx, &tc.ID); err != nil {
+		return err
+	}
+
 	if len(tc.Trees) > 0 {
 		treeIDs := utils.Map(tc.Trees, func(t *entities.Tree) int32 {
 			return t.ID
 		})
-
-		if err := r.store.UnlinkTreeClusterID(ctx, &tc.ID); err != nil {
-			return err
-		}
 
 		if err := r.LinkTreesToCluster(ctx, tc.ID, treeIDs); err != nil {
 			return err

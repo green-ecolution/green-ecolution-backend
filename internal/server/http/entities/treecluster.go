@@ -27,7 +27,7 @@ type TreeClusterResponse struct {
 	Archived       bool              `json:"archived"`
 	Latitude       *float64          `json:"latitude"`
 	Longitude      *float64          `json:"longitude"`
-	Trees          []*TreeResponse   `json:"trees,omitempty" validate:"optional"`
+	Trees          []*TreeResponse   `json:"trees" validate:"optional"`
 	SoilCondition  TreeSoilCondition `json:"soil_condition"`
 	Name           string            `json:"name"`
 } // @Name TreeCluster
