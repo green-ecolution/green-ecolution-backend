@@ -128,4 +128,27 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, expectedError, err)
 	})
+
+	t.Run("should remove cluster coordinates when cluster has no trees", func(t *testing.T) {
+		// given
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+	
+		clusterID := int32(1)
+		expectedCluster := &entities.TreeCluster{
+			ID:    clusterID,
+			Trees: []*entities.Tree{},
+		}
+	
+		clusterRepo.EXPECT().GetByID(context.Background(), clusterID).Return(expectedCluster, nil)
+		clusterRepo.EXPECT().Update(context.Background(), clusterID, mock.Anything, mock.Anything, mock.Anything).Return(nil, nil)
+	
+		// when
+		err := locator.UpdateCluster(context.Background(), &clusterID)
+	
+		// then
+		assert.NoError(t, err)
+	})
 }
