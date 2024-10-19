@@ -7,9 +7,11 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	service "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
+	mock "github.com/stretchr/testify/mock"
 )
 
 func TestTreeClusterService_GetAll(t *testing.T) {
@@ -20,7 +22,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 		now := time.Now()
@@ -95,7 +97,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 		clusterRepo.EXPECT().GetAll(ctx).Return([]*entities.TreeCluster{}, nil)
@@ -113,7 +115,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 		expectedError := errors.New("GetAll failed")
@@ -136,7 +138,7 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 	treeRepo := storageMock.NewMockTreeRepository(t)
 	regionRepo := storageMock.NewMockRegionRepository(t)
-	locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+	locator := service.NewMockGeoClusterLocator(t)
 	svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 	t.Run("should return tree cluster when found", func(t *testing.T) {
@@ -225,13 +227,86 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 	})
 }
 
+func TestTreeClusterService_Create(t *testing.T) {
+	t.Run("should successfully create a new tree cluster", func(t *testing.T) {
+		// Given
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
+
+		now := time.Now()
+		tc := &entities.TreeClusterCreate{
+			Name:        "New Cluster",
+			Address:     "123 Forest Lane",
+			Description: "A test cluster",
+			SoilCondition:  entities.TreeSoilConditionLehmig,
+			TreeIDs:     []*int32{ptrToInt32(1), ptrToInt32(2)},
+		}
+
+		expectedTrees := []*entities.Tree{
+			{
+				ID:           1,
+				CreatedAt:    now,
+				UpdatedAt:    now,
+				Species:      "Oak",
+				Number:       "T001",
+				Latitude:     9.446741,
+				Longitude:    54.801539,
+				Description:  "A mature oak tree",
+				PlantingYear: 2023,
+				Readonly:     true,
+			},
+			{
+				ID:           2,
+				CreatedAt:    now,
+				UpdatedAt:    now,
+				Species:      "Pine",
+				Number:       "T002",
+				Latitude:     9.446700,
+				Longitude:    54.801510,
+				Description:  "A young pine tree",
+				PlantingYear: 2023,
+				Readonly:     true,
+			},
+		}
+
+		expectedCluster := &entities.TreeCluster{
+			ID:             10,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+			Name:           "Cluster 1",
+			Address:        "123 Main St",
+			Description:    "Test description",
+			SoilCondition:  entities.TreeSoilConditionLehmig,
+			Archived:       false,
+			Latitude:       float64Ptr(9.446741),
+			Longitude:      float64Ptr(54.801539),
+			Trees:         expectedTrees,
+		}
+
+		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
+		clusterRepo.EXPECT().Create(context.Background(), mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			Return(expectedCluster, nil)
+		locator.EXPECT().UpdateCluster(context.Background(), &expectedCluster.ID).Return(nil)
+
+		// When
+		result, err := svc.Create(context.Background(), tc)
+
+		// Then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedCluster, result)
+	})
+}
+
 func TestTreeClusterService_Delete(t *testing.T) {
 	ctx := context.Background()
 
 	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 	treeRepo := storageMock.NewMockTreeRepository(t)
 	regionRepo := storageMock.NewMockRegionRepository(t)
-	locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+	locator := service.NewMockGeoClusterLocator(t)
 	svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
     t.Run("should successfully delete a tree cluster", func(t *testing.T) {
@@ -301,7 +376,7 @@ func TestReady(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 		// when
@@ -325,4 +400,8 @@ func TestReady(t *testing.T) {
 
 func float64Ptr(f float64) *float64 {
 	return &f
+}
+
+func ptrToInt32(i int32) *int32 {
+	return &i
 }
