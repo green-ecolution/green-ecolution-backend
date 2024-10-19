@@ -8,6 +8,7 @@ packages:
       MqttService:
       TreeService:
       TreeClusterService:
+      GeoClusterLocator:
       AuthService:
       RegionService:
       SensorService:
