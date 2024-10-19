@@ -25,63 +25,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
-		now := time.Now()
-		expectedTrees := []*entities.Tree{
-			{
-				ID:           1,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				Species:      "Oak",
-				Number:       "T001",
-				Latitude:     9.446741,
-				Longitude:    54.801539,
-				Description:  "A mature oak tree",
-				PlantingYear: 2023,
-				Readonly:     true,
-			},
-			{
-				ID:           2,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				Species:      "Pine",
-				Number:       "T002",
-				Latitude:     9.446700,
-				Longitude:    9.446700,
-				Description:  "A young pine tree",
-				PlantingYear: 2023,
-				Readonly:     true,
-			},
-		}
-
-		expectedClusters := []*entities.TreeCluster{
-			{
-				ID:             1,
-				CreatedAt:      now,
-				UpdatedAt:      now,
-				Name:           "Cluster 1",
-				Address:        "123 Main St",
-				Description:    "Test description",
-				SoilCondition:  entities.TreeSoilConditionLehmig,
-				Archived:       false,
-				Latitude:       float64Ptr(9.446741),
-				Longitude:      float64Ptr(54.801539),
-				Trees:         expectedTrees,
-			},
-			{
-				ID:             2,
-				CreatedAt:      now,
-				UpdatedAt:      now,
-				Name:           "Cluster 2",
-				Address:        "456 Second St",
-				Description:    "Test description",
-				SoilCondition:  entities.TreeSoilConditionSandig,
-				Archived:       false,
-				Latitude:       nil,
-				Longitude:      nil,
-				Trees:         []*entities.Tree{},
-			},
-		}
-
+		expectedClusters := getTestTreeClusters()
 		clusterRepo.EXPECT().GetAll(ctx).Return(expectedClusters, nil)
 
 		// when
@@ -143,48 +87,7 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 
 	t.Run("should return tree cluster when found", func(t *testing.T) {
 		id := int32(1)
-		now := time.Now()
-		expectedTrees := []*entities.Tree{
-			{
-				ID:           1,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				Species:      "Oak",
-				Number:       "T001",
-				Latitude:     9.446741,
-				Longitude:    54.801539,
-				Description:  "A mature oak tree",
-				PlantingYear: 2023,
-				Readonly:     true,
-			},
-			{
-				ID:           2,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				Species:      "Pine",
-				Number:       "T002",
-				Latitude:     9.446700,
-				Longitude:    54.801510,
-				Description:  "A young pine tree",
-				PlantingYear: 2023,
-				Readonly:     true,
-			},
-		}
-
-		expectedCluster := &entities.TreeCluster{
-			ID:             id,
-			CreatedAt:      now,
-			UpdatedAt:      now,
-			Name:           "Cluster 1",
-			Address:        "123 Main St",
-			Description:    "Test description",
-			SoilCondition:  entities.TreeSoilConditionLehmig,
-			Archived:       false,
-			Latitude:       float64Ptr(9.446741),
-			Longitude:      float64Ptr(54.801539),
-			Trees:         expectedTrees,
-		}
-
+		expectedCluster := getTestTreeClusters()[0]
 		clusterRepo.EXPECT().GetByID(ctx, id).Return(expectedCluster, nil)
 
 		// when
@@ -197,7 +100,6 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 
 	t.Run("should return error if tree cluster not found", func(t *testing.T) {
 		id := int32(2)
-
 		expectedError := storage.ErrEntityNotFound
 		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
 
@@ -236,55 +138,17 @@ func TestTreeClusterService_Create(t *testing.T) {
 		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
-		now := time.Now()
 		tc := &entities.TreeClusterCreate{
-			Name:        "New Cluster",
-			Address:     "123 Forest Lane",
-			Description: "A test cluster",
+			Name:          "Cluster 1",
+			Address:       "123 Main St",
+			Description:   "Test description",
 			SoilCondition:  entities.TreeSoilConditionLehmig,
 			TreeIDs:     []*int32{ptrToInt32(1), ptrToInt32(2)},
 		}
 
-		expectedTrees := []*entities.Tree{
-			{
-				ID:           1,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				Species:      "Oak",
-				Number:       "T001",
-				Latitude:     9.446741,
-				Longitude:    54.801539,
-				Description:  "A mature oak tree",
-				PlantingYear: 2023,
-				Readonly:     true,
-			},
-			{
-				ID:           2,
-				CreatedAt:    now,
-				UpdatedAt:    now,
-				Species:      "Pine",
-				Number:       "T002",
-				Latitude:     9.446700,
-				Longitude:    54.801510,
-				Description:  "A young pine tree",
-				PlantingYear: 2023,
-				Readonly:     true,
-			},
-		}
+		expectedCluster := getTestTreeClusters()[0]
+		expectedTrees := getTestTrees()
 
-		expectedCluster := &entities.TreeCluster{
-			ID:             10,
-			CreatedAt:      now,
-			UpdatedAt:      now,
-			Name:           "Cluster 1",
-			Address:        "123 Main St",
-			Description:    "Test description",
-			SoilCondition:  entities.TreeSoilConditionLehmig,
-			Archived:       false,
-			Latitude:       float64Ptr(9.446741),
-			Longitude:      float64Ptr(54.801539),
-			Trees:         expectedTrees,
-		}
 
 		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
 		clusterRepo.EXPECT().Create(context.Background(), mock.Anything, mock.Anything, mock.Anything, mock.Anything).
@@ -312,7 +176,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
     t.Run("should successfully delete a tree cluster", func(t *testing.T) {
         id := int32(1)
 
-        clusterRepo.EXPECT().GetByID(ctx, id).Return(&entities.TreeCluster{}, nil)
+        clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
         treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
         clusterRepo.EXPECT().Delete(ctx, id).Return(nil)
 
@@ -341,7 +205,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
         id := int32(3)
         expectedError := errors.New("failed to unlink")
 
-        clusterRepo.EXPECT().GetByID(ctx, id).Return(&entities.TreeCluster{}, nil)
+        clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
         treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedError)
 
         // when
@@ -357,7 +221,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
         expectedError := errors.New("failed to delete")
 
         // Set expectations
-        clusterRepo.EXPECT().GetByID(ctx, id).Return(&entities.TreeCluster{}, nil)
+        clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
         treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
 		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedError)
 
@@ -396,6 +260,71 @@ func TestReady(t *testing.T) {
 		// then
 		assert.False(t, ready)
 	})
+}
+
+func getTestTreeClusters() []*entities.TreeCluster {
+	now := time.Now()
+
+	return []*entities.TreeCluster{
+		{
+			ID:            1,
+			CreatedAt:     now,
+			UpdatedAt:     now,
+			Name:          "Cluster 1",
+			Address:       "123 Main St",
+			Description:   "Test description",
+			SoilCondition: entities.TreeSoilConditionLehmig,
+			Archived:      false,
+			Latitude:      float64Ptr(9.446741),
+			Longitude:     float64Ptr(54.801539),
+			Trees:         getTestTrees(),
+		},
+		{
+			ID:            2,
+			CreatedAt:     now,
+			UpdatedAt:     now,
+			Name:          "Cluster 2",
+			Address:       "456 Second St",
+			Description:   "Test description",
+			SoilCondition: entities.TreeSoilConditionSandig,
+			Archived:      false,
+			Latitude:      nil,
+			Longitude:     nil,
+			Trees:        []*entities.Tree{},
+		},
+	}
+}
+
+
+func getTestTrees() []*entities.Tree {
+	now := time.Now()
+
+	return []*entities.Tree{
+		{
+			ID:           1,
+			CreatedAt:    now,
+			UpdatedAt:    now,
+			Species:      "Oak",
+			Number:       "T001",
+			Latitude:     9.446741,
+			Longitude:    54.801539,
+			Description:  "A mature oak tree",
+			PlantingYear: 2023,
+			Readonly:     true,
+		},
+		{
+			ID:           2,
+			CreatedAt:    now,
+			UpdatedAt:    now,
+			Species:      "Pine",
+			Number:       "T002",
+			Latitude:     9.446700,
+			Longitude:    54.801510,
+			Description:  "A young pine tree",
+			PlantingYear: 2023,
+			Readonly:     true,
+		},
+	}
 }
 
 func float64Ptr(f float64) *float64 {
