@@ -18,7 +18,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 
 		clusterID := int32(1)
 		expectedCluster := &entities.TreeCluster{
@@ -45,7 +45,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 	
 		// when
 		err := locator.UpdateCluster(context.Background(), nil)
@@ -60,7 +60,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 	
 		clusterID := int32(1)
 		expectedError := storage.ErrTreeClusterNotFound
@@ -80,7 +80,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 	
 		clusterID := int32(1)
 		expectedCluster := &entities.TreeCluster{
@@ -105,7 +105,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 	
 		clusterID := int32(1)
 		expectedCluster := &entities.TreeCluster{
@@ -134,7 +134,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-		locator := NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 	
 		clusterID := int32(1)
 		expectedCluster := &entities.TreeCluster{
