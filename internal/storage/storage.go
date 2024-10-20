@@ -118,6 +118,7 @@ type FlowerbedRepository interface {
 type AuthRepository interface {
 	RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error)
 	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error)
+	RefreshToken(ctx context.Context, refreshToken string) (*entities.ClientToken, error)
 }
 
 type Repository struct {

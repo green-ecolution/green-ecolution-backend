@@ -25,10 +25,10 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor [get]
-// @Param			status			query	string	false	"Sensor Status"
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			status	query	string	false	"Sensor Status"
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Security		Keycloak
 func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -61,8 +61,8 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor/{sensor_id} [get]
-// @Param			sensor_id		path	string	true	"Sensor ID"
-// @Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			sensor_id	path	string	true	"Sensor ID"
+// @Security		Keycloak
 func GetSensorByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -88,7 +88,7 @@ func GetSensorByID(_ service.Service) fiber.Handler {
 // @Param			start_time		query	string	false	"Start time"
 // @Param			end_time		query	string	false	"End time"
 // @Param			treecluster_id	query	string	false	"TreeCluster ID"
-// @Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
+// @Security		Keycloak
 func GetSensorDataByID(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -108,8 +108,8 @@ func GetSensorDataByID(_ service.Service) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor/ [post]
-// @Param			Authorization	header	string							false	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			body			body	entities.SensorCreateRequest	true	"Sensor to create"
+// @Security		Keycloak
+// @Param			body	body	entities.SensorCreateRequest	true	"Sensor to create"
 func CreateSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -129,9 +129,9 @@ func CreateSensor(_ service.Service) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor/{sensor_id} [put]
-// @Param			sensor_id		path	string							true	"Sensor ID"
-// @Param			Authorization	header	string							false	"Insert your access token"	default(Bearer <Add access token here>)
-// @Param			body			body	entities.SensorUpdateRequest	true	"Sensor information to update"
+// @Param			sensor_id	path	string	true	"Sensor ID"
+// @Security		Keycloak
+// @Param			body	body	entities.SensorUpdateRequest	true	"Sensor information to update"
 func UpdateSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
@@ -151,8 +151,8 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor/{sensor_id} [delete]
-// @Param			sensor_id		path	string	true	"Sensor ID"
-// @Param			Authorization	header	string	false	"Insert your access token"	default(Bearer <Add access token here>)
+// @Param			sensor_id	path	string	true	"Sensor ID"
+// @Security		Keycloak
 func DeleteSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement

@@ -71,6 +71,7 @@ type AuthService interface {
 	ClientTokenCallback(ctx context.Context, loginCallback *domain.LoginCallback) (*domain.ClientToken, error)
 	Register(ctx context.Context, user *domain.RegisterUser) (*domain.User, error)
 	RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error)
+	RefreshToken(ctx context.Context, refreshToken string) (*domain.ClientToken, error)
 }
 
 type RegionService interface {
