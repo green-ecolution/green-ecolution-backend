@@ -35,7 +35,24 @@ func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID *int32)
 		return err
 	}
 
-	treeIDs := utils.Map(cluster.Trees, func(t *entities.Tree) int32 {
+	if len(cluster.Trees) == 0 {
+		return s.removeClusterCoords(ctx, *clusterID)
+	}
+
+	return s.setClusterCoords(ctx, *clusterID, cluster.Trees)
+}
+
+func (s *GeoClusterLocator) removeClusterCoords(ctx context.Context, clusterID int32) error {
+	_, err := s.clusterRepo.Update(ctx, clusterID,
+		treecluster.WithLatitude(nil),
+		treecluster.WithLongitude(nil),
+		treecluster.WithRegion(nil),
+	)
+	return err
+}
+
+func (s *GeoClusterLocator) setClusterCoords(ctx context.Context, clusterID int32, trees []*entities.Tree) error {
+	treeIDs := utils.Map(trees, func(t *entities.Tree) int32 {
 		return t.ID
 	})
 
@@ -49,7 +66,7 @@ func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID *int32)
 		return err
 	}
 
-	_, err = s.clusterRepo.Update(ctx, *clusterID,
+	_, err = s.clusterRepo.Update(ctx, clusterID,
 		treecluster.WithLatitude(&lat),
 		treecluster.WithLongitude(&long),
 		treecluster.WithRegion(region),

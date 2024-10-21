@@ -65,12 +65,19 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 		Readonly:       t.Readonly,
 		SensorID:       sensorID,
 		PlantingYear:   t.PlantingYear,
-		Latitude:       t.Latitude,
-		Longitude:      t.Longitude,
 		TreeNumber:     t.Number,
 		TreeClusterID:  treeClusterID,
 		WateringStatus: sqlc.WateringStatus(t.WateringStatus),
 		Description:    &t.Description,
+	}
+
+	err := r.store.SetTreeLocation(ctx, &sqlc.SetTreeLocationParams{
+		ID:        t.ID,
+		Latitude:  t.Latitude,
+		Longitude: t.Longitude,
+	})
+	if err != nil {
+		return err
 	}
 
 	return r.store.UpdateTree(ctx, &args)
