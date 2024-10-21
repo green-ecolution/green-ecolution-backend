@@ -21,7 +21,7 @@ type SensorResponse struct {
 } // @Name Sensor
 
 type SensorListResponse struct {
-	Data       []*SensorResponse `json:"data,omitempty"`
+	Data       []*SensorResponse `json:"data"`
 	Pagination Pagination        `json:"pagination"`
 } // @Name SensorList
 
@@ -36,7 +36,7 @@ type SensorDataResponse struct {
 } // @Name SensorData
 
 type SensorDataListResponse struct {
-	Data       []*SensorDataResponse `json:"data,omitempty"`
+	Data       []*SensorDataResponse `json:"data"`
 	Pagination Pagination            `json:"pagination"`
 } // @Name SensorDataList
 

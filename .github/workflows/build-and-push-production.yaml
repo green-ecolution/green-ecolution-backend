@@ -17,6 +17,8 @@ jobs:
       packages: write
       actions: write
       pull-requests: write
+    outputs:
+      RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
     steps:
       - name: Extract version from branch name (for release branches)
         if: startsWith(github.event.pull_request.head.ref, 'release/')
@@ -62,9 +64,6 @@ jobs:
         with:
           submodules: true
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -96,6 +95,44 @@ jobs:
             APP_BUILD_TIME=${{env.BUILD_TIME}}
             APP_GIT_REPOSITORY=${{github.repository}}
           file: ./.docker/Dockerfile.prod
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
           tags: ghcr.io/${{ env.REPO_LC }}:${{ env.RELEASE_VERSION }}, ghcr.io/${{ env.REPO_LC }}:latest
+
+      - name: Notify management repo to update submodules
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GREEN_ECOLUTION_PAT }}
+          repository: green-ecolution/green-ecolution-management
+          event-type: "update-submodules-production"
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ env.COMMIT_SHA }}", "version": "${{ env.RELEASE_VERSION }}", "from": "backend"}'
+
+  upload_api_docs_prod:
+    name: Upload API Docs Production
+    needs: merge_and_publish_prod
+    env:
+      RELEASE_VERSION: ${{ needs.merge_and_publish_prod.outputs.RELEASE_VERSION }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Install dependencies
+        run: make setup/ci
+
+      - name: Go generate
+        run: make generate
+
+      - name: Move swagger docs
+        run: mv ./docs/swagger.json ./docs/api-docs-${{ env.RELEASE_VERSION }}.json
+
+      - name: Upload API Docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-docs-${{ env.RELEASE_VERSION }}.json
+          path: ./docs/api-docs-${{ env.RELEASE_VERSION }}.json
