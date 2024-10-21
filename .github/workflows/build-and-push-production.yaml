@@ -109,7 +109,7 @@ jobs:
     name: Upload API Docs Production
     needs: merge_and_publish_prod
     env:
-      RELEASE_VERSION: ${{ needs.merge_and_publish_prod.outputs.RELEASE_VERSION }}
+      RELEASE_VERSION: ${{ needs.merge_and_publish_prod.env.RELEASE_VERSION }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -132,5 +132,5 @@ jobs:
       - name: Upload API Docs
         uses: actions/upload-artifact@v4
         with:
-          name: api-docs-stage.json
+          name: api-docs-${{ env.RELEASE_VERSION }}.json
           path: ./docs/api-docs-${{ env.RELEASE_VERSION }}.json
