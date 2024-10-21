@@ -17,6 +17,8 @@ jobs:
       packages: write
       actions: write
       pull-requests: write
+    outputs:
+      RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
     steps:
       - name: Extract version from branch name (for release branches)
         if: startsWith(github.event.pull_request.head.ref, 'release/')
@@ -107,9 +109,9 @@ jobs:
 
   upload_api_docs_prod:
     name: Upload API Docs Production
-    needs: build_and_deploy_prod
+    needs: merge_and_publish_prod
     env:
-      RELEASE_VERSION: ${{ needs.build_and_deploy_prod.outputs.RELEASE_VERSION }}
+      RELEASE_VERSION: ${{ needs.merge_and_publish_prod.outputs.RELEASE_VERSION }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -132,5 +134,5 @@ jobs:
       - name: Upload API Docs
         uses: actions/upload-artifact@v4
         with:
-          name: api-docs-stage.json
+          name: api-docs-${{ env.RELEASE_VERSION }}.json
           path: ./docs/api-docs-${{ env.RELEASE_VERSION }}.json
