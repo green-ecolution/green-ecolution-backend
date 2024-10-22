@@ -89,6 +89,10 @@ type TreeClusterService interface {
 	Delete(ctx context.Context, id int32) error
 }
 
+type GeoClusterLocator interface {
+	UpdateCluster(ctx context.Context, clusterID *int32) error
+}
+
 type SensorService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.Sensor, error)

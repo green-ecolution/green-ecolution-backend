@@ -16,7 +16,7 @@ type GeoClusterLocator struct {
 	regionRepo  storage.RegionRepository
 }
 
-func NewLocationUpdate(clusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) *GeoClusterLocator {
+func NewGeoLocation(clusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) *GeoClusterLocator {
 	return &GeoClusterLocator{
 		clusterRepo: clusterRepo,
 		treeRepo:    treeRepo,
