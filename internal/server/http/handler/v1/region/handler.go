@@ -59,6 +59,7 @@ func GetRegionByID(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 
