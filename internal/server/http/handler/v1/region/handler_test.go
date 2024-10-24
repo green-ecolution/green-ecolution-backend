@@ -1,6 +1,7 @@
 package region_test
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -31,8 +32,9 @@ func TestGetAllRegions(t *testing.T) {
 		app.Get("/v1/region", handler)
 
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -57,8 +59,9 @@ func TestGetAllRegions(t *testing.T) {
 		app.Get("/v1/region", handler)
 	
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 	
 		// then
 		assert.Nil(t, err)
@@ -81,8 +84,9 @@ func TestGetAllRegions(t *testing.T) {
 		app.Get("/v1/region", handler)
 	
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 	
 		// then
 		assert.Nil(t, err)
@@ -107,8 +111,9 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region/1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/1", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -130,8 +135,9 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region/invalid-id", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/invalid-id", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -149,8 +155,9 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region/1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/1", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -168,8 +175,9 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequest("GET", "/v1/region/1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/1", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
