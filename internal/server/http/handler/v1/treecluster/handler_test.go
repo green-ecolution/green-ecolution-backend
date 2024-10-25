@@ -256,9 +256,7 @@ func TestCreateTreeCluster(t *testing.T) {
 		handler := CreateTreeCluster(mockClusterService)
 		app.Post("/v1/cluster", handler)
 
-		mockClusterService.EXPECT().
-			Create(mock.Anything, mock.AnythingOfType("*entities.TreeCluster")).
-			Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal error"))
+		mockClusterService.EXPECT().Create(mock.Anything, mock.AnythingOfType("*entities.TreeClusterCreate")).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		body, _ := json.Marshal(reqBody)
 		req, _ := http.NewRequestWithContext(context.Background(), "POST", "/v1/cluster", bytes.NewBuffer(body))
