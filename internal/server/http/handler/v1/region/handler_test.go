@@ -28,7 +28,8 @@ func TestGetAllRegions(t *testing.T) {
 			{ID: 2, Name: "Region B"},
 		}
 
-		mockRegionService.On("GetAll", mock.Anything).Return(expectedRegions, nil)
+
+		mockRegionService.EXPECT().GetAll(mock.Anything).Return(expectedRegions, nil)
 		app.Get("/v1/region", handler)
 
 		// when
@@ -55,7 +56,7 @@ func TestGetAllRegions(t *testing.T) {
 		app := fiber.New()
 		handler := region.GetAllRegions(mockRegionService)
 	
-		mockRegionService.On("GetAll", mock.Anything).Return([]*entities.Region{}, nil)
+		mockRegionService.EXPECT().GetAll(mock.Anything).Return([]*entities.Region{}, nil)
 		app.Get("/v1/region", handler)
 	
 		// when
@@ -80,7 +81,7 @@ func TestGetAllRegions(t *testing.T) {
 		app := fiber.New()
 		handler := region.GetAllRegions(mockRegionService)
 	
-		mockRegionService.On("GetAll", mock.Anything).Return(nil, errors.New("service error"))
+		mockRegionService.EXPECT().GetAll(mock.Anything).Return(nil, errors.New("service error"))
 		app.Get("/v1/region", handler)
 	
 		// when
@@ -107,7 +108,7 @@ func TestGetRegionByID(t *testing.T) {
 			Name: "Region A",
 		}
 
-		mockRegionService.On("GetByID", mock.Anything, int32(1)).Return(expectedRegion, nil)
+		mockRegionService.EXPECT().GetByID(mock.Anything, int32(1)).Return(expectedRegion, nil)
 		app.Get("/v1/region/:id", handler)
 
 		// when
@@ -151,7 +152,7 @@ func TestGetRegionByID(t *testing.T) {
 		app := fiber.New()
 		handler := region.GetRegionByID(mockRegionService)
 
-		mockRegionService.On("GetByID", mock.Anything, int32(1)).Return(nil, storage.ErrRegionNotFound)
+		mockRegionService.EXPECT().GetByID(mock.Anything, int32(1)).Return(nil, storage.ErrRegionNotFound)
 		app.Get("/v1/region/:id", handler)
 
 		// when
@@ -171,7 +172,7 @@ func TestGetRegionByID(t *testing.T) {
 		app := fiber.New()
 		handler := region.GetRegionByID(mockRegionService)
 
-		mockRegionService.On("GetByID", mock.Anything, int32(1)).Return(nil, errors.New("service error"))
+		mockRegionService.EXPECT().GetByID(mock.Anything, int32(1)).Return(nil, errors.New("service error"))
 		app.Get("/v1/region/:id", handler)
 
 		// when
