@@ -20,7 +20,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should return all regions successfully", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
 			app := RegisterRoutes(mockRegionService)
-			
+
 			expectedRegions := []*entities.Region{
 				{ID: 1, Name: "Region A"},
 				{ID: 2, Name: "Region B"},
@@ -91,7 +91,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should return 400 for invalid ID", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
 			app := RegisterRoutes(mockRegionService)
-			
+
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/invalid-id", nil)
 			resp, err := app.Test(req, -1)
 			defer resp.Body.Close()
