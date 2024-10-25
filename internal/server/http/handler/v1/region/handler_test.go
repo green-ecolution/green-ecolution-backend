@@ -2,7 +2,6 @@ package region_test
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"testing"
@@ -13,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -28,7 +28,6 @@ func TestGetAllRegions(t *testing.T) {
 			{ID: 2, Name: "Region B"},
 		}
 
-
 		mockRegionService.EXPECT().GetAll(mock.Anything).Return(expectedRegions, nil)
 		app.Get("/v1/region", handler)
 
@@ -42,7 +41,7 @@ func TestGetAllRegions(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var response serverEntities.RegionListResponse
-		err = parseJSONResponse(resp, &response)
+		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.Len(t, response.Regions, 2)
 		assert.Equal(t, "Region A", response.Regions[0].Name)
@@ -69,7 +68,7 @@ func TestGetAllRegions(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 	
 		var response serverEntities.RegionListResponse
-		err = parseJSONResponse(resp, &response)
+		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.Len(t, response.Regions, 0)
 	
@@ -121,7 +120,7 @@ func TestGetRegionByID(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var response entities.Region
-		err = parseJSONResponse(resp, &response)
+		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.Equal(t, "Region A", response.Name)
 
@@ -186,11 +185,4 @@ func TestGetRegionByID(t *testing.T) {
 
 		mockRegionService.AssertExpectations(t)
 	})
-}
-
-
-// helper function to decode JSON
-func parseJSONResponse(body *http.Response, target interface{}) error {
-	defer body.Body.Close()
-	return json.NewDecoder(body.Body).Decode(target)
 }
