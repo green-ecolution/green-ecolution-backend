@@ -3,7 +3,6 @@ package region
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -31,12 +30,12 @@ func TestRegisterRoutes(t *testing.T) {
 
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/", nil)
 			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 			var response serverEntities.RegionListResponse
 			err = utils.ParseJSONResponse(resp, &response)
-			fmt.Print(resp)
 			assert.NoError(t, err)
 			assert.Len(t, response.Regions, 2)
 			assert.Equal(t, "Region A", response.Regions[0].Name)
@@ -53,12 +52,12 @@ func TestRegisterRoutes(t *testing.T) {
 
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/", nil)
 			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 			var response serverEntities.RegionListResponse
 			err = utils.ParseJSONResponse(resp, &response)
-			fmt.Print(resp)
 			assert.NoError(t, err)
 			assert.Len(t, response.Regions, 0)
 
@@ -77,6 +76,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/1", nil)
 			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 
@@ -94,6 +94,7 @@ func TestRegisterRoutes(t *testing.T) {
 			
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/invalid-id", nil)
 			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
@@ -108,6 +109,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/1", nil)
 			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 
@@ -122,6 +124,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			req, _ := http.NewRequestWithContext(context.Background(), "GET", "/1", nil)
 			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
 			assert.Nil(t, err)
 			assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
