@@ -6,10 +6,24 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
+
+var notFoundErrors = []error{
+	storage.ErrRegionNotFound,
+	storage.ErrIDNotFound,
+	storage.ErrEntityNotFound,
+	storage.ErrSensorNotFound,
+	storage.ErrImageNotFound,
+	storage.ErrFlowerbedNotFound,
+	storage.ErrTreeClusterNotFound,
+	storage.ErrTreeNotFound,
+}
 
 func HandleError(err error) *fiber.Error {
 	code := fiber.StatusInternalServerError
+
+	// Check if the error is of type service.Error
 	var svcErr service.Error
 	if errors.As(err, &svcErr) {
 		switch svcErr.Code {
@@ -27,5 +41,14 @@ func HandleError(err error) *fiber.Error {
 			slog.Debug("missing service error code", "code", svcErr.Code)
 		}
 	}
+
+	// Check for specific "not found" errors
+	for _, notFoundErr := range notFoundErrors {
+		if errors.Is(err, notFoundErr) {
+			code = fiber.StatusNotFound
+			break
+		}
+	}
+
 	return fiber.NewError(code, err.Error())
 }

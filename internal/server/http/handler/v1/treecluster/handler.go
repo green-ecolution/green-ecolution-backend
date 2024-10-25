@@ -71,7 +71,8 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
-			return err
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		domainData, err := svc.GetByID(ctx, int32(id))
@@ -140,6 +141,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 
@@ -178,7 +180,8 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
-			return err
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		err = svc.Delete(ctx, int32(id))

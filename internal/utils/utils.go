@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"encoding/json"
+	"net/http"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -28,4 +30,10 @@ func CompareAndUpdate[T comparable](o T, n *T) T {
 		return *n
 	}
 	return o
+}
+
+// Helper function to decode JSON response
+func ParseJSONResponse(body *http.Response, target any) error {
+	defer body.Body.Close()
+	return json.NewDecoder(body.Body).Decode(target)
 }
