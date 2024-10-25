@@ -101,4 +101,3 @@ func TestReady(t *testing.T) {
 		assert.False(t, ready)
 	})
 }
-

@@ -54,24 +54,24 @@ func TestGetAllRegions(t *testing.T) {
 		mockRegionService := serviceMock.NewMockRegionService(t)
 		app := fiber.New()
 		handler := region.GetAllRegions(mockRegionService)
-	
+
 		mockRegionService.EXPECT().GetAll(mock.Anything).Return([]*entities.Region{}, nil)
 		app.Get("/v1/region", handler)
-	
+
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
-	
+
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
-	
+
 		var response serverEntities.RegionListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.Len(t, response.Regions, 0)
-	
+
 		mockRegionService.AssertExpectations(t)
 	})
 
@@ -79,19 +79,19 @@ func TestGetAllRegions(t *testing.T) {
 		mockRegionService := serviceMock.NewMockRegionService(t)
 		app := fiber.New()
 		handler := region.GetAllRegions(mockRegionService)
-	
+
 		mockRegionService.EXPECT().GetAll(mock.Anything).Return(nil, errors.New("service error"))
 		app.Get("/v1/region", handler)
-	
+
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
-	
+
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-		
+
 		mockRegionService.AssertExpectations(t)
 	})
 }
