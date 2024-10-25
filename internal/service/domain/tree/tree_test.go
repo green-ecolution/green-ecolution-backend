@@ -276,6 +276,58 @@ func TestTreeService_Delete(t *testing.T) {
 	})
 
 }
+func TestTreeService_Ready(t *testing.T) {
+	t.Run("should return true when treeRepo and sensorRepo are initialized", func(t *testing.T) {
+		// Given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, nil, nil, nil)
+
+		// When
+		result := svc.Ready()
+
+		// Then
+		assert.True(t, result)
+	})
+
+	t.Run("should return false when treeRepo is nil", func(t *testing.T) {
+		// Given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+
+		svc := NewTreeService(nil, sensorRepo, nil, nil, nil)
+
+		// When
+		result := svc.Ready()
+
+		// Then
+		assert.False(t, result)
+	})
+
+	t.Run("should return false when sensorRepo is nil", func(t *testing.T) {
+		// Given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+
+		svc := NewTreeService(treeRepo, nil, nil, nil, nil)
+
+		// When
+		result := svc.Ready()
+
+		// Then
+		assert.False(t, result)
+	})
+
+	t.Run("should return false when both treeRepo and sensorRepo are nil", func(t *testing.T) {
+		// Given
+		svc := NewTreeService(nil, nil, nil, nil, nil)
+
+		// When
+		result := svc.Ready()
+
+		// Then
+		assert.False(t, result)
+	})
+}
 
 func getTestTreeClusters() []*entities.TreeCluster {
 	now := time.Now()
