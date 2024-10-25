@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	service "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/mock"
 	"testing"
@@ -13,6 +14,80 @@ import (
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestTreeService_GetAll(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should return all trees when successful", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+
+		locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		expectedTrees := getTestTrees()
+		treeRepo.EXPECT().GetAll(ctx).Return(expectedTrees, nil)
+
+		// when
+		trees, err := svc.GetAll(ctx)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedTrees, trees)
+	})
+
+	t.Run("should return empty slice when no trees are found", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+
+		locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		treeRepo.EXPECT().GetAll(ctx).Return([]*entities.Tree{}, nil)
+
+		// when
+		trees, err := svc.GetAll(ctx)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, trees)
+	})
+
+	t.Run("should return error when GetAll fails", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+
+		locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		expectedError := errors.New("GetAll failed")
+
+		treeRepo.EXPECT().GetAll(ctx).Return(nil, expectedError)
+
+		// when
+		trees, err := svc.GetAll(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, trees)
+		assert.EqualError(t, err, "500: "+expectedError.Error())
+	})
+}
 
 func TestTreeService_Delete(t *testing.T) {
 	ctx := context.Background()
