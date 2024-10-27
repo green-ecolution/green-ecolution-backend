@@ -37,6 +37,7 @@ func TestGetAllTreeClusters(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -64,6 +65,7 @@ func TestGetAllTreeClusters(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -88,6 +90,7 @@ func TestGetAllTreeClusters(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -114,6 +117,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster/1", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -136,6 +140,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster/invalid", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -153,6 +158,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster/999", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -172,6 +178,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/cluster/1", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -230,6 +237,7 @@ func TestCreateTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), "POST", "/v1/cluster", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -256,8 +264,8 @@ func TestCreateTreeCluster(t *testing.T) {
 		body, _ := json.Marshal(invalidRequestBody)
 		req, _ := http.NewRequestWithContext(context.Background(), "POST", "/v1/cluster", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
-
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -276,8 +284,8 @@ func TestCreateTreeCluster(t *testing.T) {
 		body, _ := json.Marshal(reqBody)
 		req, _ := http.NewRequestWithContext(context.Background(), "POST", "/v1/cluster", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
-
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -335,6 +343,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), "PUT", "/v1/cluster/1", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -357,6 +366,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "PUT", "/v1/cluster/invalid", nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -376,6 +386,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), "PUT", "/v1/cluster/1", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -395,6 +406,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), "PUT", "/v1/cluster/1", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -416,6 +428,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), "PUT", "/v1/cluster/1", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -438,6 +451,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "DELETE", "/v1/cluster/"+strconv.Itoa(clusterID), nil)
 		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
@@ -455,6 +469,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 		// when
         req, _ := http.NewRequestWithContext(context.Background(), "DELETE", "/v1/cluster/invalid_id", nil)
         resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
         assert.Nil(t, err)
@@ -473,6 +488,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 		// when
         req, _ := http.NewRequestWithContext(context.Background(), "DELETE", "/v1/cluster/"+strconv.Itoa(clusterID), nil)
         resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
 
 		// then
         assert.Nil(t, err)
