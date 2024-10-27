@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"testing"
 	"time"
 
 	"github.com/docker/go-connections/nat"
@@ -12,11 +13,6 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-type Container struct {
-	Container *postgres.PostgresContainer
-	URL       string
-}
-
 var (
 	dbUsername = "user"
 	dbPassword = "geheim"
@@ -24,8 +20,11 @@ var (
 	dbDriver   = "pgx"
 )
 
-// StartPostgres starts a postgres container
-func StartPostgres(ctx context.Context) (*Container, error) {
+// SetupPostgres starts a postgres container
+func SetupPostgresT(t testing.TB, ctx context.Context) *postgres.PostgresContainer {
+	t.Helper()
+	t.Log("Setting up postgres container...")
+
 	startupTimeout := time.Second * 30
 	pollInterval := time.Microsecond * 100
 
@@ -45,16 +44,47 @@ func StartPostgres(ctx context.Context) (*Container, error) {
 		),
 	)
 	if err != nil {
+		t.Fatalf("Could not start postgres container: %s", err)
+	}
+
+	t.Cleanup(func() {
+		if err := postgis.Terminate(ctx); err != nil {
+			t.Errorf("Could not terminate container: %s", err)
+		}
+	})
+
+	return postgis
+}
+
+// SetupPostgres starts a postgres container
+func SetupPostgres(ctx context.Context) *postgres.PostgresContainer {
+	startupTimeout := time.Second * 30
+	pollInterval := time.Microsecond * 100
+
+	postgis, err := postgres.Run(context.Background(),
+		"postgis/postgis",
+		postgres.WithDatabase(dbName),
+		postgres.WithUsername(dbUsername),
+		postgres.WithPassword(dbPassword),
+		postgres.WithSQLDriver(dbDriver),
+		testcontainers.WithWaitStrategy(
+			wait.ForSQL(nat.Port("5432/tcp"), dbDriver, func(host string, port nat.Port) string {
+				return fmt.Sprintf("postgresql://%s:%s@%s:%s/%s", dbUsername, dbPassword, host, port.Port(), dbName)
+			}).
+				WithStartupTimeout(startupTimeout).
+				WithPollInterval(pollInterval).
+				WithQuery("SELECT 1"),
+		),
+	)
+	if err != nil {
 		log.Fatalf("Could not start postgres container: %s", err)
 	}
 
-	dbURL, err := postgis.ConnectionString(context.Background())
-	if err != nil {
-		log.Fatalf("Could not get connection string: %s", err)
-	}
+	return postgis
+}
 
-	return &Container{
-		Container: postgis,
-		URL:       dbURL,
-	}, nil
+func (s *PostgresTestSuite) Terminate(ctx context.Context) {
+	if err := s.Container.Terminate(ctx); err != nil {
+		log.Fatalf("Could not terminate container: %s", err)
+	}
 }
