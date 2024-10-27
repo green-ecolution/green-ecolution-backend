@@ -32,7 +32,7 @@ func TestGetAllRegions(t *testing.T) {
 		app.Get("/v1/region", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -59,7 +59,7 @@ func TestGetAllRegions(t *testing.T) {
 		app.Get("/v1/region", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -84,7 +84,7 @@ func TestGetAllRegions(t *testing.T) {
 		app.Get("/v1/region", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -111,7 +111,7 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region/1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -135,7 +135,7 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/invalid-id", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region/invalid-id", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -155,7 +155,7 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region/1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -175,7 +175,7 @@ func TestGetRegionByID(t *testing.T) {
 		app.Get("/v1/region/:id", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/region/1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/region/1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 

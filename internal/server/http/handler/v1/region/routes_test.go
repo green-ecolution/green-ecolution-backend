@@ -1,6 +1,7 @@
 package region
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -17,7 +18,7 @@ func TestRegisterRoutes(t *testing.T) {
 			app := RegisterRoutes(mockRegionService)
 
 			// when
-			req, _ := http.NewRequest(http.MethodGet, "/", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 
 			expectedRegions := []*entities.Region{
 				{ID: 1, Name: "Region A"},
@@ -25,9 +26,10 @@ func TestRegisterRoutes(t *testing.T) {
 			}
 
 			mockRegionService.EXPECT().GetAll(mock.Anything).Return(expectedRegions, nil)
-			
+
 			// then
 			resp, err := app.Test(req)
+			defer resp.Body.Close()
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
@@ -37,16 +39,17 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
 			app := RegisterRoutes(mockRegionService)
-			
+
 			// when
-			req, _ := http.NewRequest(http.MethodGet, "/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
 
 			expectedRegion := &entities.Region{ID: 1, Name: "Region A"}
-			
+
 			mockRegionService.EXPECT().GetByID(mock.Anything, int32(1)).Return(expectedRegion, nil)
-			
+
 			// then
 			resp, err := app.Test(req)
+			defer resp.Body.Close()
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
