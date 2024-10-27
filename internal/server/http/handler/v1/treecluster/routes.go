@@ -13,6 +13,6 @@ func RegisterRoutes(svc service.TreeClusterService) *fiber.App {
 	app.Post("/", CreateTreeCluster(svc))
 	app.Put("/:treecluster_id", UpdateTreeCluster(svc))
 	app.Delete("/:treecluster_id", DeleteTreeCluster(svc))
-	
+
 	return app
 }
