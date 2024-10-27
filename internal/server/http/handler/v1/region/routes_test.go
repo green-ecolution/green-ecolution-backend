@@ -12,7 +12,7 @@ import (
 )
 
 func TestRegisterRoutes(t *testing.T) {
-	t.Run("/v1/region/", func(t *testing.T) {
+	t.Run("/v1/region", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
 			app := RegisterRoutes(mockRegionService)
