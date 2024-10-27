@@ -45,7 +45,7 @@ func TestGetAppInfo(t *testing.T) {
 				IP:        net.ParseIP("127.0.0.1"),
 				Port:      8080,
 				Interface: "eth0",
-				Uptime:    time.Duration(24 * time.Hour),
+				Uptime:    24 * time.Hour,
 			},
 		}
 
