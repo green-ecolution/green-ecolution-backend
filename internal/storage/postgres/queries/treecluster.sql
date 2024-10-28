@@ -58,6 +58,6 @@ UPDATE tree_clusters SET
   archived = TRUE
 WHERE id = $1;
 
--- name: DeleteTreeCluster :exec
-DELETE FROM tree_clusters WHERE id = $1;
+-- name: DeleteTreeCluster :one
+DELETE FROM tree_clusters WHERE id = $1 RETURNING id;
 

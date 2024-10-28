@@ -121,5 +121,14 @@ func (r *TreeClusterRepository) Archive(ctx context.Context, id int32) error {
 }
 
 func (r *TreeClusterRepository) Delete(ctx context.Context, id int32) error {
-	return r.store.DeleteTreeCluster(ctx, id)
+	rowID, err := r.store.DeleteTreeCluster(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if rowID != id || rowID == 0 {
+		return storage.ErrTreeClusterNotFound
+	}
+
+	return nil
 }
