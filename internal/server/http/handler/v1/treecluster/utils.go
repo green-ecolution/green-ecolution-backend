@@ -9,6 +9,9 @@ import (
 )
 
 var (
+	testLatitude  = 9.446741
+    testLongitude = 54.801539
+
 	TestCluster = &entities.TreeCluster{
 		ID:             1,
 		Name:           "Test Cluster",
@@ -17,8 +20,8 @@ var (
 		WateringStatus: entities.WateringStatusBad,
 		Region:         &entities.Region{ID: 1, Name: "Region 1"},
 		Archived:       false,
-		Latitude:       utils.Float64Ptr(9.446741),
-		Longitude:      utils.Float64Ptr(54.801539),
+		Latitude:       utils.Float64Ptr(testLatitude),
+		Longitude:      utils.Float64Ptr(testLongitude),
 		SoilCondition:  entities.TreeSoilConditionSandig,
 		Trees: []*entities.Tree{
 			{
@@ -27,8 +30,8 @@ var (
 				UpdatedAt:    time.Now(),
 				Species:      "Oak",
 				Number:       "T001",
-				Latitude:     9.446741,
-				Longitude:    54.801539,
+				Latitude:     testLatitude,
+				Longitude:    testLongitude,
 				Description:  "A mature oak tree",
 				PlantingYear: 2023,
 				Readonly:     true,
@@ -54,8 +57,8 @@ var (
 			WateringStatus: entities.WateringStatusGood,
 			Region:         &entities.Region{ID: 2, Name: "Region 2"},
 			Archived:       false,
-			Latitude:       utils.Float64Ptr(10.123456),
-			Longitude:      utils.Float64Ptr(55.654321),
+			Latitude:       utils.Float64Ptr(testLatitude),
+			Longitude:      utils.Float64Ptr(testLongitude),
 			SoilCondition:  entities.TreeSoilConditionLehmig,
 			Trees: []*entities.Tree{},
 		},
