@@ -18,9 +18,9 @@ func (r *RegionRepository) Update(ctx context.Context, id int32, vFn ...entities
 		fn(entity)
 	}
 
-  if entity.Name == "" {
-    return nil, errors.New("name is required")
-  }
+	if entity.Name == "" {
+		return nil, errors.New("name is required")
+	}
 
 	if err := r.updateEntity(ctx, entity); err != nil {
 		return nil, err

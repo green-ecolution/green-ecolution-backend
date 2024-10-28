@@ -20,9 +20,9 @@ func (r *RegionRepository) Create(ctx context.Context, vFn ...entities.EntityFun
 		fn(entity)
 	}
 
-  if entity.Name == "" {
-    return nil, errors.New("name is required")
-  }
+	if entity.Name == "" {
+		return nil, errors.New("name is required")
+	}
 
 	id, err := r.createEntity(ctx, entity)
 	if err != nil {

@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 		store:         suite.Store,
 		RegionMappers: defaultRegionMappers(),
 	}
-	defer suite.Container.Terminate(ctx)
+	defer suite.Terminate(ctx)
 
 	code = m.Run()
 }
