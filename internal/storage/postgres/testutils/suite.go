@@ -108,3 +108,18 @@ func (s *PostgresTestSuite) CloseConnTemporary(t testing.TB) {
 		s.Store = initStore(s.URL)
 	})
 }
+
+func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string) {
+	t.Helper()
+	t.Log("Executing query...")
+
+	db, err := sql.Open("pgx", s.URL)
+	if err != nil {
+		t.Fatalf("Could not execute query: %s", err)
+	}
+
+	_, err = db.Exec(query)
+	if err != nil {
+		t.Fatalf("Could not execute query: %s", err)
+	}
+}
