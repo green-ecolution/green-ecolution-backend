@@ -117,7 +117,16 @@ func WithTrees(trees []*entities.Tree) entities.EntityFunc[entities.TreeCluster]
 }
 
 func (r *TreeClusterRepository) Archive(ctx context.Context, id int32) error {
-	return r.store.ArchiveTreeCluster(ctx, id)
+  rowID, err := r.store.ArchiveTreeCluster(ctx, id)
+  if err != nil {
+    return err
+  }
+
+  if rowID != id || rowID == 0 {
+    return storage.ErrTreeClusterNotFound
+  }
+
+  return nil
 }
 
 func (r *TreeClusterRepository) Delete(ctx context.Context, id int32) error {
