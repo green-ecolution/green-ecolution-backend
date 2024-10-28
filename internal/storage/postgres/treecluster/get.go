@@ -51,6 +51,10 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 }
 
 func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error) {
+	if err := r.tcIDExists(ctx, id); err != nil {
+		return nil, err
+	}
+
 	row, err := r.store.GetRegionByTreeClusterID(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -63,6 +67,10 @@ func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id
 }
 
 func (r *TreeClusterRepository) GetLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	if err := r.tcIDExists(ctx, id); err != nil {
+		return nil, err
+	}
+
 	rows, err := r.store.GetLinkedTreesByTreeClusterID(ctx, id)
 
 	if err != nil {
@@ -75,3 +83,14 @@ func (r *TreeClusterRepository) GetLinkedTreesByTreeClusterID(ctx context.Contex
 	return r.treeMapper.FromSqlList(rows), nil
 }
 
+func (r *TreeClusterRepository) tcIDExists(ctx context.Context, id int32) error {
+	_, err := r.store.GetTreeClusterByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return storage.ErrTreeClusterNotFound
+		}
+		return err
+	}
+
+	return nil
+}
