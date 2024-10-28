@@ -4,9 +4,6 @@ SELECT * FROM tree_clusters;
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
 
--- name: GetSensorByTreeClusterID :one
-SELECT sensors.* FROM sensors JOIN tree_clusters ON sensors.id = tree_clusters.sensor_id WHERE tree_clusters.id = $1;
-
 -- name: GetRegionByTreeClusterID :one
 SELECT regions.* FROM regions JOIN tree_clusters ON regions.id = tree_clusters.region_id WHERE tree_clusters.id = $1;
 
@@ -19,9 +16,6 @@ INSERT INTO tree_clusters (
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id;
-
--- name: GetTreeClusterByAddress :one
-SELECT * FROM tree_clusters WHERE address = $1 LIMIT 1;
 
 -- name: LinkTreesToTreeCluster :exec
 UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
