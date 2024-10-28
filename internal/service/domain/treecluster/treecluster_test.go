@@ -395,7 +395,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
-			[]int32{},
+			[]int32{1,2},
 		).Return(expectedTrees, nil)
 
 		clusterRepo.EXPECT().Update(
@@ -427,7 +427,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
-			[]int32{},
+			[]int32{1,2},
 		).Return(expectedTrees, nil)
 
 		clusterRepo.EXPECT().Update(
