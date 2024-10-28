@@ -71,10 +71,10 @@ type VehicleRepository interface {
 
 type TreeClusterRepository interface {
 	BasicCrudRepository[entities.TreeCluster]
-	GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error)
-	Archive(ctx context.Context, id int32) error
+  GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error)
+  GetLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
+  Archive(ctx context.Context, id int32) error
 	LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error
-	GetByAddress(ctx context.Context, address string) (*entities.TreeCluster, error)
 }
 
 type TreeRepository interface {
