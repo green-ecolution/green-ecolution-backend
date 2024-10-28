@@ -17,15 +17,17 @@ func TestRegisterRoutes(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
 			app := RegisterRoutes(mockRegionService)
 
-			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
-
 			expectedRegions := []*entities.Region{
 				{ID: 1, Name: "Region A"},
 				{ID: 2, Name: "Region B"},
 			}
 
-			mockRegionService.EXPECT().GetAll(mock.Anything).Return(expectedRegions, nil)
+			mockRegionService.EXPECT().GetAll(
+				mock.Anything,
+			).Return(expectedRegions, nil)
+
+			// when
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
 
 			// then
 			resp, err := app.Test(req)
@@ -40,12 +42,13 @@ func TestRegisterRoutes(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
 			app := RegisterRoutes(mockRegionService)
 
+			mockRegionService.EXPECT().GetByID(
+				mock.Anything, 
+				int32(1),
+			).Return(&entities.Region{ID: 1, Name: "Region A"}, nil)
+
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
-
-			expectedRegion := &entities.Region{ID: 1, Name: "Region A"}
-
-			mockRegionService.EXPECT().GetByID(mock.Anything, int32(1)).Return(expectedRegion, nil)
 
 			// then
 			resp, err := app.Test(req)
