@@ -96,3 +96,80 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestTreeClusterRepository_Archived(t *testing.T) {
+  t.Run("Archive tree cluster should archive tree cluster", func(t *testing.T) {
+    // given
+    suite.ResetDB(t)
+    suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    // when
+    err := r.Archive(context.Background(), 1)
+    got, errGot := r.GetByID(context.Background(), 1)
+
+    // then
+    assert.NoError(t, err)
+    assert.NoError(t, errGot)
+    assert.NotNil(t, got)
+    assert.True(t, got.Archived)
+  })
+
+  t.Run("Archive tree cluster with non-existing id should return error", func(t *testing.T) {
+    // given
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    // when
+    err := r.Archive(context.Background(), 99)
+
+    // then
+    assert.Error(t, err)
+  })
+
+  t.Run("Archive tree cluster with negative id should return error", func(t *testing.T) {
+    // given
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    // when
+    err := r.Archive(context.Background(), -1)
+
+    // then
+    assert.Error(t, err)
+  })
+
+  t.Run("Archive tree cluster that is already archived should return not return error", func(t *testing.T) {
+    // given
+    suite.ResetDB(t)
+    suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    r := NewTreeClusterRepository(suite.Store, mappers)
+    err := r.Archive(context.Background(), 1)
+    assert.NoError(t, err)
+
+    // when
+    gotBefore, errGotBefore := r.GetByID(context.Background(), 1)
+    err = r.Archive(context.Background(), 1)
+    gotAfter, errGotAfter := r.GetByID(context.Background(), 1)
+
+    // then
+    assert.NoError(t, err)
+    assert.NoError(t, errGotBefore)
+    assert.NoError(t, errGotAfter)
+    assert.NotNil(t, gotBefore)
+    assert.NotNil(t, gotAfter)
+    assert.True(t, gotBefore.Archived)
+    assert.True(t, gotAfter.Archived)
+  })
+
+  t.Run("Archive tree cluster with context canceled exceeded should return error", func(t *testing.T) {
+    // given
+    r := NewTreeClusterRepository(suite.Store, mappers)
+    ctx, cancel := context.WithCancel(context.Background())
+    cancel()
+
+    // when
+    err := r.Archive(ctx, 1)
+
+    // then
+    assert.Error(t, err)
+  })
+}
