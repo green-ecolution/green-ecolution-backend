@@ -11,7 +11,6 @@ func RegisterRoutes(svc service.SensorService) *fiber.App {
 	app.Get("/", GetAllSensors(svc))
 	app.Get("/:id", GetSensorByID(svc))
 	app.Get("/:id/data", GetSensorDataByID(svc))
-
 	app.Post("/", CreateSensor(svc))
 	app.Put("/:id", UpdateSensor(svc))
 	app.Delete("/:id", DeleteSensor(svc))
