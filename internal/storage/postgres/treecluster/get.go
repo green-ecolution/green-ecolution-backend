@@ -50,15 +50,6 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 	return data, nil
 }
 
-func (r *TreeClusterRepository) GetSensorByTreeClusterID(ctx context.Context, id int32) (*entities.Sensor, error) {
-	row, err := r.store.GetSensorByTreeClusterID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	return r.sensorMapper.FromSql(row), nil
-}
-
 func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error) {
 	row, err := r.store.GetRegionByTreeClusterID(ctx, id)
 	if err != nil {
@@ -84,22 +75,3 @@ func (r *TreeClusterRepository) GetLinkedTreesByTreeClusterID(ctx context.Contex
 	return r.treeMapper.FromSqlList(rows), nil
 }
 
-func (r *TreeClusterRepository) GetByAddress(ctx context.Context, address string) (*entities.TreeCluster, error) {
-	row, err := r.store.GetTreeClusterByAddress(ctx, address)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-	data := r.mapper.FromSql(row)
-	data.Region, err = r.GetRegionByTreeClusterID(ctx, row.ID)
-	if err != nil {
-		if !errors.Is(err, storage.ErrRegionNotFound) { // If region is not found, we can still return the tree cluster
-			return nil, err
-		}
-	}
-	data.Trees, err = r.GetLinkedTreesByTreeClusterID(ctx, row.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
-}

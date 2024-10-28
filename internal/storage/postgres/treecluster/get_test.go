@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -145,62 +144,6 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 
 		// when
 		got, err := r.GetByID(ctx, 1)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-}
-
-func TestTreeClusterRepository_GetSensorByTreeClusterID(t *testing.T) {
-	suite.ResetDB(t)
-	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
-	t.Run("GetSensorByTreeClusterID should return sensor", func(t *testing.T) {
-		// given
-		r := NewTreeClusterRepository(suite.Store, mappers)
-
-		// when
-		got, err := r.GetSensorByTreeClusterID(context.Background(), 1)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, got)
-		assert.Equal(t, int32(1), got.ID)
-		assert.Equal(t, entities.SensorStatusOnline, got.Status)
-	})
-
-	t.Run("GetSensorByTreeClusterID with non-existing id should return error", func(t *testing.T) {
-		// given
-		r := NewTreeClusterRepository(suite.Store, mappers)
-
-		// when
-		got, err := r.GetSensorByTreeClusterID(context.Background(), 99)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("GetSensorByTreeClusterID with negative id should return error", func(t *testing.T) {
-		// given
-		r := NewTreeClusterRepository(suite.Store, mappers)
-
-		// when
-		got, err := r.GetSensorByTreeClusterID(context.Background(), -1)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("GetSensorByTreeClusterID with context canceled exceeded should return error", func(t *testing.T) {
-		// given
-		r := NewTreeClusterRepository(suite.Store, mappers)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		// when
-		got, err := r.GetSensorByTreeClusterID(ctx, 1)
 
 		// then
 		assert.Error(t, err)
