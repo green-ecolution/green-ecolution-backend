@@ -61,6 +61,6 @@ func (s *PostgresTestSuite) InsertSeed(t testing.TB, dir string) {
 	seedPath := fmt.Sprintf("%s/%s", rootDir, dir)
 
 	if err := goose.Up(db, seedPath, goose.WithNoVersioning()); err != nil {
-		log.Fatalf("Could not insert seed data: %s", err)
+		t.Fatalf("Could not insert seed data: %s", err)
 	}
 }
