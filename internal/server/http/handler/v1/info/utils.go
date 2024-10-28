@@ -8,9 +8,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-
 var (
-	repoURL, _ = url.Parse("https://github.com/green-ecolution/green-ecolution-backend")
+	repoURL, _   = url.Parse("https://github.com/green-ecolution/green-ecolution-backend")
 	serverURL, _ = url.Parse("http://localhost")
 
 	TestInfo = &entities.App{
