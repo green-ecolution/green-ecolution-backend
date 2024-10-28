@@ -37,7 +37,7 @@ func TestRegisterRoutes(t *testing.T) {
 			app := RegisterRoutes(mockClusterService)
 
 			mockClusterService.EXPECT().Create(
-				mock.Anything, 
+				mock.Anything,
 				mock.AnythingOfType("*entities.TreeClusterCreate"),
 			).Return(TestCluster, nil)
 

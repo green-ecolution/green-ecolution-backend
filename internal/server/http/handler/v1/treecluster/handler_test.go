@@ -106,7 +106,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().GetByID(
-			mock.Anything, 
+			mock.Anything,
 			int32(1),
 		).Return(TestCluster, nil)
 
@@ -150,7 +150,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().GetByID(
-			mock.Anything, 
+			mock.Anything,
 			int32(999),
 		).Return(nil, storage.ErrTreeClusterNotFound)
 
@@ -173,7 +173,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().GetByID(
-			mock.Anything, 
+			mock.Anything,
 			int32(1),
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
@@ -190,7 +190,6 @@ func TestGetTreeClusterByID(t *testing.T) {
 	})
 }
 
-
 func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should create tree cluster successfully", func(t *testing.T) {
 		app := fiber.New()
@@ -199,7 +198,7 @@ func TestCreateTreeCluster(t *testing.T) {
 		app.Post("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().Create(
-			mock.Anything, 
+			mock.Anything,
 			mock.AnythingOfType("*entities.TreeClusterCreate"),
 		).Return(TestCluster, nil)
 
@@ -250,7 +249,7 @@ func TestCreateTreeCluster(t *testing.T) {
 		app.Post("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().Create(
-			mock.Anything, 
+			mock.Anything,
 			mock.AnythingOfType("*entities.TreeClusterCreate"),
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
@@ -277,8 +276,8 @@ func TestUpdateTreeCluster(t *testing.T) {
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().Update(
-			mock.Anything, 
-			int32(1), 
+			mock.Anything,
+			int32(1),
 			mock.Anything,
 		).Return(TestCluster, nil)
 
@@ -344,8 +343,8 @@ func TestUpdateTreeCluster(t *testing.T) {
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().Update(
-			mock.Anything, 
-			int32(1), 
+			mock.Anything,
+			int32(1),
 			mock.Anything,
 		).Return(nil, storage.ErrTreeClusterNotFound)
 
@@ -408,42 +407,42 @@ func TestDeleteTreeCluster(t *testing.T) {
 		mockClusterService.AssertExpectations(t)
 	})
 
-    t.Run("should return 400 for invalid ID format", func(t *testing.T) {
+	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := DeleteTreeCluster(mockClusterService)
 		app.Delete("/v1/cluster/:treecluster_id", handler)
 
 		// when
-        req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/invalid_id", nil)
-        resp, err := app.Test(req, -1)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/invalid_id", nil)
+		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
 		// then
-        assert.Nil(t, err)
-        assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-    })
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
 
-    t.Run("should return 404 for non-existing tree cluster", func(t *testing.T) {
+	t.Run("should return 404 for non-existing tree cluster", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := DeleteTreeCluster(mockClusterService)
 		app.Delete("/v1/cluster/:treecluster_id", handler)
 
-        clusterID := 999
-        mockClusterService.EXPECT().Delete(
-			mock.Anything, 
+		clusterID := 999
+		mockClusterService.EXPECT().Delete(
+			mock.Anything,
 			int32(clusterID),
 		).Return(service.NewError(service.NotFound, "tree cluster not found"))
 
 		// when
-        req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/"+strconv.Itoa(clusterID), nil)
-        resp, err := app.Test(req, -1)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/"+strconv.Itoa(clusterID), nil)
+		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
 		// then
-        assert.Nil(t, err)
-        assert.Equal(t, http.StatusNotFound, resp.StatusCode)
-        mockClusterService.AssertExpectations(t)
-    })
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+		mockClusterService.AssertExpectations(t)
+	})
 }

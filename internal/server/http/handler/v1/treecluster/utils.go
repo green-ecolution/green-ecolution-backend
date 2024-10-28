@@ -10,7 +10,7 @@ import (
 
 var (
 	testLatitude  = 9.446741
-    testLongitude = 54.801539
+	testLongitude = 54.801539
 
 	TestCluster = &entities.TreeCluster{
 		ID:             1,
@@ -60,7 +60,7 @@ var (
 			Latitude:       utils.Float64Ptr(testLatitude),
 			Longitude:      utils.Float64Ptr(testLongitude),
 			SoilCondition:  entities.TreeSoilConditionLehmig,
-			Trees: []*entities.Tree{},
+			Trees:          []*entities.Tree{},
 		},
 	}
 )
