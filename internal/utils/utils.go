@@ -37,3 +37,11 @@ func ParseJSONResponse(body *http.Response, target any) error {
 	defer body.Body.Close()
 	return json.NewDecoder(body.Body).Decode(target)
 }
+
+func Float64Ptr(f float64) *float64 {
+	return &f
+}
+
+func PtrInt32(value int32) *int32 {
+	return &value
+}
