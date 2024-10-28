@@ -1,5 +1,5 @@
 -- name: GetAllRegions :many
-SELECT * FROM regions;
+SELECT * FROM regions ORDER BY id;
 
 -- name: GetRegionById :one
 SELECT * FROM regions WHERE id = $1;
