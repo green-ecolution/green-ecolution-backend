@@ -18,7 +18,6 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("should return all tree clusters when successful", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -37,7 +36,6 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 	})
 
 	t.Run("should return empty slice when no clusters are found", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -55,16 +53,15 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 	})
 
 	t.Run("should return error when GetAll fails", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
-		expectedError := errors.New("GetAll failed")
+		expectedErr := errors.New("GetAll failed")
 
-		clusterRepo.EXPECT().GetAll(ctx).Return(nil, expectedError)
+		clusterRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
 
 		// when
 		clusters, err := svc.GetAll(ctx)
@@ -72,7 +69,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, clusters)
-		assert.EqualError(t, err, "500: " + expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 }
 
@@ -100,8 +97,8 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 
 	t.Run("should return error if tree cluster not found", func(t *testing.T) {
 		id := int32(2)
-		expectedError := storage.ErrEntityNotFound
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+		expectedErr := storage.ErrEntityNotFound
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when
 		cluster, err := svc.GetByID(ctx, id)
@@ -109,15 +106,14 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, cluster)
-		assert.EqualError(t, err, "404: " + expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 
 	t.Run("should return error for unexpected repository error", func(t *testing.T) {
 		id := int32(3)
-		expectedError := errors.New("unexpected error")
+		expectedErr := errors.New("unexpected error")
 
-		// Set expectation for GetByID
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when
 		cluster, err := svc.GetByID(ctx, id)
@@ -125,11 +121,12 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, cluster)
-		assert.EqualError(t, err, "500: " + expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 }
 
 func TestTreeClusterService_Create(t *testing.T) {
+	ctx := context.Background()
 	newCluster := &entities.TreeClusterCreate{
 		Name:          "Cluster 1",
 		Address:       "123 Main St",
@@ -139,7 +136,6 @@ func TestTreeClusterService_Create(t *testing.T) {
 	}
 
 	t.Run("should successfully create a new tree cluster", func(t *testing.T) {
-		// Given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -149,21 +145,33 @@ func TestTreeClusterService_Create(t *testing.T) {
 		expectedCluster := getTestTreeClusters()[0]
 		expectedTrees := getTestTrees()
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
-		clusterRepo.EXPECT().Create(context.Background(), mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return(expectedCluster, nil)
-		locator.EXPECT().UpdateCluster(context.Background(), &expectedCluster.ID).Return(nil)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(expectedTrees, nil)
 
-		// When
-		result, err := svc.Create(context.Background(), newCluster)
+		clusterRepo.EXPECT().Create(
+			ctx,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(expectedCluster, nil)
 
-		// Then
+		locator.EXPECT().UpdateCluster(
+			ctx,
+			&expectedCluster.ID,
+		).Return(nil)
+
+		// when
+		result, err := svc.Create(ctx, newCluster)
+
+		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedCluster, result)
 	})
 
 	t.Run("should successfully create a new tree cluster with empty trees", func(t *testing.T) {
-		// Given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -180,21 +188,33 @@ func TestTreeClusterService_Create(t *testing.T) {
 
 		expectedCluster := getTestTreeClusters()[1]
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{}).Return(nil, nil)
-		clusterRepo.EXPECT().Create(context.Background(), mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return(expectedCluster, nil)
-		locator.EXPECT().UpdateCluster(context.Background(), &expectedCluster.ID).Return(nil)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{},
+		).Return(nil, nil)
+
+		clusterRepo.EXPECT().Create(
+			ctx,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(expectedCluster, nil)
+
+		locator.EXPECT().UpdateCluster(
+			ctx,
+			&expectedCluster.ID,
+		).Return(nil)
 	
-		// When
-		result, err := svc.Create(context.Background(), newCluster)
+		// when
+		result, err := svc.Create(ctx, newCluster)
 	
-		// Then
+		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedCluster, result)
 	})
 
 	t.Run("should return an error when getting trees fails", func(t *testing.T) {
-		// Given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -202,18 +222,21 @@ func TestTreeClusterService_Create(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 		expectedErr := storage.ErrTreeNotFound
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(nil, expectedErr)
+
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx, 
+			[]int32{1, 2},
+		).Return(nil, expectedErr)
 	
-		// When
-		result, err := svc.Create(context.Background(), newCluster)
+		// when
+		result, err := svc.Create(ctx, newCluster)
 	
-		// Then
+		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 
 	t.Run("should return an error when creating cluster fails", func(t *testing.T) {
-		// Given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -223,20 +246,30 @@ func TestTreeClusterService_Create(t *testing.T) {
 		expectedErr := errors.New("Failed to create cluster")
 		expectedTrees := getTestTrees()
 	
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
-		clusterRepo.EXPECT().Create(context.Background(), mock.Anything, mock.Anything, mock.Anything, mock.Anything).
-			Return(nil, expectedErr)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx, 
+			[]int32{1, 2},
+		).Return(expectedTrees, nil)
+
+		clusterRepo.EXPECT().Create(
+			ctx, 
+			mock.Anything, 
+			mock.Anything, 
+			mock.Anything, 
+			mock.Anything,
+		).Return(nil, expectedErr)
 	
-		// When
-		result, err := svc.Create(context.Background(), newCluster)
+		// when
+		result, err := svc.Create(ctx, newCluster)
 	
-		// Then
+		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 }
 
 func TestTreeClusterService_Update(t *testing.T) {
+	ctx := context.Background()
 	clusterID := int32(1)
 	updatedCluster := &entities.TreeClusterUpdate{
 		Name:          "Cluster 1",
@@ -247,7 +280,6 @@ func TestTreeClusterService_Update(t *testing.T) {
 	}
 
 	t.Run("should successfully update a tree cluster", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -257,12 +289,28 @@ func TestTreeClusterService_Update(t *testing.T) {
 		expectedCluster := getTestTreeClusters()[0]
 		expectedTrees := getTestTrees()
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
-		clusterRepo.EXPECT().Update(context.Background(), clusterID, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedCluster, nil)
-		locator.EXPECT().UpdateCluster(context.Background(), &clusterID).Return(nil)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(expectedTrees, nil)
+
+		clusterRepo.EXPECT().Update(
+			ctx,
+			clusterID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(expectedCluster, nil)
+
+		locator.EXPECT().UpdateCluster(
+			ctx,
+			&clusterID,
+		).Return(nil)
 
 		// when
-		result, err := svc.Update(context.Background(), clusterID, updatedCluster)
+		result, err := svc.Update(ctx, clusterID, updatedCluster)
 
 		// then
 		assert.NoError(t, err)
@@ -271,7 +319,6 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 
 	t.Run("should successfully update a tree cluster with empty tree IDs", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -288,12 +335,28 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 		expectedCluster := getTestTreeClusters()[1]
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{}).Return(nil, nil)
-		clusterRepo.EXPECT().Update(context.Background(), clusterID, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(expectedCluster, nil)
-		locator.EXPECT().UpdateCluster(context.Background(), &clusterID).Return(nil)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{},
+		).Return(nil, nil)
+
+		clusterRepo.EXPECT().Update(
+			ctx,
+			clusterID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(expectedCluster, nil)
+
+		locator.EXPECT().UpdateCluster(
+			ctx,
+			&clusterID,
+		).Return(nil)
 
 		// when
-		result, err := svc.Update(context.Background(), clusterID, updatedClusterEmptyTrees)
+		result, err := svc.Update(ctx, clusterID, updatedClusterEmptyTrees)
 
 		// then
 		assert.NoError(t, err)
@@ -301,14 +364,16 @@ func TestTreeClusterService_Update(t *testing.T) {
 	})
 
 	t.Run("should return an error when no trees are found", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(nil, storage.ErrTreeNotFound)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx, 
+			[]int32{1, 2},
+		).Return(nil, storage.ErrTreeNotFound)
 
 		// when
 		result, err := svc.Update(context.Background(), clusterID, updatedCluster)
@@ -319,7 +384,6 @@ func TestTreeClusterService_Update(t *testing.T) {
 	})
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -329,8 +393,20 @@ func TestTreeClusterService_Update(t *testing.T) {
 		expectedErr := errors.New("failed to update cluster")
 		expectedTrees := getTestTrees()
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
-		clusterRepo.EXPECT().Update(context.Background(), clusterID, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{},
+		).Return(expectedTrees, nil)
+
+		clusterRepo.EXPECT().Update(
+			ctx,
+			clusterID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(nil, expectedErr)
 
 		// when
 		result, err := svc.Update(context.Background(), clusterID, updatedCluster)
@@ -341,7 +417,6 @@ func TestTreeClusterService_Update(t *testing.T) {
 	})
 
 	t.Run("should return an error when cluster ID does not exist", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -350,15 +425,27 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 		expectedTrees := getTestTrees()
 
-		treeRepo.EXPECT().GetTreesByIDs(context.Background(), []int32{1, 2}).Return(expectedTrees, nil)
-		clusterRepo.EXPECT().Update(context.Background(), clusterID, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, storage.ErrEntityNotFound)
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{},
+		).Return(expectedTrees, nil)
+
+		clusterRepo.EXPECT().Update(
+			ctx,
+			clusterID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(nil, storage.ErrEntityNotFound)
 
 		// when
-		result, err := svc.Update(context.Background(), clusterID, updatedCluster)
+		result, err := svc.Update(ctx, clusterID, updatedCluster)
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: "+storage.ErrEntityNotFound.Error())
+		assert.EqualError(t, err, handleError(storage.ErrEntityNotFound).Error())
 	})
 }
 
@@ -388,53 +475,51 @@ func TestTreeClusterService_Delete(t *testing.T) {
 	t.Run("should return error if tree cluster not found", func(t *testing.T) {
 		id := int32(2)
 
-		expectedError := storage.ErrEntityNotFound
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+		expectedErr := storage.ErrEntityNotFound
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when
         err := svc.Delete(ctx, id)
 		
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "404: " + expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 
 	t.Run("should return error if unlinking tree cluster ID fails", func(t *testing.T) {
         id := int32(3)
-        expectedError := errors.New("failed to unlink")
+        expectedErr := errors.New("failed to unlink")
 
         clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
-        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedError)
+        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedErr)
 
         // when
         err := svc.Delete(ctx, id)
 
 		// then
         assert.Error(t, err)
-		assert.EqualError(t, err, "500: " + expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedErr).Error())
     })
 
 	t.Run("should return error if deleting tree cluster fails", func(t *testing.T) {
         id := int32(4)
-        expectedError := errors.New("failed to delete")
+        expectedErr := errors.New("failed to delete")
 
-        // Set expectations
         clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
         treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
-		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedError)
+		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
 
         // when
         err := svc.Delete(ctx, id)
 
         // then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: " + expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedErr).Error())
     })
 }
 
 func TestReady(t *testing.T) {
 	t.Run("should return true if the service is ready", func(t *testing.T) {
-		// given
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -449,7 +534,6 @@ func TestReady(t *testing.T) {
 	})
 
 	t.Run("should return false if the service is not ready", func(t *testing.T) {
-		// given
 		svc := NewTreeClusterService(nil, nil, nil, nil)
 
 		// when
@@ -492,7 +576,6 @@ func getTestTreeClusters() []*entities.TreeCluster {
 		},
 	}
 }
-
 
 func getTestTrees() []*entities.Tree {
 	now := time.Now()
