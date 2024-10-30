@@ -200,7 +200,21 @@ func TestUpdateTree(t *testing.T) {
 
 		mockService.AssertExpectations(t)
 	})
+	t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		handler := UpdateTree(mockService)
+		app.Put("/v1/tree/:id", handler)
 
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockService := serviceMock.NewMockTreeService(t)
@@ -231,7 +245,7 @@ func TestUpdateTree(t *testing.T) {
 		// when
 		reqBody := getMockTreeUpdateRequest()
 		reqBodyBytes, _ := json.Marshal(reqBody)
-		req := httptest.NewRequest("PUT", "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(reqBodyBytes))
+		req := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(reqBodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
 
