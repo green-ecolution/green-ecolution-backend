@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	httpEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
@@ -263,6 +264,89 @@ func TestUpdateTree(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 }
+
+// TestDeleteTree tests the DeleteTree handler.
+func TestDeleteTree(t *testing.T) {
+	t.Run("should delete tree successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Delete("/v1/tree/:id", DeleteTree(mockService))
+
+		treeID := int32(1)
+		mockService.EXPECT().Delete(mock.Anything, treeID).Return(nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/"+strconv.Itoa(int(treeID)), nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+	t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Delete("/v1/tree/:id", DeleteTree(mockService))
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 Not Found when tree does not exist", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Delete("/v1/tree/:id", DeleteTree(mockService))
+
+		treeID := int32(999)
+		mockService.EXPECT().Delete(
+			mock.Anything,
+			treeID,
+		).Return(service.NewError(service.NotFound, "tree not found"))
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/"+strconv.Itoa(int(treeID)), nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("should return 500 Internal Server Error on service error", func(t *testing.T) {
+
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Delete("/v1/tree/:id", DeleteTree(mockService))
+
+		treeID := int32(1)
+		mockService.EXPECT().Delete(mock.Anything, treeID).Return(fiber.NewError(fiber.StatusInternalServerError, "service error"))
+
+		// when
+		body, _ := json.Marshal(getMockTreeUpdateRequest())
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+
+}
+
 func getMockTreeUpdateRequest() *httpEntities.TreeUpdateRequest {
 	return &httpEntities.TreeUpdateRequest{
 		TreeClusterID: nil,
@@ -275,6 +359,7 @@ func getMockTreeUpdateRequest() *httpEntities.TreeUpdateRequest {
 		SensorID:      nil,
 		Description:   "Updated description",
 	}
+
 }
 func getMockTreeCreateRequest() *httpEntities.TreeCreateRequest {
 	return &httpEntities.TreeCreateRequest{
