@@ -19,6 +19,85 @@ import (
 	"time"
 )
 
+func TestGetTreeByID(t *testing.T) {
+	t.Run("should return tree successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockTreeService := serviceMock.NewMockTreeService(t)
+		app.Get("v1/tree/:id", GetTreeByID(mockTreeService))
+
+		treeID := int32(1)
+		mockTree := &entities.Tree{
+			ID:           treeID,
+			Species:      "Oak",
+			PlantingYear: 2023,
+			Number:       "T001",
+			Latitude:     54.801539,
+			Longitude:    9.446741,
+			Description:  "oak tree",
+		}
+		mockTreeService.EXPECT().GetByID(
+			mock.Anything,
+			int32(1),
+		).Return(mockTree, nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/"+strconv.Itoa(int(treeID)), nil)
+		req.Header.Set("Content-Type", "application/json")
+		resp, _ := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		mockTreeService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
+		app := fiber.New()
+		mockTreeService := serviceMock.NewMockTreeService(t)
+		app.Get("v1/tree/:id", GetTreeByID(mockTreeService))
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree/invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 when tree not found", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Get("/v1/tree/:id", GetTreeByID(mockService))
+
+		mockService.EXPECT().GetByID(mock.Anything, int32(999)).Return(nil, storage.ErrTreeNotFound)
+
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/999", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("should return 500 when internal server error occurs", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Get("/v1/tree/:id", GetTreeByID(mockService))
+
+		treeID := int32(1)
+		mockService.EXPECT().GetByID(mock.Anything, treeID).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/"+strconv.Itoa(int(treeID)), nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+}
+
 // TestGetAllTrees tests the GetAllTrees handler.
 func TestGetAllTrees(t *testing.T) {
 	t.Run("should return all trees successfully", func(t *testing.T) {
@@ -33,7 +112,6 @@ func TestGetAllTrees(t *testing.T) {
 		// Create a request to the endpoint
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// Verify the response
@@ -53,7 +131,6 @@ func TestGetAllTrees(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -73,7 +150,6 @@ func TestGetAllTrees(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -104,7 +180,6 @@ func TestCreateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(reqBodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -132,7 +207,6 @@ func TestCreateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -154,7 +228,6 @@ func TestCreateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -185,7 +258,6 @@ func TestUpdateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -224,7 +296,6 @@ func TestUpdateTree(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/1", bytes.NewBuffer(invalidRequestBody))
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -248,7 +319,6 @@ func TestUpdateTree(t *testing.T) {
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(reqBodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -269,7 +339,6 @@ func TestUpdateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
@@ -350,7 +419,6 @@ func TestDeleteTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
-
 		defer resp.Body.Close()
 
 		// then
