@@ -8,10 +8,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	httpEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -30,6 +32,7 @@ func TestGetAllTrees(t *testing.T) {
 		// Create a request to the endpoint
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
 		resp, err := app.Test(req, -1)
+
 		defer resp.Body.Close()
 
 		// Verify the response
@@ -49,6 +52,7 @@ func TestGetAllTrees(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
 		resp, err := app.Test(req, -1)
+
 		defer resp.Body.Close()
 
 		// then
@@ -68,6 +72,7 @@ func TestGetAllTrees(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
 		resp, err := app.Test(req, -1)
+
 		defer resp.Body.Close()
 
 		// then
@@ -98,6 +103,7 @@ func TestCreateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(reqBodyBytes))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+
 		defer resp.Body.Close()
 
 		// then
@@ -125,6 +131,7 @@ func TestCreateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+
 		defer resp.Body.Close()
 
 		// then
@@ -146,6 +153,7 @@ func TestCreateTree(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
+
 		defer resp.Body.Close()
 
 		// then
@@ -155,6 +163,119 @@ func TestCreateTree(t *testing.T) {
 	})
 }
 
+// TestUpdateTree tests the UpdateTree handler.
+func TestUpdateTree(t *testing.T) {
+	t.Run("should update tree successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Put("/v1/tree/:id", UpdateTree(mockService))
+
+		testTree := getMockTrees()[0]
+		treeID := int32(1)
+
+		mockService.EXPECT().Update(
+			mock.Anything,
+			treeID,
+			mock.Anything,
+		).Return(testTree, nil)
+
+		// when
+		body, _ := json.Marshal(getMockTreeUpdateRequest())
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response httpEntities.TreeResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, testTree.Latitude, response.Latitude)
+		assert.Equal(t, testTree.Longitude, response.Longitude)
+
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Put("/v1/tree/:id", UpdateTree(mockService))
+
+		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/1", bytes.NewBuffer(invalidRequestBody))
+		resp, err := app.Test(req, -1)
+
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 Not Found when tree does not exist", func(t *testing.T) {
+
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Put("/v1/tree/:id", UpdateTree(mockService))
+
+		treeID := int32(999)
+		mockService.EXPECT().Update(mock.Anything, treeID, mock.AnythingOfType("*entities.TreeUpdate")).Return(nil,
+			storage.ErrTreeClusterNotFound)
+
+		// when
+		reqBody := getMockTreeUpdateRequest()
+		reqBodyBytes, _ := json.Marshal(reqBody)
+		req := httptest.NewRequest("PUT", "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(reqBodyBytes))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+	t.Run("should return 500 Internal Server Error on service error", func(t *testing.T) {
+		app := fiber.New()
+		mockService := serviceMock.NewMockTreeService(t)
+		app.Put("/v1/tree/:id", UpdateTree(mockService))
+
+		treeID := int32(1)
+		mockService.EXPECT().Update(mock.Anything, treeID, mock.AnythingOfType("*entities.TreeUpdate")).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "server error"))
+
+		// when
+		body, _ := json.Marshal(getMockTreeUpdateRequest())
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		mockService.AssertExpectations(t)
+	})
+}
+func getMockTreeUpdateRequest() *httpEntities.TreeUpdateRequest {
+	return &httpEntities.TreeUpdateRequest{
+		TreeClusterID: nil,
+		Readonly:      false,
+		PlantingYear:  2023,
+		Species:       "Oak",
+		Number:        "T001",
+		Latitude:      54.801539,
+		Longitude:     9.446741,
+		SensorID:      nil,
+		Description:   "Updated description",
+	}
+}
 func getMockTreeCreateRequest() *httpEntities.TreeCreateRequest {
 	return &httpEntities.TreeCreateRequest{
 		TreeClusterID: nil,
@@ -168,6 +289,7 @@ func getMockTreeCreateRequest() *httpEntities.TreeCreateRequest {
 		Description:   "A newly planted oak tree",
 	}
 }
+
 func getMockTrees() []*entities.Tree {
 	now := time.Now()
 
