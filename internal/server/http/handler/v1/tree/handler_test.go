@@ -311,7 +311,7 @@ func TestUpdateTree(t *testing.T) {
 
 		treeID := int32(999)
 		mockService.EXPECT().Update(mock.Anything, treeID, mock.AnythingOfType("*entities.TreeUpdate")).Return(nil,
-			storage.ErrTreeClusterNotFound)
+			storage.ErrTreeNotFound)
 
 		// when
 		reqBody := getMockTreeUpdateRequest()
