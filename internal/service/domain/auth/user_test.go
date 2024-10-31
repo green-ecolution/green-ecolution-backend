@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -229,6 +231,61 @@ func TestClientTokenCallback(t *testing.T) {
 		// when
 		authRepo.EXPECT().GetAccessTokenFromClientCode(context.Background(), loginCallback.Code, loginCallback.RedirectURL.String()).Return(nil, assert.AnError)
 		_, err := svc.ClientTokenCallback(context.Background(), loginCallback)
+
+		// then
+		assert.Error(t, err)
+	})
+}
+
+func TestLogoutRequest(t *testing.T) {
+	t.Run("should succeed when logout request is valid", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		logoutRequest := &entities.Logout{RefreshToken: "valid-refresh-token"}
+		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(nil)
+
+		// then
+		err := svc.LogoutRequest(context.Background(), logoutRequest)
+
+		// when
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error when validation fails", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		invalidLogoutRequest := &entities.Logout{RefreshToken: ""}
+
+		// when
+		err := svc.LogoutRequest(context.Background(), invalidLogoutRequest)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when session removal fails", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		logoutRequest := &entities.Logout{RefreshToken: "valid-refresh-token"}
+		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(errors.New("Internal error"))
+
+		// when
+		err := svc.LogoutRequest(context.Background(), logoutRequest)
 
 		// then
 		assert.Error(t, err)
