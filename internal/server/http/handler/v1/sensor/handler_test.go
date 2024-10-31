@@ -83,7 +83,7 @@ func TestGetAllSensors(t *testing.T) {
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
 		).Return(nil, errors.New("service error"))
-		
+
 		app.Get("/v1/sensor", handler)
 
 		// when
