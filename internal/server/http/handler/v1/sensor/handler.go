@@ -156,7 +156,7 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 func DeleteSensor(_ service.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// TODO: Implement
-		return c.SendString("Not implemented")
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
