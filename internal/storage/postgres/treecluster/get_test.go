@@ -177,7 +177,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-    assert.ErrorIs(t, err, storage.ErrRegionNotFound)
+		assert.ErrorIs(t, err, storage.ErrRegionNotFound)
 		assert.Nil(t, got)
 	})
 
@@ -190,7 +190,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-    assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
+		assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
 		assert.Nil(t, got)
 	})
 
@@ -203,7 +203,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-    assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
+		assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
 		assert.Nil(t, got)
 	})
 
@@ -250,7 +250,7 @@ func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-    assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
+		assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
 		assert.Nil(t, got)
 	})
 
@@ -275,7 +275,7 @@ func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-    assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
+		assert.ErrorIs(t, err, storage.ErrTreeClusterNotFound)
 		assert.Nil(t, got)
 	})
 
