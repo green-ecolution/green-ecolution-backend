@@ -71,7 +71,8 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
-			return err
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		domainData, err := svc.GetByID(ctx, int32(id))
@@ -140,6 +141,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 
@@ -178,7 +180,8 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
-			return err
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		err = svc.Delete(ctx, int32(id))
@@ -187,74 +190,6 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		}
 
 		return c.SendStatus(fiber.StatusNoContent)
-	}
-}
-
-// @Summary		Get all trees in tree cluster
-// @Description	Get all trees in tree cluster
-// @Id				get-all-trees-in-tree-cluster
-// @Tags			Tree Cluster
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/cluster/{cluster_id}/trees [get]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
-// @Param			age			query	string	false	"Age"
-// @Security		Keycloak
-func GetTreesInTreeCluster(_ service.TreeClusterService) fiber.Handler {
-	// TODO: Change response @Success to entities.TreeListResponse
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Add trees to tree cluster
-// @Description	Add trees to tree cluster
-// @Id				add-trees-to-tree-cluster
-// @Tags			Tree Cluster
-// @Produce		json
-// @Success		200	{object}	entities.TreeClusterResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/cluster/{cluster_id}/trees [post]
-// @Param			cluster_id	path	string								true	"Tree Cluster ID"
-// @Param			body		body	entities.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
-// @Security		Keycloak
-func AddTreesToTreeCluster(_ service.TreeClusterService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Remove trees from tree cluster
-// @Description	Remove trees from tree cluster
-// @Id				remove-trees-from-tree-cluster
-// @Tags			Tree Cluster
-// @Produce		json
-// @Success		200	{object}	entities.TreeClusterResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/cluster/{cluster_id}/trees/{tree_id} [delete]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
-// @Param			tree_id		path	string	true	"Tree ID"
-// @Security		Keycloak
-func RemoveTreesFromTreeCluster(_ service.TreeClusterService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 
