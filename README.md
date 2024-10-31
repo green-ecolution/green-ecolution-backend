@@ -1,5 +1,6 @@
 <p>
   <a href=""><img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white"/></a>
+  <a href=""><img src="https://raw.githubusercontent.com/green-ecolution/green-ecolution-backend/badges/.badges/develop/coverage.svg"/></a>
 </p>
 
 # Green Ecolution Backend
