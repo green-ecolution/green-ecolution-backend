@@ -17,3 +17,14 @@ func RegisterRoutes(svc service.AuthService) *fiber.App {
 
 	return app
 }
+
+func RegisterPublicRoutes(svc service.AuthService) *fiber.App {
+	app := fiber.New()
+
+	app.Post("/logout", Logout(svc))
+	app.Get("/login", Login(svc))
+	app.Post("/login/token", RequestToken(svc))
+	app.Post("/token/refresh", RefreshToken(svc))
+
+	return app
+}
