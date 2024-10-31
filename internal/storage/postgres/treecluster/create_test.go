@@ -40,7 +40,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Nil(t, got.LastWatered)
 	})
 
-	t.Run("should return tree cluster with all values set", func(t *testing.T) {
+	t.Run("should create tree cluster with all values set", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
@@ -146,6 +146,37 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
+
+	t.Run("should return error when tree cluster has empty name", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.Create(context.Background(), WithName(""))
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+  t.Run("should return error if context is canceled", func(t *testing.T) {
+    // given
+    suite.ResetDB(t)
+    suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    ctx, cancel := context.WithCancel(context.Background())
+    cancel()
+
+    // when
+    got, err := r.Create(ctx, WithName("test"))
+
+    // then
+    assert.Error(t, err)
+    assert.Nil(t, got)
+  })
 }
 
 func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
@@ -182,4 +213,48 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 			assert.Equal(t, tc.ID, *sqlTree.TreeClusterID)
 		}
 	})
+
+  t.Run("should return error when tree cluster not found", func(t *testing.T) {
+    // given
+    suite.ResetDB(t)
+    suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    testTrees, err := suite.Store.GetAllTrees(context.Background())
+    assert.NoError(t, err)
+    trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+
+    // when
+    err = r.LinkTreesToCluster(context.Background(), 99, utils.Map(trees, func(t *entities.Tree) int32 {
+      return t.ID
+    }))
+
+    // then
+    assert.Error(t, err)
+  })
+
+  t.Run("should return error when context is canceled", func(t *testing.T) {
+    // given
+    suite.ResetDB(t)
+    suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    testTrees, err := suite.Store.GetAllTrees(context.Background())
+    assert.NoError(t, err)
+    trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+
+    tc, err := r.Create(context.Background(), WithName("test"))
+    assert.NoError(t, err)
+
+    ctx, cancel := context.WithCancel(context.Background())
+    cancel()
+
+    // when
+    err = r.LinkTreesToCluster(ctx, tc.ID, utils.Map(trees, func(t *entities.Tree) int32 {
+      return t.ID
+    }))
+
+    // then
+    assert.Error(t, err)
+  })
 }
