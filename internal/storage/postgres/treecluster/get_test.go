@@ -9,7 +9,7 @@ import (
 )
 
 func TestTreeClusterRepository_GetAll(t *testing.T) {
-	t.Run("GetAll tree clusters should return tree clusters order by id", func(t *testing.T) {
+	t.Run("should return all tree clusters", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
@@ -49,7 +49,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 	})
 
-	t.Run("GetAll tree clusters with empty database should return empty list", func(t *testing.T) {
+	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeClusterRepository(suite.Store, mappers)
@@ -62,7 +62,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		assert.Empty(t, got)
 	})
 
-	t.Run("GetAll tree clusters with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -79,7 +79,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 func TestTreeClusterRepository_GetByID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
-	t.Run("GetByID tree cluster should return tree cluster", func(t *testing.T) {
+	t.Run("should return tree cluster by id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -113,7 +113,7 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		}
 	})
 
-	t.Run("GetByID tree cluster with non-existing id should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with non-existing id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -125,7 +125,7 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetByID tree cluster with negative id should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with negative id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -137,7 +137,7 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetByID tree cluster with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with zero id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -155,7 +155,7 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
-	t.Run("GetRegionByTreeClusterID should return region", func(t *testing.T) {
+	t.Run("should return region by tree cluster id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -168,7 +168,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 		assert.Equal(t, allTestCluster[0].RegionID, got.ID)
 	})
 
-	t.Run("GetRegionByTreeClusterID with no region should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster has no region", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -181,7 +181,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetRegionByTreeClusterID with non-existing id should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with non-existing id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -194,7 +194,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetRegionByTreeClusterID with negative id should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with negative id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -207,7 +207,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetRegionByTreeClusterID with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -225,7 +225,7 @@ func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
-	t.Run("GetLinkedTreesByTreeClusterID should return linked trees", func(t *testing.T) {
+	t.Run("should return linked trees by tree cluster id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -241,7 +241,7 @@ func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 		}
 	})
 
-	t.Run("GetLinkedTreesByTreeClusterID with non-existing id should return error", func(t *testing.T) {
+	t.Run("should return error with non-existing id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -254,7 +254,7 @@ func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetLinkedTreesByTreeClusterID with no linked trees should return empty list", func(t *testing.T) {
+	t.Run("should return empty list with no linked trees", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -266,7 +266,7 @@ func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 		assert.Empty(t, got)
 	})
 
-	t.Run("GetLinkedTreesByTreeClusterID with negative id should return error", func(t *testing.T) {
+	t.Run("should return error with negative id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -279,7 +279,7 @@ func TestTreeClusterRepository_GetLinkedTreesByTreeClusterID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("GetLinkedTreesByTreeClusterID with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())

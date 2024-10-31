@@ -32,7 +32,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestTreeClusterRepository_Delete(t *testing.T) {
-	t.Run("Delete tree cluster should delete tree cluster", func(t *testing.T) {
+	t.Run("should delete tree cluster", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.ExecQuery(t, "INSERT INTO tree_clusters (id, name, moisture_level, address, description) VALUES (1, 'test', 0.5, '', '')")
@@ -48,7 +48,7 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Delete tree cluster with linked tree should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster has linked trees", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
@@ -61,7 +61,7 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Delete tree cluster with non-existing id should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with non-existing id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -72,7 +72,7 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Delete tree cluster with negative id should return error", func(t *testing.T) {
+	t.Run("should return error when tree cluster with negative id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -83,7 +83,7 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Delete tree cluster with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -98,7 +98,7 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 }
 
 func TestTreeClusterRepository_Archived(t *testing.T) {
-  t.Run("Archive tree cluster should archive tree cluster", func(t *testing.T) {
+  t.Run("should archive tree cluster", func(t *testing.T) {
     // given
     suite.ResetDB(t)
     suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
@@ -115,7 +115,7 @@ func TestTreeClusterRepository_Archived(t *testing.T) {
     assert.True(t, got.Archived)
   })
 
-  t.Run("Archive tree cluster with non-existing id should return error", func(t *testing.T) {
+  t.Run("should return error when tree cluster with non-existing id", func(t *testing.T) {
     // given
     r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -126,7 +126,7 @@ func TestTreeClusterRepository_Archived(t *testing.T) {
     assert.Error(t, err)
   })
 
-  t.Run("Archive tree cluster with negative id should return error", func(t *testing.T) {
+  t.Run("should return error when tree cluster with negative id", func(t *testing.T) {
     // given
     r := NewTreeClusterRepository(suite.Store, mappers)
 
@@ -137,7 +137,7 @@ func TestTreeClusterRepository_Archived(t *testing.T) {
     assert.Error(t, err)
   })
 
-  t.Run("Archive tree cluster that is already archived should return not return error", func(t *testing.T) {
+  t.Run("should not return error when archive tree cluster twice", func(t *testing.T) {
     // given
     suite.ResetDB(t)
     suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
@@ -160,7 +160,7 @@ func TestTreeClusterRepository_Archived(t *testing.T) {
     assert.True(t, gotAfter.Archived)
   })
 
-  t.Run("Archive tree cluster with context canceled exceeded should return error", func(t *testing.T) {
+  t.Run("should return error if context is canceled", func(t *testing.T) {
     // given
     r := NewTreeClusterRepository(suite.Store, mappers)
     ctx, cancel := context.WithCancel(context.Background())
