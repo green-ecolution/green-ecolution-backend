@@ -2,6 +2,7 @@ package treecluster
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -29,6 +30,10 @@ func (r *TreeClusterRepository) Create(ctx context.Context, tcFn ...entities.Ent
 	entity := defaultTreeCluster()
 	for _, fn := range tcFn {
 		fn(entity)
+	}
+
+	if err := r.validateTreeClusterEntity(entity); err != nil {
+		return nil, err
 	}
 
 	id, err := r.createEntity(ctx, entity)
@@ -84,6 +89,18 @@ func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entiti
 	}
 
 	return id, nil
+}
+
+func (r *TreeClusterRepository) validateTreeClusterEntity(tc *entities.TreeCluster) error {
+	if tc == nil {
+		return errors.New("tree cluster is nil")
+	}
+
+	if tc.Name == "" {
+		return errors.New("tree cluster name is empty")
+	}
+
+	return nil
 }
 
 func (r *TreeClusterRepository) LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error {
