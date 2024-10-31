@@ -9,7 +9,7 @@ import (
 )
 
 func TestRegionRepository_GetAll(t *testing.T) {
-	t.Run("Get all regions should return all regions ordered by id", func(t *testing.T) {
+	t.Run("should return all regions ordered by id", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/region")
@@ -29,7 +29,7 @@ func TestRegionRepository_GetAll(t *testing.T) {
 		}
 	})
 
-	t.Run("Get all regions with empty database should return empty list", func(t *testing.T) {
+	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
@@ -42,7 +42,7 @@ func TestRegionRepository_GetAll(t *testing.T) {
 		assert.Empty(t, got)
 	})
 
-	t.Run("Get all regions with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
 		ctx, cancel := context.WithCancel(context.Background())
@@ -58,7 +58,7 @@ func TestRegionRepository_GetAll(t *testing.T) {
 }
 
 func TestRegionRepository_GetByID(t *testing.T) {
-	t.Run("Get region by id should return region", func(t *testing.T) {
+	t.Run("should return region by id", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -77,7 +77,7 @@ func TestRegionRepository_GetByID(t *testing.T) {
 		assert.NotZero(t, got.UpdatedAt)
 	})
 
-	t.Run("Get region by id with non-existing id should return error", func(t *testing.T) {
+	t.Run("should return error when region not found", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -91,7 +91,7 @@ func TestRegionRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Get region by id with negative id should return error", func(t *testing.T) {
+	t.Run("should return error when region id is negative", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -105,7 +105,7 @@ func TestRegionRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Get region by id with zero id should return error", func(t *testing.T) {
+	t.Run("should return error when region id is zero", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -119,7 +119,7 @@ func TestRegionRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Get region by id with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
 		ctx, cancel := context.WithCancel(context.Background())
@@ -141,22 +141,22 @@ func TestRegionRepository_GetByName(t *testing.T) {
 		args string
 	}{
 		{
-			name: "Get region by name 'Mürwik' should return region",
+			name: "should return region by name 'Mürwik'",
 			want: allTestRegions[0],
 			args: "Mürwik",
 		},
 		{
-			name: "Get region by name 'Fruerlund' should return region",
+			name: "should return region by name 'Fruerlund'",
 			want: allTestRegions[1],
 			args: "Fruerlund",
 		},
 		{
-			name: "Get region by name 'Jürgensby' should return region",
+			name: "should return region by name 'Jürgensby'",
 			want: allTestRegions[2],
 			args: "Jürgensby",
 		},
 		{
-			name: "Get region by name 'Sandberg' should return region",
+			name: "should return region by name 'Sandberg'",
 			want: allTestRegions[3],
 			args: "Sandberg",
 		},
@@ -182,7 +182,7 @@ func TestRegionRepository_GetByName(t *testing.T) {
 		})
 	}
 
-	t.Run("Get region by name with non-existing name should return error", func(t *testing.T) {
+	t.Run("should return error when region not found", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
@@ -195,7 +195,7 @@ func TestRegionRepository_GetByName(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Get region by name with empty name should return error", func(t *testing.T) {
+	t.Run("should return error when region name is empty", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
@@ -208,7 +208,7 @@ func TestRegionRepository_GetByName(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Get region by name with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
 		ctx, cancel := context.WithCancel(context.Background())
@@ -224,7 +224,7 @@ func TestRegionRepository_GetByName(t *testing.T) {
 }
 
 func TestRegionRepository_GetByPoint(t *testing.T) {
-	t.Run("Get region by point should return region", func(t *testing.T) {
+	t.Run("should return region by point", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -243,7 +243,7 @@ func TestRegionRepository_GetByPoint(t *testing.T) {
 		assert.NotZero(t, got.UpdatedAt)
 	})
 
-	t.Run("Get region by point with non-existing point should return nil", func(t *testing.T) {
+	t.Run("should return nil when region not found by point", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -257,7 +257,7 @@ func TestRegionRepository_GetByPoint(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Get region by point with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
 		ctx, cancel := context.WithCancel(context.Background())

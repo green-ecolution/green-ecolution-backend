@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestRegionRepository_Delete(t *testing.T) {
-	t.Run("Delete region should delete region", func(t *testing.T) {
+	t.Run("should delete region", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/region")
@@ -53,7 +53,7 @@ func TestRegionRepository_Delete(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("Delete region with non-existing id should return error", func(t *testing.T) {
+	t.Run("should return error when region not found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewRegionRepository(defaultFields.store, defaultFields.RegionMappers)
@@ -65,7 +65,7 @@ func TestRegionRepository_Delete(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	t.Run("Delete region with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(defaultFields.store, defaultFields.RegionMappers)
 		ctx, cancel := context.WithCancel(context.Background())
