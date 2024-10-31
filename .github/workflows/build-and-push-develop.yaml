@@ -5,6 +5,38 @@ name: Build and Push Docker Image Develop
       - develop
 
 jobs:
+  update_test_cover_badge:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Dependencies
+        run: sudo apt-get update && sudo apt-get install -y make build-essential libgeos-dev libproj-dev
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Setup
+        run: make setup/ci
+
+      - name: Build
+        run: make build
+
+      - name: generate test coverage
+        run: go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+
+      - name: check test coverage
+        uses: vladopajic/go-test-coverage@v2
+        with:
+          profile: cover.out
+          local-prefix: github.com/green-ecolution/green-ecolution-backend
+          git-token: ${{ github.ref_name == 'develop' && secrets.GITHUB_TOKEN || '' }}
+          git-branch: badges
+
   build_and_deploy_dev:
     runs-on: ubuntu-latest
     permissions:
@@ -97,7 +129,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GREEN_ECOLUTION_PAT }}
         run: |
-          gh run download -R green-ecolution/green-ecolution-backend -n api-docs.json 
+          gh run download -R green-ecolution/green-ecolution-backend -n api-docs.json
 
       - name: Check API Docs exist
         run: |
