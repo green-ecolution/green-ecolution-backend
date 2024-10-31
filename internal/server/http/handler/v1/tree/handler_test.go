@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -105,7 +104,7 @@ func TestGetAllTrees(t *testing.T) {
 		app.Get("/v1/tree", GetAllTrees(mockService))
 		mockService.EXPECT().GetAll(
 			mock.Anything,
-		).Return(getMockTrees(), nil)
+		).Return(TestTrees, nil)
 
 		// when
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
@@ -161,14 +160,14 @@ func TestCreateTree(t *testing.T) {
 		app := fiber.New()
 		mockService := serviceMock.NewMockTreeService(t)
 		app.Post("/v1/tree", CreateTree(mockService))
-		testTree := getMockTrees()[0]
+		testTree := TestTrees[0]
 		mockService.EXPECT().Create(
 			mock.Anything,
 			mock.AnythingOfType("*entities.TreeCreate"),
 		).Return(testTree, nil)
 
 		// when
-		reqBody := getMockTreeCreateRequest()
+		reqBody := TestTreeCreateRequest
 		reqBodyBytes, _ := json.Marshal(reqBody)
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(reqBodyBytes))
 		req.Header.Set("Content-Type", "application/json")
@@ -215,7 +214,7 @@ func TestCreateTree(t *testing.T) {
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
-		body, _ := json.Marshal(getMockTreeCreateRequest())
+		body, _ := json.Marshal(TestTreeCreateRequest)
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/tree", bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
@@ -232,7 +231,7 @@ func TestUpdateTree(t *testing.T) {
 		app := fiber.New()
 		mockService := serviceMock.NewMockTreeService(t)
 		app.Put("/v1/tree/:id", UpdateTree(mockService))
-		testTree := getMockTrees()[0]
+		testTree := TestTrees[0]
 		treeID := int32(1)
 		mockService.EXPECT().Update(
 			mock.Anything,
@@ -241,7 +240,7 @@ func TestUpdateTree(t *testing.T) {
 		).Return(testTree, nil)
 
 		// when
-		body, _ := json.Marshal(getMockTreeUpdateRequest())
+		body, _ := json.Marshal(TestTreeUpdateRequest)
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
@@ -299,7 +298,7 @@ func TestUpdateTree(t *testing.T) {
 			storage.ErrTreeNotFound)
 
 		// when
-		reqBody := getMockTreeUpdateRequest()
+		reqBody := TestTreeUpdateRequest
 		reqBodyBytes, _ := json.Marshal(reqBody)
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(reqBodyBytes))
 		req.Header.Set("Content-Type", "application/json")
@@ -319,7 +318,7 @@ func TestUpdateTree(t *testing.T) {
 		mockService.EXPECT().Update(mock.Anything, treeID, mock.AnythingOfType("*entities.TreeUpdate")).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "server error"))
 
 		// when
-		body, _ := json.Marshal(getMockTreeUpdateRequest())
+		body, _ := json.Marshal(TestTreeUpdateRequest)
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
@@ -395,7 +394,7 @@ func TestDeleteTree(t *testing.T) {
 		mockService.EXPECT().Delete(mock.Anything, treeID).Return(fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
-		body, _ := json.Marshal(getMockTreeUpdateRequest())
+		body, _ := json.Marshal(TestTreeUpdateRequest)
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/"+strconv.Itoa(int(treeID)), bytes.NewBuffer(body))
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
@@ -406,53 +405,4 @@ func TestDeleteTree(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 		mockService.AssertExpectations(t)
 	})
-}
-func getMockTreeRequest(description string) *httpEntities.TreeCreateRequest {
-	return &httpEntities.TreeCreateRequest{
-		TreeClusterID: nil,
-		Readonly:      false,
-		PlantingYear:  2023,
-		Species:       "Oak",
-		Number:        "T001",
-		Latitude:      54.801539,
-		Longitude:     9.446741,
-		SensorID:      nil,
-		Description:   description,
-	}
-}
-func getMockTreeUpdateRequest() *httpEntities.TreeUpdateRequest {
-	return (*httpEntities.TreeUpdateRequest)(getMockTreeRequest("Updated description"))
-}
-func getMockTreeCreateRequest() *httpEntities.TreeCreateRequest {
-	return getMockTreeRequest("A newly planted oak tree")
-}
-func getMockTrees() []*entities.Tree {
-	now := time.Now()
-
-	return []*entities.Tree{
-		{
-			ID:           1,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Oak",
-			Number:       "T001",
-			Latitude:     9.446741,
-			Longitude:    54.801539,
-			Description:  "A mature oak tree",
-			PlantingYear: 2023,
-			Readonly:     true,
-		},
-		{
-			ID:           2,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Pine",
-			Number:       "T002",
-			Latitude:     9.446700,
-			Longitude:    54.801510,
-			Description:  "A young pine tree",
-			PlantingYear: 2023,
-			Readonly:     true,
-		},
-	}
 }
