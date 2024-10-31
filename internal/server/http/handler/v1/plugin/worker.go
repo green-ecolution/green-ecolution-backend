@@ -19,7 +19,7 @@ type PluginWorkerOption func(*PluginWorkerConfig)
 
 var defaultPluginWorkerConfig = PluginWorkerConfig{
 	timeout:  5 * time.Minute,
-    interval: 1 * time.Minute,
+	interval: 1 * time.Minute,
 }
 
 func WithTimeout(timeout time.Duration) PluginWorkerOption {

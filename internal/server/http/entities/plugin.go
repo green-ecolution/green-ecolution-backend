@@ -1,7 +1,7 @@
 package entities
 
 type PluginResponse struct {
-  Slug        string `json:"slug"`
+	Slug        string `json:"slug"`
 	Name        string `json:"name"`
 	Version     string `json:"version"`
 	Description string `json:"description"`
@@ -9,7 +9,7 @@ type PluginResponse struct {
 } // @name Plugin
 
 type PluginRegisterRequest struct {
-  Slug        string `json:"slug"`
+	Slug        string `json:"slug"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Version     string `json:"version"`

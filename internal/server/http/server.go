@@ -39,7 +39,7 @@ func (s *Server) Run(ctx context.Context) error {
 		ErrorHandler: errorHandler,
 	})
 	pluginCleanup := plugin.NewPluginWorker(
-		plugin.WithTimeout(5*time.Minute),
+		plugin.WithTimeout(5 * time.Minute),
 	)
 
 	app.Mount("/", s.middleware(s.publicRoutes, s.privateRoutes))
