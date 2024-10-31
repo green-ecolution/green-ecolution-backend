@@ -24,3 +24,4 @@ packages:
       AuthRepository: 
       UserRepository:
       RegionRepository:
+      ImageRepository:
