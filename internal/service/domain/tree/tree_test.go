@@ -27,7 +27,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
@@ -50,7 +50,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
@@ -72,7 +72,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
@@ -100,7 +100,7 @@ func TestTreeService_GetByID(t *testing.T) {
 	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 	regionRepo := storageMock.NewMockRegionRepository(t)
 
-	locator := treecluster.NewLocationUpdate(clusterRepo, treeRepo, regionRepo)
+	locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
 	svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
 	t.Run("should return tree when found", func(t *testing.T) {
