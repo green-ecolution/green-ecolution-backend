@@ -21,7 +21,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 			mockTreeService.EXPECT().GetAll(
 				mock.Anything,
-			).Return(getMockTrees(), nil)
+			).Return(TestTrees, nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
@@ -40,10 +40,10 @@ func TestRegisterTreeRoutes(t *testing.T) {
 			mockTreeService.EXPECT().Create(
 				mock.Anything,
 				mock.AnythingOfType("*entities.TreeCreate"),
-			).Return(getMockTrees()[0], nil)
+			).Return(TestTrees[0], nil)
 
 			// when
-			body, _ := json.Marshal(getMockTreeCreateRequest())
+			body, _ := json.Marshal(TestTreeCreateRequest)
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 
@@ -63,7 +63,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 			mockTreeService.EXPECT().GetByID(
 				mock.Anything,
 				int32(1),
-			).Return(getMockTrees()[0], nil)
+			).Return(TestTrees[0], nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
@@ -83,10 +83,10 @@ func TestRegisterTreeRoutes(t *testing.T) {
 				mock.Anything,
 				int32(1),
 				mock.Anything,
-			).Return(getMockTrees()[0], nil)
+			).Return(TestTrees[0], nil)
 
 			// when
-			body, _ := json.Marshal(getMockTreeUpdateRequest())
+			body, _ := json.Marshal(TestTreeUpdateRequest)
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 
