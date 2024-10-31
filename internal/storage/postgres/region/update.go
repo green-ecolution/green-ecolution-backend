@@ -2,6 +2,7 @@ package region
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -15,6 +16,10 @@ func (r *RegionRepository) Update(ctx context.Context, id int32, vFn ...entities
 
 	for _, fn := range vFn {
 		fn(entity)
+	}
+
+	if entity.Name == "" {
+		return nil, errors.New("name is required")
 	}
 
 	if err := r.updateEntity(ctx, entity); err != nil {
