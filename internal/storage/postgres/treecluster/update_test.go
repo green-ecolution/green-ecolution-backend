@@ -133,8 +133,10 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
-		assert.Equal(t, 1.0, got.Latitude)
-		assert.Equal(t, 1.0, got.Longitude)
+		assert.NotNil(t, got.Latitude)
+		assert.NotNil(t, got.Longitude)
+		assert.Equal(t, 1.0, *got.Latitude)
+		assert.Equal(t, 1.0, *got.Longitude)
 	})
 
 	t.Run("should remove tree cluster coordinates", func(t *testing.T) {
