@@ -44,6 +44,7 @@ func getPluginFiles(c *fiber.Ctx) error {
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
 //	@Router			/v1/plugin [post]
+//
 // @Param			body	body	entities.PluginRegisterRequest	true	"Plugin registration request"
 func registerPlugin(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -86,7 +87,7 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 			LastHeartbeat: time.Now(),
 			Version:       req.Version,
 			Description:   req.Description,
-      Slug:          req.Slug,
+			Slug:          req.Slug,
 		}
 
 		slog.Info("Plugin registered", "plugin", req.Name, "version", req.Version, "slug", req.Slug)
@@ -103,20 +104,20 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 	}
 }
 
-//	@Summary		Heartbeat for a plugin
-//	@Description	Heartbeat for a plugin
-//	@Id				plugin-heartbeat
-//	@Tags			Plugin
-//	@Produce		json
-//	@Success		200	{object}	string
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/plugin/{plugin_slug}/heartbeat [post]
-//	@Param			plugin_slug	path	string	true	"Name of the plugin specified by slug during registration"
-//	@Security		Keycloak
+// @Summary		Heartbeat for a plugin
+// @Description	Heartbeat for a plugin
+// @Id				plugin-heartbeat
+// @Tags			Plugin
+// @Produce		json
+// @Success		200	{object}	string
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/plugin/{plugin_slug}/heartbeat [post]
+// @Param			plugin_slug	path	string	true	"Name of the plugin specified by slug during registration"
+// @Security		Keycloak
 func pluginHeartbeat() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// pluginMutex.Lock()
@@ -130,18 +131,18 @@ func pluginHeartbeat() fiber.Handler {
 	}
 }
 
-//	@Summary		Get a list of all registered plugins
-//	@Description	Get a list of all registered plugins
-//	@Id				get-plugins-list
-//	@Tags			Plugin
-//	@Produce		json
-//	@Success		200	{object}	entities.PluginListResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/plugin [get]
+// @Summary		Get a list of all registered plugins
+// @Description	Get a list of all registered plugins
+// @Id				get-plugins-list
+// @Tags			Plugin
+// @Produce		json
+// @Success		200	{object}	entities.PluginListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/plugin [get]
 func GetPluginsList() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// pluginMutex.RLock()
@@ -150,11 +151,11 @@ func GetPluginsList() fiber.Handler {
 		plugins := make([]entities.PluginResponse, 0, len(registeredPlugins))
 		for _, plugin := range registeredPlugins {
 			plugins = append(plugins, entities.PluginResponse{
-        Slug:        plugin.Slug,
+				Slug:        plugin.Slug,
 				Name:        plugin.Name,
 				Version:     plugin.Version,
 				Description: plugin.Description,
-        HostPath:    plugin.Path.String(),
+				HostPath:    plugin.Path.String(),
 			},
 			)
 		}
@@ -165,19 +166,19 @@ func GetPluginsList() fiber.Handler {
 	}
 }
 
-//	@Summary		Get a plugin info
-//	@Description	Get a plugin info
-//	@Id				get-plugin-info
-//	@Tags			Plugin
-//	@Produce		json
-//	@Success		200	{object}	entities.PluginResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/plugin/{plugin_slug} [get]
-//	@Param			plugin_slug	path	string	true	"Slug of the plugin"
+// @Summary		Get a plugin info
+// @Description	Get a plugin info
+// @Id				get-plugin-info
+// @Tags			Plugin
+// @Produce		json
+// @Success		200	{object}	entities.PluginResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/plugin/{plugin_slug} [get]
+// @Param			plugin_slug	path	string	true	"Slug of the plugin"
 func GetPluginInfo() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// pluginMutex.RLock()
@@ -189,11 +190,11 @@ func GetPluginInfo() fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.PluginResponse{
-      Slug:        plugin.Slug,
+			Slug:        plugin.Slug,
 			Name:        plugin.Name,
 			Version:     plugin.Version,
 			Description: plugin.Description,
-      HostPath:    plugin.Path.String(),
+			HostPath:    plugin.Path.String(),
 		})
 	}
 }
