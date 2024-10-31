@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	service "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/treecluster"
@@ -31,7 +30,7 @@ func TestTreeService_GetAll(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
-		expectedTrees := getTestTrees()
+		expectedTrees := TestTreesList
 		treeRepo.EXPECT().GetAll(ctx).Return(expectedTrees, nil)
 
 		// when
@@ -86,7 +85,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, trees)
-		assert.EqualError(t, err, "500: "+expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 }
 
@@ -105,7 +104,7 @@ func TestTreeService_GetByID(t *testing.T) {
 
 	t.Run("should return tree when found", func(t *testing.T) {
 		id := int32(1)
-		expectedTree := getTestTrees()[0]
+		expectedTree := TestTreesList[0]
 		treeRepo.EXPECT().GetByID(ctx, id).Return(expectedTree, nil)
 
 		// when
@@ -127,7 +126,7 @@ func TestTreeService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, tree)
-		assert.EqualError(t, err, "404: "+expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 
 	t.Run("should return error for unexpected repository error", func(t *testing.T) {
@@ -143,192 +142,63 @@ func TestTreeService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, tree)
-		assert.EqualError(t, err, "500: "+expectedError.Error())
+		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 }
 
-func TestTreeService_Delete(t *testing.T) {
-	ctx := context.Background()
-
-	t.Run("should successfully delete a tree", func(t *testing.T) {
-		// Given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
-		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
-
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
-
-		expectedTree := getTestTrees()[0]
-		expectedTree.TreeCluster = getTestTreeClusters()[0]
-
-		// Mock expectations
-		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
-		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
-		locator.EXPECT().UpdateCluster(ctx, &expectedTree.TreeCluster.ID).Return(nil)
-
-		// When
-		err := svc.Delete(ctx, expectedTree.ID)
-
-		// Then
-		assert.NoError(t, err)
-	})
-
-	t.Run("should return error if tree not found", func(t *testing.T) {
-		// Given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
-		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
-
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
-
-		id := int32(1)
-		expectedError := storage.ErrTreeNotFound
-
-		// Mock expectations
-		treeRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
-
-		// When
-		err := svc.Delete(ctx, id)
-
-		// Then
-		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedError).Error())
-	})
-	t.Run("should return error if tree deletion fails", func(t *testing.T) {
-		// Given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
-		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
-
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
-
-		expectedTree := getTestTrees()[0]
-		expectedTree.TreeCluster = getTestTreeClusters()[0]
-		expectedError := errors.New("deletion failed")
-
-		// Mock expectations
-		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
-		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(expectedError)
-
-		// When
-		err := svc.Delete(ctx, expectedTree.ID)
-
-		// Then
-		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedError).Error())
-	})
-	t.Run("should return error if updating cluster fails after deleting tree", func(t *testing.T) {
-		// Given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
-		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
-
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
-
-		expectedTree := getTestTrees()[0]
-		expectedTree.TreeCluster = getTestTreeClusters()[0]
-		expectedError := errors.New("cluster update failed")
-
-		// Mock expectations
-		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
-		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
-		locator.EXPECT().UpdateCluster(ctx, &expectedTree.TreeCluster.ID).Return(expectedError)
-
-		// When
-		err := svc.Delete(ctx, expectedTree.ID)
-
-		// Then
-		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedError).Error())
-	})
-	t.Run("should delete a tree without triggering cluster update when tree has no cluster", func(t *testing.T) {
-		// Given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
-		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
-
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
-
-		expectedTree := getTestTrees()[0]
-		expectedTree.TreeCluster = nil // Tree has no cluster
-
-		// Mock expectations
-		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
-		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
-
-		// Ensure UpdateCluster is not called
-		locator.AssertNotCalled(t, "UpdateCluster", ctx, mock.Anything)
-
-		// When
-		err := svc.Delete(ctx, expectedTree.ID)
-
-		// Then
-		assert.NoError(t, err)
-	})
-
-}
 func TestTreeService_Ready(t *testing.T) {
 	t.Run("should return true when treeRepo and sensorRepo are initialized", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 
 		svc := NewTreeService(treeRepo, sensorRepo, nil, nil, nil)
 
-		// When
+		// when
 		result := svc.Ready()
 
-		// Then
+		// then
 		assert.True(t, result)
 	})
 
 	t.Run("should return false when treeRepo is nil", func(t *testing.T) {
-		// Given
+		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 
 		svc := NewTreeService(nil, sensorRepo, nil, nil, nil)
 
-		// When
+		// when
 		result := svc.Ready()
 
-		// Then
+		// then
 		assert.False(t, result)
 	})
 
 	t.Run("should return false when sensorRepo is nil", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 
 		svc := NewTreeService(treeRepo, nil, nil, nil, nil)
 
-		// When
+		// when
 		result := svc.Ready()
 
-		// Then
+		// then
 		assert.False(t, result)
 	})
 
 	t.Run("should return false when both treeRepo and sensorRepo are nil", func(t *testing.T) {
-		// Given
+		// given
 		svc := NewTreeService(nil, nil, nil, nil, nil)
 
-		// When
+		// when
 		result := svc.Ready()
 
-		// Then
+		// then
 		assert.False(t, result)
 	})
 }
+
 func TestTreeService_Create(t *testing.T) {
 	ctx := context.Background()
 	newTreeCreate := &entities.TreeCreate{
@@ -341,7 +211,7 @@ func TestTreeService_Create(t *testing.T) {
 		SensorID:      ptrToInt32(1),
 	}
 	t.Run("should successfully create a new tree", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -350,9 +220,9 @@ func TestTreeService_Create(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		expectedTree := getTestTrees()[0]
-		expectedCluster := getTestTreeClusters()[0]
-		expectedSensor := getTestSensors()[0]
+		expectedTree := TestTreesList[0]
+		expectedCluster := TestTreeClusters[0]
+		expectedSensor := TestSensors[0]
 
 		// Mock expectations
 		treeClusterRepo.EXPECT().GetByID(ctx, int32(1)).Return(expectedCluster, nil)
@@ -368,16 +238,16 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything).Return(expectedTree, nil)
 		locator.EXPECT().UpdateCluster(ctx, newTreeCreate.TreeClusterID).Return(nil)
 
-		// When
+		// when
 		result, err := svc.Create(ctx, newTreeCreate)
 
-		// Then
+		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedTree, result)
 	})
 
 	t.Run("should return validation error", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -394,16 +264,17 @@ func TestTreeService_Create(t *testing.T) {
 			Number:       "", // Invalid: Number is required
 		}
 
-		// When
+		// when
 		result, err := svc.Create(ctx, invalidTreeCreate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "validation error")
 	})
+
 	t.Run("should return error when fetching TreeCluster fails", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -417,17 +288,17 @@ func TestTreeService_Create(t *testing.T) {
 		// Mock expectations
 		treeClusterRepo.EXPECT().GetByID(ctx, *newTreeCreate.TreeClusterID).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Create(ctx, newTreeCreate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 
 	t.Run("should return error when fetching Sensor fails", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -437,23 +308,23 @@ func TestTreeService_Create(t *testing.T) {
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
 		expectedError := storage.ErrSensorNotFound
-		expectedCluster := getTestTreeClusters()[0]
+		expectedCluster := TestTreeClusters[0]
 
 		// Mock expectations
 		treeClusterRepo.EXPECT().GetByID(ctx, int32(1)).Return(expectedCluster, nil)
 		sensorRepo.EXPECT().GetByID(ctx, *newTreeCreate.SensorID).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Create(ctx, newTreeCreate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 
 	t.Run("should return error when creating tree fails", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -462,8 +333,8 @@ func TestTreeService_Create(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		expectedCluster := getTestTreeClusters()[0]
-		expectedSensor := getTestSensors()[0]
+		expectedCluster := TestTreeClusters[0]
+		expectedSensor := TestSensors[0]
 		expectedError := errors.New("tree creation failed")
 
 		// Mock expectations
@@ -479,17 +350,17 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Create(ctx, newTreeCreate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 
 	t.Run("should return error when updating cluster fails", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -498,9 +369,9 @@ func TestTreeService_Create(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		expectedTree := getTestTrees()[0]
-		expectedCluster := getTestTreeClusters()[0]
-		expectedSensor := getTestSensors()[0]
+		expectedTree := TestTreesList[0]
+		expectedCluster := TestTreeClusters[0]
+		expectedSensor := TestSensors[0]
 		expectedError := errors.New("cluster update failed")
 
 		// Mock expectations
@@ -517,13 +388,145 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything).Return(expectedTree, nil)
 		locator.EXPECT().UpdateCluster(ctx, newTreeCreate.TreeClusterID).Return(expectedError)
 
-		// When
+		// when
 		result, err := svc.Create(ctx, newTreeCreate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
+	})
+}
+
+func TestTreeService_Delete(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should successfully delete a tree", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+
+		expectedTree := TestTreesList[0]
+		expectedTree.TreeCluster = TestTreeClusters[0]
+
+		// Mock expectations
+		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
+		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
+		locator.EXPECT().UpdateCluster(ctx, &expectedTree.TreeCluster.ID).Return(nil)
+
+		// when
+		err := svc.Delete(ctx, expectedTree.ID)
+
+		// then
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error if tree not found", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+
+		id := int32(1)
+		expectedError := storage.ErrTreeNotFound
+
+		// Mock expectations
+		treeRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
+
+		// when
+		err := svc.Delete(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, handleError(expectedError).Error())
+	})
+
+	t.Run("should return error if tree deletion fails", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+
+		expectedTree := TestTreesList[0]
+		expectedTree.TreeCluster = TestTreeClusters[0]
+		expectedError := errors.New("deletion failed")
+
+		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
+		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(expectedError)
+
+		// when
+		err := svc.Delete(ctx, expectedTree.ID)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, handleError(expectedError).Error())
+	})
+
+	t.Run("should return error if updating cluster fails after deleting tree", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+
+		expectedTree := TestTreesList[0]
+		expectedTree.TreeCluster = TestTreeClusters[0]
+		expectedError := errors.New("cluster update failed")
+
+		// Mock expectations
+		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
+		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
+		locator.EXPECT().UpdateCluster(ctx, &expectedTree.TreeCluster.ID).Return(expectedError)
+
+		// when
+		err := svc.Delete(ctx, expectedTree.ID)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, handleError(expectedError).Error())
+	})
+
+	t.Run("should delete a tree without triggering cluster update when tree has no cluster", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+
+		expectedTree := TestTreesList[0]
+		expectedTree.TreeCluster = nil // Tree has no cluster
+
+		// Mock expectations
+		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
+		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
+
+		// Ensure UpdateCluster is not called
+		locator.AssertNotCalled(t, "UpdateCluster", ctx, mock.Anything)
+
+		// when
+		err := svc.Delete(ctx, expectedTree.ID)
+
+		// then
+		assert.NoError(t, err)
 	})
 }
 
@@ -542,12 +545,12 @@ func TestTreeService_Update(t *testing.T) {
 		Description:   "Updated description",
 	}
 
-	updatedTree := getTestTrees()[0]
+	updatedTree := TestTreesList[0]
 	updatedTree.Description = treeUpdate.Description
-	updatedTree.TreeCluster = getTestTreeClusters()[1]
+	updatedTree.TreeCluster = TestTreeClusters[1]
 
 	t.Run("should successfully update a tree", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -556,10 +559,10 @@ func TestTreeService_Update(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		currentTree := getTestTrees()[0]
-		treeCluster := getTestTreeClusters()[0]
+		currentTree := TestTreesList[0]
+		treeCluster := TestTreeClusters[0]
 		currentTree.TreeCluster = treeCluster
-		sensor := getTestSensors()[0]
+		sensor := TestSensors[0]
 		currentTree.Sensor = sensor
 
 		// Mock expectations
@@ -578,16 +581,16 @@ func TestTreeService_Update(t *testing.T) {
 		locator.EXPECT().UpdateCluster(ctx, &currentTree.TreeCluster.ID).Return(nil)
 		locator.EXPECT().UpdateCluster(ctx, &updatedTree.TreeCluster.ID).Return(nil)
 
-		// When
+		// when
 		result, err := svc.Update(ctx, id, treeUpdate)
 
-		// Then
+		// then
 		assert.NoError(t, err)
 		assert.Equal(t, updatedTree, result)
 	})
 
 	t.Run("should return validation error", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -602,16 +605,17 @@ func TestTreeService_Update(t *testing.T) {
 			PlantingYear: -2013,
 		}
 
-		// When
+		// when
 		result, err := svc.Update(ctx, 1, invalidTreeUpdate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "validation error")
 	})
+
 	t.Run("should return error if tree not found", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -625,17 +629,17 @@ func TestTreeService_Update(t *testing.T) {
 		// Mock expectations
 		treeRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Update(ctx, id, treeUpdate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
 
 	t.Run("should return error if TreeCluster not found", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -646,8 +650,8 @@ func TestTreeService_Update(t *testing.T) {
 
 		expectedError := storage.ErrTreeClusterNotFound
 
-		currentTree := getTestTrees()[0]
-		treeCluster := getTestTreeClusters()[0]
+		currentTree := TestTreesList[0]
+		treeCluster := TestTreeClusters[0]
 		currentTree.TreeCluster = treeCluster
 
 		// Mock expectations
@@ -655,17 +659,17 @@ func TestTreeService_Update(t *testing.T) {
 
 		treeClusterRepo.EXPECT().GetByID(ctx, currentTree.TreeCluster.ID).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Update(ctx, id, treeUpdate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.ErrorContains(t, err, expectedError.Error())
 	})
 
 	t.Run("should return error if Sensor not found", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -676,10 +680,10 @@ func TestTreeService_Update(t *testing.T) {
 
 		expectedError := storage.ErrSensorNotFound
 
-		currentTree := getTestTrees()[0]
-		sensor := getTestSensors()[0]
+		currentTree := TestTreesList[0]
+		sensor := TestSensors[0]
 		currentTree.Sensor = sensor
-		treeCluster := getTestTreeClusters()[0]
+		treeCluster := TestTreeClusters[0]
 		currentTree.TreeCluster = treeCluster
 
 		// Mock expectations
@@ -687,16 +691,17 @@ func TestTreeService_Update(t *testing.T) {
 		treeClusterRepo.EXPECT().GetByID(ctx, currentTree.TreeCluster.ID).Return(treeCluster, nil)
 		sensorRepo.EXPECT().GetByID(ctx, currentTree.Sensor.ID).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Update(ctx, id, treeUpdate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.ErrorContains(t, err, expectedError.Error())
 	})
+
 	t.Run("should return error if updating tree fails", func(t *testing.T) {
-		// Given
+		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
@@ -707,10 +712,10 @@ func TestTreeService_Update(t *testing.T) {
 
 		expectedError := errors.New("update failed")
 
-		currentTree := getTestTrees()[0]
-		treeCluster := getTestTreeClusters()[0]
+		currentTree := TestTreesList[0]
+		treeCluster := TestTreeClusters[0]
 		currentTree.TreeCluster = treeCluster
-		sensor := getTestSensors()[0]
+		sensor := TestSensors[0]
 		currentTree.Sensor = sensor
 
 		// Mock expectations
@@ -727,106 +732,12 @@ func TestTreeService_Update(t *testing.T) {
 			mock.Anything,
 			mock.Anything).Return(nil, expectedError)
 
-		// When
+		// when
 		result, err := svc.Update(ctx, id, treeUpdate)
 
-		// Then
+		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
 	})
-}
-
-func getTestTreeClusters() []*entities.TreeCluster {
-	now := time.Now()
-
-	return []*entities.TreeCluster{
-		{
-			ID:            1,
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			Name:          "Cluster 1",
-			Address:       "123 Main St",
-			Description:   "Test description",
-			SoilCondition: entities.TreeSoilConditionLehmig,
-			Archived:      false,
-			Latitude:      float64Ptr(9.446741),
-			Longitude:     float64Ptr(54.801539),
-			Trees:         getTestTrees(),
-		},
-		{
-			ID:            2,
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			Name:          "Cluster 2",
-			Address:       "456 Second St",
-			Description:   "Test description",
-			SoilCondition: entities.TreeSoilConditionSandig,
-			Archived:      false,
-			Latitude:      nil,
-			Longitude:     nil,
-			Trees:         []*entities.Tree{},
-		},
-	}
-}
-
-func getTestTrees() []*entities.Tree {
-	now := time.Now()
-
-	return []*entities.Tree{
-		{
-			ID:           1,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Oak",
-			Number:       "T001",
-			Latitude:     9.446741,
-			Longitude:    54.801539,
-			Description:  "A mature oak tree",
-			PlantingYear: 2023,
-			Readonly:     true,
-		},
-		{
-			ID:           2,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Pine",
-			Number:       "T002",
-			Latitude:     9.446700,
-			Longitude:    54.801510,
-			Description:  "A young pine tree",
-			PlantingYear: 2023,
-			Readonly:     true,
-		},
-	}
-}
-
-func getTestSensors() []*entities.Sensor {
-	now := time.Now()
-
-	return []*entities.Sensor{
-		{
-			ID:        1,
-			CreatedAt: now,
-			UpdatedAt: now,
-			Status:    entities.SensorStatusUnknown,
-			Data:      nil,
-		},
-		{
-			ID:        2,
-			CreatedAt: now,
-			UpdatedAt: now,
-			Status:    entities.SensorStatusUnknown,
-			Data:      nil,
-		},
-	}
-
-}
-
-func float64Ptr(f float64) *float64 {
-	return &f
-}
-
-func ptrToInt32(i int32) *int32 {
-	return &i
 }
