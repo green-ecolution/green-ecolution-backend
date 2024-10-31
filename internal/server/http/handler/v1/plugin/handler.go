@@ -24,7 +24,7 @@ func getPluginFiles(c *fiber.Ctx) error {
 		Rewrite: func(r *httputil.ProxyRequest) {
 			r.SetURL(&plugin.Path)
 			r.Out.Host = r.In.Host
-			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin.Name, plugin.Path.String(), 1)
+			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin.Slug, plugin.Path.String(), 1)
 			r.SetXForwarded()
 		},
 	}
@@ -44,6 +44,7 @@ func getPluginFiles(c *fiber.Ctx) error {
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
 //	@Router			/v1/plugin [post]
+// @Param			body	body	entities.PluginRegisterRequest	true	"Plugin registration request"
 func registerPlugin(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req entities.PluginRegisterRequest
@@ -75,20 +76,21 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 		// pluginMutex.Lock()
 		// defer pluginMutex.Unlock()
 
-		if _, ok := registeredPlugins[req.Name]; ok {
+		if _, ok := registeredPlugins[req.Slug]; ok {
 			return c.Status(fiber.StatusForbidden).SendString("plugin already registered")
 		}
 
-		registeredPlugins[req.Name] = domain.Plugin{
+		registeredPlugins[req.Slug] = domain.Plugin{
 			Name:          req.Name,
 			Path:          *path,
 			LastHeartbeat: time.Now(),
 			Version:       req.Version,
 			Description:   req.Description,
+      Slug:          req.Slug,
 		}
 
-		slog.Info("Plugin registered", "plugin", req.Name)
-		slog.Debug("Plugin registered", "plugin", fmt.Sprintf("%+v", registeredPlugins[req.Name]))
+		slog.Info("Plugin registered", "plugin", req.Name, "version", req.Version, "slug", req.Slug)
+		slog.Debug("Plugin registered", "plugin", fmt.Sprintf("%+v", registeredPlugins[req.Slug]))
 
 		response := entities.ClientTokenResponse{
 			AccessToken:  token.AccessToken,
@@ -112,9 +114,9 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 //	@Failure		403	{object}	HTTPError
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
-//	@Router			/v1/plugin/{plugin_name}/heartbeat [post]
-//	@Param			plugin_name		path	string	true	"Name of the plugin"
-//	@Param			Authorization	header	string	true	"Insert your access token"	default(Bearer <Add access token here>)
+//	@Router			/v1/plugin/{plugin_slug}/heartbeat [post]
+//	@Param			plugin_slug	path	string	true	"Name of the plugin specified by slug during registration"
+//	@Security		Keycloak
 func pluginHeartbeat() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// pluginMutex.Lock()
@@ -148,6 +150,7 @@ func GetPluginsList() fiber.Handler {
 		plugins := make([]entities.PluginResponse, 0, len(registeredPlugins))
 		for _, plugin := range registeredPlugins {
 			plugins = append(plugins, entities.PluginResponse{
+        Slug:        plugin.Slug,
 				Name:        plugin.Name,
 				Version:     plugin.Version,
 				Description: plugin.Description,
@@ -173,8 +176,8 @@ func GetPluginsList() fiber.Handler {
 //	@Failure		403	{object}	HTTPError
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
-//	@Router			/v1/plugin/{plugin_name} [get]
-//	@Param			plugin_name	path	string	true	"Name of the plugin"
+//	@Router			/v1/plugin/{plugin_slug} [get]
+//	@Param			plugin_slug	path	string	true	"Slug of the plugin"
 func GetPluginInfo() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// pluginMutex.RLock()
@@ -186,6 +189,7 @@ func GetPluginInfo() fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.PluginResponse{
+      Slug:        plugin.Slug,
 			Name:        plugin.Name,
 			Version:     plugin.Version,
 			Description: plugin.Description,
