@@ -188,11 +188,11 @@ func TestGetRegionByID(t *testing.T) {
 		app := fiber.New()
 		handler := region.GetRegionByID(mockRegionService)
 
-		mockRegionService.EXPECT().GetByID(
+	  mockRegionService.EXPECT().GetByID(
 			mock.Anything,
 			int32(1),
 		).Return(nil, errors.New("service error"))
-
+    
 		app.Get("/v1/region/:id", handler)
 
 		// when

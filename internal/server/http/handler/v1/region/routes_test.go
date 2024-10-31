@@ -43,7 +43,7 @@ func TestRegisterRoutes(t *testing.T) {
 			app := RegisterRoutes(mockRegionService)
 
 			mockRegionService.EXPECT().GetByID(
-				mock.Anything,
+				mock.Anything, 
 				int32(1),
 			).Return(&entities.Region{ID: 1, Name: "Region A"}, nil)
 
