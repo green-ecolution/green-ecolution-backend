@@ -23,6 +23,7 @@ func TestTreeService_ImportTree(t *testing.T) {
 		Species:      "Oak",
 		Number:       "T001",
 	}
+
 	t.Run("should create a new tree when no matching tree exists", func(t *testing.T) {
 		// Given
 		treeRepo := storageMock.NewMockTreeRepository(t)
@@ -30,15 +31,10 @@ func TestTreeService_ImportTree(t *testing.T) {
 		imageRepo := storageMock.NewMockImageRepository(t)
 		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		locator := service.NewMockGeoClusterLocator(t)
-
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
 		expectedTree := getTestTrees()[0]
-
-		// Mock GetByCoordinates to simulate no tree found
 		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(nil, nil)
-
-		// Mock Create to confirm new tree is created
 		treeRepo.EXPECT().Create(ctx,
 			mock.Anything,
 			mock.Anything,
@@ -70,13 +66,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		updatedTree := getTestTrees()[0]
 		updatedTree.Description = "Updated description"
 
-		// Mock GetByCoordinates to return an existing tree
 		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(existingTree, nil)
-
-		//Mock GetByID because it is called in update function
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
-
-		// Mock Update to confirm tree is updated
 		treeRepo.EXPECT().Update(ctx, existingTree.ID,
 			mock.Anything,
 			mock.Anything,
@@ -107,15 +98,9 @@ func TestTreeService_ImportTree(t *testing.T) {
 		existingTree := getTestTrees()[0]
 		treeToImport.PlantingYear = 2024
 
-		// Mock GetByCoordinates to return an existing tree
 		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(existingTree, nil)
-
-		//Mock GetByID because it is called in delete function
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
-
-		// Mock Delete for deleting the existing tree
 		treeRepo.EXPECT().Delete(ctx, existingTree.ID).Return(nil)
-
 		treeRepo.EXPECT().Create(ctx,
 			mock.Anything,
 			mock.Anything,
@@ -145,12 +130,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		existingTree := getTestTrees()[0]
 		expectedErr := errors.New("error deleting tree")
 
-		// Mock GetByCoordinates to return an existing tree
 		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(existingTree, nil)
-
-		//Mock GetByID because it is called in delete function
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
-
 		treeRepo.EXPECT().Delete(ctx, existingTree.ID).Return(expectedErr)
 
 		// When

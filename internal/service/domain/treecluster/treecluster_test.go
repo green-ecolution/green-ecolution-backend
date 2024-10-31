@@ -131,8 +131,8 @@ func TestTreeClusterService_Create(t *testing.T) {
 		Name:          "Cluster 1",
 		Address:       "123 Main St",
 		Description:   "Test description",
-		SoilCondition:  entities.TreeSoilConditionLehmig,
-		TreeIDs:     []*int32{ptrToInt32(1), ptrToInt32(2)},
+		SoilCondition: entities.TreeSoilConditionLehmig,
+		TreeIDs:       []*int32{ptrToInt32(1), ptrToInt32(2)},
 	}
 
 	t.Run("should successfully create a new tree cluster", func(t *testing.T) {
@@ -205,10 +205,10 @@ func TestTreeClusterService_Create(t *testing.T) {
 			ctx,
 			&expectedCluster.ID,
 		).Return(nil)
-	
+
 		// when
 		result, err := svc.Create(ctx, newCluster)
-	
+
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedCluster, result)
@@ -224,14 +224,14 @@ func TestTreeClusterService_Create(t *testing.T) {
 		expectedErr := storage.ErrTreeNotFound
 
 		treeRepo.EXPECT().GetTreesByIDs(
-      
-			ctx, 
+
+			ctx,
 			[]int32{1, 2},
 		).Return(nil, expectedErr)
-	
+
 		// when
 		result, err := svc.Create(ctx, newCluster)
-	
+
 		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
@@ -243,26 +243,26 @@ func TestTreeClusterService_Create(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
-	
+
 		expectedErr := errors.New("Failed to create cluster")
 		expectedTrees := getTestTrees()
-	
+
 		treeRepo.EXPECT().GetTreesByIDs(
-			ctx, 
+			ctx,
 			[]int32{1, 2},
 		).Return(expectedTrees, nil)
 
 		clusterRepo.EXPECT().Create(
-			ctx, 
-			mock.Anything, 
-			mock.Anything, 
-			mock.Anything, 
+			ctx,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 		).Return(nil, expectedErr)
-	
+
 		// when
 		result, err := svc.Create(ctx, newCluster)
-	
+
 		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
@@ -277,7 +277,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 		Address:       "123 Main St",
 		Description:   "Test description",
 		SoilCondition: entities.TreeSoilConditionLehmig,
-		TreeIDs:     []*int32{ptrToInt32(1), ptrToInt32(2)},
+		TreeIDs:       []*int32{ptrToInt32(1), ptrToInt32(2)},
 	}
 
 	t.Run("should successfully update a tree cluster", func(t *testing.T) {
@@ -317,7 +317,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expectedCluster, result)
 	})
-  
+
 	t.Run("should successfully update a tree cluster with empty tree IDs", func(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
@@ -371,7 +371,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
 		treeRepo.EXPECT().GetTreesByIDs(
-			ctx, 
+			ctx,
 			[]int32{1, 2},
 		).Return(nil, storage.ErrTreeNotFound)
 
@@ -395,7 +395,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
-			[]int32{1,2},
+			[]int32{1, 2},
 		).Return(expectedTrees, nil)
 
 		clusterRepo.EXPECT().Update(
@@ -427,7 +427,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
-			[]int32{1,2},
+			[]int32{1, 2},
 		).Return(expectedTrees, nil)
 
 		clusterRepo.EXPECT().Update(
@@ -458,19 +458,19 @@ func TestTreeClusterService_Delete(t *testing.T) {
 	locator := service.NewMockGeoClusterLocator(t)
 	svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
 
-    t.Run("should successfully delete a tree cluster", func(t *testing.T) {
-        id := int32(1)
+	t.Run("should successfully delete a tree cluster", func(t *testing.T) {
+		id := int32(1)
 
-        clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
-        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
-        clusterRepo.EXPECT().Delete(ctx, id).Return(nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
+		clusterRepo.EXPECT().Delete(ctx, id).Return(nil)
 
 		// when
-        err := svc.Delete(ctx, id)
+		err := svc.Delete(ctx, id)
 
 		// then
-        assert.NoError(t, err)
-    })
+		assert.NoError(t, err)
+	})
 
 	t.Run("should return error if tree cluster not found", func(t *testing.T) {
 		id := int32(2)
@@ -480,8 +480,8 @@ func TestTreeClusterService_Delete(t *testing.T) {
 
 		// when
 
-        err := svc.Delete(ctx, id)
-		
+		err := svc.Delete(ctx, id)
+
 		// then
 		assert.Error(t, err)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
@@ -489,35 +489,35 @@ func TestTreeClusterService_Delete(t *testing.T) {
 
 	t.Run("should return error if unlinking tree cluster ID fails", func(t *testing.T) {
 
-        id := int32(3)
-        expectedErr := errors.New("failed to unlink")
+		id := int32(3)
+		expectedErr := errors.New("failed to unlink")
 
-        clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
-        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedErr)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedErr)
 
-        // when
-        err := svc.Delete(ctx, id)
+		// when
+		err := svc.Delete(ctx, id)
 
 		// then
-        assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
-    })
-
-	t.Run("should return error if deleting tree cluster fails", func(t *testing.T) {
-        id := int32(4)
-        expectedErr := errors.New("failed to delete")
-
-        clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
-        treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
-		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
-
-        // when
-        err := svc.Delete(ctx, id)
-
-        // then
 		assert.Error(t, err)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
-    })
+	})
+
+	t.Run("should return error if deleting tree cluster fails", func(t *testing.T) {
+		id := int32(4)
+		expectedErr := errors.New("failed to delete")
+
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
+		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
+
+		// when
+		err := svc.Delete(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
 }
 
 func TestReady(t *testing.T) {
@@ -574,7 +574,7 @@ func getTestTreeClusters() []*entities.TreeCluster {
 			Archived:      false,
 			Latitude:      nil,
 			Longitude:     nil,
-			Trees:        []*entities.Tree{},
+			Trees:         []*entities.Tree{},
 		},
 	}
 }
