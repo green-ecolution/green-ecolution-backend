@@ -9,7 +9,7 @@ import (
 
 func TestRegionRepository_Create(t *testing.T) {
 	suite.ResetDB(t)
-	t.Run("Create region should create region", func(t *testing.T) {
+	t.Run("should create region", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(defaultFields.store, defaultFields.RegionMappers)
 
@@ -22,7 +22,7 @@ func TestRegionRepository_Create(t *testing.T) {
 		assert.Equal(t, "test", got.Name)
 	})
 
-	t.Run("Create region with empty name should return error", func(t *testing.T) {
+	t.Run("should return error when create region with empty name", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(defaultFields.store, defaultFields.RegionMappers)
 
@@ -34,7 +34,7 @@ func TestRegionRepository_Create(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("Create region with context canceled exceeded should return error", func(t *testing.T) {
+	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewRegionRepository(defaultFields.store, defaultFields.RegionMappers)
 		ctx, cancel := context.WithCancel(context.Background())
