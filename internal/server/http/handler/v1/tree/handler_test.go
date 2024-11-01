@@ -26,19 +26,10 @@ func TestGetTreeByID(t *testing.T) {
 		app.Get("v1/tree/:id", GetTreeByID(mockTreeService))
 
 		treeID := int32(1)
-		mockTree := &entities.Tree{
-			ID:           treeID,
-			Species:      "Oak",
-			PlantingYear: 2023,
-			Number:       "T001",
-			Latitude:     54.801539,
-			Longitude:    9.446741,
-			Description:  "oak tree",
-		}
 		mockTreeService.EXPECT().GetByID(
 			mock.Anything,
 			int32(1),
-		).Return(mockTree, nil)
+		).Return(TestTrees[0], nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/"+strconv.Itoa(int(treeID)), nil)
