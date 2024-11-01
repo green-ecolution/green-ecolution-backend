@@ -28,7 +28,6 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		for i, sensor := range got {
 			assert.Equal(t, sensorUtils.TestSensorList[i].ID, sensor.ID)
 			assert.Equal(t, sensorUtils.TestSensorList[i].Status, sensor.Status)
-			//assert.Equal(t, sensorUtils.TestSensorList[i].Data, sensor.Data)
 			assert.NotZero(t, sensor.CreatedAt)
 			assert.NotZero(t, sensor.UpdatedAt)
 		}
@@ -77,7 +76,6 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, sensorUtils.TestSensor.ID, got.ID)
 		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
-		//assert.Equal(t, sensorUtils.TestSensor.Data, got.Data)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 	})

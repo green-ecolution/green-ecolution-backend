@@ -26,7 +26,6 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
-		//assert.Equal(t, sensorUtils.TestSensor.Data, got.Data)
 		assert.NotZero(t, got.ID)
 	})
 }

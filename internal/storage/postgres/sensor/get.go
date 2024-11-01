@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -16,15 +15,7 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, erro
 		return nil, err
 	}
 
-	data := r.mapper.FromSqlList(rows)
-	for _, f := range data {
-		f.Data, err = r.GetSensorDataByID(ctx, f.ID)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to get sensor data by ID")
-		}
-	}
-
-	return data, nil
+	return r.mapper.FromSqlList(rows), nil
 }
 
 func (r *SensorRepository) GetByID(ctx context.Context, id int32) (*entities.Sensor, error) {
@@ -33,13 +24,7 @@ func (r *SensorRepository) GetByID(ctx context.Context, id int32) (*entities.Sen
 		return nil, err
 	}
 
-	data := r.mapper.FromSql(row)
-	data.Data, err = r.GetSensorDataByID(ctx, id)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get sensor data by ID")
-	}
-
-	return data, nil
+	return r.mapper.FromSql(row), nil
 }
 
 func (r *SensorRepository) GetStatusByID(ctx context.Context, id int32) (*entities.SensorStatus, error) {
@@ -52,10 +37,6 @@ func (r *SensorRepository) GetStatusByID(ctx context.Context, id int32) (*entiti
 }
 
 func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error) {
-	if status == nil {
-		return nil, fmt.Errorf("status cannot be nil")
-	}
-	
 	row, err := r.store.GetSensorByStatus(ctx, sqlc.SensorStatus(*status))
 	if err != nil {
 		return nil, err
@@ -67,12 +48,11 @@ func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entiti
 func (r *SensorRepository) GetSensorDataByID(ctx context.Context, id int32) ([]*entities.SensorData, error) {
 	rows, err := r.store.GetSensorDataBySensorID(ctx, id)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get sensor data by sensor ID")
+		return nil, err
 	}
 
 	domainData := make([]*entities.SensorData, len(rows))
 
-	// Check if there are rows returned.
 	for i, row := range rows {
 		domainData[i] = r.mapper.FromSqlSensorData(row)
 		data, err := mapper.MapSensorData(row.Data)
