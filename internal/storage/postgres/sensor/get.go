@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -37,6 +38,10 @@ func (r *SensorRepository) GetStatusByID(ctx context.Context, id int32) (*entiti
 }
 
 func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error) {
+	if status == nil {
+		return nil, fmt.Errorf("status cannot be nil")
+	}
+	
 	row, err := r.store.GetSensorByStatus(ctx, sqlc.SensorStatus(*status))
 	if err != nil {
 		return nil, err
