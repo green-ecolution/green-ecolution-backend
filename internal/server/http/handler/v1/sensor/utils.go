@@ -16,7 +16,7 @@ var (
 		Status:    entities.SensorStatusOnline,
 		Data: []*entities.SensorData{
 			{
-				ID:        101,
+				ID:        1,
 				CreatedAt: currentTime,
 				UpdatedAt: currentTime,
 				Data: &entities.MqttPayload{
