@@ -117,7 +117,7 @@ func TestGetRegionByID(t *testing.T) {
 		}
 
 		mockRegionService.EXPECT().GetByID(
-			mock.Anything, 
+			mock.Anything,
 			int32(1),
 		).Return(expectedRegion, nil)
 
@@ -165,7 +165,7 @@ func TestGetRegionByID(t *testing.T) {
 		handler := region.GetRegionByID(mockRegionService)
 
 		mockRegionService.EXPECT().GetByID(
-			mock.Anything, 
+			mock.Anything,
 			int32(1),
 		).Return(nil, storage.ErrRegionNotFound)
 
@@ -189,10 +189,10 @@ func TestGetRegionByID(t *testing.T) {
 		handler := region.GetRegionByID(mockRegionService)
 
 		mockRegionService.EXPECT().GetByID(
-			mock.Anything, 
+			mock.Anything,
 			int32(1),
 		).Return(nil, errors.New("service error"))
-		
+
 		app.Get("/v1/region/:id", handler)
 
 		// when

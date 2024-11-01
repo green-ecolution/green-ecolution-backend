@@ -72,7 +72,8 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
-			return err
+			err = service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		domainData, err := svc.GetByID(ctx, int32(id))
@@ -139,6 +140,7 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
+			err = service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 		var req entities.TreeUpdateRequest
@@ -174,6 +176,7 @@ func DeleteTree(svc service.TreeService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
+			err = service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 		err = svc.Delete(ctx, int32(id))
