@@ -9,7 +9,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 )
@@ -19,7 +18,7 @@ type TreeService struct {
 	sensorRepo      storage.SensorRepository
 	ImageRepo       storage.ImageRepository
 	treeClusterRepo storage.TreeClusterRepository
-	locator         *treecluster.GeoClusterLocator
+	locator         service.GeoClusterLocator
 	validator       *validator.Validate
 }
 
@@ -28,7 +27,7 @@ func NewTreeService(
 	repoSensor storage.SensorRepository,
 	repoImage storage.ImageRepository,
 	treeClusterRepo storage.TreeClusterRepository,
-	geoClusterLocator *treecluster.GeoClusterLocator,
+	geoClusterLocator service.GeoClusterLocator,
 ) service.TreeService {
 	return &TreeService{
 
@@ -106,10 +105,11 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		return nil, handleError(err)
 	}
 
-	if err = s.locator.UpdateCluster(ctx, treeCreate.TreeClusterID); err != nil {
-		return nil, handleError(err)
+	if treeCreate.TreeClusterID != nil {
+		if err = s.locator.UpdateCluster(ctx, treeCreate.TreeClusterID); err != nil {
+			return nil, handleError(err)
+		}
 	}
-
 	return newTree, nil
 }
 
