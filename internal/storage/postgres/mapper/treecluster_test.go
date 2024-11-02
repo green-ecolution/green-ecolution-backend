@@ -103,8 +103,8 @@ var allTestTreecluster = []*sqlc.TreeCluster{
 		Description:    "Cluster with newly planted trees",
 		Archived:       false,
 		SoilCondition:  sqlc.TreeSoilConditionSandig,
-		Latitude:       utils.Float64Ptr(41.1234),
-		Longitude:      utils.Float64Ptr(-73.9876),
+		Latitude:       utils.P(41.1234),
+		Longitude:      utils.P(-73.9876),
 		Name:           "Treecluster 01",
 	},
 	{
@@ -118,8 +118,8 @@ var allTestTreecluster = []*sqlc.TreeCluster{
 		Description:    "Cluster needs a lot of care",
 		Archived:       false,
 		SoilCondition:  sqlc.TreeSoilConditionTonig,
-		Latitude:       utils.Float64Ptr(41.1234),
-		Longitude:      utils.Float64Ptr(-73.9876),
+		Latitude:       utils.P(41.1234),
+		Longitude:      utils.P(-73.9876),
 		Name:           "Treecluster 02",
 	},
 }

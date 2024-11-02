@@ -101,7 +101,7 @@ var allTestTrees = []*sqlc.Tree{
 		Longitude:      13.4050,
 		WateringStatus: sqlc.WateringStatusGood,
 		Readonly:       true,
-		Description:    utils.StringPointer("Newly planted tree"),
+		Description:    utils.P("Newly planted tree"),
 		TreeNumber:     "P 1234",
 	},
 	{
@@ -114,7 +114,7 @@ var allTestTrees = []*sqlc.Tree{
 		Longitude:      13.4050,
 		WateringStatus: sqlc.WateringStatusModerate,
 		Readonly:       true,
-		Description:    utils.StringPointer("Also newly planted tree"),
+		Description:    utils.P("Also newly planted tree"),
 		TreeNumber:     "P 2345",
 	},
 }
