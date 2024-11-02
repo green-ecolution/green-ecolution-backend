@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
@@ -24,8 +25,12 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 	}
 }
 
-func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error) {
+func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
 	slog.Debug("Creating user in keycloak", "user", user)
+  if user == nil {
+    return nil, errors.New("user is nil")
+  }
+
 	keyCloakUser := userToKeyCloakUser(user)
 
 	clientToken, err := loginRestAPIClient(ctx, r.cfg.KeyCloak.BaseURL, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
@@ -43,18 +48,23 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 		return nil, errors.Wrap(err, "failed to set password")
 	}
 
-	kcRoles := make([]gocloak.Role, len(*roles))
-	for _, roleName := range *roles {
-		roleNameLowerCase := strings.ToLower(roleName)
-		roleKeyCloak, err := client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, roleNameLowerCase)
-		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("failed to get role by name: '%v'", roleNameLowerCase))
-		}
-		kcRoles = append(kcRoles, *roleKeyCloak)
-	}
+	if roles != nil || len(roles) > 0 {
+		kcRoles := make([]gocloak.Role, len(roles))
+		for i, roleName := range roles {
+			var roleKeyCloak *gocloak.Role
+			roleNameLowerCase := strings.ToLower(roleName)
+			roleKeyCloak, err = client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, roleNameLowerCase)
+			if err != nil {
+				return nil, errors.Wrap(err, fmt.Sprintf("failed to get role by name: '%v'", roleNameLowerCase))
+			}
 
-	if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
+			if roleKeyCloak != nil {
+        kcRoles[i] = *roleKeyCloak
+      }
+		}
+		if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
+		}
 	}
 
 	userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID)
@@ -101,6 +111,7 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	}
 	return &entities.User{
 		ID:        userID,
+		CreatedAt: time.Unix(*user.CreatedTimestamp, 0),
 		Username:  *user.Username,
 		FirstName: *user.FirstName,
 		LastName:  *user.LastName,

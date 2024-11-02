@@ -30,7 +30,7 @@ func TestRegisterUser(t *testing.T) {
 		input := &entities.RegisterUser{
 			User:     *inputUser,
 			Password: "password",
-			Roles:    &[]string{"viewer"},
+			Roles:    []string{"viewer"},
 		}
 
 		expected := &entities.User{
