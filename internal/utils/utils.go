@@ -51,3 +51,10 @@ func PtrInt32(value int32) *int32 {
 func StringPointer(s string) *string {
 	return &s
 }
+
+func StringPtrToString(source *string) string {
+	if source == nil {
+		return ""
+	}
+	return *source
+}
