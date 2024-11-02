@@ -37,8 +37,8 @@ func TestKeyCloakRepo_RetrospectToken(t *testing.T) {
 		got, err := k.RetrospectToken(ctx, "invalid-token")
 
 		// then
-    assert.NotNil(t, got)
-    assert.NotNil(t, got.Active)
+		assert.NotNil(t, got)
+		assert.NotNil(t, got.Active)
 		assert.False(t, *got.Active)
 		assert.NoError(t, err)
 	})
@@ -53,9 +53,33 @@ func TestKeyCloakRepo_RetrospectToken(t *testing.T) {
 		got, err := k.RetrospectToken(ctx, "")
 
 		// then
-    assert.NotNil(t, got)
-    assert.NotNil(t, got.Active)
+		assert.NotNil(t, got)
+		assert.NotNil(t, got.Active)
 		assert.False(t, *got.Active)
 		assert.NoError(t, err)
+	})
+}
+
+
+
+func TestKeyCloakRepo_GetAccessTokenFromClientCode(t *testing.T) {
+}
+
+func TestKeyCloakRepo_RefreshToken(t *testing.T) {
+	t.Run("should return valid token", func(t *testing.T) {
+	})
+
+	t.Run("should return error when refresh token is invalid", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		cfg := suite.IdentityConfig(t, ctx)
+		k := NewKeycloakRepository(cfg)
+
+		// when
+		got, err := k.RefreshToken(ctx, "invalid-refresh-token")
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
 	})
 }

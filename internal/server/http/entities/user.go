@@ -23,15 +23,15 @@ type UserListResponse struct {
 } // @Name UserList
 
 type UserRegisterRequest struct {
-	Username    string    `json:"username"`
-	FirstName   string    `json:"first_name"`
-	LastName    string    `json:"last_name"`
-	Email       string    `json:"email"`
-	EmployeeID  string    `json:"employee_id,omitempty"`
-	PhoneNumber string    `json:"phone_number,omitempty"`
-	Password    string    `json:"password"`
-	Roles       *[]string `json:"roles"`
-	Avatar      string    `json:"avatar_url,omitempty"`
+	Username    string   `json:"username"`
+	FirstName   string   `json:"first_name"`
+	LastName    string   `json:"last_name"`
+	Email       string   `json:"email"`
+	EmployeeID  string   `json:"employee_id,omitempty"`
+	PhoneNumber string   `json:"phone_number,omitempty"`
+	Password    string   `json:"password"`
+	Roles       []string `json:"roles"`
+	Avatar      string   `json:"avatar_url,omitempty"`
 } // @Name UserRegister
 
 type UserUpdateRequest struct {
