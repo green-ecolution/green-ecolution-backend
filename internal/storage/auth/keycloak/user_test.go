@@ -22,7 +22,7 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 			LastName:    "Tester",
 			Email:       "test@green-ecolution.de",
 			EmployeeID:  "123456",
-			PhoneNumber: "123456",
+			PhoneNumber: "+49 123456",
 		}
 
 		// when
@@ -35,8 +35,8 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 		assert.Equal(t, user.FirstName, createdUser.FirstName)
 		assert.Equal(t, user.LastName, createdUser.LastName)
 		assert.Equal(t, user.Email, createdUser.Email)
-		// assert.Equal(t, user.EmployeeID, createdUser.EmployeeID) // fixme: handle additional fields in repo
-		// assert.Equal(t, user.PhoneNumber, createdUser.PhoneNumber) // fixme: handle additional fields in repo
+		assert.Equal(t, user.EmployeeID, createdUser.EmployeeID)
+		assert.Equal(t, user.PhoneNumber, createdUser.PhoneNumber)
 		assert.NotNil(t, createdUser.ID)
 		assert.NotZero(t, createdUser.ID)
 		assert.NotZero(t, createdUser.CreatedAt)
@@ -55,7 +55,7 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 			LastName:    "Tester",
 			Email:       "test@green-ecolution.de",
 			EmployeeID:  "123456",
-			PhoneNumber: "123456",
+			PhoneNumber: "+49 123456",
 		}
 
 		// when
@@ -79,7 +79,7 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 			LastName:    "Tester",
 			Email:       "test1@green-ecolution.de",
 			EmployeeID:  "123456",
-			PhoneNumber: "123456",
+			PhoneNumber: "+49 123456",
 		}
 
 		// when
@@ -103,7 +103,7 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 			LastName:    "Tester",
 			Email:       "test2@green-ecolution.de",
 			EmployeeID:  "123456",
-			PhoneNumber: "123456",
+			PhoneNumber: "+49 123456",
 		}
 
 		// when
@@ -116,8 +116,8 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 		assert.Equal(t, user.FirstName, createdUser.FirstName)
 		assert.Equal(t, user.LastName, createdUser.LastName)
 		assert.Equal(t, user.Email, createdUser.Email)
-		// assert.Equal(t, user.EmployeeID, createdUser.EmployeeID) // fixme: handle additional fields in repo
-		// assert.Equal(t, user.PhoneNumber, createdUser.PhoneNumber) // fixme: handle additional fields in repo
+		assert.Equal(t, user.EmployeeID, createdUser.EmployeeID)
+		assert.Equal(t, user.PhoneNumber, createdUser.PhoneNumber)
 		assert.NotNil(t, createdUser.ID)
 		assert.NotZero(t, createdUser.ID)
 		assert.NotZero(t, createdUser.CreatedAt)
@@ -136,7 +136,7 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 			LastName:    "Tester",
 			Email:       "test3@green-ecolution.de",
 			EmployeeID:  "123456",
-			PhoneNumber: "123456",
+			PhoneNumber: "+49 123456",
 		}
 
 		// when
@@ -149,8 +149,8 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 		assert.Equal(t, user.FirstName, createdUser.FirstName)
 		assert.Equal(t, user.LastName, createdUser.LastName)
 		assert.Equal(t, user.Email, createdUser.Email)
-		// assert.Equal(t, user.EmployeeID, createdUser.EmployeeID) // fixme: handle additional fields in repo
-		// assert.Equal(t, user.PhoneNumber, createdUser.PhoneNumber) // fixme: handle additional fields in repo
+		assert.Equal(t, user.EmployeeID, createdUser.EmployeeID)
+		assert.Equal(t, user.PhoneNumber, createdUser.PhoneNumber)
 		assert.NotNil(t, createdUser.ID)
 		assert.NotZero(t, createdUser.ID)
 		assert.NotZero(t, createdUser.CreatedAt)

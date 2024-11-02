@@ -75,27 +75,6 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 	return keyCloakUserToUser(userKeyCloak)
 }
 
-func (r *UserRepository) GetByAccessToken(ctx context.Context, token string) (*entities.User, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	kUser, err := client.GetUserInfo(ctx, token, r.cfg.KeyCloak.Realm)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get user info from token")
-	}
-
-	user := &entities.User{
-		Username:      *kUser.PreferredUsername,
-		FirstName:     *kUser.GivenName,
-		LastName:      *kUser.FamilyName,
-		Email:         *kUser.Email,
-		EmailVerified: *kUser.EmailVerified,
-		// TODO: Handle Additional Fields
-		// PhoneNumber: ...,
-		// EmployeeID: ...,
-	}
-
-	return user, nil
-}
-
 func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string) error {
 	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
 	if err := client.Logout(ctx, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm, refreshToken); err != nil {
@@ -109,13 +88,22 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to parse user id: '%v'", *user.ID))
 	}
+	var phone_number string
+	var employee_id string
+	if user.Attributes != nil {
+		phone_number = (*user.Attributes)["phone_number"][0]
+		employee_id = (*user.Attributes)["employee_id"][0]
+	}
+
 	return &entities.User{
-		ID:        userID,
-		CreatedAt: time.Unix(*user.CreatedTimestamp, 0),
-		Username:  *user.Username,
-		FirstName: *user.FirstName,
-		LastName:  *user.LastName,
-		Email:     *user.Email,
+		ID:          userID,
+		CreatedAt:   time.Unix(*user.CreatedTimestamp, 0),
+		Username:    *user.Username,
+		FirstName:   *user.FirstName,
+		LastName:    *user.LastName,
+		Email:       *user.Email,
+		PhoneNumber: phone_number,
+		EmployeeID:  employee_id,
 	}, nil
 }
 
