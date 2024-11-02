@@ -82,19 +82,19 @@ func TestImageMapper_FromSqlList(t *testing.T) {
 
 var allTestImages = []*sqlc.Image{
 	{
-		ID:             1,
-		CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-		UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-		Url:           	"/test/path/to/image",
-		Filename:    	utils.StringPointer("Screenshot"),
-		MimeType: 		utils.StringPointer("pdf"),
+		ID:        1,
+		CreatedAt: pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt: pgtype.Timestamp{Time: time.Now()},
+		Url:       "/test/path/to/image",
+		Filename:  utils.StringPointer("Screenshot"),
+		MimeType:  utils.StringPointer("pdf"),
 	},
 	{
-		ID:             2,
-		CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-		UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-		Url:           	"/test/path/to/image",
-		Filename:    	utils.StringPointer("Screenshot 02"),
-		MimeType: 		utils.StringPointer("png"),
+		ID:        2,
+		CreatedAt: pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt: pgtype.Timestamp{Time: time.Now()},
+		Url:       "/test/path/to/image",
+		Filename:  utils.StringPointer("Screenshot 02"),
+		MimeType:  utils.StringPointer("png"),
 	},
 }

@@ -65,35 +65,35 @@ func TestVehicleMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.Description, got[i].Description)
 			assert.Equal(t, src.WaterCapacity, got[i].WaterCapacity)
 		}
- })
+	})
 
- t.Run("should return nil for nil input", func(t *testing.T) {
-     // given
-     var src []*sqlc.Vehicle = nil
+	t.Run("should return nil for nil input", func(t *testing.T) {
+		// given
+		var src []*sqlc.Vehicle = nil
 
-     // when
-     got := verhicleMapper.FromSqlList(src)
+		// when
+		got := verhicleMapper.FromSqlList(src)
 
-     // then
-     assert.Nil(t, got)
- })
+		// then
+		assert.Nil(t, got)
+	})
 }
 
 var allTestVehicles = []*sqlc.Vehicle{
- {
-	ID:             1,
-	CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-	UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-	NumberPlate: "FL TZ 1234",
-	Description: "This is a big car",
-	WaterCapacity: 2000.10,
- },
- {
-	ID:             2,
-	CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-	UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-	NumberPlate: "FL TZ 1235",
-	Description: "This is a small car",
-	WaterCapacity: 1000,
- },
+	{
+		ID:            1,
+		CreatedAt:     pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt:     pgtype.Timestamp{Time: time.Now()},
+		NumberPlate:   "FL TZ 1234",
+		Description:   "This is a big car",
+		WaterCapacity: 2000.10,
+	},
+	{
+		ID:            2,
+		CreatedAt:     pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt:     pgtype.Timestamp{Time: time.Now()},
+		NumberPlate:   "FL TZ 1235",
+		Description:   "This is a small car",
+		WaterCapacity: 1000,
+	},
 }
