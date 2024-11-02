@@ -47,3 +47,7 @@ func Float64Ptr(f float64) *float64 {
 func PtrInt32(value int32) *int32 {
 	return &value
 }
+
+func StringPointer(s string) *string {
+	return &s
+}
