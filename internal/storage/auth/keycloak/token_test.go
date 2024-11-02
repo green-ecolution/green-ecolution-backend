@@ -60,8 +60,6 @@ func TestKeyCloakRepo_RetrospectToken(t *testing.T) {
 	})
 }
 
-
-
 func TestKeyCloakRepo_GetAccessTokenFromClientCode(t *testing.T) {
 }
 

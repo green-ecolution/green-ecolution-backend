@@ -27,9 +27,9 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
 	slog.Debug("Creating user in keycloak", "user", user)
-  if user == nil {
-    return nil, errors.New("user is nil")
-  }
+	if user == nil {
+		return nil, errors.New("user is nil")
+	}
 
 	keyCloakUser := userToKeyCloakUser(user)
 
@@ -59,8 +59,8 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 			}
 
 			if roleKeyCloak != nil {
-        kcRoles[i] = *roleKeyCloak
-      }
+				kcRoles[i] = *roleKeyCloak
+			}
 		}
 		if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
