@@ -22,6 +22,16 @@ func Map[T, K any](slice []T, fn func(T) K) []K {
 	return result
 }
 
+func MapKeysSlice[K comparable, V, T any](m map[K]V, fn func(K, V) T) []T {
+	result := make([]T, 0, len(m))
+
+	for k, v := range m {
+		result = append(result, fn(k, v))
+	}
+
+	return result
+}
+
 func Reduce[T, K any](slice []T, fn func(K, T) K, initial K) K {
 	result := initial
 

@@ -13,6 +13,7 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func getPluginFiles(c *fiber.Ctx) error {
@@ -81,7 +82,7 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusForbidden).SendString("plugin already registered")
 		}
 
-		registeredPlugins[req.Slug] = domain.Plugin{
+		registeredPlugins[req.Slug] = &domain.Plugin{
 			Name:          req.Name,
 			Path:          *path,
 			LastHeartbeat: time.Now(),
@@ -148,17 +149,15 @@ func GetPluginsList() fiber.Handler {
 		// pluginMutex.RLock()
 		// defer pluginMutex.RUnlock()
 
-		plugins := make([]entities.PluginResponse, 0, len(registeredPlugins))
-		for _, plugin := range registeredPlugins {
-			plugins = append(plugins, entities.PluginResponse{
-				Slug:        plugin.Slug,
-				Name:        plugin.Name,
-				Version:     plugin.Version,
-				Description: plugin.Description,
-				HostPath:    plugin.Path.String(),
-			},
-			)
-		}
+		plugins := utils.MapKeysSlice(registeredPlugins, func(_ string, v *domain.Plugin) entities.PluginResponse {
+			return entities.PluginResponse{
+				Slug:        v.Slug,
+				Name:        v.Name,
+				Version:     v.Version,
+				Description: v.Description,
+				HostPath:    v.Path.String(),
+			}
+		})
 
 		return c.Status(fiber.StatusOK).JSON(entities.PluginListResponse{
 			Plugins: plugins,
