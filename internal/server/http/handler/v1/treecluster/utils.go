@@ -44,7 +44,7 @@ var (
 		Address:       "123 Main St",
 		Description:   "Test description",
 		SoilCondition: serverEntities.TreeSoilConditionSandig,
-		TreeIDs:       []*int32{utils.P(1)},
+		TreeIDs:       []*int32{utils.P(int32(1))},
 	}
 
 	TestClusterList = []*entities.TreeCluster{
