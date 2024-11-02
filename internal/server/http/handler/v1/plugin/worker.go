@@ -52,14 +52,12 @@ func (w *PluginWorker) Run(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			// pluginMutex.Lock()
 			for name, plugin := range registeredPlugins {
 				if time.Since(plugin.LastHeartbeat) > w.cfg.timeout {
 					slog.Info("Removing plugin due to timeout", "plugin", name)
 					delete(registeredPlugins, name)
 				}
 			}
-			// pluginMutex.Unlock()
 		}
 	}
 }

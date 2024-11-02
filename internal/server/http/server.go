@@ -13,6 +13,10 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
+const (
+	pluginCleanupTimeout = 5 * time.Second
+)
+
 type HTTPError struct {
 	Error  string `json:"error"`
 	Code   int    `json:"code"`
@@ -39,7 +43,7 @@ func (s *Server) Run(ctx context.Context) error {
 		ErrorHandler: errorHandler,
 	})
 	pluginCleanup := plugin.NewPluginWorker(
-		plugin.WithTimeout(5 * time.Minute),
+		plugin.WithTimeout(pluginCleanupTimeout),
 	)
 
 	app.Mount("/", s.middleware(s.publicRoutes, s.privateRoutes))
