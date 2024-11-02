@@ -40,18 +40,6 @@ func ParseJSONResponse(body *http.Response, target any) error {
 	return json.NewDecoder(body.Body).Decode(target)
 }
 
-func Float64Ptr(f float64) *float64 {
-	return &f
-}
-
-func PtrInt32(value int32) *int32 {
-	return &value
-}
-
-func StringPointer(s string) *string {
-	return &s
-}
-
 func StringPtrToString(source *string) string {
 	if source == nil {
 		return ""
