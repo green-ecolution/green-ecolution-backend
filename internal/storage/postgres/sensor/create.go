@@ -28,15 +28,21 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	}
 
 	entity.ID = id
-	_, err = r.InsertSensorData(ctx, entity.Data)
-	if err != nil {
-		return nil, err
+	if len(entity.Data) > 0 {
+		_, err = r.InsertSensorData(ctx, entity.Data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return r.GetByID(ctx, id)
 }
 
 func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entities.SensorData) ([]*entities.SensorData, error) {
+	if len(data) == 0 {
+		return nil, errors.New("data cannot be empty")
+	}
+
 	for _, d := range data {
 		mqttData := r.mapper.FromDomainSensorData(d.Data)
 		raw, err := json.Marshal(mqttData)

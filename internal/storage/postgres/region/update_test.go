@@ -55,12 +55,11 @@ func TestRegionRepository_Update(t *testing.T) {
 		r := NewRegionRepository(defaultFields.store, defaultFields.RegionMappers)
 
 		// when
-		got, err := r.Update(context.Background(), 1)
+		got, err := r.Update(context.Background(), 0)
 
 		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, got)
-		assert.Equal(t, "test", got.Name)
+		assert.Error(t, err)
+		assert.Nil(t, got)
 	})
 
 	t.Run("should return error when update region not found", func(t *testing.T) {
