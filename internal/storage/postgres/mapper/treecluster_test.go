@@ -4,7 +4,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -120,4 +122,43 @@ var allTestTreecluster = []*sqlc.TreeCluster{
 		Longitude:      utils.Float64Ptr(-73.9876),
 		Name:           "Treecluster 02",
 	},
+}
+
+func TestMapWateringStatus(t *testing.T) {
+	tests := []struct {
+		input    sqlc.WateringStatus
+		expected entities.WateringStatus
+	}{
+		{input: sqlc.WateringStatusGood, expected: entities.WateringStatusGood},
+		{input: sqlc.WateringStatusModerate, expected: entities.WateringStatusModerate},
+		{input: sqlc.WateringStatusBad, expected: entities.WateringStatusBad},
+		{input: sqlc.WateringStatusUnknown, expected: entities.WateringStatusUnknown},
+	}
+
+	for _, test := range tests {
+		t.Run(string(test.input), func(t *testing.T) {
+			result := mapper.MapWateringStatus(test.input)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
+
+func TestMapSoilCondition(t *testing.T) {
+	tests := []struct {
+		input    sqlc.TreeSoilCondition
+		expected entities.TreeSoilCondition
+	}{
+		{input: sqlc.TreeSoilConditionSandig, expected: entities.TreeSoilConditionSandig},
+		{input: sqlc.TreeSoilConditionTonig, expected: entities.TreeSoilConditionTonig},
+		{input: sqlc.TreeSoilConditionLehmig, expected: entities.TreeSoilConditionLehmig},
+		{input: sqlc.TreeSoilConditionSchluffig, expected: entities.TreeSoilConditionSchluffig},
+		{input: sqlc.TreeSoilConditionUnknown, expected: entities.TreeSoilConditionUnknown},
+	}
+
+	for _, test := range tests {
+		t.Run(string(test.input), func(t *testing.T) {
+			result := mapper.MapSoilCondition(test.input)
+			assert.Equal(t, test.expected, result)
+		})
+	}
 }
