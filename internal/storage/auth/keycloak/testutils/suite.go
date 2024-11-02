@@ -14,8 +14,8 @@ import (
 type KeycloakTestSuite struct {
 	Container        *keycloak.KeycloakContainer
 	RealmName        string
-	BackendClientId  string
-	FrontendClientId string
+	BackendClientID  string
+	FrontendClientID string
 	User             string
 	Password         string
 }
@@ -32,8 +32,8 @@ func SetupKeycloakTestSuite(ctx context.Context) *KeycloakTestSuite {
 		User:             User,
 		Password:         Password,
 		RealmName:        "green-ecolution-test",
-		BackendClientId:  "green-ecolution-backend",
-		FrontendClientId: "green-ecolution-frontend",
+		BackendClientID:  "green-ecolution-backend",
+		FrontendClientID: "green-ecolution-frontend",
 	}
 }
 
@@ -62,11 +62,11 @@ func (s *KeycloakTestSuite) IdentityConfig(t testing.TB, ctx context.Context) *c
 		KeyCloak: config.KeyCloakConfig{
 			BaseURL:        s.GetAuthServerURL(t, ctx),
 			Realm:          s.RealmName,
-			ClientID:       s.BackendClientId,
+			ClientID:       s.BackendClientID,
 			ClientSecret:   *backendClient.Secret,
 			RealmPublicKey: "",
 			Frontend: config.KeyCloakFrontendConfig{
-				ClientID:     s.FrontendClientId,
+				ClientID:     s.FrontendClientID,
 				ClientSecret: *frontendClient.Secret,
 				AuthURL:      s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/auth",
 				TokenURL:     s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/token",
@@ -101,7 +101,7 @@ func (s *KeycloakTestSuite) GetBackendClient(t testing.TB, ctx context.Context) 
 		t.Fatalf("Could not get admin client: %s", err)
 	}
 
-	backendClient, err := adminClient.GetClient(s.RealmName, s.BackendClientId)
+	backendClient, err := adminClient.GetClient(s.RealmName, s.BackendClientID)
 	if err != nil {
 		t.Fatalf("Could not get backend client: %s", err)
 	}
@@ -116,7 +116,7 @@ func (s *KeycloakTestSuite) GetFrontendClient(t testing.TB, ctx context.Context)
 		t.Fatalf("Could not get admin client: %s", err)
 	}
 
-	frontendClient, err := adminClient.GetClient(s.RealmName, s.FrontendClientId)
+	frontendClient, err := adminClient.GetClient(s.RealmName, s.FrontendClientID)
 	if err != nil {
 		t.Fatalf("Could not get frontend client: %s", err)
 	}
