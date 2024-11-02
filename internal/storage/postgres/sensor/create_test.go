@@ -18,7 +18,7 @@ func TestSensorRepository_Create(t *testing.T) {
 
 		// when
 		got, err := r.Create(
-			context.Background(), 
+			context.Background(),
 			WithStatus(sensorUtils.TestSensor.Status),
 			WithData(sensorUtils.TestSensor.Data),
 		)
@@ -69,7 +69,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		sensor := &entities.Sensor{
 			Status: entities.SensorStatusOnline,
 		}
-		
+
 		_, err := r.Create(context.Background(), WithStatus(sensor.Status))
 		assert.NoError(t, err)
 
@@ -93,7 +93,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		sensor := &entities.Sensor{
 			Status: entities.SensorStatusOnline,
 		}
-		
+
 		_, err := r.Create(context.Background(), WithStatus(sensor.Status))
 		assert.NoError(t, err)
 
@@ -110,10 +110,10 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 	t.Run("should return error when data is nil", func(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-	
+
 		// when
 		got, err := r.InsertSensorData(context.Background(), nil)
-	
+
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)

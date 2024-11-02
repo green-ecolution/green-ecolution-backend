@@ -66,7 +66,7 @@ var (
 				ID:        1,
 				CreatedAt: currentTime,
 				UpdatedAt: currentTime,
-				Data:     TestMqttPayload,
+				Data:      TestMqttPayload,
 			},
 		},
 	}

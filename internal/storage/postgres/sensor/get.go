@@ -41,7 +41,7 @@ func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entiti
 	if status == nil {
 		return nil, fmt.Errorf("status cannot be nil")
 	}
-	
+
 	row, err := r.store.GetSensorByStatus(ctx, sqlc.SensorStatus(*status))
 	if err != nil {
 		return nil, err
