@@ -6,8 +6,9 @@ import (
 	"log"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-	"github.com/stillya/testcontainers-keycloak"
+	keycloak "github.com/stillya/testcontainers-keycloak"
 )
 
 type KeycloakTestSuite struct {
@@ -52,10 +53,40 @@ func startKeycloakContainer(ctx context.Context) *keycloak.KeycloakContainer {
 	return keycloakContainer
 }
 
+func (s *KeycloakTestSuite) IdentityConfig(t testing.TB, ctx context.Context) *config.IdentityAuthConfig {
+	t.Helper()
+	backendClient := s.GetBackendClient(t, ctx)
+	frontendClient := s.GetFrontendClient(t, ctx)
+
+	return &config.IdentityAuthConfig{
+		KeyCloak: config.KeyCloakConfig{
+			BaseURL:        s.GetAuthServerURL(t, ctx),
+			Realm:          s.RealmName,
+			ClientID:       s.BackendClientId,
+			ClientSecret:   *backendClient.Secret,
+			RealmPublicKey: "",
+			Frontend: config.KeyCloakFrontendConfig{
+				ClientID:     s.FrontendClientId,
+				ClientSecret: *frontendClient.Secret,
+				AuthURL:      s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/auth",
+				TokenURL:     s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/token",
+			},
+		},
+	}
+}
+
+func (s *KeycloakTestSuite) GetAdminClient(t testing.TB, ctx context.Context) *keycloak.AdminClient {
+	t.Helper()
+	adminClient, err := s.Container.GetAdminClient(ctx)
+	if err != nil {
+		t.Fatalf("Could not get admin client: %s", err)
+	}
+
+	return adminClient
+}
+
 func (s *KeycloakTestSuite) GetAuthServerURL(t testing.TB, ctx context.Context) string {
 	t.Helper()
-	t.Log("Getting auth server URL..")
-
 	url, err := s.Container.GetAuthServerURL(ctx)
 	if err != nil {
 		t.Fatalf("Could not get auth server URL: %s", err)
@@ -65,8 +96,6 @@ func (s *KeycloakTestSuite) GetAuthServerURL(t testing.TB, ctx context.Context) 
 
 func (s *KeycloakTestSuite) GetBackendClient(t testing.TB, ctx context.Context) *keycloak.Client {
 	t.Helper()
-	t.Log("Getting backend client..")
-
 	adminClient, err := s.Container.GetAdminClient(ctx)
 	if err != nil {
 		t.Fatalf("Could not get admin client: %s", err)
@@ -82,8 +111,6 @@ func (s *KeycloakTestSuite) GetBackendClient(t testing.TB, ctx context.Context) 
 
 func (s *KeycloakTestSuite) GetFrontendClient(t testing.TB, ctx context.Context) *keycloak.Client {
 	t.Helper()
-	t.Log("Getting frontend client..")
-
 	adminClient, err := s.Container.GetAdminClient(ctx)
 	if err != nil {
 		t.Fatalf("Could not get admin client: %s", err)
