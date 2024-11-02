@@ -77,15 +77,15 @@ func TestRegionMapper_FromSqlList(t *testing.T) {
 
 var allTestRegions = []*sqlc.Region{
 	{
-		ID:             1,
-		CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-		UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-		Name:      		"Mürwik",
+		ID:        1,
+		CreatedAt: pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt: pgtype.Timestamp{Time: time.Now()},
+		Name:      "Mürwik",
 	},
 	{
-		ID:             1,
-		CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-		UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-		Name:      		"Innenstadt",
+		ID:        1,
+		CreatedAt: pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt: pgtype.Timestamp{Time: time.Now()},
+		Name:      "Innenstadt",
 	},
 }

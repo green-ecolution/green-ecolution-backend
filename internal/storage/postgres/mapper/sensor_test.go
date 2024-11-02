@@ -77,15 +77,15 @@ func TestSensorMapper_FromSqlList(t *testing.T) {
 
 var allTestSensors = []*sqlc.Sensor{
 	{
-		ID:             1,
-		CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-		UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-		Status: sqlc.SensorStatusOffline,
+		ID:        1,
+		CreatedAt: pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt: pgtype.Timestamp{Time: time.Now()},
+		Status:    sqlc.SensorStatusOffline,
 	},
 	{
-		ID:             1,
-		CreatedAt:      pgtype.Timestamp{Time: time.Now()},
-		UpdatedAt:      pgtype.Timestamp{Time: time.Now()},
-		Status: sqlc.SensorStatusOnline,
+		ID:        1,
+		CreatedAt: pgtype.Timestamp{Time: time.Now()},
+		UpdatedAt: pgtype.Timestamp{Time: time.Now()},
+		Status:    sqlc.SensorStatusOnline,
 	},
 }
