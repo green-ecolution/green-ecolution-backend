@@ -120,7 +120,7 @@ func TestHTTPLogger(t *testing.T) {
 	})
 }
 
-func TestHTTPLogger_BorderlineCases(t *testing.T) {
+func TestHTTPLogger_EdgeCases(t *testing.T) {
 	t.Run("should handle long processing time", func(t *testing.T) {
 		app := fiber.New()
 		app.Use(HTTPLogger())
