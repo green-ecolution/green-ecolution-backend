@@ -17,15 +17,9 @@ func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed
 
 	data := r.mapper.FromSqlList(row)
 	for _, f := range data {
-		f.Sensor, err = r.GetSensorByFlowerbedID(ctx, f.ID)
-		if err != nil {
-			return nil, err
-		}
+		f.Sensor, err = r.GetSensorByFlowerbedID(ctx, f.ID) //  Error can be ignored when sensor is not found
 
-		f.Images, err = r.GetAllImagesByID(ctx, f.ID)
-		if err != nil {
-			return nil, err
-		}
+		f.Images, err = r.GetAllImagesByID(ctx, f.ID) //  Error can be ignored when images are not found
 
 		f.Region, err = r.GetRegionByFlowerbedID(ctx, f.ID)
 		if err != nil {
