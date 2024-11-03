@@ -149,7 +149,6 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)

@@ -405,19 +405,19 @@ func TestFlowerbedRepository_GetRegionByFlowerbedID(t *testing.T) {
 }
 
 type testFlowerbeds struct {
-	ID       int32
-	Description     string
-	RegionID int32
-	SensorID int32
-	Images []*entities.Image
+	ID          int32
+	Description string
+	RegionID    int32
+	SensorID    int32
+	Images      []*entities.Image
 }
 
 var allTestFlowerbeds = []*testFlowerbeds{
 	{
-		ID:       1,
-		Description:     "Big flowerbed nearby the sea",
-		RegionID: 1,
-		SensorID:  2,
+		ID:          1,
+		Description: "Big flowerbed nearby the sea",
+		RegionID:    1,
+		SensorID:    2,
 		Images: []*entities.Image{
 			{
 				ID:       1,
@@ -428,10 +428,10 @@ var allTestFlowerbeds = []*testFlowerbeds{
 		},
 	},
 	{
-		ID:       2,
-		Description:     "Small flowerbed in the park",
-		RegionID: 3,
-		SensorID:  -1, // no sensor
-		Images: []*entities.Image{},
+		ID:          2,
+		Description: "Small flowerbed in the park",
+		RegionID:    3,
+		SensorID:    -1, // no sensor
+		Images:      []*entities.Image{},
 	},
 }
