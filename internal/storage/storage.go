@@ -23,6 +23,7 @@ var (
 	ErrTreeClusterNotFound = errors.New("treecluster not found")
 	ErrRegionNotFound      = errors.New("region not found")
 	ErrTreeNotFound        = errors.New("tree not found")
+	ErrVehicleNotFound     = errors.New("vehicle not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")

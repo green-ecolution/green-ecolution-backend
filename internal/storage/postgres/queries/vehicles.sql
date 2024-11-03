@@ -21,5 +21,5 @@ UPDATE vehicles SET
   water_capacity = $4
 WHERE id = $1;
 
--- name: DeleteVehicle :exec
-DELETE FROM vehicles WHERE id = $1;
+-- name: DeleteVehicle :one
+DELETE FROM vehicles WHERE id = $1 RETURNING id;
