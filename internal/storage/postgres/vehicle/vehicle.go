@@ -56,5 +56,14 @@ func WithWaterCapacity(waterCapacity float64) entities.EntityFunc[entities.Vehic
 }
 
 func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
-	return r.store.DeleteVehicle(ctx, id)
+	rowID, err := r.store.DeleteVehicle(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if rowID != id || rowID == 0 {
+		return storage.ErrVehicleNotFound
+	}
+
+	return nil
 }

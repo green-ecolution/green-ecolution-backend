@@ -2,6 +2,7 @@ package vehicle
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 
@@ -40,41 +41,53 @@ func TestMain(m *testing.M) {
 }
 
 func TestVehicleRepository_Delete(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+
 	t.Run("should delete vehicle", func(t *testing.T) {
 		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
-		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
-
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+		
 		// when
 		err := r.Delete(context.Background(), 1)
-
+		
 		// then
 		assert.NoError(t, err)
 	})
 
-	t.Run("should return error when vehicle not found", func(t *testing.T) {
+    t.Run("should return error when vehicle not found", func(t *testing.T) {
+        // given
+        r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+        // when
+        err := r.Delete(context.Background(), 99)
+
+        // then
+        assert.Error(t, err)
+    })
+
+	t.Run("should return error when tree cluster with negative id", func(t *testing.T) {
 		// given
-		suite.ResetDB(t)
-		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
 		// when
-		err := r.Delete(context.Background(), 99)
+		err := r.Delete(context.Background(), -1)
+		fmt.Print(err)
 
 		// then
 		assert.Error(t, err)
 	})
 
 	t.Run("should return error when vehicle is canceled", func(t *testing.T) {
-		// given
-		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
+        // given
+        r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+        ctx, cancel := context.WithCancel(context.Background())
+        cancel()
 
-		// when
-		err := r.Delete(ctx, 1)
+        // when
+        err := r.Delete(ctx, 1)
 
-		// then
-		assert.Error(t, err)
-	})
+        // then
+        assert.Error(t, err)
+    })
 }
