@@ -131,11 +131,7 @@ func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
 		return err
 	}
 
-	if rowID != id || rowID == 0 {
-		return storage.ErrFlowerbedNotFound
-	}
-
-	return nil
+	return r.checkFlowerbedExists(rowID)
 }
 
 func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
@@ -159,20 +155,13 @@ func (r *FlowerbedRepository) UnlinkImage(ctx context.Context, id, imageID int32
 		ImageID:     imageID,
 	}
 
-	rowIDs, err := r.store.UnlinkFlowerbedImage(ctx, &args)
+	rowID, err := r.store.UnlinkFlowerbedImage(ctx, &args)
+
 	if err != nil {
 		return err
 	}
 
-	if len(rowIDs) == 0 {
-		return storage.ErrImageNotFound
-	}
-
-	if err := r.checkIDsExist(rowIDs, id, imageID); err != nil {
-		return err
-	}
-
-	return nil
+	return r.checkFlowerbedExists(rowID)
 }
 
 func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) error {
@@ -181,36 +170,21 @@ func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) err
 		return err
 	}
 
-	if rowID != id || rowID == 0 {
-		return storage.ErrFlowerbedNotFound
-	}
-
-	return nil
+	return r.checkFlowerbedExists(rowID)
 }
 
 func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
-	return r.store.ArchiveFlowerbed(ctx, id)
+	rowID, err := r.store.ArchiveFlowerbed(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return r.checkFlowerbedExists(rowID)
 }
 
-func (r *FlowerbedRepository) checkIDsExist(rowIDs []*sqlc.FlowerbedImage, flowerbedID, imageID int32) error {
-	flowerbedFound := false
-	imageFound := false
-
-	for _, rowID := range rowIDs {
-		if rowID.FlowerbedID == flowerbedID {
-			flowerbedFound = true
-		}
-		if rowID.ImageID == imageID {
-			imageFound = true
-		}
-	}
-
-	if !flowerbedFound {
+func (r *FlowerbedRepository) checkFlowerbedExists(rowID int32) error {
+	if rowID == 0 {
 		return storage.ErrFlowerbedNotFound
 	}
-	if !imageFound {
-		return storage.ErrImageNotFound
-	}
-
 	return nil
 }
