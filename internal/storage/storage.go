@@ -107,6 +107,7 @@ type FlowerbedRepository interface {
 	BasicCrudRepository[entities.Flowerbed]
 	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
+	GetRegionByFlowerbedID(ctx context.Context, id int32) (*entities.Region, error)
 
 	CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
