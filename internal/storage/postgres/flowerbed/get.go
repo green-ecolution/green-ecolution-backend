@@ -49,6 +49,10 @@ func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.
 }
 
 func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID int32) ([]*entities.Image, error) {
+	if err := r.tcIDExists(ctx, flowerbedID); err != nil {
+		return nil, err
+	}
+
 	row, err := r.store.GetAllImagesByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
 		return nil, r.store.HandleError(err)
@@ -58,6 +62,10 @@ func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID 
 }
 
 func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
+	if err := r.tcIDExists(ctx, flowerbedID); err != nil {
+		return nil, err
+	}
+
 	row, err := r.store.GetSensorByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -70,6 +78,10 @@ func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flower
 }
 
 func (r *FlowerbedRepository) GetRegionByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Region, error) {
+	if err := r.tcIDExists(ctx, flowerbedID); err != nil {
+		return nil, err
+	}
+
 	row, err := r.store.GetRegionByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -79,4 +91,16 @@ func (r *FlowerbedRepository) GetRegionByFlowerbedID(ctx context.Context, flower
 	}
 
 	return r.regionMapper.FromSql(row), nil
+}
+
+func (r *FlowerbedRepository) tcIDExists(ctx context.Context, id int32) error {
+	_, err := r.store.GetFlowerbedByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return storage.ErrFlowerbedNotFound
+		}
+		return err
+	}
+
+	return nil
 }

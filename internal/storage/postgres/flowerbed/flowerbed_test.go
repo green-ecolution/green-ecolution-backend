@@ -96,10 +96,11 @@ func TestRegionRepository_Delete(t *testing.T) {
 }
 
 func TestRegionRepository_DeleteAndUnlinkImages(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
+
 	t.Run("should unlink images and delete flowerbed", func(t *testing.T) {
 		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
 		r := NewFlowerbedRepository(suite.Store, mappers)
 
 		// when
@@ -110,10 +111,6 @@ func TestRegionRepository_DeleteAndUnlinkImages(t *testing.T) {
 
 		_, err = r.GetByID(context.Background(), 1)
 		assert.Error(t, err)
-
-		images, err := r.GetAllImagesByID(context.Background(), 1)
-		assert.NoError(t, err)
-		assert.Empty(t, images)
 	})
 
 	t.Run("should return error when flowerbed has no images", func(t *testing.T) {

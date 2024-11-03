@@ -270,7 +270,7 @@ func TestFlowerbedRepository_GetSensorByFlowerbedID(t *testing.T) {
 		assert.Equal(t, expectedSensor, got.ID)
 	})
 
-	t.Run("should return empty slice when no sensor is found", func(t *testing.T) {
+	t.Run("should return error when no sensor is found", func(t *testing.T) {
 		// given
 		r := NewFlowerbedRepository(suite.Store, mappers)
 
@@ -278,9 +278,8 @@ func TestFlowerbedRepository_GetSensorByFlowerbedID(t *testing.T) {
 		got, err := r.GetSensorByFlowerbedID(context.Background(), 2)
 
 		// then
-		assert.NoError(t, err)
+		assert.Error(t, err)
 		assert.Nil(t, got)
-		assert.NoError(t, err)
 	})
 
 	t.Run("should return error when flowerbed with non-existing id", func(t *testing.T) {
