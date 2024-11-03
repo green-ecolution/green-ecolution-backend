@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +33,20 @@ func TestMain(m *testing.M) {
 }
 
 func TestRegionRepository_Delete(t *testing.T) {
-	t.Run("should delete region", func(t *testing.T) {
+	t.Run("should delete flowerbed", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.Delete(context.Background(), 2)
+
+		// then
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error when flowerbed has linked images", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
@@ -42,16 +56,26 @@ func TestRegionRepository_Delete(t *testing.T) {
 		err := r.Delete(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.Error(t, err)
 	})
 
-	t.Run("should return error when region not found", func(t *testing.T) {
+	t.Run("should return error when flowerbed not found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewFlowerbedRepository(suite.Store, mappers)
 
 		// when
 		err := r.Delete(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when flowerbed with negative id", func(t *testing.T) {
+		// given
+		r := NewFlowerbedRepository(suite.Store, mappers)
+		// when
+		err := r.Delete(context.Background(), -1)
 
 		// then
 		assert.Error(t, err)
@@ -65,6 +89,151 @@ func TestRegionRepository_Delete(t *testing.T) {
 
 		// when
 		err := r.Delete(ctx, 1)
+
+		// then
+		assert.Error(t, err)
+	})
+}
+
+func TestRegionRepository_DeleteAndUnlinkImages(t *testing.T) {
+	t.Run("should unlink images and delete flowerbed", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.DeleteAndUnlinkImages(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+
+		_, err = r.GetByID(context.Background(), 1)
+		assert.Error(t, err)
+
+		images, err := r.GetAllImagesByID(context.Background(), 1)
+		assert.NoError(t, err)
+		assert.Empty(t, images)
+	})
+
+	t.Run("should return error when flowerbed has no images", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// then
+		err := r.DeleteAndUnlinkImages(context.Background(), 2)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when flowerbed not found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// then
+		err := r.DeleteAndUnlinkImages(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when flowerbed with negative id", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// then
+		err := r.DeleteAndUnlinkImages(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewFlowerbedRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		err := r.DeleteAndUnlinkImages(ctx, 1)
+
+		// then
+		assert.Error(t, err)
+	})
+}
+
+func TestRegionRepository_UnlinkImage(t *testing.T) {
+	t.Run("should unlink image from flowerbed", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 1, 1)
+
+		// then
+		assert.NoError(t, err)
+
+		images, err := r.GetAllImagesByID(context.Background(), 1)
+		assert.NoError(t, err)
+		assert.NotContains(t, images, &entities.Image{ID: 1})
+	})
+
+	t.Run("should return error when flowerbed_id is not found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 99, 1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when image_id is not found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 1, 99)
+
+		// then
+		assert.Error(t, err)
+	})
+}
+
+func TestRegionRepository_UnlinkAllImages(t *testing.T) {
+	t.Run("should unlink all images from flowerbed", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/flowerbed")
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkAllImages(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+
+		images, err := r.GetAllImagesByID(context.Background(), 1)
+		assert.NoError(t, err)
+		assert.Empty(t, images)
+	})
+
+	t.Run("should return error when unlinking all images fails", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewFlowerbedRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkAllImages(context.Background(), 99)
 
 		// then
 		assert.Error(t, err)
