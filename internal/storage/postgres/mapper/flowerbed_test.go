@@ -24,6 +24,7 @@ func TestFlowerbedMapper_FromSql(t *testing.T) {
 		assert.NotNil(t, got)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
+		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
 		assert.Equal(t, src.Size, got.Size)
 		assert.Equal(t, src.Description, got.Description)
 		assert.Equal(t, src.NumberOfPlants, got.NumberOfPlants)

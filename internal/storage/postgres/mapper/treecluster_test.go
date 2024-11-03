@@ -36,6 +36,8 @@ func TestTreeclusterMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.Latitude, got.Latitude)
 		assert.Equal(t, src.Longitude, got.Longitude)
 		assert.Equal(t, src.Name, got.Name)
+		assert.Equal(t, src.Description, got.Description)
+		assert.Equal(t, src.SoilCondition, sqlc.WateringStatus(got.SoilCondition))
 	})
 
 	t.Run("should return nil for nil input", func(t *testing.T) {
@@ -76,6 +78,8 @@ func TestTreeclusterMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.Latitude, got[i].Latitude)
 			assert.Equal(t, src.Longitude, got[i].Longitude)
 			assert.Equal(t, src.Name, got[i].Name)
+			assert.Equal(t, src.Description, got[i].Description)
+			assert.Equal(t, src.SoilCondition, sqlc.WateringStatus(got[i].SoilCondition))
 		}
 	})
 
