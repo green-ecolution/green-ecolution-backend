@@ -39,16 +39,28 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 }
 
 func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	entity, err := r.Create(ctx, tFn...)
+	createdEntity, err := r.Create(ctx, tFn...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
-		return nil, err
+	entity := defaultTree()
+	for _, fn := range tFn {
+		fn(&entity)
 	}
 
-	return entity, nil
+	if entity.Images != nil {
+		if err := r.handleImages(ctx, createdEntity.ID, entity.Images); err != nil {
+			return nil, err
+		}
+		linkedImages, err := r.GetAllImagesByID(ctx, createdEntity.ID)
+		if err != nil {
+			return nil, err
+		}
+		createdEntity.Images = linkedImages
+	}
+
+	return createdEntity, nil
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
