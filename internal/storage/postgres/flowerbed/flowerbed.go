@@ -156,7 +156,6 @@ func (r *FlowerbedRepository) UnlinkImage(ctx context.Context, id, imageID int32
 	}
 
 	rowID, err := r.store.UnlinkFlowerbedImage(ctx, &args)
-
 	if err != nil {
 		return err
 	}
