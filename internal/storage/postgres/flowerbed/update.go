@@ -49,8 +49,8 @@ func (r *FlowerbedRepository) updateEntity(ctx context.Context, f *entities.Flow
 		MoistureLevel:  f.MoistureLevel,
 		RegionID:       &f.Region.ID,
 		Address:        f.Address,
-		Latitude:       f.Latitude,
-		Longitude:      f.Longitude,
+		Latitude:       *f.Latitude,
+		Longitude:      *f.Longitude,
 	}
 
 	return r.store.UpdateFlowerbed(ctx, &args)
