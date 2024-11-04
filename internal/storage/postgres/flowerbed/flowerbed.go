@@ -125,6 +125,12 @@ func WithSensorID(id int32) entities.EntityFunc[entities.Flowerbed] {
 	}
 }
 
+func WithRegionID(id int32) entities.EntityFunc[entities.Flowerbed] {
+	return func(f *entities.Flowerbed) {
+		f.Region = &entities.Region{ID: id}
+	}
+}
+
 func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
 	rowID, err := r.store.DeleteFlowerbed(ctx, id)
 	if err != nil {
