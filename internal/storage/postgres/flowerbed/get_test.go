@@ -24,31 +24,31 @@ func TestFlowerbedRepository_GetAll(t *testing.T) {
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
 		assert.Len(t, got, len(allTestFlowerbeds))
-		for i, tc := range got {
-			assert.Equal(t, allTestFlowerbeds[i].ID, tc.ID)
-			assert.Equal(t, allTestFlowerbeds[i].Description, tc.Description)
+		for i, fb := range got {
+			assert.Equal(t, allTestFlowerbeds[i].ID, fb.ID)
+			assert.Equal(t, allTestFlowerbeds[i].Description, fb.Description)
 
 			// assert region
-			assert.NotNil(t, tc.Region)
-			assert.Equal(t, allTestFlowerbeds[i].RegionID, tc.Region.ID)
+			assert.NotNil(t, fb.Region)
+			assert.Equal(t, allTestFlowerbeds[i].RegionID, fb.Region.ID)
 
 			// assert sensor
 			if allTestFlowerbeds[i].SensorID == -1 {
-				assert.Nil(t, tc.Sensor)
+				assert.Nil(t, fb.Sensor)
 				assert.NoError(t, err)
 			} else {
-				assert.NotNil(t, tc.Sensor)
-				assert.Equal(t, allTestFlowerbeds[i].SensorID, tc.Sensor.ID)
+				assert.NotNil(t, fb.Sensor)
+				assert.Equal(t, allTestFlowerbeds[i].SensorID, fb.Sensor.ID)
 			}
 
 			// assert images
 			if len(allTestFlowerbeds[i].Images) == 0 {
-				assert.Equal(t, []*entities.Image{}, tc.Images)
+				assert.Equal(t, []*entities.Image{}, fb.Images)
 				assert.NoError(t, err)
 			} else {
-				assert.NotNil(t, tc.Images)
-				assert.Equal(t, len(allTestFlowerbeds[i].Images), len(tc.Images))
-				assert.Equal(t, allTestFlowerbeds[i].Images[0].ID, tc.Images[0].ID)
+				assert.NotNil(t, fb.Images)
+				assert.Equal(t, len(allTestFlowerbeds[i].Images), len(fb.Images))
+				assert.Equal(t, allTestFlowerbeds[i].Images[0].ID, fb.Images[0].ID)
 			}
 		}
 	})
@@ -179,11 +179,11 @@ func TestFlowerbedRepository_GetAllImagesByID(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, len(expectedImages), len(got))
-		for i, tc := range got {
-			assert.Equal(t, expectedImages[i].ID, tc.ID)
-			assert.Equal(t, expectedImages[i].Filename, tc.Filename)
-			assert.Equal(t, expectedImages[i].MimeType, tc.MimeType)
-			assert.Equal(t, expectedImages[i].URL, tc.URL)
+		for i, fb := range got {
+			assert.Equal(t, expectedImages[i].ID, fb.ID)
+			assert.Equal(t, expectedImages[i].Filename, fb.Filename)
+			assert.Equal(t, expectedImages[i].MimeType, fb.MimeType)
+			assert.Equal(t, expectedImages[i].URL, fb.URL)
 		}
 	})
 
