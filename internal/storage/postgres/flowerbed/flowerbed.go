@@ -81,13 +81,13 @@ func WithAddress(address string) entities.EntityFunc[entities.Flowerbed] {
 	}
 }
 
-func WithLatitude(latitude float64) entities.EntityFunc[entities.Flowerbed] {
+func WithLatitude(latitude *float64) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Latitude = latitude
 	}
 }
 
-func WithLongitude(longitude float64) entities.EntityFunc[entities.Flowerbed] {
+func WithLongitude(longitude *float64) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Longitude = longitude
 	}
