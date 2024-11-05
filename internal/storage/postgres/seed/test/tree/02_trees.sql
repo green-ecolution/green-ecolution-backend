@@ -32,6 +32,8 @@ VALUES
     (3, 2, 2, 2023, 'Betula pendula', 1010, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326), false, 'bad', 'Sample description 3');
 
 ALTER SEQUENCE trees_id_seq RESTART WITH 4;
+
+INSERT INTO tree_images (tree_id, image_id) VALUES (1, 1), (1, 2);
 -- +goose StatementEnd
 
 -- +goose Down

@@ -13,7 +13,6 @@ func TestTreeRepository_Create(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
@@ -91,7 +90,7 @@ func TestTreeRepository_Create(t *testing.T) {
 
 func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 	t.Run("should create tree and link images successfully", func(t *testing.T) {
-		// Setup
+		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
@@ -101,7 +100,7 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		}
 		images := mappers.iMapper.FromSqlList(sqlImages)
 
-		// Execute
+		// when
 		tree, createErr := r.CreateAndLinkImages(context.Background(),
 			WithSpecies("Oak"),
 			WithTreeNumber("T001"),

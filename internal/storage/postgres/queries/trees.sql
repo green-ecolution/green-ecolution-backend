@@ -58,8 +58,8 @@ INSERT INTO tree_images (
   $1, $2
 );
 
--- name: UnlinkTreeImage :exec
-DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2;
+-- name: UnlinkTreeImage :one
+DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2 RETURNING image_id;
 
 -- name: UnlinkAllTreeImages :exec
 DELETE FROM tree_images WHERE tree_id = $1;
@@ -69,8 +69,8 @@ UPDATE trees SET
   geometry = ST_GeomFromText($2, 4326)
 WHERE id = $1;
 
--- name: DeleteTree :exec
-DELETE FROM trees WHERE id = $1;
+-- name: DeleteTree :one
+DELETE FROM trees WHERE id = $1 RETURNING id;
 
 -- name: UnlinkTreeClusterID :exec
 UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
