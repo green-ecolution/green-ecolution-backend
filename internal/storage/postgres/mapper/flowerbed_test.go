@@ -31,8 +31,8 @@ func TestFlowerbedMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.MoistureLevel, got.MoistureLevel)
 		assert.Equal(t, src.Address, got.Address)
 		assert.Equal(t, src.Archived, got.Archived)
-		assert.Equal(t, src.Latitude, got.Latitude)
-		assert.Equal(t, src.Longitude, got.Longitude)
+		assert.Equal(t, src.Latitude, *got.Latitude)
+		assert.Equal(t, src.Longitude, *got.Longitude)
 	})
 
 	t.Run("should return nil for nil input", func(t *testing.T) {
@@ -71,8 +71,8 @@ func TestFlowerbedMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.MoistureLevel, got[i].MoistureLevel)
 			assert.Equal(t, src.Address, got[i].Address)
 			assert.Equal(t, src.Archived, got[i].Archived)
-			assert.Equal(t, src.Latitude, got[i].Latitude)
-			assert.Equal(t, src.Longitude, got[i].Longitude)
+			assert.Equal(t, src.Latitude, *got[i].Latitude)
+			assert.Equal(t, src.Longitude, *got[i].Longitude)
 		}
 	})
 
