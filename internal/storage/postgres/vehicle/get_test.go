@@ -101,7 +101,6 @@ func TestVehicleRepository_GetByID(t *testing.T) {
 		suite.ResetDB(t)
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
-
 		// when
 		got, err := r.GetByID(ctx, -1)
 
@@ -222,15 +221,15 @@ func TestVehicleRepository_GetByPlate(t *testing.T) {
 
 var allTestVehicles = []*entities.Vehicle{
 	{
-		ID: 1,
-		NumberPlate: "B-1234",
-		Description: "Test vehicle 1",
+		ID:            1,
+		NumberPlate:   "B-1234",
+		Description:   "Test vehicle 1",
 		WaterCapacity: 100.0,
 	},
 	{
-		ID: 2,
-		NumberPlate: "B-5678",
-		Description: "Test vehicle 2",
+		ID:            2,
+		NumberPlate:   "B-5678",
+		Description:   "Test vehicle 2",
 		WaterCapacity: 150.0,
 	},
 }
