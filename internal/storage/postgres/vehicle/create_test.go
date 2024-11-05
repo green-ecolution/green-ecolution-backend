@@ -11,8 +11,8 @@ import (
 func TestVehicleRepository_Create(t *testing.T) {
 	suite.ResetDB(t)
 	input := entities.Vehicle{
-		Description: "Big car",
-		NumberPlate: "FL ZU 9876",
+		Description:   "Big car",
+		NumberPlate:   "FL ZU 9876",
 		WaterCapacity: 2000,
 	}
 

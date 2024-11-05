@@ -99,8 +99,8 @@ func TestFlowerbedRepository_UpdateWithImages(t *testing.T) {
 
 		// when
 		got, err := r.UpdateWithImages(
-			context.Background(), 
-			1, 
+			context.Background(),
+			1,
 			WithDescription("Updated description"),
 			WithImagesIDs([]int32{1}),
 		)
@@ -128,8 +128,8 @@ func TestFlowerbedRepository_UpdateWithImages(t *testing.T) {
 
 		// when
 		got, err := r.UpdateWithImages(
-			context.Background(), 
-			2, 
+			context.Background(),
+			2,
 			WithDescription("Updated description"),
 			WithImagesIDs([]int32{1}),
 		)

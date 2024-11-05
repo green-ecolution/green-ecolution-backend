@@ -33,7 +33,7 @@ func (r *FlowerbedRepository) Update(ctx context.Context, id int32, fFn ...entit
 	return r.GetByID(ctx, id)
 }
 
-func (r *FlowerbedRepository) UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {	
+func (r *FlowerbedRepository) UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {
 	f, err := r.Update(ctx, id, fFn...)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (r *FlowerbedRepository) updateImages(ctx context.Context, f *entities.Flow
 		return err
 	}
 
-	if (len(images) > 0) {
+	if len(images) > 0 {
 		if err := r.UnlinkAllImages(ctx, f.ID); err != nil {
 			return err
 		}

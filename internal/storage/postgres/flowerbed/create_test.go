@@ -15,15 +15,15 @@ func TestRegionRepository_Create(t *testing.T) {
 	sensor := &entities.Sensor{ID: 1, Status: entities.SensorStatusOnline}
 
 	input := entities.Flowerbed{
-		Description: "New description",
-		Size: 40000,
+		Description:    "New description",
+		Size:           40000,
 		NumberOfPlants: 100000,
-		MoistureLevel: 3.5,
-		Address: "126 Water street",
-		Latitude: utils.P(54.81269326939148), 
-		Longitude: utils.P(54.81269326939148),
-		Region: region,
-		Sensor: sensor,
+		MoistureLevel:  3.5,
+		Address:        "126 Water street",
+		Latitude:       utils.P(54.81269326939148),
+		Longitude:      utils.P(54.81269326939148),
+		Region:         region,
+		Sensor:         sensor,
 	}
 
 	t.Run("should create flowerbed with region, longitude and latitude", func(t *testing.T) {
@@ -34,7 +34,7 @@ func TestRegionRepository_Create(t *testing.T) {
 
 		// when
 		got, err := r.Create(
-			context.Background(), 
+			context.Background(),
 			WithLatitude(input.Latitude),
 			WithRegionID(input.Region.ID),
 			WithLongitude(input.Longitude),
@@ -70,7 +70,7 @@ func TestRegionRepository_Create(t *testing.T) {
 
 		// when
 		got, err := r.Create(
-			context.Background(), 
+			context.Background(),
 			WithDescription(input.Description),
 			WithAddress(input.Address),
 			WithMoistureLevel(input.MoistureLevel),
@@ -129,7 +129,7 @@ func TestRegionRepository_Create(t *testing.T) {
 
 		// when
 		got, err := r.Create(
-			context.Background(), 
+			context.Background(),
 			WithLatitude(nil),
 			WithRegionID(input.Region.ID),
 			WithLongitude(input.Longitude),
@@ -148,7 +148,7 @@ func TestRegionRepository_Create(t *testing.T) {
 
 		// when
 		got, err := r.Create(
-			context.Background(), 
+			context.Background(),
 			WithLatitude(input.Latitude),
 			WithRegionID(input.Region.ID),
 			WithLongitude(nil),
@@ -167,7 +167,7 @@ func TestRegionRepository_Create(t *testing.T) {
 
 		// when
 		got, err := r.Create(
-			context.Background(), 
+			context.Background(),
 			WithLatitude(input.Latitude),
 			WithRegionID(0),
 			WithLongitude(input.Longitude),
@@ -214,9 +214,9 @@ func TestRegionRepository_CreateAndLinkImages(t *testing.T) {
 	imageIDs := []int32{1}
 
 	input := entities.Flowerbed{
-		Latitude: utils.P(54.81269326939148), 
+		Latitude:  utils.P(54.81269326939148),
 		Longitude: utils.P(54.81269326939148),
-		Region: region,
+		Region:    region,
 	}
 
 	t.Run("should create flowerbed with all values set", func(t *testing.T) {
@@ -227,7 +227,7 @@ func TestRegionRepository_CreateAndLinkImages(t *testing.T) {
 
 		// when
 		got, err := r.CreateAndLinkImages(
-			context.Background(), 
+			context.Background(),
 			WithDescription(input.Description),
 			WithImagesIDs(imageIDs),
 			WithLatitude(input.Latitude),
@@ -276,7 +276,7 @@ func TestRegionRepository_CreateAndLinkImages(t *testing.T) {
 
 		// when
 		got, err := r.CreateAndLinkImages(
-			context.Background(), 
+			context.Background(),
 			WithDescription(input.Description),
 			WithLatitude(input.Latitude),
 			WithRegionID(input.Region.ID),
@@ -312,7 +312,7 @@ func TestRegionRepository_CreateAndLinkImages(t *testing.T) {
 		r := NewFlowerbedRepository(suite.Store, mappers)
 
 		got, err := r.CreateAndLinkImages(
-			context.Background(), 
+			context.Background(),
 			WithDescription(input.Description),
 			WithImagesIDs([]int32{99}),
 			WithLatitude(input.Latitude),
@@ -320,9 +320,9 @@ func TestRegionRepository_CreateAndLinkImages(t *testing.T) {
 			WithLongitude(input.Longitude),
 		)
 
-        assert.Error(t, err)
-        assert.Nil(t, got)
-    })
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
 
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
