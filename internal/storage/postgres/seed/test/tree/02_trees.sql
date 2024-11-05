@@ -29,9 +29,10 @@ INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, tree_
 VALUES
     (1, 1, 1, 2021, 'Quercus robur', 1005, 54.82124518093376, 9.485702120628517, ST_SetSRID(ST_MakePoint(54.82124518093376, 9.485702120628517), 4326), true, 'unknown', 'Sample description 1'),
     (2, 1, NULL, 2022, 'Quercus robur', 1006, 54.8215076622281, 9.487153277881877, ST_SetSRID(ST_MakePoint(54.8215076622281, 9.487153277881877), 4326), true, 'good', 'Sample description 2'),
-    (3, 2, 2, 2023, 'Betula pendula', 1010, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326), false, 'bad', 'Sample description 3');
+    (3, 2, 2, 2023, 'Betula pendula', 1010, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326), false, 'bad', 'Sample description 3'),
+    (4, null, 3, 2020, 'Quercus robur', 1008, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.787330993834613, 9.4440523405200551), 4326), false, 'bad', 'Sample description 4');
 
-ALTER SEQUENCE trees_id_seq RESTART WITH 4;
+ALTER SEQUENCE trees_id_seq RESTART WITH 5;
 
 INSERT INTO tree_images (tree_id, image_id) VALUES (1, 1), (1, 2);
 -- +goose StatementEnd
