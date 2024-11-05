@@ -3,9 +3,8 @@ package tree
 import (
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 var (
@@ -90,8 +89,8 @@ var (
 		Longitude:     testLongitude,
 		PlantingYear:  2023,
 		Number:        "T001",
-		TreeClusterID: utils.PtrInt32(1),
-		SensorID:      utils.PtrInt32(1),
+		TreeClusterID: utils.P(int32(1)),
+		SensorID:      utils.P(int32(1)),
 	}
 
 	TestTreeImport = &entities.TreeImport{
@@ -103,8 +102,8 @@ var (
 	}
 
 	TestTreeUpdate = &entities.TreeUpdate{
-		TreeClusterID: utils.PtrInt32(1),
-		SensorID:      utils.PtrInt32(1),
+		TreeClusterID: utils.P(int32(1)),
+		SensorID:      utils.P(int32(1)),
 		PlantingYear:  2023,
 		Species:       "Oak",
 		Number:        "T001",
