@@ -20,8 +20,8 @@ var (
 		WateringStatus: entities.WateringStatusBad,
 		Region:         &entities.Region{ID: 1, Name: "Region 1"},
 		Archived:       false,
-		Latitude:       utils.Float64Ptr(testLatitude),
-		Longitude:      utils.Float64Ptr(testLongitude),
+		Latitude:       utils.P(testLatitude),
+		Longitude:      utils.P(testLongitude),
 		SoilCondition:  entities.TreeSoilConditionSandig,
 		Trees: []*entities.Tree{
 			{
@@ -44,7 +44,7 @@ var (
 		Address:       "123 Main St",
 		Description:   "Test description",
 		SoilCondition: serverEntities.TreeSoilConditionSandig,
-		TreeIDs:       []*int32{utils.PtrInt32(1)},
+		TreeIDs:       []*int32{utils.P(int32(1))},
 	}
 
 	TestClusterList = []*entities.TreeCluster{
@@ -57,8 +57,8 @@ var (
 			WateringStatus: entities.WateringStatusGood,
 			Region:         &entities.Region{ID: 2, Name: "Region 2"},
 			Archived:       false,
-			Latitude:       utils.Float64Ptr(testLatitude),
-			Longitude:      utils.Float64Ptr(testLongitude),
+			Latitude:       utils.P(testLatitude),
+			Longitude:      utils.P(testLongitude),
 			SoilCondition:  entities.TreeSoilConditionLehmig,
 			Trees:          []*entities.Tree{},
 		},
