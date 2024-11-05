@@ -21,7 +21,7 @@ packages:
       SensorRepository:
       TreeRepository:
       TreeClusterRepository:
-      AuthRepository: 
+      AuthRepository:
       UserRepository:
       RegionRepository:
       ImageRepository:

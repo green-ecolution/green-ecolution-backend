@@ -3,7 +3,6 @@ package tree
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	service "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
@@ -16,14 +15,6 @@ import (
 func TestTreeService_ImportTree(t *testing.T) {
 	ctx := context.Background()
 
-	treeToImport := &entities.TreeImport{
-		Latitude:     54.801539,
-		Longitude:    9.446741,
-		PlantingYear: 2023,
-		Species:      "Oak",
-		Number:       "T001",
-	}
-
 	t.Run("should create a new tree when no matching tree exists", func(t *testing.T) {
 		// Given
 		treeRepo := storageMock.NewMockTreeRepository(t)
@@ -33,8 +24,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		locator := service.NewMockGeoClusterLocator(t)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		expectedTree := getTestTrees()[0]
-		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(nil, nil)
+		expectedTree := TestTreesList[0]
+		treeRepo.EXPECT().GetByCoordinates(ctx, TestTreeImport.Latitude, TestTreeImport.Longitude).Return(nil, nil)
 		treeRepo.EXPECT().Create(ctx,
 			mock.Anything,
 			mock.Anything,
@@ -46,7 +37,7 @@ func TestTreeService_ImportTree(t *testing.T) {
 			mock.Anything).Return(expectedTree, nil)
 
 		// When
-		err := svc.ImportTree(ctx, []*entities.TreeImport{treeToImport})
+		err := svc.ImportTree(ctx, []*entities.TreeImport{TestTreeImport})
 
 		// Then
 		assert.NoError(t, err)
@@ -62,11 +53,11 @@ func TestTreeService_ImportTree(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		existingTree := getTestTrees()[0]
-		updatedTree := getTestTrees()[0]
+		existingTree := TestTreesList[0]
+		updatedTree := TestTreesList[0]
 		updatedTree.Description = "Updated description"
 
-		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(existingTree, nil)
+		treeRepo.EXPECT().GetByCoordinates(ctx, TestTreeImport.Latitude, TestTreeImport.Longitude).Return(existingTree, nil)
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
 		treeRepo.EXPECT().Update(ctx, existingTree.ID,
 			mock.Anything,
@@ -79,7 +70,7 @@ func TestTreeService_ImportTree(t *testing.T) {
 			mock.Anything).Return(updatedTree, nil)
 
 		// When
-		err := svc.ImportTree(ctx, []*entities.TreeImport{treeToImport})
+		err := svc.ImportTree(ctx, []*entities.TreeImport{TestTreeImport})
 
 		// Then
 		assert.NoError(t, err)
@@ -95,10 +86,10 @@ func TestTreeService_ImportTree(t *testing.T) {
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
 		// Define existing tree and tree import data
-		existingTree := getTestTrees()[0]
-		treeToImport.PlantingYear = 2024
+		existingTree := TestTreesList[0]
+		TestTreeImport.PlantingYear = 2024
 
-		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(existingTree, nil)
+		treeRepo.EXPECT().GetByCoordinates(ctx, TestTreeImport.Latitude, TestTreeImport.Longitude).Return(existingTree, nil)
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
 		treeRepo.EXPECT().Delete(ctx, existingTree.ID).Return(nil)
 		treeRepo.EXPECT().Create(ctx,
@@ -109,10 +100,10 @@ func TestTreeService_ImportTree(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
-			mock.Anything).Return(getTestTrees()[1], nil)
+			mock.Anything).Return(TestTreesList[1], nil)
 
 		// Call ImportTree
-		err := svc.ImportTree(ctx, []*entities.TreeImport{treeToImport})
+		err := svc.ImportTree(ctx, []*entities.TreeImport{TestTreeImport})
 
 		// Assert that no error occurred
 		assert.NoError(t, err)
@@ -127,49 +118,18 @@ func TestTreeService_ImportTree(t *testing.T) {
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
 
-		existingTree := getTestTrees()[0]
+		existingTree := TestTreesList[0]
 		expectedErr := errors.New("error deleting tree")
 
-		treeRepo.EXPECT().GetByCoordinates(ctx, treeToImport.Latitude, treeToImport.Longitude).Return(existingTree, nil)
+		treeRepo.EXPECT().GetByCoordinates(ctx, TestTreeImport.Latitude, TestTreeImport.Longitude).Return(existingTree, nil)
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
 		treeRepo.EXPECT().Delete(ctx, existingTree.ID).Return(expectedErr)
 
 		// When
-		err := svc.ImportTree(ctx, []*entities.TreeImport{treeToImport})
+		err := svc.ImportTree(ctx, []*entities.TreeImport{TestTreeImport})
 
 		// then
 		assert.Error(t, err)
 		assert.ErrorContains(t, err, expectedErr.Error())
 	})
-}
-
-func getTestTrees() []*entities.Tree {
-	now := time.Now()
-
-	return []*entities.Tree{
-		{
-			ID:           1,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Oak",
-			Number:       "T001",
-			Latitude:     9.446741,
-			Longitude:    54.801539,
-			Description:  "A mature oak tree",
-			PlantingYear: 2023,
-			Readonly:     true,
-		},
-		{
-			ID:           2,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Pine",
-			Number:       "T002",
-			Latitude:     9.446700,
-			Longitude:    54.801510,
-			Description:  "A young pine tree",
-			PlantingYear: 2023,
-			Readonly:     true,
-		},
-	}
 }

@@ -88,7 +88,6 @@ type TreeClusterService interface {
 	Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
 	Delete(ctx context.Context, id int32) error
 }
-
 type GeoClusterLocator interface {
 	UpdateCluster(ctx context.Context, clusterID *int32) error
 }
