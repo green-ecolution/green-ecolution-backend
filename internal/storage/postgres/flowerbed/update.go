@@ -2,6 +2,7 @@ package flowerbed
 
 import (
 	"context"
+	"reflect"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -14,8 +15,14 @@ func (r *FlowerbedRepository) Update(ctx context.Context, id int32, fFn ...entit
 		return nil, r.store.HandleError(err)
 	}
 
+	original := *prev
+
 	for _, fn := range fFn {
 		fn(prev)
+	}
+
+	if reflect.DeepEqual(original, *prev) {
+		return prev, nil
 	}
 
 	err = r.updateEntity(ctx, prev)
@@ -26,7 +33,7 @@ func (r *FlowerbedRepository) Update(ctx context.Context, id int32, fFn ...entit
 	return r.GetByID(ctx, id)
 }
 
-func (r *FlowerbedRepository) UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {
+func (r *FlowerbedRepository) UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {	
 	f, err := r.Update(ctx, id, fFn...)
 	if err != nil {
 		return nil, err
@@ -40,9 +47,14 @@ func (r *FlowerbedRepository) UpdateWithImages(ctx context.Context, id int32, fF
 }
 
 func (r *FlowerbedRepository) updateEntity(ctx context.Context, f *entities.Flowerbed) error {
+	var sensorID *int32
+	if f.Sensor != nil {
+		sensorID = &f.Sensor.ID
+	}
+
 	args := sqlc.UpdateFlowerbedParams{
 		ID:             f.ID,
-		SensorID:       &f.Sensor.ID,
+		SensorID:       sensorID,
 		Size:           f.Size,
 		Description:    f.Description,
 		NumberOfPlants: f.NumberOfPlants,
@@ -57,8 +69,15 @@ func (r *FlowerbedRepository) updateEntity(ctx context.Context, f *entities.Flow
 }
 
 func (r *FlowerbedRepository) updateImages(ctx context.Context, f *entities.Flowerbed) error {
-	if err := r.UnlinkAllImages(ctx, f.ID); err != nil {
+	images, err := r.GetAllImagesByID(ctx, f.ID)
+	if err != nil {
 		return err
+	}
+
+	if (len(images) > 0) {
+		if err := r.UnlinkAllImages(ctx, f.ID); err != nil {
+			return err
+		}
 	}
 
 	for _, img := range f.Images {
