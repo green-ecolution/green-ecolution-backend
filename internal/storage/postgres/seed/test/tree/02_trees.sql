@@ -21,9 +21,11 @@ ALTER SEQUENCE sensors_id_seq RESTART WITH 5;
 INSERT INTO images (id, url, filename, mime_type)
 VALUES
     (1, 'example/image1.jpg', 'image1.jpg', 'image/jpeg'),
-    (2, 'example/image2.jpg', 'image2.jpg', 'image/jpeg');
+    (2, 'example/image2.jpg', 'image2.jpg', 'image/jpeg'),
+    (3, 'example/tree01_A.jpg', 'tree01_A.jpg', 'image/jpeg'),
+    (4, 'example/tree02_A.jpg', 'tree02_A.jpg', 'image/jpeg');
 
-ALTER SEQUENCE images_id_seq RESTART WITH 3;
+ALTER SEQUENCE images_id_seq RESTART WITH 5;
 
 INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, tree_number, latitude, longitude, geometry, readonly, watering_status, description)
 VALUES

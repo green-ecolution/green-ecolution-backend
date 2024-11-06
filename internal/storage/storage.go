@@ -87,6 +87,7 @@ type TreeRepository interface {
 	GetTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error)
 
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+	UpdateTreeClusterID(ctx context.Context, treeIDs []int32, treeClusterID *int32) error
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
