@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
@@ -164,6 +165,44 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
+	t.Run("should remove session successfully", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+		userRepo := NewUserRepository(identityConfig)
+		token := loginAdminAndGetToken(t)
+
+		// when
+		err := userRepo.RemoveSession(context.Background(), token.RefreshToken)
+
+		// then
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error when failed to remove session", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+		userRepo := NewUserRepository(identityConfig)
+
+		// when
+		err := userRepo.RemoveSession(context.Background(), "invalid-token")
+
+		// then
+		assert.Error(t, err)
+	})
+}
+
+func loginAdminAndGetToken(t testing.TB) *gocloak.JWT {
+	t.Helper()
+  identityConfig := suite.IdentityConfig(t, context.Background())
+	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
+	token, err := client.Login(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm, suite.User, suite.Password)
+	if err != nil {
+		t.Fatalf("failed to get token: %v", err)
+	}
+	return token
 }
 
 func testUserToCreateFunc() []*entities.User {
