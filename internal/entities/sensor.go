@@ -26,11 +26,11 @@ type SensorData struct {
 }
 
 type SensorCreate struct {
-	Status    SensorStatus
-	Data      []*SensorData
+	Status SensorStatus
+	Data   []*SensorData
 }
 
 type SensorUpdate struct {
-	Status    SensorStatus
-	Data      []*SensorData
+	Status SensorStatus
+	Data   []*SensorData
 }

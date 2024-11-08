@@ -11,8 +11,8 @@ import (
 )
 
 type SensorService struct {
-	sensorRepo storage.SensorRepository
-	treeRepo storage.TreeRepository
+	sensorRepo    storage.SensorRepository
+	treeRepo      storage.TreeRepository
 	flowerbedRepo storage.FlowerbedRepository
 }
 
@@ -22,8 +22,8 @@ func NewSensorService(
 	flowerbedRepo storage.FlowerbedRepository,
 ) service.SensorService {
 	return &SensorService{
-		sensorRepo: sensorRepo,
-		treeRepo: treeRepo,
+		sensorRepo:    sensorRepo,
+		treeRepo:      treeRepo,
 		flowerbedRepo: flowerbedRepo,
 	}
 }

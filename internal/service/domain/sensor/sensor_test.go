@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-
 func TestSensorService_GetAll(t *testing.T) {
 	t.Run("should return all sensor", func(t *testing.T) {
 		// given
@@ -90,7 +89,7 @@ func TestSensorService_GetByID(t *testing.T) {
 func TestSensorService_Create(t *testing.T) {
 	newSensor := &entities.SensorCreate{
 		Status: entities.SensorStatusOnline,
-		Data: sensorUtils.TestSensor.Data,
+		Data:   sensorUtils.TestSensor.Data,
 	}
 
 	t.Run("should successfully create a new sensor", func(t *testing.T) {
@@ -121,7 +120,7 @@ func TestSensorService_Create(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
-		newSensor.Data = []*entities.SensorData{};
+		newSensor.Data = []*entities.SensorData{}
 
 		sensorRepo.EXPECT().Create(
 			context.Background(),
@@ -144,7 +143,7 @@ func TestSensorService_Create(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
-		newSensor.Status = "";
+		newSensor.Status = ""
 
 		sensorRepo.EXPECT().Create(
 			context.Background(),
@@ -186,7 +185,7 @@ func TestSensorService_Create(t *testing.T) {
 func TestSensorService_Update(t *testing.T) {
 	updateSensor := &entities.SensorUpdate{
 		Status: entities.SensorStatusOnline,
-		Data: sensorUtils.TestSensor.Data,
+		Data:   sensorUtils.TestSensor.Data,
 	}
 
 	t.Run("should successfully update a sensor", func(t *testing.T) {
