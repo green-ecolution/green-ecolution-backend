@@ -5,10 +5,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 
@@ -81,6 +83,179 @@ func TestSensorService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, sensor)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+}
+
+func TestSensorService_Create(t *testing.T) {
+	newSensor := &entities.SensorCreate{
+		Status: entities.SensorStatusOnline,
+		Data: sensorUtils.TestSensor.Data,
+	}
+
+	t.Run("should successfully create a new sensor", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		sensorRepo.EXPECT().Create(
+			context.Background(),
+			mock.Anything,
+			mock.Anything,
+		).Return(sensorUtils.TestSensor, nil)
+
+		// when
+		result, err := svc.Create(context.Background(), newSensor)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, sensorUtils.TestSensor, result)
+	})
+
+	t.Run("should successfully create a new sensor without data", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		newSensor.Data = []*entities.SensorData{};
+
+		sensorRepo.EXPECT().Create(
+			context.Background(),
+			mock.Anything,
+			mock.Anything,
+		).Return(sensorUtils.TestSensor, nil)
+
+		// when
+		result, err := svc.Create(context.Background(), newSensor)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, sensorUtils.TestSensor, result)
+	})
+
+	t.Run("should successfully create a new sensor without status", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		newSensor.Status = "";
+
+		sensorRepo.EXPECT().Create(
+			context.Background(),
+			mock.Anything,
+			mock.Anything,
+		).Return(sensorUtils.TestSensor, nil)
+
+		// when
+		result, err := svc.Create(context.Background(), newSensor)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, sensorUtils.TestSensor, result)
+	})
+
+	t.Run("should return an error when createing sensor fails", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		expectedErr := errors.New("Failed to create sensor")
+
+		sensorRepo.EXPECT().Create(
+			context.Background(),
+			mock.Anything,
+			mock.Anything,
+		).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Create(context.Background(), newSensor)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+}
+
+func TestSensorService_Update(t *testing.T) {
+	updateSensor := &entities.SensorUpdate{
+		Status: entities.SensorStatusOnline,
+		Data: sensorUtils.TestSensor.Data,
+	}
+
+	t.Run("should successfully update a sensor", func(t *testing.T) {
+		// given
+		id := int32(1)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+
+		sensorRepo.EXPECT().Update(
+			context.Background(),
+			id,
+			mock.Anything,
+			mock.Anything,
+		).Return(sensorUtils.TestSensor, nil)
+
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, sensorUtils.TestSensor, result)
+	})
+
+	t.Run("should return an error when sensor ID does not exist", func(t *testing.T) {
+		// given
+		id := int32(99)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		expectedErr := errors.New("failed to update cluster")
+
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+
+	t.Run("should return an error when the update fails", func(t *testing.T) {
+		// given
+		id := int32(1)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		expectedErr := errors.New("failed to update cluster")
+
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+
+		sensorRepo.EXPECT().Update(
+			context.Background(),
+			id,
+			mock.Anything,
+			mock.Anything,
+		).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
+
+		// then
+		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
 }

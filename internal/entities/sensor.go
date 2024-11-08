@@ -24,3 +24,13 @@ type SensorData struct {
 	UpdatedAt time.Time
 	Data      *MqttPayload
 }
+
+type SensorCreate struct {
+	Status    SensorStatus
+	Data      []*SensorData
+}
+
+type SensorUpdate struct {
+	Status    SensorStatus
+	Data      []*SensorData
+}

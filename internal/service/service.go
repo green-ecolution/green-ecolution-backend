@@ -96,6 +96,8 @@ type SensorService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.Sensor, error)
 	GetByID(ctx context.Context, id int32) (*domain.Sensor, error)
+	Create(ctx context.Context, sn *domain.SensorCreate) (*domain.Sensor, error)
+	Update(ctx context.Context, id int32, sn *domain.SensorUpdate) (*domain.Sensor, error)
 	Delete(ctx context.Context, id int32) error
 }
 
