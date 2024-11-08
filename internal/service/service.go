@@ -62,9 +62,7 @@ type MqttService interface {
 }
 
 type TreeService interface {
-	Service
-	BasicCrudService(domain.Tree, domain.TreeCreate, domain.TreeUpdate)
-
+	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
 }
 
@@ -86,7 +84,7 @@ type RegionService interface {
 
 type TreeClusterService interface {
 	Service
-	BasicCrudService(domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate)
+	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
 }
 
 type GeoClusterLocator interface {
@@ -94,8 +92,12 @@ type GeoClusterLocator interface {
 }
 
 type SensorService interface {
+	CrudService[domain.Sensor, domain.SensorCreate, domain.SensorUpdate]
+}
+
+type CrudService[T any, CreateType any, UpdateType any] interface {
 	Service
-	BasicCrudService(domain.Sensor, domain.SensorCreate, domain.SensorUpdate)
+	BasicCrudService[T, CreateType, UpdateType]
 }
 
 type VehicleService interface {
