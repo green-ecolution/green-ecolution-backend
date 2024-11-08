@@ -160,7 +160,7 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 // @Id				delete-sensor
 // @Tags			Sensor
 // @Produce		json
-// @Success		200
+// @Success		204
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
@@ -169,10 +169,21 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 // @Router			/v1/sensor/{sensor_id} [delete]
 // @Param			sensor_id	path	string	true	"Sensor ID"
 // @Security		Keycloak
-func DeleteSensor(_ service.Service) fiber.Handler {
+func DeleteSensor(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			err = service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		err = svc.Delete(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 

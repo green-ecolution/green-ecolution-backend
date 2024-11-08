@@ -89,6 +89,11 @@ func TestRegisterRoutes(t *testing.T) {
 			app := fiber.New()
 			RegisterRoutes(app, mockSensorService)
 
+			mockSensorService.EXPECT().Delete(
+				mock.Anything,
+				int32(1),
+			).Return(nil)
+
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
 
@@ -96,7 +101,7 @@ func TestRegisterRoutes(t *testing.T) {
 			resp, err := app.Test(req)
 			defer resp.Body.Close()
 			assert.NoError(t, err)
-			assert.Equal(t, http.StatusNotImplemented, resp.StatusCode)
+			assert.Equal(t, http.StatusNoContent, resp.StatusCode)
 		})
 	})
 

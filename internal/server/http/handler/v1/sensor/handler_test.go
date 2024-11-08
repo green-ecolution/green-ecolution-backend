@@ -11,6 +11,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -132,5 +133,134 @@ func TestGetSensorById(t *testing.T) {
 		assert.Equal(t, entities.SensorStatus(response.Status), entities.SensorStatus(TestSensor.Status))
 		// TODO: compare data
 		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 Bad Request for invalid sensor ID", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := GetSensorByID(mockSensorService)
+		app.Get("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 Not Found if sensor does not exist", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := GetSensorByID(mockSensorService)
+
+		mockSensorService.EXPECT().GetByID(
+			mock.Anything,
+			int32(999),
+		).Return(nil, storage.ErrSensorNotFound)
+
+		app.Get("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/999", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := GetSensorByID(mockSensorService)
+
+		mockSensorService.EXPECT().GetByID(
+			mock.Anything,
+			int32(1),
+		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+
+		app.Get("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockSensorService.AssertExpectations(t)
+	})
+}
+
+func TestDeleteSensor(t *testing.T) {
+	t.Run("should delete sensor successfully", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := DeleteSensor(mockSensorService)
+
+		mockSensorService.EXPECT().Delete(
+			mock.Anything,
+			int32(1),
+		).Return(nil)
+
+		app.Delete("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+		
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := DeleteSensor(mockSensorService)
+
+		app.Delete("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+		
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 for non-existing sensor", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := DeleteSensor(mockSensorService)
+
+		mockSensorService.EXPECT().Delete(
+			mock.Anything,
+			int32(999),
+		).Return(storage.ErrSensorNotFound)
+
+		app.Delete("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/999", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+		
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 	})
 }
