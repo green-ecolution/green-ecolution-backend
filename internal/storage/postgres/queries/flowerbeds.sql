@@ -32,6 +32,9 @@ DELETE FROM flowerbed_images WHERE flowerbed_id = $1 RETURNING flowerbed_id;
 -- name: UnlinkSensorIDFromFlowerbeds :exec
 UPDATE flowerbeds SET sensor_id = NULL WHERE sensor_id = $1;
 
+-- name: UnlinkSensorIDFromFlowerbeds :exec
+UPDATE flowerbeds SET sensor_id = NULL WHERE sensor_id = $1;
+
 -- name: UpdateFlowerbed :exec
 UPDATE flowerbeds SET
   sensor_id = $2,
