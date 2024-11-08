@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -95,6 +96,41 @@ func TestGetAllSensors(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
+		mockSensorService.AssertExpectations(t)
+	})
+}
+
+func TestGetSensorById(t *testing.T) {
+	t.Run("should return sensor by id successfully", func(t *testing.T) {
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		app := fiber.New()
+		handler := GetSensorByID(mockSensorService)
+
+		mockSensorService.EXPECT().GetByID(
+			mock.Anything,
+			int32(1),
+		).Return(TestSensor, nil)
+
+		app.Get("/v1/sensor/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.SensorResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, response.ID, TestSensor.ID)
+		assert.WithinDuration(t, response.CreatedAt, TestSensor.CreatedAt, time.Second)
+        assert.WithinDuration(t, response.UpdatedAt, TestSensor.UpdatedAt, time.Second)
+		assert.Equal(t, entities.SensorStatus(response.Status), entities.SensorStatus(TestSensor.Status))
+		// TODO: compare data
 		mockSensorService.AssertExpectations(t)
 	})
 }

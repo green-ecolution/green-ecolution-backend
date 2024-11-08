@@ -1,6 +1,8 @@
 package sensor
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -63,10 +65,24 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 // @Router			/v1/sensor/{sensor_id} [get]
 // @Param			sensor_id	path	string	true	"Sensor ID"
 // @Security		Keycloak
-func GetSensorByID(_ service.Service) fiber.Handler {
+func GetSensorByID(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, err := svc.GetByID(ctx, int32(id))
+
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapToDto(domainData)
+
+		return c.JSON(data)
 	}
 }
 
