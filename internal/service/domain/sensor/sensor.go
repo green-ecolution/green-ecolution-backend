@@ -36,6 +36,15 @@ func (s *SensorService) GetAll(ctx context.Context) ([]*entities.Sensor, error) 
 	return sensors, nil
 }
 
+func (s *SensorService) GetByID(ctx context.Context, id int32) (*entities.Sensor, error) {
+	sensor, err := s.sensorRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return sensor, nil
+}
+
 func (s *SensorService) Delete(ctx context.Context, id int32) error {
 	_, err := s.sensorRepo.GetByID(ctx, id)
 	if err != nil {

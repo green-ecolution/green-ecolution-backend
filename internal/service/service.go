@@ -95,6 +95,7 @@ type GeoClusterLocator interface {
 type SensorService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.Sensor, error)
+	GetByID(ctx context.Context, id int32) (*domain.Sensor, error)
 	Delete(ctx context.Context, id int32) error
 }
 

@@ -45,6 +45,46 @@ func TestSensorService_GetAll(t *testing.T) {
 	})
 }
 
+func TestSensorService_GetByID(t *testing.T) {
+	t.Run("should return sensor when found", func(t *testing.T) {
+		// given
+		id := int32(1)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+
+		// when
+		sensor, err := svc.GetByID(context.Background(), id)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, sensorUtils.TestSensor, sensor)
+	})
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		// given
+		id := int32(1)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		expectedErr := storage.ErrEntityNotFound
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(nil, expectedErr)
+
+		// when
+		sensor, err := svc.GetByID(context.Background(), id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, sensor)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+}
+
 func TestSensorService_Delete(t *testing.T) {
 	ctx := context.Background()
 
@@ -67,6 +107,7 @@ func TestSensorService_Delete(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 	})
+
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		// given
 		id := int32(1)
