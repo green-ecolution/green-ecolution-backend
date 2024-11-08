@@ -38,16 +38,16 @@ func (s *SensorService) GetAll(ctx context.Context) ([]*entities.Sensor, error) 
 }
 
 func (s *SensorService) GetByID(ctx context.Context, id int32) (*entities.Sensor, error) {
-	sensor, err := s.sensorRepo.GetByID(ctx, id)
+	get, err := s.sensorRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return sensor, nil
+	return get, nil
 }
 
 func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (*entities.Sensor, error) {
-	sensor, err := s.sensorRepo.Create(ctx,
+	created, err := s.sensorRepo.Create(ctx,
 		sensor.WithData(sc.Data),
 		sensor.WithStatus(sc.Status),
 	)
@@ -56,7 +56,7 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		return nil, handleError(err)
 	}
 
-	return sensor, nil
+	return created, nil
 }
 
 func (s *SensorService) Update(ctx context.Context, id int32, su *entities.SensorUpdate) (*entities.Sensor, error) {
@@ -65,7 +65,7 @@ func (s *SensorService) Update(ctx context.Context, id int32, su *entities.Senso
 		return nil, handleError(err)
 	}
 
-	sensor, err := s.sensorRepo.Update(ctx, id,
+	updated, err := s.sensorRepo.Update(ctx, id,
 		sensor.WithData(su.Data),
 		sensor.WithStatus(su.Status),
 	)
@@ -73,7 +73,7 @@ func (s *SensorService) Update(ctx context.Context, id int32, su *entities.Senso
 		return nil, handleError(err)
 	}
 
-	return sensor, nil
+	return updated, nil
 }
 
 func (s *SensorService) Delete(ctx context.Context, id int32) error {
