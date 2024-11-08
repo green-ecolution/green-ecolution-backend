@@ -75,7 +75,7 @@ DELETE FROM trees WHERE id = $1;
 -- name: UnlinkTreeClusterID :exec
 UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
 
--- name: UnlinkSensorID :exec
+-- name: UnlinkSensorIDFromTrees :exec
 UPDATE trees SET sensor_id = NULL WHERE sensor_id = $1;
 
 -- name: CalculateGroupedCentroids :one
