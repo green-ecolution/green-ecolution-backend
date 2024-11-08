@@ -154,7 +154,7 @@ func TestFlowerbedRepository_GetByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetByID(ctx, 1)
+		got, err := r.GetByID(ctx, 0)
 
 		// then
 		assert.Error(t, err)
