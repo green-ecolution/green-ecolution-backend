@@ -126,23 +126,10 @@ func GetSensorDataByID(_ service.Service) fiber.Handler {
 // @Router			/v1/sensor/ [post]
 // @Security		Keycloak
 // @Param			body	body	entities.SensorCreateRequest	true	"Sensor to create"
-func CreateSensor(svc service.SensorService) fiber.Handler {
+func CreateSensor(_ service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-
-		var req entities.SensorCreateRequest
-		if err := c.BodyParser(&req); err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, err.Error())
-		}
-
-		domainReq := sensorMapper.FromCreateRequest(&req)
-		domainData, err := svc.Create(ctx, domainReq)
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		data := mapToDto(domainData)
-		return c.Status(fiber.StatusCreated).JSON(data)
+		// TODO: Implement
+		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 

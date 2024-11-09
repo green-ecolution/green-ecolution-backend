@@ -13,8 +13,6 @@ import (
 type SensorHTTPMapper interface {
 	// goverter:ignore Type
 	FromResponse(src *domain.Sensor) *entities.SensorResponse
-	FromCreateRequest(*entities.SensorCreateRequest) *domain.SensorCreate
-	FromUpdateRequest(*entities.SensorUpdateRequest) *domain.SensorUpdate
 }
 
 func MapSensorData(src []byte) (*domain.MqttPayload, error) {
