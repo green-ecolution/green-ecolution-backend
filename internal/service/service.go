@@ -64,6 +64,7 @@ type MqttService interface {
 type TreeService interface {
 	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
+	GetBySensorID(ctx context.Context, id int32) (*domain.Tree, error)
 }
 
 type AuthService interface {

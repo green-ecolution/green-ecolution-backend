@@ -4,6 +4,9 @@ SELECT * FROM trees;
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
 
+-- name: GetTreeBySensorID :one
+SELECT * FROM trees WHERE sensor_id = $1;
+
 -- name: GetTreesByIDs :many
 SELECT * FROM trees WHERE id = ANY($1::int[]);
 
