@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -69,21 +70,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("id"))
-		if err != nil {
-			err = service.NewError(service.BadRequest, "invalid ID format")
-			return errorhandler.HandleError(err)
-		}
-
-		domainData, err := svc.GetByID(ctx, int32(id))
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		data := mapTreeToDto(domainData)
-
-		return c.JSON(data)
+		return getTreeByField(c, "id", svc.GetByID)
 	}
 }
 
@@ -103,21 +90,7 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Security		Keycloak
 func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("sensor_id"))
-		if err != nil {
-			err = service.NewError(service.BadRequest, "invalid ID format")
-			return errorhandler.HandleError(err)
-		}
-
-		domainData, err := svc.GetBySensorID(ctx, int32(id))
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		data := mapTreeToDto(domainData)
-
-		return c.JSON(data)
+		return getTreeByField(c, "sensor_id", svc.GetBySensorID)
 	}
 }
 
@@ -360,4 +333,24 @@ func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
 	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
 
 	return dto
+}
+
+func getTreeByField(c *fiber.Ctx, field string, fetchFunc func(ctx context.Context, id int32) (*domain.Tree, error)) error {
+	ctx := c.Context()
+	idStr := c.Params(field)
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		err = service.NewError(service.BadRequest, "invalid ID format")
+		return errorhandler.HandleError(err)
+	}
+
+	domainData, err := fetchFunc(ctx, int32(id))
+	if err != nil {
+		return errorhandler.HandleError(err)
+	}
+
+	data := mapTreeToDto(domainData)
+
+	return c.JSON(data)
 }

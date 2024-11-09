@@ -86,14 +86,14 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService := serviceMock.NewMockTreeService(t)
 		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
 
-		sensorId := int32(1)
+		sensorID := int32(1)
 		mockTreeService.EXPECT().GetBySensorID(
 			mock.Anything,
-			sensorId,
+			sensorID,
 		).Return(TestTrees[0], nil)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+strconv.Itoa(int(sensorId)), nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+strconv.Itoa(int(sensorID)), nil)
 		req.Header.Set("Content-Type", "application/json")
 		resp, _ := app.Test(req, -1)
 		defer resp.Body.Close()
@@ -123,7 +123,7 @@ func TestGetTreeBySensorID(t *testing.T) {
 		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
 
 		mockTreeService.EXPECT().GetBySensorID(
-			mock.Anything, 
+			mock.Anything,
 			int32(999),
 		).Return(nil, storage.ErrTreeNotFound)
 
@@ -141,13 +141,13 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService := serviceMock.NewMockTreeService(t)
 		app.Get("/v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
 
-		sensorId := int32(1)
+		sensorID := int32(1)
 		mockTreeService.EXPECT().GetBySensorID(
-			mock.Anything, 
-			sensorId,
+			mock.Anything,
+			sensorID,
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
-		
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+strconv.Itoa(int(sensorId)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+strconv.Itoa(int(sensorID)), nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -303,8 +303,8 @@ func TestUpdateTree(t *testing.T) {
 
 		treeID := int32(999)
 		mockTreeService.EXPECT().Update(
-			mock.Anything, 
-			treeID, 
+			mock.Anything,
+			treeID,
 			mock.AnythingOfType("*entities.TreeUpdate"),
 		).Return(nil, storage.ErrTreeNotFound)
 
@@ -329,8 +329,8 @@ func TestUpdateTree(t *testing.T) {
 
 		treeID := int32(1)
 		mockTreeService.EXPECT().Update(
-			mock.Anything, 
-			treeID, 
+			mock.Anything,
+			treeID,
 			mock.AnythingOfType("*entities.TreeUpdate"),
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "server error"))
 
@@ -356,7 +356,7 @@ func TestDeleteTree(t *testing.T) {
 		treeID := int32(1)
 
 		mockTreeService.EXPECT().Delete(
-			mock.Anything, 
+			mock.Anything,
 			treeID,
 		).Return(nil)
 
@@ -415,7 +415,7 @@ func TestDeleteTree(t *testing.T) {
 
 		treeID := int32(1)
 		mockTreeService.EXPECT().Delete(
-			mock.Anything, 
+			mock.Anything,
 			treeID,
 		).Return(fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
