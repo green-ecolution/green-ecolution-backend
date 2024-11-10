@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,14 +18,14 @@ func TestSensorRepository_Create(t *testing.T) {
 		// when
 		got, err := r.Create(
 			context.Background(),
-			WithStatus(sensorUtils.TestSensor.Status),
-			WithData(sensorUtils.TestSensor.Data),
+			WithStatus(getTestSensors()[0].Status),
+			WithData(getTestSensors()[0].Data),
 		)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
-		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
+		assert.Equal(t, getTestSensors()[0].Status, got.Status)
 		assert.NotZero(t, got.ID)
 	})
 
@@ -76,7 +75,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		data := []*entities.SensorData{
 			{
 				ID:   1,
-				Data: sensorUtils.TestMqttPayload,
+				Data: getTestSensors()[0].Data[0].Data,
 			},
 		}
 

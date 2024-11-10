@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,10 +24,10 @@ func TestSensorRepository_GetAll(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, len(sensorUtils.TestSensorList), len(got))
+		assert.Equal(t, len(getTestSensors()), len(got))
 		for i, sensor := range got {
-			assert.Equal(t, sensorUtils.TestSensorList[i].ID, sensor.ID)
-			assert.Equal(t, sensorUtils.TestSensorList[i].Status, sensor.Status)
+			assert.Equal(t, getTestSensors()[i].ID, sensor.ID)
+			assert.Equal(t, getTestSensors()[i].Status, sensor.Status)
 			assert.NotZero(t, sensor.CreatedAt)
 			assert.NotZero(t, sensor.UpdatedAt)
 		}
@@ -74,8 +74,8 @@ func TestSensorRepository_GetByID(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor.ID, got.ID)
-		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
+		assert.Equal(t, getTestSensors()[0].ID, got.ID)
+		assert.Equal(t, getTestSensors()[0].Status, got.Status)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 	})
@@ -150,7 +150,7 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor.Status, *got)
+		assert.Equal(t, getTestSensors()[0].Status, *got)
 	})
 
 	t.Run("should return error when sensor not found", func(t *testing.T) {
@@ -219,13 +219,13 @@ func TestSensorRepository_GetSensorByStatus(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetSensorByStatus(ctx, &sensorUtils.TestSensor.Status)
+		got, err := r.GetSensorByStatus(ctx, &getTestSensors()[0].Status)
 
 		// then
 		assert.NoError(t, err)
 		assert.Len(t, got, 1)
-		assert.Equal(t, sensorUtils.TestSensor.ID, got[0].ID)
-		assert.Equal(t, sensorUtils.TestSensor.Status, got[0].Status)
+		assert.Equal(t, getTestSensors()[0].ID, got[0].ID)
+		assert.Equal(t, getTestSensors()[0].Status, got[0].Status)
 	})
 
 	t.Run("should return empty slice when no sensors match status", func(t *testing.T) {
@@ -264,7 +264,7 @@ func TestSensorRepository_GetSensorByStatus(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetSensorByStatus(ctx, &sensorUtils.TestSensor.Status)
+		got, err := r.GetSensorByStatus(ctx, &getTestSensors()[0].Status)
 
 		// then
 		assert.Error(t, err)
@@ -320,4 +320,70 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
+}
+
+func getTestSensors() []*entities.Sensor {
+	testDate := time.Date(2023, time.November, 10, 10, 0, 0, 0, time.UTC)
+
+	return []*entities.Sensor{
+		{
+			ID:        1,
+			CreatedAt: testDate,
+			UpdatedAt: testDate,
+			Status:    entities.SensorStatusOnline,
+			Data: []*entities.SensorData{
+				{
+					ID:        101,
+					CreatedAt: testDate,
+					UpdatedAt: testDate,
+					Data: &entities.MqttPayload{
+						EndDeviceIDs: entities.MqttIdentifierDeviceID{
+							DeviceID: "Device123",
+							ApplicationIDs: entities.MqttIdentifierApplicationID{
+								ApplicationID: "AppID123",
+							},
+							DevEUI:  "00-14-22-01-23-45",
+							JoinEUI: "00-15-33-02-34-56",
+						},
+						CorrelationIDs: []string{"corrID1", "corrID2"},
+						ReceivedAt:     &testDate,
+						UplinkMessage: entities.MqttUplinkMessage{
+							SessionKeyID:   "sessionKey1",
+							FPort:          1,
+							Fcnt:           10,
+							FRMPayload:     "payloadData",
+							DecodedPayload: entities.MqttDecodedPayload{Battery: 85.0, Humidity: 55, Raw: 123},
+							RxMetadata: []entities.MqttRxMetadata{
+								{
+									GatewayIDs: entities.MqttRxMetadataGatewayIDs{
+										GatewayID: "Gateway123",
+									},
+									Rssi:        -45,
+									ChannelRssi: -42,
+									Snr:         9.5,
+									Location: entities.MqttLocation{
+										Latitude:  52.5200,
+										Longitude: 13.4050,
+										Altitude:  34.0,
+									},
+								},
+							},
+							Settings: entities.MqttUplinkSettings{
+								DataRate: entities.MqttUplinkSettingsDataRate{
+									Lora: entities.MqttUplinkSettingsLora{
+										Bandwidth:       125,
+										SpreadingFactor: 7,
+										CodingRate:      "4/5",
+									},
+								},
+								Frequency: "868100000",
+							},
+							Confirmed:       true,
+							ConsumedAirtime: "0.123s",
+						},
+					},
+				},
+			},
+		},
+	}
 }
