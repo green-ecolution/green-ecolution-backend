@@ -1,4 +1,4 @@
-package sensor
+package sensor_test
 
 import (
 	"time"

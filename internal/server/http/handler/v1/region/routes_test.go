@@ -1,4 +1,4 @@
-package region
+package region_test
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -15,7 +16,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/region", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
-			app := RegisterRoutes(mockRegionService)
+			app := region.RegisterRoutes(mockRegionService)
 
 			expectedRegions := []*entities.Region{
 				{ID: 1, Name: "Region A"},
@@ -40,7 +41,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/region/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
-			app := RegisterRoutes(mockRegionService)
+			app := region.RegisterRoutes(mockRegionService)
 
 			mockRegionService.EXPECT().GetByID(
 				mock.Anything,
