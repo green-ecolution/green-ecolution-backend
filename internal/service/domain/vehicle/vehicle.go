@@ -7,6 +7,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
 )
 
 type VehicleService struct {
@@ -44,6 +45,42 @@ func (v *VehicleService) GetByPlate(ctx context.Context, plate string) (*entitie
 	}
 
 	return vehicle, nil
+}
+
+func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate) (*entities.Vehicle, error) {
+	created, err := v.vehicleRepo.Create(ctx,
+		vehicle.WithNumberPlate(vh.NumberPlate),
+		vehicle.WithDescription(vh.Description),
+		vehicle.WithWaterCapacity(vh.WaterCapacity),
+		vehicle.WithVehicleStatus(vh.Status),
+		vehicle.WithVehicleType(vh.Type),
+	)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return created, nil
+}
+
+func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.VehicleUpdate) (*entities.Vehicle, error) {
+	_, err := v.vehicleRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	updated, err := v.vehicleRepo.Update(ctx,
+		id,
+		vehicle.WithNumberPlate(vh.NumberPlate),
+		vehicle.WithDescription(vh.Description),
+		vehicle.WithWaterCapacity(vh.WaterCapacity),
+		vehicle.WithVehicleStatus(vh.Status),
+		vehicle.WithVehicleType(vh.Type),
+	)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return updated, nil
 }
 
 func (v *VehicleService) Delete(ctx context.Context, id int32) error {

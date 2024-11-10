@@ -31,3 +31,19 @@ type Vehicle struct {
 	Status        VehicleStatus
 	Type          VehicleType
 }
+
+type VehicleCreate struct {
+	NumberPlate   string
+	Description   string
+	WaterCapacity float64
+	Status        VehicleStatus
+	Type          VehicleType
+}
+
+type VehicleUpdate struct {
+	NumberPlate   string
+	Description   string
+	WaterCapacity float64
+	Status        VehicleStatus
+	Type          VehicleType
+}
