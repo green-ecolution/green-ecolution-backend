@@ -141,9 +141,9 @@ func TestVehicleService_Create(t *testing.T) {
 	input := &entities.VehicleCreate{
 		NumberPlate:   "FL TBZ 123",
 		Description:   "Test description",
-		Status: entities.VehicleStatusActive,
-		Type:      entities.VehicleTypeTrailer,
-		WaterCapacity:     2000.5,
+		Status:        entities.VehicleStatusActive,
+		Type:          entities.VehicleTypeTrailer,
+		WaterCapacity: 2000.5,
 	}
 
 	t.Run("should successfully create a new vehicle", func(t *testing.T) {
@@ -199,9 +199,9 @@ func TestVehicleService_Update(t *testing.T) {
 	input := &entities.VehicleUpdate{
 		NumberPlate:   "FL TBZ 123",
 		Description:   "Test description",
-		Status: entities.VehicleStatusActive,
-		Type:      entities.VehicleTypeTrailer,
-		WaterCapacity:     2000.5,
+		Status:        entities.VehicleStatusActive,
+		Type:          entities.VehicleTypeTrailer,
+		WaterCapacity: 2000.5,
 	}
 
 	t.Run("should successfully update a vehicle", func(t *testing.T) {
@@ -368,9 +368,9 @@ func getTestVehicles() []*entities.Vehicle {
 			UpdatedAt:     now,
 			NumberPlate:   "FL TBZ 123",
 			Description:   "Test description",
-			Status: entities.VehicleStatusActive,
-			Type:      entities.VehicleTypeTrailer,
-			WaterCapacity:     2000.5,
+			Status:        entities.VehicleStatusActive,
+			Type:          entities.VehicleTypeTrailer,
+			WaterCapacity: 2000.5,
 		},
 		{
 			ID:            2,
@@ -378,9 +378,9 @@ func getTestVehicles() []*entities.Vehicle {
 			UpdatedAt:     now,
 			NumberPlate:   "FL TBZ 3456",
 			Description:   "Test description",
-			Status: entities.VehicleStatusNotAvailable,
-			Type:      entities.VehicleTypeTransporter,
-			WaterCapacity:     1000.5,
+			Status:        entities.VehicleStatusNotAvailable,
+			Type:          entities.VehicleTypeTransporter,
+			WaterCapacity: 1000.5,
 		},
 	}
 }

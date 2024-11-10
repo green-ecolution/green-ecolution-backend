@@ -62,7 +62,7 @@ func TestRegisterRoutes(t *testing.T) {
 			mockVehicleService.EXPECT().GetByID(
 				mock.Anything,
 				int32(1),
-			).Return(TestVehicle , nil)
+			).Return(TestVehicle, nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)

@@ -17,7 +17,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-
 func TestGetAllVehicles(t *testing.T) {
 	t.Run("should return all vehicles successfully", func(t *testing.T) {
 		app := fiber.New()
@@ -83,7 +82,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
@@ -199,7 +198,7 @@ func TestGetVehicleByPlate(t *testing.T) {
 		plate := "FL%20TBZ%201234"
 
 		mockVehicleService.EXPECT().GetByPlate(
-			mock.Anything, 
+			mock.Anything,
 			plate,
 		).Return(TestVehicle, nil)
 
@@ -245,7 +244,7 @@ func TestGetVehicleByPlate(t *testing.T) {
 		plate := "FL%20TBZ%201244"
 
 		mockVehicleService.EXPECT().GetByPlate(
-			mock.Anything, 
+			mock.Anything,
 			plate,
 		).Return(nil, storage.ErrVehicleNotFound)
 
@@ -493,7 +492,7 @@ func TestDeleteVehicle(t *testing.T) {
 
 		clusterID := 1
 		mockVehicleService.EXPECT().Delete(
-			mock.Anything, 
+			mock.Anything,
 			int32(clusterID),
 		).Return(nil)
 
@@ -535,7 +534,7 @@ func TestDeleteVehicle(t *testing.T) {
 
 		clusterID := 999
 		mockVehicleService.EXPECT().Delete(
-			mock.Anything, 
+			mock.Anything,
 			int32(clusterID),
 		).Return(storage.ErrVehicleNotFound)
 
