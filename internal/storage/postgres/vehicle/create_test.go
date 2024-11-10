@@ -14,6 +14,8 @@ func TestVehicleRepository_Create(t *testing.T) {
 		Description:   "Big car",
 		NumberPlate:   "FL ZU 9876",
 		WaterCapacity: 2000,
+		Type: entities.VehicleTypeTrailer,
+		Status: entities.VehicleStatusNotAvailable,
 	}
 
 	t.Run("should create vehicle", func(t *testing.T) {
@@ -26,6 +28,8 @@ func TestVehicleRepository_Create(t *testing.T) {
 			WithDescription(input.Description),
 			WithNumberPlate(input.NumberPlate),
 			WithWaterCapacity(input.WaterCapacity),
+			WithVehicleStatus(input.Status),
+			WithVehicleType(input.Type),
 		)
 
 		// then
@@ -34,9 +38,11 @@ func TestVehicleRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Description, got.Description)
 		assert.Equal(t, input.NumberPlate, got.NumberPlate)
 		assert.Equal(t, input.WaterCapacity, got.WaterCapacity)
+		assert.Equal(t, input.Type, got.Type)
+		assert.Equal(t, input.Status, got.Status)
 	})
 
-	t.Run("should create vehicle with no description", func(t *testing.T) {
+	t.Run("should create vehicle with no description, type and status", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
@@ -53,6 +59,8 @@ func TestVehicleRepository_Create(t *testing.T) {
 		assert.Equal(t, "", got.Description)
 		assert.Equal(t, input.NumberPlate, got.NumberPlate)
 		assert.Equal(t, input.WaterCapacity, got.WaterCapacity)
+		assert.Equal(t, entities.VehicleTypeUnknown, got.Type)
+		assert.Equal(t, entities.VehicleStatusUnknown, got.Status)
 	})
 
 	t.Run("should return error when create vehicle with zero water capacity", func(t *testing.T) {

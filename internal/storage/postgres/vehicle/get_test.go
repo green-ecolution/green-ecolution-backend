@@ -26,6 +26,8 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestVehicles[i].Description, vehicle.Description)
 			assert.Equal(t, allTestVehicles[i].NumberPlate, vehicle.NumberPlate)
 			assert.Equal(t, allTestVehicles[i].WaterCapacity, vehicle.WaterCapacity)
+			assert.Equal(t, allTestVehicles[i].Type, vehicle.Type)
+			assert.Equal(t, allTestVehicles[i].Status, vehicle.Status)
 			assert.NotZero(t, vehicle.CreatedAt)
 			assert.NotZero(t, vehicle.UpdatedAt)
 		}
@@ -77,6 +79,8 @@ func TestVehicleRepository_GetByID(t *testing.T) {
 		assert.Equal(t, shouldReturn.NumberPlate, got.NumberPlate)
 		assert.Equal(t, shouldReturn.Description, got.Description)
 		assert.Equal(t, shouldReturn.WaterCapacity, got.WaterCapacity)
+		assert.Equal(t, shouldReturn.Type, got.Type)
+		assert.Equal(t, shouldReturn.Status, got.Status)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 	})
@@ -173,6 +177,8 @@ func TestVehicleRepository_GetByPlate(t *testing.T) {
 			assert.Equal(t, tt.want.NumberPlate, got.NumberPlate)
 			assert.Equal(t, tt.want.Description, got.Description)
 			assert.Equal(t, tt.want.WaterCapacity, got.WaterCapacity)
+			assert.Equal(t, tt.want.Type, got.Type)
+			assert.Equal(t, tt.want.Status, got.Status)
 			assert.NotZero(t, got.CreatedAt)
 			assert.NotZero(t, got.UpdatedAt)
 		})
@@ -225,11 +231,15 @@ var allTestVehicles = []*entities.Vehicle{
 		NumberPlate:   "B-1234",
 		Description:   "Test vehicle 1",
 		WaterCapacity: 100.0,
+		Type: entities.VehicleTypeTrailer,
+		Status: entities.VehicleStatusActive,
 	},
 	{
 		ID:            2,
 		NumberPlate:   "B-5678",
 		Description:   "Test vehicle 2",
 		WaterCapacity: 150.0,
+		Type: entities.VehicleTypeTransporter,
+		Status: entities.VehicleStatusUnknown,
 	},
 }

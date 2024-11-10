@@ -55,6 +55,20 @@ func WithWaterCapacity(waterCapacity float64) entities.EntityFunc[entities.Vehic
 	}
 }
 
+func WithVehicleType(vehicleType entities.VehicleType) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating vehicle type", "vehicle type", vehicleType)
+		v.Type = vehicleType
+	}
+}
+
+func WithVehicleStatus(vehicleStatus entities.VehicleStatus) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating vehicle status", "vehicle status", vehicleStatus)
+		v.Status = vehicleStatus
+	}
+}
+
 func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
 	rowID, err := r.store.DeleteVehicle(ctx, id)
 	if err != nil {

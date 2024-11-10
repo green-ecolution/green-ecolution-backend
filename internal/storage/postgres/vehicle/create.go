@@ -13,6 +13,8 @@ func defaultVehicle() *entities.Vehicle {
 		NumberPlate:   "",
 		Description:   "",
 		WaterCapacity: 0,
+		Type: entities.VehicleTypeUnknown,
+		Status:  entities.VehicleStatusUnknown,
 	}
 }
 
@@ -44,6 +46,8 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 		NumberPlate:   entity.NumberPlate,
 		Description:   entity.Description,
 		WaterCapacity: entity.WaterCapacity,
+		Type: sqlc.VehicleType(entity.Type),
+		Status: sqlc.VehicleStatus(entity.Status),
 	}
 
 	id, err := r.store.CreateVehicle(ctx, &args)
