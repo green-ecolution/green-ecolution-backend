@@ -20,9 +20,8 @@ func (s *Server) middleware(
 	app.Use(middleware.RequestID())
 
 	initPublicRoutes(app)
-
-	app.Use(middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService))
 	initPrivateRoutes(app)
+	app.Use(middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService))
 
 	slog.Info("Fiber middlewares setup complete")
 
