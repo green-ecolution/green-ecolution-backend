@@ -195,6 +195,38 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 	}
 }
 
+// @Summary		Delete vehicle
+// @Description	Delete vehicle
+// @Id				delete-vehicle
+// @Tags			Vehicle
+// @Produce		json
+// @Success		204
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/{id} [delete]
+// @Param			id	path	string	true	"Vehicle ID"
+// @Security		Keycloak
+func DeleteVehicle(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		err = svc.Delete(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
+
 func mapVehicleToDto(v *domain.Vehicle) *entities.VehicleResponse {
 	dto := vehicleMapper.FormResponse(v)
 

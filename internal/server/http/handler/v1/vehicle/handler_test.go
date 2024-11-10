@@ -366,7 +366,7 @@ func TestUpdateVehicle(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := UpdateVehicle(mockVehicleService)
-		app.Put("/v1/vehicle/1", handler)
+		app.Put("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().Update(
 			mock.Anything,
@@ -377,7 +377,7 @@ func TestUpdateVehicle(t *testing.T) {
 		// when
 		body, _ := json.Marshal(TestVehicleRequest)
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/vehicle/1", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json") 
+		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -389,6 +389,164 @@ func TestUpdateVehicle(t *testing.T) {
 		err = json.NewDecoder(resp.Body).Decode(&response)
 		assert.NoError(t, err)
 		assert.Equal(t, TestVehicleRequest.NumberPlate, response.NumberPlate)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 Bad Request for invalid vehicle ID", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := UpdateVehicle(mockVehicleService)
+		app.Put("/v1/vehicle/:id", handler)
+
+		// when
+		body, _ := json.Marshal(TestVehicleRequest)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/vehicle/invalid-id", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := UpdateVehicle(mockVehicleService)
+		app.Put("/v1/vehicle/:id", handler)
+
+		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
+
+		// when
+		body, _ := json.Marshal(invalidRequestBody)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/vehicle/1", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 Not Found if cluster does not exist", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := UpdateVehicle(mockVehicleService)
+		app.Put("/v1/vehicle/:id", handler)
+
+		mockVehicleService.EXPECT().Update(
+			mock.Anything,
+			int32(1),
+			mock.Anything,
+		).Return(nil, storage.ErrVehicleNotFound)
+
+		// when
+		body, _ := json.Marshal(TestVehicleRequest)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/vehicle/1", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := UpdateVehicle(mockVehicleService)
+		app.Put("/v1/vehicle/:id", handler)
+
+		mockVehicleService.EXPECT().Update(
+			mock.Anything,
+			int32(1),
+			mock.Anything,
+		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+
+		// when
+		body, _ := json.Marshal(TestVehicleRequest)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/vehicle/1", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+}
+
+func TestDeleteVehicle(t *testing.T) {
+	t.Run("should delete vehicle successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := DeleteVehicle(mockVehicleService)
+		app.Delete("/v1/vehicle/:id", handler)
+
+		clusterID := 1
+		mockVehicleService.EXPECT().Delete(
+			mock.Anything, 
+			int32(clusterID),
+		).Return(nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/vehicle/1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := DeleteVehicle(mockVehicleService)
+		app.Delete("/v1/vehicle/:id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/vehicle/invalid-id", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return 404 for non-existing vehicle", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := DeleteVehicle(mockVehicleService)
+		app.Delete("/v1/vehicle/:id", handler)
+
+		clusterID := 999
+		mockVehicleService.EXPECT().Delete(
+			mock.Anything, 
+			int32(clusterID),
+		).Return(storage.ErrVehicleNotFound)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/vehicle/999", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 
 		mockVehicleService.AssertExpectations(t)
 	})

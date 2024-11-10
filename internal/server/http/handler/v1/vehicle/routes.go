@@ -13,6 +13,7 @@ func RegisterRoutes(svc service.VehicleService) *fiber.App {
 	app.Get("/plate/:plate", GetVehicleByPlate(svc))
 	app.Post("/", CreateVehicle(svc))
 	app.Put("/:id", UpdateVehicle(svc))
+	app.Delete("/:id", DeleteVehicle(svc))
 
 	return app
 }
