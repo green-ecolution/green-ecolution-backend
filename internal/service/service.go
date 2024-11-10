@@ -119,6 +119,7 @@ type Services struct {
 	RegionService      RegionService
 	TreeClusterService TreeClusterService
 	SensorService      SensorService
+	VehicleService     VehicleService
 }
 
 func (s *Services) AllServicesReady() bool {
