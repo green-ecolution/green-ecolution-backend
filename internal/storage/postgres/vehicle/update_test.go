@@ -16,8 +16,8 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		Description:   "Updated description",
 		NumberPlate:   "FL NEW 9876",
 		WaterCapacity: 10000,
-		Type: entities.VehicleTypeTransporter,
-		Status: entities.VehicleStatusAvailable,
+		Type:          entities.VehicleTypeTransporter,
+		Status:        entities.VehicleStatusAvailable,
 	}
 
 	t.Run("should update vehicle", func(t *testing.T) {

@@ -14,8 +14,8 @@ func TestVehicleRepository_Create(t *testing.T) {
 		Description:   "Big car",
 		NumberPlate:   "FL ZU 9876",
 		WaterCapacity: 2000,
-		Type: entities.VehicleTypeTrailer,
-		Status: entities.VehicleStatusNotAvailable,
+		Type:          entities.VehicleTypeTrailer,
+		Status:        entities.VehicleStatusNotAvailable,
 	}
 
 	t.Run("should create vehicle", func(t *testing.T) {

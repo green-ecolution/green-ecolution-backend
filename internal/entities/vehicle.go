@@ -7,18 +7,18 @@ import (
 type VehicleStatus string
 
 const (
-	VehicleStatusActive  VehicleStatus = "active"
-	VehicleStatusAvailable VehicleStatus = "available"
+	VehicleStatusActive       VehicleStatus = "active"
+	VehicleStatusAvailable    VehicleStatus = "available"
 	VehicleStatusNotAvailable VehicleStatus = "not available"
-	VehicleStatusUnknown VehicleStatus = "unknown"
+	VehicleStatusUnknown      VehicleStatus = "unknown"
 )
 
 type VehicleType string
 
 const (
-	VehicleTypeTransporter  VehicleType = "transporter"
-	VehicleTypeTrailer VehicleType = "trailer"
-	VehicleTypeUnknown VehicleType = "unknown"
+	VehicleTypeTransporter VehicleType = "transporter"
+	VehicleTypeTrailer     VehicleType = "trailer"
+	VehicleTypeUnknown     VehicleType = "unknown"
 )
 
 type Vehicle struct {
@@ -28,6 +28,6 @@ type Vehicle struct {
 	NumberPlate   string
 	Description   string
 	WaterCapacity float64
-	Status VehicleStatus
-	Type VehicleType
+	Status        VehicleStatus
+	Type          VehicleType
 }
