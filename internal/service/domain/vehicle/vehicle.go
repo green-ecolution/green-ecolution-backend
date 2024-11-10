@@ -30,21 +30,21 @@ func (v *VehicleService) GetAll(ctx context.Context) ([]*entities.Vehicle, error
 }
 
 func (v *VehicleService) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
-	vehicle, err := v.vehicleRepo.GetByID(ctx, id)
+	got, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return vehicle, nil
+	return got, nil
 }
 
 func (v *VehicleService) GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error) {
-	vehicle, err := v.vehicleRepo.GetByPlate(ctx, plate)
+	got, err := v.vehicleRepo.GetByPlate(ctx, plate)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return vehicle, nil
+	return got, nil
 }
 
 func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate) (*entities.Vehicle, error) {
