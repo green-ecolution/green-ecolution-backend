@@ -117,7 +117,7 @@ func TestGetVehicleByID(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var response serverEntities.TreeClusterResponse
+		var response serverEntities.VehicleResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.Equal(t, TestVehicle.ID, response.ID)
@@ -177,6 +177,101 @@ func TestGetVehicleByID(t *testing.T) {
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+}
+
+func TestGetVehicleByPlate(t *testing.T) {
+	t.Run("should return vehicle successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := GetVehicleByPlate(mockVehicleService)
+		app.Get("/v1/vehicle/plate/:plate", handler)
+		plate := "FL%20TBZ%201234"
+
+		mockVehicleService.EXPECT().GetByPlate(
+			mock.Anything, 
+			plate,
+		).Return(TestVehicle, nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/plate/"+plate, nil)
+
+		resp, err := app.Test(req, -1)
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		defer resp.Body.Close()
+
+		var response serverEntities.VehicleResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+		assert.Equal(t, TestVehicle.ID, response.ID)
+		assert.Equal(t, TestVehicle.NumberPlate, response.NumberPlate)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 Bad Request for invalid vehicle plate", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := GetVehicleByID(mockVehicleService)
+		app.Get("/v1/vehicle/plate/:plate", handler)
+		plate := "%20"
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/plate/"+plate, nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 Not Found if vehicle does not exist", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := GetVehicleByPlate(mockVehicleService)
+		app.Get("/v1/vehicle/plate/:plate", handler)
+		plate := "FL%20TBZ%201244"
+
+		mockVehicleService.EXPECT().GetByPlate(
+			mock.Anything, 
+			plate,
+		).Return(nil, storage.ErrVehicleNotFound)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/plate/"+plate, nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := GetVehicleByPlate(mockVehicleService)
+		app.Get("/v1/vehicle/plate/:plate", handler)
+		plate := "FL%20TBZ%201244"
+
+		mockVehicleService.EXPECT().GetByPlate(
+			mock.Anything,
+			plate,
+		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/plate/"+plate, nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 

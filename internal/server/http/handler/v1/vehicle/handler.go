@@ -1,6 +1,7 @@
 package vehicle
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -81,7 +82,41 @@ func GetVehicleByID(svc service.VehicleService) fiber.Handler {
 		}
 
 		data := mapVehicleToDto(domainData)
+		return c.JSON(data)
+	}
+}
 
+// @Summary		Get vehicle by plate
+// @Description	Get vehicle by plate
+// @Id				get-vehicle-by-plate
+// @Tags			Vehicle
+// @Produce		json
+// @Success		200	{object}	entities.VehicleResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/plate/{plate} [get]
+// @Param			plate	path	string	true	"Vehicle plate number"
+// @Security		Keycloak
+func GetVehicleByPlate(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+
+		plate := c.Params("plate")
+		if plate == "" {
+			fmt.Print(plate);
+			err := service.NewError(service.BadRequest, "invalid Plate format")
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, err := svc.GetByPlate(ctx, plate)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapVehicleToDto(domainData)
 		return c.JSON(data)
 	}
 }
