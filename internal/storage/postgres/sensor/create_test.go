@@ -15,11 +15,18 @@ func TestSensorRepository_Create(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
+		data := []*entities.SensorData{
+			{
+				ID:   1,
+				Data: getTestSensors()[0].Data[0].Data,
+			},
+		}
+
 		// when
 		got, err := r.Create(
 			context.Background(),
 			WithStatus(getTestSensors()[0].Status),
-			WithData(getTestSensors()[0].Data),
+			WithData(data),
 		)
 
 		// then
