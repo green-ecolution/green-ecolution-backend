@@ -69,7 +69,7 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 		Readonly:       t.Readonly,
 		PlantingYear:   t.PlantingYear,
 		TreeNumber:     t.Number,
-		SensorID: sensorID,
+		SensorID:       sensorID,
 		TreeClusterID:  treeClusterID,
 		WateringStatus: sqlc.WateringStatus(t.WateringStatus),
 		Description:    &t.Description,
