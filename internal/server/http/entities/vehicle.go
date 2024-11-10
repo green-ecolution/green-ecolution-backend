@@ -31,6 +31,6 @@ type VehicleResponse struct {
 } // @Name Vehicle
 
 type VehicleListResponse struct {
-	Vehicles   []*VehicleResponse `json:"vehicles"`
-	Pagination Pagination         `json:"pagination"`
+    Data       []*VehicleResponse `json:"data"`
+    Pagination *Pagination        `json:"pagination"`
 } // @Name VehicleList
