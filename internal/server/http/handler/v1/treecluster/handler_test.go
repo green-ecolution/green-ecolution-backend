@@ -1,4 +1,4 @@
-package treecluster
+package treecluster_test
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -23,7 +24,7 @@ func TestGetAllTreeClusters(t *testing.T) {
 	t.Run("should return all tree clusters successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetAllTreeClusters(mockClusterService)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
@@ -51,7 +52,7 @@ func TestGetAllTreeClusters(t *testing.T) {
 	t.Run("should return an empty list when no tree clusters are available", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetAllTreeClusters(mockClusterService)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
@@ -78,7 +79,7 @@ func TestGetAllTreeClusters(t *testing.T) {
 	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetAllTreeClusters(mockClusterService)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
@@ -102,7 +103,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 	t.Run("should return tree cluster successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetTreeClusterByID(mockClusterService)
+		handler := treecluster.GetTreeClusterByID(mockClusterService)
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().GetByID(
@@ -130,7 +131,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid cluster ID", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetTreeClusterByID(mockClusterService)
+		handler := treecluster.GetTreeClusterByID(mockClusterService)
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		// when
@@ -146,7 +147,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 	t.Run("should return 404 Not Found if cluster does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetTreeClusterByID(mockClusterService)
+		handler := treecluster.GetTreeClusterByID(mockClusterService)
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().GetByID(
@@ -169,7 +170,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := GetTreeClusterByID(mockClusterService)
+		handler := treecluster.GetTreeClusterByID(mockClusterService)
 		app.Get("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().GetByID(
@@ -194,7 +195,7 @@ func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should create tree cluster successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := CreateTreeCluster(mockClusterService)
+		handler := treecluster.CreateTreeCluster(mockClusterService)
 		app.Post("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().Create(
@@ -225,7 +226,7 @@ func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := CreateTreeCluster(mockClusterService)
+		handler := treecluster.CreateTreeCluster(mockClusterService)
 		app.Post("/v1/cluster", handler)
 
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
@@ -245,7 +246,7 @@ func TestCreateTreeCluster(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := CreateTreeCluster(mockClusterService)
+		handler := treecluster.CreateTreeCluster(mockClusterService)
 		app.Post("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().Create(
@@ -272,7 +273,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 	t.Run("should update tree cluster successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := UpdateTreeCluster(mockClusterService)
+		handler := treecluster.UpdateTreeCluster(mockClusterService)
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().Update(
@@ -303,7 +304,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid cluster ID", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := UpdateTreeCluster(mockClusterService)
+		handler := treecluster.UpdateTreeCluster(mockClusterService)
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		// when
@@ -319,7 +320,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := UpdateTreeCluster(mockClusterService)
+		handler := treecluster.UpdateTreeCluster(mockClusterService)
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
@@ -339,7 +340,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 	t.Run("should return 404 Not Found if cluster does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := UpdateTreeCluster(mockClusterService)
+		handler := treecluster.UpdateTreeCluster(mockClusterService)
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().Update(
@@ -365,7 +366,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := UpdateTreeCluster(mockClusterService)
+		handler := treecluster.UpdateTreeCluster(mockClusterService)
 		app.Put("/v1/cluster/:treecluster_id", handler)
 
 		mockClusterService.EXPECT().Update(mock.Anything, int32(1), mock.Anything).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
@@ -389,7 +390,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 	t.Run("should delete tree cluster successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := DeleteTreeCluster(mockClusterService)
+		handler := treecluster.DeleteTreeCluster(mockClusterService)
 		app.Delete("/v1/cluster/:treecluster_id", handler)
 
 		clusterID := 1
@@ -410,7 +411,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := DeleteTreeCluster(mockClusterService)
+		handler := treecluster.DeleteTreeCluster(mockClusterService)
 		app.Delete("/v1/cluster/:treecluster_id", handler)
 
 		// when
@@ -426,7 +427,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 	t.Run("should return 404 for non-existing tree cluster", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
-		handler := DeleteTreeCluster(mockClusterService)
+		handler := treecluster.DeleteTreeCluster(mockClusterService)
 		app.Delete("/v1/cluster/:treecluster_id", handler)
 
 		clusterID := 999

@@ -1,4 +1,4 @@
-package treecluster
+package treecluster_test
 
 import (
 	"bytes"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -16,7 +17,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/cluster", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-			app := RegisterRoutes(mockClusterService)
+			app := treecluster.RegisterRoutes(mockClusterService)
 
 			mockClusterService.EXPECT().GetAll(
 				mock.Anything,
@@ -34,7 +35,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call POST handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-			app := RegisterRoutes(mockClusterService)
+			app := treecluster.RegisterRoutes(mockClusterService)
 
 			mockClusterService.EXPECT().Create(
 				mock.Anything,
@@ -57,7 +58,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/cluster/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-			app := RegisterRoutes(mockClusterService)
+			app := treecluster.RegisterRoutes(mockClusterService)
 
 			mockClusterService.EXPECT().GetByID(
 				mock.Anything,
@@ -76,7 +77,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call PUT handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-			app := RegisterRoutes(mockClusterService)
+			app := treecluster.RegisterRoutes(mockClusterService)
 
 			mockClusterService.EXPECT().Update(
 				mock.Anything,
@@ -98,7 +99,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call DELETE handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-			app := RegisterRoutes(mockClusterService)
+			app := treecluster.RegisterRoutes(mockClusterService)
 
 			mockClusterService.EXPECT().Delete(
 				mock.Anything,

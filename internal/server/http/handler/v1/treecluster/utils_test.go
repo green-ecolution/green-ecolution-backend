@@ -1,4 +1,4 @@
-package treecluster
+package treecluster_test
 
 import (
 	"time"

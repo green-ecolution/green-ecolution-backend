@@ -1,4 +1,4 @@
-package sensor
+package sensor_test
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +20,7 @@ func TestGetAllSensors(t *testing.T) {
 	t.Run("should return all sensors successfully with full MqttPayload", func(t *testing.T) {
 		mockSensorService := serviceMock.NewMockSensorService(t)
 		app := fiber.New()
-		handler := GetAllSensors(mockSensorService)
+		handler := sensor.GetAllSensors(mockSensorService)
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
@@ -50,7 +51,7 @@ func TestGetAllSensors(t *testing.T) {
 	t.Run("should return empty sensor list when no sensors found", func(t *testing.T) {
 		mockSensorService := serviceMock.NewMockSensorService(t)
 		app := fiber.New()
-		handler := GetAllSensors(mockSensorService)
+		handler := sensor.GetAllSensors(mockSensorService)
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
@@ -78,7 +79,7 @@ func TestGetAllSensors(t *testing.T) {
 	t.Run("should return 500 when service returns an error", func(t *testing.T) {
 		mockSensorService := serviceMock.NewMockSensorService(t)
 		app := fiber.New()
-		handler := GetAllSensors(mockSensorService)
+		handler := sensor.GetAllSensors(mockSensorService)
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,

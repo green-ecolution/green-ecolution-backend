@@ -1,10 +1,11 @@
-package sensor
+package sensor_test
 
 import (
 	"context"
 	"net/http"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,7 +15,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/sensor", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := RegisterRoutes(mockSensorService)
+			app := sensor.RegisterRoutes(mockSensorService)
 
 			mockSensorService.EXPECT().GetAll(
 				mock.Anything,
@@ -32,7 +33,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call POST handler", func(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := RegisterRoutes(mockSensorService)
+			app := sensor.RegisterRoutes(mockSensorService)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", nil)
@@ -48,7 +49,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/sensor/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := RegisterRoutes(mockSensorService)
+			app := sensor.RegisterRoutes(mockSensorService)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
@@ -62,7 +63,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call PUT handler", func(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := RegisterRoutes(mockSensorService)
+			app := sensor.RegisterRoutes(mockSensorService)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", nil)
@@ -76,7 +77,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call DELETE handler", func(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := RegisterRoutes(mockSensorService)
+			app := sensor.RegisterRoutes(mockSensorService)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
@@ -92,7 +93,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/sensor/:id/data", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := RegisterRoutes(mockSensorService)
+			app := sensor.RegisterRoutes(mockSensorService)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1/data", nil)
