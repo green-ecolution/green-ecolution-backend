@@ -16,22 +16,22 @@ var (
 	vehicleMapper = generated.VehicleHTTPMapperImpl{}
 )
 
-// @Summary		Get all vehicles
-// @Description	Get all vehicles
-// @Id				get-all-vehicles
-// @Tags			Vehicle
-// @Produce		json
-// @Success		200	{object}	entities.VehicleListResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			status	query	string	false	"Status"
-// @Security		Keycloak
+//	@Summary		Get all vehicles
+//	@Description	Get all vehicles
+//	@Id				get-all-vehicles
+//	@Tags			Vehicle
+//	@Produce		json
+//	@Success		200	{object}	entities.VehicleListResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/vehicle [get]
+//	@Param			page	query	string	false	"Page"
+//	@Param			limit	query	string	false	"Limit"
+//	@Param			status	query	string	false	"Status"
+//	@Security		Keycloak
 func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -52,20 +52,20 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	}
 }
 
-// @Summary		Get vehicle by ID
-// @Description	Get vehicle by ID
-// @Id				get-vehicle-by-id
-// @Tags			Vehicle
-// @Produce		json
-// @Success		200	{object}	entities.VehicleResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle/{id} [get]
-// @Param			id	path	string	true	"Vehicle ID"
-// @Security		Keycloak
+//	@Summary		Get vehicle by ID
+//	@Description	Get vehicle by ID
+//	@Id				get-vehicle-by-id
+//	@Tags			Vehicle
+//	@Produce		json
+//	@Success		200	{object}	entities.VehicleResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/vehicle/{id} [get]
+//	@Param			id	path	string	true	"Vehicle ID"
+//	@Security		Keycloak
 func GetVehicleByID(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -86,20 +86,20 @@ func GetVehicleByID(svc service.VehicleService) fiber.Handler {
 	}
 }
 
-// @Summary		Get vehicle by plate
-// @Description	Get vehicle by plate
-// @Id				get-vehicle-by-plate
-// @Tags			Vehicle
-// @Produce		json
-// @Success		200	{object}	entities.VehicleResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle/plate/{plate} [get]
-// @Param			plate	path	string	true	"Vehicle plate number"
-// @Security		Keycloak
+//	@Summary		Get vehicle by plate
+//	@Description	Get vehicle by plate
+//	@Id				get-vehicle-by-plate
+//	@Tags			Vehicle
+//	@Produce		json
+//	@Success		200	{object}	entities.VehicleResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/vehicle/plate/{plate} [get]
+//	@Param			plate	path	string	true	"Vehicle plate number"
+//	@Security		Keycloak
 func GetVehicleByPlate(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -112,6 +112,80 @@ func GetVehicleByPlate(svc service.VehicleService) fiber.Handler {
 		}
 
 		domainData, err := svc.GetByPlate(ctx, plate)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapVehicleToDto(domainData)
+		return c.JSON(data)
+	}
+}
+
+//	@Summary		Create vehicle
+//	@Description	Create vehicle
+//	@Id				create-vehicle
+//	@Tags			Vehicle
+//	@Produce		json
+//	@Success		201	{object}	entities.VehicleResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/vehicle [post]
+//	@Param			body	body	entities.VehicleCreateRequest	true	"Vehicle Create Request"
+//	@Security		Keycloak
+func CreateVehicle(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+
+		var req entities.VehicleCreateRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := vehicleMapper.FromCreateRequest(&req)
+		domainData, err := svc.Create(ctx, domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapVehicleToDto(domainData)
+		return c.Status(fiber.StatusCreated).JSON(data)
+	}
+}
+
+//	@Summary		Update vehicle
+//	@Description	Update vehicle
+//	@Id				update-vehicle
+//	@Tags			Vehicle
+//	@Produce		json
+//	@Success		200	{object}	entities.VehicleResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/vehicle/{id} [put]
+//	@Param			id		path	string							true	"Vehicle ID"
+//	@Param			body	body	entities.VehicleUpdateRequest	true	"Vehicle Update Request"
+//	@Security		Keycloak
+func UpdateVehicle(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		var req entities.VehicleUpdateRequest
+		if err = c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := vehicleMapper.FromUpdateRequest(&req)
+		domainData, err := svc.Update(ctx, int32(id), domainReq)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}

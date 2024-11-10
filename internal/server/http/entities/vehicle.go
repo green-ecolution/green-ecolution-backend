@@ -34,3 +34,19 @@ type VehicleListResponse struct {
     Data       []*VehicleResponse `json:"data"`
     Pagination *Pagination        `json:"pagination"`
 } // @Name VehicleList
+
+type VehicleCreateRequest struct {
+	NumberPlate   string        `json:"number_plate"`
+	Description   string        `json:"description"`
+	WaterCapacity float64       `json:"water_capacity"`
+	Status        VehicleStatus `json:"status"`
+	Type          VehicleType   `json:"type"`
+} // @Name VehicleCreate
+
+type VehicleUpdateRequest struct {
+	NumberPlate   string        `json:"number_plate"`
+	Description   string        `json:"description"`
+	WaterCapacity float64       `json:"water_capacity"`
+	Status        VehicleStatus `json:"status"`
+	Type          VehicleType   `json:"type"`
+} // @Name VehicleUpdate

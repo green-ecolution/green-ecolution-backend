@@ -33,4 +33,12 @@ var (
 			WaterCapacity:     1000.5,
 		},
 	}
+
+	TestVehicleRequest = &entities.VehicleCreate{
+		NumberPlate:   "FL TBZ 123",
+		Description:   "Test description",
+		Status: entities.VehicleStatusActive,
+		Type:      entities.VehicleTypeTrailer,
+		WaterCapacity:     2000.5,
+	}
 )
