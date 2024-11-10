@@ -135,6 +135,60 @@ func TestVehicleService_GetByPlate(t *testing.T) {
 	})
 }
 
+func TestVehicleService_Delete(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should successfully delete a vehicle", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		id := int32(1)
+
+		vehicleRepo.EXPECT().GetByID(ctx, id).Return(getTestVehicles()[0], nil)
+		vehicleRepo.EXPECT().Delete(ctx, id).Return(nil)
+
+		// when
+		err := svc.Delete(ctx, id)
+
+		// then
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error if vehicle not found", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		id := int32(1)
+		expectedErr := storage.ErrEntityNotFound
+		vehicleRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
+
+		// when
+		err := svc.Delete(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+
+	t.Run("should return error if deleting vehicle fails", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+		
+		id := int32(4)
+		expectedErr := errors.New("failed to delete")
+
+		vehicleRepo.EXPECT().GetByID(ctx, id).Return(getTestVehicles()[0], nil)
+		vehicleRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
+
+		// when
+		err := svc.Delete(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+}
+
 func getTestVehicles() []*entities.Vehicle {
 	now := time.Now()
 

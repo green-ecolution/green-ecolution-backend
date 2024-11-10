@@ -46,6 +46,20 @@ func (v *VehicleService) GetByPlate(ctx context.Context, plate string) (*entitie
 	return vehicle, nil
 }
 
+func (v *VehicleService) Delete(ctx context.Context, id int32) error {
+	_, err := v.vehicleRepo.GetByID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+
+	err = v.vehicleRepo.Delete(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+
+	return nil
+}
+
 func (v *VehicleService) Ready() bool {
 	return v.vehicleRepo != nil
 }
