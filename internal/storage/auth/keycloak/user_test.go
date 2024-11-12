@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/Nerzal/gocloak/v13"
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
@@ -191,6 +193,99 @@ func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+	})
+}
+
+func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
+	t.Run("should convert keycloak user to user successfully", func(t *testing.T) {
+		// given
+    uuid, _ := uuid.NewRandom()
+		user := &gocloak.User{
+			ID:               gocloak.StringP(uuid.String()),
+			CreatedTimestamp: gocloak.Int64P(123456),
+			Username:         gocloak.StringP("test"),
+			FirstName:        gocloak.StringP("Toni"),
+			LastName:         gocloak.StringP("Tester"),
+			Email:            gocloak.StringP("dev@green-ecolution.de"),
+			Attributes: &map[string][]string{
+				"phone_number": {"+49 123456"},
+				"employee_id":  {"123456"},
+			},
+		}
+
+		// when
+		got, err := keyCloakUserToUser(user)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.Equal(t, uuid.String(), got.ID.String())
+		assert.Equal(t, "test", got.Username)
+		assert.Equal(t, "Toni", got.FirstName)
+		assert.Equal(t, "Tester", got.LastName)
+		assert.Equal(t, "dev@green-ecolution.de", got.Email)
+		assert.Equal(t, "+49 123456", got.PhoneNumber)
+		assert.Equal(t, "123456", got.EmployeeID)
+	})
+
+	t.Run("should return error when failed to parse user id", func(t *testing.T) {
+		// given
+		user := &gocloak.User{
+			ID:               gocloak.StringP("invalid-id"),
+			CreatedTimestamp: gocloak.Int64P(123456),
+			Username:         gocloak.StringP("test"),
+			FirstName:        gocloak.StringP("Toni"),
+			LastName:         gocloak.StringP("Tester"),
+			Email:            gocloak.StringP("dev@green-ecolution.de"),
+			Attributes: &map[string][]string{
+				"phone_number": {"+49 123456"},
+				"employee_id":  {"123456"},
+			},
+		}
+
+		// when
+		got, err := keyCloakUserToUser(user)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+}
+
+func TestKeyCloakUserRepo_UserToKeyCloakUser(t *testing.T) {
+	t.Run("should convert user to keycloak user successfully", func(t *testing.T) {
+		// given
+		uuid, _ := uuid.NewRandom()
+		user := &entities.User{
+			ID:          uuid,
+			CreatedAt:   time.Unix(123456, 0),
+			Username:    "test",
+			FirstName:   "Toni",
+			LastName:    "Tester",
+			Email:       "dev@green-ecolution.de",
+			PhoneNumber: "+49 123456",
+			EmployeeID:  "123456",
+		}
+
+		// when
+		got := userToKeyCloakUser(user)
+
+		// then
+		assert.NotNil(t, got)
+    assert.NotNil(t, got.ID)
+    assert.NotNil(t, got.Username)
+    assert.NotNil(t, got.FirstName)
+    assert.NotNil(t, got.LastName)
+    assert.NotNil(t, got.Email)
+    assert.NotNil(t, got.Attributes)
+
+		assert.Equal(t, uuid.String(), *got.ID)
+		assert.Equal(t, "test", *got.Username)
+		assert.Equal(t, "Toni", *got.FirstName)
+		assert.Equal(t, "Tester", *got.LastName)
+		assert.Equal(t, "dev@green-ecolution.de", *got.Email)
+		assert.Equal(t, "+49 123456", (*got.Attributes)["phone_number"][0])
+		assert.Equal(t, "123456", (*got.Attributes)["employee_id"][0])
 	})
 }
 

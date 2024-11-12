@@ -113,6 +113,7 @@ func userToKeyCloakUser(user *entities.User) *gocloak.User {
 	attribute["employee_id"] = []string{user.EmployeeID}
 
 	return &gocloak.User{
+    ID:         gocloak.StringP(user.ID.String()),
 		Username:   gocloak.StringP(user.Username),
 		FirstName:  gocloak.StringP(user.FirstName),
 		LastName:   gocloak.StringP(user.LastName),
