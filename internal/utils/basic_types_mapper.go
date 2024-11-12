@@ -38,6 +38,10 @@ func StringToNetIP(s string) net.IP {
 }
 
 func NetIPToString(ip net.IP) string {
+  if ip == nil {
+    return ""
+  }
+
 	return ip.String()
 }
 
@@ -51,6 +55,9 @@ func TimeToString(t time.Time) string {
 }
 
 func NetURLToString(u *url.URL) string {
+  if u == nil {
+    return ""
+  }
 	return u.String()
 }
 
