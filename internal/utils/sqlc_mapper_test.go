@@ -107,4 +107,3 @@ func TestConvertNullableImage(t *testing.T) {
 		assert.Equal(t, img.Url, result.URL)
 	})
 }
-
