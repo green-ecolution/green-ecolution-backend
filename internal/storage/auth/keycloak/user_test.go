@@ -297,4 +297,3 @@ func TestKeyCloakUserRepo_UserToKeyCloakUser(t *testing.T) {
 		assert.Equal(t, "123456", (*got.Attributes)["employee_id"][0])
 	})
 }
-

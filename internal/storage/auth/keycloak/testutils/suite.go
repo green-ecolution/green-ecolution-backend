@@ -129,4 +129,3 @@ func (s *KeycloakTestSuite) Terminate(ctx context.Context) {
 		log.Fatalf("Could not terminate container: %s", err)
 	}
 }
-
