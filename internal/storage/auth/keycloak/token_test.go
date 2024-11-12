@@ -62,6 +62,7 @@ func TestKeyCloakRepo_RetrospectToken(t *testing.T) {
 }
 
 func TestKeyCloakRepo_GetAccessTokenFromClientCode(t *testing.T) {
+  t.Skip("don't know how to test this yet, need to recreate the login flow. Will come back to this later")
 }
 
 func TestKeyCloakRepo_RefreshToken(t *testing.T) {
@@ -79,8 +80,8 @@ func TestKeyCloakRepo_RefreshToken(t *testing.T) {
 			PhoneNumber: "+49 123456",
 		}
 
-		ensureUserExists(t, user)
-		validToken := loginUser(t, user)
+		suite.EnsureUserExists(t, user)
+		validToken := suite.LoginUser(t, user)
 
 		// when
 		got, err := k.RefreshToken(ctx, validToken.RefreshToken)
