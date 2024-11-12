@@ -9,20 +9,20 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-func (suite *KeycloakTestSuite) LoginAdminAndGetToken(t testing.TB) *gocloak.JWT {
+func (s *KeycloakTestSuite) LoginAdminAndGetToken(t testing.TB) *gocloak.JWT {
 	t.Helper()
-	identityConfig := suite.IdentityConfig(t, context.Background())
+	identityConfig := s.IdentityConfig(t, context.Background())
 	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
-	token, err := client.Login(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm, suite.User, suite.Password)
+	token, err := client.Login(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm, s.User, s.Password)
 	if err != nil {
 		t.Fatalf("loginAdminAndGetToken::failed to get token: %v", err)
 	}
 	return token
 }
 
-func (suite *KeycloakTestSuite) LoginUser(t testing.TB, user *entities.User) *gocloak.JWT {
+func (s *KeycloakTestSuite) LoginUser(t testing.TB, user *entities.User) *gocloak.JWT {
 	t.Helper()
-	identityConfig := suite.IdentityConfig(t, context.Background())
+	identityConfig := s.IdentityConfig(t, context.Background())
 	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
 	token, err := client.Login(context.Background(), identityConfig.KeyCloak.Frontend.ClientID, identityConfig.KeyCloak.Frontend.ClientSecret, identityConfig.KeyCloak.Realm, user.Username, "test")
 	if err != nil {
@@ -32,11 +32,14 @@ func (suite *KeycloakTestSuite) LoginUser(t testing.TB, user *entities.User) *go
 	return token
 }
 
-func (suite *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) {
+func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) {
 	t.Helper()
-	identityConfig := suite.IdentityConfig(t, context.Background())
+	identityConfig := s.IdentityConfig(t, context.Background())
 	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
 	token, err := client.LoginClient(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm)
+	if err != nil {
+		t.Fatalf("ensureUserExists::failed to get token: %v", err)
+	}
 
 	attribute := make(map[string][]string)
 	attribute["phone_number"] = []string{user.PhoneNumber}
@@ -62,7 +65,7 @@ func (suite *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.Us
 	}
 }
 
-func (suite *KeycloakTestSuite) TestUserToCreateFunc() []*entities.User {
+func (s *KeycloakTestSuite) TestUserToCreateFunc() []*entities.User {
 	n := 20
 	users := make([]*entities.User, n)
 	for i := 0; i < n; i++ {

@@ -62,7 +62,7 @@ func TestKeyCloakRepo_RetrospectToken(t *testing.T) {
 }
 
 func TestKeyCloakRepo_GetAccessTokenFromClientCode(t *testing.T) {
-  t.Skip("don't know how to test this yet, need to recreate the login flow. Will come back to this later")
+	t.Skip("don't know how to test this yet, need to recreate the login flow. Will come back to this later")
 }
 
 func TestKeyCloakRepo_RefreshToken(t *testing.T) {

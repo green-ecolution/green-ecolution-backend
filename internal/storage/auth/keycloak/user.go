@@ -88,11 +88,11 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to parse user id: '%v'", *user.ID))
 	}
-	var phone_number string
-	var employee_id string
+	var phoneNumber string
+	var employeeID string
 	if user.Attributes != nil {
-		phone_number = (*user.Attributes)["phone_number"][0]
-		employee_id = (*user.Attributes)["employee_id"][0]
+		phoneNumber = (*user.Attributes)["phone_number"][0]
+		employeeID = (*user.Attributes)["employee_id"][0]
 	}
 
 	return &entities.User{
@@ -102,8 +102,8 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		FirstName:   *user.FirstName,
 		LastName:    *user.LastName,
 		Email:       *user.Email,
-		PhoneNumber: phone_number,
-		EmployeeID:  employee_id,
+		PhoneNumber: phoneNumber,
+		EmployeeID:  employeeID,
 	}, nil
 }
 
