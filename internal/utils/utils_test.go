@@ -132,7 +132,7 @@ func TestRootDir(t *testing.T) {
 type MockReadCloser struct{}
 
 func (m MockReadCloser) Read(p []byte) (n int, err error) {
-  return 0, nil
+	return 0, nil
 }
 
 func (m MockReadCloser) Close() error {
@@ -140,26 +140,26 @@ func (m MockReadCloser) Close() error {
 }
 
 func TestParseJSONResponse(t *testing.T) {
-  t.Skip("it's only used in tests, so maybe it's should be moved to test file")
+	t.Skip("it's only used in tests, so maybe it's should be moved to test file")
 }
 
 func TestStringPtrToString(t *testing.T) {
-  t.Run("should return empty string when source is nil", func(t *testing.T) {
-    // when
-    result := StringPtrToString(nil)
+	t.Run("should return empty string when source is nil", func(t *testing.T) {
+		// when
+		result := StringPtrToString(nil)
 
-    // then
-    assert.Empty(t, result)
-  })
+		// then
+		assert.Empty(t, result)
+	})
 
-  t.Run("should return string value when source is not nil", func(t *testing.T) {
-    // given
-    source := "source"
+	t.Run("should return string value when source is not nil", func(t *testing.T) {
+		// given
+		source := "source"
 
-    // when
-    result := StringPtrToString(&source)
+		// when
+		result := StringPtrToString(&source)
 
-    // then
-    assert.Equal(t, source, result)
-  })
+		// then
+		assert.Equal(t, source, result)
+	})
 }
