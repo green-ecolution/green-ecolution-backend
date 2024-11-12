@@ -46,7 +46,7 @@ func TestURLToURL(t *testing.T) {
 
 func TestTimeDurationToTimeDuration(t *testing.T) {
 	t.Run("should return same duration", func(t *testing.T) {
-		duration := time.Duration(5 * time.Second)
+		duration := 5 * time.Second
 		result := TimeDurationToTimeDuration(duration)
 		assert.Equal(t, duration, result)
 	})
@@ -146,7 +146,7 @@ func TestNetURLToString(t *testing.T) {
 
 func TestTimeDurationToString(t *testing.T) {
 	t.Run("should format duration to string", func(t *testing.T) {
-		duration := time.Duration(5 * time.Second)
+		duration := 5 * time.Second
 		result := TimeDurationToString(duration)
 		assert.Equal(t, "5s", result)
 	})
