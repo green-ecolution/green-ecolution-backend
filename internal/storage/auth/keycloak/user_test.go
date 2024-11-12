@@ -170,9 +170,9 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
 	t.Run("should remove session successfully", func(t *testing.T) {
 		// given
-		identityConfig := &config.IdentityAuthConfig{}
+		identityConfig := suite.IdentityConfig(t, context.Background())
 		userRepo := NewUserRepository(identityConfig)
-		token := loginAdminAndGetToken(t)
+		token := loginUser(t, 0)
 
 		// when
 		err := userRepo.RemoveSession(context.Background(), token.RefreshToken)
@@ -196,12 +196,25 @@ func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
 
 func loginAdminAndGetToken(t testing.TB) *gocloak.JWT {
 	t.Helper()
-  identityConfig := suite.IdentityConfig(t, context.Background())
+	identityConfig := suite.IdentityConfig(t, context.Background())
 	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
 	token, err := client.Login(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm, suite.User, suite.Password)
 	if err != nil {
 		t.Fatalf("failed to get token: %v", err)
 	}
+	return token
+}
+
+func loginUser(t testing.TB, n int) *gocloak.JWT {
+	t.Helper()
+	user := testUser[n]
+	identityConfig := suite.IdentityConfig(t, context.Background())
+	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
+	token, err := client.Login(context.Background(), identityConfig.KeyCloak.Frontend.ClientID, identityConfig.KeyCloak.Frontend.ClientSecret, identityConfig.KeyCloak.Realm, user.Username, "test")
+	if err != nil {
+		t.Fatalf("failed to get token: %v", err)
+	}
+
 	return token
 }
 
