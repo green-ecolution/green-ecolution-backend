@@ -154,6 +154,7 @@ func TestKeyCloakUserRepo_Create(t *testing.T) {
 				assert.Error(t, err)
 				assert.Nil(t, got)
 			} else {
+				assert.NoError(t, err)
 				assert.NotNil(t, got)
 				assert.Equal(t, tt.args.user.Username, got.Username)
 				assert.Equal(t, tt.args.user.FirstName, got.FirstName)
@@ -174,7 +175,16 @@ func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
 		// given
 		identityConfig := suite.IdentityConfig(t, context.Background())
 		userRepo := NewUserRepository(identityConfig)
-		token := loginUser(t, 0)
+		user := &entities.User{
+			Username:    "should-remove-session",
+			FirstName:   "Toni",
+			LastName:    "Tester",
+			Email:       "should-remove-session@green-ecolution.de",
+			EmployeeID:  "123456",
+			PhoneNumber: "+49 123456",
+		}
+		ensureUserExists(t, user)
+		token := loginUser(t, user)
 
 		// when
 		err := userRepo.RemoveSession(context.Background(), token.RefreshToken)
@@ -199,7 +209,7 @@ func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
 func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
 	t.Run("should convert keycloak user to user successfully", func(t *testing.T) {
 		// given
-    uuid, _ := uuid.NewRandom()
+		uuid, _ := uuid.NewRandom()
 		user := &gocloak.User{
 			ID:               gocloak.StringP(uuid.String()),
 			CreatedTimestamp: gocloak.Int64P(123456),
@@ -272,12 +282,12 @@ func TestKeyCloakUserRepo_UserToKeyCloakUser(t *testing.T) {
 
 		// then
 		assert.NotNil(t, got)
-    assert.NotNil(t, got.ID)
-    assert.NotNil(t, got.Username)
-    assert.NotNil(t, got.FirstName)
-    assert.NotNil(t, got.LastName)
-    assert.NotNil(t, got.Email)
-    assert.NotNil(t, got.Attributes)
+		assert.NotNil(t, got.ID)
+		assert.NotNil(t, got.Username)
+		assert.NotNil(t, got.FirstName)
+		assert.NotNil(t, got.LastName)
+		assert.NotNil(t, got.Email)
+		assert.NotNil(t, got.Attributes)
 
 		assert.Equal(t, uuid.String(), *got.ID)
 		assert.Equal(t, "test", *got.Username)
@@ -295,22 +305,37 @@ func loginAdminAndGetToken(t testing.TB) *gocloak.JWT {
 	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
 	token, err := client.Login(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm, suite.User, suite.Password)
 	if err != nil {
-		t.Fatalf("failed to get token: %v", err)
+		t.Fatalf("loginAdminAndGetToken::failed to get token: %v", err)
 	}
 	return token
 }
 
-func loginUser(t testing.TB, n int) *gocloak.JWT {
+func loginUser(t testing.TB, user *entities.User) *gocloak.JWT {
 	t.Helper()
-	user := testUser[n]
 	identityConfig := suite.IdentityConfig(t, context.Background())
 	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
 	token, err := client.Login(context.Background(), identityConfig.KeyCloak.Frontend.ClientID, identityConfig.KeyCloak.Frontend.ClientSecret, identityConfig.KeyCloak.Realm, user.Username, "test")
 	if err != nil {
-		t.Fatalf("failed to get token: %v", err)
+		t.Fatalf("loginUser::failed to get token: %v", err)
 	}
 
 	return token
+}
+
+func ensureUserExists(t testing.TB, user *entities.User) {
+	t.Helper()
+	identityConfig := suite.IdentityConfig(t, context.Background())
+	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
+	token, err := client.LoginClient(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm)
+
+  userID, err := client.CreateUser(context.Background(), token.AccessToken, identityConfig.KeyCloak.Realm, *userToKeyCloakUser(user))
+	if err != nil {
+		t.Log("ensureUserExists::failed to create user. maybe user already exists. error: ", err)
+	}
+
+	if err = client.SetPassword(context.Background(), token.AccessToken, userID, identityConfig.KeyCloak.Realm, "test", false); err != nil {
+    t.Fatalf("ensureUserExists::failed to set password: %v", err)
+	}
 }
 
 func testUserToCreateFunc() []*entities.User {

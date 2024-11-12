@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,6 +66,39 @@ func TestKeyCloakRepo_GetAccessTokenFromClientCode(t *testing.T) {
 
 func TestKeyCloakRepo_RefreshToken(t *testing.T) {
 	t.Run("should return valid token", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		cfg := suite.IdentityConfig(t, ctx)
+		k := NewKeycloakRepository(cfg)
+		user := &entities.User{
+			Username:    "should-refresh-token",
+			FirstName:   "Toni",
+			LastName:    "Tester",
+			Email:       "should-refresh-token@green-ecolution.de",
+			EmployeeID:  "123456",
+			PhoneNumber: "+49 123456",
+		}
+
+		ensureUserExists(t, user)
+		validToken := loginUser(t, user)
+
+		// when
+		got, err := k.RefreshToken(ctx, validToken.RefreshToken)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotNil(t, got.AccessToken)
+		assert.NotNil(t, got.RefreshToken)
+		assert.NotEmpty(t, got.AccessToken)
+		assert.NotEmpty(t, got.RefreshToken)
+
+		assert.NotEqual(t, validToken.AccessToken, got.AccessToken)
+		assert.NotEqual(t, validToken.RefreshToken, got.RefreshToken)
+
+		// validate
+		_, err = k.RetrospectToken(ctx, got.AccessToken)
+		assert.NoError(t, err)
 	})
 
 	t.Run("should return error when refresh token is invalid", func(t *testing.T) {
