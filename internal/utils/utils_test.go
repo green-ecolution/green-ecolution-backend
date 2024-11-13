@@ -129,16 +129,6 @@ func TestRootDir(t *testing.T) {
 	})
 }
 
-type MockReadCloser struct{}
-
-func (m MockReadCloser) Read(p []byte) (n int, err error) {
-	return 0, nil
-}
-
-func (m MockReadCloser) Close() error {
-	return nil
-}
-
 func TestParseJSONResponse(t *testing.T) {
 	t.Skip("it's only used in tests, so maybe it's should be moved to test file")
 }
