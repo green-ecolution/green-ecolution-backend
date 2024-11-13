@@ -166,5 +166,9 @@ func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) erro
 }
 
 func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error {
+	_, err := r.store.GetTreeClusterByID(ctx, treeClusterID)
+	if err != nil {
+		return err
+	}
 	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
 }

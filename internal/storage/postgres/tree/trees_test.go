@@ -31,6 +31,24 @@ func TestMain(m *testing.M) {
 }
 
 func TestTreeRepository_Delete(t *testing.T) {
+	t.Run("should delete tree successfully", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+		treeID := int32(1)
+
+		// when
+		err := r.Delete(context.Background(), treeID)
+
+		// then
+		assert.NoError(t, err)
+
+		deletedTree, err := r.GetByID(context.Background(), treeID)
+		assert.Error(t, err)
+		assert.Nil(t, deletedTree)
+	})
+
 	t.Run("should delete tree and linked images successfully", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -67,6 +85,30 @@ func TestTreeRepository_Delete(t *testing.T) {
 
 		// when
 		err := r.Delete(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if tree ID is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.Delete(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if tree ID is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.Delete(context.Background(), 0)
 
 		// then
 		assert.Error(t, err)
@@ -116,6 +158,42 @@ func TestTreeRepository_DeleteAndUnlinkImages(t *testing.T) {
 		}
 	})
 
+	t.Run("should return error if tree not found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.DeleteAndUnlinkImages(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if tree ID is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.DeleteAndUnlinkImages(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if tree ID is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.DeleteAndUnlinkImages(context.Background(), 0)
+
+		// then
+		assert.Error(t, err)
+	})
+
 	t.Run("should return error by canceling the context", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -130,6 +208,7 @@ func TestTreeRepository_DeleteAndUnlinkImages(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
 func TestTreeRepository_UnlinkImage(t *testing.T) {
 	t.Run("should unlink a specific image from tree successfully", func(t *testing.T) {
 		// given
@@ -153,13 +232,73 @@ func TestTreeRepository_UnlinkImage(t *testing.T) {
 		assert.False(t, isContained)
 	})
 
-	t.Run("should return error if image or tree not found", func(t *testing.T) {
+	t.Run("should return error if tree not found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		err := r.UnlinkImage(context.Background(), 99, 99)
+		err := r.UnlinkImage(context.Background(), 99, 1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if image not found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 1, 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if tree is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), -1, 1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if tree is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 0, 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if image is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 1, -1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if image is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkImage(context.Background(), 1, 0)
 
 		// then
 		assert.Error(t, err)
@@ -185,6 +324,65 @@ func TestTreeRepository_UnlinkTreeClusterID(t *testing.T) {
 		trees, err = suite.Store.GetTreesByTreeClusterID(context.Background(), &treeClusterID)
 		assert.NoError(t, err)
 		assert.Empty(t, trees)
+	})
+
+	t.Run("should return empty trees when tree cluster is not set in any tree", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+		treeClusterID := int32(6)
+		trees, err := suite.Store.GetTreesByTreeClusterID(context.Background(), &treeClusterID)
+		assert.NoError(t, err)
+		assert.Empty(t, trees)
+
+		// when
+		err = r.UnlinkTreeClusterID(context.Background(), treeClusterID)
+
+		// then
+		assert.NoError(t, err)
+		trees, err = suite.Store.GetTreesByTreeClusterID(context.Background(), &treeClusterID)
+		assert.NoError(t, err)
+		assert.Empty(t, trees)
+	})
+
+	t.Run("should return error when tree cluster not found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkTreeClusterID(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when tree cluster id negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkTreeClusterID(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when tree cluster id is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		err := r.UnlinkTreeClusterID(context.Background(), 0)
+
+		// then
+		assert.Error(t, err)
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
