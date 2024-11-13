@@ -2,8 +2,10 @@ package tree
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
 
@@ -27,6 +29,10 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 	entity := defaultTree()
 	for _, fn := range tFn {
 		fn(&entity)
+	}
+
+	if err := r.validateTreeEntity(ctx, &entity); err != nil {
+		return nil, err
 	}
 
 	id, err := r.createEntity(ctx, &entity)
@@ -121,4 +127,26 @@ func (r *TreeRepository) linkImages(ctx context.Context, treeID, imgID int32) er
 	}
 
 	return r.store.LinkTreeImage(ctx, &params)
+}
+
+func (r *TreeRepository) validateTreeEntity(ctx context.Context, tree *entities.Tree) error {
+	if tree == nil {
+		return errors.New("tree is nil")
+	}
+	if tree.Latitude < -90 || tree.Latitude > 180 {
+		return storage.ErrInvalidLatitude
+	}
+	if tree.Longitude < -180 || tree.Longitude > 180 {
+		return storage.ErrInvalidLongitude
+	}
+	params := sqlc.GetTreeByCoordinatesParams{
+		Latitude:  tree.Latitude,
+		Longitude: tree.Longitude,
+	}
+	treeByCoordinates, err := r.store.GetTreeByCoordinates(ctx, &params)
+
+	if err == nil && treeByCoordinates != nil {
+		return storage.ErrTreeWithSameCoordinates
+	}
+	return nil
 }
