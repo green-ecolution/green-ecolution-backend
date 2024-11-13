@@ -42,6 +42,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Empty(t, got)
 	})
+
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)
@@ -56,12 +57,26 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		assert.Nil(t, trees)
 	})
 }
+
 func TestTreeRepository_GetByID(t *testing.T) {
 	t.Run("should return the correct tree by ID", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
+		treeID := int32(1)
+
+		sqlTreeCluster, clusterErr := suite.Store.GetTreeClusterByTreeID(context.Background(), treeID)
+		if clusterErr != nil {
+			t.Fatal(clusterErr)
+		}
+		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+
+		sqlSensor, sensorErr := suite.Store.GetSensorByTreeID(context.Background(), treeID)
+		if sensorErr != nil {
+			t.Fatal(sensorErr)
+		}
+		sensor := mappers.sMapper.FromSql(sqlSensor)
 
 		// when
 		tree, err := r.GetByID(context.Background(), 1)
@@ -69,10 +84,12 @@ func TestTreeRepository_GetByID(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, tree)
-		assert.NotNil(t, tree.TreeCluster)
+		assert.Equal(t, tree.TreeCluster.ID, treeCluster.ID)
+		assert.Equal(t, tree.Sensor.ID, sensor.ID)
 		assert.NotNil(t, tree.Sensor)
 		assertExpectedEqualToTree(t, tree, testTrees[0])
 	})
+
 	t.Run("should return error if tree not found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -80,6 +97,32 @@ func TestTreeRepository_GetByID(t *testing.T) {
 
 		// when
 		tree, err := r.GetByID(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+	})
+
+	t.Run("should return error if tree id is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		tree, err := r.GetByID(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+	})
+
+	t.Run("should return error if tree id is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		tree, err := r.GetByID(context.Background(), 0)
 
 		// then
 		assert.Error(t, err)
@@ -100,6 +143,7 @@ func TestTreeRepository_GetByID(t *testing.T) {
 		assert.Nil(t, tree)
 	})
 }
+
 func TestTreeRepository_GetTreesByIDs(t *testing.T) {
 	t.Run("should return trees successfully by IDs", func(t *testing.T) {
 		// given
@@ -125,7 +169,7 @@ func TestTreeRepository_GetTreesByIDs(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
-		ids := []int32{99, 100}
+		ids := []int32{99, 100, -1, 0}
 
 		// when
 		trees, err := r.GetTreesByIDs(context.Background(), ids)
@@ -149,6 +193,7 @@ func TestTreeRepository_GetTreesByIDs(t *testing.T) {
 		assert.Nil(t, trees)
 	})
 }
+
 func TestTreeRepository_GetCenterPoint(t *testing.T) {
 	t.Run("should successfully calculate and parse the center point", func(t *testing.T) {
 		// given
@@ -212,7 +257,7 @@ func TestTreeRepository_GetByTreeClusterID(t *testing.T) {
 		}
 	})
 
-	t.Run("should return empty list when no trees are linked with the given tree cluster ID", func(t *testing.T) {
+	t.Run("should return error tree cluster ID is invalid", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
@@ -221,8 +266,34 @@ func TestTreeRepository_GetByTreeClusterID(t *testing.T) {
 		trees, err := r.GetByTreeClusterID(context.Background(), 99)
 
 		// then
-		assert.NoError(t, err)
-		assert.Empty(t, trees)
+		assert.Error(t, err)
+		assert.Nil(t, trees)
+	})
+
+	t.Run("should return error tree cluster ID is invalid", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		trees, err := r.GetByTreeClusterID(context.Background(), 0)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, trees)
+	})
+
+	t.Run("should return error tree cluster ID is invalid", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		trees, err := r.GetByTreeClusterID(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, trees)
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -400,6 +471,34 @@ func TestTreeRepository_GetSensorByTreeID(t *testing.T) {
 		assert.Nil(t, sensor, "Sensor should be nil when tree ID does not exist")
 	})
 
+	t.Run("should return error when tree ID is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+		invalidTreeID := int32(-1)
+
+		// when
+		sensor, err := r.GetSensorByTreeID(context.Background(), invalidTreeID)
+
+		// then
+		assert.Error(t, err, "Expected an error when the tree ID is negative")
+		assert.Nil(t, sensor, "Sensor should be nil when tree ID is negative")
+	})
+
+	t.Run("should return error when tree ID is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+		invalidTreeID := int32(0)
+
+		// when
+		sensor, err := r.GetSensorByTreeID(context.Background(), invalidTreeID)
+
+		// then
+		assert.Error(t, err, "Expected an error when the tree ID ID is zero")
+		assert.Nil(t, sensor, "Sensor should be nil when tree ID ID is zero")
+	})
+
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)
@@ -458,6 +557,34 @@ func TestTreeRepository_GetTreeClusterByTreeID(t *testing.T) {
 		// then
 		assert.Error(t, err, "Expected an error when the tree ID does not exist")
 		assert.Nil(t, treeCluster, "TreeCluster should be nil when tree ID does not exist")
+	})
+
+	t.Run("should return error when tree ID is zero", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+		invalidTreeID := int32(0)
+
+		// when
+		treeCluster, err := r.GetTreeClusterByTreeID(context.Background(), invalidTreeID)
+
+		// then
+		assert.Error(t, err, "Expected an error when the tree ID is zero")
+		assert.Nil(t, treeCluster, "TreeCluster should be nil when tree ID is zero")
+	})
+
+	t.Run("should return error when tree ID is negative", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeRepository(suite.Store, mappers)
+		invalidTreeID := int32(-1)
+
+		// when
+		treeCluster, err := r.GetTreeClusterByTreeID(context.Background(), invalidTreeID)
+
+		// then
+		assert.Error(t, err, "Expected an error when the tree ID is negative")
+		assert.Nil(t, treeCluster, "TreeCluster should be nil when tree ID is negative")
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
