@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +19,12 @@ func TestHealthCheckMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/health", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
@@ -29,7 +35,12 @@ func TestHealthCheckMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/health", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
@@ -41,7 +52,12 @@ func TestHealthCheckMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/health?param=value", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should handle query parameters")
@@ -56,7 +72,12 @@ func TestHealthCheckMiddleware(t *testing.T) {
 
 				req := httptest.NewRequest(method, "/health", nil)
 				resp, err := app.Test(req, -1)
-				defer resp.Body.Close()
+				if err != nil {
+					t.Fatalf("Request failed: %v", err)
+				}
+				if resp != nil {
+					defer resp.Body.Close()
+				}
 
 				assert.Nil(t, err)
 				assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Health check should only allow GET method")
@@ -70,31 +91,38 @@ func TestHealthCheckMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/health", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
 		assert.Equal(t, "text/plain; charset=utf-8", resp.Header.Get("Content-Type"), "Content-Type should be set to text/plain")
 	})
 
-	t.Run(
-		"should return correct response body",
-		func(t *testing.T) {
-			app := fiber.New()
-			app.Use(middleware.HealthCheck(nil))
+	t.Run("should return correct response body", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.HealthCheck(nil))
 
-			req := httptest.NewRequest("GET", "/health", nil)
-			resp, err := app.Test(req, -1)
+		req := httptest.NewRequest("GET", "/health", nil)
+		resp, err := app.Test(req, -1)
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
 			defer resp.Body.Close()
+		}
 
-			assert.Nil(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
 
-			body := make([]byte, resp.ContentLength)
-			resp.Body.Read(body)
-			assert.Equal(t, "OK", string(body), "Health check response body should be 'OK'")
-		},
-	)
+		body := make([]byte, resp.ContentLength)
+		resp.Body.Read(body)
+		assert.Equal(t, "OK", string(body), "Health check response body should be 'OK'")
+	})
 }
 
 func TestHTTPLoggerMiddleware(t *testing.T) {
@@ -104,7 +132,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/log", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.NotNil(t, resp, "Response should not be nil for HTTPLogger")
@@ -120,7 +153,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/log", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Response should return status 200")
@@ -132,7 +170,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/non-existent", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Response should return status 404 for non-existent route")
@@ -148,7 +191,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("POST", "/log", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "POST request should return status 200")
@@ -165,7 +213,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/log", nil)
 		req.Header.Set("X-Custom-Header", "TestHeader")
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Request with headers should return status 200")
@@ -207,7 +260,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/error", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode, "Internal server error should return status 500")
@@ -223,7 +281,12 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/log?param1=value1&param2=value2", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Request with query parameters should return status 200")
@@ -241,12 +304,18 @@ func TestRequestIDMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/request-id", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "RequestID middleware should allow the request to proceed")
 		assert.NotEmpty(t, resp.Header.Get("X-Request-ID"), "X-Request-ID header should be set")
 	})
+
 }
 
 func TestPublicRoutes(t *testing.T) {
@@ -264,11 +333,160 @@ func TestPublicRoutes(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/public", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Public route should return status 200")
 	})
+	t.Run("should set X-Request-ID header for a new request", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.RequestID())
+
+		app.Get("/request-id", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/request-id", nil)
+		resp, err := app.Test(req, -1)
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.NotEmpty(t, resp.Header.Get("X-Request-ID"), "X-Request-ID header should be set")
+	})
+
+	t.Run("should preserve X-Request-ID if already set by client", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.RequestID())
+
+		app.Get("/request-id", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/request-id", nil)
+		req.Header.Set("X-Request-ID", "existing-id")
+		resp, err := app.Test(req, -1)
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		assert.Equal(t, "existing-id", resp.Header.Get("X-Request-ID"), "Middleware should not overwrite existing X-Request-ID header")
+	})
+
+	t.Run("should handle concurrent requests and generate unique IDs", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.RequestID())
+
+		app.Get("/request-id", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		ids := make(map[string]bool)
+		for i := 0; i < 10; i++ {
+			req := httptest.NewRequest("GET", "/request-id", nil)
+			resp, err := app.Test(req, -1)
+			if err != nil {
+				t.Fatalf("Request failed: %v", err)
+			}
+			if resp != nil {
+				defer resp.Body.Close()
+			}
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+			id := resp.Header.Get("X-Request-ID")
+			assert.NotEmpty(t, id, "Each request should have an X-Request-ID header")
+			_, exists := ids[id]
+			assert.False(t, exists, "Request ID should be unique across concurrent requests")
+			ids[id] = true
+		}
+	})
+
+	t.Run("should set X-Request-ID even on non-matching routes", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.RequestID())
+
+		req := httptest.NewRequest("GET", "/non-existing-route", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Non-matching route should return 404")
+		assert.NotEmpty(t, resp.Header.Get("X-Request-ID"), "X-Request-ID header should still be set on non-matching routes")
+	})
+
+	t.Run("should return 500 Internal Server Error if middleware fails", func(t *testing.T) {
+		app := fiber.New()
+
+		app.Use(func(c *fiber.Ctx) error {
+			return fiber.NewError(http.StatusInternalServerError, "Middleware error")
+		})
+
+		app.Get("/request-id", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/request-id", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode, "Should return 500 if middleware fails")
+	})
+
+	t.Run("should generate consistent format for X-Request-ID", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.RequestID())
+
+		app.Get("/request-id", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/request-id", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		id := resp.Header.Get("X-Request-ID")
+		assert.Regexp(t, `^[a-f0-9-]+$`, id, "X-Request-ID should be in a consistent format")
+	})
+
 }
 
 func TestInvalidRoutes(t *testing.T) {
@@ -278,9 +496,157 @@ func TestInvalidRoutes(t *testing.T) {
 
 		req := httptest.NewRequest("GET", "/invalid-route", nil)
 		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Invalid route should return status 404")
+	})
+	t.Run("should return 404 for an undefined route", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.HealthCheck(nil))
+
+		req := httptest.NewRequest("GET", "/undefined-route", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Undefined route should return status 404")
+	})
+
+	t.Run("should return 405 for valid route with unsupported method", func(t *testing.T) {
+		app := fiber.New()
+		app.Get("/valid-route", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("POST", "/valid-route", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusMethodNotAllowed, resp.StatusCode, "Unsupported method for valid route should return status 405")
+	})
+
+	t.Run("should return 404 for routes with similar names but no exact match", func(t *testing.T) {
+		app := fiber.New()
+		app.Get("/exact-route", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/exact-route-similar", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Similar route name should return status 404 if not an exact match")
+	})
+
+	t.Run("should return 404 for route with extra trailing slash", func(t *testing.T) {
+		app := fiber.New(fiber.Config{
+			StrictRouting: false,
+		})
+		app.Get("/no-trailing-slash", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/no-trailing-slash/", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode, "Route with extra trailing slash should return status 200 if framework normalizes slashes")
+	})
+
+	t.Run("should return 404 for routes with query parameters on undefined route", func(t *testing.T) {
+		app := fiber.New()
+		app.Get("/defined-route", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/undefined-route?query=param", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Undefined route with query parameters should return status 404")
+	})
+
+	t.Run("should return 404 for routes with incorrect parameter format", func(t *testing.T) {
+		app := fiber.New()
+		app.Get("/route/:id", func(c *fiber.Ctx) error {
+			id := c.Params("id")
+			if _, err := strconv.Atoi(id); err != nil {
+				return c.SendStatus(http.StatusNotFound)
+			}
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/route/wrong-format-id", nil)
+		resp, err := app.Test(req, -1)
+
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Route with incorrect parameter format should return status 404")
+	})
+
+	t.Run("should return 404 for routes with incorrect prefix or suffix", func(t *testing.T) {
+		app := fiber.New()
+		app.Get("/prefix-route", func(c *fiber.Ctx) error {
+			return c.SendStatus(http.StatusOK)
+		})
+
+		req := httptest.NewRequest("GET", "/wrong-prefix-route", nil)
+		resp, err := app.Test(req, -1)
+		if err != nil {
+			t.Fatalf("Request failed: %v", err)
+		}
+		if resp != nil {
+			defer resp.Body.Close()
+		}
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Route with incorrect prefix or suffix should return status 404")
 	})
 }
