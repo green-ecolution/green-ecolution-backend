@@ -58,7 +58,7 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 	if t.Sensor != nil {
 		sensorID = &t.Sensor.ID
 
-		if err := r.store.UnlinkSensorID(ctx, sensorID); err != nil {
+		if err := r.store.UnlinkSensorIDFromTrees(ctx, sensorID); err != nil {
 			return err
 		}
 	}
