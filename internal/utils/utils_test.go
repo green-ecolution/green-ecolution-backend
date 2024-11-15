@@ -1,6 +1,10 @@
 package utils
 
 import (
+	"io"
+
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -130,7 +134,71 @@ func TestRootDir(t *testing.T) {
 }
 
 func TestParseJSONResponse(t *testing.T) {
-	t.Skip("it's only used in tests, so maybe it's should be moved to test file")
+	t.Run("should successfully decode JSON response", func(t *testing.T) {
+		// given
+		responseBody := `{"name":"Toni","age":30}`
+		response := &http.Response{
+			Body: io.NopCloser(strings.NewReader(responseBody)),
+		}
+		var result map[string]any
+
+		// when
+		err := ParseJSONResponse(response, &result)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, "Toni", result["name"])
+		assert.Equal(t, 30.0, result["age"])
+	})
+
+	t.Run("should return error for invalid JSON", func(t *testing.T) {
+		// given
+		responseBody := `{"name": "Toni", "age": }` // Invalid JSON
+		response := &http.Response{
+			Body: io.NopCloser(strings.NewReader(responseBody)),
+		}
+		var result map[string]any
+
+		// when
+		err := ParseJSONResponse(response, &result)
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "invalid character")
+	})
+
+	t.Run("should handle empty body", func(t *testing.T) {
+		// given
+		response := &http.Response{
+			Body: io.NopCloser(strings.NewReader("")),
+		}
+		var result map[string]any
+
+		// when
+		err := ParseJSONResponse(response, &result)
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "EOF")
+	})
+
+	t.Run("should handle JSON array response", func(t *testing.T) {
+		// given
+		responseBody := `[{"name":"Toni"},{"name":"Tester"}]`
+		response := &http.Response{
+			Body: io.NopCloser(strings.NewReader(responseBody)),
+		}
+		var result []map[string]any
+
+		// when
+		err := ParseJSONResponse(response, &result)
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, result, 2)
+		assert.Equal(t, "Toni", result[0]["name"])
+		assert.Equal(t, "Tester", result[1]["name"])
+	})
 }
 
 func TestStringPtrToString(t *testing.T) {
