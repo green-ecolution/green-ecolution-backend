@@ -49,23 +49,27 @@ func (r *TreeRepository) UpdateTreeClusterID(ctx context.Context, treeIDs []int3
 }
 
 func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) error {
-	var sensorID *int32
-	if t.Sensor != nil {
-		sensorID = &t.Sensor.ID
-	}
-
 	var treeClusterID *int32
 	if t.TreeCluster != nil {
 		treeClusterID = &t.TreeCluster.ID
+	}
+
+	var sensorID *int32
+	if t.Sensor != nil {
+		sensorID = &t.Sensor.ID
+
+		if err := r.store.UnlinkSensorID(ctx, sensorID); err != nil {
+			return err
+		}
 	}
 
 	args := sqlc.UpdateTreeParams{
 		ID:             t.ID,
 		Species:        t.Species,
 		Readonly:       t.Readonly,
-		SensorID:       sensorID,
 		PlantingYear:   t.PlantingYear,
 		TreeNumber:     t.Number,
+		SensorID:       sensorID,
 		TreeClusterID:  treeClusterID,
 		WateringStatus: sqlc.WateringStatus(t.WateringStatus),
 		Description:    &t.Description,
