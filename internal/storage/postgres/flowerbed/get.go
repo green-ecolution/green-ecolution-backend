@@ -17,8 +17,15 @@ func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed
 
 	data := r.mapper.FromSqlList(row)
 	for _, f := range data {
-		f.Sensor, _ = r.GetSensorByFlowerbedID(ctx, f.ID) //  Error can be ignored when sensor is not found
-		f.Images, _ = r.GetAllImagesByID(ctx, f.ID)       //  Error can be ignored when images are not found
+		f.Sensor, err = r.GetSensorByFlowerbedID(ctx, f.ID)
+		if err != nil && !errors.Is(err, storage.ErrSensorNotFound) {
+			return nil, err
+		}
+
+		f.Images, _ = r.GetAllImagesByID(ctx, f.ID)
+		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+			return nil, err
+		}
 
 		f.Region, err = r.GetRegionByFlowerbedID(ctx, f.ID)
 		if err != nil {
@@ -37,8 +44,15 @@ func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.
 
 	data := r.mapper.FromSql(row)
 
-	data.Sensor, _ = r.GetSensorByFlowerbedID(ctx, id) //  Error can be ignored when sensor is not found
-	data.Images, _ = r.GetAllImagesByID(ctx, id)       //  Error can be ignored when images are not found
+	data.Sensor, err = r.GetSensorByFlowerbedID(ctx, id)
+	if err != nil && !errors.Is(err, storage.ErrSensorNotFound) {
+		return nil, err
+	}
+
+	data.Images, err = r.GetAllImagesByID(ctx, id)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, err
+	}
 
 	data.Region, err = r.GetRegionByFlowerbedID(ctx, id)
 	if err != nil {
