@@ -52,7 +52,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		numberPlate :=  "FL ZT 9876"
+		numberPlate := "FL ZT 9876"
 
 		// when
 		firstVehicle, err := r.Update(

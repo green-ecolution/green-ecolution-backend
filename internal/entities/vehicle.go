@@ -42,7 +42,7 @@ type VehicleCreate struct {
 
 type VehicleUpdate struct {
 	NumberPlate   string `validate:"required"`
-	Description   string 
+	Description   string
 	WaterCapacity float64 `validate:"gt=0"`
 	Status        VehicleStatus
 	Type          VehicleType

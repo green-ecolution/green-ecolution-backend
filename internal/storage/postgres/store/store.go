@@ -43,8 +43,8 @@ func (s *Store) HandleError(err error) error {
 	if err == nil {
 		return nil
 	}
-	
-	if (errors.Is(err, pgx.ErrNoRows)) {
+
+	if errors.Is(err, pgx.ErrNoRows) {
 		switch s.entityType {
 		case Sensor:
 			return storage.ErrSensorNotFound

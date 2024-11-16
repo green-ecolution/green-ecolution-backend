@@ -153,7 +153,7 @@ func TestVehicleService_Create(t *testing.T) {
 		expectedVehicle := getTestVehicles()[0]
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(nil, nil)
 
@@ -181,7 +181,7 @@ func TestVehicleService_Create(t *testing.T) {
 		expectedErr := errors.New("Failed to create vehicle")
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(nil, nil)
 
@@ -207,7 +207,7 @@ func TestVehicleService_Create(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(getTestVehicles()[0], nil)
 
@@ -227,7 +227,7 @@ func TestVehicleService_Create(t *testing.T) {
 		expectedErr := errors.New("failed to get vehicle")
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(nil, expectedErr)
 
@@ -297,7 +297,7 @@ func TestVehicleService_Update(t *testing.T) {
 		).Return(expectedVehicle, nil)
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(nil, nil)
 
@@ -349,7 +349,7 @@ func TestVehicleService_Update(t *testing.T) {
 		).Return(expectedVehicle, nil)
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(nil, nil)
 
@@ -381,7 +381,7 @@ func TestVehicleService_Update(t *testing.T) {
 		).Return(getTestVehicles()[0], nil)
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(getTestVehicles()[0], nil)
 
@@ -406,7 +406,7 @@ func TestVehicleService_Update(t *testing.T) {
 		).Return(getTestVehicles()[0], nil)
 
 		vehicleRepo.EXPECT().GetByPlate(
-			ctx, 
+			ctx,
 			input.NumberPlate,
 		).Return(nil, expectedErr)
 

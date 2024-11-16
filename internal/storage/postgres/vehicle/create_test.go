@@ -22,7 +22,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		numberPlate :=  "FL ZU 9876"
+		numberPlate := "FL ZU 9876"
 
 		// when
 		got, err := r.Create(
@@ -48,7 +48,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		numberPlate :=  "FL ZB 9876"
+		numberPlate := "FL ZB 9876"
 
 		// when
 		got, err := r.Create(
@@ -104,7 +104,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		numberPlate :=  "FL ZT 9876"
+		numberPlate := "FL ZT 9876"
 
 		// when
 		firstVehicle, err := r.Create(

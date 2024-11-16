@@ -14,13 +14,13 @@ import (
 
 type VehicleService struct {
 	vehicleRepo storage.VehicleRepository
-	validator       *validator.Validate
+	validator   *validator.Validate
 }
 
 func NewVehicleService(vehicleRepository storage.VehicleRepository) service.VehicleService {
 	return &VehicleService{
 		vehicleRepo: vehicleRepository,
-		validator:       validator.New(),
+		validator:   validator.New(),
 	}
 }
 
@@ -61,7 +61,7 @@ func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate)
 	} else if isTaken {
 		return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
 	}
-	
+
 	created, err := v.vehicleRepo.Create(ctx,
 		vehicle.WithNumberPlate(vh.NumberPlate),
 		vehicle.WithDescription(vh.Description),
@@ -81,7 +81,7 @@ func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.Vehi
 	if err := v.validator.Struct(vh); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
-	
+
 	_, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
