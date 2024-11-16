@@ -42,7 +42,7 @@ type DashboardConfig struct {
 }
 
 type IdentityAuthConfig struct {
-  OidcProvider OidcProvider `mapstructure:"oidc_provider"`
+	OidcProvider OidcProvider `mapstructure:"oidc_provider"`
 }
 
 type Config struct {
