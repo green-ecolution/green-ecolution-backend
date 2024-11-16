@@ -115,7 +115,7 @@ func (v *VehicleService) Ready() bool {
 }
 
 func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
+	if errors.Is(err, storage.ErrVehicleNotFound) {
 		return service.NewError(service.NotFound, err.Error())
 	}
 
