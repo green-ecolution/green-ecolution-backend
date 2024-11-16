@@ -132,12 +132,12 @@ func WithRegionID(id int32) entities.EntityFunc[entities.Flowerbed] {
 }
 
 func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
-	rowID, err := r.store.DeleteFlowerbed(ctx, id)
+	_, err := r.store.DeleteFlowerbed(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return r.checkFlowerbedExists(rowID)
+	return nil
 }
 
 func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
@@ -161,35 +161,28 @@ func (r *FlowerbedRepository) UnlinkImage(ctx context.Context, id, imageID int32
 		ImageID:     imageID,
 	}
 
-	rowID, err := r.store.UnlinkFlowerbedImage(ctx, &args)
+	_, err := r.store.UnlinkFlowerbedImage(ctx, &args)
 	if err != nil {
 		return err
 	}
 
-	return r.checkFlowerbedExists(rowID)
+	return nil
 }
 
 func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) error {
-	rowID, err := r.store.UnlinkAllFlowerbedImages(ctx, id)
+	_, err := r.store.UnlinkAllFlowerbedImages(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return r.checkFlowerbedExists(rowID)
+	return nil
 }
 
 func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
-	rowID, err := r.store.ArchiveFlowerbed(ctx, id)
+	_, err := r.store.ArchiveFlowerbed(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return r.checkFlowerbedExists(rowID)
-}
-
-func (r *FlowerbedRepository) checkFlowerbedExists(rowID int32) error {
-	if rowID == 0 {
-		return storage.ErrFlowerbedNotFound
-	}
 	return nil
 }
