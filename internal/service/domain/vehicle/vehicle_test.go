@@ -58,7 +58,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicles)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "500: GetAll failed", err.Error())
 	})
 }
 
@@ -86,7 +86,7 @@ func TestVehicleService_GetByID(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		id := int32(1)
-		expectedErr := storage.ErrEntityNotFound
+		expectedErr := storage.ErrVehicleNotFound
 		vehicleRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when
@@ -95,7 +95,7 @@ func TestVehicleService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicle)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "404: vehicle not found", err.Error())
 	})
 }
 
@@ -123,7 +123,7 @@ func TestVehicleService_GetByPlate(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		plate := "FL TBZ 1234"
-		expectedErr := storage.ErrEntityNotFound
+		expectedErr := storage.ErrVehicleNotFound
 		vehicleRepo.EXPECT().GetByPlate(ctx, plate).Return(nil, expectedErr)
 
 		// when
@@ -132,7 +132,7 @@ func TestVehicleService_GetByPlate(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicle)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "404: vehicle not found", err.Error())
 	})
 }
 
@@ -173,7 +173,7 @@ func TestVehicleService_Create(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
-		expectedErr := errors.New("Failed to create cluster")
+		expectedErr := errors.New("Failed to create vehicle")
 
 		vehicleRepo.EXPECT().Create(
 			ctx,
@@ -189,7 +189,7 @@ func TestVehicleService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "500: Failed to create vehicle", err.Error())
 	})
 
 	t.Run("should return validation error on empty number plate", func(t *testing.T) {
@@ -205,7 +205,7 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 
 	t.Run("should return validation error on zero water capacity", func(t *testing.T) {
@@ -222,7 +222,7 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 }
 
@@ -280,14 +280,14 @@ func TestVehicleService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(storage.ErrVehicleNotFound).Error())
+		assert.Equal(t, "404: vehicle not found", err.Error())
 	})
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
-		expectedErr := errors.New("failed to update cluster")
+		expectedErr := errors.New("failed to update vehicle")
 		expectedVehicle := getTestVehicles()[0]
 
 		vehicleRepo.EXPECT().GetByID(
@@ -310,7 +310,7 @@ func TestVehicleService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "500: failed to update vehicle", err.Error())
 	})
 
 	t.Run("should return validation error on empty number plate", func(t *testing.T) {
@@ -326,7 +326,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 
 	t.Run("should return validation error on zero water capacity", func(t *testing.T) {
@@ -343,7 +343,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 }
 
@@ -371,7 +371,7 @@ func TestVehicleService_Delete(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		id := int32(1)
-		expectedErr := storage.ErrEntityNotFound
+		expectedErr := storage.ErrVehicleNotFound
 		vehicleRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when
@@ -380,6 +380,7 @@ func TestVehicleService_Delete(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "404: vehicle not found", err.Error())
 	})
 
 	t.Run("should return error if deleting vehicle fails", func(t *testing.T) {
@@ -397,7 +398,7 @@ func TestVehicleService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.Equal(t, "500: failed to delete", err.Error())
 	})
 }
 
