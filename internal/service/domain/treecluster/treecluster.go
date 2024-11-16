@@ -2,9 +2,11 @@ package treecluster
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 
+	"github.com/pkg/errors"
+
+	"github.com/go-playground/validator/v10"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -16,6 +18,7 @@ type TreeClusterService struct {
 	treeRepo        storage.TreeRepository
 	regionRepo      storage.RegionRepository
 	locator         service.GeoClusterLocator
+	validator       *validator.Validate
 }
 
 func NewTreeClusterService(
@@ -29,6 +32,7 @@ func NewTreeClusterService(
 		treeRepo:        treeRepo,
 		regionRepo:      regionRepo,
 		locator:         locator,
+		validator:       validator.New(),
 	}
 }
 
@@ -51,6 +55,10 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
+	if err := s.validator.Struct(tc); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+
 	trees, err := s.getTrees(ctx, tc.TreeIDs)
 	if err != nil {
 		return nil, handleError(err)
@@ -90,6 +98,10 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 }
 
 func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
+	if err := s.validator.Struct(tc); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+
 	trees, err := s.getTrees(ctx, tc.TreeIDs)
 	if err != nil {
 		return nil, handleError(err)

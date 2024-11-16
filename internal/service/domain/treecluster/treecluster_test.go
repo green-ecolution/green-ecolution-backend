@@ -266,6 +266,31 @@ func TestTreeClusterService_Create(t *testing.T) {
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
+
+	t.Run("should return validation error on empty name", func(t *testing.T) {
+		// given
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
+
+		newCluster := &entities.TreeClusterCreate{
+			Name:          "",
+			Address:       "123 Main St",
+			Description:   "Test description",
+			SoilCondition: entities.TreeSoilConditionLehmig,
+			TreeIDs:       []*int32{},
+		}
+
+		// when
+		result, err := svc.Create(ctx, newCluster)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
 }
 
 func TestTreeClusterService_Update(t *testing.T) {
@@ -445,6 +470,31 @@ func TestTreeClusterService_Update(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(storage.ErrEntityNotFound).Error())
+	})
+
+	t.Run("should return validation error on empty name", func(t *testing.T) {
+		// given
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		locator := service.NewMockGeoClusterLocator(t)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, locator)
+
+		updateCluster := &entities.TreeClusterUpdate{
+			Name:          "",
+			Address:       "123 Main St",
+			Description:   "Test description",
+			SoilCondition: entities.TreeSoilConditionLehmig,
+			TreeIDs:       []*int32{},
+		}
+
+		// when
+		result, err := svc.Update(ctx, int32(1), updateCluster)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
 	})
 }
 
