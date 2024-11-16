@@ -23,13 +23,13 @@ func (s *AuthService) Register(ctx context.Context, user *domain.RegisterUser) (
 }
 
 func (s *AuthService) LoginRequest(_ context.Context, loginRequest *domain.LoginRequest) (*domain.LoginResp, error) {
-	loginURL, err := url.ParseRequestURI(s.cfg.KeyCloak.Frontend.AuthURL)
+	loginURL, err := url.ParseRequestURI(s.cfg.OidcProvider.AuthURL)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url in config").Error())
 	}
 
 	query := loginURL.Query()
-	query.Add("client_id", s.cfg.KeyCloak.Frontend.ClientID)
+	query.Add("client_id", s.cfg.OidcProvider.Frontend.ClientID)
 	query.Add("response_type", "code")
 	query.Add("redirect_uri", loginRequest.RedirectURL.String())
 

@@ -41,24 +41,8 @@ type DashboardConfig struct {
 	Title string
 }
 
-type KeyCloakConfig struct {
-	BaseURL        string
-	Realm          string
-	ClientID       string `mapstructure:"client_id"`
-	ClientSecret   string `mapstructure:"client_secret"`
-	RealmPublicKey string `mapstructure:"realm_public_key"`
-	Frontend       KeyCloakFrontendConfig
-}
-
-type KeyCloakFrontendConfig struct {
-	ClientID     string `mapstructure:"client_id"`
-	ClientSecret string `mapstructure:"client_secret"`
-	AuthURL      string `mapstructure:"auth_url"`
-	TokenURL     string `mapstructure:"token_url"`
-}
-
 type IdentityAuthConfig struct {
-	KeyCloak KeyCloakConfig
+  OidcProvider OidcProvider `mapstructure:"oidc_provider"`
 }
 
 type Config struct {

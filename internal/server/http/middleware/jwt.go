@@ -16,7 +16,7 @@ import (
 )
 
 func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) fiber.Handler {
-	base64Str := cfg.KeyCloak.RealmPublicKey
+	base64Str := cfg.OidcProvider.PublicKey.StaticKey
 	publicKey, err := parsePublicKey(base64Str)
 	if err != nil {
 		return func(c *fiber.Ctx) error {
