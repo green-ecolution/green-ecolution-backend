@@ -12,8 +12,8 @@ import (
 func (s *KeycloakTestSuite) LoginAdminAndGetToken(t testing.TB) *gocloak.JWT {
 	t.Helper()
 	identityConfig := s.IdentityConfig(t, context.Background())
-	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
-	token, err := client.Login(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm, s.User, s.Password)
+	client := gocloak.NewClient(identityConfig.OidcProvider.BaseURL)
+	token, err := client.Login(context.Background(), identityConfig.OidcProvider.Backend.ClientID, identityConfig.OidcProvider.Backend.ClientSecret, identityConfig.OidcProvider.DomainName, s.User, s.Password)
 	if err != nil {
 		t.Fatalf("loginAdminAndGetToken::failed to get token: %v", err)
 	}
@@ -23,8 +23,8 @@ func (s *KeycloakTestSuite) LoginAdminAndGetToken(t testing.TB) *gocloak.JWT {
 func (s *KeycloakTestSuite) LoginUser(t testing.TB, user *entities.User) *gocloak.JWT {
 	t.Helper()
 	identityConfig := s.IdentityConfig(t, context.Background())
-	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
-	token, err := client.Login(context.Background(), identityConfig.KeyCloak.Frontend.ClientID, identityConfig.KeyCloak.Frontend.ClientSecret, identityConfig.KeyCloak.Realm, user.Username, "test")
+	client := gocloak.NewClient(identityConfig.OidcProvider.BaseURL)
+	token, err := client.Login(context.Background(), identityConfig.OidcProvider.Frontend.ClientID, identityConfig.OidcProvider.Frontend.ClientSecret, identityConfig.OidcProvider.DomainName, user.Username, "test")
 	if err != nil {
 		t.Fatalf("loginUser::failed to get token: %v", err)
 	}
@@ -35,8 +35,8 @@ func (s *KeycloakTestSuite) LoginUser(t testing.TB, user *entities.User) *gocloa
 func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) {
 	t.Helper()
 	identityConfig := s.IdentityConfig(t, context.Background())
-	client := gocloak.NewClient(identityConfig.KeyCloak.BaseURL)
-	token, err := client.LoginClient(context.Background(), identityConfig.KeyCloak.ClientID, identityConfig.KeyCloak.ClientSecret, identityConfig.KeyCloak.Realm)
+	client := gocloak.NewClient(identityConfig.OidcProvider.BaseURL)
+	token, err := client.LoginClient(context.Background(), identityConfig.OidcProvider.Backend.ClientID, identityConfig.OidcProvider.Backend.ClientSecret, identityConfig.OidcProvider.DomainName)
 	if err != nil {
 		t.Fatalf("ensureUserExists::failed to get token: %v", err)
 	}
@@ -55,12 +55,12 @@ func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) 
 		Attributes: &attribute,
 	}
 
-	userID, err := client.CreateUser(context.Background(), token.AccessToken, identityConfig.KeyCloak.Realm, kcUser)
+	userID, err := client.CreateUser(context.Background(), token.AccessToken, identityConfig.OidcProvider.DomainName, kcUser)
 	if err != nil {
 		t.Log("ensureUserExists::failed to create user. maybe user already exists. error: ", err)
 	}
 
-	if err = client.SetPassword(context.Background(), token.AccessToken, userID, identityConfig.KeyCloak.Realm, "test", false); err != nil {
+	if err = client.SetPassword(context.Background(), token.AccessToken, userID, identityConfig.OidcProvider.DomainName, "test", false); err != nil {
 		t.Fatalf("ensureUserExists::failed to set password: %v", err)
 	}
 }

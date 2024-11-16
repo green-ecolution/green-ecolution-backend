@@ -59,17 +59,18 @@ func (s *KeycloakTestSuite) IdentityConfig(t testing.TB, ctx context.Context) *c
 	frontendClient := s.GetFrontendClient(t, ctx)
 
 	return &config.IdentityAuthConfig{
-		KeyCloak: config.KeyCloakConfig{
-			BaseURL:        s.GetAuthServerURL(t, ctx),
-			Realm:          s.RealmName,
-			ClientID:       s.BackendClientID,
-			ClientSecret:   *backendClient.Secret,
-			RealmPublicKey: "",
-			Frontend: config.KeyCloakFrontendConfig{
+		OidcProvider: config.OidcProvider{
+			BaseURL:    s.GetAuthServerURL(t, ctx),
+			DomainName: s.RealmName,
+			AuthURL:    s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/auth",
+			TokenURL:   s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/token",
+			Backend: config.OidcClient{
+				ClientID:     s.BackendClientID,
+				ClientSecret: *backendClient.Secret,
+			},
+			Frontend: config.OidcClient{
 				ClientID:     s.FrontendClientID,
 				ClientSecret: *frontendClient.Secret,
-				AuthURL:      s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/auth",
-				TokenURL:     s.GetAuthServerURL(t, ctx) + "/realms/" + s.RealmName + "/protocol/openid-connect/token",
 			},
 		},
 	}

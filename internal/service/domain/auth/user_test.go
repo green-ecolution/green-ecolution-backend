@@ -94,14 +94,16 @@ func TestLoginRequest(t *testing.T) {
 	t.Run("should return login url", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{
-			KeyCloak: config.KeyCloakConfig{
-				BaseURL:      "http://localhost:8080/auth",
-				Realm:        "realm",
-				ClientID:     "backend_client",
-				ClientSecret: "backend_secret",
-				Frontend: config.KeyCloakFrontendConfig{
-					AuthURL:      "http://localhost:8080/auth/realms/realm/protocol/openid-connect/auth",
-					TokenURL:     "http://localhost:8080/auth/realms/realm/protocol/openid-connect/token",
+			OidcProvider: config.OidcProvider{
+				BaseURL:    "http://localhost:8080/auth",
+				DomainName: "realm",
+				AuthURL:    "http://localhost:8080/auth/realms/realm/protocol/openid-connect/auth",
+				TokenURL:   "http://localhost:8080/auth/realms/realm/protocol/openid-connect/token",
+				Backend: config.OidcClient{
+					ClientID:     "backend_client",
+					ClientSecret: "backend_secret",
+				},
+				Frontend: config.OidcClient{
 					ClientID:     "frontend_client",
 					ClientSecret: "frontend_secret",
 				},
@@ -115,7 +117,7 @@ func TestLoginRequest(t *testing.T) {
 
 		respURL, _ := url.Parse("http://localhost:8080/auth/realms/realm/protocol/openid-connect/auth")
 		query := respURL.Query()
-		query.Add("client_id", identityConfig.KeyCloak.Frontend.ClientID)
+		query.Add("client_id", identityConfig.OidcProvider.Frontend.ClientID)
 		query.Add("response_type", "code")
 		query.Add("redirect_uri", loginRequest.RedirectURL.String())
 		respURL.RawQuery = query.Encode()
@@ -139,10 +141,8 @@ func TestLoginRequest(t *testing.T) {
 	t.Run("should return error when failed to parse auth url in config", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{
-			KeyCloak: config.KeyCloakConfig{
-				Frontend: config.KeyCloakFrontendConfig{
-					AuthURL: "not_a_valid_url",
-				},
+			OidcProvider: config.OidcProvider{
+				AuthURL: "not_a_valid_url",
 			},
 		}
 

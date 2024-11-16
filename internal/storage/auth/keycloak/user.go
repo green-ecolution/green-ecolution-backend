@@ -33,18 +33,18 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 
 	keyCloakUser := userToKeyCloakUser(user)
 
-	clientToken, err := loginRestAPIClient(ctx, r.cfg.KeyCloak.BaseURL, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
+	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, *keyCloakUser)
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, *keyCloakUser)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create user")
 	}
 
-	if err = client.SetPassword(ctx, clientToken.AccessToken, userID, r.cfg.KeyCloak.Realm, password, false); err != nil {
+	if err = client.SetPassword(ctx, clientToken.AccessToken, userID, r.cfg.OidcProvider.DomainName, password, false); err != nil {
 		return nil, errors.Wrap(err, "failed to set password")
 	}
 
@@ -53,7 +53,7 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 		for i, roleName := range roles {
 			var roleKeyCloak *gocloak.Role
 			roleNameLowerCase := strings.ToLower(roleName)
-			roleKeyCloak, err = client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, roleNameLowerCase)
+			roleKeyCloak, err = client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, roleNameLowerCase)
 			if err != nil {
 				return nil, errors.Wrap(err, fmt.Sprintf("failed to get role by name: '%v'", roleNameLowerCase))
 			}
@@ -62,12 +62,12 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 				kcRoles[i] = *roleKeyCloak
 			}
 		}
-		if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles); err != nil {
+		if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, userID, kcRoles); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
 		}
 	}
 
-	userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID)
+	userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, userID)
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to get created user by id: '%v'", userID))
 	}
@@ -76,8 +76,8 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 }
 
 func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string) error {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	if err := client.Logout(ctx, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm, refreshToken); err != nil {
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+	if err := client.Logout(ctx, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName, refreshToken); err != nil {
 		return errors.Wrap(err, "failed to logout")
 	}
 	return nil

@@ -10,12 +10,14 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -449,4 +451,62 @@ func TestRegister(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		mockAuthService.AssertExpectations(t)
 	})
+}
+
+func TestRefreshToken(t *testing.T) {
+	t.Run("should refresh token sucessfully", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Post("/v1/user/refresh", RefreshToken(mockAuthService))
+		refreshToken := generateJWT(t, "user123")
+
+		expectedResponse := &domain.ClientToken{
+			AccessToken:  "valid_access_token",
+			RefreshToken: refreshToken,
+			ExpiresIn:    3600,
+			TokenType:    "Bearer",
+		}
+
+		// when
+		mockAuthService.EXPECT().RefreshToken(mock.Anything, refreshToken).Return(expectedResponse, nil)
+		reqBody, _ := json.Marshal(entities.RefreshTokenRequest{
+			RefreshToken: refreshToken,
+		})
+		req := httptest.NewRequest(http.MethodPost, "/v1/user/refresh", bytes.NewReader(reqBody))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		mockAuthService.AssertExpectations(t)
+
+		var response entities.ClientTokenResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.Nil(t, err)
+		assert.Equal(t, expectedResponse.AccessToken, response.AccessToken)
+		assert.Equal(t, expectedResponse.RefreshToken, response.RefreshToken)
+		assert.Equal(t, expectedResponse.ExpiresIn, response.ExpiresIn)
+		assert.Equal(t, expectedResponse.TokenType, response.TokenType)
+	})
+}
+
+func generateJWT(t testing.TB, sub string) string {
+	t.Helper()
+
+	claims := jwt.MapClaims{
+		"sub": sub,
+		"exp": time.Now().Add(time.Hour).Unix(),
+		"iat": time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(viper.GetString("jwt.secret")))
+	if err != nil {
+		t.Fatalf("failed to generate JWT: %v", err)
+	}
+
+	return tokenString
 }
