@@ -490,6 +490,47 @@ func TestRefreshToken(t *testing.T) {
 		assert.Equal(t, expectedResponse.ExpiresIn, response.ExpiresIn)
 		assert.Equal(t, expectedResponse.TokenType, response.TokenType)
 	})
+
+  t.Run("Should return 400 bad request for invalid request body.", func(t *testing.T) {
+    // given
+    app := fiber.New()
+    mockAuthService := serviceMock.NewMockAuthService(t)
+    app.Post("/v1/user/refresh", RefreshToken(mockAuthService))
+
+    // when
+    req := httptest.NewRequest(http.MethodPost, "/v1/user/refresh", nil)
+    resp, err := app.Test(req, -1)
+    defer resp.Body.Close()
+
+    // then
+    assert.Nil(t, err)
+    assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+    mockAuthService.AssertExpectations(t)
+  })
+
+  t.Run("Should return 401 for invalid refresh token.", func(t *testing.T) {
+    // given
+    app := fiber.New()
+    mockAuthService := serviceMock.NewMockAuthService(t)
+    app.Post("/v1/user/refresh", RefreshToken(mockAuthService))
+
+    refreshToken := generateJWT(t, "user123")
+
+    // when
+    mockAuthService.EXPECT().RefreshToken(mock.Anything, refreshToken).Return(nil, errors.New("service error"))
+    reqBody, _ := json.Marshal(entities.RefreshTokenRequest{
+      RefreshToken: refreshToken,
+    })
+    req := httptest.NewRequest(http.MethodPost, "/v1/user/refresh", bytes.NewReader(reqBody))
+    req.Header.Set("Content-Type", "application/json")
+    resp, err := app.Test(req, -1)
+    defer resp.Body.Close()
+
+    // then
+    assert.Nil(t, err)
+    assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+    mockAuthService.AssertExpectations(t)
+  })
 }
 
 func generateJWT(t testing.TB, sub string) string {
