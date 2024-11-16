@@ -27,7 +27,7 @@ func Login(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		redirectURL, err := url.ParseRequestURI(c.Query("redirect_url"))
 		if err != nil {
-      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		req := domain.LoginRequest{
@@ -36,7 +36,7 @@ func Login(svc service.AuthService) fiber.Handler {
 
 		resp, err := svc.LoginRequest(ctx, &req)
 		if err != nil {
-      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
 		}
 
 		response := entities.LoginResponse{
@@ -60,7 +60,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.LogoutRequest{}
 		if err := c.BodyParser(&req); err != nil {
-      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		domainReq := domain.Logout{
@@ -69,7 +69,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 
 		err := svc.LogoutRequest(ctx, &domainReq)
 		if err != nil {
-      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
 		}
 
 		return c.SendStatus(fiber.StatusOK)
@@ -92,12 +92,12 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.LoginTokenRequest{}
 		if err := c.BodyParser(&req); err != nil {
-      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		redirectURL, err := parseURL(c.Query("redirect_url"))
 		if err != nil {
-      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		domainReq := domain.LoginCallback{
@@ -107,7 +107,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		token, err := svc.ClientTokenCallback(ctx, &domainReq)
 		if err != nil {
-      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get token").Error()))
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get token").Error()))
 		}
 
 		response := entities.ClientTokenResponse{
@@ -137,7 +137,7 @@ func Register(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.UserRegisterRequest{}
 		if err := c.BodyParser(&req); err != nil {
-      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		domainUser := domain.RegisterUser{
@@ -153,7 +153,7 @@ func Register(svc service.AuthService) fiber.Handler {
 
 		u, err := svc.Register(ctx, &domainUser)
 		if err != nil {
-      return errorhandler.HandleError(err)
+			return errorhandler.HandleError(err)
 		}
 
 		response := entities.UserResponse{
@@ -288,17 +288,17 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
 		}
 
-    jwtClaims := jwt.MapClaims{}
+		jwtClaims := jwt.MapClaims{}
 		_, err := jwt.ParseWithClaims(req.RefreshToken, jwtClaims, func(token *jwt.Token) (any, error) {
 			return token, nil
 		})
 
 		var sub string
-    if claims, ok := jwtClaims["sub"]; ok {
-      if e, ok := claims.(string); ok {
-        sub = e
-      }
-    }
+		if claims, ok := jwtClaims["sub"]; ok {
+			if e, ok := claims.(string); ok {
+				sub = e
+			}
+		}
 
 		if sub == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
