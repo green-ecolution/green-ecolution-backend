@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/singleflight"
@@ -26,7 +27,7 @@ func Login(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		redirectURL, err := url.ParseRequestURI(c.Query("redirect_url"))
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
+      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		req := domain.LoginRequest{
@@ -35,7 +36,7 @@ func Login(svc service.AuthService) fiber.Handler {
 
 		resp, err := svc.LoginRequest(ctx, &req)
 		if err != nil {
-			return err
+      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
 		}
 
 		response := entities.LoginResponse{
@@ -59,7 +60,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.LogoutRequest{}
 		if err := c.BodyParser(&req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		domainReq := domain.Logout{
@@ -68,7 +69,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 
 		err := svc.LogoutRequest(ctx, &domainReq)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
+      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
 		}
 
 		return c.SendStatus(fiber.StatusOK)
@@ -91,12 +92,12 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.LoginTokenRequest{}
 		if err := c.BodyParser(&req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		redirectURL, err := parseURL(c.Query("redirect_url"))
 		if err != nil {
-			return err
+      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		domainReq := domain.LoginCallback{
@@ -106,7 +107,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		token, err := svc.ClientTokenCallback(ctx, &domainReq)
 		if err != nil {
-			return err
+      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get token").Error()))
 		}
 
 		response := entities.ClientTokenResponse{
@@ -136,9 +137,7 @@ func Register(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.UserRegisterRequest{}
 		if err := c.BodyParser(&req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": errors.Wrap(err, "failed to parse request").Error(),
-			})
+      return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		domainUser := domain.RegisterUser{
@@ -154,7 +153,7 @@ func Register(svc service.AuthService) fiber.Handler {
 
 		u, err := svc.Register(ctx, &domainUser)
 		if err != nil {
-			return err
+      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to register user").Error()))
 		}
 
 		response := entities.UserResponse{
