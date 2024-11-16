@@ -101,7 +101,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.Tr
 	if err := s.validator.Struct(tc); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
-	
+
 	trees, err := s.getTrees(ctx, tc.TreeIDs)
 	if err != nil {
 		return nil, handleError(err)
