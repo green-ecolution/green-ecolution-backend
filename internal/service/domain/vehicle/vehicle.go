@@ -55,6 +55,12 @@ func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate)
 	if err := v.validator.Struct(vh); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
+
+	if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
+		return nil, err
+	} else if isTaken {
+		return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
+	}
 	
 	created, err := v.vehicleRepo.Create(ctx,
 		vehicle.WithNumberPlate(vh.NumberPlate),
@@ -79,6 +85,12 @@ func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.Vehi
 	_, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
+	}
+
+	if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
+		return nil, err
+	} else if isTaken {
+		return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
 	}
 
 	updated, err := v.vehicleRepo.Update(ctx,
@@ -120,4 +132,12 @@ func handleError(err error) error {
 	}
 
 	return service.NewError(service.InternalError, err.Error())
+}
+
+func (v *VehicleService) isVehicleNumberPlateTaken(ctx context.Context, plate string) (bool, error) {
+	existingVehicle, err := v.vehicleRepo.GetByPlate(ctx, plate)
+	if err != nil && !errors.Is(err, storage.ErrVehicleNotFound) {
+		return false, handleError(err)
+	}
+	return existingVehicle != nil, nil
 }

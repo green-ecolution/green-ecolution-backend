@@ -152,6 +152,11 @@ func TestVehicleService_Create(t *testing.T) {
 
 		expectedVehicle := getTestVehicles()[0]
 
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(nil, nil)
+
 		vehicleRepo.EXPECT().Create(
 			ctx,
 			mock.Anything,
@@ -175,6 +180,11 @@ func TestVehicleService_Create(t *testing.T) {
 
 		expectedErr := errors.New("Failed to create vehicle")
 
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(nil, nil)
+
 		vehicleRepo.EXPECT().Create(
 			ctx,
 			mock.Anything,
@@ -190,6 +200,44 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 		assert.Equal(t, "500: Failed to create vehicle", err.Error())
+	})
+
+	t.Run("should return an error when creating vehicle fails due to dupliacte number plate", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(getTestVehicles()[0], nil)
+
+		// when
+		result, err := svc.Create(ctx, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Equal(t, err.Error(), "400: Number plate is already taken")
+	})
+
+	t.Run("should return an error when creating vehicle fails due to error in GetByPlate", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		expectedErr := errors.New("failed to get vehicle")
+
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Create(ctx, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Equal(t, err.Error(), "500: failed to get vehicle")
 	})
 
 	t.Run("should return validation error on empty number plate", func(t *testing.T) {
@@ -248,6 +296,11 @@ func TestVehicleService_Update(t *testing.T) {
 			vehicleID,
 		).Return(expectedVehicle, nil)
 
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(nil, nil)
+
 		vehicleRepo.EXPECT().Update(
 			ctx,
 			vehicleID,
@@ -295,6 +348,11 @@ func TestVehicleService_Update(t *testing.T) {
 			vehicleID,
 		).Return(expectedVehicle, nil)
 
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(nil, nil)
+
 		vehicleRepo.EXPECT().Update(
 			ctx,
 			vehicleID,
@@ -311,6 +369,54 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 		assert.Equal(t, "500: failed to update vehicle", err.Error())
+	})
+
+	t.Run("should return an error when updating vehicle fails due to dupliacte number plate", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			vehicleID,
+		).Return(getTestVehicles()[0], nil)
+
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(getTestVehicles()[0], nil)
+
+		// when
+		result, err := svc.Update(ctx, vehicleID, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Equal(t, err.Error(), "400: Number plate is already taken")
+	})
+
+	t.Run("should return an error when updating vehicle fails due to error in GetByPlate", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		expectedErr := errors.New("failed to get vehicle")
+
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			vehicleID,
+		).Return(getTestVehicles()[0], nil)
+
+		vehicleRepo.EXPECT().GetByPlate(
+			ctx, 
+			input.NumberPlate,
+		).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Update(ctx, vehicleID, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Equal(t, err.Error(), "500: failed to get vehicle")
 	})
 
 	t.Run("should return validation error on empty number plate", func(t *testing.T) {

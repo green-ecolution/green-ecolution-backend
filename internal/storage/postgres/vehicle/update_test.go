@@ -48,6 +48,37 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		assert.Equal(t, input.Status, gotByID.Status)
 	})
 
+	t.Run("should return error when update vehicle with duplicate plate", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+
+		numberPlate :=  "FL ZT 9876"
+
+		// when
+		firstVehicle, err := r.Update(
+			context.Background(),
+			int32(2),
+			WithDescription(input.Description),
+			WithNumberPlate(numberPlate),
+			WithWaterCapacity(input.WaterCapacity),
+			WithVehicleStatus(input.Status),
+			WithVehicleType(input.Type),
+		)
+		assert.NoError(t, err)
+		assert.NotNil(t, firstVehicle)
+
+		secondVehicle, err := r.Update(
+			context.Background(),
+			int32(1),
+			WithDescription("New Car"),
+			WithNumberPlate(numberPlate),
+			WithWaterCapacity(2.000),
+		)
+
+		assert.Error(t, err)
+		assert.Nil(t, secondVehicle)
+	})
+
 	t.Run("should return error when update vehicle with zero water capacity", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
