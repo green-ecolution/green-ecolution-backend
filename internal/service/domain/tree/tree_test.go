@@ -146,59 +146,6 @@ func TestTreeService_GetByID(t *testing.T) {
 	})
 }
 
-func TestTreeService_Ready(t *testing.T) {
-	t.Run("should return true when treeRepo and sensorRepo are initialized", func(t *testing.T) {
-		// given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-
-		svc := NewTreeService(treeRepo, sensorRepo, nil, nil, nil)
-
-		// when
-		result := svc.Ready()
-
-		// then
-		assert.True(t, result)
-	})
-
-	t.Run("should return false when treeRepo is nil", func(t *testing.T) {
-		// given
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-
-		svc := NewTreeService(nil, sensorRepo, nil, nil, nil)
-
-		// when
-		result := svc.Ready()
-
-		// then
-		assert.False(t, result)
-	})
-
-	t.Run("should return false when sensorRepo is nil", func(t *testing.T) {
-		// given
-		treeRepo := storageMock.NewMockTreeRepository(t)
-
-		svc := NewTreeService(treeRepo, nil, nil, nil, nil)
-
-		// when
-		result := svc.Ready()
-
-		// then
-		assert.False(t, result)
-	})
-
-	t.Run("should return false when both treeRepo and sensorRepo are nil", func(t *testing.T) {
-		// given
-		svc := NewTreeService(nil, nil, nil, nil, nil)
-
-		// when
-		result := svc.Ready()
-
-		// then
-		assert.False(t, result)
-	})
-}
-
 func TestTreeService_Create(t *testing.T) {
 	ctx := context.Background()
 
@@ -721,5 +668,58 @@ func TestTreeService_Update(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedError).Error())
+	})
+}
+
+func TestTreeService_Ready(t *testing.T) {
+	t.Run("should return true when treeRepo and sensorRepo are initialized", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+
+		svc := NewTreeService(treeRepo, sensorRepo, nil, nil, nil)
+
+		// when
+		result := svc.Ready()
+
+		// then
+		assert.True(t, result)
+	})
+
+	t.Run("should return false when treeRepo is nil", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+
+		svc := NewTreeService(nil, sensorRepo, nil, nil, nil)
+
+		// when
+		result := svc.Ready()
+
+		// then
+		assert.False(t, result)
+	})
+
+	t.Run("should return false when sensorRepo is nil", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+
+		svc := NewTreeService(treeRepo, nil, nil, nil, nil)
+
+		// when
+		result := svc.Ready()
+
+		// then
+		assert.False(t, result)
+	})
+
+	t.Run("should return false when both treeRepo and sensorRepo are nil", func(t *testing.T) {
+		// given
+		svc := NewTreeService(nil, nil, nil, nil, nil)
+
+		// when
+		result := svc.Ready()
+
+		// then
+		assert.False(t, result)
 	})
 }

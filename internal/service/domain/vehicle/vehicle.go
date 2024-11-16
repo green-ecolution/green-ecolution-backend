@@ -2,8 +2,10 @@ package vehicle
 
 import (
 	"context"
-	"errors"
 
+	"github.com/pkg/errors"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -12,11 +14,13 @@ import (
 
 type VehicleService struct {
 	vehicleRepo storage.VehicleRepository
+	validator       *validator.Validate
 }
 
 func NewVehicleService(vehicleRepository storage.VehicleRepository) service.VehicleService {
 	return &VehicleService{
 		vehicleRepo: vehicleRepository,
+		validator:       validator.New(),
 	}
 }
 
@@ -48,6 +52,10 @@ func (v *VehicleService) GetByPlate(ctx context.Context, plate string) (*entitie
 }
 
 func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate) (*entities.Vehicle, error) {
+	if err := v.validator.Struct(vh); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+	
 	created, err := v.vehicleRepo.Create(ctx,
 		vehicle.WithNumberPlate(vh.NumberPlate),
 		vehicle.WithDescription(vh.Description),
@@ -55,6 +63,7 @@ func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate)
 		vehicle.WithVehicleStatus(vh.Status),
 		vehicle.WithVehicleType(vh.Type),
 	)
+
 	if err != nil {
 		return nil, handleError(err)
 	}
@@ -63,6 +72,10 @@ func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate)
 }
 
 func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.VehicleUpdate) (*entities.Vehicle, error) {
+	if err := v.validator.Struct(vh); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+	
 	_, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)

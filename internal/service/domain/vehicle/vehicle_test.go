@@ -191,6 +191,39 @@ func TestVehicleService_Create(t *testing.T) {
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
+
+	t.Run("should return validation error on empty number plate", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = ""
+
+		// when
+		result, err := svc.Create(ctx, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+
+	t.Run("should return validation error on zero water capacity", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = "FL TBZ 123"
+		input.WaterCapacity = 0
+
+		// when
+		result, err := svc.Create(ctx, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
 }
 
 func TestVehicleService_Update(t *testing.T) {
@@ -278,6 +311,39 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+
+	t.Run("should return validation error on empty number plate", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = ""
+
+		// when
+		result, err := svc.Update(ctx, int32(1), input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+
+	t.Run("should return validation error on zero water capacity", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = "FL TBZ 123"
+		input.WaterCapacity = 0
+
+		// when
+		result, err := svc.Update(ctx, int32(1), input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
 	})
 }
 
