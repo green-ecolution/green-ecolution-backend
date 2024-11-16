@@ -7,9 +7,6 @@ INSERT INTO vehicles (id, number_plate, description, water_capacity, type, statu
 INSERT INTO vehicles (id, number_plate, description, water_capacity, type, status) VALUES (2, 'B-5678', 'Test vehicle 2', 150.0, 'transporter', 'unknown');
 ALTER SEQUENCE vehicles_id_seq RESTART WITH 3;
 
-INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('95b69b4c-b38b-4394-9520-496879b67791', 1);
-INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('d2563a8e-a608-4039-8718-25fc3c1d8e57', 2);
-
 INSERT INTO tree_clusters (id, name, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
 VALUES 
   (1, 'Solitüde Strand', 'good', 0.75, 1, 'Solitüde Strand', 'Alle Bäume am Strand', 'sandig', 54.820940, 9.489022, ST_SetSRID(ST_MakePoint(54.820940, 9.489022), 4326)),
