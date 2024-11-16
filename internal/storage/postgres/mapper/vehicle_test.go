@@ -1,6 +1,7 @@
 package mapper_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -120,7 +121,7 @@ func TestMapVehicleStatus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(string(test.input), func(t *testing.T) {
+		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
 			result := mapper.MapVehicleStatus(test.input)
 			assert.Equal(t, test.expected, result)
 		})
@@ -138,7 +139,7 @@ func TestMapVehicleType(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(string(test.input), func(t *testing.T) {
+		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
 			result := mapper.MapVehicleType(test.input)
 			assert.Equal(t, test.expected, result)
 		})
