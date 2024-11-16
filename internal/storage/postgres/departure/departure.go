@@ -32,27 +32,36 @@ func NewDepartureRepository(s *store.Store, mappers DepartureMappers) storage.De
 	}
 }
 
-// GetAll implements storage.DepartureRepository.
-func (d *DepartureRepository) GetAll(ctx context.Context) ([]*entities.Departure, error) {
-	panic("unimplemented")
+func WithName(name string) entities.EntityFunc[entities.Departure] {
+	return func(d *entities.Departure) {
+		d.Name = name
+	}
 }
 
-// GetByID implements storage.DepartureRepository.
-func (d *DepartureRepository) GetByID(ctx context.Context, id int32) (*entities.Departure, error) {
-	panic("unimplemented")
+func WithDescription(description string) entities.EntityFunc[entities.Departure] {
+	return func(d *entities.Departure) {
+		d.Description = description
+	}
 }
 
-// Create implements storage.DepartureRepository.
-func (d *DepartureRepository) Create(ctx context.Context, fn ...entities.EntityFunc[entities.Departure]) (*entities.Departure, error) {
-	panic("unimplemented")
+func WithLatitude(latitude *float64) entities.EntityFunc[entities.Departure] {
+	return func(d *entities.Departure) {
+		d.Latitude = latitude
+	}
 }
 
-// Delete implements storage.DepartureRepository.
+func WithLongitude(longitude *float64) entities.EntityFunc[entities.Departure] {
+	return func(d *entities.Departure) {
+		d.Longitude = longitude
+	}
+}
+
 func (d *DepartureRepository) Delete(ctx context.Context, id int32) error {
-	panic("unimplemented")
-}
+	_, err := d.store.DeleteDeparture(ctx, id)
 
-// Update implements storage.DepartureRepository.
-func (d *DepartureRepository) Update(ctx context.Context, id int32, fn ...entities.EntityFunc[entities.Departure]) (*entities.Departure, error) {
-	panic("unimplemented")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
