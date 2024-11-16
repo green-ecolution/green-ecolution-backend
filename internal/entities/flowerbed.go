@@ -17,6 +17,6 @@ type Flowerbed struct {
 	Sensor         *Sensor
 	Images         []*Image
 	Archived       bool
-	Latitude       float64
-	Longitude      float64
+	Latitude       *float64
+	Longitude      *float64
 }

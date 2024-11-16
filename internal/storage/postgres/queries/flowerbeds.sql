@@ -23,11 +23,11 @@ INSERT INTO flowerbeds (
 -- name: LinkFlowerbedImage :exec
 INSERT INTO flowerbed_images (flowerbed_id, image_id) VALUES ($1, $2);
 
--- name: UnlinkFlowerbedImage :exec
-DELETE FROM flowerbed_images WHERE flowerbed_id = $1 AND image_id = $2;
+-- name: UnlinkFlowerbedImage :one
+DELETE FROM flowerbed_images WHERE flowerbed_id = $1 AND image_id = $2 RETURNING flowerbed_id;
 
--- name: UnlinkAllFlowerbedImages :exec
-DELETE FROM flowerbed_images WHERE flowerbed_id = $1;
+-- name: UnlinkAllFlowerbedImages :one
+DELETE FROM flowerbed_images WHERE flowerbed_id = $1 RETURNING flowerbed_id;
 
 -- name: UpdateFlowerbed :exec
 UPDATE flowerbeds SET
@@ -48,10 +48,10 @@ UPDATE flowerbeds SET
   geometry = ST_GeomFromText($2, 4326)
 WHERE id = $1;
 
--- name: ArchiveFlowerbed :exec
+-- name: ArchiveFlowerbed :one
 UPDATE flowerbeds SET
   archived = TRUE
-WHERE id = $1;
+WHERE id = $1 RETURNING id;
 
--- name: DeleteFlowerbed :exec
-DELETE FROM flowerbeds WHERE id = $1;
+-- name: DeleteFlowerbed :one
+DELETE FROM flowerbeds WHERE id = $1 RETURNING id;

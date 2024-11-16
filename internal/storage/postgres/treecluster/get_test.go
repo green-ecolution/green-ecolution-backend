@@ -140,6 +140,18 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 	t.Run("should return error when tree cluster with zero id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetByID(context.Background(), 0)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 

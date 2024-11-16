@@ -5,6 +5,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/pkg/errors"
 )
 
 func defaultFlowerbed() *entities.Flowerbed {
@@ -14,10 +15,10 @@ func defaultFlowerbed() *entities.Flowerbed {
 		Description:    "",
 		NumberOfPlants: 0,
 		MoistureLevel:  0,
-		Region:         &entities.Region{},
+		Region:         nil,
 		Address:        "",
-		Latitude:       0,
-		Longitude:      0,
+		Latitude:       nil,
+		Longitude:      nil,
 		Images:         make([]*entities.Image, 0),
 		Archived:       false,
 	}
@@ -27,6 +28,10 @@ func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.Entity
 	entity := defaultFlowerbed()
 	for _, fn := range fFn {
 		fn(entity)
+	}
+
+	if err := r.validateFlowerbedEntity(entity); err != nil {
+		return nil, err
 	}
 
 	id, err := r.createEntity(ctx, entity)
@@ -53,16 +58,21 @@ func (r *FlowerbedRepository) CreateAndLinkImages(ctx context.Context, fFn ...en
 }
 
 func (r *FlowerbedRepository) createEntity(ctx context.Context, entity *entities.Flowerbed) (*int32, error) {
+	var region *int32
+	if entity.Region != nil {
+		region = &entity.Region.ID
+	}
+
 	args := sqlc.CreateFlowerbedParams{
 		SensorID:       &entity.Sensor.ID,
 		Size:           entity.Size,
 		Description:    entity.Description,
 		NumberOfPlants: entity.NumberOfPlants,
 		MoistureLevel:  entity.MoistureLevel,
-		RegionID:       &entity.Region.ID,
+		RegionID:       region,
 		Address:        entity.Address,
-		Latitude:       entity.Latitude,
-		Longitude:      entity.Longitude,
+		Latitude:       *entity.Latitude,
+		Longitude:      *entity.Longitude,
 	}
 
 	id, err := r.store.CreateFlowerbed(ctx, &args)
@@ -90,4 +100,24 @@ func (r *FlowerbedRepository) linkImages(ctx context.Context, flowerbedID, imgID
 		ImageID:     imgID,
 	}
 	return r.store.LinkFlowerbedImage(ctx, &params)
+}
+
+func (r *FlowerbedRepository) validateFlowerbedEntity(fb *entities.Flowerbed) error {
+	if fb == nil {
+		return errors.New("flowerbed is nil")
+	}
+
+	if fb.Longitude == nil {
+		return errors.New("flowerbed longitude is empty")
+	}
+
+	if fb.Latitude == nil {
+		return errors.New("flowerbed latitude is empty")
+	}
+
+	if fb.Region == nil {
+		return errors.New("flowerbed region is empty")
+	}
+
+	return nil
 }
