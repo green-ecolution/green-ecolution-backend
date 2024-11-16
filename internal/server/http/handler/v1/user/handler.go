@@ -153,7 +153,7 @@ func Register(svc service.AuthService) fiber.Handler {
 
 		u, err := svc.Register(ctx, &domainUser)
 		if err != nil {
-      return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to register user").Error()))
+      return errorhandler.HandleError(err)
 		}
 
 		response := entities.UserResponse{
