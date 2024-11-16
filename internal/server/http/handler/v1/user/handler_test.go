@@ -17,7 +17,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -503,7 +502,7 @@ func generateJWT(t testing.TB, sub string) string {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(viper.GetString("jwt.secret")))
+	tokenString, err := token.SignedString([]byte(""))
 	if err != nil {
 		t.Fatalf("failed to generate JWT: %v", err)
 	}

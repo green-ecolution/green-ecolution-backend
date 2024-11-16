@@ -288,18 +288,17 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
 		}
 
-		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (any, error) {
+    jwtClaims := jwt.MapClaims{}
+		_, err := jwt.ParseWithClaims(req.RefreshToken, jwtClaims, func(token *jwt.Token) (any, error) {
 			return token, nil
 		})
 
 		var sub string
-		if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok {
-			if e, ok := claims["sub"]; ok {
-				if e, ok := e.(string); ok {
-					sub = e
-				}
-			}
-		}
+    if claims, ok := jwtClaims["sub"]; ok {
+      if e, ok := claims.(string); ok {
+        sub = e
+      }
+    }
 
 		if sub == "" {
 			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
