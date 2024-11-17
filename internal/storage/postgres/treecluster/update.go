@@ -6,24 +6,27 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/jackc/pgx/v5"
 )
 
-func (r *TreeClusterRepository) Update(ctx context.Context, id int32, tcFn ...entities.EntityFunc[entities.TreeCluster]) (*entities.TreeCluster, error) {
-	tc, err := r.GetByID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
+func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func (*entities.TreeCluster) (bool, error)) error {
+  return r.store.WithTx(ctx, func(tx pgx.Tx) error {
+    tc, err := r.GetByID(ctx, id)
+    if err != nil {
+      return err
+    }
 
-	for _, fn := range tcFn {
-		fn(tc)
-	}
+    updated, err := updateFn(tc)
+    if err != nil {
+      return err
+    }
 
-	err = r.updateEntity(ctx, tc)
-	if err != nil {
-		return nil, err
-	}
+    if !updated {
+      return nil
+    }
 
-	return tc, nil
+    return r.updateEntity(ctx, tc)
+  })
 }
 
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {

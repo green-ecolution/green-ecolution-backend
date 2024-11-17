@@ -2,13 +2,13 @@ package store
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/pkg/errors"
 )
 
 type EntityType string
@@ -69,18 +69,21 @@ func (s *Store) HandleError(err error) error {
 
 func (s *Store) WithTx(ctx context.Context, fn func(tx pgx.Tx) error) error {
 	tx, err := s.db.BeginTx(ctx, pgx.TxOptions{})
-	if err != nil {
+  if err != nil {
 		return err
 	}
 
 	err = fn(tx)
-	if err != nil {
-		err = tx.Rollback(ctx)
-		if err != nil {
-			return err
-		}
+	if err == nil {
+		return tx.Commit(ctx)
 	}
-	return tx.Commit(ctx)
+
+	rollbackErr := tx.Rollback(ctx)
+	if rollbackErr != nil {
+		return errors.Join(err, rollbackErr)
+	}
+
+	return err
 }
 
 func (s *Store) Close() {
