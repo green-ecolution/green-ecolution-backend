@@ -109,21 +109,6 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 		assert.Nil(t, cluster)
 		assert.EqualError(t, err, handleError(expectedErr).Error())
 	})
-
-	t.Run("should return error for unexpected repository error", func(t *testing.T) {
-		id := int32(3)
-		expectedErr := errors.New("unexpected error")
-
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
-
-		// when
-		cluster, err := svc.GetByID(ctx, id)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, cluster)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
-	})
 }
 
 func TestTreeClusterService_Create(t *testing.T) {

@@ -27,3 +27,4 @@ packages:
       RegionRepository:
       ImageRepository:
       VehicleRepository:
+      FlowerbedRepository:

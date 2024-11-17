@@ -178,6 +178,10 @@ func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) err
 	return nil
 }
 
+func (r *FlowerbedRepository) UnlinkSensorID(ctx context.Context, sensorID int32) error {
+	return r.store.UnlinkSensorIDFromFlowerbeds(ctx, &sensorID)
+}
+
 func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
 	_, err := r.store.ArchiveFlowerbed(ctx, id)
 	if err != nil {

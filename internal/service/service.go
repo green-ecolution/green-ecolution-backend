@@ -41,6 +41,14 @@ const (
 	InternalError ErrorCode = 500
 )
 
+type BasicCrudService[T any, CreateType any, UpdateType any] interface {
+	GetAll(ctx context.Context) ([]*T, error)
+	GetByID(ctx context.Context, id int32) (*T, error)
+	Create(ctx context.Context, createData *CreateType) (*T, error)
+	Update(ctx context.Context, id int32, updateData *UpdateType) (*T, error)
+	Delete(ctx context.Context, id int32) error
+}
+
 type InfoService interface {
 	Service
 	GetAppInfo(context.Context) (*domain.App, error)
@@ -54,14 +62,8 @@ type MqttService interface {
 }
 
 type TreeService interface {
-	Service
+	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
-
-	GetAll(ctx context.Context) ([]*domain.Tree, error)
-	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
-	Update(ctx context.Context, id int32, tc *domain.TreeUpdate) (*domain.Tree, error)
-	Create(ctx context.Context, treeCreate *domain.TreeCreate) (*domain.Tree, error)
-	Delete(ctx context.Context, id int32) error
 }
 
 type AuthService interface {
@@ -82,19 +84,20 @@ type RegionService interface {
 
 type TreeClusterService interface {
 	Service
-	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
-	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
-	Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error)
-	Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
-	Delete(ctx context.Context, id int32) error
+	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
 }
+
 type GeoClusterLocator interface {
 	UpdateCluster(ctx context.Context, clusterID *int32) error
 }
 
 type SensorService interface {
+	CrudService[domain.Sensor, domain.SensorCreate, domain.SensorUpdate]
+}
+
+type CrudService[T any, CreateType any, UpdateType any] interface {
 	Service
-	GetAll(ctx context.Context) ([]*domain.Sensor, error)
+	BasicCrudService[T, CreateType, UpdateType]
 }
 
 type VehicleService interface {

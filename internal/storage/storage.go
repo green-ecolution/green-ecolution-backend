@@ -89,6 +89,7 @@ type TreeRepository interface {
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
+	UnlinkSensorID(ctx context.Context, sensorID int32) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
 	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	GetCenterPoint(ctx context.Context, id []int32) (float64, float64, error)
@@ -113,6 +114,7 @@ type FlowerbedRepository interface {
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
+	UnlinkSensorID(ctx context.Context, sensorID int32) error
 	Archive(ctx context.Context, id int32) error
 }
 
