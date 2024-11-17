@@ -60,12 +60,12 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 
 	trees, err := s.getTrees(ctx, createTc.TreeIDs)
 	if err != nil {
-		return nil, err
+		return nil, handleError(err)
 	}
 
 	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster) (bool, error) {
-		if err := s.handlePrevTreeLocation(ctx, trees); err != nil {
-			return false, err
+		if err = s.handlePrevTreeLocation(ctx, trees); err != nil {
+			return false, handleError(err)
 		}
 
 		tc.Name = createTc.Name
@@ -74,7 +74,7 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		tc.Trees = trees
 
 		if err = s.locator.UpdateCluster(ctx, tc); err != nil {
-			return false, err
+			return false, handleError(err)
 		}
 
 		return true, nil
@@ -88,15 +88,16 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 }
 
 func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
-	err := s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
-		if err := s.validator.Struct(tc); err != nil {
-			return false, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
-		}
+  if err := s.validator.Struct(tcUpdate); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
 
-		trees, err := s.getTrees(ctx, tcUpdate.TreeIDs)
-		if err != nil {
-			return false, err
-		}
+	trees, err := s.getTrees(ctx, tcUpdate.TreeIDs)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 
 		tc.Trees = trees
 		tc.Name = tcUpdate.Name
@@ -143,7 +144,7 @@ func (s *TreeClusterService) Ready() bool {
 
 // handlePrevTreeLocation updates the locations of clusters associated with the provided trees.
 //
-// This method iterates over a list of trees and processes the clusters they belong to. 
+// This method iterates over a list of trees and processes the clusters they belong to.
 // For each cluster, the cluster's location is updated by recalculating its coordinates and region using the `GeoClusterLocator`.
 // Clusters are only updated once, even if multiple trees belong to the same cluster.
 //
@@ -152,7 +153,8 @@ func (s *TreeClusterService) Ready() bool {
 //   - trees: A slice of Tree entities to process. Each tree may reference a cluster.
 //
 // Returns:
-//   An error if any cluster update fails, otherwise nil.
+//
+//	An error if any cluster update fails, otherwise nil.
 //
 // Notes:
 //   - Clusters with an ID of 0 are ignored.

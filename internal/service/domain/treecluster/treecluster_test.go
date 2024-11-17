@@ -139,15 +139,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 		clusterRepo.EXPECT().Create(
 			ctx,
 			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
 		).Return(expectedCluster, nil)
-
-		locator.EXPECT().UpdateCluster(
-			ctx,
-			&expectedCluster.ID,
-		).Return(nil)
 
 		// when
 		result, err := svc.Create(ctx, newCluster)
@@ -182,15 +174,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 		clusterRepo.EXPECT().Create(
 			ctx,
 			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
 		).Return(expectedCluster, nil)
-
-		locator.EXPECT().UpdateCluster(
-			ctx,
-			&expectedCluster.ID,
-		).Return(nil)
 
 		// when
 		result, err := svc.Create(ctx, newCluster)
@@ -239,9 +223,6 @@ func TestTreeClusterService_Create(t *testing.T) {
 
 		clusterRepo.EXPECT().Create(
 			ctx,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
 			mock.Anything,
 		).Return(nil, expectedErr)
 
@@ -305,19 +286,11 @@ func TestTreeClusterService_Update(t *testing.T) {
 			[]int32{1, 2},
 		).Return(expectedTrees, nil)
 
+		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(expectedCluster, nil)
 		clusterRepo.EXPECT().Update(
 			ctx,
 			clusterID,
 			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-		).Return(expectedCluster, nil)
-
-		locator.EXPECT().UpdateCluster(
-			ctx,
-			&clusterID,
 		).Return(nil)
 
 		// when
@@ -350,19 +323,11 @@ func TestTreeClusterService_Update(t *testing.T) {
 			[]int32{},
 		).Return(nil, nil)
 
+		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(expectedCluster, nil)
 		clusterRepo.EXPECT().Update(
 			ctx,
 			clusterID,
 			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-		).Return(expectedCluster, nil)
-
-		locator.EXPECT().UpdateCluster(
-			ctx,
-			&clusterID,
 		).Return(nil)
 
 		// when
@@ -412,11 +377,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 			ctx,
 			clusterID,
 			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-		).Return(nil, expectedErr)
+		).Return(expectedErr)
 
 		// when
 		result, err := svc.Update(context.Background(), clusterID, updatedCluster)
@@ -444,11 +405,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 			ctx,
 			clusterID,
 			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-		).Return(nil, storage.ErrEntityNotFound)
+		).Return(storage.ErrEntityNotFound)
 
 		// when
 		result, err := svc.Update(ctx, clusterID, updatedCluster)
