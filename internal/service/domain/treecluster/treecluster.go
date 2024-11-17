@@ -10,7 +10,6 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 )
 
 type TreeClusterService struct {
@@ -54,43 +53,34 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 	return treeCluster, nil
 }
 
-func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
-	if err := s.validator.Struct(tc); err != nil {
+func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
+	if err := s.validator.Struct(createTc); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	trees, err := s.getTrees(ctx, tc.TreeIDs)
+	trees, err := s.getTrees(ctx, createTc.TreeIDs)
 	if err != nil {
-		return nil, handleError(err)
+		return nil, err
 	}
 
-	visitedClusters := make(map[int32]bool)
-	for _, tree := range trees {
-		if tree.TreeCluster != nil && tree.TreeCluster.ID != 0 {
-			if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
-				slog.Debug("Tree already visited", "treeID", tree.ID)
-				continue
-			}
-
-			slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
-			if err = s.locator.UpdateCluster(ctx, &tree.TreeCluster.ID); err != nil {
-				return nil, handleError(err)
-			}
-			visitedClusters[tree.TreeCluster.ID] = true
+	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster) (bool, error) {
+		if err := s.handlePrevTreeLocation(ctx, trees); err != nil {
+			return false, err
 		}
-	}
 
-	c, err := s.treeClusterRepo.Create(ctx,
-		treecluster.WithName(tc.Name),
-		treecluster.WithAddress(tc.Address),
-		treecluster.WithDescription(tc.Description),
-		treecluster.WithTrees(trees),
-	)
+		tc.Name = createTc.Name
+		tc.Address = createTc.Address
+		tc.Description = createTc.Description
+		tc.Trees = trees
+
+		if err = s.locator.UpdateCluster(ctx, tc); err != nil {
+			return false, err
+		}
+
+		return true, nil
+	})
+
 	if err != nil {
-		return nil, handleError(err)
-	}
-
-	if err = s.locator.UpdateCluster(ctx, &c.ID); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -151,8 +141,51 @@ func (s *TreeClusterService) Ready() bool {
 	return s.treeClusterRepo != nil
 }
 
+// handlePrevTreeLocation updates the locations of clusters associated with the provided trees.
+//
+// This method iterates over a list of trees and processes the clusters they belong to. 
+// For each cluster, the cluster's location is updated by recalculating its coordinates and region using the `GeoClusterLocator`.
+// Clusters are only updated once, even if multiple trees belong to the same cluster.
+//
+// Parameters:
+//   - ctx: The context for managing request-scoped values, cancellation, and timeouts.
+//   - trees: A slice of Tree entities to process. Each tree may reference a cluster.
+//
+// Returns:
+//   An error if any cluster update fails, otherwise nil.
+//
+// Notes:
+//   - Clusters with an ID of 0 are ignored.
+//   - Updates are performed via a callback mechanism in the `treeClusterRepo` to ensure thread safety or transactional consistency.
+func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees []*domain.Tree) error {
+	visitedClusters := make(map[int32]bool)
+	for _, tree := range trees {
+		if tree.TreeCluster != nil && tree.TreeCluster.ID != 0 {
+			if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
+				slog.Debug("Tree already visited", "treeID", tree.ID)
+				continue
+			}
+
+			slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
+
+			err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, func(tc *domain.TreeCluster) (bool, error) {
+				if err := s.locator.UpdateCluster(ctx, tc); err != nil {
+					return false, err
+				}
+				return true, nil
+			})
+			if err != nil {
+				return err
+			}
+
+			visitedClusters[tree.TreeCluster.ID] = true
+		}
+	}
+
+	return nil
+}
+
 func handleError(err error) error {
-	// TODO: Rollback the transaction if an error occurs.
 	if errors.Is(err, storage.ErrEntityNotFound) {
 		return service.NewError(service.NotFound, err.Error())
 	}
