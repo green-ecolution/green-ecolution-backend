@@ -78,6 +78,11 @@ func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, 
 }
 
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	_, err := r.store.GetTreeClusterByID(ctx, id)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
 	rows, err := r.store.GetTreesByTreeClusterID(ctx, &id)
 	if err != nil {
 		return nil, r.store.HandleError(err)
