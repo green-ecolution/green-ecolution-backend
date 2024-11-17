@@ -188,7 +188,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 func handleError(err error) error {
 	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, err.Error())
+		return service.NewError(service.NotFound, storage.ErrTreeNotFound.Error())
 	}
 
 	return service.NewError(service.InternalError, err.Error())
