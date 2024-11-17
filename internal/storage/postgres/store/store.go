@@ -24,16 +24,20 @@ const (
 )
 
 type Store struct {
-	*sqlc.Queries
+  sqlc.Querier
 	db         *pgxpool.Pool
 	entityType EntityType
 }
 
-func NewStore(db *pgxpool.Pool) *Store {
-	return &Store{
-		Queries: sqlc.New(db),
-		db:      db,
-	}
+func NewStore(db *pgxpool.Pool, queries sqlc.Querier) *Store {
+  return &Store{
+    Querier: queries,
+    db:      db,
+  }
+}
+
+func (s *Store) DB() *pgxpool.Pool {
+  return s.db
 }
 
 func (s *Store) SetEntityType(entityType EntityType) {
