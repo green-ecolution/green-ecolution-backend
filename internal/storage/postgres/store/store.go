@@ -23,26 +23,45 @@ const (
 )
 
 type Store struct {
-  sqlc.Querier
+	sqlc.Querier
 	db         *pgxpool.Pool
 	entityType EntityType
 }
 
-func NewStore(db *pgxpool.Pool, queries sqlc.Querier) *Store {
-  return &Store{
-    Querier: queries,
-    db:      db,
+func NewStore(db *pgxpool.Pool, querier sqlc.Querier) (*Store, error) {
+	if db == nil {
+		return nil, errors.New("db is nil")
+	}
+
+	if querier == nil {
+		return nil, errors.New("querier is nil")
+	}
+
+	return &Store{
+		Querier: querier,
+		db:      db,
+	}, nil
+}
+
+func (s *Store) SwitchQuerier(querier sqlc.Querier) func() {
+  originalQuerier := s.Querier
+  s.Querier = querier
+
+  return func() {
+    s.Querier = originalQuerier
   }
 }
 
 func (s *Store) DB() *pgxpool.Pool {
-  return s.db
+	return s.db
 }
 
+// TODO: Remove
 func (s *Store) SetEntityType(entityType EntityType) {
 	s.entityType = entityType
 }
 
+// TODO: Improve error handling
 func (s *Store) HandleError(err error) error {
 	if err == nil {
 		return nil
@@ -71,19 +90,27 @@ func (s *Store) HandleError(err error) error {
 	return err
 }
 
-func (s *Store) WithTx(ctx context.Context, fn func(tx pgx.Tx) error) error {
+func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
+  if fn == nil {
+    return errors.New("txFn is nil")
+  }
+
 	tx, err := s.db.BeginTx(ctx, pgx.TxOptions{})
-  if err != nil {
+	if err != nil {
 		return err
 	}
 
-	err = fn(tx)
+  qtx := sqlc.New(tx)
+	err = fn(qtx)
 	if err == nil {
+    slog.Debug("Committing transaction")
 		return tx.Commit(ctx)
 	}
 
+  slog.Debug("Rolling back transaction")
 	rollbackErr := tx.Rollback(ctx)
 	if rollbackErr != nil {
+    slog.Error("Error rolling back transaction", "error", rollbackErr)
 		return errors.Join(err, rollbackErr)
 	}
 
@@ -94,34 +121,3 @@ func (s *Store) Close() {
 	s.db.Close()
 }
 
-func (s *Store) CheckSensorExists(ctx context.Context, sensorID *int32) error {
-	if sensorID != nil {
-		_, err := s.GetSensorByID(ctx, *sensorID)
-		if err != nil {
-			if errors.Is(err, pgx.ErrNoRows) {
-				return storage.ErrSensorNotFound
-			} else {
-				slog.Error("Error getting sensor by id", "error", err)
-				return s.HandleError(err)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (s *Store) CheckImageExists(ctx context.Context, imageID *int32) error {
-	if imageID != nil {
-		_, err := s.GetImageByID(ctx, *imageID)
-		if err != nil {
-			if errors.Is(err, pgx.ErrNoRows) {
-				return storage.ErrImageNotFound
-			} else {
-				slog.Error("Error getting image by id", "error", err)
-				return s.HandleError(err)
-			}
-		}
-	}
-
-	return nil
-}

@@ -7,11 +7,13 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func (*entities.TreeCluster) (bool, error)) error {
-  return r.store.WithTx(ctx, func(tx pgx.Tx) error {
+  return r.store.WithTx(ctx, func(q *sqlc.Queries) error {
+    cancel := r.store.SwitchQuerier(q)
+    defer cancel()
+
     tc, err := r.GetByID(ctx, id)
     if err != nil {
       return err

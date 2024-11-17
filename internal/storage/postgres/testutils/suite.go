@@ -96,7 +96,13 @@ func initStore(dbURL string) *store.Store {
 	if err != nil {
 		log.Fatalf("Error while connecting to PostgreSQL: %s", err)
 	}
-	return store.NewStore(pool, sqlc.New(pool))
+	
+  s, err := store.NewStore(pool, sqlc.New(pool))
+  if err != nil {
+    log.Fatalf("failed to create store: %s", err)
+  }
+
+  return s
 }
 
 // CloseConn closes the connection. After the test, the connection will be re-established.
