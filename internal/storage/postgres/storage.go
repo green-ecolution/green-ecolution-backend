@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
 	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
@@ -15,7 +16,7 @@ import (
 )
 
 func NewRepository(conn *pgxpool.Pool) *storage.Repository {
-	s := store.NewStore(conn)
+	s := store.NewStore(conn, sqlc.New(conn))
 
 	treeMappers := tree.NewTreeRepositoryMappers(
 		&mapper.InternalTreeRepoMapperImpl{},
