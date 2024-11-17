@@ -1,6 +1,8 @@
 package postgres
 
 import (
+	"log/slog"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed"
@@ -16,7 +18,11 @@ import (
 )
 
 func NewRepository(conn *pgxpool.Pool) *storage.Repository {
-	s := store.NewStore(conn, sqlc.New(conn))
+	s, err := store.NewStore(conn, sqlc.New(conn))
+  if err != nil {
+    slog.Error("failed to create store", "error", err)
+    panic(err)
+  }
 
 	treeMappers := tree.NewTreeRepositoryMappers(
 		&mapper.InternalTreeRepoMapperImpl{},

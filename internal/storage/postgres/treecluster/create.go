@@ -7,7 +7,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 func defaultTreeCluster() *entities.TreeCluster {
@@ -33,7 +32,10 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 	}
 
 	var createdTc *entities.TreeCluster
-	err := r.store.WithTx(ctx, func(tx pgx.Tx) error {
+	err := r.store.WithTx(ctx, func(q *sqlc.Queries) error {
+		cancel := r.store.SwitchQuerier(q)
+		defer cancel()
+
 		entity := defaultTreeCluster()
 		created, err := createFn(entity)
 		if err != nil {

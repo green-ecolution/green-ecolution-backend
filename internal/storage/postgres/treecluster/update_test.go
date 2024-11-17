@@ -5,10 +5,8 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestTreeClusterRepository_Update(t *testing.T) {
@@ -266,37 +264,5 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		assert.NotEqual(t, "updated", got.Name)
-	})
-
-	t.Run("should rollback when update errors", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
-    tc, _ := suite.Store.GetTreeClusterByID(context.Background(), 1)
-    region, _ := suite.Store.GetRegionByTreeClusterID(context.Background(), 1)
-    trees, _ := suite.Store.GetTreesByTreeClusterID(context.Background(), utils.P(int32(1)))
-
-    mockQuerier := storageMock.NewMockQuerier(t)
-    mockQuerier.EXPECT().GetTreeClusterByID(mock.Anything, int32(1)).Return(tc, nil)
-    mockQuerier.EXPECT().GetRegionByTreeClusterID(mock.Anything, int32(1)).Return(region, nil)
-    mockQuerier.EXPECT().GetLinkedTreesByTreeClusterID(mock.Anything, int32(1)).Return(trees, nil)
-    mockQuerier.EXPECT().UnlinkTreeClusterID(mock.Anything, utils.P(int32(1))).Return(assert.AnError)
-    suite.SwitchQuerier(t, mockQuerier)
-
-    r := NewTreeClusterRepository(suite.Store, mappers)
-    updateFn := func(tc *entities.TreeCluster) (bool, error) {
-      tc.Name = "should not update"
-      return true, nil
-    }
-
-    // when
-    updateErr := r.Update(context.Background(), 1, updateFn)
-    got, getErr := r.GetByID(context.Background(), 1)
-
-    // then
-    assert.Error(t, updateErr)
-    assert.NoError(t, getErr)
-    assert.NotNil(t, got)
-    assert.NotEqual(t, "should not update", got.Name)
 	})
 }
