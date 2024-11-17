@@ -110,19 +110,16 @@ func (s *PostgresTestSuite) CloseConnTemporary(t testing.TB) {
 	})
 }
 
-func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string) {
+func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string, args ...any) (pgx.Rows, error) {
 	t.Helper()
 	t.Log("Executing query...")
 
-	db, err := sql.Open("pgx", s.URL)
+  result, err := s.Store.DB().Query(context.Background(), query, args...)
 	if err != nil {
-		t.Fatalf("Could not execute query: %s", err)
+    return nil, err
 	}
 
-	_, err = db.Exec(query)
-	if err != nil {
-		t.Fatalf("Could not execute query: %s", err)
-	}
+  return result, nil
 }
 
 func (s *PostgresTestSuite) SwitchQuerier(t testing.TB, querier sqlc.Querier) {
@@ -130,10 +127,10 @@ func (s *PostgresTestSuite) SwitchQuerier(t testing.TB, querier sqlc.Querier) {
 	t.Log("Switching querier...")
 
 	oldQuerier := s.Store.Querier
-  s.Store.Querier = querier
+	s.Store.Querier = querier
 
 	t.Cleanup(func() {
-    t.Log("Restoring querier...")
+		t.Log("Restoring querier...")
 		s.Store.Querier = oldQuerier
 	})
 }
