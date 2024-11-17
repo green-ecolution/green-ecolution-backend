@@ -36,14 +36,14 @@ type VehicleCreate struct {
 	NumberPlate   string `validate:"required"`
 	Description   string
 	WaterCapacity float64 `validate:"gt=0"`
-	Status        VehicleStatus
-	Type          VehicleType
+	Status        VehicleStatus `validate:"oneof=active available 'not available' unknown"`
+	Type          VehicleType `validate:"oneof=transporter trailer unknown"`
 }
 
 type VehicleUpdate struct {
 	NumberPlate   string `validate:"required"`
 	Description   string
 	WaterCapacity float64 `validate:"gt=0"`
-	Status        VehicleStatus
-	Type          VehicleType
+	Status        VehicleStatus `validate:"oneof=active available 'not available' unknown"`
+	Type          VehicleType `validate:"oneof=transporter trailer unknown"`
 }
