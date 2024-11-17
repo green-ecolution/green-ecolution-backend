@@ -47,13 +47,13 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	)
 	sensorRepo := sensor.NewSensorRepository(store.NewStore(conn, sqlc.New(conn)), sensorMappers)
 
-	flowMappers := flowerbed.NewFlowerbedMappers(
+	flowerbedMappers := flowerbed.NewFlowerbedMappers(
 		&mapper.InternalFlowerbedRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(store.NewStore(conn, sqlc.New(conn)), flowMappers)
+	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowerbedMappers)
 
 	regionMappers := region.NewRegionMappers(
 		&mapper.InternalRegionRepoMapperImpl{},
