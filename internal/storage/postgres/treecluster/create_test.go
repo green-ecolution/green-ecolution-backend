@@ -122,15 +122,15 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-    createFn := func(tc *entities.TreeCluster) (bool, error) {
-      tc.Name = "test"
-      tc.Latitude = utils.P(54.81269326939148)
-      tc.Longitude = utils.P(9.484419532963013)
-      return true, nil
-    }
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "test"
+			tc.Latitude = utils.P(54.81269326939148)
+			tc.Longitude = utils.P(9.484419532963013)
+			return true, nil
+		}
 
 		// when
-    got, err := r.Create(context.Background(), createFn)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.NoError(t, err)
@@ -162,10 +162,10 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-    createFn := func(tc *entities.TreeCluster) (bool, error) {
-      tc.Name = ""
-      return true, nil
-    }
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = ""
+			return true, nil
+		}
 
 		// when
 		got, err := r.Create(context.Background(), createFn)
@@ -180,10 +180,10 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-    createFn := func(tc *entities.TreeCluster) (bool, error) {
-      tc.Name = "test"
-      return true, nil
-    }
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "test"
+			return true, nil
+		}
 
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
@@ -195,6 +195,73 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
+
+	t.Run("should return error when createFn returns error", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			return false, assert.AnError
+		}
+
+		tc, err := r.Create(context.Background(), createFn)
+		assert.Error(t, err)
+		assert.Nil(t, tc)
+	})
+
+	t.Run("should not create tree cluster when createFn returns false", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			return false, nil
+		}
+
+		// when
+		tc, err := r.Create(context.Background(), createFn)
+
+		// then
+		assert.NoError(t, err)
+		assert.Nil(t, tc)
+	})
+
+	t.Run("should return error when tree cluster has empty name", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = ""
+			return true, nil
+		}
+
+		// when
+		tc, err := r.Create(context.Background(), createFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tc)
+	})
+
+	t.Run("should rollback transaction when createFn returns false", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "test"
+			return false, nil
+		}
+
+		// when
+		tc, err := r.Create(context.Background(), createFn)
+
+		// then
+		assert.NoError(t, err)
+		assert.Nil(t, tc)
+	})
 }
 
 func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
@@ -203,10 +270,10 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-    createFn := func(tc *entities.TreeCluster) (bool, error) {
-      tc.Name = "test"
-      return true, nil
-    }
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "test"
+			return true, nil
+		}
 
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
@@ -264,10 +331,10 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
 		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
-    createFn := func(tc *entities.TreeCluster) (bool, error) {
-      tc.Name = "test"
-      return true, nil
-    }
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "test"
+			return true, nil
+		}
 
 		tc, err := r.Create(context.Background(), createFn)
 		assert.NoError(t, err)

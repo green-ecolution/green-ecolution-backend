@@ -202,4 +202,67 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		assert.Nil(t, got.Latitude)
 		assert.Nil(t, got.Longitude)
 	})
+
+  t.Run("should return error when updateFn is nil", func(t *testing.T) {
+    // given
+    r := NewTreeClusterRepository(suite.Store, mappers)
+
+    // when
+    err := r.Update(context.Background(), 1, nil)
+
+    // then
+    assert.Error(t, err)
+  })
+
+  t.Run("should return error when updateFn returns error", func(t *testing.T) {
+    // given
+    r := NewTreeClusterRepository(suite.Store, mappers)
+    updateFn := func(tc *entities.TreeCluster) (bool, error) {
+      return true, assert.AnError
+    }
+
+    // when
+    err := r.Update(context.Background(), 1, updateFn)
+
+    // then
+    assert.Error(t, err)
+  })
+
+  t.Run("should not update when updateFn returns false", func(t *testing.T) {
+    // given
+    r := NewTreeClusterRepository(suite.Store, mappers)
+    updateFn := func(tc *entities.TreeCluster) (bool, error) {
+      return false, nil
+    }
+
+    // when
+    updateErr := r.Update(context.Background(), 1, updateFn)
+    got, getErr := r.GetByID(context.Background(), 1)
+
+    // then
+    assert.NoError(t, updateErr)
+    assert.NoError(t, getErr)
+    assert.NotNil(t, got)
+  })
+
+  t.Run("should not rollback when updateFn returns false", func(t *testing.T) {
+    // given
+    suite.ResetDB(t)
+    suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    r := NewTreeClusterRepository(suite.Store, mappers)
+    updateFn := func(tc *entities.TreeCluster) (bool, error) {
+      tc.Name = "updated"
+      return false, nil
+    }
+
+    // when
+    err := r.Update(context.Background(), 1, updateFn)
+    got, getErr := r.GetByID(context.Background(), 1)
+
+    // then
+    assert.NoError(t, err)
+    assert.NoError(t, getErr)
+    assert.NotNil(t, got)
+    assert.NotEqual(t, "updated", got.Name)
+  })
 }
