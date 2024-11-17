@@ -10,32 +10,32 @@ import (
 )
 
 type GeoClusterLocator struct {
-	treeRepo    storage.TreeRepository
-	regionRepo  storage.RegionRepository
+	treeRepo   storage.TreeRepository
+	regionRepo storage.RegionRepository
 }
 
 func NewGeoLocation(treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) *GeoClusterLocator {
 	return &GeoClusterLocator{
-		treeRepo:    treeRepo,
-		regionRepo:  regionRepo,
+		treeRepo:   treeRepo,
+		regionRepo: regionRepo,
 	}
 }
 
 func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, cluster *entities.TreeCluster) error {
-	slog.Debug("Updating cluster location", "clusterID", cluster.ID)
 	if cluster == nil {
 		return nil
 	}
 
+	slog.Debug("Updating cluster location", "clusterID", cluster.ID)
 	if len(cluster.Trees) == 0 {
-		s.removeClusterCoords(ctx, cluster)
+		s.removeClusterCoords(cluster)
 		return nil
 	}
 
 	return s.setClusterCoords(ctx, cluster, cluster.Trees)
 }
 
-func (s *GeoClusterLocator) removeClusterCoords(ctx context.Context, tc *entities.TreeCluster) {
+func (s *GeoClusterLocator) removeClusterCoords(tc *entities.TreeCluster) {
 	tc.Latitude = nil
 	tc.Longitude = nil
 	tc.Region = nil
@@ -66,7 +66,7 @@ func (s *GeoClusterLocator) setClusterCoords(ctx context.Context, tc *entities.T
 func (s *GeoClusterLocator) getRegionByPoint(ctx context.Context, lat, long float64) (*entities.Region, error) {
 	region, err := s.regionRepo.GetByPoint(ctx, lat, long)
 	if err != nil {
-		return nil, handleError(err)
+		return nil, err
 	}
 
 	return region, nil

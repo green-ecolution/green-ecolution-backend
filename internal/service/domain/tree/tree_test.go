@@ -26,7 +26,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
@@ -49,7 +49,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
@@ -71,7 +71,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
@@ -99,7 +99,7 @@ func TestTreeService_GetByID(t *testing.T) {
 	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 	regionRepo := storageMock.NewMockRegionRepository(t)
 
-	locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+	locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 	svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
 	t.Run("should return tree when found", func(t *testing.T) {
@@ -175,7 +175,7 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything).Return(expectedTree, nil)
-		locator.EXPECT().UpdateCluster(ctx, TestTreeCreate.TreeClusterID).Return(nil)
+		locator.EXPECT().UpdateCluster(ctx, expectedCluster).Return(nil)
 
 		// when
 		result, err := svc.Create(ctx, TestTreeCreate)
@@ -325,7 +325,7 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything).Return(expectedTree, nil)
-		locator.EXPECT().UpdateCluster(ctx, TestTreeCreate.TreeClusterID).Return(expectedError)
+		locator.EXPECT().UpdateCluster(ctx, expectedCluster).Return(expectedError)
 
 		// when
 		result, err := svc.Create(ctx, TestTreeCreate)
@@ -356,7 +356,7 @@ func TestTreeService_Delete(t *testing.T) {
 		// Mock expectations
 		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
 		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
-		locator.EXPECT().UpdateCluster(ctx, &expectedTree.TreeCluster.ID).Return(nil)
+		locator.EXPECT().UpdateCluster(ctx, expectedTree.TreeCluster).Return(nil)
 
 		// when
 		err := svc.Delete(ctx, expectedTree.ID)
@@ -431,7 +431,7 @@ func TestTreeService_Delete(t *testing.T) {
 		// Mock expectations
 		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(expectedTree, nil)
 		treeRepo.EXPECT().Delete(ctx, expectedTree.ID).Return(nil)
-		locator.EXPECT().UpdateCluster(ctx, &expectedTree.TreeCluster.ID).Return(expectedError)
+		locator.EXPECT().UpdateCluster(ctx, expectedTree.TreeCluster).Return(expectedError)
 
 		// when
 		err := svc.Delete(ctx, expectedTree.ID)
@@ -507,8 +507,8 @@ func TestTreeService_Update(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything).Return(updatedTree, nil)
-		locator.EXPECT().UpdateCluster(ctx, &currentTree.TreeCluster.ID).Return(nil)
-		locator.EXPECT().UpdateCluster(ctx, &updatedTree.TreeCluster.ID).Return(nil)
+		locator.EXPECT().UpdateCluster(ctx, currentTree.TreeCluster).Return(nil)
+		locator.EXPECT().UpdateCluster(ctx, updatedTree.TreeCluster).Return(nil)
 
 		// when
 		result, err := svc.Update(ctx, id, TestTreeUpdate)
