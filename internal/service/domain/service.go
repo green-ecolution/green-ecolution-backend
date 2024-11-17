@@ -14,7 +14,7 @@ import (
 )
 
 func NewService(cfg *config.Config, repos *storage.Repository) *service.Services {
-	geoLocator := treecluster.NewGeoLocation(repos.TreeCluster, repos.Tree, repos.Region)
+	geoLocator := treecluster.NewGeoLocation(repos.Tree, repos.Region)
 
 	return &service.Services{
 		InfoService:        info.NewInfoService(repos.Info),
