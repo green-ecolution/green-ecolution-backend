@@ -97,33 +97,35 @@ func (s *TreeClusterService) Create(ctx context.Context, tc *domain.TreeClusterC
 	return c, nil
 }
 
-func (s *TreeClusterService) Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
-	if err := s.validator.Struct(tc); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
-	}
+func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
+	err := s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
+		if err := s.validator.Struct(tc); err != nil {
+			return false, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		}
 
-	trees, err := s.getTrees(ctx, tc.TreeIDs)
+		trees, err := s.getTrees(ctx, tcUpdate.TreeIDs)
+		if err != nil {
+			return false, err
+		}
+
+		tc.Trees = trees
+		tc.Name = tcUpdate.Name
+		tc.Address = tcUpdate.Address
+		tc.Description = tcUpdate.Description
+		tc.SoilCondition = tcUpdate.SoilCondition
+
+		if err = s.locator.UpdateCluster(ctx, tc); err != nil {
+			return false, err
+		}
+
+		return true, nil
+	})
+
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	c, err := s.treeClusterRepo.Update(ctx, id,
-		treecluster.WithTrees(trees),
-		treecluster.WithName(tc.Name),
-		treecluster.WithAddress(tc.Address),
-		treecluster.WithDescription(tc.Description),
-		treecluster.WithSoilCondition(tc.SoilCondition),
-	)
-
-	if err != nil {
-		return nil, handleError(err)
-	}
-
-	if err = s.locator.UpdateCluster(ctx, &id); err != nil {
-		return nil, handleError(err)
-	}
-
-	return c, nil
+	return s.GetByID(ctx, id)
 }
 
 func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
