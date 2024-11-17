@@ -32,35 +32,51 @@ func (r *TreeRepository) UpdateWithImages(ctx context.Context, id int32, tFn ...
 		return nil, err
 	}
 
-	if err := r.updateImages(ctx, t); err != nil {
-		return nil, err
+	entity := defaultTree()
+	for _, fn := range tFn {
+		fn(&entity)
 	}
 
+	if len(entity.Images) > 0 {
+		if t.Images == nil {
+			t.Images = entity.Images
+		} else {
+			t.Images = append(t.Images, entity.Images...)
+		}
+		if err := r.updateImages(ctx, t); err != nil {
+			return nil, err
+		}
+	}
 	return r.GetByID(ctx, id)
 }
 
 func (r *TreeRepository) UpdateTreeClusterID(ctx context.Context, treeIDs []int32, treeClusterID *int32) error {
+	for _, id := range treeIDs {
+		_, err := r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+	}
+	_, err := r.store.GetTreeClusterByID(ctx, *treeClusterID)
+	if err != nil {
+		return err
+	}
 	args := &sqlc.UpdateTreeClusterIDParams{
 		Column1:       treeIDs,
 		TreeClusterID: treeClusterID,
 	}
-
 	return r.store.UpdateTreeClusterID(ctx, args)
 }
 
 func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) error {
-	var treeClusterID *int32
-	if t.TreeCluster != nil {
-		treeClusterID = &t.TreeCluster.ID
-	}
-
 	var sensorID *int32
 	if t.Sensor != nil {
 		sensorID = &t.Sensor.ID
+	}
 
-		if err := r.store.UnlinkSensorIDFromTrees(ctx, sensorID); err != nil {
-			return err
-		}
+	var treeClusterID *int32
+	if t.TreeCluster != nil {
+		treeClusterID = &t.TreeCluster.ID
 	}
 
 	args := sqlc.UpdateTreeParams{
