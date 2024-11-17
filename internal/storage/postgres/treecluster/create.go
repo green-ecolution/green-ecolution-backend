@@ -28,6 +28,10 @@ func defaultTreeCluster() *entities.TreeCluster {
 }
 
 func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error) {
+  if createFn == nil {
+    return nil, errors.New("createFn is nil")
+  }
+
 	var createdTc *entities.TreeCluster
 	err := r.store.WithTx(ctx, func(tx pgx.Tx) error {
 		entity := defaultTreeCluster()
