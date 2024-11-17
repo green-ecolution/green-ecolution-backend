@@ -28,9 +28,9 @@ func defaultTreeCluster() *entities.TreeCluster {
 }
 
 func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error) {
-  if createFn == nil {
-    return nil, errors.New("createFn is nil")
-  }
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
+	}
 
 	var createdTc *entities.TreeCluster
 	err := r.store.WithTx(ctx, func(tx pgx.Tx) error {
@@ -44,7 +44,7 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 			return nil
 		}
 
-		if err := r.validateTreeClusterEntity(entity); err != nil {
+		if err = r.validateTreeClusterEntity(entity); err != nil {
 			return err
 		}
 

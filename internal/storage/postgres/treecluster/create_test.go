@@ -245,10 +245,12 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Nil(t, tc)
 	})
 
-	t.Run("should rollback transaction when createFn returns false", func(t *testing.T) {
+	t.Run("should rollback transaction when createFn returns false and not return error", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    newID := int32(9)
+
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		createFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "test"
@@ -257,10 +259,34 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 
 		// when
 		tc, err := r.Create(context.Background(), createFn)
+		got, _ := suite.Store.GetTreeClusterByID(context.Background(), newID)
 
 		// then
 		assert.NoError(t, err)
 		assert.Nil(t, tc)
+    assert.Empty(t, got)
+	})
+
+	t.Run("should rollback transaction when createFn returns error and return error", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+    newID := int32(9)
+
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		createFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "test"
+			return false, assert.AnError
+		}
+
+		// when
+		tc, err := r.Create(context.Background(), createFn)
+		got, _ := suite.Store.GetTreeClusterByID(context.Background(), newID)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tc)
+    assert.Empty(t, got)
 	})
 }
 
