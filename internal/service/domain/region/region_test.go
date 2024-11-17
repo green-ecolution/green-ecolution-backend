@@ -2,6 +2,7 @@ package region
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -34,13 +35,14 @@ func TestRegionService_GetAll(t *testing.T) {
 		// given
 		repo := storageMock.NewMockRegionRepository(t)
 		svc := NewRegionService(repo)
+		expectedErr := errors.New("GetAll failed")
 
-		repo.EXPECT().GetAll(context.Background()).Return(nil, storage.ErrRegionNotFound)
+		repo.EXPECT().GetAll(context.Background()).Return(nil, expectedErr)
 		regions, err := svc.GetAll(context.Background())
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, storage.ErrRegionNotFound, err)
+		assert.Equal(t, "500: GetAll failed", err.Error())
 		assert.Nil(t, regions)
 	})
 }
@@ -68,11 +70,11 @@ func TestRegionService_GetByID(t *testing.T) {
 		svc := NewRegionService(repo)
 
 		// when
-		repo.EXPECT().GetByID(context.Background(), int32(3)).Return(nil, storage.ErrRegionNotFound)
+		repo.EXPECT().GetByID(context.Background(), int32(3)).Return(nil, storage.ErrEntityNotFound)
 		region, err := svc.GetByID(context.Background(), 3)
 
 		// then
-		assert.Error(t, err)
+		assert.Equal(t, "404: region not found", err.Error())
 		assert.Nil(t, region)
 	})
 }
