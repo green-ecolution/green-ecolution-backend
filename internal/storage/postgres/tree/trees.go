@@ -122,7 +122,8 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 			TreeID:  id,
 			ImageID: img.ID,
 		}
-		if err = r.store.UnlinkTreeImage(ctx, &args); err != nil {
+		_, err = r.store.UnlinkTreeImage(ctx, &args)
+		if err != nil {
 			return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
 		}
 
@@ -130,7 +131,17 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 			return r.store.HandleError(errors.Wrap(err, "failed to delete image"))
 		}
 	}
-	return r.store.DeleteTree(ctx, id)
+
+	rowID, err := r.store.DeleteTree(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if rowID != id || rowID == 0 {
+		return storage.ErrTreeNotFound
+	}
+
+	return nil
 }
 
 func (r *TreeRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
@@ -146,7 +157,8 @@ func (r *TreeRepository) UnlinkImage(ctx context.Context, treeID, imageID int32)
 		TreeID:  treeID,
 		ImageID: imageID,
 	}
-	return r.store.UnlinkTreeImage(ctx, &args)
+	_, err := r.store.UnlinkTreeImage(ctx, &args)
+	return err
 }
 
 func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) error {
@@ -154,6 +166,10 @@ func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) erro
 }
 
 func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error {
+	_, err := r.store.GetTreeClusterByID(ctx, treeClusterID)
+	if err != nil {
+		return err
+	}
 	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
 }
 
