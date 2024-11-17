@@ -10,6 +10,7 @@ import (
 	service "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -132,7 +133,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 		Address:       "123 Main St",
 		Description:   "Test description",
 		SoilCondition: entities.TreeSoilConditionLehmig,
-		TreeIDs:       []*int32{ptrToInt32(1), ptrToInt32(2)},
+		TreeIDs:       []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully create a new tree cluster", func(t *testing.T) {
@@ -301,7 +302,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 		Address:       "123 Main St",
 		Description:   "Test description",
 		SoilCondition: entities.TreeSoilConditionLehmig,
-		TreeIDs:       []*int32{ptrToInt32(1), ptrToInt32(2)},
+		TreeIDs:       []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully update a tree cluster", func(t *testing.T) {
@@ -606,8 +607,8 @@ func getTestTreeClusters() []*entities.TreeCluster {
 			Description:   "Test description",
 			SoilCondition: entities.TreeSoilConditionLehmig,
 			Archived:      false,
-			Latitude:      float64Ptr(9.446741),
-			Longitude:     float64Ptr(54.801539),
+			Latitude:      utils.P(9.446741),
+			Longitude:     utils.P(54.801539),
 			Trees:         getTestTrees(),
 		},
 		{
@@ -655,12 +656,4 @@ func getTestTrees() []*entities.Tree {
 			Readonly:     true,
 		},
 	}
-}
-
-func float64Ptr(f float64) *float64 {
-	return &f
-}
-
-func ptrToInt32(i int32) *int32 {
-	return &i
 }

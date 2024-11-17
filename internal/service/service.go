@@ -97,6 +97,16 @@ type SensorService interface {
 	GetAll(ctx context.Context) ([]*domain.Sensor, error)
 }
 
+type VehicleService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.Vehicle, error)
+	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
+	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
+	Create(ctx context.Context, vh *domain.VehicleCreate) (*domain.Vehicle, error)
+	Update(tx context.Context, id int32, vh *domain.VehicleUpdate) (*domain.Vehicle, error)
+	Delete(ctx context.Context, id int32) error
+}
+
 type Service interface {
 	Ready() bool
 }
@@ -109,6 +119,7 @@ type Services struct {
 	RegionService      RegionService
 	TreeClusterService TreeClusterService
 	SensorService      SensorService
+	VehicleService     VehicleService
 }
 
 func (s *Services) AllServicesReady() bool {

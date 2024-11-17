@@ -3,12 +3,9 @@
 INSERT INTO images (url) VALUES ('https://avatars.githubusercontent.com/u/165842746?s=96&v=4');
 INSERT INTO images (url, filename, mime_type) VALUES ('https://app.dev.green-ecolution.de/api/v1/images/avatar.png', 'avatar.png', 'image/png');
 
-INSERT INTO vehicles (id, number_plate, description, water_capacity) VALUES (1, 'B-1234', 'Test vehicle 1', 100.0);
-INSERT INTO vehicles (id, number_plate, description, water_capacity) VALUES (2, 'B-5678', 'Test vehicle 2', 150.0);
+INSERT INTO vehicles (id, number_plate, description, water_capacity, type, status) VALUES (1, 'B-1234', 'Test vehicle 1', 100.0, 'trailer', 'active');
+INSERT INTO vehicles (id, number_plate, description, water_capacity, type, status) VALUES (2, 'B-5678', 'Test vehicle 2', 150.0, 'transporter', 'unknown');
 ALTER SEQUENCE vehicles_id_seq RESTART WITH 3;
-
-INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('95b69b4c-b38b-4394-9520-496879b67791', 1);
-INSERT INTO user_vehicles (user_id, vehicle_id) VALUES ('d2563a8e-a608-4039-8718-25fc3c1d8e57', 2);
 
 INSERT INTO tree_clusters (id, name, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
 VALUES 

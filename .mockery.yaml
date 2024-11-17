@@ -12,6 +12,7 @@ packages:
       AuthService:
       RegionService:
       SensorService:
+      VehicleService:
       Service:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
@@ -25,3 +26,4 @@ packages:
       UserRepository:
       RegionRepository:
       ImageRepository:
+      VehicleRepository:

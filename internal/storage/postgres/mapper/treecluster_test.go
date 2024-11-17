@@ -1,6 +1,7 @@
 package mapper_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -140,7 +141,7 @@ func TestMapWateringStatus(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(string(test.input), func(t *testing.T) {
+		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
 			result := mapper.MapWateringStatus(test.input)
 			assert.Equal(t, test.expected, result)
 		})
@@ -160,7 +161,7 @@ func TestMapSoilCondition(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		t.Run(string(test.input), func(t *testing.T) {
+		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
 			result := mapper.MapSoilCondition(test.input)
 			assert.Equal(t, test.expected, result)
 		})

@@ -21,6 +21,7 @@ func TestNewService(t *testing.T) {
 		mockAuthRepo := storageMock.NewMockAuthRepository(t)
 		mockUserRepo := storageMock.NewMockUserRepository(t)
 		mockImageRepo := storageMock.NewMockImageRepository(t)
+		mockVehicleRepo := storageMock.NewMockVehicleRepository(t)
 
 		mockRepos := &storage.Repository{
 			Auth:        mockAuthRepo,
@@ -31,6 +32,7 @@ func TestNewService(t *testing.T) {
 			Image:       mockImageRepo,
 			TreeCluster: mockClusterRepo,
 			Region:      mockRegionRepo,
+			Vehicle:     mockVehicleRepo,
 		}
 
 		svc := NewService(mockConfig, mockRepos)
@@ -44,5 +46,6 @@ func TestNewService(t *testing.T) {
 		assert.NotNil(t, svc.RegionService)
 		assert.NotNil(t, svc.TreeClusterService)
 		assert.NotNil(t, svc.SensorService)
+		assert.NotNil(t, svc.VehicleService)
 	})
 }

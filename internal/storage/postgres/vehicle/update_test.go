@@ -16,6 +16,8 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		Description:   "Updated description",
 		NumberPlate:   "FL NEW 9876",
 		WaterCapacity: 10000,
+		Type:          entities.VehicleTypeTransporter,
+		Status:        entities.VehicleStatusAvailable,
 	}
 
 	t.Run("should update vehicle", func(t *testing.T) {
@@ -28,6 +30,8 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			WithDescription(input.Description),
 			WithNumberPlate(input.NumberPlate),
 			WithWaterCapacity(input.WaterCapacity),
+			WithVehicleStatus(input.Status),
+			WithVehicleType(input.Type),
 		)
 		gotByID, _ := r.GetByID(context.Background(), 1)
 
@@ -40,6 +44,39 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		assert.Equal(t, input.Description, gotByID.Description)
 		assert.Equal(t, input.NumberPlate, gotByID.NumberPlate)
 		assert.Equal(t, input.WaterCapacity, gotByID.WaterCapacity)
+		assert.Equal(t, input.Type, gotByID.Type)
+		assert.Equal(t, input.Status, gotByID.Status)
+	})
+
+	t.Run("should return error when update vehicle with duplicate plate", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+
+		numberPlate := "FL ZT 9876"
+
+		// when
+		firstVehicle, err := r.Update(
+			context.Background(),
+			int32(2),
+			WithDescription(input.Description),
+			WithNumberPlate(numberPlate),
+			WithWaterCapacity(input.WaterCapacity),
+			WithVehicleStatus(input.Status),
+			WithVehicleType(input.Type),
+		)
+		assert.NoError(t, err)
+		assert.NotNil(t, firstVehicle)
+
+		secondVehicle, err := r.Update(
+			context.Background(),
+			int32(1),
+			WithDescription("New Car"),
+			WithNumberPlate(numberPlate),
+			WithWaterCapacity(2.000),
+		)
+
+		assert.Error(t, err)
+		assert.Nil(t, secondVehicle)
 	})
 
 	t.Run("should return error when update vehicle with zero water capacity", func(t *testing.T) {

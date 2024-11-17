@@ -10,6 +10,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 )
 
@@ -23,6 +24,7 @@ func (s *Server) privateRoutes(app *fiber.App) {
 	grp.Mount("/user", user.RegisterRoutes(s.services.AuthService))
 	grp.Mount("/role", user.RegisterRoutes(s.services.AuthService))
 	grp.Mount("/region", region.RegisterRoutes(s.services.RegionService))
+	grp.Mount("/vehicle", vehicle.RegisterRoutes(s.services.VehicleService))
 	grp.Mount("/import", fileimport.RegisterRoutes(s.services.TreeService))
 }
 
