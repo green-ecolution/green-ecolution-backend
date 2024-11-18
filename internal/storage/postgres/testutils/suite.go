@@ -97,10 +97,7 @@ func initStore(dbURL string) *store.Store {
 		log.Fatalf("Error while connecting to PostgreSQL: %s", err)
 	}
 
-	s, err := store.NewStore(pool, sqlc.New(pool))
-	if err != nil {
-		log.Fatalf("failed to create store: %s", err)
-	}
+	s := store.NewStore(pool, sqlc.New(pool))
 
 	return s
 }

@@ -35,44 +35,40 @@ func TestStore_NewStore(t *testing.T) {
 		pool := poolConn(t)
 
 		// when
-		s, err := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// then
-		assert.NoError(t, err)
 		assert.NotNil(t, s)
 	})
 
-	t.Run("should return error when querier is nil", func(t *testing.T) {
+	t.Run("should panic when querier is nil", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
 
 		// when
-		s, err := store.NewStore(pool, nil)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, s)
+		defer func() {
+			assert.NotNil(t, recover())
+		}()
+		_ = store.NewStore(pool, nil)
 	})
 
-	t.Run("should return error when pool is nil", func(t *testing.T) {
+	t.Run("should panic when pool is nil", func(t *testing.T) {
 		// given
 		var pool *pgxpool.Pool
 
 		// when
-		s, err := store.NewStore(pool, sqlc.New(pool))
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, s)
+		defer func() {
+			assert.NotNil(t, recover())
+		}()
+		_ = store.NewStore(pool, sqlc.New(pool))
 	})
 
-	t.Run("should return error when pool is nil and querier is nil", func(t *testing.T) {
+	t.Run("should panic when pool is nil and querier is nil", func(t *testing.T) {
 		// when
-		s, err := store.NewStore(nil, nil)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, s)
+		defer func() {
+			assert.NotNil(t, recover())
+		}()
+		_ = store.NewStore(nil, nil)
 	})
 }
 
@@ -80,7 +76,7 @@ func TestStore_DB(t *testing.T) {
 	t.Run("should return db", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// when
 		db := s.DB()
@@ -106,10 +102,10 @@ func TestStore_WithTx(t *testing.T) {
 	t.Run("should execute function with transaction", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// when
-		err := s.WithTx(context.Background(), func(q *sqlc.Queries) error {
+		err := s.WithTx(context.Background(), func(s *store.Store) error {
 			return nil
 		})
 
@@ -120,10 +116,10 @@ func TestStore_WithTx(t *testing.T) {
 	t.Run("should return error when function returns error", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// when
-		err := s.WithTx(context.Background(), func(q *sqlc.Queries) error {
+		err := s.WithTx(context.Background(), func(s *store.Store) error {
 			return pgx.ErrNoRows
 		})
 
@@ -134,7 +130,7 @@ func TestStore_WithTx(t *testing.T) {
 	t.Run("should return error when function is nil", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// when
 		err := s.WithTx(context.Background(), nil)
@@ -146,12 +142,12 @@ func TestStore_WithTx(t *testing.T) {
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
 		// when
-		err := s.WithTx(ctx, func(q *sqlc.Queries) error {
+		err := s.WithTx(ctx, func(s *store.Store) error {
 			return nil
 		})
 
@@ -162,11 +158,11 @@ func TestStore_WithTx(t *testing.T) {
 	t.Run("should commit transaction", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// when
-		err := s.WithTx(context.Background(), func(q *sqlc.Queries) error {
-			_, _ = q.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
+		err := s.WithTx(context.Background(), func(s *store.Store) error {
+			_, _ = s.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
 			return nil
 		})
 
@@ -187,11 +183,11 @@ func TestStore_WithTx(t *testing.T) {
 	t.Run("should rollback transaction", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
-		s, _ := store.NewStore(pool, sqlc.New(pool))
+		s := store.NewStore(pool, sqlc.New(pool))
 
 		// when
-		err := s.WithTx(context.Background(), func(q *sqlc.Queries) error {
-			_, _ = q.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
+		err := s.WithTx(context.Background(), func(s *store.Store) error {
+			_, _ = s.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
 			return assert.AnError
 		})
 

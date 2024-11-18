@@ -28,27 +28,20 @@ type Store struct {
 	entityType EntityType
 }
 
-func NewStore(db *pgxpool.Pool, querier sqlc.Querier) (*Store, error) {
+func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
 	if db == nil {
-		return nil, errors.New("db is nil")
+		slog.Error("db is nil")
+		panic("db is nil")
 	}
 
 	if querier == nil {
-		return nil, errors.New("querier is nil")
+		slog.Error("querier is nil")
+		panic("querier is nil")
 	}
 
 	return &Store{
 		Querier: querier,
 		db:      db,
-	}, nil
-}
-
-func (s *Store) SwitchQuerier(querier sqlc.Querier) func() {
-	originalQuerier := s.Querier
-	s.Querier = querier
-
-	return func() {
-		s.Querier = originalQuerier
 	}
 }
 
@@ -90,7 +83,7 @@ func (s *Store) HandleError(err error) error {
 	return err
 }
 
-func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
+func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	if fn == nil {
 		return errors.New("txFn is nil")
 	}
@@ -101,7 +94,7 @@ func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error 
 	}
 
 	qtx := sqlc.New(tx)
-	err = fn(qtx)
+	err = fn(NewStore(s.db, qtx))
 	if err == nil {
 		slog.Debug("Committing transaction")
 		return tx.Commit(ctx)
