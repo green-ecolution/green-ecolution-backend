@@ -103,10 +103,10 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 
 	if treeCreate.TreeClusterID != nil {
-    tc, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
-    if err != nil {
-      return nil, handleError(err)
-    }
+		tc, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
+		if err != nil {
+			return nil, handleError(err)
+		}
 		if err = s.locator.UpdateCluster(ctx, tc); err != nil {
 			return nil, handleError(err)
 		}

@@ -35,7 +35,7 @@ func TestTreeClusterRepository_Delete(t *testing.T) {
 	t.Run("should delete tree cluster", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
-		suite.ExecQuery(t, "INSERT INTO tree_clusters (id, name, moisture_level, address, description) VALUES (1, 'test', 0.5, '', '')")
+		_, _ = suite.ExecQuery(t, "INSERT INTO tree_clusters (id, name, moisture_level, address, description) VALUES (1, 'test', 0.5, '', '')")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
 		// when

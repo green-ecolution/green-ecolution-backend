@@ -96,13 +96,13 @@ func initStore(dbURL string) *store.Store {
 	if err != nil {
 		log.Fatalf("Error while connecting to PostgreSQL: %s", err)
 	}
-	
-  s, err := store.NewStore(pool, sqlc.New(pool))
-  if err != nil {
-    log.Fatalf("failed to create store: %s", err)
-  }
 
-  return s
+	s, err := store.NewStore(pool, sqlc.New(pool))
+	if err != nil {
+		log.Fatalf("failed to create store: %s", err)
+	}
+
+	return s
 }
 
 // CloseConn closes the connection. After the test, the connection will be re-established.
@@ -120,12 +120,12 @@ func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string, args ...any) (
 	t.Helper()
 	t.Log("Executing query...")
 
-  result, err := s.Store.DB().Query(context.Background(), query, args...)
+	result, err := s.Store.DB().Query(context.Background(), query, args...)
 	if err != nil {
-    return nil, err
+		return nil, err
 	}
 
-  return result, nil
+	return result, nil
 }
 
 func (s *PostgresTestSuite) SwitchQuerier(t testing.TB, querier sqlc.Querier) {

@@ -9,31 +9,31 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func (*entities.TreeCluster) (bool, error)) error {
-  return r.store.WithTx(ctx, func(q *sqlc.Queries) error {
-    cancel := r.store.SwitchQuerier(q)
-    defer cancel()
+func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func(*entities.TreeCluster) (bool, error)) error {
+	return r.store.WithTx(ctx, func(q *sqlc.Queries) error {
+		cancel := r.store.SwitchQuerier(q)
+		defer cancel()
 
-    tc, err := r.GetByID(ctx, id)
-    if err != nil {
-      return err
-    }
+		tc, err := r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
 
-    if updateFn == nil {
-      return errors.New("updateFn is nil")
-    }
+		if updateFn == nil {
+			return errors.New("updateFn is nil")
+		}
 
-    updated, err := updateFn(tc)
-    if err != nil {
-      return err
-    }
+		updated, err := updateFn(tc)
+		if err != nil {
+			return err
+		}
 
-    if !updated {
-      return nil
-    }
+		if !updated {
+			return nil
+		}
 
-    return r.updateEntity(ctx, tc)
-  })
+		return r.updateEntity(ctx, tc)
+	})
 }
 
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {

@@ -88,7 +88,7 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 }
 
 func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
-  if err := s.validator.Struct(tcUpdate); err != nil {
+	if err := s.validator.Struct(tcUpdate); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
@@ -98,14 +98,13 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 	}
 
 	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
-
 		tc.Trees = trees
 		tc.Name = tcUpdate.Name
 		tc.Address = tcUpdate.Address
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
 
-		if err = s.locator.UpdateCluster(ctx, tc); err != nil {
+		if err := s.locator.UpdateCluster(ctx, tc); err != nil {
 			return false, err
 		}
 
@@ -163,25 +162,27 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 	visitedClusters := make(map[int32]bool)
 	for _, tree := range trees {
 		if tree.TreeCluster != nil && tree.TreeCluster.ID != 0 {
-			if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
-				slog.Debug("Tree already visited", "treeID", tree.ID)
-				continue
-			}
-
-			slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
-
-			err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, func(tc *domain.TreeCluster) (bool, error) {
-				if err := s.locator.UpdateCluster(ctx, tc); err != nil {
-					return false, err
-				}
-				return true, nil
-			})
-			if err != nil {
-				return err
-			}
-
-			visitedClusters[tree.TreeCluster.ID] = true
+			continue
 		}
+
+		if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
+			slog.Debug("Tree already visited", "treeID", tree.ID)
+			continue
+		}
+
+		slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
+
+		err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, func(tc *domain.TreeCluster) (bool, error) {
+			if err := s.locator.UpdateCluster(ctx, tc); err != nil {
+				return false, err
+			}
+			return true, nil
+		})
+		if err != nil {
+			return err
+		}
+
+		visitedClusters[tree.TreeCluster.ID] = true
 	}
 
 	return nil
