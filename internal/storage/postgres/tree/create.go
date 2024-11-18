@@ -78,6 +78,9 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	var sensorID *int32
 	if entity.Sensor != nil {
 		sensorID = &entity.Sensor.ID
+		if err := r.store.UnlinkSensorIDFromTrees(ctx, sensorID); err != nil {
+			return -1, err
+		}
 	}
 
 	args := sqlc.CreateTreeParams{

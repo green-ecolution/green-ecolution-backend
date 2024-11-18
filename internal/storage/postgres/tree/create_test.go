@@ -93,6 +93,60 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Equal(t, entities.WateringStatusGood, got.WateringStatus)
 	})
 
+	t.Run("should unlink the sensor id in other trees", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), 1)
+		if sensorErr != nil {
+			t.Fatal(sensorErr)
+		}
+		sensor := mappers.sMapper.FromSql(sqlSensor)
+
+		existTree, existTreeErr := r.GetByID(context.Background(), 1)
+		if existTreeErr != nil {
+			t.Fatal(sensorErr)
+		}
+		assert.NotNil(t, existTree.Sensor.ID)
+		assert.Equal(t, sensor.ID, existTree.Sensor.ID)
+
+		// when
+		got, err := r.Create(context.Background(),
+			WithSpecies("Oak"),
+			WithTreeNumber("T001"),
+			WithPlantingYear(2023),
+			WithLatitude(54.801539),
+			WithLongitude(9.446741),
+			WithDescription("A newly planted oak tree"),
+			WithWateringStatus(entities.WateringStatusGood),
+			WithSensor(sensor),
+		)
+
+		sensorByNewTree, errSensorByTree := r.GetSensorByTreeID(context.Background(), got.ID)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotZero(t, got.ID)
+		assert.WithinDuration(t, got.CreatedAt, time.Now(), time.Second)
+		assert.WithinDuration(t, got.UpdatedAt, time.Now(), time.Second)
+		assert.NoError(t, errSensorByTree)
+		assert.NotNil(t, sensorByNewTree)
+		assert.Equal(t, sensor.ID, sensorByNewTree.ID)
+		assert.Nil(t, existTree.Sensor.ID)
+		assert.Empty(t, got.Images)
+		assert.Equal(t, "Oak", got.Species)
+		assert.Equal(t, "T001", got.Number)
+		assert.Equal(t, int32(2023), got.PlantingYear)
+		assert.Equal(t, 54.801539, got.Latitude)
+		assert.Equal(t, 9.446741, got.Longitude)
+		assert.Equal(t, "A newly planted oak tree", got.Description)
+		assert.Equal(t, false, got.Readonly)
+		assert.Equal(t, entities.WateringStatusGood, got.WateringStatus)
+	})
+
 	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)

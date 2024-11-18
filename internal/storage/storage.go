@@ -31,8 +31,8 @@ var (
 	ErrTxClosed         = errors.New("transaction closed")
 	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")
 
-	ErrInvalidLatitude         = errors.New("latitude must be between -190,180")
-	ErrInvalidLongitude        = errors.New("longitude must be between -190,180")
+	ErrInvalidLatitude         = errors.New("latitude must be between 90,-90")
+	ErrInvalidLongitude        = errors.New("longitude must be between 180,-180")
 	ErrTreeWithSameCoordinates = errors.New("tree with same coordinates already exists")
 )
 

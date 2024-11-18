@@ -132,13 +132,9 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 		}
 	}
 
-	rowID, err := r.store.DeleteTree(ctx, id)
+	_, err = r.store.DeleteTree(ctx, id)
 	if err != nil {
 		return err
-	}
-
-	if rowID != id || rowID == 0 {
-		return storage.ErrTreeNotFound
 	}
 
 	return nil
