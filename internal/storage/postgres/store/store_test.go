@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 	ctx := context.Background()
 	defer func() { os.Exit(code) }()
 	pgContainer = testutils.SetupPostgres(ctx)
-	defer pgContainer.Terminate(ctx)
+	defer func() { _ = pgContainer.Terminate(ctx) }()
 
 	code = m.Run()
 }
@@ -166,7 +166,7 @@ func TestStore_WithTx(t *testing.T) {
 
 		// when
 		err := s.WithTx(context.Background(), func(q *sqlc.Queries) error {
-			q.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
+			_, _ = q.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
 			return nil
 		})
 
@@ -191,7 +191,7 @@ func TestStore_WithTx(t *testing.T) {
 
 		// when
 		err := s.WithTx(context.Background(), func(q *sqlc.Queries) error {
-			q.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
+			_, _ = q.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
 			return assert.AnError
 		})
 

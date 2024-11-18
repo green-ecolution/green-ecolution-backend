@@ -44,12 +44,12 @@ func NewStore(db *pgxpool.Pool, querier sqlc.Querier) (*Store, error) {
 }
 
 func (s *Store) SwitchQuerier(querier sqlc.Querier) func() {
-  originalQuerier := s.Querier
-  s.Querier = querier
+	originalQuerier := s.Querier
+	s.Querier = querier
 
-  return func() {
-    s.Querier = originalQuerier
-  }
+	return func() {
+		s.Querier = originalQuerier
+	}
 }
 
 func (s *Store) DB() *pgxpool.Pool {
@@ -91,26 +91,26 @@ func (s *Store) HandleError(err error) error {
 }
 
 func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error {
-  if fn == nil {
-    return errors.New("txFn is nil")
-  }
+	if fn == nil {
+		return errors.New("txFn is nil")
+	}
 
 	tx, err := s.db.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return err
 	}
 
-  qtx := sqlc.New(tx)
+	qtx := sqlc.New(tx)
 	err = fn(qtx)
 	if err == nil {
-    slog.Debug("Committing transaction")
+		slog.Debug("Committing transaction")
 		return tx.Commit(ctx)
 	}
 
-  slog.Debug("Rolling back transaction")
+	slog.Debug("Rolling back transaction")
 	rollbackErr := tx.Rollback(ctx)
 	if rollbackErr != nil {
-    slog.Error("Error rolling back transaction", "error", rollbackErr)
+		slog.Error("Error rolling back transaction", "error", rollbackErr)
 		return errors.Join(err, rollbackErr)
 	}
 
@@ -120,4 +120,3 @@ func (s *Store) WithTx(ctx context.Context, fn func(*sqlc.Queries) error) error 
 func (s *Store) Close() {
 	s.db.Close()
 }
-

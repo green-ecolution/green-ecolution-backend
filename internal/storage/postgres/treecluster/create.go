@@ -46,7 +46,7 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 			return nil
 		}
 
-		if err = r.validateTreeClusterEntity(entity); err != nil {
+		if err := r.validateTreeClusterEntity(entity); err != nil {
 			return err
 		}
 
@@ -55,6 +55,9 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 			return err
 		}
 		createdTc, err = r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
 
 		return nil
 	})
