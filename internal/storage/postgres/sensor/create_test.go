@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"context"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -12,7 +13,6 @@ import (
 )
 
 func TestSensorRepository_Create(t *testing.T) {
-
 	t.Run("should create sensor", func(t *testing.T) {
 		suite.ResetDB(t)
 		// given
@@ -33,6 +33,8 @@ func TestSensorRepository_Create(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
+		assert.Equal(t, float64(0), got.Latitude)
+		assert.Equal(t, float64(0), got.Longitude)
 		assert.Equal(t, entities.SensorStatusOnline, got.Status)
 		assert.NotZero(t, got.ID)
 	})
@@ -43,14 +45,53 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(context.Background(), WithSensorID("sensor-5"))
+		got, err := r.Create(context.Background(),
+			WithSensorID("sensor-5"),
+			WithLatitude(54.801539),
+			WithLongitude(9.446741))
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, entities.SensorStatusUnknown, got.Status)
 		assert.Equal(t, []*entities.SensorData(nil), got.Data)
+		assert.Equal(t, 54.801539, got.Latitude)
+		assert.Equal(t, 9.446741, got.Longitude)
 		assert.NotZero(t, got.ID)
+	})
+
+	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
+		suite.ResetDB(t)
+		// given
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.Create(context.Background(),
+			WithSensorID("sensor-5"),
+			WithLatitude(-200),
+			WithLongitude(0))
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), storage.ErrInvalidLatitude.Error())
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error if longitude is out of bounds", func(t *testing.T) {
+		suite.ResetDB(t)
+		// given
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.Create(context.Background(),
+			WithSensorID("sensor-5"),
+			WithLatitude(0),
+			WithLongitude(200))
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), storage.ErrInvalidLongitude.Error())
+		assert.Nil(t, got)
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {

@@ -72,19 +72,6 @@ func (r *SensorRepository) GetSensorDataByID(ctx context.Context, id string) ([]
 	return domainData, nil
 }
 
-func (r *SensorRepository) GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Sensor, error) {
-	params := sqlc.GetSensorByCoordinatesParams{
-		Latitude:  latitude,
-		Longitude: longitude,
-	}
-	row, err := r.store.GetSensorByCoordinates(ctx, &params)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-	sensor := r.mapper.FromSql(row)
-	return sensor, nil
-}
-
 func (r *SensorRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, long float64, err error) {
 	geoStr, err := r.store.CalculateGroupedCentroids(ctx, ids)
 	if err != nil {

@@ -17,15 +17,21 @@ func TestSensorRepository_Update(t *testing.T) {
 	t.Run("should update sensor successfully", func(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+		newLat := 54.82078826498143
+		newLong := 9.489684366114483
 
-		got, err := r.Update(context.Background(), sensorUtils.TestSensorID, WithStatus(entities.SensorStatusOffline))
-		gotByID, _ := r.GetByID(context.Background(), sensorUtils.TestSensorID)
+		got, err := r.Update(context.Background(),
+			sensorUtils.TestSensorID,
+			WithStatus(entities.SensorStatusOffline),
+			WithLatitude(newLat),
+			WithLongitude(newLong))
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, entities.SensorStatusOffline, got.Status)
-		assert.Equal(t, entities.SensorStatusOffline, gotByID.Status)
+		assert.Equal(t, newLat, got.Latitude)
+		assert.Equal(t, newLong, got.Longitude)
 	})
 
 	t.Run("should return error when update sensor with empty name", func(t *testing.T) {

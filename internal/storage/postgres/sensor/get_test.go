@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -26,6 +25,8 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		for i, sensor := range got {
 			assert.Equal(t, sensorUtils.TestSensorList[i].ID, sensor.ID)
 			assert.Equal(t, sensorUtils.TestSensorList[i].Status, sensor.Status)
+			assert.Equal(t, sensorUtils.TestSensorList[i].Latitude, sensor.Latitude)
+			assert.Equal(t, sensorUtils.TestSensorList[i].Longitude, sensor.Longitude)
 			assert.NotZero(t, sensor.CreatedAt)
 			assert.NotZero(t, sensor.UpdatedAt)
 		}
@@ -70,15 +71,15 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		// when
 		got, err := r.GetByID(ctx, sensorUtils.TestSensorID)
 
-		fmt.Println(".................... AHF ................. AHF .............. AHF  ..........")
-		fmt.Println(got.ID)
-
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensorID, got.ID)
-		assert.Equal(t, entities.SensorStatusOnline, got.Status)
+		assert.Equal(t, sensorUtils.TestSensor.ID, got.ID)
+		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
+		assert.Equal(t, sensorUtils.TestSensor.Latitude, got.Latitude)
+		assert.Equal(t, sensorUtils.TestSensor.Longitude, got.Longitude)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
+
 	})
 
 	t.Run("should return error when sensor not found", func(t *testing.T) {
@@ -195,11 +196,21 @@ func TestSensorRepository_GetSensorByStatus(t *testing.T) {
 		// when
 		got, err := r.GetSensorByStatus(ctx, &sensorUtils.TestSensor.Status)
 
+		testSensorList := []*entities.Sensor{sensorUtils.TestSensorList[0], sensorUtils.TestSensorList[3]}
+
 		// then
+
 		assert.NoError(t, err)
-		assert.Len(t, got, 1)
-		assert.Equal(t, sensorUtils.TestSensor.ID, got[0].ID)
-		assert.Equal(t, sensorUtils.TestSensor.Status, got[0].Status)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, len(testSensorList))
+		for i := range got {
+			assert.Equal(t, testSensorList[i].ID, got[i].ID)
+			assert.Equal(t, testSensorList[i].Status, got[i].Status)
+			assert.Equal(t, testSensorList[i].Latitude, got[i].Latitude)
+			assert.Equal(t, testSensorList[i].Longitude, got[i].Longitude)
+			assert.NotZero(t, got[i].CreatedAt)
+			assert.NotZero(t, got[i].UpdatedAt)
+		}
 	})
 
 	t.Run("should return empty slice when no sensors match status", func(t *testing.T) {

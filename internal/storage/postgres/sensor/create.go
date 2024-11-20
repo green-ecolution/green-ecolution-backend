@@ -26,7 +26,7 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 		fn(entity)
 	}
 
-	if err := r.validateSensorEntity(ctx, entity); err != nil {
+	if err := r.validateSensorEntity(entity); err != nil {
 		return nil, err
 	}
 
@@ -87,7 +87,7 @@ func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Se
 	})
 }
 
-func (r *SensorRepository) validateSensorEntity(ctx context.Context, sensor *entities.Sensor) error {
+func (r *SensorRepository) validateSensorEntity(sensor *entities.Sensor) error {
 	if sensor == nil {
 		return errors.New("sensor is nil")
 	}
@@ -97,14 +97,6 @@ func (r *SensorRepository) validateSensorEntity(ctx context.Context, sensor *ent
 	if sensor.Longitude < -180 || sensor.Longitude > 180 {
 		return storage.ErrInvalidLongitude
 	}
-	params := sqlc.GetSensorByCoordinatesParams{
-		Latitude:  sensor.Latitude,
-		Longitude: sensor.Longitude,
-	}
-	sensorByCoordinates, err := r.store.GetSensorByCoordinates(ctx, &params)
 
-	if err == nil && sensorByCoordinates != nil {
-		return storage.ErrTreeWithSameCoordinates
-	}
 	return nil
 }

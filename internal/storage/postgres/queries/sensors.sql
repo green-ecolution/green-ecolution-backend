@@ -7,9 +7,6 @@ SELECT * FROM sensors WHERE id = $1;
 -- name: GetSensorByStatus :many
 SELECT * FROM sensors WHERE status = $1;
 
--- name: GetSensorByCoordinates :one
-SELECT * FROM sensors WHERE latitude = $1 AND longitude = $2 LIMIT 1;
-
 -- name: GetSensorDataBySensorID :many
 SELECT * FROM sensor_data WHERE sensor_id = $1;
 
