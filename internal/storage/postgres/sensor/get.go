@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/twpayne/go-geos"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
@@ -68,4 +70,36 @@ func (r *SensorRepository) GetSensorDataByID(ctx context.Context, id string) ([]
 	}
 
 	return domainData, nil
+}
+
+func (r *SensorRepository) GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Sensor, error) {
+	params := sqlc.GetSensorByCoordinatesParams{
+		Latitude:  latitude,
+		Longitude: longitude,
+	}
+	row, err := r.store.GetSensorByCoordinates(ctx, &params)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	sensor := r.mapper.FromSql(row)
+	return sensor, nil
+}
+
+func (r *SensorRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, long float64, err error) {
+	geoStr, err := r.store.CalculateGroupedCentroids(ctx, ids)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	// Parse geoStr to get latitude and longitude
+	g, err := geos.NewGeomFromWKT(geoStr)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	if g.IsEmpty() {
+		return 0, 0, errors.New("empty geometry")
+	}
+
+	return g.X(), g.Y(), nil
 }

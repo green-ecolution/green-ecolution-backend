@@ -49,6 +49,19 @@ func WithSensorID(sensorID string) entities.EntityFunc[entities.Sensor] {
 		s.ID = sensorID
 	}
 }
+
+func WithLatitude(lat float64) entities.EntityFunc[entities.Sensor] {
+	return func(t *entities.Sensor) {
+		t.Latitude = lat
+	}
+}
+
+func WithLongitude(long float64) entities.EntityFunc[entities.Sensor] {
+	return func(t *entities.Sensor) {
+		t.Longitude = long
+	}
+}
+
 func (r *SensorRepository) Delete(ctx context.Context, id string) error {
 	return r.store.DeleteSensor(ctx, id)
 }

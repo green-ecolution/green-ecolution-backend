@@ -30,6 +30,10 @@ var (
 	ErrConnectionClosed = errors.New("connection is closed")
 	ErrTxClosed         = errors.New("transaction closed")
 	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")
+
+	ErrInvalidLatitude         = errors.New("latitude must be between 90,-90")
+	ErrInvalidLongitude        = errors.New("longitude must be between 180,-180")
+	ErrTreeWithSameCoordinates = errors.New("tree with same coordinates already exists")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {

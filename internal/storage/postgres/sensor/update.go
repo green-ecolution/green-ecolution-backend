@@ -3,6 +3,8 @@ package sensor
 import (
 	"context"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
@@ -37,5 +39,37 @@ func (r *SensorRepository) updateEntity(ctx context.Context, sensor *entities.Se
 		Status: sqlc.SensorStatus(sensor.Status),
 	}
 
+	locationParams := &sqlc.SetSensorLocationParams{
+		ID:        sensor.ID,
+		Latitude:  sensor.Latitude,
+		Longitude: sensor.Longitude,
+	}
+
+	if err := r.validateCoordinates(ctx, locationParams); err != nil {
+		return err
+	}
+	err := r.store.SetSensorLocation(ctx, locationParams)
+	if err != nil {
+		return err
+	}
+
 	return r.store.UpdateSensor(ctx, &params)
+}
+func (r *SensorRepository) validateCoordinates(ctx context.Context, locationParams *sqlc.SetSensorLocationParams) error {
+	if locationParams.Latitude < -90 || locationParams.Latitude > 90 {
+		return storage.ErrInvalidLatitude
+	}
+	if locationParams.Longitude < -180 || locationParams.Longitude > 180 {
+		return storage.ErrInvalidLongitude
+	}
+	params := sqlc.GetSensorByCoordinatesParams{
+		Latitude:  locationParams.Latitude,
+		Longitude: locationParams.Longitude,
+	}
+	sensorByCoordinates, err := r.store.GetSensorByCoordinates(ctx, &params)
+
+	if err == nil && sensorByCoordinates != nil {
+		return storage.ErrTreeWithSameCoordinates
+	}
+	return nil
 }
