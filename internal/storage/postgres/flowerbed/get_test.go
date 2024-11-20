@@ -33,7 +33,7 @@ func TestFlowerbedRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestFlowerbeds[i].RegionID, fb.Region.ID)
 
 			// assert sensor
-			if allTestFlowerbeds[i].SensorID == -1 {
+			if allTestFlowerbeds[i].SensorID == "no-sensor" {
 				assert.Nil(t, fb.Sensor)
 				assert.NoError(t, err)
 			} else {
@@ -104,7 +104,7 @@ func TestFlowerbedRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestFlowerbeds[0].RegionID, got.Region.ID)
 
 		// assert sensor
-		if expectedF.SensorID == -1 {
+		if expectedF.SensorID == "no-sensor" {
 			assert.Nil(t, got.Sensor)
 			assert.NoError(t, err)
 		} else {
@@ -408,7 +408,7 @@ type testFlowerbeds struct {
 	ID          int32
 	Description string
 	RegionID    int32
-	SensorID    int32
+	SensorID    string
 	Images      []*entities.Image
 }
 
@@ -417,7 +417,7 @@ var allTestFlowerbeds = []*testFlowerbeds{
 		ID:          1,
 		Description: "Big flowerbed nearby the sea",
 		RegionID:    1,
-		SensorID:    2,
+		SensorID:    "sensor-2",
 		Images: []*entities.Image{
 			{
 				ID:       1,
@@ -431,7 +431,7 @@ var allTestFlowerbeds = []*testFlowerbeds{
 		ID:          2,
 		Description: "Small flowerbed in the park",
 		RegionID:    3,
-		SensorID:    -1, // no sensor
+		SensorID:    "no-sensor", // no sensor
 		Images:      []*entities.Image{},
 	},
 }

@@ -47,7 +47,7 @@ func (r *FlowerbedRepository) UpdateWithImages(ctx context.Context, id int32, fF
 }
 
 func (r *FlowerbedRepository) updateEntity(ctx context.Context, f *entities.Flowerbed) error {
-	var sensorID *int32
+	var sensorID *string
 	if f.Sensor != nil {
 		sensorID = &f.Sensor.ID
 	}

@@ -11,7 +11,7 @@ const (
 )
 
 type Sensor struct {
-	ID        int32
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Status    SensorStatus
@@ -20,6 +20,7 @@ type Sensor struct {
 
 type SensorData struct {
 	ID        int32
+	SensorID  *string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Data      *MqttPayload

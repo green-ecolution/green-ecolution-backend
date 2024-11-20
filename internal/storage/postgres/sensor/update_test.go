@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,8 +18,8 @@ func TestSensorRepository_Update(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
-		got, err := r.Update(context.Background(), 1, WithStatus(entities.SensorStatusOffline))
-		gotByID, _ := r.GetByID(context.Background(), 1)
+		got, err := r.Update(context.Background(), sensorUtils.TestSensorID, WithStatus(entities.SensorStatusOffline))
+		gotByID, _ := r.GetByID(context.Background(), sensorUtils.TestSensorID)
 
 		// then
 		assert.NoError(t, err)
@@ -31,31 +33,19 @@ func TestSensorRepository_Update(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Update(context.Background(), 1, WithStatus(""))
+		got, err := r.Update(context.Background(), sensorUtils.TestSensorID, WithStatus(""))
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
 
-	t.Run("should return error when update sensor with negative id", func(t *testing.T) {
+	t.Run("should return error when update sensor with empty id", func(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Update(context.Background(), -1, WithStatus(entities.SensorStatusOffline))
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("should return error when update sensor with zero id", func(t *testing.T) {
-		// given
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.Update(context.Background(), 0)
+		got, err := r.Update(context.Background(), "")
 
 		// then
 		assert.Error(t, err)
@@ -65,10 +55,9 @@ func TestSensorRepository_Update(t *testing.T) {
 	t.Run("should return error when sensor not found", func(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		invalidID := int32(999)
 
 		// when
-		got, err := r.Update(context.Background(), invalidID)
+		got, err := r.Update(context.Background(), "notFoundID")
 
 		// then
 		assert.Error(t, err)
@@ -82,7 +71,7 @@ func TestSensorRepository_Update(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Update(ctx, 1, WithStatus(entities.SensorStatusOffline))
+		got, err := r.Update(ctx, sensorUtils.TestSensorID, WithStatus(entities.SensorStatusOffline))
 
 		// then
 		assert.Error(t, err)

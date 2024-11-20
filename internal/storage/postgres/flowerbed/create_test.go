@@ -12,7 +12,7 @@ import (
 
 func TestRegionRepository_Create(t *testing.T) {
 	region := &entities.Region{ID: 1, Name: "Mürwik"}
-	sensor := &entities.Sensor{ID: 1, Status: entities.SensorStatusOnline}
+	sensor := &entities.Sensor{ID: "sensor-1", Status: entities.SensorStatusOnline}
 
 	input := entities.Flowerbed{
 		Description:    "New description",

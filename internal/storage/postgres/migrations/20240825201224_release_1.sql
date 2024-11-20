@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS tree_clusters (
 CREATE TYPE sensor_status AS ENUM ('online', 'offline', 'unknown');
 
 CREATE TABLE IF NOT EXISTS sensors (
-  id SERIAL PRIMARY KEY,
+  id VARCHAR PRIMARY KEY,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   status sensor_status NOT NULL DEFAULT 'unknown'
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS sensor_data (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   data JSONB NOT NULL,
-  sensor_id INT NOT NULL,
+  sensor_id VARCHAR NOT NULL,
   FOREIGN KEY (sensor_id) REFERENCES sensors(id)
 );
 
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS trees (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   tree_cluster_id INT,
-  sensor_id INT,
+  sensor_id VARCHAR,
   age INT NOT NULL,
   height_above_sea_level FLOAT NOT NULL,
   planting_year INT NOT NULL,
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS flowerbeds (
   id SERIAL PRIMARY KEY,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  sensor_id INT,
+  sensor_id VARCHAR,
   size FLOAT NOT NULL,
   description TEXT NOT NULL,
   number_of_plants INT NOT NULL DEFAULT 0,

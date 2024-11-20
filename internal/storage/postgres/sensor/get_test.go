@@ -20,8 +20,6 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		// when
 		got, err := r.GetAll(context.Background())
 
-		fmt.Print(got[len(got)-1].Data)
-
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, len(sensorUtils.TestSensorList), len(got))
@@ -70,12 +68,15 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetByID(ctx, 1)
+		got, err := r.GetByID(ctx, sensorUtils.TestSensorID)
+
+		fmt.Println(".................... AHF ................. AHF .............. AHF  ..........")
+		fmt.Println(got.ID)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor.ID, got.ID)
-		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
+		assert.Equal(t, sensorUtils.TestSensorID, got.ID)
+		assert.Equal(t, entities.SensorStatusOnline, got.Status)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 	})
@@ -87,35 +88,21 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetByID(ctx, 1)
+		got, err := r.GetByID(ctx, sensorUtils.TestSensorID)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
 
-	t.Run("should return error when sensor id is negative", func(t *testing.T) {
+	t.Run("should return error when sensor id is empty", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetByID(ctx, -1)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("should return error when sensor id is zero", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetByID(ctx, 0)
+		got, err := r.GetByID(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -129,7 +116,7 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetByID(ctx, 1)
+		got, err := r.GetByID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
@@ -146,11 +133,11 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetStatusByID(ctx, 1)
+		got, err := r.GetStatusByID(ctx, "sensor-1")
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor.Status, *got)
+		assert.Equal(t, entities.SensorStatusOnline, *got)
 	})
 
 	t.Run("should return error when sensor not found", func(t *testing.T) {
@@ -160,35 +147,21 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetStatusByID(ctx, 1)
+		got, err := r.GetStatusByID(ctx, sensorUtils.TestSensorID)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
 
-	t.Run("should return error when sensor id is negative", func(t *testing.T) {
+	t.Run("should return error when sensor id is empty", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetStatusByID(ctx, -1)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("should return error when sensor id is zero", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetStatusByID(ctx, 0)
+		got, err := r.GetStatusByID(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -198,11 +171,12 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+		suite.ResetDB(t)
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
 		// when
-		got, err := r.GetStatusByID(ctx, 1)
+		got, err := r.GetStatusByID(ctx, sensorUtils.TestSensorID)
 
 		// then
 		assert.Error(t, err)
@@ -281,7 +255,7 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, 1)
+		got, err := r.GetSensorDataByID(ctx, sensorUtils.TestSensorID)
 
 		// then
 		assert.NoError(t, err)
@@ -300,7 +274,7 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, 999)
+		got, err := r.GetSensorDataByID(ctx, "notFoundID")
 
 		// then
 		assert.NoError(t, err)
@@ -310,11 +284,12 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+		suite.ResetDB(t)
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, 1)
+		got, err := r.GetSensorDataByID(ctx, sensorUtils.TestSensorID)
 
 		// then
 		assert.Error(t, err)

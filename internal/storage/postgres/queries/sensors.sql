@@ -12,9 +12,11 @@ SELECT * FROM sensor_data WHERE sensor_id = $1;
 
 -- name: CreateSensor :one
 INSERT INTO sensors (
+    id,
   status
 ) VALUES (
-  $1
+  $1,
+$2
 ) RETURNING id;
 
 -- name: UpdateSensor :exec

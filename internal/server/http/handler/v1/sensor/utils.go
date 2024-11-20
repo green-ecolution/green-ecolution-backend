@@ -3,12 +3,14 @@ package sensor
 import (
 	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
 var (
-	currentTime = time.Now()
-
+	currentTime     = time.Now()
+	TestSensorID    = "sensor-1"
 	TestMqttPayload = &entities.MqttPayload{
 		EndDeviceIDs: entities.MqttIdentifierDeviceID{
 			DeviceID: "Device123",
@@ -57,21 +59,30 @@ var (
 	}
 
 	TestSensor = &entities.Sensor{
-		ID:        1,
+		ID:        TestSensorID,
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
 		Status:    entities.SensorStatusOnline,
-		Data: []*entities.SensorData{
-			{
-				ID:        1,
-				CreatedAt: currentTime,
-				UpdatedAt: currentTime,
-				Data:      TestMqttPayload,
-			},
-		},
+		Data:      []*entities.SensorData{TestSensorData[0]},
 	}
 
 	TestSensorList = []*entities.Sensor{
 		TestSensor,
+	}
+
+	TestSensorData = []*entities.SensorData{
+		{
+			ID:        1,
+			SensorID:  utils.P(TestSensorID),
+			CreatedAt: currentTime,
+			UpdatedAt: currentTime,
+			Data:      TestMqttPayload,
+		},
+		{
+			ID:        2,
+			CreatedAt: currentTime,
+			UpdatedAt: currentTime,
+			Data:      TestMqttPayload,
+		},
 	}
 )

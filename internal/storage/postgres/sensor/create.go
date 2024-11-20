@@ -44,6 +44,12 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 	}
 
 	for _, d := range data {
+		if d.SensorID == nil {
+			return nil, r.store.HandleError(errors.New("sensor id cannot be nil"))
+		}
+	}
+
+	for _, d := range data {
 		mqttData := r.mapper.FromDomainSensorData(d.Data)
 		raw, err := json.Marshal(mqttData)
 		if err != nil {
@@ -51,7 +57,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 		}
 
 		params := &sqlc.InsertSensorDataParams{
-			SensorID: d.ID,
+			SensorID: *d.SensorID,
 			Data:     raw,
 		}
 
@@ -64,6 +70,8 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 	return data, nil
 }
 
-func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Sensor) (int32, error) {
-	return r.store.CreateSensor(ctx, sqlc.SensorStatus(sensor.Status))
+func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Sensor) (string, error) {
+	return r.store.CreateSensor(ctx, &sqlc.CreateSensorParams{
+		ID: sensor.ID, Status: sqlc.SensorStatus(sensor.Status),
+	})
 }

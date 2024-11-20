@@ -119,7 +119,7 @@ func WithImagesIDs(imagesIDs []int32) entities.EntityFunc[entities.Flowerbed] {
 	}
 }
 
-func WithSensorID(id int32) entities.EntityFunc[entities.Flowerbed] {
+func WithSensorID(id string) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Sensor = &entities.Sensor{ID: id}
 	}
@@ -178,7 +178,7 @@ func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) err
 	return nil
 }
 
-func (r *FlowerbedRepository) UnlinkSensorID(ctx context.Context, sensorID int32) error {
+func (r *FlowerbedRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {
 	return r.store.UnlinkSensorIDFromFlowerbeds(ctx, &sensorID)
 }
 

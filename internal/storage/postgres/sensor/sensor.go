@@ -44,6 +44,11 @@ func WithData(data []*entities.SensorData) entities.EntityFunc[entities.Sensor] 
 	}
 }
 
-func (r *SensorRepository) Delete(ctx context.Context, id int32) error {
+func WithSensorID(sensorID string) entities.EntityFunc[entities.Sensor] {
+	return func(s *entities.Sensor) {
+		s.ID = sensorID
+	}
+}
+func (r *SensorRepository) Delete(ctx context.Context, id string) error {
 	return r.store.DeleteSensor(ctx, id)
 }

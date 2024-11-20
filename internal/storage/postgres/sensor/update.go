@@ -7,7 +7,7 @@ import (
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
 
-func (r *SensorRepository) Update(ctx context.Context, id int32, sFn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error) {
+func (r *SensorRepository) Update(ctx context.Context, id string, sFn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error) {
 	entity, err := r.GetByID(ctx, id)
 	if err != nil {
 		return nil, err

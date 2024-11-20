@@ -68,14 +68,14 @@ var (
 
 	TestSensors = []*entities.Sensor{
 		{
-			ID:        1,
+			ID:        "sensor-1",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Status:    entities.SensorStatusUnknown,
 			Data:      nil,
 		},
 		{
-			ID:        2,
+			ID:        "sensor-2",
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Status:    entities.SensorStatusUnknown,
@@ -90,7 +90,7 @@ var (
 		PlantingYear:  2023,
 		Number:        "T001",
 		TreeClusterID: utils.P(int32(1)),
-		SensorID:      utils.P(int32(1)),
+		SensorID:      utils.P("sensor-1"),
 	}
 
 	TestTreeImport = &entities.TreeImport{
@@ -103,7 +103,7 @@ var (
 
 	TestTreeUpdate = &entities.TreeUpdate{
 		TreeClusterID: utils.P(int32(1)),
-		SensorID:      utils.P(int32(1)),
+		SensorID:      utils.P("sensor-1"),
 		PlantingYear:  2023,
 		Species:       "Oak",
 		Number:        "T001",

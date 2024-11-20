@@ -157,6 +157,6 @@ func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID 
 	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
 }
 
-func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID int32) error {
+func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {
 	return r.store.UnlinkSensorIDFromTrees(ctx, &sensorID)
 }

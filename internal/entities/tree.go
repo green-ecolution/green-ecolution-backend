@@ -23,7 +23,7 @@ type Tree struct {
 
 type TreeCreate struct {
 	TreeClusterID *int32
-	SensorID      *int32
+	SensorID      *string
 	Readonly      bool
 	PlantingYear  int32 `validate:"required"`
 	Species       string
@@ -35,7 +35,7 @@ type TreeCreate struct {
 
 type TreeUpdate struct {
 	TreeClusterID *int32
-	SensorID      *int32
+	SensorID      *string
 	PlantingYear  int32 `validate:"gt=0"`
 	Species       string
 	Number        string

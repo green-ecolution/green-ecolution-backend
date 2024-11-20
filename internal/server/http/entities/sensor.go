@@ -13,7 +13,7 @@ const (
 )
 
 type SensorResponse struct {
-	ID        int32        `json:"id"`
+	ID        string       `json:"id"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	Status    SensorStatus `json:"status"`
@@ -26,7 +26,7 @@ type SensorListResponse struct {
 } // @Name SensorList
 
 type SensorDataResponse struct {
-	ID               int32   `json:"id"`
+	ID               string  `json:"id"`
 	BatteryLevel     float64 `json:"battery_level"`
 	Temperature      float64 `json:"temperature"`
 	Humidity         float64 `json:"humidity"`

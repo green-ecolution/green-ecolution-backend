@@ -54,7 +54,7 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 		treeClusterID = &t.TreeCluster.ID
 	}
 
-	var sensorID *int32
+	var sensorID *string
 	if t.Sensor != nil {
 		sensorID = &t.Sensor.ID
 

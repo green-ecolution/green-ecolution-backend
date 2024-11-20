@@ -87,9 +87,9 @@ func (s *Store) Close() {
 	s.db.Close()
 }
 
-func (s *Store) CheckSensorExists(ctx context.Context, sensorID *int32) error {
-	if sensorID != nil {
-		_, err := s.GetSensorByID(ctx, *sensorID)
+func (s *Store) CheckSensorExists(ctx context.Context, sensorID string) error {
+	if sensorID != "" {
+		_, err := s.GetSensorByID(ctx, sensorID)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
 				return storage.ErrSensorNotFound
