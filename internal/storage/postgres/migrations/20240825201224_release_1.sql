@@ -53,7 +53,10 @@ CREATE TABLE IF NOT EXISTS sensors (
   id VARCHAR PRIMARY KEY,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  status sensor_status NOT NULL DEFAULT 'unknown'
+  status sensor_status NOT NULL DEFAULT 'unknown',
+  latitude FLOAT NOT NULL,
+  longitude FLOAT NOT NULL,
+  geometry GEOMETRY(Point, 4326)
 );
 
 CREATE TABLE IF NOT EXISTS sensor_data (
