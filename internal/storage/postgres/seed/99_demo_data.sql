@@ -99,15 +99,96 @@ VALUES
 
 INSERT INTO sensor_data (sensor_id, data)
 VALUES
-    ('sensor-1', '{"temperature": 20.0, "humidity": 0.5, "moisture": 0.75}'),
-    ('sensor-1', '{"temperature": 21.0, "humidity": 0.6, "moisture": 0.5}'),
-    ('sensor-1', '{"temperature": 22.0, "humidity": 0.7, "moisture": 0.25}'),
-    ('sensor-2', '{"temperature": 20.0, "humidity": 0.5, "moisture": 0.75}'),
-    ('sensor-2', '{"temperature": 21.0, "humidity": 0.6, "moisture": 0.5}'),
-    ('sensor-2', '{"temperature": 22.0, "humidity": 0.7, "moisture": 0.25}'),
-    ('sensor-3', '{"temperature": 20.0, "humidity": 0.5, "moisture": 0.75}'),
-    ('sensor-3', '{"temperature": 21.0, "humidity": 0.6, "moisture": 0.5}'),
-    ('sensor-3', '{"temperature": 22.0, "humidity": 0.7, "moisture": 0.25}');
+    ('sensor-1', '{
+        "temperature": 20.0,
+        "humidity": 0.5,
+        "battery": 34,
+        "watermarks": [
+            {"resistance": 23, "centibar": 38, "depth": 30},
+            {"resistance": 24, "centibar": 40, "depth": 60},
+            {"resistance": 25, "centibar": 42, "depth": 90}
+        ]
+    }'),
+    ('sensor-1', '{
+        "temperature": 21.5,
+        "humidity": 0.6,
+        "battery": 36,
+        "watermarks": [
+            {"resistance": 26, "centibar": 45, "depth": 30},
+            {"resistance": 28, "centibar": 47, "depth": 60},
+            {"resistance": 30, "centibar": 50, "depth": 90}
+        ]
+    }'),
+    ('sensor-1', '{
+        "temperature": 22.0,
+        "humidity": 0.7,
+        "battery": 32,
+        "watermarks": [
+            {"resistance": 29, "centibar": 55, "depth": 30},
+            {"resistance": 31, "centibar": 58, "depth": 60},
+            {"resistance": 33, "centibar": 60, "depth": 90}
+        ]
+    }'),
+    ('sensor-2', '{
+        "temperature": 20.0,
+        "humidity": 0.5,
+        "battery": 40,
+        "watermarks": [
+            {"resistance": 22, "centibar": 35, "depth": 30},
+            {"resistance": 23, "centibar": 38, "depth": 60},
+            {"resistance": 24, "centibar": 40, "depth": 90}
+        ]
+    }'),
+    ('sensor-2', '{
+        "temperature": 21.0,
+        "humidity": 0.6,
+        "battery": 39,
+        "watermarks": [
+            {"resistance": 25, "centibar": 43, "depth": 30},
+            {"resistance": 27, "centibar": 46, "depth": 60},
+            {"resistance": 28, "centibar": 49, "depth": 90}
+        ]
+    }'),
+    ('sensor-2', '{
+        "temperature": 22.0,
+        "humidity": 0.7,
+        "battery": 38,
+        "watermarks": [
+            {"resistance": 29, "centibar": 52, "depth": 30},
+            {"resistance": 30, "centibar": 55, "depth": 60},
+            {"resistance": 32, "centibar": 58, "depth": 90}
+        ]
+    }'),
+    ('sensor-3', '{
+        "temperature": 19.5,
+        "humidity": 0.4,
+        "battery": 37,
+        "watermarks": [
+            {"resistance": 20, "centibar": 32, "depth": 30},
+            {"resistance": 21, "centibar": 34, "depth": 60},
+            {"resistance": 22, "centibar": 36, "depth": 90}
+        ]
+    }'),
+    ('sensor-3', '{
+        "temperature": 20.5,
+        "humidity": 0.5,
+        "battery": 36,
+        "watermarks": [
+            {"resistance": 23, "centibar": 38, "depth": 30},
+            {"resistance": 24, "centibar": 40, "depth": 60},
+            {"resistance": 25, "centibar": 42, "depth": 90}
+        ]
+    }'),
+    ('sensor-3', '{
+        "temperature": 21.5,
+        "humidity": 0.6,
+        "battery": 35,
+        "watermarks": [
+            {"resistance": 26, "centibar": 45, "depth": 30},
+            {"resistance": 28, "centibar": 47, "depth": 60},
+            {"resistance": 30, "centibar": 50, "depth": 90}
+        ]
+    }');
 
 -- +goose StatementEnd
 
