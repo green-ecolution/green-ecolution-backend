@@ -9,7 +9,9 @@ type Watermark struct {
 type MqttPayload struct {
 	DeviceID    string
 	Battery     float64
-	Humidity    int
-	Temperature int
+	Humidity    float64
+	Temperature float64
+	Latitude    float64
+	Longitude   float64
 	Watermarks  []Watermark
 }

@@ -68,15 +68,9 @@ func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 		slog.Error("Error while converting MQTT payload to sensor data", "error", err)
 	}
 
-	fmt.Println("sensorData........................................................")
-	fmt.Println(sensorData)
-	fmt.Println("sensorData........................................................")
+	slog.Info("Logging sensor data", "sensorData", sensorData)
 
 	domainPayload := m.mapper.FromResponse(sensorData)
-
-	fmt.Println("domainPayload........................................................")
-	fmt.Println(domainPayload)
-	fmt.Println("domainPayload........................................................")
 	_, err = m.svc.MqttService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
 		slog.Error("Error handling message", "error", err)
@@ -103,8 +97,10 @@ func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPaylo
 	payload := &sensor.MqttPayloadResponse{
 		DeviceID:    endDeviceIDs["device_id"].(string),
 		Battery:     decodedPayload["battery"].(float64),
-		Humidity:    int(decodedPayload["humidity"].(float64)),
-		Temperature: int(temperature),
+		Humidity:    decodedPayload["humidity"].(float64),
+		Temperature: temperature,
+		Latitude:    decodedPayload["latitude"].(float64),
+		Longitude:   decodedPayload["longitude"].(float64),
 		Watermarks: []sensor.WatermarkResponse{
 			{
 				Resistance: int(decodedPayload["watermarkOneResistanceValue"].(float64)),

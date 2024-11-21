@@ -9,7 +9,9 @@ type WatermarkResponse struct {
 type MqttPayloadResponse struct {
 	DeviceID    string              `json:"device_id"`
 	Battery     float64             `json:"battery"`
-	Humidity    int                 `json:"humidity"`
-	Temperature int                 `json:"temperature"`
+	Humidity    float64             `json:"humidity"`
+	Temperature float64             `json:"temperature"`
+	Latitude    float64             `json:"latitude"`
+	Longitude   float64             `json:"longitude"`
 	Watermarks  []WatermarkResponse `json:"watermarks"`
 } // @Name MqttPayload
