@@ -155,8 +155,8 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-	
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
 		id := int32(1)
@@ -177,8 +177,8 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-	
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
 		id := int32(2)
@@ -194,15 +194,14 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		assert.EqualError(t, err, "404: tree not found")
 	})
 
-
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-	
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
 		id := int32(2)
@@ -224,8 +223,8 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
-	
-		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+
+		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
 		id := int32(3)
