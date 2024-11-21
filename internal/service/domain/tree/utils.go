@@ -72,6 +72,8 @@ var (
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Status:    entities.SensorStatusUnknown,
+			Latitude:  54.82124518093376,
+			Longitude: 9.485702120628517,
 			Data:      nil,
 		},
 		{
@@ -79,6 +81,8 @@ var (
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 			Status:    entities.SensorStatusUnknown,
+			Latitude:  54.787809938410133,
+			Longitude: 9.444052105200551,
 			Data:      nil,
 		},
 	}

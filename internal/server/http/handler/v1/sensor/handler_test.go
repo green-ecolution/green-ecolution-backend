@@ -40,7 +40,7 @@ func TestGetAllSensors(t *testing.T) {
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 
-		assert.Len(t, response.Data, 1)
+		assert.Len(t, response.Data, len(TestSensorList))
 		sensorData := response.Data[0]
 		assert.Equal(t, TestSensorList[0].ID, sensorData.ID)
 

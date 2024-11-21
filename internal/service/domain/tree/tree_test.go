@@ -165,7 +165,7 @@ func TestTreeService_Create(t *testing.T) {
 
 		// Mock expectations
 		treeClusterRepo.EXPECT().GetByID(ctx, int32(1)).Return(expectedCluster, nil)
-		sensorRepo.EXPECT().GetByID(ctx, int32(1)).Return(expectedSensor, nil)
+		sensorRepo.EXPECT().GetByID(ctx, TestSensors[0].ID).Return(expectedSensor, nil)
 		treeRepo.EXPECT().Create(ctx,
 			mock.Anything,
 			mock.Anything,
