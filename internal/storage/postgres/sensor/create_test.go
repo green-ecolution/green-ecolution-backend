@@ -2,8 +2,9 @@ package sensor
 
 import (
 	"context"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"testing"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 

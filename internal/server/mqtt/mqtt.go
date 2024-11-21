@@ -3,7 +3,9 @@ package mqtt
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
+	"strconv"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/config"
@@ -61,16 +63,66 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 }
 
 func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
-	var sensorData sensor.MqttPayloadResponse
-	if err := json.Unmarshal(msg.Payload(), &sensorData); err != nil {
-		slog.Error("Error unmarshalling message", "error", err)
-		return
+	sensorData, err := m.convertToMqttPayloadResponse(msg)
+	if err != nil {
+		slog.Error("Error while converting MQTT payload to sensor data", "error", err)
 	}
 
-	domainPayload := m.mapper.FromResponse(&sensorData)
-	_, err := m.svc.MqttService.HandleMessage(context.Background(), domainPayload)
+	fmt.Println("sensorData........................................................")
+	fmt.Println(sensorData)
+	fmt.Println("sensorData........................................................")
+
+	domainPayload := m.mapper.FromResponse(sensorData)
+
+	fmt.Println("domainPayload........................................................")
+	fmt.Println(domainPayload)
+	fmt.Println("domainPayload........................................................")
+	_, err = m.svc.MqttService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
 		slog.Error("Error handling message", "error", err)
 		return
 	}
+}
+
+func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPayloadResponse, error) {
+	var raw map[string]any
+	if err := json.Unmarshal(msg.Payload(), &raw); err != nil {
+		return nil, fmt.Errorf("error unmarshalling JSON: %w", err)
+	}
+
+	endDeviceIDs := raw["end_device_ids"].(map[string]any)
+	uplinkMessage := raw["uplink_message"].(map[string]any)
+	decodedPayload := uplinkMessage["decoded_payload"].(map[string]any)
+
+	// Parse temperature from string to float64
+	temperature, err := strconv.ParseFloat(decodedPayload["temperature"].(string), 64)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing temperature: %w", err)
+	}
+
+	payload := &sensor.MqttPayloadResponse{
+		DeviceID:    endDeviceIDs["device_id"].(string),
+		Battery:     decodedPayload["battery"].(float64),
+		Humidity:    int(decodedPayload["humidity"].(float64)),
+		Temperature: int(temperature),
+		Watermarks: []sensor.WatermarkResponse{
+			{
+				Resistance: int(decodedPayload["watermarkOneResistanceValue"].(float64)),
+				Centibar:   int(decodedPayload["watermarkOneCentibarValue"].(float64)),
+				Depth:      30,
+			},
+			{
+				Resistance: int(decodedPayload["watermarkTwoResistanceValue"].(float64)),
+				Centibar:   int(decodedPayload["watermarkTwoCentibarValue"].(float64)),
+				Depth:      60,
+			},
+			{
+				Resistance: int(decodedPayload["watermarkThreeResistanceValue"].(float64)),
+				Centibar:   int(decodedPayload["watermarkThreeCentibarValue"].(float64)),
+				Depth:      90,
+			},
+		},
+	}
+
+	return payload, nil
 }
