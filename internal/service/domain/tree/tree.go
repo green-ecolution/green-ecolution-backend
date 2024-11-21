@@ -58,16 +58,13 @@ func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, er
 	return tr, nil
 }
 
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, err.Error())
+func (s *TreeService) GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error) {
+	tr, err := s.treeRepo.GetBySensorID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
 	}
 
-	return service.NewError(service.InternalError, err.Error())
-}
-
-func (s *TreeService) Ready() bool {
-	return s.treeRepo != nil && s.sensorRepo != nil
+	return tr, nil
 }
 
 func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
@@ -187,4 +184,20 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		}
 	}
 	return updatedTree, nil
+}
+
+func handleError(err error) error {
+	if errors.Is(err, storage.ErrEntityNotFound) {
+		return service.NewError(service.NotFound, storage.ErrTreeNotFound.Error())
+	}
+
+	if errors.Is(err, storage.ErrSensorNotFound) {
+		return service.NewError(service.NotFound, err.Error())
+	}
+
+	return service.NewError(service.InternalError, err.Error())
+}
+
+func (s *TreeService) Ready() bool {
+	return s.treeRepo != nil && s.sensorRepo != nil
 }

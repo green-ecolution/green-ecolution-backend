@@ -42,6 +42,29 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	return t, nil
 }
 
+func (r *TreeRepository) GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error) {
+	_, err := r.store.GetSensorByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrSensorNotFound
+		} else {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
+	row, err := r.store.GetTreeBySensorID(ctx, &id)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	t := r.mapper.FromSql(row)
+	if err := r.mapFields(ctx, t); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	return t, nil
+}
+
 func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error) {
 	rows, err := r.store.GetTreesByIDs(ctx, ids)
 	if err != nil {

@@ -86,7 +86,7 @@ func TestVehicleService_GetByID(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		id := int32(1)
-		expectedErr := storage.ErrVehicleNotFound
+		expectedErr := storage.ErrEntityNotFound
 		vehicleRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when
@@ -123,7 +123,7 @@ func TestVehicleService_GetByPlate(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		plate := "FL TBZ 1234"
-		expectedErr := storage.ErrVehicleNotFound
+		expectedErr := storage.ErrEntityNotFound
 		vehicleRepo.EXPECT().GetByPlate(ctx, plate).Return(nil, expectedErr)
 
 		// when
@@ -326,7 +326,7 @@ func TestVehicleService_Update(t *testing.T) {
 		vehicleRepo.EXPECT().GetByID(
 			ctx,
 			vehicleID,
-		).Return(nil, storage.ErrVehicleNotFound)
+		).Return(nil, storage.ErrEntityNotFound)
 
 		// when
 		result, err := svc.Update(ctx, vehicleID, input)
@@ -477,7 +477,7 @@ func TestVehicleService_Delete(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		id := int32(1)
-		expectedErr := storage.ErrVehicleNotFound
+		expectedErr := storage.ErrEntityNotFound
 		vehicleRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
 		// when

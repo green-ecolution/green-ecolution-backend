@@ -152,7 +152,7 @@ func (s *TreeClusterService) Ready() bool {
 func handleError(err error) error {
 	// TODO: Rollback the transaction if an error occurs.
 	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, err.Error())
+		return service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
 	}
 
 	return service.NewError(service.InternalError, err.Error())

@@ -20,6 +20,7 @@ const (
 	TreeCluster EntityType = "treecluster"
 	Tree        EntityType = "tree"
 	Vehicle     EntityType = "vehicle"
+	Region      EntityType = "region"
 )
 
 type Store struct {
@@ -45,22 +46,7 @@ func (s *Store) HandleError(err error) error {
 	}
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		switch s.entityType {
-		case Sensor:
-			return storage.ErrSensorNotFound
-		case Image:
-			return storage.ErrImageNotFound
-		case Flowerbed:
-			return storage.ErrFlowerbedNotFound
-		case Vehicle:
-			return storage.ErrVehicleNotFound
-		case TreeCluster:
-			return storage.ErrTreeClusterNotFound
-		case Tree:
-			return storage.ErrTreeNotFound
-		default:
-			return storage.ErrEntityNotFound
-		}
+		return storage.ErrEntityNotFound
 	}
 
 	slog.Error("An Error occurred in database operation", "error", err)
