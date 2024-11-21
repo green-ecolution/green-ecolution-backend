@@ -191,6 +191,10 @@ func handleError(err error) error {
 		return service.NewError(service.NotFound, storage.ErrTreeNotFound.Error())
 	}
 
+	if errors.Is(err, storage.ErrSensorNotFound) {
+		return service.NewError(service.NotFound, err.Error())
+	}
+
 	return service.NewError(service.InternalError, err.Error())
 }
 

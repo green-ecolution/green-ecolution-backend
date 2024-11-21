@@ -2,7 +2,6 @@ package tree
 
 import (
 	"context"
-	"fmt"
 
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 
@@ -44,8 +43,16 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 }
 
 func (r *TreeRepository) GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error) {
+	_, err := r.store.GetSensorByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrSensorNotFound
+		} else {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
 	row, err := r.store.GetTreeBySensorID(ctx, &id)
-	fmt.Print(err)
 	if err != nil {
 		return nil, r.store.HandleError(err)
 	}

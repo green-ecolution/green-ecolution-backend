@@ -146,6 +146,103 @@ func TestTreeService_GetByID(t *testing.T) {
 	})
 }
 
+func TestTreeService_GetBySensorID(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should return tree when found", func(t *testing.T) {
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+	
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		id := int32(1)
+		expectedTree := TestTreesList[0]
+		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(expectedTree, nil)
+
+		// when
+		tree, err := svc.GetBySensorID(ctx, id)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedTree, tree)
+	})
+
+	t.Run("should return error if tree not found", func(t *testing.T) {
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+	
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		id := int32(2)
+		expectedError := storage.ErrEntityNotFound
+		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(nil, expectedError)
+
+		// when
+		tree, err := svc.GetBySensorID(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+		assert.EqualError(t, err, "404: tree not found")
+	})
+
+
+	t.Run("should return error if sensor not found", func(t *testing.T) {
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+	
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		id := int32(2)
+		expectedError := storage.ErrSensorNotFound
+		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(nil, expectedError)
+
+		// when
+		tree, err := svc.GetBySensorID(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+		assert.EqualError(t, err, "404: sensor not found")
+	})
+
+	t.Run("should return error for unexpected repository error", func(t *testing.T) {
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+	
+		locator := treecluster.NewGeoLocation(clusterRepo, treeRepo, regionRepo)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
+
+		id := int32(3)
+		expectedError := errors.New("unexpected error")
+
+		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(nil, expectedError)
+
+		// when
+		tree, err := svc.GetBySensorID(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+		assert.EqualError(t, err, "500: unexpected error")
+	})
+}
+
 func TestTreeService_Create(t *testing.T) {
 	ctx := context.Background()
 
