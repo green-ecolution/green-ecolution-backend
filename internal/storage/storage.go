@@ -31,9 +31,8 @@ var (
 	ErrTxClosed         = errors.New("transaction closed")
 	ErrTxCommitRollback = errors.New("transaction cannot commit or rollback")
 
-	ErrInvalidLatitude         = errors.New("latitude must be between 90,-90")
-	ErrInvalidLongitude        = errors.New("longitude must be between 180,-180")
-	ErrTreeWithSameCoordinates = errors.New("tree with same coordinates already exists")
+	ErrInvalidLatitude  = errors.New("latitude must be between 90,-90")
+	ErrInvalidLongitude = errors.New("longitude must be between 180,-180")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
@@ -88,10 +87,8 @@ type TreeRepository interface {
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error)
 	GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
-	GetTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error)
 
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
-	UpdateTreeClusterID(ctx context.Context, treeIDs []int32, treeClusterID *int32) error
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error

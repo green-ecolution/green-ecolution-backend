@@ -42,7 +42,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
+		r := TreeRepository{store: suite.Store, TreeMappers: mappers}
 		sqlTreeCluster, clusterErr := suite.Store.GetTreeClusterByID(context.Background(), 1)
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
@@ -67,7 +67,7 @@ func TestTreeRepository_Create(t *testing.T) {
 			WithTreeCluster(treeCluster),
 			WithSensor(sensor),
 		)
-		treeClusterByTree, errClusterByTree := r.GetTreeClusterByTreeID(context.Background(), got.ID)
+		treeClusterByTree, errClusterByTree := r.getTreeClusterByTreeID(context.Background(), got.ID)
 		sensorByTree, errSensorByTree := r.GetSensorByTreeID(context.Background(), got.ID)
 
 		// then
@@ -129,29 +129,6 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("should return error if tree with same coordinates already exists", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-
-		existingTree, getErr := suite.Store.GetTreeByID(context.Background(), 1)
-		if getErr != nil {
-			t.Fatal(getErr)
-		}
-
-		// when
-		got, err := r.Create(context.Background(),
-			WithLatitude(existingTree.Latitude),
-			WithLongitude(existingTree.Longitude),
-		)
-
-		// then
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), storage.ErrTreeWithSameCoordinates.Error())
-		assert.Nil(t, got)
-	})
-
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -175,7 +152,7 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
+		r := TreeRepository{store: suite.Store, TreeMappers: mappers}
 		sqlImages, err := suite.Store.GetAllImages(context.Background())
 		if err != nil {
 			t.Fatal(err)
@@ -206,7 +183,7 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 			WithSensor(sensor),
 			WithImages(images),
 		)
-		treeClusterByTree, errClusterByTree := r.GetTreeClusterByTreeID(context.Background(), tree.ID)
+		treeClusterByTree, errClusterByTree := r.getTreeClusterByTreeID(context.Background(), tree.ID)
 		sensorByTree, errSensorByTree := r.GetSensorByTreeID(context.Background(), tree.ID)
 
 		// then
