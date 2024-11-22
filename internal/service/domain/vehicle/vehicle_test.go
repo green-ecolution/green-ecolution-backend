@@ -144,6 +144,11 @@ func TestVehicleService_Create(t *testing.T) {
 		Status:        entities.VehicleStatusActive,
 		Type:          entities.VehicleTypeTrailer,
 		WaterCapacity: 2000.5,
+		Model:         "Actros L Mercedes Benz",
+		DriverLicense: entities.DriverLicenseTrailer,
+		Height:        2.1,
+		Length:        5.0,
+		Width:         2.4,
 	}
 
 	t.Run("should successfully create a new vehicle", func(t *testing.T) {
@@ -272,6 +277,41 @@ func TestVehicleService_Create(t *testing.T) {
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "400: validation error")
 	})
+
+	t.Run("should return validation error on zero size measurements", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = "FL TBZ 123"
+		input.Height = 0
+
+		// when
+		result, err := svc.Create(ctx, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "400: validation error")
+	})
+
+	t.Run("should return validation error on wrong driver licence format", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = "FL TBZ 123"
+		input.Height = 3.0
+		input.DriverLicense = ""
+
+		// when
+		result, err := svc.Create(ctx, input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "400: validation error")
+	})
 }
 
 func TestVehicleService_Update(t *testing.T) {
@@ -283,6 +323,11 @@ func TestVehicleService_Update(t *testing.T) {
 		Status:        entities.VehicleStatusActive,
 		Type:          entities.VehicleTypeTrailer,
 		WaterCapacity: 2000.5,
+		Model:         "Actros L Mercedes Benz",
+		DriverLicense: entities.DriverLicenseTrailer,
+		Height:        2.1,
+		Length:        5.0,
+		Width:         2.4,
 	}
 
 	t.Run("should successfully update a vehicle", func(t *testing.T) {
@@ -451,6 +496,43 @@ func TestVehicleService_Update(t *testing.T) {
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "400: validation error")
 	})
+
+	t.Run("should return validation error on zero size measurements", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = "FL TBZ 123"
+		input.WaterCapacity = 100
+		input.Height = 0
+
+		// when
+		result, err := svc.Update(ctx, int32(1), input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "400: validation error")
+	})
+
+	t.Run("should return validation error on wrong driving licence format", func(t *testing.T) {
+		// given
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		input.NumberPlate = "FL TBZ 123"
+		input.WaterCapacity = 100
+		input.Height = 3.0
+		input.DriverLicense = ""
+
+		// when
+		result, err := svc.Update(ctx, int32(1), input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "400: validation error")
+	})
 }
 
 func TestVehicleService_Delete(t *testing.T) {
@@ -544,6 +626,12 @@ func getTestVehicles() []*entities.Vehicle {
 			Status:        entities.VehicleStatusActive,
 			Type:          entities.VehicleTypeTrailer,
 			WaterCapacity: 2000.5,
+			Model:         "1615/17 - Conrad - MAN TGE 3.180",
+			DriverLicense: entities.DriverLicenseTrailer,
+			Height:        1.5,
+			Length:        2.0,
+			Width:         2.0,
+
 		},
 		{
 			ID:            2,
@@ -554,6 +642,11 @@ func getTestVehicles() []*entities.Vehicle {
 			Status:        entities.VehicleStatusNotAvailable,
 			Type:          entities.VehicleTypeTransporter,
 			WaterCapacity: 1000.5,
+			Model:         "Actros L Mercedes Benz",
+			DriverLicense: entities.DriverLicenseTransporter,
+			Height:        2.1,
+			Length:        5.0,
+			Width:         2.4,
 		},
 	}
 }
