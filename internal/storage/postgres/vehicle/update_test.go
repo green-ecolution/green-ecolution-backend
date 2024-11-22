@@ -12,16 +12,16 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 	input := entities.Vehicle{
-		Description:   "Updated description",
-		NumberPlate:   "FL NEW 9876",
-		WaterCapacity: 10000,
-		Type:          entities.VehicleTypeTransporter,
-		Status:        entities.VehicleStatusAvailable,
+		Description:    "Updated description",
+		NumberPlate:    "FL NEW 9876",
+		WaterCapacity:  10000,
+		Type:           entities.VehicleTypeTransporter,
+		Status:         entities.VehicleStatusAvailable,
 		DrivingLicense: entities.DrivingLicenseCar,
-		Height:        2.75,
-		Length:        6.0,
-		Width:         5.0,
-		Model:         "New model 1615/17",
+		Height:         2.75,
+		Length:         6.0,
+		Width:          5.0,
+		Model:          "New model 1615/17",
 	}
 
 	t.Run("should update vehicle", func(t *testing.T) {

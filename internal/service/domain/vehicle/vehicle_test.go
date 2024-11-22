@@ -139,16 +139,16 @@ func TestVehicleService_GetByPlate(t *testing.T) {
 func TestVehicleService_Create(t *testing.T) {
 	ctx := context.Background()
 	input := &entities.VehicleCreate{
-		NumberPlate:   "FL TBZ 123",
-		Description:   "Test description",
-		Status:        entities.VehicleStatusActive,
-		Type:          entities.VehicleTypeTrailer,
-		WaterCapacity: 2000.5,
-		Model:         "Actros L Mercedes Benz",
+		NumberPlate:    "FL TBZ 123",
+		Description:    "Test description",
+		Status:         entities.VehicleStatusActive,
+		Type:           entities.VehicleTypeTrailer,
+		WaterCapacity:  2000.5,
+		Model:          "Actros L Mercedes Benz",
 		DrivingLicense: entities.DrivingLicenseTrailer,
-		Height:        2.1,
-		Length:        5.0,
-		Width:         2.4,
+		Height:         2.1,
+		Length:         5.0,
+		Width:          2.4,
 	}
 
 	t.Run("should successfully create a new vehicle", func(t *testing.T) {
@@ -318,16 +318,16 @@ func TestVehicleService_Update(t *testing.T) {
 	ctx := context.Background()
 	vehicleID := int32(1)
 	input := &entities.VehicleUpdate{
-		NumberPlate:   "FL TBZ 123",
-		Description:   "Test description",
-		Status:        entities.VehicleStatusActive,
-		Type:          entities.VehicleTypeTrailer,
-		WaterCapacity: 2000.5,
-		Model:         "Actros L Mercedes Benz",
+		NumberPlate:    "FL TBZ 123",
+		Description:    "Test description",
+		Status:         entities.VehicleStatusActive,
+		Type:           entities.VehicleTypeTrailer,
+		WaterCapacity:  2000.5,
+		Model:          "Actros L Mercedes Benz",
 		DrivingLicense: entities.DrivingLicenseTrailer,
-		Height:        2.1,
-		Length:        5.0,
-		Width:         2.4,
+		Height:         2.1,
+		Length:         5.0,
+		Width:          2.4,
 	}
 
 	t.Run("should successfully update a vehicle", func(t *testing.T) {
@@ -618,35 +618,34 @@ func getTestVehicles() []*entities.Vehicle {
 
 	return []*entities.Vehicle{
 		{
-			ID:            1,
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			NumberPlate:   "FL TBZ 123",
-			Description:   "Test description",
-			Status:        entities.VehicleStatusActive,
-			Type:          entities.VehicleTypeTrailer,
-			WaterCapacity: 2000.5,
-			Model:         "1615/17 - Conrad - MAN TGE 3.180",
+			ID:             1,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+			NumberPlate:    "FL TBZ 123",
+			Description:    "Test description",
+			Status:         entities.VehicleStatusActive,
+			Type:           entities.VehicleTypeTrailer,
+			WaterCapacity:  2000.5,
+			Model:          "1615/17 - Conrad - MAN TGE 3.180",
 			DrivingLicense: entities.DrivingLicenseTrailer,
-			Height:        1.5,
-			Length:        2.0,
-			Width:         2.0,
-
+			Height:         1.5,
+			Length:         2.0,
+			Width:          2.0,
 		},
 		{
-			ID:            2,
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			NumberPlate:   "FL TBZ 3456",
-			Description:   "Test description",
-			Status:        entities.VehicleStatusNotAvailable,
-			Type:          entities.VehicleTypeTransporter,
-			WaterCapacity: 1000.5,
-			Model:         "Actros L Mercedes Benz",
+			ID:             2,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+			NumberPlate:    "FL TBZ 3456",
+			Description:    "Test description",
+			Status:         entities.VehicleStatusNotAvailable,
+			Type:           entities.VehicleTypeTransporter,
+			WaterCapacity:  1000.5,
+			Model:          "Actros L Mercedes Benz",
 			DrivingLicense: entities.DrivingLicenseTransporter,
-			Height:        2.1,
-			Length:        5.0,
-			Width:         2.4,
+			Height:         2.1,
+			Length:         5.0,
+			Width:          2.4,
 		},
 	}
 }

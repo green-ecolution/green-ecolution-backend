@@ -10,16 +10,16 @@ import (
 
 func defaultVehicle() *entities.Vehicle {
 	return &entities.Vehicle{
-		NumberPlate:   "",
-		Description:   "",
-		WaterCapacity: 0,
-		Type:          entities.VehicleTypeUnknown,
-		Status:        entities.VehicleStatusUnknown,
-		Model:         "",
+		NumberPlate:    "",
+		Description:    "",
+		WaterCapacity:  0,
+		Type:           entities.VehicleTypeUnknown,
+		Status:         entities.VehicleStatusUnknown,
+		Model:          "",
 		DrivingLicense: entities.DrivingLicenseCar,
-		Height:        0,
-		Length:        0,
-		Width:         0,
+		Height:         0,
+		Length:         0,
+		Width:          0,
 	}
 }
 
@@ -44,16 +44,16 @@ func (r *VehicleRepository) Create(ctx context.Context, vFn ...entities.EntityFu
 
 func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.Vehicle) (*int32, error) {
 	args := sqlc.CreateVehicleParams{
-		NumberPlate:   entity.NumberPlate,
-		Description:   entity.Description,
-		WaterCapacity: entity.WaterCapacity,
-		Type:          sqlc.VehicleType(entity.Type),
-		Status:        sqlc.VehicleStatus(entity.Status),
+		NumberPlate:    entity.NumberPlate,
+		Description:    entity.Description,
+		WaterCapacity:  entity.WaterCapacity,
+		Type:           sqlc.VehicleType(entity.Type),
+		Status:         sqlc.VehicleStatus(entity.Status),
 		DrivingLicense: sqlc.DrivingLicense(entity.DrivingLicense),
-		Model:         entity.Model,
-		Width:         entity.Width,
-		Height:        entity.Height,
-		Length:        entity.Length,
+		Model:          entity.Model,
+		Width:          entity.Width,
+		Height:         entity.Height,
+		Length:         entity.Length,
 	}
 
 	id, err := r.store.CreateVehicle(ctx, &args)

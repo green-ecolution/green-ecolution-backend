@@ -12,15 +12,15 @@ func TestVehicleRepository_Create(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 	input := entities.Vehicle{
-		Description:   "Big car",
-		WaterCapacity: 2000,
-		Type:          entities.VehicleTypeTrailer,
-		Status:        entities.VehicleStatusNotAvailable,
+		Description:    "Big car",
+		WaterCapacity:  2000,
+		Type:           entities.VehicleTypeTrailer,
+		Status:         entities.VehicleStatusNotAvailable,
 		DrivingLicense: entities.DrivingLicenseTrailer,
-		Height:        1.5,
-		Length:        2.0,
-		Width:         2.0,
-		Model:         "1615/17 - Conrad - MAN TGE 3.180",
+		Height:         1.5,
+		Length:         2.0,
+		Width:          2.0,
+		Model:          "1615/17 - Conrad - MAN TGE 3.180",
 	}
 
 	t.Run("should create vehicle", func(t *testing.T) {

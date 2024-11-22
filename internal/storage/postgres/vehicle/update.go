@@ -30,17 +30,17 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, vFn ...entitie
 
 func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.Vehicle) error {
 	params := sqlc.UpdateVehicleParams{
-		ID:            vehicle.ID,
-		NumberPlate:   vehicle.NumberPlate,
-		Description:   vehicle.Description,
-		WaterCapacity: vehicle.WaterCapacity,
-		Type:          sqlc.VehicleType(vehicle.Type),
-		Status:        sqlc.VehicleStatus(vehicle.Status),
+		ID:             vehicle.ID,
+		NumberPlate:    vehicle.NumberPlate,
+		Description:    vehicle.Description,
+		WaterCapacity:  vehicle.WaterCapacity,
+		Type:           sqlc.VehicleType(vehicle.Type),
+		Status:         sqlc.VehicleStatus(vehicle.Status),
 		DrivingLicense: sqlc.DrivingLicense(vehicle.DrivingLicense),
-		Model:         vehicle.Model,
-		Height:        vehicle.Height,
-		Length:        vehicle.Length,
-		Width:         vehicle.Width,
+		Model:          vehicle.Model,
+		Height:         vehicle.Height,
+		Length:         vehicle.Length,
+		Width:          vehicle.Width,
 	}
 
 	return r.store.UpdateVehicle(ctx, &params)
