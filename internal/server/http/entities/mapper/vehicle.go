@@ -24,8 +24,8 @@ func MapVehicleType(vehicleType domain.VehicleType) entities.VehicleType {
 	return entities.VehicleType(vehicleType)
 }
 
-func MapDrivingLicense(DrivingLicense domain.DrivingLicense) entities.DrivingLicense {
-	return entities.DrivingLicense(DrivingLicense)
+func MapDrivingLicense(drivingLicense domain.DrivingLicense) entities.DrivingLicense {
+	return entities.DrivingLicense(drivingLicense)
 }
 
 func MapVehicleStatusReq(vehicleStatus entities.VehicleStatus) domain.VehicleStatus {
@@ -36,6 +36,6 @@ func MapVehicleTypeReq(vehicleType entities.VehicleType) domain.VehicleType {
 	return domain.VehicleType(vehicleType)
 }
 
-func MapDrivingLicenseReq(DrivingLicense entities.DrivingLicense) domain.DrivingLicense {
-	return domain.DrivingLicense(DrivingLicense)
+func MapDrivingLicenseReq(drivingLicense entities.DrivingLicense) domain.DrivingLicense {
+	return domain.DrivingLicense(drivingLicense)
 }

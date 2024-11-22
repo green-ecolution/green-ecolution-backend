@@ -22,6 +22,6 @@ func MapVehicleType(vehicleType sqlc.VehicleType) entities.VehicleType {
 	return entities.VehicleType(vehicleType)
 }
 
-func MapDrivingLicense(DrivingLicense sqlc.DrivingLicense) entities.DrivingLicense {
-	return entities.DrivingLicense(DrivingLicense)
+func MapDrivingLicense(drivingLicense sqlc.DrivingLicense) entities.DrivingLicense {
+	return entities.DrivingLicense(drivingLicense)
 }
