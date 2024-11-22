@@ -24,4 +24,6 @@ type WateringPlan struct {
 	TotalWaterRequired *float64
 	Users              []*User
 	Treecluster        []*TreeCluster
+	Transporter			*Vehicle
+	Trailer				*Vehicle
 }

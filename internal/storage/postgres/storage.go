@@ -61,8 +61,8 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	)
 	regionRepo := region.NewRegionRepository(store.NewStore(conn, sqlc.New(conn)), regionMappers)
 
-	wateringPlanMappers := watering_plan.WateringPlanMappers(
-		&mapper.InternalWateringPlanMapperImpl{},
+	wateringPlanMappers := watering_plan.NewWateringPlanRepositoryMappers(
+		&mapper.InternalWateringPlanRepoMapperImpl{},
 	)
 	wateringPlanRepo := watering_plan.NewWateringPlanRepository(s, wateringPlanMappers)
 
