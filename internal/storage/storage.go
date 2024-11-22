@@ -14,16 +14,16 @@ var (
 	ErrHostnameNotFound      = errors.New("cant get hostname")
 	ErrCannotGetAppURL       = errors.New("cannot get app url")
 
-	ErrIDNotFound          = errors.New("entity id not found")
-	ErrIDAlreadyExists     = errors.New("entity id already exists")
-	ErrEntityNotFound      = errors.New("entity not found")
-	ErrSensorNotFound      = errors.New("sensor not found")
-	ErrImageNotFound       = errors.New("image not found")
-	ErrFlowerbedNotFound   = errors.New("flowerbed not found")
-	ErrTreeClusterNotFound = errors.New("treecluster not found")
-	ErrRegionNotFound      = errors.New("region not found")
-	ErrTreeNotFound        = errors.New("tree not found")
-	ErrVehicleNotFound     = errors.New("vehicle not found")
+	ErrIDNotFound           = errors.New("entity id not found")
+	ErrIDAlreadyExists      = errors.New("entity id already exists")
+	ErrEntityNotFound       = errors.New("entity not found")
+	ErrSensorNotFound       = errors.New("sensor not found")
+	ErrImageNotFound        = errors.New("image not found")
+	ErrFlowerbedNotFound    = errors.New("flowerbed not found")
+	ErrTreeClusterNotFound  = errors.New("treecluster not found")
+	ErrRegionNotFound       = errors.New("region not found")
+	ErrTreeNotFound         = errors.New("tree not found")
+	ErrVehicleNotFound      = errors.New("vehicle not found")
 	ErrWateringPlanNotFound = errors.New("watering plan not found")
 
 	ErrUnknowError      = errors.New("unknown error")
@@ -149,16 +149,16 @@ type AuthRepository interface {
 }
 
 type Repository struct {
-	Auth        AuthRepository
-	Info        InfoRepository
-	Sensor      SensorRepository
-	Tree        TreeRepository
-	User        UserRepository
-	Role        RoleRepository
-	Image       ImageRepository
-	Vehicle     VehicleRepository
-	TreeCluster TreeClusterRepository
-	Flowerbed   FlowerbedRepository
-	Region      RegionRepository
+	Auth         AuthRepository
+	Info         InfoRepository
+	Sensor       SensorRepository
+	Tree         TreeRepository
+	User         UserRepository
+	Role         RoleRepository
+	Image        ImageRepository
+	Vehicle      VehicleRepository
+	TreeCluster  TreeClusterRepository
+	Flowerbed    FlowerbedRepository
+	Region       RegionRepository
 	WateringPlan WateringPlanRepository
-} 
+}

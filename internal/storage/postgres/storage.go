@@ -67,13 +67,13 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	wateringPlanRepo := watering_plan.NewWateringPlanRepository(s, wateringPlanMappers)
 
 	return &storage.Repository{
-		Tree:        treeRepo,
-		TreeCluster: treeClusterRepo,
-		Image:       imageRepo,
-		Vehicle:     vehicleRepo,
-		Sensor:      sensorRepo,
-		Flowerbed:   flowerbedRepo,
-		Region:      regionRepo,
+		Tree:         treeRepo,
+		TreeCluster:  treeClusterRepo,
+		Image:        imageRepo,
+		Vehicle:      vehicleRepo,
+		Sensor:       sensorRepo,
+		Flowerbed:    flowerbedRepo,
+		Region:       regionRepo,
 		WateringPlan: wateringPlanRepo,
 	}
 }

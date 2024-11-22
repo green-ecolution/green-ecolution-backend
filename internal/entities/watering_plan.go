@@ -5,25 +5,25 @@ import "time"
 type WateringPlanStatus string
 
 const (
-	WateringPlanStatusPlanned       WateringPlanStatus = "planned"
-	WateringPlanStatusActive    WateringPlanStatus = "active"
-	WateringPlanStatusCancelled WateringPlanStatus = "cancelled"
-	WateringPlanStatusFinished      WateringPlanStatus = "finished"
+	WateringPlanStatusPlanned     WateringPlanStatus = "planned"
+	WateringPlanStatusActive      WateringPlanStatus = "active"
+	WateringPlanStatusCancelled   WateringPlanStatus = "cancelled"
+	WateringPlanStatusFinished    WateringPlanStatus = "finished"
 	WateringPlanStatusNotCompeted WateringPlanStatus = "not competed"
-	WateringPlanStatusUnknown WateringPlanStatus = "unknown"
+	WateringPlanStatusUnknown     WateringPlanStatus = "unknown"
 )
 
 type WateringPlan struct {
-	ID          int32
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID        int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
 	// Date        time.Time
-	Description string
-	WateringPlanStatus    WateringPlanStatus
-	Distance   *float64
+	Description        string
+	WateringPlanStatus WateringPlanStatus
+	Distance           *float64
 	TotalWaterRequired *float64
-	Departure         *Departure
-	Users []*User
-	Treecluster []*TreeCluster
+	Departure          *Departure
+	Users              []*User
+	Treecluster        []*TreeCluster
 	// Add transporter and trailer option
 }
