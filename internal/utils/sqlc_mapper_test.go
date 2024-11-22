@@ -65,6 +65,22 @@ func TestTimeToPgTimestamp(t *testing.T) {
 	})
 }
 
+func TestPgDateToTime(t *testing.T) {
+	t.Run("should return time from pgtype.Date", func(t *testing.T) {
+		date := pgtype.Date{Time: time.Now(), Valid: true}
+		result := PgDateToTime(date)
+
+		assert.Equal(t, date.Time, result)
+	})
+
+	t.Run("should return zero time for zero pgtype.Date", func(t *testing.T) {
+		date := pgtype.Date{Valid: false}
+		result := PgDateToTime(date)
+
+		assert.True(t, result.IsZero())
+	})
+}
+
 func TestConvertNullableImage(t *testing.T) {
 	t.Run("should convert sqlc.Image to entities.Image", func(t *testing.T) {
 		img := sqlc.Image{

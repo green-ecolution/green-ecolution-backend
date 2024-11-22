@@ -17,13 +17,11 @@ type WateringPlan struct {
 	ID        int32
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	// Date        time.Time
+	Date        time.Time
 	Description        string
 	WateringPlanStatus WateringPlanStatus
 	Distance           *float64
 	TotalWaterRequired *float64
-	Departure          *Departure
 	Users              []*User
 	Treecluster        []*TreeCluster
-	// Add transporter and trailer option
 }
