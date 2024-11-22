@@ -31,8 +31,14 @@ func TestVehicleMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.NumberPlate, got.NumberPlate)
 		assert.Equal(t, src.Description, got.Description)
 		assert.Equal(t, src.WaterCapacity, got.WaterCapacity)
+		assert.Equal(t, src.Model, got.Model)
+		assert.Equal(t, src.Length, got.Length)
+		assert.Equal(t, src.Height, got.Height)
+		assert.Equal(t, src.Width, got.Width)
+		assert.Equal(t, src.Length, got.Length)
 		assert.Equal(t, src.Type, sqlc.VehicleType(got.Type))
 		assert.Equal(t, src.Status, sqlc.VehicleStatus(got.Status))
+		assert.Equal(t, src.DriverLicence, sqlc.DriverLicence(got.DriverLicence))
 	})
 
 	t.Run("should return nil for nil input", func(t *testing.T) {
@@ -69,8 +75,13 @@ func TestVehicleMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.NumberPlate, got[i].NumberPlate)
 			assert.Equal(t, src.Description, got[i].Description)
 			assert.Equal(t, src.WaterCapacity, got[i].WaterCapacity)
+			assert.Equal(t, src.Model, got[i].Model)
+			assert.Equal(t, src.Width, got[i].Width)
+			assert.Equal(t, src.Length, got[i].Length)
+			assert.Equal(t, src.Height, got[i].Height)
 			assert.Equal(t, src.Type, sqlc.VehicleType(got[i].Type))
 			assert.Equal(t, src.Status, sqlc.VehicleStatus(got[i].Status))
+			assert.Equal(t, src.DriverLicence, sqlc.DriverLicence(got[i].DriverLicence))
 		}
 	})
 
@@ -96,6 +107,11 @@ var allTestVehicles = []*sqlc.Vehicle{
 		WaterCapacity: 2000.10,
 		Type:          sqlc.VehicleTypeTransporter,
 		Status:        sqlc.VehicleStatusNotavailable,
+		Model:         "1615/17 - Conrad - MAN TGE 3.180",
+		DriverLicence: sqlc.DriverLicenceBE,
+		Height:        1.5,
+		Length:        2.0,
+		Width:         2.0,
 	},
 	{
 		ID:            2,
@@ -106,6 +122,11 @@ var allTestVehicles = []*sqlc.Vehicle{
 		WaterCapacity: 1000,
 		Type:          sqlc.VehicleTypeTransporter,
 		Status:        sqlc.VehicleStatusNotavailable,
+		Model:         "Actros L Mercedes Benz",
+		DriverLicence: sqlc.DriverLicenceC,
+		Height:        2.1,
+		Length:        5.0,
+		Width:         2.4,
 	},
 }
 
@@ -141,6 +162,24 @@ func TestMapVehicleType(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
 			result := mapper.MapVehicleType(test.input)
+			assert.Equal(t, test.expected, result)
+		})
+	}
+}
+
+func TestMapDriverLicence(t *testing.T) {
+	tests := []struct {
+		input    sqlc.DriverLicence
+		expected entities.DriverLicence
+	}{
+		{input: sqlc.DriverLicenceB, expected: entities.DriverLicenceCar},
+		{input: sqlc.DriverLicenceBE, expected: entities.DriverLicenceTrailer},
+		{input: sqlc.DriverLicenceC, expected: entities.DriverLicenceTransporter},
+	}
+
+	for _, test := range tests {
+		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
+			result := mapper.MapDriverLicence(test.input)
 			assert.Equal(t, test.expected, result)
 		})
 	}
