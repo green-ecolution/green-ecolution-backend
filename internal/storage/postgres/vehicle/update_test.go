@@ -18,10 +18,10 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		Type:          entities.VehicleTypeTransporter,
 		Status:        entities.VehicleStatusAvailable,
 		DriverLicence: entities.DriverLicenceCar,
-		Height: 2.75,
-		Length: 6.0,
-		Width: 5.0,
-		Model: "New model 1615/17",
+		Height:        2.75,
+		Length:        6.0,
+		Width:         5.0,
+		Model:         "New model 1615/17",
 	}
 
 	t.Run("should update vehicle", func(t *testing.T) {

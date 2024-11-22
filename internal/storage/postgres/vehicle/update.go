@@ -37,10 +37,10 @@ func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.
 		Type:          sqlc.VehicleType(vehicle.Type),
 		Status:        sqlc.VehicleStatus(vehicle.Status),
 		DriverLicence: sqlc.DriverLicence(vehicle.DriverLicence),
-		Model: vehicle.Model,
-		Height: vehicle.Height,
-		Length: vehicle.Length,
-		Width: vehicle.Width,
+		Model:         vehicle.Model,
+		Height:        vehicle.Height,
+		Length:        vehicle.Length,
+		Width:         vehicle.Width,
 	}
 
 	return r.store.UpdateVehicle(ctx, &params)

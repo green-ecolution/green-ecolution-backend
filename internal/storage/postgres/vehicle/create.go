@@ -15,11 +15,11 @@ func defaultVehicle() *entities.Vehicle {
 		WaterCapacity: 0,
 		Type:          entities.VehicleTypeUnknown,
 		Status:        entities.VehicleStatusUnknown,
-		Model: "",
+		Model:         "",
 		DriverLicence: entities.DriverLicenceCar,
-		Height: 0,
-		Length: 0,
-		Width: 0,
+		Height:        0,
+		Length:        0,
+		Width:         0,
 	}
 }
 
@@ -50,10 +50,10 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 		Type:          sqlc.VehicleType(entity.Type),
 		Status:        sqlc.VehicleStatus(entity.Status),
 		DriverLicence: sqlc.DriverLicence(entity.DriverLicence),
-		Model: entity.Model,
-		Width: entity.Width,
-		Height: entity.Height,
-		Length: entity.Length,
+		Model:         entity.Model,
+		Width:         entity.Width,
+		Height:        entity.Height,
+		Length:        entity.Length,
 	}
 
 	id, err := r.store.CreateVehicle(ctx, &args)
@@ -72,7 +72,7 @@ func (r *VehicleRepository) validateVehicle(entity *entities.Vehicle) error {
 	if entity.Length == 0 || entity.Width == 0 || entity.Height == 0 {
 		return errors.New("size measurements are required and can not be 0")
 	}
-	
+
 	if entity.NumberPlate == "" {
 		return errors.New("number plate is required")
 	}
