@@ -69,6 +69,41 @@ func WithVehicleStatus(vehicleStatus entities.VehicleStatus) entities.EntityFunc
 	}
 }
 
+func WithModel(model string) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating model", "model", model)
+		v.Model = model
+	}
+}
+
+func WithDriverLicence(driverLicence entities.DriverLicence) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating driver licence", "driver licence", driverLicence)
+		v.DriverLicence = driverLicence
+	}
+}
+
+func WithHeight(height float64) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating height", "height", height)
+		v.Height = height
+	}
+}
+
+func WithWidth(width float64) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating width", "width", width)
+		v.Width = width
+	}
+}
+
+func WithLength(length float64) entities.EntityFunc[entities.Vehicle] {
+	return func(v *entities.Vehicle) {
+		slog.Debug("updating length", "length", length)
+		v.Length = length
+	}
+}
+
 func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
 	_, err := r.store.DeleteVehicle(ctx, id)
 	if err != nil {

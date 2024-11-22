@@ -18,6 +18,7 @@ type User struct {
 	PhoneNumber   string
 	EmailVerified bool
 	Avatar        *url.URL
+	DriverLicence DriverLicence
 }
 
 type RegisterUser struct {
