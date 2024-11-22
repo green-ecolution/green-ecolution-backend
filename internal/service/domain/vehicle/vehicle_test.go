@@ -145,7 +145,7 @@ func TestVehicleService_Create(t *testing.T) {
 		Type:          entities.VehicleTypeTrailer,
 		WaterCapacity: 2000.5,
 		Model:         "Actros L Mercedes Benz",
-		DriverLicense: entities.DriverLicenseTrailer,
+		DrivingLicense: entities.DrivingLicenseTrailer,
 		Height:        2.1,
 		Length:        5.0,
 		Width:         2.4,
@@ -295,14 +295,14 @@ func TestVehicleService_Create(t *testing.T) {
 		assert.Contains(t, err.Error(), "400: validation error")
 	})
 
-	t.Run("should return validation error on wrong driver licence format", func(t *testing.T) {
+	t.Run("should return validation error on wrong driving licence format", func(t *testing.T) {
 		// given
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
 		input.NumberPlate = "FL TBZ 123"
 		input.Height = 3.0
-		input.DriverLicense = ""
+		input.DrivingLicense = ""
 
 		// when
 		result, err := svc.Create(ctx, input)
@@ -324,7 +324,7 @@ func TestVehicleService_Update(t *testing.T) {
 		Type:          entities.VehicleTypeTrailer,
 		WaterCapacity: 2000.5,
 		Model:         "Actros L Mercedes Benz",
-		DriverLicense: entities.DriverLicenseTrailer,
+		DrivingLicense: entities.DrivingLicenseTrailer,
 		Height:        2.1,
 		Length:        5.0,
 		Width:         2.4,
@@ -523,7 +523,7 @@ func TestVehicleService_Update(t *testing.T) {
 		input.NumberPlate = "FL TBZ 123"
 		input.WaterCapacity = 100
 		input.Height = 3.0
-		input.DriverLicense = ""
+		input.DrivingLicense = ""
 
 		// when
 		result, err := svc.Update(ctx, int32(1), input)
@@ -627,7 +627,7 @@ func getTestVehicles() []*entities.Vehicle {
 			Type:          entities.VehicleTypeTrailer,
 			WaterCapacity: 2000.5,
 			Model:         "1615/17 - Conrad - MAN TGE 3.180",
-			DriverLicense: entities.DriverLicenseTrailer,
+			DrivingLicense: entities.DrivingLicenseTrailer,
 			Height:        1.5,
 			Length:        2.0,
 			Width:         2.0,
@@ -643,7 +643,7 @@ func getTestVehicles() []*entities.Vehicle {
 			Type:          entities.VehicleTypeTransporter,
 			WaterCapacity: 1000.5,
 			Model:         "Actros L Mercedes Benz",
-			DriverLicense: entities.DriverLicenseTransporter,
+			DrivingLicense: entities.DrivingLicenseTransporter,
 			Height:        2.1,
 			Length:        5.0,
 			Width:         2.4,

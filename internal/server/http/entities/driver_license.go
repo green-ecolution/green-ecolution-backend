@@ -1,9 +1,9 @@
 package entities
 
-type DriverLicense string // @Name DriverLicense
+type DrivingLicense string // @Name DrivingLicense
 
 const (
-	DriverLicenseCar         DriverLicense = "B"
-	DriverLicenseTrailer     DriverLicense = "BE"
-	DriverLicenseTransporter DriverLicense = "C"
+	DrivingLicenseCar         DrivingLicense = "B"
+	DrivingLicenseTrailer     DrivingLicense = "BE"
+	DrivingLicenseTransporter DrivingLicense = "C"
 )

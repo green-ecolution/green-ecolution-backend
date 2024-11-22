@@ -29,7 +29,7 @@ type VehicleResponse struct {
 	Status        VehicleStatus `json:"status"`
 	Type          VehicleType   `json:"type"`
 	Model         string        `json:"model"`
-	DriverLicense DriverLicense `json:"driver_license"`
+	DrivingLicense DrivingLicense `json:"driving_license"`
 	Height        float64       `json:"height"`
 	Width         float64       `json:"width"`
 	Length        float64       `json:"length"`
@@ -47,7 +47,7 @@ type VehicleCreateRequest struct {
 	Status        VehicleStatus `json:"status"`
 	Type          VehicleType   `json:"type"`
 	Model         string        `json:"model"`
-	DriverLicense DriverLicense `json:"driver_license"`
+	DrivingLicense DrivingLicense `json:"driving_license"`
 	Height        float64       `json:"height"`
 	Width         float64       `json:"width"`
 	Length        float64       `json:"length"`
@@ -60,7 +60,7 @@ type VehicleUpdateRequest struct {
 	Status        VehicleStatus `json:"status"`
 	Type          VehicleType   `json:"type"`
 	Model         string        `json:"model"`
-	DriverLicense DriverLicense `json:"driver_license"`
+	DrivingLicense DrivingLicense `json:"driving_license"`
 	Height        float64       `json:"height"`
 	Width         float64       `json:"width"`
 	Length        float64       `json:"length"`

@@ -76,10 +76,10 @@ func WithModel(model string) entities.EntityFunc[entities.Vehicle] {
 	}
 }
 
-func WithDriverLicense(DriverLicense entities.DriverLicense) entities.EntityFunc[entities.Vehicle] {
+func WithDrivingLicense(DrivingLicense entities.DrivingLicense) entities.EntityFunc[entities.Vehicle] {
 	return func(v *entities.Vehicle) {
-		slog.Debug("updating driver license", "driver license", DriverLicense)
-		v.DriverLicense = DriverLicense
+		slog.Debug("updating driving license", "driving license", DrivingLicense)
+		v.DrivingLicense = DrivingLicense
 	}
 }
 

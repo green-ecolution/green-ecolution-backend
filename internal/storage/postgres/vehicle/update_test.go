@@ -17,7 +17,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		WaterCapacity: 10000,
 		Type:          entities.VehicleTypeTransporter,
 		Status:        entities.VehicleStatusAvailable,
-		DriverLicense: entities.DriverLicenseCar,
+		DrivingLicense: entities.DrivingLicenseCar,
 		Height:        2.75,
 		Length:        6.0,
 		Width:         5.0,
@@ -37,7 +37,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			WithVehicleStatus(input.Status),
 			WithVehicleType(input.Type),
 			WithModel(input.Model),
-			WithDriverLicense(input.DriverLicense),
+			WithDrivingLicense(input.DrivingLicense),
 			WithHeight(input.Height),
 			WithLength(input.Length),
 			WithWidth(input.Width),
@@ -55,7 +55,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		assert.Equal(t, input.WaterCapacity, gotByID.WaterCapacity)
 		assert.Equal(t, input.Type, gotByID.Type)
 		assert.Equal(t, input.Status, gotByID.Status)
-		assert.Equal(t, input.DriverLicense, gotByID.DriverLicense)
+		assert.Equal(t, input.DrivingLicense, gotByID.DrivingLicense)
 		assert.Equal(t, input.Model, gotByID.Model)
 		assert.Equal(t, input.Height, gotByID.Height)
 		assert.Equal(t, input.Length, gotByID.Length)
@@ -126,11 +126,11 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
-	t.Run("should return error when update vehicle with wrong driver license", func(t *testing.T) {
+	t.Run("should return error when update vehicle with wrong driving license", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 		// when
-		got, err := r.Update(context.Background(), 2, WithDriverLicense(""))
+		got, err := r.Update(context.Background(), 2, WithDrivingLicense(""))
 
 		// then
 		assert.Error(t, err)

@@ -36,7 +36,7 @@ func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.
 		WaterCapacity: vehicle.WaterCapacity,
 		Type:          sqlc.VehicleType(vehicle.Type),
 		Status:        sqlc.VehicleStatus(vehicle.Status),
-		DriverLicense: sqlc.DriverLicense(vehicle.DriverLicense),
+		DrivingLicense: sqlc.DrivingLicense(vehicle.DrivingLicense),
 		Model:         vehicle.Model,
 		Height:        vehicle.Height,
 		Length:        vehicle.Length,

@@ -15,7 +15,7 @@ INSERT INTO vehicles (
   type, 
   status, 
   model, 
-  driver_license, 
+  driving_license, 
   height, 
   length, 
   width
@@ -31,7 +31,7 @@ UPDATE vehicles SET
   type = $5,
   status = $6,
   model = $7,
-  driver_license = $8,
+  driving_license = $8,
   height = $9,
   length = $10,
   width = $11

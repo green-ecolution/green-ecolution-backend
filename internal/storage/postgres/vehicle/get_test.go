@@ -28,7 +28,7 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestVehicles[i].WaterCapacity, vehicle.WaterCapacity)
 			assert.Equal(t, allTestVehicles[i].Type, vehicle.Type)
 			assert.Equal(t, allTestVehicles[i].Status, vehicle.Status)
-			assert.Equal(t, allTestVehicles[i].DriverLicense, vehicle.DriverLicense)
+			assert.Equal(t, allTestVehicles[i].DrivingLicense, vehicle.DrivingLicense)
 			assert.Equal(t, allTestVehicles[i].Height, vehicle.Height)
 			assert.Equal(t, allTestVehicles[i].Width, vehicle.Width)
 			assert.Equal(t, allTestVehicles[i].Length, vehicle.Length)
@@ -86,7 +86,7 @@ func TestVehicleRepository_GetByID(t *testing.T) {
 		assert.Equal(t, shouldReturn.WaterCapacity, got.WaterCapacity)
 		assert.Equal(t, shouldReturn.Type, got.Type)
 		assert.Equal(t, shouldReturn.Status, got.Status)
-		assert.Equal(t, shouldReturn.DriverLicense, got.DriverLicense)
+		assert.Equal(t, shouldReturn.DrivingLicense, got.DrivingLicense)
 		assert.Equal(t, shouldReturn.Height, got.Height)
 		assert.Equal(t, shouldReturn.Length, got.Length)
 		assert.Equal(t, shouldReturn.Width, got.Width)
@@ -189,7 +189,7 @@ func TestVehicleRepository_GetByPlate(t *testing.T) {
 			assert.Equal(t, tt.want.WaterCapacity, got.WaterCapacity)
 			assert.Equal(t, tt.want.Type, got.Type)
 			assert.Equal(t, tt.want.Status, got.Status)
-			assert.Equal(t, tt.want.DriverLicense, got.DriverLicense)
+			assert.Equal(t, tt.want.DrivingLicense, got.DrivingLicense)
 			assert.Equal(t, tt.want.Height, got.Height)
 			assert.Equal(t, tt.want.Length, got.Length)
 			assert.Equal(t, tt.want.Width, got.Width)
@@ -249,7 +249,7 @@ var allTestVehicles = []*entities.Vehicle{
 		Type:          entities.VehicleTypeTrailer,
 		Status:        entities.VehicleStatusActive,
 		Model:         "1615/17 - Conrad - MAN TGE 3.180",
-		DriverLicense: entities.DriverLicenseTrailer,
+		DrivingLicense: entities.DrivingLicenseTrailer,
 		Height:        1.5,
 		Length:        2.0,
 		Width:         2.0,
@@ -262,7 +262,7 @@ var allTestVehicles = []*entities.Vehicle{
 		Type:          entities.VehicleTypeTransporter,
 		Status:        entities.VehicleStatusUnknown,
 		Model:         "Actros L Mercedes Benz",
-		DriverLicense: entities.DriverLicenseTransporter,
+		DrivingLicense: entities.DrivingLicenseTransporter,
 		Height:        2.1,
 		Length:        5.0,
 		Width:         2.4,
