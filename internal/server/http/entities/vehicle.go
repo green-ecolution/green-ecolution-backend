@@ -60,7 +60,7 @@ type VehicleUpdateRequest struct {
 	Status               VehicleStatus `json:"status"`
 	Type                 VehicleType   `json:"type"`
 	Model                string        `json:"model"`
-	ReqiredDriverLicence DriverLicence `json:"driver_licence"`
+	DriverLicence DriverLicence `json:"driver_licence"`
 	Height               float64       `json:"height"`
 	Width                float64       `json:"width"`
 	Length               float64       `json:"length"`
