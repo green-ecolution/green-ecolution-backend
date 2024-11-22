@@ -29,7 +29,7 @@ func NewWateringPlanRepositoryMappers(wMapper mapper.InternalWateringPlanRepoMap
 func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) storage.WateringPlanRepository {
 	s.SetEntityType(store.WateringPlan)
 	return &WateringPlanRepository{
-		store: s,
+		store:               s,
 		WateringPlanMappers: mappers,
 	}
 }
@@ -104,11 +104,6 @@ func (w *WateringPlanRepository) Delete(ctx context.Context, id int32) error {
 	}
 
 	return nil
-}
-
-// Create implements storage.WateringPlanRepository.
-func (w *WateringPlanRepository) Create(ctx context.Context, fn ...entities.EntityFunc[entities.WateringPlan]) (*entities.WateringPlan, error) {
-	panic("unimplemented")
 }
 
 // Update implements storage.WateringPlanRepository.

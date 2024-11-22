@@ -37,6 +37,13 @@ func PgDateToTime(pgDate pgtype.Date) time.Time {
 	return time.Time{}
 }
 
+func TimeToPgDate(date time.Time) (pgtype.Date, error) {
+	pgDate := pgtype.Date{}
+	pgDate.Time = date
+
+	return pgDate, nil
+}
+
 //nolint:gocritic
 func ConvertNullableImage(img sqlc.Image) *entities.Image {
 	if img.ID == 0 {

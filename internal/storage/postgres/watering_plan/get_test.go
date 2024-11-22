@@ -84,7 +84,6 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].TotalWaterRequired, got.TotalWaterRequired)
 	})
 
-
 	t.Run("should return error when watering paln with non-existing id", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
@@ -138,43 +137,43 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
-		ID:                1,
-		Date:              time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
-		Description:       "New watering plan for the west side of the city",
+		ID:                 1,
+		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
+		Description:        "New watering plan for the west side of the city",
 		WateringPlanStatus: "planned",
-		Distance:          utils.P(63.0),
+		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
 	{
-		ID:                2,
-		Date:              time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-		Description:       "New watering plan for the east side of the city",
+		ID:                 2,
+		Date:               time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		Description:        "New watering plan for the east side of the city",
 		WateringPlanStatus: "active",
-		Distance:          utils.P(63.0),
+		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
 	{
-		ID:                3,
-		Date:              time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
-		Description:       "Very important watering plan due to no rainfall",
+		ID:                 3,
+		Date:               time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
+		Description:        "Very important watering plan due to no rainfall",
 		WateringPlanStatus: "finished",
-		Distance:          utils.P(63.0),
+		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
 	{
-		ID:                4,
-		Date:              time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
-		Description:       "New watering plan for the south side of the city",
+		ID:                 4,
+		Date:               time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
+		Description:        "New watering plan for the south side of the city",
 		WateringPlanStatus: "not competed",
-		Distance:          utils.P(63.0),
+		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
 	{
-		ID:                5,
-		Date:              time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
-		Description:       "Cancelled due to flood",
+		ID:                 5,
+		Date:               time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
+		Description:        "Cancelled due to flood",
 		WateringPlanStatus: "cancelled",
-		Distance:          utils.P(63.0),
+		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
 }

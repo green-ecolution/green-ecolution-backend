@@ -16,23 +16,23 @@ CREATE TABLE IF NOT EXISTS user_watering_plans (
   user_id UUID NOT NULL,
   watering_plan_id INT NOT NULL,
   PRIMARY KEY (user_id, watering_plan_id),
-  FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id)
+  FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS vehicle_watering_plans (
   vehicle_id INT NOT NULL,
   watering_plan_id INT NOT NULL,
   PRIMARY KEY (vehicle_id, watering_plan_id),
-  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
-  FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id)
+  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE,
+  FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS tree_cluster_watering_plans (
   tree_cluster_id INT NOT NULL,
   watering_plan_id INT NOT NULL,
   PRIMARY KEY (tree_cluster_id, watering_plan_id),
-  FOREIGN KEY (tree_cluster_id) REFERENCES tree_clusters(id),
-  FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id)
+  FOREIGN KEY (tree_cluster_id) REFERENCES tree_clusters(id) ON DELETE CASCADE,
+  FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id) ON DELETE CASCADE
 );
 
 -- +goose StatementBegin

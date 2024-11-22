@@ -9,14 +9,23 @@ VALUES
   (5, '2024-06-04', 'Cancelled due to flood', 'cancelled', 63.0, 6000.0);
 ALTER SEQUENCE watering_plans_id_seq RESTART WITH 6;
 
-INSERT INTO user_watering_plans (user_id, watering_plan_id) VALUES 
-('b55bd65c-301f-4e2a-9ab2-a91c6cdaed20', 1),
-('c7a6434a-e91d-4d21-af07-d5c7e6b7ba5a', 1),
-('2db62407-0d00-4c02-8d73-93f3d0701d49', 1);
+INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id) VALUES 
+(1, 1),
+(2, 1),
+(2, 2);
+
+INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id) VALUES 
+(1, 1),
+(2, 1),
+(3, 1),
+(4, 2),
+(5, 2),
+(6, 2);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
 DELETE FROM watering_plans;
-DELETE FROM user_watering_plans;
+DELETE FROM vehicle_watering_plans;
+DELETE FROM tree_cluster_watering_plans;
 -- +goose StatementEnd
