@@ -8,7 +8,7 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
-// goverter:extend MapDriverLicence MapVehicleStatus MapVehicleType
+// goverter:extend MapDriverLicense MapVehicleStatus MapVehicleType
 type InternalVehicleRepoMapper interface {
 	FromSql(src *sqlc.Vehicle) *entities.Vehicle
 	FromSqlList(src []*sqlc.Vehicle) []*entities.Vehicle
@@ -22,6 +22,6 @@ func MapVehicleType(vehicleType sqlc.VehicleType) entities.VehicleType {
 	return entities.VehicleType(vehicleType)
 }
 
-func MapDriverLicence(driverLicence sqlc.DriverLicence) entities.DriverLicence {
-	return entities.DriverLicence(driverLicence)
+func MapDriverLicense(DriverLicense sqlc.DriverLicense) entities.DriverLicense {
+	return entities.DriverLicense(DriverLicense)
 }

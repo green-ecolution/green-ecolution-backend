@@ -16,7 +16,7 @@ func defaultVehicle() *entities.Vehicle {
 		Type:          entities.VehicleTypeUnknown,
 		Status:        entities.VehicleStatusUnknown,
 		Model:         "",
-		DriverLicence: entities.DriverLicenceCar,
+		DriverLicense: entities.DriverLicenseCar,
 		Height:        0,
 		Length:        0,
 		Width:         0,
@@ -49,7 +49,7 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 		WaterCapacity: entity.WaterCapacity,
 		Type:          sqlc.VehicleType(entity.Type),
 		Status:        sqlc.VehicleStatus(entity.Status),
-		DriverLicence: sqlc.DriverLicence(entity.DriverLicence),
+		DriverLicense: sqlc.DriverLicense(entity.DriverLicense),
 		Model:         entity.Model,
 		Width:         entity.Width,
 		Height:        entity.Height,
@@ -77,8 +77,8 @@ func (r *VehicleRepository) validateVehicle(entity *entities.Vehicle) error {
 		return errors.New("number plate is required")
 	}
 
-	if entity.DriverLicence == "" {
-		return errors.New("driver licence is required and should be either B, BE or C")
+	if entity.DriverLicense == "" {
+		return errors.New("driver license is required and should be either B, BE or C")
 	}
 
 	return nil

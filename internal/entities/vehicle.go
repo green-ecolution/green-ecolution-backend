@@ -31,7 +31,7 @@ type Vehicle struct {
 	Status        VehicleStatus
 	Type          VehicleType
 	Model         string
-	DriverLicence DriverLicence
+	DriverLicense DriverLicense
 	Height        float64
 	Width         float64
 	Length        float64
@@ -44,7 +44,7 @@ type VehicleCreate struct {
 	Status        VehicleStatus `validate:"oneof=active available 'not available' unknown"`
 	Type          VehicleType   `validate:"oneof=transporter trailer unknown"`
 	Model         string        `validate:"required"`
-	DriverLicence DriverLicence `validate:"oneof=B BE C"`
+	DriverLicense DriverLicense `validate:"oneof=B BE C"`
 	Height        float64       `validate:"gt=0"`
 	Width         float64       `validate:"gt=0"`
 	Length        float64       `validate:"gt=0"`
@@ -57,7 +57,7 @@ type VehicleUpdate struct {
 	Status        VehicleStatus `validate:"oneof=active available 'not available' unknown"`
 	Type          VehicleType   `validate:"oneof=transporter trailer unknown"`
 	Model         string        `validate:"required"`
-	DriverLicence DriverLicence `validate:"oneof=B BE C"`
+	DriverLicense DriverLicense `validate:"oneof=B BE C"`
 	Height        float64       `validate:"gt=0"`
 	Width         float64       `validate:"gt=0"`
 	Length        float64       `validate:"gt=0"`

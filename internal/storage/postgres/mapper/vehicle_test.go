@@ -38,7 +38,7 @@ func TestVehicleMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.Length, got.Length)
 		assert.Equal(t, src.Type, sqlc.VehicleType(got.Type))
 		assert.Equal(t, src.Status, sqlc.VehicleStatus(got.Status))
-		assert.Equal(t, src.DriverLicence, sqlc.DriverLicence(got.DriverLicence))
+		assert.Equal(t, src.DriverLicense, sqlc.DriverLicense(got.DriverLicense))
 	})
 
 	t.Run("should return nil for nil input", func(t *testing.T) {
@@ -81,7 +81,7 @@ func TestVehicleMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.Height, got[i].Height)
 			assert.Equal(t, src.Type, sqlc.VehicleType(got[i].Type))
 			assert.Equal(t, src.Status, sqlc.VehicleStatus(got[i].Status))
-			assert.Equal(t, src.DriverLicence, sqlc.DriverLicence(got[i].DriverLicence))
+			assert.Equal(t, src.DriverLicense, sqlc.DriverLicense(got[i].DriverLicense))
 		}
 	})
 
@@ -108,7 +108,7 @@ var allTestVehicles = []*sqlc.Vehicle{
 		Type:          sqlc.VehicleTypeTransporter,
 		Status:        sqlc.VehicleStatusNotavailable,
 		Model:         "1615/17 - Conrad - MAN TGE 3.180",
-		DriverLicence: sqlc.DriverLicenceBE,
+		DriverLicense: sqlc.DriverLicenseBE,
 		Height:        1.5,
 		Length:        2.0,
 		Width:         2.0,
@@ -123,7 +123,7 @@ var allTestVehicles = []*sqlc.Vehicle{
 		Type:          sqlc.VehicleTypeTransporter,
 		Status:        sqlc.VehicleStatusNotavailable,
 		Model:         "Actros L Mercedes Benz",
-		DriverLicence: sqlc.DriverLicenceC,
+		DriverLicense: sqlc.DriverLicenseC,
 		Height:        2.1,
 		Length:        5.0,
 		Width:         2.4,
@@ -167,19 +167,19 @@ func TestMapVehicleType(t *testing.T) {
 	}
 }
 
-func TestMapDriverLicence(t *testing.T) {
+func TestMapDriverLicense(t *testing.T) {
 	tests := []struct {
-		input    sqlc.DriverLicence
-		expected entities.DriverLicence
+		input    sqlc.DriverLicense
+		expected entities.DriverLicense
 	}{
-		{input: sqlc.DriverLicenceB, expected: entities.DriverLicenceCar},
-		{input: sqlc.DriverLicenceBE, expected: entities.DriverLicenceTrailer},
-		{input: sqlc.DriverLicenceC, expected: entities.DriverLicenceTransporter},
+		{input: sqlc.DriverLicenseB, expected: entities.DriverLicenseCar},
+		{input: sqlc.DriverLicenseBE, expected: entities.DriverLicenseTrailer},
+		{input: sqlc.DriverLicenseC, expected: entities.DriverLicenseTransporter},
 	}
 
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("should return %v for input %v", test.expected, test.input), func(t *testing.T) {
-			result := mapper.MapDriverLicence(test.input)
+			result := mapper.MapDriverLicense(test.input)
 			assert.Equal(t, test.expected, result)
 		})
 	}
