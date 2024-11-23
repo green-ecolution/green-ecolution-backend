@@ -2,7 +2,7 @@ package watering_plan
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -29,6 +29,10 @@ func (w *WateringPlanRepository) Create(ctx context.Context, wFn ...entities.Ent
 		fn(entity)
 	}
 
+	if err := w.validateWateringPlan(entity); err != nil {
+		return nil, err
+	}
+
 	id, err := w.createEntity(ctx, entity)
 	if err != nil {
 		return nil, w.store.HandleError(err)
@@ -41,7 +45,7 @@ func (w *WateringPlanRepository) Create(ctx context.Context, wFn ...entities.Ent
 func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entities.WateringPlan) (*int32, error) {
 	date, err := utils.TimeToPgDate(entity.Date);
 	if err != nil {
-		return nil, fmt.Errorf("failed to convert time to pgtype.Date: %w", err)
+		return nil, errors.New("failed to convert date")
 	}
 
 	args := sqlc.CreateWateringPlanParams{
@@ -60,4 +64,24 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 	}
 
 	return &id, nil
+}
+
+func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringPlan) error {
+	if entity.Transporter == nil || entity.Transporter.Type != entities.VehicleTypeTransporter {
+		return errors.New("watering plan requires a valid transporter")
+	}
+
+	if entity.Trailer != nil && entity.Trailer.Type != entities.VehicleTypeTrailer {
+		return errors.New("trailer vehicle requires a vehicle of type trailer")
+	}
+
+	// if len(entity.Users) == 0 {
+	// 	return errors.New("watering plan requires employees")
+	// }
+
+	if len(entity.Treecluster) == 0 {
+		return errors.New("watering plan requires tree cluster")
+	}
+
+	return nil
 }

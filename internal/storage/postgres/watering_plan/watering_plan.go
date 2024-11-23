@@ -18,11 +18,19 @@ type WateringPlanRepository struct {
 
 type WateringPlanMappers struct {
 	mapper mapper.InternalWateringPlanRepoMapper
+	vehicleMapper mapper.InternalVehicleRepoMapper
+	clusterMapper mapper.InternalTreeClusterRepoMapper
 }
 
-func NewWateringPlanRepositoryMappers(wMapper mapper.InternalWateringPlanRepoMapper) WateringPlanMappers {
+func NewWateringPlanRepositoryMappers(
+	wMapper mapper.InternalWateringPlanRepoMapper,
+	vMapper mapper.InternalVehicleRepoMapper,
+	tcMapper mapper.InternalTreeClusterRepoMapper,
+) WateringPlanMappers {
 	return WateringPlanMappers{
 		mapper: wMapper,
+		vehicleMapper: vMapper,
+		clusterMapper: tcMapper,
 	}
 }
 

@@ -101,15 +101,10 @@ func TestTimeToPgDate(t *testing.T) {
 		date := time.Time{}
 
 		pgDate, err := TimeToPgDate(date)
-		assert.NoError(t, err)
-
-		assert.Equal(t, date.Year(), pgDate.Time.Year())
-		assert.Equal(t, date.Month(), pgDate.Time.Month())
-		assert.Equal(t, date.Day(), pgDate.Time.Day())
-		assert.Equal(t, date.Hour(), pgDate.Time.Hour())
-		assert.Equal(t, date.Minute(), pgDate.Time.Minute())
-		assert.Equal(t, date.Second(), pgDate.Time.Second())
-		assert.Equal(t, date.Nanosecond(), pgDate.Time.Nanosecond())
+		
+		assert.Error(t, err)
+		assert.Empty(t, pgDate)
+		assert.Equal(t, "invalid date: zero value provided", err.Error())
 	})
 }
 

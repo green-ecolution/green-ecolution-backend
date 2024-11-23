@@ -23,6 +23,8 @@ func TestMain(m *testing.M) {
 	suite = testutils.SetupPostgresTestSuite(ctx)
 	mappers = NewWateringPlanRepositoryMappers(
 		&generated.InternalWateringPlanRepoMapperImpl{},
+		&generated.InternalVehicleRepoMapperImpl{},
+		&generated.InternalTreeClusterRepoMapperImpl{},
 	)
 	defer suite.Terminate(ctx)
 

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -38,10 +39,16 @@ func PgDateToTime(pgDate pgtype.Date) time.Time {
 }
 
 func TimeToPgDate(date time.Time) (pgtype.Date, error) {
-	pgDate := pgtype.Date{}
-	pgDate.Time = date
+    if date.IsZero() {
+        return pgtype.Date{}, fmt.Errorf("invalid date: zero value provided")
+    }
 
-	return pgDate, nil
+    pgDate := pgtype.Date{
+		Time: date,
+		Valid: true,
+	}
+
+    return pgDate, nil
 }
 
 //nolint:gocritic
