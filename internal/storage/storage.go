@@ -143,6 +143,10 @@ type AuthRepository interface {
 	RefreshToken(ctx context.Context, refreshToken string) (*entities.ClientToken, error)
 }
 
+type DepartureRepository interface {
+	BasicCrudRepository[entities.Departure]
+}
+
 type Repository struct {
 	Auth        AuthRepository
 	Info        InfoRepository
@@ -155,4 +159,5 @@ type Repository struct {
 	TreeCluster TreeClusterRepository
 	Flowerbed   FlowerbedRepository
 	Region      RegionRepository
+	Depature 	DepartureRepository
 }

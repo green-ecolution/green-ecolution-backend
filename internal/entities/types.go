@@ -7,7 +7,8 @@ type Entities interface {
 		Vehicle |
 		TreeCluster |
 		Tree |
-		Region
+		Region |
+		Departure
 }
 
 type EntityFunc[T Entities] func(*T)
