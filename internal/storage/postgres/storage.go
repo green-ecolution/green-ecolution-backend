@@ -54,7 +54,7 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowerbedMappers)
+	flowerbedRepo := flowerbed.NewFlowerbedRepository(store.NewStore(conn, sqlc.New(conn)), flowerbedMappers)
 
 	regionMappers := region.NewRegionMappers(
 		&mapper.InternalRegionRepoMapperImpl{},
@@ -66,7 +66,7 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 		&mapper.InternalVehicleRepoMapperImpl{},
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
-	wateringPlanRepo := watering_plan.NewWateringPlanRepository(s, wateringPlanMappers)
+	wateringPlanRepo := watering_plan.NewWateringPlanRepository(store.NewStore(conn, sqlc.New(conn)), wateringPlanMappers)
 
 	return &storage.Repository{
 		Tree:         treeRepo,
