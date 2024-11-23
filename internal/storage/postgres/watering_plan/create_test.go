@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -24,6 +25,18 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	uuid, _ := uuid.NewRandom()
+	testUser := &entities.User{
+		ID:          uuid,
+		CreatedAt:   time.Unix(123456, 0),
+		Username:    "test",
+		FirstName:   "Toni",
+		LastName:    "Tester",
+		Email:       "dev@green-ecolution.de",
+		PhoneNumber: "+49 123456",
+		EmployeeID:  "123456",
+	}
+
 	input := entities.WateringPlan{
 		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan",
@@ -32,6 +45,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		Trailer: mappers.vehicleMapper.FromSqlList(testVehicles)[0],
 		Transporter: mappers.vehicleMapper.FromSqlList(testVehicles)[1],
 		Treecluster:  mappers.clusterMapper.FromSqlList(testCluster)[0:5],
+		Users: []*entities.User{testUser},
 	}
 	
 	t.Run("should create watering plan with all values", func(t *testing.T) {
@@ -47,7 +61,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithTransporter(input.Transporter),
 			WithTrailer(input.Trailer),
 			WithTreecluster(input.Treecluster),
-			// WithUsers(input.Users),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -71,6 +85,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -94,6 +109,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithDate(time.Time{}),
 			WithTransporter(input.Transporter),
 			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -112,12 +128,32 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithTransporter(input.Transporter),
 			WithTrailer(input.Transporter),
 			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
 		)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 		assert.Equal(t, "trailer vehicle requires a vehicle of type trailer", err.Error())
+	})
+
+	t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.Create(context.Background(), 
+			WithDate(input.Date),
+			WithTransporter(input.Transporter),
+			WithTrailer(input.Trailer),
+			WithTreecluster(input.Treecluster),
+			WithUsers([]*entities.User{}),
+		)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.Equal(t, "watering plan requires employees", err.Error())
 	})
 
 	t.Run("should return error when transporter has not correct vehilce type", func(t *testing.T) {
@@ -129,6 +165,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithDate(input.Date),
 			WithTransporter(input.Trailer),
 			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -146,6 +183,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithDate(input.Date),
 			WithTransporter(nil),
 			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -163,6 +201,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTreecluster([]*entities.TreeCluster{}),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -197,6 +236,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			WithDate(input.Date),
 			WithTransporter(nil),
 			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
 		)
 
 		// then
@@ -204,4 +244,3 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Nil(t, got)
 	})
 }
-
