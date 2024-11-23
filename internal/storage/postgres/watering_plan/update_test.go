@@ -11,7 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestWateringPlanRepository_Create(t *testing.T) {
+
+func TestWateringPlanRepository_Update(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 
@@ -38,8 +39,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	}
 
 	input := entities.WateringPlan{
-		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
-		Description:        "New watering plan",
+		Date:               time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC),
+		Description:        "Updated watering plan",
 		Distance:           utils.P(50.0),
 		TotalWaterRequired: utils.P(30000.0),
 		Trailer: mappers.vehicleMapper.FromSqlList(testVehicles)[0],
@@ -47,13 +48,14 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		Treecluster:  mappers.clusterMapper.FromSqlList(testCluster)[0:5],
 		Users: []*entities.User{testUser},
 	}
-	
-	t.Run("should create watering plan with all values", func(t *testing.T) {
+
+	t.Run("should update watering plan", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(),
+			int32(1),
 			WithDate(input.Date),
 			WithDescription(input.Description),
 			WithDistance(input.Distance),
@@ -76,36 +78,13 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// TODO: test linkd treeclusters, vehicles and users
 	})
 
-	t.Run("should create watering plan with default values", func(t *testing.T) {
-		// given
-		r := NewWateringPlanRepository(suite.Store, mappers)
-
-		// when
-		got, err := r.Create(context.Background(), 
-			WithDate(input.Date),
-			WithTransporter(input.Transporter),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, got)
-		assert.NotZero(t, got.ID)
-		assert.Equal(t, input.Date, got.Date)
-		assert.Equal(t, "", got.Description)
-		assert.Equal(t, utils.P(float64(0)), got.Distance)
-		assert.Equal(t, utils.P(float64(0)), got.TotalWaterRequired)
-
-		// TODO: test linkd treeclusters, vehicles and users
-	})
-
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(),
+			int32(1),
 			WithDate(time.Time{}),
 			WithTransporter(input.Transporter),
 			WithTreecluster(input.Treecluster),
@@ -123,7 +102,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(), 
+			int32(1),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTrailer(input.Transporter),
@@ -142,7 +122,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(),
+			int32(1),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTrailer(input.Trailer),
@@ -161,7 +142,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(),
+			int32(1), 
 			WithDate(input.Date),
 			WithTransporter(input.Trailer),
 			WithTreecluster(input.Treecluster),
@@ -179,7 +161,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(),
+			int32(1),
 			WithDate(input.Date),
 			WithTransporter(nil),
 			WithTreecluster(input.Treecluster),
@@ -197,7 +180,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Update(context.Background(),
+			int32(1),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTreecluster([]*entities.TreeCluster{}),
@@ -215,7 +199,61 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background())
+		got, err := r.Update(context.Background(), int32(1), WithDescription("Test"))
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when update watering plan with negative id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.Update(context.Background(),
+			int32(-1),
+			WithDate(input.Date),
+			WithTransporter(nil),
+			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
+		)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when update watering plan with zero id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.Update(context.Background(),
+			int32(0),
+			WithDate(input.Date),
+			WithTransporter(nil),
+			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
+		)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when update watering plan not found", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.Update(context.Background(),
+			int32(99),
+			WithDate(input.Date),
+			WithTransporter(nil),
+			WithTreecluster(input.Treecluster),
+			WithUsers(input.Users),
+		)
 
 		// then
 		assert.Error(t, err)
@@ -226,11 +264,12 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(context.Background(),)
 		cancel()
 
 		// when
-		got, err := r.Create(ctx, 
+		got, err := r.Update(ctx,
+			int32(1),
 			WithDate(input.Date),
 			WithTransporter(nil),
 			WithTreecluster(input.Treecluster),

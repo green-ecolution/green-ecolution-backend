@@ -113,8 +113,3 @@ func (w *WateringPlanRepository) Delete(ctx context.Context, id int32) error {
 
 	return nil
 }
-
-// Update implements storage.WateringPlanRepository.
-func (w *WateringPlanRepository) Update(ctx context.Context, id int32, fn ...entities.EntityFunc[entities.WateringPlan]) (*entities.WateringPlan, error) {
-	panic("unimplemented")
-}
