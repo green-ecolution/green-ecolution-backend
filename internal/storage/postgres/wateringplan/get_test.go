@@ -1,4 +1,4 @@
-package watering_plan
+package wateringplan
 
 import (
 	"context"
@@ -171,8 +171,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 5,
 		Date:               time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
-		Description:        "Cancelled due to flood",
-		WateringPlanStatus: "cancelled",
+		Description:        "Canceled due to flood",
+		WateringPlanStatus: "canceled",
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},

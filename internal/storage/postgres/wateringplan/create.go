@@ -1,4 +1,4 @@
-package watering_plan
+package wateringplan
 
 import (
 	"context"

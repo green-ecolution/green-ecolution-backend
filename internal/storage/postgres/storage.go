@@ -12,7 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/watering_plan"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/wateringplan"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -61,12 +61,12 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	)
 	regionRepo := region.NewRegionRepository(store.NewStore(conn, sqlc.New(conn)), regionMappers)
 
-	wateringPlanMappers := watering_plan.NewWateringPlanRepositoryMappers(
+	wateringPlanMappers := wateringplan.NewWateringPlanRepositoryMappers(
 		&mapper.InternalWateringPlanRepoMapperImpl{},
 		&mapper.InternalVehicleRepoMapperImpl{},
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
-	wateringPlanRepo := watering_plan.NewWateringPlanRepository(store.NewStore(conn, sqlc.New(conn)), wateringPlanMappers)
+	wateringPlanRepo := wateringplan.NewWateringPlanRepository(store.NewStore(conn, sqlc.New(conn)), wateringPlanMappers)
 
 	return &storage.Repository{
 		Tree:         treeRepo,

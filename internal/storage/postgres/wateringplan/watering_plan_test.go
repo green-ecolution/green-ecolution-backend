@@ -1,8 +1,7 @@
-package watering_plan
+package wateringplan
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"testing"
 
@@ -66,7 +65,6 @@ func TestWateringPlanRepository_Delete(t *testing.T) {
 
 		// when
 		err := r.Delete(context.Background(), -1)
-		fmt.Print(err)
 
 		// then
 		assert.Error(t, err)

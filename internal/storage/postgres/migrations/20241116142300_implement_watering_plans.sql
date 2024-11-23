@@ -1,5 +1,5 @@
 -- +goose Up
-CREATE TYPE watering_plan_status AS ENUM ('planned', 'active', 'cancelled', 'finished', 'not competed', 'unknown');
+CREATE TYPE watering_plan_status AS ENUM ('planned', 'active', 'canceled', 'finished', 'not competed', 'unknown');
 
 CREATE TABLE IF NOT EXISTS watering_plans (
   id SERIAL PRIMARY KEY,

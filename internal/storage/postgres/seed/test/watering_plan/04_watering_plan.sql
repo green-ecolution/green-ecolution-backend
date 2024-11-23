@@ -6,7 +6,7 @@ VALUES
   (2, '2024-08-03', 'New watering plan for the east side of the city', 'active', 63.0, 6000.0),
   (3, '2024-06-12', 'Very important watering plan due to no rainfall', 'finished', 63.0, 6000.0),
   (4, '2024-06-10', 'New watering plan for the south side of the city', 'not competed', 63.0, 6000.0),
-  (5, '2024-06-04', 'Cancelled due to flood', 'cancelled', 63.0, 6000.0);
+  (5, '2024-06-04', 'Canceled due to flood', 'canceled', 63.0, 6000.0);
 ALTER SEQUENCE watering_plans_id_seq RESTART WITH 6;
 
 INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id) VALUES 
