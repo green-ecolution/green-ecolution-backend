@@ -12,7 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/wateringplan"
+	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/watering_plan"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
