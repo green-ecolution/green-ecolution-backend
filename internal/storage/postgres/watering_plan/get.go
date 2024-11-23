@@ -12,7 +12,7 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 		return nil, w.store.HandleError(err)
 	}
 
-	// TODO: get mapped data like users and tree
+	// TODO: get mapped data like users, vehicles, treecluster
 	return w.mapper.FromSqlList(rows), nil
 }
 
@@ -22,6 +22,6 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 		return nil, w.store.HandleError(err)
 	}
 
-	// TODO: get mapped data like users and tree
+	// TODO: get mapped data like users, vehicles, treecluster
 	return w.mapper.FromSql(row), nil
 }
