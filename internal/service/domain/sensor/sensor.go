@@ -105,7 +105,7 @@ func (s *SensorService) Ready() bool {
 }
 func handleError(err error) error {
 	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, err.Error())
+		return service.NewError(service.NotFound, storage.ErrSensorNotFound.Error())
 	}
 
 	return service.NewError(service.InternalError, err.Error())

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
 	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
@@ -15,15 +16,13 @@ import (
 )
 
 func NewRepository(conn *pgxpool.Pool) *storage.Repository {
-	s := store.NewStore(conn)
-
 	treeMappers := tree.NewTreeRepositoryMappers(
 		&mapper.InternalTreeRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
-	treeRepo := tree.NewTreeRepository(s, treeMappers)
+	treeRepo := tree.NewTreeRepository(store.NewStore(conn, sqlc.New(conn)), treeMappers)
 
 	tcMappers := treecluster.NewTreeClusterRepositoryMappers(
 		&mapper.InternalTreeClusterRepoMapperImpl{},
@@ -31,22 +30,22 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 		&mapper.InternalRegionRepoMapperImpl{},
 		&mapper.InternalTreeRepoMapperImpl{},
 	)
-	treeClusterRepo := treecluster.NewTreeClusterRepository(s, tcMappers)
+	treeClusterRepo := treecluster.NewTreeClusterRepository(store.NewStore(conn, sqlc.New(conn)), tcMappers)
 
 	imageMappers := image.NewImageRepositoryMappers(
 		&mapper.InternalImageRepoMapperImpl{},
 	)
-	imageRepo := image.NewImageRepository(s, imageMappers)
+	imageRepo := image.NewImageRepository(store.NewStore(conn, sqlc.New(conn)), imageMappers)
 
 	vehicleMappers := vehicle.NewVehicleRepositoryMappers(
 		&mapper.InternalVehicleRepoMapperImpl{},
 	)
-	vehicleRepo := vehicle.NewVehicleRepository(s, vehicleMappers)
+	vehicleRepo := vehicle.NewVehicleRepository(store.NewStore(conn, sqlc.New(conn)), vehicleMappers)
 
 	sensorMappers := sensor.NewSensorRepositoryMappers(
 		&mapper.InternalSensorRepoMapperImpl{},
 	)
-	sensorRepo := sensor.NewSensorRepository(s, sensorMappers)
+	sensorRepo := sensor.NewSensorRepository(store.NewStore(conn, sqlc.New(conn)), sensorMappers)
 
 	flowMappers := flowerbed.NewFlowerbedMappers(
 		&mapper.InternalFlowerbedRepoMapperImpl{},
@@ -54,12 +53,12 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(s, flowMappers)
+	flowerbedRepo := flowerbed.NewFlowerbedRepository(store.NewStore(conn, sqlc.New(conn)), flowMappers)
 
 	regionMappers := region.NewRegionMappers(
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
-	regionRepo := region.NewRegionRepository(s, regionMappers)
+	regionRepo := region.NewRegionRepository(store.NewStore(conn, sqlc.New(conn)), regionMappers)
 
 	return &storage.Repository{
 		Tree:        treeRepo,

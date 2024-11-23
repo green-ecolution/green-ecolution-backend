@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"testing"
 
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -95,7 +96,10 @@ func initStore(dbURL string) *store.Store {
 	if err != nil {
 		log.Fatalf("Error while connecting to PostgreSQL: %s", err)
 	}
-	return store.NewStore(pool)
+
+	s := store.NewStore(pool, sqlc.New(pool))
+
+	return s
 }
 
 // CloseConn closes the connection. After the test, the connection will be re-established.
@@ -109,17 +113,27 @@ func (s *PostgresTestSuite) CloseConnTemporary(t testing.TB) {
 	})
 }
 
-func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string) {
+func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string, args ...any) (pgx.Rows, error) {
 	t.Helper()
 	t.Log("Executing query...")
 
-	db, err := sql.Open("pgx", s.URL)
+	result, err := s.Store.DB().Query(context.Background(), query, args...)
 	if err != nil {
-		t.Fatalf("Could not execute query: %s", err)
+		return nil, err
 	}
 
-	_, err = db.Exec(query)
-	if err != nil {
-		t.Fatalf("Could not execute query: %s", err)
-	}
+	return result, nil
+}
+
+func (s *PostgresTestSuite) SwitchQuerier(t testing.TB, querier sqlc.Querier) {
+	t.Helper()
+	t.Log("Switching querier...")
+
+	oldQuerier := s.Store.Querier
+	s.Store.Querier = querier
+
+	t.Cleanup(func() {
+		t.Log("Restoring querier...")
+		s.Store.Querier = oldQuerier
+	})
 }

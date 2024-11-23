@@ -1,6 +1,7 @@
 package tree
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -69,21 +70,27 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("id"))
-		if err != nil {
-			err = service.NewError(service.BadRequest, "invalid ID format")
-			return errorhandler.HandleError(err)
-		}
+		return getTreeByField(c, "id", svc.GetByID)
+	}
+}
 
-		domainData, err := svc.GetByID(ctx, int32(id))
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		data := mapTreeToDto(domainData)
-
-		return c.JSON(data)
+// @Summary		Get tree by sensor ID
+// @Description	Get tree by sensor ID
+// @Id				get-tree-by-sensor-id
+// @Tags			Tree Sensor
+// @Produce		json
+// @Success		200	{object}	entities.TreeResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/tree/sensor/{sensor_id} [get]
+// @Param			sensor_id	path	string	false	"Sensor ID"
+// @Security		Keycloak
+func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return getTreeByField(c, "sensor_id", svc.GetBySensorID)
 	}
 }
 
@@ -326,4 +333,24 @@ func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
 	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
 
 	return dto
+}
+
+func getTreeByField(c *fiber.Ctx, field string, fetchFunc func(ctx context.Context, id int32) (*domain.Tree, error)) error {
+	ctx := c.Context()
+	idStr := c.Params(field)
+
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		err = service.NewError(service.BadRequest, "invalid ID format")
+		return errorhandler.HandleError(err)
+	}
+
+	domainData, err := fetchFunc(ctx, int32(id))
+	if err != nil {
+		return errorhandler.HandleError(err)
+	}
+
+	data := mapTreeToDto(domainData)
+
+	return c.JSON(data)
 }

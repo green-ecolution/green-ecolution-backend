@@ -2,28 +2,42 @@ package treecluster
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (r *TreeClusterRepository) Update(ctx context.Context, id int32, tcFn ...entities.EntityFunc[entities.TreeCluster]) (*entities.TreeCluster, error) {
-	tc, err := r.GetByID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
+func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func(*entities.TreeCluster) (bool, error)) error {
+	return r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
 
-	for _, fn := range tcFn {
-		fn(tc)
-	}
+		tc, err := r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
 
-	err = r.updateEntity(ctx, tc)
-	if err != nil {
-		return nil, err
-	}
+		if updateFn == nil {
+			return errors.New("updateFn is nil")
+		}
 
-	return tc, nil
+		updated, err := updateFn(tc)
+		if err != nil {
+			return err
+		}
+
+		if !updated {
+			return nil
+		}
+
+		return r.updateEntity(ctx, tc)
+	})
 }
 
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {

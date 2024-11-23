@@ -117,6 +117,27 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		})
 	})
 
+	t.Run("/v1/tree/sensor/:sensor_id", func(t *testing.T) {
+		t.Run("should call GET handler", func(t *testing.T) {
+			mockTreeService := serviceMock.NewMockTreeService(t)
+			app := RegisterRoutes(mockTreeService)
+
+			mockTreeService.EXPECT().GetBySensorID(
+				mock.Anything,
+				int32(1),
+			).Return(TestTrees[0], nil)
+
+			// when
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor/1", nil)
+
+			// then
+			resp, err := app.Test(req)
+			defer resp.Body.Close()
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+		})
+	})
+
 	t.Run("/v1/tree/:id/images", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			//TODO: Implement test for GetTreeImages

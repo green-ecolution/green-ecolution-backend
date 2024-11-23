@@ -36,11 +36,16 @@ var (
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
+	// GetAll returns all entities
 	GetAll(ctx context.Context) ([]*T, error)
+	// GetByID returns one entity by id
 	GetByID(ctx context.Context, id int32) (*T, error)
 
+	// Create creates a new entity. It accepts a list of EntityFunc[T] to apply to the new entity
 	Create(ctx context.Context, fn ...entities.EntityFunc[T]) (*T, error)
 	Update(ctx context.Context, id int32, fn ...entities.EntityFunc[T]) (*T, error)
+
+	// Delete deletes a entity by id
 	Delete(ctx context.Context, id int32) error
 }
 
@@ -73,7 +78,20 @@ type VehicleRepository interface {
 }
 
 type TreeClusterRepository interface {
-	BasicCrudRepository[entities.TreeCluster]
+	// GetAll returns all tree clusters
+	GetAll(ctx context.Context) ([]*entities.TreeCluster, error)
+	// GetByID returns one tree cluster by id
+	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
+
+	// Create creates a new tree cluster. It accepts a function that takes a tree cluster that can be modified. Any changes made to the tree cluster will be saved in the storage. If the function returns true, the tree cluster will be created, otherwise it will not be created.
+	Create(ctx context.Context, fn func(tc *entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error)
+
+	// Update updates a tree cluster by id. It takes the id of the tree cluster to update and a function that takes a tree cluster that can be modified. Any changes made to the tree cluster will be saved updated in the storage. If the function returns true, the tree cluster will be updated, otherwise it will not be updated.
+	Update(ctx context.Context, id int32, fn func(tc *entities.TreeCluster) (bool, error)) error
+
+	// Delete deletes a tree cluster by id
+	Delete(ctx context.Context, id int32) error
+
 	GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error)
 	GetLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	Archive(ctx context.Context, id int32) error
@@ -87,6 +105,7 @@ type TreeRepository interface {
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error)
 	GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
+	GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error)
 
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error

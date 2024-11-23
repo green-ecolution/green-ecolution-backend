@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,12 +15,18 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "updated"
+			return true, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), 1, WithName("updated"))
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		assert.Equal(t, "updated", got.Name)
 	})
@@ -27,39 +34,48 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 	t.Run("should return error when update tree cluster with non-existing id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "updated"
+			return true, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), 99, WithName("updated"))
+		err := r.Update(context.Background(), 99, updateFn)
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 
 	t.Run("should return error when update tree cluster with negative id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "updated"
+			return true, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), -1, WithName("updated"))
+		err := r.Update(context.Background(), -1, updateFn)
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "updated"
+			return true, nil
+		}
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
 		// when
-		got, err := r.Update(ctx, 1, WithName("updated"))
+		err := r.Update(ctx, 1, updateFn)
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 
 	t.Run("should not update tree cluster when no changes", func(t *testing.T) {
@@ -69,12 +85,17 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		gotBefore, err := r.GetByID(context.Background(), 1)
 		assert.NoError(t, err)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			return false, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), 1)
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		assert.Equal(t, gotBefore, got)
 	})
@@ -87,12 +108,18 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
 		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Trees = trees
+			return true, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), 1, WithTrees(trees))
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		for _, tree := range testTrees[0:2] {
 			assert.Equal(t, got.ID, *tree.TreeClusterID)
@@ -108,11 +135,18 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		assert.NoError(t, err)
 		beforeTrees := beforeTreeCluster.Trees
 
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Trees = nil
+			return true, nil
+		}
+
 		// when
-		got, err := r.Update(context.Background(), 1, WithTrees(nil))
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		for _, tree := range beforeTrees {
 			actualTree, err := suite.Store.GetTreeByID(context.Background(), tree.ID)
@@ -126,12 +160,19 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Latitude = utils.P(1.0)
+			tc.Longitude = utils.P(1.0)
+			return true, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), 1, WithLatitude(utils.P(1.0)), WithLongitude(utils.P(1.0)))
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		assert.NotNil(t, got.Latitude)
 		assert.NotNil(t, got.Longitude)
@@ -144,14 +185,84 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Latitude = nil
+			tc.Longitude = nil
+			return true, nil
+		}
 
 		// when
-		got, err := r.Update(context.Background(), 1, WithLatitude(nil), WithLongitude(nil))
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
 		assert.NotNil(t, got)
 		assert.Nil(t, got.Latitude)
 		assert.Nil(t, got.Longitude)
+	})
+
+	t.Run("should return error when updateFn is nil", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		// when
+		err := r.Update(context.Background(), 1, nil)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when updateFn returns error", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			return true, assert.AnError
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should not update when updateFn returns false", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			return false, nil
+		}
+
+		// when
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+	})
+
+	t.Run("should not rollback when updateFn returns false", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "updated"
+			return false, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.NotEqual(t, "updated", got.Name)
 	})
 }

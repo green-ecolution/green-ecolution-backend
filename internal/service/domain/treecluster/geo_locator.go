@@ -6,52 +6,42 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type GeoClusterLocator struct {
-	treeRepo    storage.TreeRepository
-	clusterRepo storage.TreeClusterRepository
-	regionRepo  storage.RegionRepository
+	treeRepo   storage.TreeRepository
+	regionRepo storage.RegionRepository
 }
 
-func NewGeoLocation(clusterRepo storage.TreeClusterRepository, treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) *GeoClusterLocator {
+func NewGeoLocation(treeRepo storage.TreeRepository, regionRepo storage.RegionRepository) *GeoClusterLocator {
 	return &GeoClusterLocator{
-		clusterRepo: clusterRepo,
-		treeRepo:    treeRepo,
-		regionRepo:  regionRepo,
+		treeRepo:   treeRepo,
+		regionRepo: regionRepo,
 	}
 }
 
-// UpdateCluster updates the center point of a cluster based on the center point of its trees
-func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, clusterID *int32) error {
-	slog.Debug("Updating cluster location", "clusterID", clusterID)
-	if clusterID == nil {
+func (s *GeoClusterLocator) UpdateCluster(ctx context.Context, cluster *entities.TreeCluster) error {
+	if cluster == nil {
 		return nil
 	}
-	cluster, err := s.clusterRepo.GetByID(ctx, *clusterID)
-	if err != nil {
-		return err
-	}
 
+	slog.Debug("Updating cluster location", "clusterID", cluster.ID)
 	if len(cluster.Trees) == 0 {
-		return s.removeClusterCoords(ctx, *clusterID)
+		s.removeClusterCoords(cluster)
+		return nil
 	}
 
-	return s.setClusterCoords(ctx, *clusterID, cluster.Trees)
+	return s.setClusterCoords(ctx, cluster, cluster.Trees)
 }
 
-func (s *GeoClusterLocator) removeClusterCoords(ctx context.Context, clusterID int32) error {
-	_, err := s.clusterRepo.Update(ctx, clusterID,
-		treecluster.WithLatitude(nil),
-		treecluster.WithLongitude(nil),
-		treecluster.WithRegion(nil),
-	)
-	return err
+func (s *GeoClusterLocator) removeClusterCoords(tc *entities.TreeCluster) {
+	tc.Latitude = nil
+	tc.Longitude = nil
+	tc.Region = nil
 }
 
-func (s *GeoClusterLocator) setClusterCoords(ctx context.Context, clusterID int32, trees []*entities.Tree) error {
+func (s *GeoClusterLocator) setClusterCoords(ctx context.Context, tc *entities.TreeCluster, trees []*entities.Tree) error {
 	treeIDs := utils.Map(trees, func(t *entities.Tree) int32 {
 		return t.ID
 	})
@@ -66,19 +56,17 @@ func (s *GeoClusterLocator) setClusterCoords(ctx context.Context, clusterID int3
 		return err
 	}
 
-	_, err = s.clusterRepo.Update(ctx, clusterID,
-		treecluster.WithLatitude(&lat),
-		treecluster.WithLongitude(&long),
-		treecluster.WithRegion(region),
-	)
+	tc.Latitude = &lat
+	tc.Longitude = &long
+	tc.Region = region
 
-	return err
+	return nil
 }
 
 func (s *GeoClusterLocator) getRegionByPoint(ctx context.Context, lat, long float64) (*entities.Region, error) {
 	region, err := s.regionRepo.GetByPoint(ctx, lat, long)
 	if err != nil {
-		return nil, handleError(err)
+		return nil, err
 	}
 
 	return region, nil
