@@ -9,7 +9,7 @@ type WateringPlanStatus string
 const (
 	WateringPlanStatusPlanned     WateringPlanStatus = "planned"
 	WateringPlanStatusActive      WateringPlanStatus = "active"
-	WateringPlanStatusCanceled   WateringPlanStatus = "canceled"
+	WateringPlanStatusCanceled    WateringPlanStatus = "canceled"
 	WateringPlanStatusFinished    WateringPlanStatus = "finished"
 	WateringPlanStatusNotCompeted WateringPlanStatus = "not competed"
 	WateringPlanStatusUnknown     WateringPlanStatus = "unknown"

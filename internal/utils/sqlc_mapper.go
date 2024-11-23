@@ -33,7 +33,7 @@ func TimeToPgTimestamp(t *time.Time) pgtype.Timestamp {
 
 func PgDateToTime(pgDate pgtype.Date) time.Time {
 	if pgDate.Valid {
-		return time.Time(pgDate.Time)
+		return pgDate.Time
 	}
 	return time.Time{}
 }
