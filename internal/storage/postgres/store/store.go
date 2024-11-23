@@ -21,6 +21,7 @@ const (
 	Tree        EntityType = "tree"
 	Vehicle     EntityType = "vehicle"
 	Region      EntityType = "region"
+	WateringPlan EntityType = "watering plan"
 )
 
 type Store struct {

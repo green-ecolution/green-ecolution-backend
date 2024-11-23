@@ -24,6 +24,7 @@ var (
 	ErrRegionNotFound      = errors.New("region not found")
 	ErrTreeNotFound        = errors.New("tree not found")
 	ErrVehicleNotFound     = errors.New("vehicle not found")
+	ErrWateringPlanNotFound = errors.New("watering plan not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")
@@ -72,6 +73,10 @@ type ImageRepository interface {
 type VehicleRepository interface {
 	BasicCrudRepository[entities.Vehicle]
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
+}
+
+type WateringPlanRepository interface {
+	BasicCrudRepository[entities.WateringPlan]
 }
 
 type TreeClusterRepository interface {
@@ -155,4 +160,5 @@ type Repository struct {
 	TreeCluster TreeClusterRepository
 	Flowerbed   FlowerbedRepository
 	Region      RegionRepository
+	WateringPlan WateringPlanRepository
 } 
