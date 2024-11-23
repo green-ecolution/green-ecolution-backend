@@ -11,7 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestWateringPlanRepository_Update(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
@@ -43,10 +42,10 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		Description:        "Updated watering plan",
 		Distance:           utils.P(50.0),
 		TotalWaterRequired: utils.P(30000.0),
-		Trailer: mappers.vehicleMapper.FromSqlList(testVehicles)[0],
-		Transporter: mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		Treecluster:  mappers.clusterMapper.FromSqlList(testCluster)[0:5],
-		Users: []*entities.User{testUser},
+		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
+		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
+		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:5],
+		Users:              []*entities.User{testUser},
 	}
 
 	t.Run("should update watering plan", func(t *testing.T) {
@@ -102,7 +101,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Update(context.Background(), 
+		got, err := r.Update(context.Background(),
 			int32(1),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
@@ -143,7 +142,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 
 		// when
 		got, err := r.Update(context.Background(),
-			int32(1), 
+			int32(1),
 			WithDate(input.Date),
 			WithTransporter(input.Trailer),
 			WithTreecluster(input.Treecluster),
@@ -264,7 +263,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		ctx, cancel := context.WithCancel(context.Background(),)
+		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 
 		// when

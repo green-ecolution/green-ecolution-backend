@@ -42,18 +42,18 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		Description:        "New watering plan",
 		Distance:           utils.P(50.0),
 		TotalWaterRequired: utils.P(30000.0),
-		Trailer: mappers.vehicleMapper.FromSqlList(testVehicles)[0],
-		Transporter: mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		Treecluster:  mappers.clusterMapper.FromSqlList(testCluster)[0:5],
-		Users: []*entities.User{testUser},
+		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
+		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
+		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:5],
+		Users:              []*entities.User{testUser},
 	}
-	
+
 	t.Run("should create watering plan with all values", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithDescription(input.Description),
 			WithDistance(input.Distance),
@@ -81,7 +81,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTreecluster(input.Treecluster),
@@ -105,7 +105,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(time.Time{}),
 			WithTransporter(input.Transporter),
 			WithTreecluster(input.Treecluster),
@@ -123,7 +123,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTrailer(input.Transporter),
@@ -142,7 +142,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTrailer(input.Trailer),
@@ -161,7 +161,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithTransporter(input.Trailer),
 			WithTreecluster(input.Treecluster),
@@ -179,7 +179,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithTransporter(nil),
 			WithTreecluster(input.Treecluster),
@@ -197,7 +197,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), 
+		got, err := r.Create(context.Background(),
 			WithDate(input.Date),
 			WithTransporter(input.Transporter),
 			WithTreecluster([]*entities.TreeCluster{}),
@@ -230,7 +230,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Create(ctx, 
+		got, err := r.Create(ctx,
 			WithDate(input.Date),
 			WithTransporter(nil),
 			WithTreecluster(input.Treecluster),

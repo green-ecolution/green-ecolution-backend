@@ -16,16 +16,16 @@ const (
 )
 
 type WateringPlan struct {
-	ID        int32
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Date         time.Time
+	ID                 int32
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
+	Date               time.Time
 	Description        string
 	WateringPlanStatus WateringPlanStatus
 	Distance           *float64
 	TotalWaterRequired *float64
 	Users              []*User
 	Treecluster        []*TreeCluster
-	Transporter			*Vehicle
-	Trailer				*Vehicle 
+	Transporter        *Vehicle
+	Trailer            *Vehicle
 }

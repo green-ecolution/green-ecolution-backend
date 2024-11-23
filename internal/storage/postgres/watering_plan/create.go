@@ -43,15 +43,15 @@ func (w *WateringPlanRepository) Create(ctx context.Context, wFn ...entities.Ent
 }
 
 func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entities.WateringPlan) (*int32, error) {
-	date, err := utils.TimeToPgDate(entity.Date);
+	date, err := utils.TimeToPgDate(entity.Date)
 	if err != nil {
 		return nil, errors.New("failed to convert date")
 	}
 
 	args := sqlc.CreateWateringPlanParams{
-		Date:   date,
-		Description:   entity.Description,
-		Distance: entity.Distance,
+		Date:               date,
+		Description:        entity.Description,
+		Distance:           entity.Distance,
 		TotalWaterRequired: entity.TotalWaterRequired,
 		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}

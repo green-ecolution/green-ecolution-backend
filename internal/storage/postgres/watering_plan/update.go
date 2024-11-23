@@ -31,16 +31,16 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, wpFn ...e
 }
 
 func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entities.WateringPlan) error {
-	date, err := utils.TimeToPgDate(entity.Date);
+	date, err := utils.TimeToPgDate(entity.Date)
 	if err != nil {
 		return errors.New("failed to convert date")
 	}
-	
+
 	params := sqlc.UpdateWateringPlanParams{
-		ID:            entity.ID,
-		Date:   date,
-		Description:   entity.Description,
-		Distance: entity.Distance,
+		ID:                 entity.ID,
+		Date:               date,
+		Description:        entity.Description,
+		Distance:           entity.Distance,
 		TotalWaterRequired: entity.TotalWaterRequired,
 		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}

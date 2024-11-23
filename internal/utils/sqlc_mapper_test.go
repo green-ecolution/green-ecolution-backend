@@ -101,7 +101,7 @@ func TestTimeToPgDate(t *testing.T) {
 		date := time.Time{}
 
 		pgDate, err := TimeToPgDate(date)
-		
+
 		assert.Error(t, err)
 		assert.Empty(t, pgDate)
 		assert.Equal(t, "invalid date: zero value provided", err.Error())

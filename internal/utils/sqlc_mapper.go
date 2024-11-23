@@ -39,16 +39,16 @@ func PgDateToTime(pgDate pgtype.Date) time.Time {
 }
 
 func TimeToPgDate(date time.Time) (pgtype.Date, error) {
-    if date.IsZero() {
-        return pgtype.Date{}, fmt.Errorf("invalid date: zero value provided")
-    }
+	if date.IsZero() {
+		return pgtype.Date{}, fmt.Errorf("invalid date: zero value provided")
+	}
 
-    pgDate := pgtype.Date{
-		Time: date,
+	pgDate := pgtype.Date{
+		Time:  date,
 		Valid: true,
 	}
 
-    return pgDate, nil
+	return pgDate, nil
 }
 
 //nolint:gocritic
