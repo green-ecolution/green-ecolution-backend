@@ -7,6 +7,22 @@ SELECT * FROM vehicles WHERE id = $1;
 -- name: GetVehicleByPlate :one
 SELECT * FROM vehicles WHERE number_plate = $1;
 
+-- name: GetVehicleTransporterByWateringPlan :one
+SELECT v.* FROM vehicles v
+JOIN 
+  vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
+WHERE 
+  vwp.watering_plan_id = $1
+AND v.type = 'transporter';
+
+-- name: GetVehicleTrailerByWateringPlan :one
+SELECT v.* FROM vehicles v
+JOIN 
+  vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
+WHERE 
+  vwp.watering_plan_id = $1
+AND v.type = 'trailer';
+
 -- name: CreateVehicle :one
 INSERT INTO vehicles (
   number_plate, 

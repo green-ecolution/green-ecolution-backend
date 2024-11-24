@@ -76,6 +76,7 @@ type ImageRepository interface {
 type VehicleRepository interface {
 	BasicCrudRepository[entities.Vehicle]
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
+	GetByWateringPlan(ctx context.Context, wateringPlanID int32, vehicleType entities.VehicleType) (*entities.Vehicle, error)
 }
 
 type WateringPlanRepository interface {
