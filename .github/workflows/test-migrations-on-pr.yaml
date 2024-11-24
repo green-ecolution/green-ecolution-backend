@@ -28,15 +28,6 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/pressly/goose/master/install.sh | sh
 
-      - name: Goose Up
-        run: goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" up
-
-      - name: Test Migrations Reset
-        run: |
-          goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" reset
-          echo "Checking if all migrations are down"
-          goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" status
-
       - name: Test Migrations Up
         run: |
           goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" up
@@ -49,6 +40,13 @@ jobs:
             echo "Checking down $i"
             goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" down
           done
+
+      - name: Test Migrations Reset
+        run: |
+          goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" up
+          goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" reset
+          echo "Checking if all migrations are down"
+          goose -dir internal/storage/postgres/migrations postgres "postgres://postgres:postgres@localhost:5432/postgres" status
 
       - name: Test Seed Up
         run: |
