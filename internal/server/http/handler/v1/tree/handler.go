@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -70,7 +69,23 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return getTreeByField(c, "id", svc.GetByID)
+		ctx := c.Context()
+		idStr := c.Params("id")
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			err = service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, err := svc.GetByID(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapTreeToDto(domainData)
+
+		return c.JSON(data)
 	}
 }
 
@@ -90,7 +105,16 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 // @Security		Keycloak
 func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return getTreeByField(c, "sensor_id", svc.GetBySensorID)
+		ctx := c.Context()
+		id := c.Params("sensor_id")
+
+		domainData, err := svc.GetBySensorID(ctx, id)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+		data := mapTreeToDto(domainData)
+
+		return c.JSON(data)
 	}
 }
 
@@ -333,24 +357,4 @@ func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
 	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
 
 	return dto
-}
-
-func getTreeByField(c *fiber.Ctx, field string, fetchFunc func(ctx context.Context, id int32) (*domain.Tree, error)) error {
-	ctx := c.Context()
-	idStr := c.Params(field)
-
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		err = service.NewError(service.BadRequest, "invalid ID format")
-		return errorhandler.HandleError(err)
-	}
-
-	domainData, err := fetchFunc(ctx, int32(id))
-	if err != nil {
-		return errorhandler.HandleError(err)
-	}
-
-	data := mapTreeToDto(domainData)
-
-	return c.JSON(data)
 }

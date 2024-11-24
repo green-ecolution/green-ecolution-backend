@@ -121,14 +121,14 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			app := RegisterRoutes(mockTreeService)
-
+			sensorID := "sensor-1"
 			mockTreeService.EXPECT().GetBySensorID(
 				mock.Anything,
-				int32(1),
+				sensorID,
 			).Return(TestTrees[0], nil)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor/"+sensorID, nil)
 
 			// then
 			resp, err := app.Test(req)

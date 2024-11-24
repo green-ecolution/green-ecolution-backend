@@ -58,7 +58,7 @@ func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, er
 	return tr, nil
 }
 
-func (s *TreeService) GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error) {
+func (s *TreeService) GetBySensorID(ctx context.Context, id string) (*entities.Tree, error) {
 	tr, err := s.treeRepo.GetBySensorID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)

@@ -86,14 +86,14 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService := serviceMock.NewMockTreeService(t)
 		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
 
-		sensorID := int32(1)
+		sensorID := "sensor-1"
 		mockTreeService.EXPECT().GetBySensorID(
 			mock.Anything,
 			sensorID,
 		).Return(TestTrees[0], nil)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+strconv.Itoa(int(sensorID)), nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+sensorID, nil)
 		req.Header.Set("Content-Type", "application/json")
 		resp, _ := app.Test(req, -1)
 		defer resp.Body.Close()
@@ -102,32 +102,33 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
-		app := fiber.New()
-		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
-
-		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree/sensor/invalid", nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	})
+	//t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
+	//	app := fiber.New()
+	//	mockTreeService := serviceMock.NewMockTreeService(t)
+	//	app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
+	//
+	//	// when
+	//	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree/sensor/"999, nil)
+	//	resp, err := app.Test(req, -1)
+	//	defer resp.Body.Close()
+	//
+	//	// then
+	//	assert.Nil(t, err)
+	//	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	//})
 
 	t.Run("should return 404 when tree not found", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
 		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
 
+		sensorID := "sensor-999"
 		mockTreeService.EXPECT().GetBySensorID(
 			mock.Anything,
-			int32(999),
+			sensorID,
 		).Return(nil, storage.ErrTreeNotFound)
 
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/999", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+sensorID, nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -141,13 +142,13 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService := serviceMock.NewMockTreeService(t)
 		app.Get("/v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
 
-		sensorID := int32(1)
+		sensorID := "sensor-1"
 		mockTreeService.EXPECT().GetBySensorID(
 			mock.Anything,
 			sensorID,
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
 
-		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+strconv.Itoa(int(sensorID)), nil)
+		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+sensorID, nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
