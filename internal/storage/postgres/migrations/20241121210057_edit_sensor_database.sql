@@ -10,7 +10,7 @@ ALTER TABLE sensors ADD COLUMN longitude FLOAT NOT NULL;
 ALTER TABLE sensors ADD COLUMN geometry GEOMETRY(Point, 4326);
 
 ALTER TABLE sensor_data ALTER COLUMN sensor_id TYPE VARCHAR USING sensor_id::TEXT;
-ALTER TABLE sensor_data ADD CONSTRAINT sensor_data_sensor_id_fkey FOREIGN KEY (sensor_id) REFERENCES sensors(id);
+ALTER TABLE sensor_data ADD CONSTRAINT sensor_data_sensor_id_fkey FOREIGN KEY (sensor_id) REFERENCES sensors(id) ON DELETE CASCADE;
 
 ALTER TABLE trees ALTER COLUMN sensor_id TYPE VARCHAR USING sensor_id::TEXT;
 ALTER TABLE trees ADD CONSTRAINT trees_sensor_id_fkey FOREIGN KEY (sensor_id) REFERENCES sensors(id);
