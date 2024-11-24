@@ -8,37 +8,37 @@ import (
 )
 
 type DatabaseConfig struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
-	Name     string
-	Timeout  time.Duration
+	Host     string        `mapstructure:"host"`
+	Port     int           `mapstructure:"port"`
+	Username string        `mapstructure:"username"`
+	Password string        `mapstructure:"password"`
+	Name     string        `mapstructure:"name"`
+	Timeout  time.Duration `mapstructure:"timeout"`
 }
 
 type MQTTConfig struct {
-	Broker   string
+	Broker   string `mapstructure:"broker"`
 	ClientID string `mapstructure:"client_id"`
-	Username string
-	Password string
-	Topic    string
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	Topic    string `mapstructure:"topic"`
 }
 
 type LogConfig struct {
-	Level  logger.LogLevel
-	Format logger.LogFormat
+	Level  logger.LogLevel  `mapstructure:"level"`
+	Format logger.LogFormat `mapstructure:"format"`
 }
 
 type ServerConfig struct {
-	Logs        LogConfig
-	Database    DatabaseConfig
-	Port        int
-	Development bool
-	AppURL      string `mapstructure:"app_url"`
+	Logs        LogConfig      `mapstructure:"logs"`
+	Database    DatabaseConfig `mapstructure:"database"`
+	Port        int            `mapstructure:"port"`
+	Development bool           `mapstructure:"development"`
+	AppURL      string         `mapstructure:"app_url"`
 }
 
 type DashboardConfig struct {
-	Title string
+	Title string `mapstructure:"title"`
 }
 
 type IdentityAuthConfig struct {
@@ -46,9 +46,9 @@ type IdentityAuthConfig struct {
 }
 
 type Config struct {
-	Server       ServerConfig
-	Dashboard    DashboardConfig
-	MQTT         MQTTConfig
+	Server       ServerConfig       `mapstructure:"server"`
+	Dashboard    DashboardConfig    `mapstructure:"dashboard"`
+	MQTT         MQTTConfig         `mapstructure:"mqtt"`
 	IdentityAuth IdentityAuthConfig `mapstructure:"auth"`
 }
 
