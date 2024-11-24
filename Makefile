@@ -122,6 +122,8 @@ setup/macos:
 	brew install sqlc
 	brew install yq
 	brew install delve
+	brew install proj
+	brew install geos
 	go install github.com/air-verse/air@latest
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/swaggo/swag/cmd/swag@latest
