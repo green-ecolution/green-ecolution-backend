@@ -2,8 +2,10 @@ package tree
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
 
@@ -29,6 +31,10 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 		fn(&entity)
 	}
 
+	if err := r.validateTreeEntity(&entity); err != nil {
+		return nil, err
+	}
+
 	id, err := r.createEntity(ctx, &entity)
 	if err != nil {
 		return nil, r.store.HandleError(err)
@@ -39,16 +45,28 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 }
 
 func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	entity, err := r.Create(ctx, tFn...)
+	createdEntity, err := r.Create(ctx, tFn...)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
-		return nil, err
+	entity := defaultTree()
+	for _, fn := range tFn {
+		fn(&entity)
 	}
 
-	return entity, nil
+	if entity.Images != nil {
+		if err := r.handleImages(ctx, createdEntity.ID, entity.Images); err != nil {
+			return nil, err
+		}
+		linkedImages, err := r.GetAllImagesByID(ctx, createdEntity.ID)
+		if err != nil {
+			return nil, err
+		}
+		createdEntity.Images = linkedImages
+	}
+
+	return createdEntity, nil
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
@@ -60,7 +78,6 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	var sensorID *int32
 	if entity.Sensor != nil {
 		sensorID = &entity.Sensor.ID
-
 		if err := r.store.UnlinkSensorIDFromTrees(ctx, sensorID); err != nil {
 			return -1, err
 		}
@@ -113,4 +130,17 @@ func (r *TreeRepository) linkImages(ctx context.Context, treeID, imgID int32) er
 	}
 
 	return r.store.LinkTreeImage(ctx, &params)
+}
+
+func (r *TreeRepository) validateTreeEntity(tree *entities.Tree) error {
+	if tree == nil {
+		return errors.New("tree is nil")
+	}
+	if tree.Latitude < -90 || tree.Latitude > 90 {
+		return storage.ErrInvalidLatitude
+	}
+	if tree.Longitude < -180 || tree.Longitude > 180 {
+		return storage.ErrInvalidLongitude
+	}
+	return nil
 }

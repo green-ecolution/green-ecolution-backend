@@ -101,6 +101,11 @@ func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, 
 }
 
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	_, err := r.store.GetTreeClusterByID(ctx, id)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
 	rows, err := r.store.GetTreesByTreeClusterID(ctx, &id)
 	if err != nil {
 		return nil, r.store.HandleError(err)
@@ -154,7 +159,7 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, flowerbedID int3
 	return r.sMapper.FromSql(row), nil
 }
 
-func (r *TreeRepository) GetTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
+func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
 	row, err := r.store.GetTreeClusterByTreeID(ctx, treeID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -206,7 +211,7 @@ func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 }
 
 func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
-	treeCluster, err := r.GetTreeClusterByTreeID(ctx, t.ID)
+	treeCluster, err := r.getTreeClusterByTreeID(ctx, t.ID)
 	if err != nil {
 		return r.store.HandleError(err)
 	}
