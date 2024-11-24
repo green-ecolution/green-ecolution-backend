@@ -18,19 +18,10 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 
 	data := w.mapper.FromSqlList(rows)
 	for _, wp := range data {
-		wp.Transporter, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTransporter)
-		if err != nil {
-			return nil, w.store.HandleError(err)
-		}
-
-		wp.Trailer, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTrailer)
-		if err != nil {
-		 	if !errors.Is(err, storage.ErrEntityNotFound) {
-		 		return nil, w.store.HandleError(err)
-			}
+		if err := w.mapFields(ctx, wp); err != nil {
+			return nil, err
 		}
 	}
-
 	// TODO: get mapped data like users, treecluster
 	return data, nil
 }
@@ -41,8 +32,13 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 		return nil, w.store.HandleError(err)
 	}
 
-	// TODO: get mapped data like users, vehicles, treecluster
-	return w.mapper.FromSql(row), nil
+	wp := w.mapper.FromSql(row)
+
+	if err := w.mapFields(ctx, wp); err != nil {
+		return nil, err
+	}
+	// TODO: get mapped data like users, treecluster
+	return wp, nil
 }
 
 func (w *WateringPlanRepository) GetLinkedVehicleByID(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error) {
@@ -66,4 +62,22 @@ func (w *WateringPlanRepository) GetLinkedVehicleByID(ctx context.Context, id in
 	}
 
 	return w.vehicleMapper.FromSql(row), nil
+}
+
+func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
+    var err error
+
+    wp.Transporter, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTransporter)
+    if err != nil {
+        return w.store.HandleError(err)
+    }
+
+    wp.Trailer, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTrailer)
+    if err != nil {
+        if !errors.Is(err, storage.ErrEntityNotFound) {
+            return w.store.HandleError(err)
+        }
+    }
+
+    return nil
 }

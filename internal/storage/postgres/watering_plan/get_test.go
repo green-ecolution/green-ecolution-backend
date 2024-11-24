@@ -94,9 +94,13 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].WateringPlanStatus, got.WateringPlanStatus)
 		assert.Equal(t, allTestWateringPlans[0].Distance, got.Distance)
 		assert.Equal(t, allTestWateringPlans[0].TotalWaterRequired, got.TotalWaterRequired)
+
+		// assert transporter
+		assert.Equal(t, allTestWateringPlans[0].Transporter, got.Transporter.ID)
+		assert.Equal(t, allTestWateringPlans[0].Trailer, got.Trailer.ID)
 	})
 
-	t.Run("should return error when watering paln with non-existing id", func(t *testing.T) {
+	t.Run("should return error when watering plan with non-existing id", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
