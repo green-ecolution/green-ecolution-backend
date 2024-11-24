@@ -24,7 +24,7 @@ func (r *SensorRepository) Update(ctx context.Context, id string, sFn ...entitie
 	}
 
 	if len(entity.Data) > 0 {
-		_, err := r.InsertSensorData(ctx, entity.Data)
+		_, err := r.InsertSensorData(ctx, entity.Data, entity.ID)
 		if err != nil {
 			return nil, err
 		}

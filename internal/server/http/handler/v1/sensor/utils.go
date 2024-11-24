@@ -3,8 +3,6 @@ package sensor
 import (
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -79,7 +77,6 @@ var (
 	TestSensorData = []*entities.SensorData{
 		{
 			ID:        1,
-			SensorID:  utils.P(TestSensorID),
 			CreatedAt: currentTime,
 			UpdatedAt: currentTime,
 			Data:      TestMqttPayload,

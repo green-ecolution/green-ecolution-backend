@@ -12,11 +12,21 @@ VALUES
     (8, 'Gewerbegebiet Süd', 'bad', 0.1, NULL, 'Schleswiger Straße', 'Sehr viel versiegelter Boden.', 'sandig', 54.768115, 9.435285, ST_SetSRID(ST_MakePoint(54.768115, 9.435285), 4326));
 ALTER SEQUENCE tree_clusters_id_seq RESTART WITH 9;
 
-INSERT INTO sensors (id, status) VALUES (1, 'online');
-INSERT INTO sensors (id, status) VALUES (2, 'offline');
-INSERT INTO sensors (id, status) VALUES (3, 'unknown');
-INSERT INTO sensors (id, status) VALUES (4, 'online');
-ALTER SEQUENCE sensors_id_seq RESTART WITH 5;
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('sensor-1', 'online', 54.82124518093376, 9.485702120628517, ST_SetSRID(ST_MakePoint(54.82124518093376, 9.485702120628517), 4326));
+
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('sensor-2', 'offline', 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326));
+
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('sensor-3', 'unknown', 54.77933725347423, 9.426465409018832, ST_SetSRID(ST_MakePoint(54.77933725347423, 9.426465409018832), 4326));
+
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('sensor-4', 'online', 54.82078826498143, 9.489684366114483, ST_SetSRID(ST_MakePoint(54.82078826498143, 9.489684366114483), 4326));
 
 INSERT INTO images (id, url, filename, mime_type)
 VALUES
@@ -29,10 +39,10 @@ ALTER SEQUENCE images_id_seq RESTART WITH 5;
 
 INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, tree_number, latitude, longitude, geometry, readonly, watering_status, description)
 VALUES
-    (1, 1, 1, 2021, 'Quercus robur', 1005, 54.82124518093376, 9.485702120628517, ST_SetSRID(ST_MakePoint(54.82124518093376, 9.485702120628517), 4326), true, 'unknown', 'Sample description 1'),
+    (1, 1, 'sensor-1', 2021, 'Quercus robur', 1005, 54.82124518093376, 9.485702120628517, ST_SetSRID(ST_MakePoint(54.82124518093376, 9.485702120628517), 4326), true, 'unknown', 'Sample description 1'),
     (2, 1, NULL, 2022, 'Quercus robur', 1006, 54.8215076622281, 9.487153277881877, ST_SetSRID(ST_MakePoint(54.8215076622281, 9.487153277881877), 4326), true, 'good', 'Sample description 2'),
-    (3, 2, 2, 2023, 'Betula pendula', 1010, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326), false, 'bad', 'Sample description 3'),
-    (4, null, 3, 2020, 'Quercus robur', 1008, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.787330993834613, 9.4440523405200551), 4326), false, 'bad', 'Sample description 4');
+    (3, 2, 'sensor-2', 2023, 'Betula pendula', 1010, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.78780993841013, 9.444052105200551), 4326), false, 'bad', 'Sample description 3'),
+    (4, null, 'sensor-3', 2020, 'Quercus robur', 1008, 54.78780993841013, 9.444052105200551, ST_SetSRID(ST_MakePoint(54.787330993834613, 9.4440523405200551), 4326), false, 'bad', 'Sample description 4');
 
 ALTER SEQUENCE trees_id_seq RESTART WITH 5;
 

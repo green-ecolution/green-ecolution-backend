@@ -6,8 +6,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +18,6 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 		sensorID := "sensor-4"
 		sensorData := sensorUtils.TestSensorData[1]
-		sensorData.SensorID = utils.P(sensorID)
 		sensorDataList := []*entities.SensorData{sensorData}
 
 		// when
@@ -116,23 +113,20 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		sensor := &entities.Sensor{
-			Status: entities.SensorStatusOnline,
-		}
+		sensor := &entities.Sensor{ID: "sensor-1", Latitude: 54.82124518093376, Longitude: 9.485702120628517, Status: entities.SensorStatusOnline}
 
 		_, err := r.Create(context.Background(), WithSensorID(sensorUtils.TestSensorID), WithStatus(sensor.Status))
 		assert.NoError(t, err)
 
 		data := []*entities.SensorData{
 			{
-				ID:       1,
-				SensorID: utils.P(sensorUtils.TestSensorID),
-				Data:     sensorUtils.TestMqttPayload,
+				ID:   1,
+				Data: sensorUtils.TestMqttPayload,
 			},
 		}
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), data)
+		got, err := r.InsertSensorData(context.Background(), data, sensor.ID)
 
 		// then
 		assert.NoError(t, err)
@@ -142,9 +136,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 	t.Run("should return error when data is empty", func(t *testing.T) {
 		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		sensor := &entities.Sensor{
-			Status: entities.SensorStatusOnline,
-		}
+		sensor := &entities.Sensor{ID: "sensor-1", Latitude: 54.82124518093376, Longitude: 9.485702120628517, Status: entities.SensorStatusOnline}
 
 		_, err := r.Create(context.Background(), WithSensorID(sensorUtils.TestSensorID), WithStatus(sensor.Status))
 		assert.NoError(t, err)
@@ -152,7 +144,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		var data []*entities.SensorData
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), data)
+		got, err := r.InsertSensorData(context.Background(), data, sensor.ID)
 
 		// then
 		assert.Error(t, err)
@@ -165,7 +157,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), nil)
+		got, err := r.InsertSensorData(context.Background(), nil, "sensor-1")
 
 		// then
 		assert.Error(t, err)

@@ -37,7 +37,7 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 
 	entity.ID = id
 	if len(entity.Data) > 0 {
-		_, err = r.InsertSensorData(ctx, entity.Data)
+		_, err = r.InsertSensorData(ctx, entity.Data, id)
 		if err != nil {
 			return nil, err
 		}
@@ -46,15 +46,13 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	return r.GetByID(ctx, id)
 }
 
-func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entities.SensorData) ([]*entities.SensorData, error) {
+func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entities.SensorData, id string) ([]*entities.SensorData, error) {
 	if len(data) == 0 {
 		return nil, errors.New("data cannot be empty")
 	}
 
-	for _, d := range data {
-		if d.SensorID == nil {
-			return nil, r.store.HandleError(errors.New("sensor id cannot be nil"))
-		}
+	if id == "" {
+		return nil, r.store.HandleError(errors.New("sensor id cannot be empty"))
 	}
 
 	for _, d := range data {
@@ -65,7 +63,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 		}
 
 		params := &sqlc.InsertSensorDataParams{
-			SensorID: *d.SensorID,
+			SensorID: id,
 			Data:     raw,
 		}
 

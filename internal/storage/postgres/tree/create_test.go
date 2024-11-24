@@ -48,8 +48,8 @@ func TestTreeRepository_Create(t *testing.T) {
 			t.Fatal(clusterErr)
 		}
 		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
-
-		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), 1)
+		sensorID := "sensor-1"
+		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), sensorID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
@@ -164,8 +164,8 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 			t.Fatal(clusterErr)
 		}
 		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
-
-		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), 1)
+		sensorID := "sensor-1"
+		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), sensorID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
