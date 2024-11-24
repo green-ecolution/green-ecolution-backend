@@ -272,4 +272,7 @@ docs
 config.yaml
 bin
 _sqlc
-.docker/.env*
+.docker/local/.env*
+config/config.stage.yaml
+config/config.prod.yaml
+config/config.dev.yaml
