@@ -1,7 +1,7 @@
 ENV ?= dev
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := green-ecolution-backend
-APP_VERSION ?= 0.0.1
+APP_VERSION ?= $(shell git describe --tags --always --dirty)
 APP_GIT_COMMIT ?= $(shell git rev-parse HEAD)
 APP_GIT_BRANCH ?= $(shell git rev-parse --abbrev-ref HEAD)
 APP_GIT_REPOSITORY ?= https://github.com/green-ecolution/green-ecolution-backend
@@ -26,41 +26,41 @@ POSTGRES_PORT ?= 5432
 
 .PHONY: help
 help:
-	@echo "Usage: make <command>"
+	@echo "Usage: make [target]"
 	@echo ""
-	@echo "Commands:"
-	@echo "  all                              Build for all platforms"
-	@echo "  build/all                        Build for all platforms"
-	@echo "  build/darwin                     Build for darwin"
-	@echo "  build/linux                      Build for linux"
-	@echo "  build/windows                    Build for windows"
-	@echo "  build                            Build"
-	@echo "  generate                         Generate"
-	@echo "  setup                            Install dependencies"
-	@echo "  setup/macos                      Install dependencies for macOS"
-	@echo "  setup/ci                         Install dependencies for CI"
-	@echo "  clean                            Clean"
-	@echo "  run                              Run"
-	@echo "  run/live                         Run live"
-	@echo "  run/docker env=[dev,stage,prod]  Run docker"
-	@echo "  run/docker/dev                   Run docker dev"
-	@echo "  run/docker/stage                 Run docker stage"
-	@echo "  run/docker/prod                  Run docker prod"
-	@echo "  migrate/new name=<name>          Create new migration"
-	@echo "  migrate/up                       Migrate up"
-	@echo "  migrate/down                     Migrate down"
-	@echo "  migrate/reset                    Migrate reset"
-	@echo "  migrate/status                   Migrate status"
-	@echo "  seed/up                          Seed up"
-	@echo "  seed/reset                       Seed reset"
-	@echo "  tidy                             Fmt and Tidy"
-	@echo "  lint                             Lint"
-	@echo "  test                             Test"
-	@echo "  test/verbose                     Test verbose"
-	@echo "  config/enc                       Encrypt config with sops"
-	@echo "  config/dec                       Decrypt config with sops"
-	@echo "  config/edit                      Edit config with sops and $EDITOR"
-	@echo "  debug                            Debug with delve"
+	@echo "Targets:"
+	@echo "  all                               Build for all platforms"
+	@echo "  build/all                         Build for all platforms"
+	@echo "  build/darwin                      Build for darwin"
+	@echo "  build/linux                       Build for linux"
+	@echo "  build/windows                     Build for windows"
+	@echo "  build                             Build"
+	@echo "  generate                          Generate"
+	@echo "  setup                             Install dependencies"
+	@echo "  setup/macos                       Install dependencies for macOS"
+	@echo "  setup/ci                          Install dependencies for CI"
+	@echo "  clean                             Clean"
+	@echo "  run                               Run"
+	@echo "  run/live                          Run live"
+	@echo "  run/docker ENV=[dev,stage,prod]   Run docker container (default: dev)"
+	@echo "  infra/up                          Run infrastructure in docker compose (postgres and pgadmin)"
+	@echo "  infra/down                        Run infrastructure down"
+	@echo "  migrate/new name=<name>           Create new migration"
+	@echo "  migrate/up                        Migrate up"
+	@echo "  migrate/down                      Migrate down"
+	@echo "  migrate/reset                     Migrate reset"
+	@echo "  migrate/status                    Migrate status"
+	@echo "  seed/up                           Seed up"
+	@echo "  seed/reset                        Seed reset"
+	@echo "  tidy                              Fmt and Tidy"
+	@echo "  lint                              Lint"
+	@echo "  test                              Test"
+	@echo "  test/verbose                      Test verbose"
+	@echo "  config/all                        Encrypt all config"
+	@echo "  config/enc  ENV=[dev,stage,prod]  Encrypt config"
+	@echo "  config/dec  ENV=[dev,stage,prod]  Decrypt config"
+	@echo "  config/edit ENV=[dev,stage,prod]  Edit config"
+	@echo "  debug                             Debug"
 
 .PHONY: all
 all: build
@@ -260,8 +260,8 @@ test/verbose:
 	@echo "Testing..."
 	go test -v -cover ./...
 
-.PHONY: config/enc/all
-config/enc/all:
+.PHONY: config/all
+config/all:
 	@echo "Encrypting config..."
 	sops -e config/config.dev.yaml > config/config.dev.enc.yaml; \
 	sops -e config/config.stage.yaml > config/config.stage.enc.yaml; \
