@@ -129,9 +129,11 @@ func TestGetSensorById(t *testing.T) {
 
 		assert.Equal(t, response.ID, TestSensor.ID)
 		assert.WithinDuration(t, response.CreatedAt, TestSensor.CreatedAt, time.Second)
-        assert.WithinDuration(t, response.UpdatedAt, TestSensor.UpdatedAt, time.Second)
-		assert.Equal(t, entities.SensorStatus(response.Status), entities.SensorStatus(TestSensor.Status))
+		assert.WithinDuration(t, response.UpdatedAt, TestSensor.UpdatedAt, time.Second)
+		assert.Equal(t, entities.SensorStatus(response.Status), TestSensor.Status)
+
 		// TODO: compare data
+
 		mockSensorService.AssertExpectations(t)
 	})
 
@@ -217,7 +219,7 @@ func TestDeleteSensor(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
-		
+
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
@@ -236,7 +238,7 @@ func TestDeleteSensor(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/invalid", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
-		
+
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
@@ -258,7 +260,7 @@ func TestDeleteSensor(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/999", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
-		
+
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode)

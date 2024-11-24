@@ -281,7 +281,7 @@ func TestSensorService_Delete(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 	})
-	
+
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		// given
 		id := "sensor-1"
