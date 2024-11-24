@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"

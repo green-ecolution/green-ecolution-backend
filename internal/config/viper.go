@@ -1,16 +1,22 @@
 package config
 
 import (
+	"fmt"
 	"log/slog"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
 )
 
 func InitViper() (*Config, error) {
-	viper.SetConfigName("config")
+	osEnv := os.Getenv("ENV")
+	if osEnv == "" {
+		osEnv = "dev"
+	}
+	viper.SetConfigName(fmt.Sprintf("config.%s", osEnv))
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("./config")
 	viper.SetEnvPrefix("GE")
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

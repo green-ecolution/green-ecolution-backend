@@ -6,7 +6,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	keycloak "github.com/stillya/testcontainers-keycloak"
 )

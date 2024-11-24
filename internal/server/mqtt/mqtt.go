@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
