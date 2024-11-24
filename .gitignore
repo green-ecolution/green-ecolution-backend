@@ -272,3 +272,4 @@ docs
 config.yaml
 bin
 _sqlc
+.docker/.env*

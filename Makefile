@@ -26,6 +26,44 @@ POSTGRES_DB ?= postgres
 POSTGRES_HOST ?= localhost
 POSTGRES_PORT ?= 5432
 
+.PHONY: help
+help:
+	@echo "Usage: make <command>"
+	@echo ""
+	@echo "Commands:"
+	@echo "  all                              Build for all platforms"
+	@echo "  build/all                        Build for all platforms"
+	@echo "  build/darwin                     Build for darwin"
+	@echo "  build/linux                      Build for linux"
+	@echo "  build/windows                    Build for windows"
+	@echo "  build                            Build"
+	@echo "  generate                         Generate"
+	@echo "  setup                            Install dependencies"
+	@echo "  setup/macos                      Install dependencies for macOS"
+	@echo "  setup/ci                         Install dependencies for CI"
+	@echo "  clean                            Clean"
+	@echo "  run                              Run"
+	@echo "  run/live                         Run live"
+	@echo "  run/docker env=[dev,stage,prod]  Run docker"
+	@echo "  run/docker/dev                   Run docker dev"
+	@echo "  run/docker/stage                 Run docker stage"
+	@echo "  run/docker/prod                  Run docker prod"
+	@echo "  migrate/new name=<name>          Create new migration"
+	@echo "  migrate/up                       Migrate up"
+	@echo "  migrate/down                     Migrate down"
+	@echo "  migrate/reset                    Migrate reset"
+	@echo "  migrate/status                   Migrate status"
+	@echo "  seed/up                          Seed up"
+	@echo "  seed/reset                       Seed reset"
+	@echo "  tidy                             Fmt and Tidy"
+	@echo "  lint                             Lint"
+	@echo "  test                             Test"
+	@echo "  test/verbose                     Test verbose"
+	@echo "  config/enc                       Encrypt config with sops"
+	@echo "  config/dec                       Decrypt config with sops"
+	@echo "  config/edit                      Edit config with sops and $EDITOR"
+	@echo "  debug                            Debug with delve"
+
 .PHONY: all
 all: build
 
@@ -71,13 +109,19 @@ setup:
 	go install github.com/pressly/goose/v3/cmd/goose@latest
 	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 	go install github.com/jmattheis/goverter/cmd/goverter@latest
+	go install github.com/go-delve/delve/cmd/dlv@latest
 	go mod download
+	wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
+    chmod +x /usr/bin/yq
+
 
 .PHONY: setup/macos
 setup/macos:
 	@echo "Installing..."
 	brew install goose
 	brew install sqlc
+	brew install yq
+	brew install delve
 	go install github.com/air-verse/air@latest
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/swaggo/swag/cmd/swag@latest
@@ -118,6 +162,76 @@ run: build
 run/live: generate
 	@echo "Running live..."
 	air
+
+.PHONY: run/docker/prepare
+run/docker/prepare:
+	@echo "Preparing docker..."
+	@if [ -f "config.yaml" ]; then \
+		yq e -r '.' config.yaml -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > ./.docker/.env.local; \
+	else \
+		if make config/dec; then \
+			yq e -r '.' config.yaml -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > ./.docker/.env.local; \
+		else \
+			echo "error: cant decrypt config"; \
+			exit 1; \
+		fi; \
+	fi
+
+.PHONY: run/docker
+run/docker: run/docker/prepare
+	@if [ -z "$(env)" ]; then \
+		echo "run docker dev"; \
+		make run/docker/dev; \
+	fi
+	@if [ "$(env)" = "dev" ]; then \
+		echo "run docker dev"; \
+		make run/docker/dev; \
+	fi
+	@if [ "$(env)" = "stage" ]; then \
+		echo "run docker stage"; \
+		make run/docker/stage; \
+	fi
+	@if [ "$(env)" = "prod" ]; then \
+		echo "run docker prod"; \
+		make run/docker/prod; \
+	fi
+
+
+.PHONY: run/docker/dev
+run/docker/dev:
+	@echo "Running docker..."
+	docker build -t $(BINARY_NAME)-docker-dev \
+		--build-arg APP_VERSION=$(APP_VERSION) \
+		--build-arg APP_GIT_COMMIT=$(APP_GIT_COMMIT) \
+		--build-arg APP_GIT_BRANCH=$(APP_GIT_BRANCH) \
+		--build-arg APP_GIT_REPOSITORY=$(APP_GIT_REPOSITORY) \
+		--build-arg APP_BUILD_TIME=$(APP_BUILD_TIME) \
+		-f ./.docker/Dockerfile.dev .
+	docker run -it --env-file ./.docker/.env.local --rm -p 3000:3000 $(BINARY_NAME)-docker-dev
+
+.PHONY: run/docker/stage
+run/docker/stage:
+	@echo "Running docker..."
+	docker build -t $(BINARY_NAME)-docker-stage \
+		--build-arg APP_VERSION=$(APP_VERSION) \
+		--build-arg APP_GIT_COMMIT=$(APP_GIT_COMMIT) \
+		--build-arg APP_GIT_BRANCH=$(APP_GIT_BRANCH) \
+		--build-arg APP_GIT_REPOSITORY=$(APP_GIT_REPOSITORY) \
+		--build-arg APP_BUILD_TIME=$(APP_BUILD_TIME) \
+		-f ./.docker/Dockerfile.stage .
+	docker run -it --env-file ./.docker/.env.local --rm -p 3000:3000 $(BINARY_NAME)-docker-stage
+
+.PHONY: run/docker/prod
+run/docker/prod:
+	@echo "Running docker..."
+	docker build -t $(BINARY_NAME)-docker-prod \
+		--build-arg APP_VERSION=$(APP_VERSION) \
+		--build-arg APP_GIT_COMMIT=$(APP_GIT_COMMIT) \
+		--build-arg APP_GIT_BRANCH=$(APP_GIT_BRANCH) \
+		--build-arg APP_GIT_REPOSITORY=$(APP_GIT_REPOSITORY) \
+		--build-arg APP_BUILD_TIME=$(APP_BUILD_TIME) \
+		-f ./.docker/Dockerfile.prod .
+	docker run -it --env-file ./.docker/.env.local --rm -p 3000:3000 $(BINARY_NAME)-docker-prod
 
 .PHONY: migrate/new
 migrate/new:
@@ -196,3 +310,8 @@ config/dec:
 config/edit:
 	@echo "Editing config..."
 	sops edit config.enc.yaml
+
+.PHONY: debug
+debug:
+	@echo "Debugging..."
+	dlv debug
