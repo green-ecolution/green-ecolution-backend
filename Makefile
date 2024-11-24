@@ -1,6 +1,4 @@
 ENV ?= dev
--include .env.$(ENV)
-
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := green-ecolution-backend
 APP_VERSION ?= 0.0.1
@@ -124,6 +122,7 @@ setup/macos:
 	brew install delve
 	brew install proj
 	brew install geos
+	brew install sops
 	go install github.com/air-verse/air@latest
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/swaggo/swag/cmd/swag@latest
@@ -168,72 +167,35 @@ run/live: generate
 .PHONY: run/docker/prepare
 run/docker/prepare:
 	@echo "Preparing docker..."
-	@if [ -f "config.yaml" ]; then \
-		yq e -r '.' config.yaml -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > ./.docker/.env.local; \
-	else \
-		if $(MAKE) config/dec; then \
-			yq e -r '.' config.yaml -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > ./.docker/.env.local; \
-		else \
-			echo "error: cant decrypt config"; \
-			exit 1; \
-		fi; \
+	@if [ -z "$(ENV)" ]; then \
+		echo "error: env is required"; \
+		echo "usage: make run/docker ENV=[dev,stage,prod]"; \
+		exit 1; \
 	fi
+	$(MAKE) config/dec; \
+	yq e -r '.' "config/config.$(ENV).yaml" -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > "./.docker/.env.$(ENV)"; \
 
 .PHONY: run/docker
 run/docker: run/docker/prepare
-	@if [ -z "$(env)" ]; then \
-		echo "run docker dev"; \
-		$(MAKE) run/docker/dev; \
-	fi
-	@if [ "$(env)" = "dev" ]; then \
-		echo "run docker dev"; \
-		$(MAKE) run/docker/dev; \
-	fi
-	@if [ "$(env)" = "stage" ]; then \
-		echo "run docker stage"; \
-		$(MAKE) run/docker/stage; \
-	fi
-	@if [ "$(env)" = "prod" ]; then \
-		echo "run docker prod"; \
-		$(MAKE) run/docker/prod; \
-	fi
-
-
-.PHONY: run/docker/dev
-run/docker/dev:
 	@echo "Running docker..."
-	docker build -t $(BINARY_NAME)-docker-dev \
+	docker build -t $(BINARY_NAME)-docker-$(ENV) \
 		--build-arg APP_VERSION=$(APP_VERSION) \
 		--build-arg APP_GIT_COMMIT=$(APP_GIT_COMMIT) \
 		--build-arg APP_GIT_BRANCH=$(APP_GIT_BRANCH) \
 		--build-arg APP_GIT_REPOSITORY=$(APP_GIT_REPOSITORY) \
 		--build-arg APP_BUILD_TIME=$(APP_BUILD_TIME) \
-		-f ./.docker/Dockerfile.dev .
-	docker run -it --env-file ./.docker/.env.local --rm -p 3000:3000 $(BINARY_NAME)-docker-dev
+		-f ./.docker/Dockerfile.$(ENV) .
+	docker run -it --env-file "./.docker/.env.$(ENV)" --rm -p 3000:3000 $(BINARY_NAME)-docker-dev
 
-.PHONY: run/docker/stage
-run/docker/stage:
-	@echo "Running docker..."
-	docker build -t $(BINARY_NAME)-docker-stage \
-		--build-arg APP_VERSION=$(APP_VERSION) \
-		--build-arg APP_GIT_COMMIT=$(APP_GIT_COMMIT) \
-		--build-arg APP_GIT_BRANCH=$(APP_GIT_BRANCH) \
-		--build-arg APP_GIT_REPOSITORY=$(APP_GIT_REPOSITORY) \
-		--build-arg APP_BUILD_TIME=$(APP_BUILD_TIME) \
-		-f ./.docker/Dockerfile.stage .
-	docker run -it --env-file ./.docker/.env.local --rm -p 3000:3000 $(BINARY_NAME)-docker-stage
+.PHONY: infra/up
+infra/up:
+	@echo "Running infra..."
+	docker-compose -f .docker/docker-compose.infra.yaml up -d
 
-.PHONY: run/docker/prod
-run/docker/prod:
-	@echo "Running docker..."
-	docker build -t $(BINARY_NAME)-docker-prod \
-		--build-arg APP_VERSION=$(APP_VERSION) \
-		--build-arg APP_GIT_COMMIT=$(APP_GIT_COMMIT) \
-		--build-arg APP_GIT_BRANCH=$(APP_GIT_BRANCH) \
-		--build-arg APP_GIT_REPOSITORY=$(APP_GIT_REPOSITORY) \
-		--build-arg APP_BUILD_TIME=$(APP_BUILD_TIME) \
-		-f ./.docker/Dockerfile.prod .
-	docker run -it --env-file ./.docker/.env.local --rm -p 3000:3000 $(BINARY_NAME)-docker-prod
+.PHONY: infra/down
+infra/down:
+	@echo "Running infra down..."
+	docker-compose -f .docker/docker-compose.infra.yaml down
 
 .PHONY: migrate/new
 migrate/new:
@@ -294,24 +256,64 @@ test:
 	go test -cover ./...
 
 .PHONY: test/verbose
-test:
+test/verbose:
 	@echo "Testing..."
 	go test -v -cover ./...
 
+.PHONY: config/enc/all
+config/enc/all:
+	@echo "Encrypting config..."
+	sops -e config/config.dev.yaml > config/config.dev.enc.yaml; \
+	sops -e config/config.stage.yaml > config/config.stage.enc.yaml; \
+	sops -e config/config.prod.yaml > config/config.prod.enc.yaml; \
+
 .PHONY: config/enc
 config/enc:
-	@echo "Encrypting config..."
-	sops -e config.yaml > config.enc.yaml
+	@if [ "$(ENV)" = "dev" ]; then \
+		@echo "Encrypting dev config..."
+		sops -e config/config.dev.yaml > config/config.dev.enc.yaml; \
+	fi
+	@if [ "$(ENV)" = "stage" ]; then \
+		@echo "Encrypting stage config..."
+		sops -e config/config.stage.yaml > config/config.stage.enc.yaml; \
+	fi
+	@if [ "$(ENV)" = "prod" ]; then \
+		@echo "Encrypting prod config..."
+		sops -e config/config.prod.yaml > config/config.prod.enc.yaml; \
+	fi
 
 .PHONY: config/dec
 config/dec:
 	@echo "Decrypting config..."
-	sops -d config.enc.yaml > config.yaml
+	@if [ "$(ENV)" = "dev" ]; then \
+		echo "run docker dev"; \
+		sops -d config/config.dev.enc.yaml > config/config.yaml; \
+	fi
+	@if [ "$(ENV)" = "stage" ]; then \
+		echo "run docker stage"; \
+		sops -d config/config.stage.enc.yaml > config/config.yaml; \
+	fi
+	@if [ "$(ENV)" = "prod" ]; then \
+		echo "run docker prod"; \
+		sops -d config/config.prod.enc.yaml > config/config.yaml; \
+	fi
 
 .PHONY: config/edit
 config/edit:
 	@echo "Editing config..."
-	sops edit config.enc.yaml
+	@echo "Decrypting config..."
+	@if [ "$(ENV)" = "dev" ]; then \
+		echo "run docker dev"; \
+		sops edit config/config.dev.enc.yaml; \
+	fi
+	@if [ "$(ENV)" = "stage" ]; then \
+		echo "run docker stage"; \
+		sops edit config/config.stage.enc.yaml; \
+	fi
+	@if [ "$(ENV)" = "prod" ]; then \
+		echo "run docker prod"; \
+		sops edit config/config.prod.enc.yaml; \
+	fi
 
 .PHONY: debug
 debug:

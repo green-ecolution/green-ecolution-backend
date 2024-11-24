@@ -47,7 +47,7 @@ RUN apk add --no-cache geos proj
 USER gorunner
 WORKDIR /app
 
-COPY --chown=gorunner:gorunner --from=builder /app/build/.docker/config.default.yaml /app/config.yaml
+COPY --chown=gorunner:gorunner --from=builder /app/build/.docker/config.default.yaml /app/config/config.dev.yaml
 COPY --chown=gorunner:gorunner --from=builder /app/build/bin/green-ecolution-backend /app/backend
 
 ENTRYPOINT [ "/app/backend" ]
