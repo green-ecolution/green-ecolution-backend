@@ -109,9 +109,6 @@ setup:
 	go install github.com/jmattheis/goverter/cmd/goverter@latest
 	go install github.com/go-delve/delve/cmd/dlv@latest
 	go mod download
-	sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && \
-    sudo chmod +x /usr/bin/yq
-
 
 .PHONY: setup/macos
 setup/macos:
@@ -123,6 +120,7 @@ setup/macos:
 	brew install proj
 	brew install geos
 	brew install sops
+	brew install age
 	go install github.com/air-verse/air@latest
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/swaggo/swag/cmd/swag@latest
