@@ -111,8 +111,8 @@ setup:
 	go install github.com/jmattheis/goverter/cmd/goverter@latest
 	go install github.com/go-delve/delve/cmd/dlv@latest
 	go mod download
-	wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
-    chmod +x /usr/bin/yq
+	sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq && \
+    sudo chmod +x /usr/bin/yq
 
 
 .PHONY: setup/macos
@@ -169,7 +169,7 @@ run/docker/prepare:
 	@if [ -f "config.yaml" ]; then \
 		yq e -r '.' config.yaml -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > ./.docker/.env.local; \
 	else \
-		if make config/dec; then \
+		if $(MAKE) config/dec; then \
 			yq e -r '.' config.yaml -os | sed -e 's/\(.*\)=/GE_\U\1=/' | sed -e "s/='\(.*\)'/=\1/" > ./.docker/.env.local; \
 		else \
 			echo "error: cant decrypt config"; \
@@ -181,19 +181,19 @@ run/docker/prepare:
 run/docker: run/docker/prepare
 	@if [ -z "$(env)" ]; then \
 		echo "run docker dev"; \
-		make run/docker/dev; \
+		$(MAKE) run/docker/dev; \
 	fi
 	@if [ "$(env)" = "dev" ]; then \
 		echo "run docker dev"; \
-		make run/docker/dev; \
+		$(MAKE) run/docker/dev; \
 	fi
 	@if [ "$(env)" = "stage" ]; then \
 		echo "run docker stage"; \
-		make run/docker/stage; \
+		$(MAKE) run/docker/stage; \
 	fi
 	@if [ "$(env)" = "prod" ]; then \
 		echo "run docker prod"; \
-		make run/docker/prod; \
+		$(MAKE) run/docker/prod; \
 	fi
 
 
