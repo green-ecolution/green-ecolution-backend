@@ -18,8 +18,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/docs"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
