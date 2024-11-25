@@ -35,18 +35,6 @@ CREATE TABLE IF NOT EXISTS tree_cluster_watering_plans (
   FOREIGN KEY (watering_plan_id) REFERENCES watering_plans(id) ON DELETE CASCADE
 );
 
--- +goose StatementBegin
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-  RETURNS TRIGGER
-  AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
-$$
-language 'plpgsql';
--- +goose StatementEnd
-
 CREATE TRIGGER update_watering_plans_updated_at
 BEFORE UPDATE ON watering_plans
 FOR EACH ROW
