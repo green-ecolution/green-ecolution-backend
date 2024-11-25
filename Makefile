@@ -267,51 +267,17 @@ config/all:
 
 .PHONY: config/enc
 config/enc:
-	@if [ "$(ENV)" = "dev" ]; then \
-		@echo "Encrypting dev config..."
-		sops -e config/config.dev.yaml > config/config.dev.enc.yaml; \
-	fi
-	@if [ "$(ENV)" = "stage" ]; then \
-		@echo "Encrypting stage config..."
-		sops -e config/config.stage.yaml > config/config.stage.enc.yaml; \
-	fi
-	@if [ "$(ENV)" = "prod" ]; then \
-		@echo "Encrypting prod config..."
-		sops -e config/config.prod.yaml > config/config.prod.enc.yaml; \
-	fi
+	sops -e config/config.$(ENV).enc.yaml > config/config.$(ENV).yaml; \
 
 .PHONY: config/dec
 config/dec:
 	@echo "Decrypting config..."
-	@if [ "$(ENV)" = "dev" ]; then \
-		echo "run docker dev"; \
-		sops -d config/config.dev.enc.yaml > config/config.yaml; \
-	fi
-	@if [ "$(ENV)" = "stage" ]; then \
-		echo "run docker stage"; \
-		sops -d config/config.stage.enc.yaml > config/config.yaml; \
-	fi
-	@if [ "$(ENV)" = "prod" ]; then \
-		echo "run docker prod"; \
-		sops -d config/config.prod.enc.yaml > config/config.yaml; \
-	fi
+	sops -d config/config.$(ENV).enc.yaml > config/config.$(ENV).yaml; \
 
 .PHONY: config/edit
 config/edit:
 	@echo "Editing config..."
-	@echo "Decrypting config..."
-	@if [ "$(ENV)" = "dev" ]; then \
-		echo "run docker dev"; \
-		sops edit config/config.dev.enc.yaml; \
-	fi
-	@if [ "$(ENV)" = "stage" ]; then \
-		echo "run docker stage"; \
-		sops edit config/config.stage.enc.yaml; \
-	fi
-	@if [ "$(ENV)" = "prod" ]; then \
-		echo "run docker prod"; \
-		sops edit config/config.prod.enc.yaml; \
-	fi
+	sops edit config/config.$(ENV).enc.yaml \
 
 .PHONY: debug
 debug:
