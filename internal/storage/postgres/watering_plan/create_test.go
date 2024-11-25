@@ -52,17 +52,20 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Description = input.Description
+			wp.Distance = input.Distance
+			wp.TotalWaterRequired = input.TotalWaterRequired
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithDescription(input.Description),
-			WithDistance(input.Distance),
-			WithTotalWaterRequired(input.TotalWaterRequired),
-			WithTransporter(input.Transporter),
-			WithTrailer(input.Trailer),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.NoError(t, err)
@@ -80,13 +83,16 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithTransporter(input.Transporter),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.NoError(t, err)
@@ -104,13 +110,16 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = time.Time{}
+			wp.Transporter = input.Transporter
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(time.Time{}),
-			WithTransporter(input.Transporter),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.Error(t, err)
@@ -122,14 +131,17 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Transporter
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithTransporter(input.Transporter),
-			WithTrailer(input.Transporter),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.Error(t, err)
@@ -141,14 +153,17 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = []*entities.User{}
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithTransporter(input.Transporter),
-			WithTrailer(input.Trailer),
-			WithTreecluster(input.Treecluster),
-			WithUsers([]*entities.User{}),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.Error(t, err)
@@ -160,13 +175,17 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Trailer
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithTransporter(input.Trailer),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.Error(t, err)
@@ -178,13 +197,17 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = nil
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithTransporter(nil),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.Error(t, err)
@@ -196,13 +219,17 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = []*entities.TreeCluster{}
+			wp.Users = input.Users
+			return true, nil
+		}
+
 		// when
-		got, err := r.Create(context.Background(),
-			WithDate(input.Date),
-			WithTransporter(input.Transporter),
-			WithTreecluster([]*entities.TreeCluster{}),
-			WithUsers(input.Users),
-		)
+		got, err := r.Create(context.Background(), createFn)
 
 		// then
 		assert.Error(t, err)
@@ -215,30 +242,108 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background())
+		got, err := r.Create(context.Background(), nil)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.Equal(t, "createFn is nil", err.Error())
+	})
+
+	t.Run("should return error if context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.Create(ctx, createFn)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
 
-	t.Run("should return error if context is canceled", func(t *testing.T) {
+	t.Run("should return error when createFn returns error", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			return false, assert.AnError
+		}
 
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
+		wp, err := r.Create(context.Background(), createFn)
+		assert.Error(t, err)
+		assert.Nil(t, wp)
+	})
+
+	t.Run("should not create watering plan when createFn returns false", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			return false, nil
+		}
 
 		// when
-		got, err := r.Create(ctx,
-			WithDate(input.Date),
-			WithTransporter(nil),
-			WithTreecluster(input.Treecluster),
-			WithUsers(input.Users),
-		)
+		wp, err := r.Create(context.Background(), createFn)
+
+		// then
+		assert.NoError(t, err)
+		assert.Nil(t, wp)
+	})
+
+	t.Run("should rollback transaction when createFn returns false and not return error", func(t *testing.T) {
+		// given
+		newID := int32(9)
+
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return false, nil
+		}
+
+		// when
+		wp, err := r.Create(context.Background(), createFn)
+		got, _ := suite.Store.GetWateringPlanByID(context.Background(), newID)
+
+		// then
+		assert.NoError(t, err)
+		assert.Nil(t, wp)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should rollback transaction when createFn returns error and return error", func(t *testing.T) {
+		// given
+		newID := int32(9)
+
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return false, assert.AnError
+		}
+
+		// when
+		wp, err := r.Create(context.Background(), createFn)
+		got, _ := suite.Store.GetWateringPlanByID(context.Background(), newID)
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
+		assert.Nil(t, wp)
+		assert.Empty(t, got)
 	})
 }

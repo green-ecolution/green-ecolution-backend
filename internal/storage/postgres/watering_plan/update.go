@@ -6,28 +6,42 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (w *WateringPlanRepository) Update(ctx context.Context, id int32, wpFn ...entities.EntityFunc[entities.WateringPlan]) (*entities.WateringPlan, error) {
-	entity, err := w.GetByID(ctx, id)
-	if err != nil {
-		return nil, w.store.HandleError(err)
-	}
+func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn func(*entities.WateringPlan) (bool, error)) error {
+	return w.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := w.store
+		defer func() {
+			w.store = oldStore
+		}()
+		w.store = s
 
-	for _, fn := range wpFn {
-		fn(entity)
-	}
+		entity, err := w.GetByID(ctx, id)
+		if err != nil {
+			return w.store.HandleError(err)
+		}
 
-	if err := w.validateWateringPlan(entity); err != nil {
-		return nil, err
-	}
+		if updateFn == nil {
+			return errors.New("updateFn is nil")
+		}
 
-	if err := w.updateEntity(ctx, entity); err != nil {
-		return nil, err
-	}
+		updated, err := updateFn(entity)
+		if err != nil {
+			return err
+		}
 
-	return w.GetByID(ctx, entity.ID)
+		if !updated {
+			return nil
+		}
+
+		if err := w.validateWateringPlan(entity); err != nil {
+			return err
+		}
+
+		return w.updateEntity(ctx, entity)
+	})
 }
 
 func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entities.WateringPlan) error {

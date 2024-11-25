@@ -76,7 +76,19 @@ type VehicleRepository interface {
 }
 
 type WateringPlanRepository interface {
-	BasicCrudRepository[entities.WateringPlan]
+	// GetAll returns all watering plans
+	GetAll(ctx context.Context) ([]*entities.WateringPlan, error)
+	// GetByID returns one watering plan by id
+	GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error)
+
+	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.
+	Create(ctx context.Context, fn func(tc *entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error)
+
+	// Update updates a watering plan by id. It takes the id of the watering plan to update and a function that takes a watering plan that can be modified. Any changes made to the plan will be saved updated in the storage. If the function returns true, the watering plan will be updated, otherwise it will not be updated.
+	Update(ctx context.Context, id int32, fn func(tc *entities.WateringPlan) (bool, error)) error
+
+	// Delete deletes a watering plan by id
+	Delete(ctx context.Context, id int32) error
 }
 
 type TreeClusterRepository interface {

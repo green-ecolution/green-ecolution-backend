@@ -7,6 +7,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -23,23 +24,51 @@ func defaultWateringPlan() *entities.WateringPlan {
 	}
 }
 
-func (w *WateringPlanRepository) Create(ctx context.Context, wFn ...entities.EntityFunc[entities.WateringPlan]) (*entities.WateringPlan, error) {
-	entity := defaultWateringPlan()
-	for _, fn := range wFn {
-		fn(entity)
+func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error) {
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
 	}
 
-	if err := w.validateWateringPlan(entity); err != nil {
+	var createdWp *entities.WateringPlan
+	err := w.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := w.store
+		defer func() {
+			w.store = oldStore
+		}()
+		w.store = s
+
+		entity := defaultWateringPlan()
+		created, err := createFn(entity)
+		if err != nil {
+			return err
+		}
+
+		if !created {
+			return nil
+		}
+
+		if err := w.validateWateringPlan(entity); err != nil {
+			return err
+		}
+
+		id, err := w.createEntity(ctx, entity)
+		if err != nil {
+			return err
+		}
+
+		createdWp, err = w.GetByID(ctx, *id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
-	id, err := w.createEntity(ctx, entity)
-	if err != nil {
-		return nil, w.store.HandleError(err)
-	}
-
-	entity.ID = *id
-	return w.GetByID(ctx, *id)
+	return createdWp, nil
 }
 
 func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entities.WateringPlan) (*int32, error) {
