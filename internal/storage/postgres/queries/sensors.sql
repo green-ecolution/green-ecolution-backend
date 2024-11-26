@@ -14,7 +14,7 @@ SELECT * FROM sensor_data WHERE sensor_id = $1;
 INSERT INTO sensors (
     id, status, latitude, longitude
 ) VALUES (
-  $1,$2,$3,$4
+  $1, $2, $3, $4
 ) RETURNING id;
 
 -- name: UpdateSensor :exec
@@ -35,11 +35,6 @@ INSERT INTO sensor_data (
 ) VALUES (
   $1, $2
 ) RETURNING id;
-
--- name: UpdateSensorGeometry :exec
-UPDATE sensors SET
-    geometry = ST_GeomFromText($2, 4326)
-WHERE id = $1;
 
 -- name: DeleteSensor :exec
 DELETE FROM sensors WHERE id = $1;

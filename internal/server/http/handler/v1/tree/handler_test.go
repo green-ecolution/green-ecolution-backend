@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -102,20 +103,31 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService.AssertExpectations(t)
 	})
 
-	//t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
-	//	app := fiber.New()
-	//	mockTreeService := serviceMock.NewMockTreeService(t)
-	//	app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
-	//
-	//	// when
-	//	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree/sensor/"999, nil)
-	//	resp, err := app.Test(req, -1)
-	//	defer resp.Body.Close()
-	//
-	//	// then
-	//	assert.Nil(t, err)
-	//	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	//})
+	t.Run("should return 400 Bad Request for invalid sensor IDs", func(t *testing.T) {
+		app := fiber.New()
+		mockTreeService := serviceMock.NewMockTreeService(t)
+		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
+
+		invalidSensorIDs := []string{
+			"hello@world",
+			"special*chars",
+			"sensor id",
+			"    ",
+			"a-really-long-invalid-sensor-id-that-exceeds-the-limit",
+			"<img src='x' onerror='alert(1)'>",
+		}
+
+		for _, invalidID := range invalidSensorIDs {
+			t.Run(fmt.Sprintf("Testing invalid sensor ID: %s", invalidID), func(t *testing.T) {
+				req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree/sensor/"+invalidID, nil)
+				resp, err := app.Test(req, -1)
+				defer resp.Body.Close()
+
+				assert.Nil(t, err)
+				assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+			})
+		}
+	})
 
 	t.Run("should return 404 when tree not found", func(t *testing.T) {
 		app := fiber.New()
