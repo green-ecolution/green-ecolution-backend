@@ -5,10 +5,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.InfoService) *fiber.App {
-	app := fiber.New()
-
-	app.Get("/", GetAppInfo(svc))
-
-	return app
+func RegisterRoutes(r fiber.Router, svc service.InfoService) {
+	r.Get("/", GetAppInfo(svc))
 }

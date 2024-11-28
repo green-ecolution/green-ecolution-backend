@@ -5,24 +5,20 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.TreeService) *fiber.App {
-	app := fiber.New()
+func RegisterRoutes(r fiber.Router, svc service.TreeService) {
+	r.Get("/", GetAllTrees(svc))
+	r.Get("/:id", GetTreeByID(svc))
+	r.Put("/:id", UpdateTree(svc))
+	r.Post("/", CreateTree(svc))
+	r.Delete("/:id", DeleteTree(svc))
 
-	app.Get("/", GetAllTrees(svc))
-	app.Get("/:id", GetTreeByID(svc))
-	app.Put("/:id", UpdateTree(svc))
-	app.Post("/", CreateTree(svc))
-	app.Delete("/:id", DeleteTree(svc))
+	r.Get("/:id/images", GetTreeImages(svc))
+	r.Post("/:id/images", AddTreeImage(svc))
+	r.Delete("/:id/images/:image_id", RemoveTreeImage(svc))
 
-	app.Get("/:id/images", GetTreeImages(svc))
-	app.Post("/:id/images", AddTreeImage(svc))
-	app.Delete("/:id/images/:image_id", RemoveTreeImage(svc))
+	r.Get("/:id/sensor", GetTreeSensor(svc))
+	r.Post("/:id/sensor", AddTreeSensor(svc))
+	r.Delete("/:id/sensor/:sensor_id", RemoveTreeSensor(svc))
 
-	app.Get("/:id/sensor", GetTreeSensor(svc))
-	app.Post("/:id/sensor", AddTreeSensor(svc))
-	app.Delete("/:id/sensor/:sensor_id", RemoveTreeSensor(svc))
-
-	app.Get("/sensor/:sensor_id", GetTreeBySensorID(svc))
-
-	return app
+	r.Get("/sensor/:sensor_id", GetTreeBySensorID(svc))
 }

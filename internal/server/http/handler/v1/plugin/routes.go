@@ -5,23 +5,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.AuthService) *fiber.App {
-	app := fiber.New()
+func RegisterRoutes(r fiber.Router, svc service.PluginService) {
+	r.Post("/register", registerPlugin(svc))
 
-	app.Post("/register", registerPlugin(svc))
-
-	app.Use("/:plugin", newPluginMiddleware())
-	app.Post("/:plugin/heartbeat", pluginHeartbeat())
-	app.Use("/:plugin", getPluginFiles)
-
-	return app
+	r.Post("/:plugin/heartbeat", pluginHeartbeat(svc))
+	r.Use("/:plugin", getPluginFiles(svc))
 }
 
-func RegisterPrivateRoutes(_ service.AuthService) *fiber.App {
-	app := fiber.New()
-
-	app.Get("/", GetPluginsList())
-	app.Get("/:plugin", GetPluginInfo())
-
-	return app
+func RegisterPrivateRoutes(r fiber.Router, svc service.PluginService) {
+	r.Get("/", GetPluginsList(svc))
+	r.Get("/:plugin", GetPluginInfo(svc))
 }

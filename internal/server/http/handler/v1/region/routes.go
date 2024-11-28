@@ -5,11 +5,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.RegionService) *fiber.App {
-	app := fiber.New()
-
-	app.Get("/", GetAllRegions(svc))
-	app.Get("/:id", GetRegionByID(svc))
-
-	return app
+func RegisterRoutes(r fiber.Router, svc service.RegionService) {
+	r.Get("/", GetAllRegions(svc))
+	r.Get("/:id", GetRegionByID(svc))
 }

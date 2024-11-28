@@ -5,8 +5,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.TreeService) *fiber.App {
-	router := fiber.New()
-	router.Post("/csv", ImportTreesFromCSV(svc))
-	return router
+func RegisterRoutes(r fiber.Router, svc service.TreeService) {
+	r.Post("/csv", ImportTreesFromCSV(svc))
 }
