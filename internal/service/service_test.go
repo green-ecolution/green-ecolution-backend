@@ -40,7 +40,7 @@ func TestAllServiceReady(t *testing.T) {
 		treeClusterSvc.EXPECT().Ready().Return(true)
 		sensorSvc.EXPECT().Ready().Return(true)
 		vehicleSvc.EXPECT().Ready().Return(true)
-    pluginSvc.EXPECT().Ready().Return(true)
+		pluginSvc.EXPECT().Ready().Return(true)
 
 		ready := svc.AllServicesReady()
 

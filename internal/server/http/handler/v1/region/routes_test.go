@@ -42,7 +42,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/region/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockRegionService)
 
 			mockRegionService.EXPECT().GetByID(

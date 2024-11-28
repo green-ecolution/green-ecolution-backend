@@ -15,7 +15,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/info", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockInfoService := serviceMock.NewMockInfoService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockInfoService)
 
 			mockInfoService.EXPECT().GetAppInfoResponse(
