@@ -75,7 +75,7 @@ func (c *PluginWorkerConfig) IsValid() bool {
 
 var defaultCfg = PluginWorkerConfig{
 	client:         http.DefaultClient,
-	interval:       500 * time.Millisecond,
+	interval:       2 * time.Minute,
 	hostAPIVersion: "v1",
 }
 
