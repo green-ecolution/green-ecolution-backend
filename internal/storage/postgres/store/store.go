@@ -14,13 +14,14 @@ import (
 type EntityType string
 
 const (
-	Sensor      EntityType = "sensor"
-	Image       EntityType = "image"
-	Flowerbed   EntityType = "flowerbed"
-	TreeCluster EntityType = "treecluster"
-	Tree        EntityType = "tree"
-	Vehicle     EntityType = "vehicle"
-	Region      EntityType = "region"
+	Sensor       EntityType = "sensor"
+	Image        EntityType = "image"
+	Flowerbed    EntityType = "flowerbed"
+	TreeCluster  EntityType = "treecluster"
+	Tree         EntityType = "tree"
+	Vehicle      EntityType = "vehicle"
+	Region       EntityType = "region"
+	WateringPlan EntityType = "watering plan"
 )
 
 type Store struct {

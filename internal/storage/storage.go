@@ -14,16 +14,17 @@ var (
 	ErrHostnameNotFound      = errors.New("cant get hostname")
 	ErrCannotGetAppURL       = errors.New("cannot get app url")
 
-	ErrIDNotFound          = errors.New("entity id not found")
-	ErrIDAlreadyExists     = errors.New("entity id already exists")
-	ErrEntityNotFound      = errors.New("entity not found")
-	ErrSensorNotFound      = errors.New("sensor not found")
-	ErrImageNotFound       = errors.New("image not found")
-	ErrFlowerbedNotFound   = errors.New("flowerbed not found")
-	ErrTreeClusterNotFound = errors.New("treecluster not found")
-	ErrRegionNotFound      = errors.New("region not found")
-	ErrTreeNotFound        = errors.New("tree not found")
-	ErrVehicleNotFound     = errors.New("vehicle not found")
+	ErrIDNotFound           = errors.New("entity id not found")
+	ErrIDAlreadyExists      = errors.New("entity id already exists")
+	ErrEntityNotFound       = errors.New("entity not found")
+	ErrSensorNotFound       = errors.New("sensor not found")
+	ErrImageNotFound        = errors.New("image not found")
+	ErrFlowerbedNotFound    = errors.New("flowerbed not found")
+	ErrTreeClusterNotFound  = errors.New("treecluster not found")
+	ErrRegionNotFound       = errors.New("region not found")
+	ErrTreeNotFound         = errors.New("tree not found")
+	ErrVehicleNotFound      = errors.New("vehicle not found")
+	ErrWateringPlanNotFound = errors.New("watering plan not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")
@@ -75,6 +76,22 @@ type ImageRepository interface {
 type VehicleRepository interface {
 	BasicCrudRepository[entities.Vehicle]
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
+}
+
+type WateringPlanRepository interface {
+	// GetAll returns all watering plans
+	GetAll(ctx context.Context) ([]*entities.WateringPlan, error)
+	// GetByID returns one watering plan by id
+	GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error)
+
+	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.
+	Create(ctx context.Context, fn func(tc *entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error)
+
+	// Update updates a watering plan by id. It takes the id of the watering plan to update and a function that takes a watering plan that can be modified. Any changes made to the plan will be saved updated in the storage. If the function returns true, the watering plan will be updated, otherwise it will not be updated.
+	Update(ctx context.Context, id int32, fn func(tc *entities.WateringPlan) (bool, error)) error
+
+	// Delete deletes a watering plan by id
+	Delete(ctx context.Context, id int32) error
 }
 
 type TreeClusterRepository interface {
@@ -152,15 +169,16 @@ type AuthRepository interface {
 }
 
 type Repository struct {
-	Auth        AuthRepository
-	Info        InfoRepository
-	Sensor      SensorRepository
-	Tree        TreeRepository
-	User        UserRepository
-	Role        RoleRepository
-	Image       ImageRepository
-	Vehicle     VehicleRepository
-	TreeCluster TreeClusterRepository
-	Flowerbed   FlowerbedRepository
-	Region      RegionRepository
+	Auth         AuthRepository
+	Info         InfoRepository
+	Sensor       SensorRepository
+	Tree         TreeRepository
+	User         UserRepository
+	Role         RoleRepository
+	Image        ImageRepository
+	Vehicle      VehicleRepository
+	TreeCluster  TreeClusterRepository
+	Flowerbed    FlowerbedRepository
+	Region       RegionRepository
+	WateringPlan WateringPlanRepository
 }

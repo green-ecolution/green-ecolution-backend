@@ -12,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
+	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/watering_plan"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -47,26 +48,34 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	)
 	sensorRepo := sensor.NewSensorRepository(store.NewStore(conn, sqlc.New(conn)), sensorMappers)
 
-	flowMappers := flowerbed.NewFlowerbedMappers(
+	flowerbedMappers := flowerbed.NewFlowerbedMappers(
 		&mapper.InternalFlowerbedRepoMapperImpl{},
 		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(store.NewStore(conn, sqlc.New(conn)), flowMappers)
+	flowerbedRepo := flowerbed.NewFlowerbedRepository(store.NewStore(conn, sqlc.New(conn)), flowerbedMappers)
 
 	regionMappers := region.NewRegionMappers(
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
 	regionRepo := region.NewRegionRepository(store.NewStore(conn, sqlc.New(conn)), regionMappers)
 
+	wateringPlanMappers := wateringplan.NewWateringPlanRepositoryMappers(
+		&mapper.InternalWateringPlanRepoMapperImpl{},
+		&mapper.InternalVehicleRepoMapperImpl{},
+		&mapper.InternalTreeClusterRepoMapperImpl{},
+	)
+	wateringPlanRepo := wateringplan.NewWateringPlanRepository(store.NewStore(conn, sqlc.New(conn)), wateringPlanMappers)
+
 	return &storage.Repository{
-		Tree:        treeRepo,
-		TreeCluster: treeClusterRepo,
-		Image:       imageRepo,
-		Vehicle:     vehicleRepo,
-		Sensor:      sensorRepo,
-		Flowerbed:   flowerbedRepo,
-		Region:      regionRepo,
+		Tree:         treeRepo,
+		TreeCluster:  treeClusterRepo,
+		Image:        imageRepo,
+		Vehicle:      vehicleRepo,
+		Sensor:       sensorRepo,
+		Flowerbed:    flowerbedRepo,
+		Region:       regionRepo,
+		WateringPlan: wateringPlanRepo,
 	}
 }

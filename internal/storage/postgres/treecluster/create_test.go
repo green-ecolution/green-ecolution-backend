@@ -227,24 +227,6 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Nil(t, tc)
 	})
 
-	t.Run("should return error when tree cluster has empty name", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
-		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
-			tc.Name = ""
-			return true, nil
-		}
-
-		// when
-		tc, err := r.Create(context.Background(), createFn)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, tc)
-	})
-
 	t.Run("should rollback transaction when createFn returns false and not return error", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)

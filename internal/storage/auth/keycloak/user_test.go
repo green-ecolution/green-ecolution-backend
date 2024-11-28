@@ -7,7 +7,7 @@ import (
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
