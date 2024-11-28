@@ -16,18 +16,19 @@ server:
     name: green_ecolution_db
 
 auth:
-  keycloak:
-    baseurl: https://auth.green-ecolution.de
-    realm: green-ecolution-dev
-    client_id: green-ecolution-backend
-    client_secret: secret_secret_secret
-    realm_public_key: secret_secret_secret
+  oidc_provider:
+    base_url: https://auth.green-ecolution.de
+    domain_name: green-ecolution-dev
+    auth_url: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
+    token_url: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/token
+    public_key:
+      static: secret_secret_secret
     frontend:
-      auth_url: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
-      token_url: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/token
       client_id: green-ecolution-frontend
       client_secret: secret_secret_secret
-
+    backend:
+      client_id: green-ecolution-backend
+      client_secret: secret_secret_secret
 mqtt:
   broker: eu1.cloud.thethings.industries:1883
   client_id: tree-sensor

@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/info"
