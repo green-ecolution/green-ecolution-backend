@@ -30,7 +30,7 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 		return nil, err
 	}
 
-	registerPath := fmt.Sprintf("%s://%s/api/%s/plugin/register", w.cfg.host.Scheme, w.cfg.hostAPIVersion, w.cfg.host.Host)
+	registerPath := fmt.Sprintf("%s://%s/api/%s/plugin/register", w.cfg.host.Scheme, w.cfg.host.Host, w.cfg.hostAPIVersion)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, registerPath, bytes.NewReader(buf))
 	if err != nil {
 		return nil, err
