@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -24,7 +25,8 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("v1/user should call POST", func(t *testing.T) {
 			mockUserService := serviceMock.NewMockAuthService(t)
-			app := RegisterRoutes(mockUserService)
+			app := fiber.New()
+			RegisterRoutes(app, mockUserService)
 			expected := &domain.User{
 				ID:            uuid.MustParse("6be4c752-94df-4719-99b1-ce58253eaf75"),
 				CreatedAt:     time.Now(),
@@ -89,7 +91,8 @@ func TestRegisterRoutes(t *testing.T) {
 func TestRegisterPublicRoutes(t *testing.T) {
 	t.Run("v1/user/logout should call POST handler", func(t *testing.T) {
 		mockUserService := serviceMock.NewMockAuthService(t)
-		app := RegisterPublicRoutes(mockUserService)
+		app := fiber.New()
+		RegisterPublicRoutes(app, mockUserService)
 
 		mockUserService.EXPECT().LogoutRequest(
 			mock.Anything,
@@ -113,7 +116,8 @@ func TestRegisterPublicRoutes(t *testing.T) {
 	t.Run("v1/user/login should call GET handler", func(t *testing.T) {
 		// given
 		mockUserService := serviceMock.NewMockAuthService(t)
-		app := RegisterPublicRoutes(mockUserService)
+		app := fiber.New()
+		RegisterPublicRoutes(app, mockUserService)
 		loginURL, _ := url.Parse("http://localhost:8080/auth/realms/green-ecolution/protocol/openid-connect/auth?client_id=green-ecolution-frontend&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin&response_type=code&scope=openid%20profile%20email&state=state&nonce=nonce")
 		expected := &domain.LoginResp{
 			LoginURL: loginURL,
@@ -142,7 +146,8 @@ func TestRegisterPublicRoutes(t *testing.T) {
 
 	t.Run("v1/user/login/token should call POST handler", func(t *testing.T) {
 		mockUserService := serviceMock.NewMockAuthService(t)
-		app := RegisterPublicRoutes(mockUserService)
+		app := fiber.New()
+		RegisterPublicRoutes(app, mockUserService)
 		expected := &domain.ClientToken{
 			AccessToken:  "access-token",
 			RefreshToken: "refresh-token",
@@ -179,7 +184,8 @@ func TestRegisterPublicRoutes(t *testing.T) {
 
 	t.Run("v1/user/token/refresh should call POST handler", func(t *testing.T) {
 		mockUserService := serviceMock.NewMockAuthService(t)
-		app := RegisterPublicRoutes(mockUserService)
+		app := fiber.New()
+		RegisterPublicRoutes(app, mockUserService)
 		refreshToken := generateJWT(t, "user123")
 
 		expectedResponse := &domain.ClientToken{

@@ -19,7 +19,7 @@ func (s *Server) root(router fiber.Router, authMiddlewares ...fiber.Handler) {
 	router.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
-	s.api(router, authMiddlewares...)
+  s.api(router, authMiddlewares...)
 }
 
 func (s *Server) api(router fiber.Router, authMiddlewares ...fiber.Handler) {
@@ -85,3 +85,4 @@ func (s *Server) v1(router fiber.Router, authMiddlewares ...fiber.Handler) {
 		plugin.RegisterPrivateRoutes(router, s.services.PluginService)
 	})
 }
+
