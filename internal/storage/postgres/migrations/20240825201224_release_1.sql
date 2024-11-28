@@ -178,7 +178,7 @@ DROP FUNCTION IF EXISTS update_updated_at_column();
 DROP TABLE IF EXISTS user_vehicles;
 DROP TABLE IF EXISTS tree_images;
 DROP TABLE IF EXISTS flowerbed_images;
-DROP TABLE IF EXISTS trees;
+DROP TABLE IF EXISTS trees; 
 DROP TABLE IF EXISTS tree_clusters;
 DROP TABLE IF EXISTS flowerbeds;
 DROP TABLE IF EXISTS vehicles;
