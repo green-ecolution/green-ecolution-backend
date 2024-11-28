@@ -1,12 +1,11 @@
 package plugin
 
 import (
-	"fmt"
+	"log"
 	"log/slog"
 	"net/http/httputil"
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
@@ -16,21 +15,25 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func getPluginFiles(c *fiber.Ctx) error {
-	// pluginMutex.RLock()
-	plugin := registeredPlugins[c.Params("plugin")]
-	// pluginMutex.RUnlock()
+func getPluginFiles(svc service.PluginService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+    pluginParam := strings.Clone(c.Params("plugin"))
+		plugin, err := svc.Get(pluginParam)
+		if err != nil {
+			return err
+		}
 
-	reverseProxy := httputil.ReverseProxy{
-		Rewrite: func(r *httputil.ProxyRequest) {
-			r.SetURL(&plugin.Path)
-			r.Out.Host = r.In.Host
-			r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin.Slug, plugin.Path.String(), 1)
-			r.SetXForwarded()
-		},
+		reverseProxy := httputil.ReverseProxy{
+			Rewrite: func(r *httputil.ProxyRequest) {
+				r.SetURL(&plugin.Path)
+				r.Out.Host = r.In.Host
+				r.Out.URL.Path = strings.Replace(r.In.URL.Path, "/api/v1/plugin/"+plugin.Slug, plugin.Path.String(), 1)
+				r.SetXForwarded()
+			},
+		}
+
+		return adaptor.HTTPHandler(&reverseProxy)(c)
 	}
-
-	return adaptor.HTTPHandler(&reverseProxy)(c)
 }
 
 //	@Summary		Register a plugin
@@ -47,7 +50,7 @@ func getPluginFiles(c *fiber.Ctx) error {
 //	@Router			/v1/plugin [post]
 //
 // @Param			body	body	entities.PluginRegisterRequest	true	"Plugin registration request"
-func registerPlugin(svc service.AuthService) fiber.Handler {
+func registerPlugin(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req entities.PluginRegisterRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -60,39 +63,29 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusBadRequest).SendString("Username or password is empty")
 		}
 
-		// Authenticate the plugin
-		token, err := svc.AuthPlugin(c.Context(), &domain.AuthPlugin{
-			Username: req.Auth.Username,
-			Password: req.Auth.Password,
-		})
-		if err != nil {
-			return err
-		}
-
 		path, err := url.Parse(req.Path)
 		if err != nil {
 			slog.Error("Failed to parse plugin path", "error", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Failed to parse plugin path")
 		}
 
-		// pluginMutex.Lock()
-		// defer pluginMutex.Unlock()
-
-		if _, ok := registeredPlugins[req.Slug]; ok {
-			return c.Status(fiber.StatusForbidden).SendString("plugin already registered")
+		plugin := &domain.Plugin{
+			Name:        req.Name,
+			Path:        *path,
+			Version:     req.Version,
+			Description: req.Description,
+			Slug:        req.Slug,
+			Auth: struct {
+				Username string
+				Password string
+			}(req.Auth),
 		}
 
-		registeredPlugins[req.Slug] = &domain.Plugin{
-			Name:          req.Name,
-			Path:          *path,
-			LastHeartbeat: time.Now(),
-			Version:       req.Version,
-			Description:   req.Description,
-			Slug:          req.Slug,
+		token, err := svc.Register(c.Context(), plugin)
+		if err != nil {
+			slog.Error("Failed to register plugin", "error", err)
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 		}
-
-		slog.Info("Plugin registered", "plugin", req.Name, "version", req.Version, "slug", req.Slug)
-		slog.Debug("Plugin registered", "plugin", fmt.Sprintf("%+v", registeredPlugins[req.Slug]))
 
 		response := entities.ClientTokenResponse{
 			AccessToken:  token.AccessToken,
@@ -119,14 +112,14 @@ func registerPlugin(svc service.AuthService) fiber.Handler {
 // @Router			/v1/plugin/{plugin_slug}/heartbeat [post]
 // @Param			plugin_slug	path	string	true	"Name of the plugin specified by slug during registration"
 // @Security		Keycloak
-func pluginHeartbeat() fiber.Handler {
+func pluginHeartbeat(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// pluginMutex.Lock()
-		// defer pluginMutex.Unlock()
 
-		plugin := registeredPlugins[c.Params("plugin")]
-		plugin.LastHeartbeat = time.Now()
-		registeredPlugins[c.Params("plugin")] = plugin
+		slug := strings.Clone(c.Params("plugin"))
+		if err := svc.HeartBeat(slug); err != nil {
+			slog.Error("Failed to heartbeat", "plugin", slug, "error", err)
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
 
 		return c.Status(fiber.StatusOK).SendString("Heartbeat received")
 	}
@@ -144,18 +137,18 @@ func pluginHeartbeat() fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/plugin [get]
-func GetPluginsList() fiber.Handler {
+// @Security		Keycloak
+func GetPluginsList(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// pluginMutex.RLock()
-		// defer pluginMutex.RUnlock()
-
-		plugins := utils.MapKeysSlice(registeredPlugins, func(_ string, v *domain.Plugin) entities.PluginResponse {
+    p, h := svc.GetAll()
+    log.Println(h)
+		plugins := utils.Map(p, func(plugin domain.Plugin) entities.PluginResponse {
 			return entities.PluginResponse{
-				Slug:        v.Slug,
-				Name:        v.Name,
-				Version:     v.Version,
-				Description: v.Description,
-				HostPath:    v.Path.String(),
+				Slug:        plugin.Slug,
+				Name:        plugin.Name,
+				Version:     plugin.Version,
+				Description: plugin.Description,
+				HostPath:    plugin.Path.String(),
 			}
 		})
 
@@ -178,13 +171,12 @@ func GetPluginsList() fiber.Handler {
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/plugin/{plugin_slug} [get]
 // @Param			plugin_slug	path	string	true	"Slug of the plugin"
-func GetPluginInfo() fiber.Handler {
+// @Security		Keycloak
+func GetPluginInfo(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// pluginMutex.RLock()
-		// defer pluginMutex.RUnlock()
-
-		plugin, ok := registeredPlugins[c.Params("plugin")]
-		if !ok {
+    pluginParam := strings.Clone(c.Params("plugin"))
+		plugin, err := svc.Get(pluginParam)
+		if err != nil {
 			return c.Status(fiber.StatusNotFound).SendString("plugin not found")
 		}
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"reflect"
+	"time"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
@@ -130,6 +131,16 @@ type VehicleService interface {
 	Delete(ctx context.Context, id int32) error
 }
 
+type PluginService interface {
+	Service
+	Register(ctx context.Context, plugin *domain.Plugin) (*domain.ClientToken, error)
+	Get(slug string) (domain.Plugin, error)
+	GetAll() ([]domain.Plugin, []time.Time)
+	HeartBeat(slug string) error
+	Unregister(slug string)
+	StartCleanup(ctx context.Context) error
+}
+
 type Service interface {
 	Ready() bool
 }
@@ -143,6 +154,7 @@ type Services struct {
 	TreeClusterService TreeClusterService
 	SensorService      SensorService
 	VehicleService     VehicleService
+	PluginService      PluginService
 }
 
 func (s *Services) AllServicesReady() bool {
