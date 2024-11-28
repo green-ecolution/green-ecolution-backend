@@ -16,9 +16,8 @@ func (s *Server) middleware() *fiber.App {
 	app.Use(middleware.HTTPLogger())
 	app.Use(middleware.RequestID())
 
-
-  authMiddlware := middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService)
-  s.root(app, authMiddlware)
+	authMiddlware := middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService)
+	s.root(app, authMiddlware)
 	slog.Info("Fiber middlewares setup complete")
 
 	return app

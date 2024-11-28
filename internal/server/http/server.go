@@ -5,15 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
-)
-
-const (
-	pluginCleanupTimeout = 5 * time.Second
 )
 
 type HTTPError struct {

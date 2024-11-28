@@ -17,7 +17,7 @@ import (
 
 func getPluginFiles(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    pluginParam := strings.Clone(c.Params("plugin"))
+		pluginParam := strings.Clone(c.Params("plugin"))
 		plugin, err := svc.Get(pluginParam)
 		if err != nil {
 			return err
@@ -76,9 +76,9 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 			Description: req.Description,
 			Slug:        req.Slug,
 			Auth: domain.AuthPlugin{
-        ClientID:     req.Auth.ClientID,
-        ClientSecret: req.Auth.ClientSecret,
-      },
+				ClientID:     req.Auth.ClientID,
+				ClientSecret: req.Auth.ClientSecret,
+			},
 		}
 
 		token, err := svc.Register(c.Context(), plugin)
@@ -114,7 +114,6 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 // @Security		Keycloak
 func pluginHeartbeat(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-
 		slug := strings.Clone(c.Params("plugin"))
 		if err := svc.HeartBeat(slug); err != nil {
 			slog.Error("Failed to heartbeat", "plugin", slug, "error", err)
@@ -140,8 +139,8 @@ func pluginHeartbeat(svc service.PluginService) fiber.Handler {
 // @Security		Keycloak
 func GetPluginsList(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    p, h := svc.GetAll()
-    log.Println(h)
+		p, h := svc.GetAll()
+		log.Println(h)
 		plugins := utils.Map(p, func(plugin domain.Plugin) entities.PluginResponse {
 			return entities.PluginResponse{
 				Slug:        plugin.Slug,
@@ -174,7 +173,7 @@ func GetPluginsList(svc service.PluginService) fiber.Handler {
 // @Security		Keycloak
 func GetPluginInfo(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-    pluginParam := strings.Clone(c.Params("plugin"))
+		pluginParam := strings.Clone(c.Params("plugin"))
 		plugin, err := svc.Get(pluginParam)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).SendString("plugin not found")

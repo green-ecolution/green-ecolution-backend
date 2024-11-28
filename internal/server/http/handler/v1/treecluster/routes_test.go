@@ -17,7 +17,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/cluster", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockClusterService)
 
 			mockClusterService.EXPECT().GetAll(
@@ -36,7 +36,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call POST handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockClusterService)
 
 			mockClusterService.EXPECT().Create(
@@ -60,7 +60,7 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/cluster/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockClusterService)
 
 			mockClusterService.EXPECT().GetByID(
@@ -80,7 +80,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call PUT handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockClusterService)
 
 			mockClusterService.EXPECT().Update(
@@ -103,7 +103,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 		t.Run("should call DELETE handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
-      app := fiber.New()
+			app := fiber.New()
 			RegisterRoutes(app, mockClusterService)
 
 			mockClusterService.EXPECT().Delete(
