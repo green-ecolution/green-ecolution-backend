@@ -15,8 +15,8 @@ type PluginRegisterRequest struct {
 	Version     string `json:"version"`
 	Path        string `json:"path"`
 	Auth        struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		ClientID     string `json:"client_id"`
+		ClientSecret string `json:"client_secret"`
 	} `json:"auth"`
 } // @name PluginRegisterRequest
 

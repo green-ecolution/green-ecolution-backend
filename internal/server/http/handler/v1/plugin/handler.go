@@ -59,7 +59,7 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 			})
 		}
 
-		if req.Auth.Username == "" || req.Auth.Password == "" {
+		if req.Auth.ClientID == "" || req.Auth.ClientSecret == "" {
 			return c.Status(fiber.StatusBadRequest).SendString("Username or password is empty")
 		}
 
@@ -75,10 +75,10 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 			Version:     req.Version,
 			Description: req.Description,
 			Slug:        req.Slug,
-			Auth: struct {
-				Username string
-				Password string
-			}(req.Auth),
+			Auth: domain.AuthPlugin{
+        ClientID:     req.Auth.ClientID,
+        ClientSecret: req.Auth.ClientSecret,
+      },
 		}
 
 		token, err := svc.Register(c.Context(), plugin)
