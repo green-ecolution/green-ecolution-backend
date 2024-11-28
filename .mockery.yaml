@@ -13,6 +13,7 @@ packages:
       RegionService:
       SensorService:
       VehicleService:
+      PluginService:
       Service:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
