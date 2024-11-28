@@ -65,6 +65,49 @@ func TestTimeToPgTimestamp(t *testing.T) {
 	})
 }
 
+func TestPgDateToTime(t *testing.T) {
+	t.Run("should return time from pgtype.Date", func(t *testing.T) {
+		date := pgtype.Date{Time: time.Now(), Valid: true}
+		result := PgDateToTime(date)
+
+		assert.Equal(t, date.Time, result)
+	})
+
+	t.Run("should return zero time for zero pgtype.Date", func(t *testing.T) {
+		date := pgtype.Date{Valid: false}
+		result := PgDateToTime(date)
+
+		assert.True(t, result.IsZero())
+	})
+}
+
+func TestTimeToPgDate(t *testing.T) {
+	t.Run("Convert current time", func(t *testing.T) {
+		date := time.Now()
+
+		pgDate, err := TimeToPgDate(date)
+		assert.NoError(t, err)
+
+		assert.Equal(t, date.Year(), pgDate.Time.Year())
+		assert.Equal(t, date.Month(), pgDate.Time.Month())
+		assert.Equal(t, date.Day(), pgDate.Time.Day())
+		assert.Equal(t, date.Hour(), pgDate.Time.Hour())
+		assert.Equal(t, date.Minute(), pgDate.Time.Minute())
+		assert.Equal(t, date.Second(), pgDate.Time.Second())
+		assert.Equal(t, date.Nanosecond(), pgDate.Time.Nanosecond())
+	})
+
+	t.Run("Convert empty time", func(t *testing.T) {
+		date := time.Time{}
+
+		pgDate, err := TimeToPgDate(date)
+
+		assert.Error(t, err)
+		assert.Empty(t, pgDate)
+		assert.Equal(t, "invalid date: zero value provided", err.Error())
+	})
+}
+
 func TestConvertNullableImage(t *testing.T) {
 	t.Run("should convert sqlc.Image to entities.Image", func(t *testing.T) {
 		img := sqlc.Image{

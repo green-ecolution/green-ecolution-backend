@@ -1,0 +1,368 @@
+package wateringplan
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestWateringPlanRepository_Update(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+
+	testVehicles, err := suite.Store.GetAllVehicles(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testCluster, err := suite.Store.GetAllTreeClusters(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	uuid, _ := uuid.NewRandom()
+	testUser := &entities.User{
+		ID:          uuid,
+		CreatedAt:   time.Unix(123456, 0),
+		Username:    "test",
+		FirstName:   "Toni",
+		LastName:    "Tester",
+		Email:       "dev@green-ecolution.de",
+		PhoneNumber: "+49 123456",
+		EmployeeID:  "123456",
+	}
+
+	input := entities.WateringPlan{
+		Date:               time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC),
+		Description:        "Updated watering plan",
+		Distance:           utils.P(50.0),
+		TotalWaterRequired: utils.P(30000.0),
+		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
+		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
+		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:5],
+		Users:              []*entities.User{testUser},
+	}
+
+	t.Run("should update watering plan", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Description = input.Description
+			wp.Distance = input.Distance
+			wp.TotalWaterRequired = input.TotalWaterRequired
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.NotZero(t, got.ID)
+		assert.Equal(t, input.Date, got.Date)
+		assert.Equal(t, input.Description, got.Description)
+		assert.Equal(t, input.Distance, got.Distance)
+		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
+
+		// TODO: test linkd treeclusters, vehicles and users
+	})
+
+	t.Run("should return error when date is not in correct format", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = time.Time{}
+			wp.Transporter = input.Transporter
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "failed to convert date", err.Error())
+	})
+
+	t.Run("should return error when trailer vehicle has not correct vehilce type", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Transporter
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "trailer vehicle requires a vehicle of type trailer", err.Error())
+	})
+
+	t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = []*entities.User{}
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "watering plan requires employees", err.Error())
+	})
+
+	t.Run("should return error when transporter has not correct vehilce type", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Trailer
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "watering plan requires a valid transporter", err.Error())
+	})
+
+	t.Run("should return error when transporter is nil", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = nil
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "watering plan requires a valid transporter", err.Error())
+	})
+
+	t.Run("should return error when no treecluster are linked", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = []*entities.TreeCluster{}
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "watering plan requires tree cluster", err.Error())
+	})
+
+	t.Run("should return error when watering plan is invalid", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		err := r.Update(context.Background(), 1, nil)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "updateFn is nil", err.Error())
+	})
+
+	t.Run("should return error when update watering plan with negative id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), -1, updateFn)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when update watering plan with zero id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 0, updateFn)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when update watering plan not found", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 99, updateFn)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error if context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		err := r.Update(ctx, 99, updateFn)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when updateFn is nil", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		err := r.Update(context.Background(), 1, nil)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should return error when updateFn returns error", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			return true, assert.AnError
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+
+		// then
+		assert.Error(t, err)
+	})
+
+	t.Run("should not update when updateFn returns false", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			return false, nil
+		}
+
+		// when
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+	})
+
+	t.Run("should not rollback when updateFn returns false", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Description = "Test"
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return false, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.NotEqual(t, "Test", got.Description)
+	})
+}
