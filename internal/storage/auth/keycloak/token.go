@@ -80,19 +80,19 @@ func (r *KeycloakRepository) RefreshToken(ctx context.Context, refreshToken stri
 }
 
 func (r *KeycloakRepository) GetAccessTokenFromPassword(ctx context.Context, user, password string) (*entities.ClientToken, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 
 	fmt.Printf("user: %s, password: %s\n", user, password)
 
 	tokenOptions := gocloak.TokenOptions{
-		ClientID:     &r.cfg.KeyCloak.Frontend.ClientID,
-		ClientSecret: &r.cfg.KeyCloak.Frontend.ClientSecret,
+		ClientID:     &r.cfg.OidcProvider.Frontend.ClientID,
+		ClientSecret: &r.cfg.OidcProvider.Frontend.ClientSecret,
 		Username:     &user,
 		Password:     &password,
 		GrantType:    gocloak.StringP("password"),
 	}
 
-	token, err := client.GetToken(ctx, r.cfg.KeyCloak.Realm, tokenOptions)
+	token, err := client.GetToken(ctx, r.cfg.OidcProvider.DomainName, tokenOptions)
 	if err != nil {
 		return nil, err
 	}
