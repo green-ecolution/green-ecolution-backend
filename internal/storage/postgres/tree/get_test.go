@@ -144,6 +144,92 @@ func TestTreeRepository_GetByID(t *testing.T) {
 	})
 }
 
+func TestTreeRepository_GetBySensorID(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+	
+	t.Run("should return the correct tree by linked sensor ID", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+		sensorID := int32(1)
+
+		// when
+		tree, err := r.GetBySensorID(context.Background(), sensorID)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, tree)
+		assert.Equal(t, tree.Sensor.ID, sensorID)
+		assertExpectedEqualToTree(t, tree, testTrees[0])
+	})
+
+	t.Run("should return error when sensor is not found", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+		sensorID := int32(99)
+
+		// when
+		tree, err := r.GetBySensorID(context.Background(), sensorID)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+		assert.Equal(t, "sensor not found", err.Error())
+	})
+
+	t.Run("should return error when tree is not found", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+		sensorID := int32(4)
+
+		// when
+		tree, err := r.GetBySensorID(context.Background(), sensorID)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+		assert.Equal(t, "entity not found", err.Error())
+	})
+
+	t.Run("should return error if sensor ID is invalid", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		tree, err := r.GetBySensorID(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+	})
+
+	t.Run("should return error if sensor ID is zero", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		tree, err := r.GetBySensorID(context.Background(), 0)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, tree)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		trees, err := r.GetBySensorID(ctx, 1)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, trees)
+	})
+}
+
 func TestTreeRepository_GetTreesByIDs(t *testing.T) {
 	t.Run("should return trees successfully by IDs", func(t *testing.T) {
 		// given
@@ -257,7 +343,7 @@ func TestTreeRepository_GetByTreeClusterID(t *testing.T) {
 		}
 	})
 
-	t.Run("should return error tree cluster ID is invalid", func(t *testing.T) {
+	t.Run("should return error tree cluster ID is not found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
@@ -270,7 +356,7 @@ func TestTreeRepository_GetByTreeClusterID(t *testing.T) {
 		assert.Nil(t, trees)
 	})
 
-	t.Run("should return error tree cluster ID is invalid", func(t *testing.T) {
+	t.Run("should return error tree cluster ID is zero", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
