@@ -72,7 +72,7 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 
 	slog.Info("Register Plugin", "plugin", plugin.Slug)
 
-	token, err := p.authRepository.GetAccessTokenFromPassword(ctx, plugin.Auth.Username, plugin.Auth.Password)
+	token, err := p.authRepository.GetAccessTokenFromClientCredentials(ctx, plugin.Auth.ClientID, plugin.Auth.ClientSecret)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to login plugin with credantials")
 	}
