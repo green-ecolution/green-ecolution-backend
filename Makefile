@@ -267,7 +267,7 @@ config/all:
 
 .PHONY: config/enc
 config/enc:
-	sops -e config/config.$(ENV).enc.yaml > config/config.$(ENV).yaml; \
+	sops -e config/config.$(ENV).yaml > config/config.$(ENV).enc.yaml; \
 
 .PHONY: config/dec
 config/dec:
