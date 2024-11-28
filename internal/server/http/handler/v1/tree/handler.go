@@ -359,3 +359,21 @@ func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
 
 	return dto
 }
+
+func getTreeByField(c *fiber.Ctx, field string, fetchFunc func(ctx context.Context, id int32) (*domain.Tree, error)) error {
+	ctx := c.Context()
+	id, err := strconv.Atoi(c.Params(field))
+	if err != nil {
+		err = service.NewError(service.BadRequest, "invalid ID format")
+		return errorhandler.HandleError(err)
+	}
+
+	domainData, err := fetchFunc(ctx, int32(id))
+	if err != nil {
+		return errorhandler.HandleError(err)
+	}
+
+	data := mapTreeToDto(domainData)
+
+	return c.JSON(data)
+}
