@@ -260,10 +260,10 @@ test/verbose:
 
 .PHONY: config/all
 config/all:
-	@echo "Encrypting config..."
-	sops -e config/config.dev.yaml > config/config.dev.enc.yaml; \
-	sops -e config/config.stage.yaml > config/config.stage.enc.yaml; \
-	sops -e config/config.prod.yaml > config/config.prod.enc.yaml; \
+	@echo "Decrypt all config..."
+	sops -d config/config.dev.enc.yaml > config/config.dev.yaml; \
+	sops -d config/config.stage.enc.yaml > config/config.stage.yaml; \
+	sops -d config/config.prod.enc.yaml > config/config.prod.yaml; \
 
 .PHONY: config/enc
 config/enc:
