@@ -64,7 +64,7 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return w.store.HandleError(err)
 	}
 
-	if err := w.DeleteAllVehicles(ctx, entity.ID); err != nil {
+	if err := w.store.DeleteAllVehiclesWateringPlan(ctx, entity.ID); err != nil {
 		return w.store.HandleError(err)
 	}
 

@@ -113,7 +113,3 @@ func (w *WateringPlanRepository) Delete(ctx context.Context, id int32) error {
 
 	return nil
 }
-
-func (w *WateringPlanRepository) DeleteAllVehicles(ctx context.Context, id int32) error {
-	return w.store.DeleteAllVehiclesWateringPlan(ctx, id)
-}
