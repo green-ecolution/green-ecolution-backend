@@ -122,6 +122,7 @@ func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringP
 }
 
 func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *entities.WateringPlan, id int32) error {
+	// link transporter to pivot table
 	err := w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
 		WateringPlanID: id,
 		VehicleID:      entity.Transporter.ID,
@@ -130,7 +131,7 @@ func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *
 		return w.store.HandleError(err)
 	}
 
-	// link trailer as vehicle
+	// link trailer to pivot table
 	if entity.Trailer != nil {
 		err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
 			WateringPlanID: id,
