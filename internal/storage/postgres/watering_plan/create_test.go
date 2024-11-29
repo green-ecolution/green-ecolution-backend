@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -77,6 +78,18 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
 		assert.Equal(t, entities.WateringPlanStatusPlanned, got.WateringPlanStatus)
 
+		// assert linked transporter
+		linkedTransporter, err := r.GetLinkedVehicleByID(context.Background(), got.ID, entities.VehicleTypeTransporter)
+		assert.NoError(t, err)
+		assert.NotNil(t, linkedTransporter)
+		assert.Equal(t, input.Transporter.NumberPlate, linkedTransporter.NumberPlate)
+
+		// assert linked trailer
+		linkedTrailer, err := r.GetLinkedVehicleByID(context.Background(), got.ID, entities.VehicleTypeTrailer)
+		assert.NoError(t, err)
+		assert.NotNil(t, linkedTrailer)
+		assert.Equal(t, input.Trailer.NumberPlate, linkedTrailer.NumberPlate)
+
 		// TODO: test linkd treeclusters, vehicles and users
 	})
 
@@ -105,7 +118,17 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, utils.P(float64(0)), got.TotalWaterRequired)
 		assert.Equal(t, entities.WateringPlanStatusPlanned, got.WateringPlanStatus)
 
-		// TODO: test linkd treeclusters, vehicles and users
+		// assert linked transporter
+		linkedTransporter, err := r.GetLinkedVehicleByID(context.Background(), got.ID, entities.VehicleTypeTransporter)
+		assert.NoError(t, err)
+		assert.NotNil(t, linkedTransporter)
+		assert.Equal(t, input.Transporter.NumberPlate, linkedTransporter.NumberPlate)
+
+		// assert no linked trailer
+		_, err = r.GetLinkedVehicleByID(context.Background(), got.ID, entities.VehicleTypeTrailer)
+		assert.Error(t, storage.ErrEntityNotFound ,err.Error())
+
+		// TODO: test linkd treeclusters and users
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {

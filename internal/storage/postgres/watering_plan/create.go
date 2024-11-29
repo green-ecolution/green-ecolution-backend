@@ -86,11 +86,31 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}
 
-	// TODO: Link vehicle, treecluster and users in pivot table
-
 	id, err := w.store.CreateWateringPlan(ctx, &args)
 	if err != nil {
 		return nil, w.store.HandleError(err)
+	}
+
+	// TODO: Link treecluster and users in pivot table
+
+	// link transporter as vehicle
+	err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
+		WateringPlanID:  id,
+		VehicleID: entity.Transporter.ID,
+	})
+	if err != nil {
+		return nil, w.store.HandleError(err)
+	}
+
+	// link trailer as vehicle
+	if entity.Trailer != nil {
+		err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
+			WateringPlanID:  id,
+			VehicleID: entity.Trailer.ID,
+		})
+		if err != nil {
+			return nil, w.store.HandleError(err)
+		}
 	}
 
 	return &id, nil
