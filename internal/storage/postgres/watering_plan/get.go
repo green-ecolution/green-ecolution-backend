@@ -43,12 +43,9 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 }
 
 func (w *WateringPlanRepository) GetLinkedVehicleByID(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error) {
-	_, err := w.GetByID(ctx, id)
-	if err != nil {
-		return nil, w.store.HandleError(err)
-	}
-
 	var row *sqlc.Vehicle
+	var err error
+
 	switch vehicleType {
 		case entities.VehicleTypeTrailer:
 			row, err = w.store.GetTrailerByWateringPlanID(ctx, id)

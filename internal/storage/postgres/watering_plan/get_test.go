@@ -96,8 +96,37 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].TotalWaterRequired, got.TotalWaterRequired)
 
 		// assert transporter
-		assert.Equal(t, allTestWateringPlans[0].Transporter, got.Transporter.ID)
-		assert.Equal(t, allTestWateringPlans[0].Trailer, got.Trailer.ID)
+		assert.Equal(t, allTestWateringPlans[0].Transporter.ID, got.Transporter.ID)
+		assert.Equal(t, allTestWateringPlans[0].Transporter.Type, got.Transporter.Type)
+
+		// assert trailer
+		assert.Equal(t, allTestWateringPlans[0].Trailer.ID, got.Trailer.ID)
+		assert.Equal(t, allTestWateringPlans[0].Trailer.Type, got.Trailer.Type)
+	})
+
+	t.Run("should return watering plan by id without trailer", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetByID(context.Background(), 2)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.Equal(t, allTestWateringPlans[1].ID, got.ID)
+		assert.Equal(t, allTestWateringPlans[1].Date, got.Date)
+		assert.Equal(t, allTestWateringPlans[1].Description, got.Description)
+		assert.Equal(t, allTestWateringPlans[1].WateringPlanStatus, got.WateringPlanStatus)
+		assert.Equal(t, allTestWateringPlans[1].Distance, got.Distance)
+		assert.Equal(t, allTestWateringPlans[1].TotalWaterRequired, got.TotalWaterRequired)
+
+		// assert transporter
+		assert.Equal(t, allTestWateringPlans[1].Transporter.ID, got.Transporter.ID)
+		assert.Equal(t, allTestWateringPlans[1].Transporter.Type, got.Transporter.Type)
+
+		// assert nil trailer
+		assert.Nil(t, got.Trailer)
 	})
 
 	t.Run("should return error when watering plan with non-existing id", func(t *testing.T) {
