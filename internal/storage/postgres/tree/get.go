@@ -42,7 +42,7 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	return t, nil
 }
 
-func (r *TreeRepository) GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error) {
+func (r *TreeRepository) GetBySensorID(ctx context.Context, id string) (*entities.Tree, error) {
 	_, err := r.store.GetSensorByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

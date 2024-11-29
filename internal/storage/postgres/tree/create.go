@@ -75,7 +75,7 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 		treeClusterID = &entity.TreeCluster.ID
 	}
 
-	var sensorID *int32
+	var sensorID *string
 	if entity.Sensor != nil {
 		sensorID = &entity.Sensor.ID
 		if err := r.store.UnlinkSensorIDFromTrees(ctx, sensorID); err != nil {

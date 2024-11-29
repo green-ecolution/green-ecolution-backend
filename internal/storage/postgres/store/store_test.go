@@ -159,10 +159,15 @@ func TestStore_WithTx(t *testing.T) {
 		// given
 		pool := poolConn(t)
 		s := store.NewStore(pool, sqlc.New(pool))
-
+		sensorID := "sensor-1"
 		// when
 		err := s.WithTx(context.Background(), func(s *store.Store) error {
-			_, _ = s.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
+			_, _ = s.CreateSensor(context.Background(), &sqlc.CreateSensorParams{
+				ID:        sensorID,
+				Status:    sqlc.SensorStatusOnline,
+				Latitude:  54.801539,
+				Longitude: 9.446741,
+			})
 			return nil
 		})
 
@@ -170,24 +175,32 @@ func TestStore_WithTx(t *testing.T) {
 		assert.NoError(t, err)
 
 		// validate
-		got, err := s.GetSensorByID(context.Background(), 1)
+		got, err := s.GetSensorByID(context.Background(), sensorID)
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
-		assert.Equal(t, int32(1), got.ID)
+		assert.Equal(t, sensorID, got.ID)
 		assert.Equal(t, sqlc.SensorStatusOnline, got.Status)
+		assert.Equal(t, 54.801539, got.Latitude)
+		assert.Equal(t, 9.446741, got.Longitude)
 
 		// cleanup
-		_ = s.DeleteSensor(context.Background(), 1)
+		_ = s.DeleteSensor(context.Background(), sensorID)
 	})
 
 	t.Run("should rollback transaction", func(t *testing.T) {
 		// given
 		pool := poolConn(t)
 		s := store.NewStore(pool, sqlc.New(pool))
+		sensorID := "sensor-1"
 
 		// when
 		err := s.WithTx(context.Background(), func(s *store.Store) error {
-			_, _ = s.CreateSensor(context.Background(), sqlc.SensorStatusOnline)
+			_, _ = s.CreateSensor(context.Background(), &sqlc.CreateSensorParams{
+				ID:        sensorID,
+				Status:    sqlc.SensorStatusOnline,
+				Latitude:  54.801539,
+				Longitude: 9.446741,
+			})
 			return assert.AnError
 		})
 
@@ -195,7 +208,7 @@ func TestStore_WithTx(t *testing.T) {
 		assert.Error(t, err)
 
 		// validate
-		got, _ := s.GetSensorByID(context.Background(), 1)
+		got, _ := s.GetSensorByID(context.Background(), sensorID)
 		assert.Empty(t, got)
 	})
 }

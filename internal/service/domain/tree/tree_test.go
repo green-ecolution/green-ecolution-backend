@@ -159,7 +159,7 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
-		id := int32(1)
+		id := "sensor-1"
 		expectedTree := TestTreesList[0]
 		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(expectedTree, nil)
 
@@ -181,7 +181,7 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
-		id := int32(2)
+		id := "sensor-2"
 		expectedError := storage.ErrEntityNotFound
 		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(nil, expectedError)
 
@@ -204,7 +204,7 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
-		id := int32(2)
+		id := "sensor-2"
 		expectedError := storage.ErrSensorNotFound
 		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(nil, expectedError)
 
@@ -227,7 +227,7 @@ func TestTreeService_GetBySensorID(t *testing.T) {
 		locator := treecluster.NewGeoLocation(treeRepo, regionRepo)
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, locator)
 
-		id := int32(3)
+		id := "sensor-3"
 		expectedError := errors.New("unexpected error")
 
 		treeRepo.EXPECT().GetBySensorID(ctx, id).Return(nil, expectedError)
@@ -261,7 +261,7 @@ func TestTreeService_Create(t *testing.T) {
 
 		// Mock expectations
 		treeClusterRepo.EXPECT().GetByID(ctx, int32(1)).Return(expectedCluster, nil)
-		sensorRepo.EXPECT().GetByID(ctx, int32(1)).Return(expectedSensor, nil)
+		sensorRepo.EXPECT().GetByID(ctx, TestSensors[0].ID).Return(expectedSensor, nil)
 		treeRepo.EXPECT().Create(ctx,
 			mock.Anything,
 			mock.Anything,

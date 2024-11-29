@@ -11,11 +11,13 @@ const (
 )
 
 type Sensor struct {
-	ID        int32
+	ID        string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Status    SensorStatus
 	Data      []*SensorData
+	Latitude  float64
+	Longitude float64
 }
 
 type SensorData struct {
@@ -26,11 +28,15 @@ type SensorData struct {
 }
 
 type SensorCreate struct {
-	Status SensorStatus
-	Data   []*SensorData
+	Status    SensorStatus
+	Data      []*SensorData
+	Latitude  float64
+	Longitude float64
 }
 
 type SensorUpdate struct {
-	Status SensorStatus
-	Data   []*SensorData
+	Status    SensorStatus
+	Data      []*SensorData
+	Latitude  float64
+	Longitude float64
 }

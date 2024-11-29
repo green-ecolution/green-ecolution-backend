@@ -122,24 +122,29 @@ type TreeRepository interface {
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error)
 	GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
-	GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error)
+	GetBySensorID(ctx context.Context, id string) (*entities.Tree, error)
 
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
-	UnlinkSensorID(ctx context.Context, sensorID int32) error
+	UnlinkSensorID(ctx context.Context, sensorID string) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
 	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	GetCenterPoint(ctx context.Context, id []int32) (float64, float64, error)
 }
 
 type SensorRepository interface {
-	BasicCrudRepository[entities.Sensor]
-	GetStatusByID(ctx context.Context, id int32) (*entities.SensorStatus, error)
+	GetAll(ctx context.Context) ([]*entities.Sensor, error)
+	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
+	Create(ctx context.Context, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
+	Update(ctx context.Context, id string, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
+	Delete(ctx context.Context, id string) error
+
+	GetStatusByID(ctx context.Context, id string) (*entities.SensorStatus, error)
 	GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error)
-	GetSensorDataByID(ctx context.Context, id int32) ([]*entities.SensorData, error)
-	InsertSensorData(ctx context.Context, data []*entities.SensorData) ([]*entities.SensorData, error)
+	GetSensorDataByID(ctx context.Context, id string) ([]*entities.SensorData, error)
+	InsertSensorData(ctx context.Context, data []*entities.SensorData, id string) ([]*entities.SensorData, error)
 }
 
 type FlowerbedRepository interface {
@@ -153,7 +158,7 @@ type FlowerbedRepository interface {
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
-	UnlinkSensorID(ctx context.Context, sensorID int32) error
+	UnlinkSensorID(ctx context.Context, sensorID string) error
 	Archive(ctx context.Context, id int32) error
 }
 

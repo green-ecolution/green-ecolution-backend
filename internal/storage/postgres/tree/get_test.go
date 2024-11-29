@@ -147,11 +147,11 @@ func TestTreeRepository_GetByID(t *testing.T) {
 func TestTreeRepository_GetBySensorID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-	
+
 	t.Run("should return the correct tree by linked sensor ID", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)
-		sensorID := int32(1)
+		sensorID := "sensor-1"
 
 		// when
 		tree, err := r.GetBySensorID(context.Background(), sensorID)
@@ -166,7 +166,7 @@ func TestTreeRepository_GetBySensorID(t *testing.T) {
 	t.Run("should return error when sensor is not found", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)
-		sensorID := int32(99)
+		sensorID := "sensor-notFound"
 
 		// when
 		tree, err := r.GetBySensorID(context.Background(), sensorID)
@@ -180,7 +180,7 @@ func TestTreeRepository_GetBySensorID(t *testing.T) {
 	t.Run("should return error when tree is not found", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)
-		sensorID := int32(4)
+		sensorID := "sensor-4"
 
 		// when
 		tree, err := r.GetBySensorID(context.Background(), sensorID)
@@ -191,38 +191,15 @@ func TestTreeRepository_GetBySensorID(t *testing.T) {
 		assert.Equal(t, "entity not found", err.Error())
 	})
 
-	t.Run("should return error if sensor ID is invalid", func(t *testing.T) {
-		// given
-		r := NewTreeRepository(suite.Store, mappers)
-
-		// when
-		tree, err := r.GetBySensorID(context.Background(), -1)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, tree)
-	})
-
-	t.Run("should return error if sensor ID is zero", func(t *testing.T) {
-		// given
-		r := NewTreeRepository(suite.Store, mappers)
-
-		// when
-		tree, err := r.GetBySensorID(context.Background(), 0)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, tree)
-	})
-
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
+		sensorID := "sensor-1"
 
 		// when
-		trees, err := r.GetBySensorID(ctx, 1)
+		trees, err := r.GetBySensorID(ctx, sensorID)
 
 		// then
 		assert.Error(t, err)

@@ -49,7 +49,7 @@ func TestSensorService_GetAll(t *testing.T) {
 func TestSensorService_GetByID(t *testing.T) {
 	t.Run("should return sensor when found", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -67,7 +67,7 @@ func TestSensorService_GetByID(t *testing.T) {
 
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -190,7 +190,7 @@ func TestSensorService_Update(t *testing.T) {
 
 	t.Run("should successfully update a sensor", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -215,7 +215,7 @@ func TestSensorService_Update(t *testing.T) {
 
 	t.Run("should return an error when sensor ID does not exist", func(t *testing.T) {
 		// given
-		id := int32(99)
+		id := "notFoundID"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -234,7 +234,7 @@ func TestSensorService_Update(t *testing.T) {
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -264,7 +264,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 	t.Run("should successfully delete a sensor", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -284,7 +284,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 	t.Run("should return error if sensor not found", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -303,7 +303,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 	t.Run("should return error if unlinking sensor ID on tree fails", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -324,7 +324,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 	t.Run("should return error if unlinking sensor ID on flowerbed fails", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
@@ -345,7 +345,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 	t.Run("should return error if deleting sensor fails", func(t *testing.T) {
 		// given
-		id := int32(1)
+		id := "sensor-1"
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)

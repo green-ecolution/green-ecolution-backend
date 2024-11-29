@@ -58,7 +58,7 @@ func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, er
 	return tr, nil
 }
 
-func (s *TreeService) GetBySensorID(ctx context.Context, id int32) (*entities.Tree, error) {
+func (s *TreeService) GetBySensorID(ctx context.Context, id string) (*entities.Tree, error) {
 	tr, err := s.treeRepo.GetBySensorID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
@@ -160,7 +160,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		var sensor *entities.Sensor
 		sensor, err = s.sensorRepo.GetByID(ctx, *tu.SensorID)
 		if err != nil {
-			return nil, handleError(fmt.Errorf("failed to find Sensor with ID %d: %w", *tu.SensorID, err))
+			return nil, handleError(fmt.Errorf("failed to find Sensor with ID %v: %w", *tu.SensorID, err))
 		}
 		fn = append(fn, tree.WithSensor(sensor))
 	} else {
