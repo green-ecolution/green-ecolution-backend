@@ -180,7 +180,7 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 	})
 }
 
-func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
+func TestWateringPlanRepository_GetLinkedVehicleByIDAndType(t *testing.T) {
 	ctx := context.Background()
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
@@ -191,7 +191,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		shouldReturn := allTestVehicles[1]
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeTransporter)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(1), entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
@@ -211,7 +211,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		shouldReturn := allTestVehicles[0]
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeTrailer)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(1), entities.VehicleTypeTrailer)
 
 		// then
 		assert.NoError(t, err)
@@ -230,7 +230,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(99), entities.VehicleTypeTrailer)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(99), entities.VehicleTypeTrailer)
 
 		// then
 		assert.Error(t, err)
@@ -242,7 +242,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(2), entities.VehicleTypeTrailer)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(2), entities.VehicleTypeTrailer)
 
 		// then
 		assert.Error(t, err)
@@ -254,7 +254,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(-1), entities.VehicleTypeTransporter)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(-1), entities.VehicleTypeTransporter)
 
 		// then
 		assert.Error(t, err)
@@ -266,7 +266,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(0), entities.VehicleTypeTransporter)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(0), entities.VehicleTypeTransporter)
 
 		// then
 		assert.Error(t, err)
@@ -278,7 +278,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeUnknown)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(1), entities.VehicleTypeUnknown)
 
 		// then
 		assert.Error(t, err)
@@ -292,7 +292,81 @@ func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeTransporter)
+		got, err := r.GetLinkedVehicleByIDAndType(ctx, int32(1), entities.VehicleTypeTransporter)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+}
+
+func WateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
+	ctx := context.Background()
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+
+	t.Run("should return treecluster by watering plan id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		shouldReturn := allTestCluster[0:2]
+
+		// when
+		got, err := r.GetLinkedTreeClustersByID(ctx, int32(1))
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, len(shouldReturn))
+		for i, tc := range got {
+			assert.Equal(t, shouldReturn[i].ID, tc.ID)
+			assert.Equal(t, shouldReturn[i].RegionID, tc.Region.ID)
+			assert.Len(t, shouldReturn[i].TreeIDs, len(tc.Trees))
+		}
+	})
+
+	t.Run("should return error when watering plan with non-existing id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedTreeClustersByID(context.Background(), 99)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when watering plan with negative id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedTreeClustersByID(context.Background(), -1)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when watering plan with zero id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedTreeClustersByID(context.Background(), 0)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.GetLinkedTreeClustersByID(ctx, 1)
 
 		// then
 		assert.Error(t, err)
@@ -369,5 +443,45 @@ var allTestVehicles = []*entities.Vehicle{
 		WaterCapacity: 150.0,
 		Type:          entities.VehicleTypeTransporter,
 		Status:        entities.VehicleStatusUnknown,
+	},
+}
+
+type testTreeCluster struct {
+	ID       int32
+	Name     string
+	RegionID int32
+	TreeIDs  []int32
+}
+
+var allTestCluster = []*testTreeCluster{
+	{
+		ID:       1,
+		Name:     "Solitüde Strand",
+		RegionID: 1,
+		TreeIDs:  []int32{1, 2, 3},
+	},
+	{
+		ID:       2,
+		Name:     "Sankt-Jürgen-Platz",
+		RegionID: 1,
+		TreeIDs:  []int32{4, 5, 6},
+	},
+	{
+		ID:       3,
+		Name:     "Flensburger Stadion",
+		RegionID: 1,
+		TreeIDs:  []int32{16, 17, 18, 19, 20},
+	},
+	{
+		ID:       4,
+		Name:     "Campus Hochschule",
+		RegionID: 4,
+		TreeIDs:  []int32{12, 13, 14, 15},
+	},
+	{
+		ID:       5,
+		Name:     "Mathildenstraße",
+		RegionID: 10,
+		TreeIDs:  []int32{7, 8, 9, 10, 11},
 	},
 }

@@ -20,10 +20,9 @@ INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id) VALUES
 INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id) VALUES 
 (1, 1),
 (2, 1),
-(3, 1),
+(3, 2),
 (4, 2),
-(5, 2),
-(6, 2);
+(5, 2);
 -- +goose StatementEnd
 
 -- +goose Down

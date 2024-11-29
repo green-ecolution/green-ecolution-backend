@@ -82,8 +82,10 @@ type WateringPlanRepository interface {
 	GetAll(ctx context.Context) ([]*entities.WateringPlan, error)
 	// GetByID returns one watering plan by id
 	GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error)
-	// Get vehicles linked to a watering plan by its id and the vehicle type
-	GetLinkedVehicleByID(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error)
+	// Get vehicles linked to a watering plan by the watering plan id and the vehicle type
+	GetLinkedVehicleByIDAndType(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error)
+	// Get tree cluster linked to a watering plan by the watering plan id
+	GetLinkedTreeClustersByID(ctx context.Context, id int32) ([]*entities.TreeCluster, error)
 	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.
 	Create(ctx context.Context, fn func(tc *entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error)
 	// Update updates a watering plan by id. It takes the id of the watering plan to update and a function that takes a watering plan that can be modified. Any changes made to the plan will be saved updated in the storage. If the function returns true, the watering plan will be updated, otherwise it will not be updated.
