@@ -1,7 +1,6 @@
 package tree
 
 import (
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -108,11 +107,8 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id := c.Params("sensor_id")
-		if !isValidSensorID(id) {
-			err := service.NewError(service.BadRequest, "invalid sensor ID")
-			return errorhandler.HandleError(err)
-		}
+		id := strings.Clone(c.Params("sensor_id"))
+
 		domainData, err := svc.GetBySensorID(ctx, id)
 		if err != nil {
 			return errorhandler.HandleError(err)
@@ -121,20 +117,6 @@ func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
 
 		return c.JSON(data)
 	}
-}
-
-func isValidSensorID(sensorID string) bool {
-	specialChars := `@#$%^&*`
-	containsSpChars := strings.ContainsAny(sensorID, specialChars)
-	invalidLength := len(sensorID) < 3 || len(sensorID) > 36
-	hasWhiteSPaces := strings.ContainsAny(sensorID, " \t\n")
-	htmlPattern := regexp.MustCompile(`(?i)<[a-z]+[^>]*>.*</[a-z]+>|<.*>`)
-	isLikeHTML := htmlPattern.MatchString(sensorID)
-	if containsSpChars || invalidLength || hasWhiteSPaces || isLikeHTML {
-		return false
-	}
-
-	return true
 }
 
 // @Summary		Create tree
