@@ -11,13 +11,17 @@ import (
 func TestVehicleRepository_UpdateSuite(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
-
 	input := entities.Vehicle{
-		Description:   "Updated description",
-		NumberPlate:   "FL NEW 9876",
-		WaterCapacity: 10000,
-		Type:          entities.VehicleTypeTransporter,
-		Status:        entities.VehicleStatusAvailable,
+		Description:    "Updated description",
+		NumberPlate:    "FL NEW 9876",
+		WaterCapacity:  10000,
+		Type:           entities.VehicleTypeTransporter,
+		Status:         entities.VehicleStatusAvailable,
+		DrivingLicense: entities.DrivingLicenseCar,
+		Height:         2.75,
+		Length:         6.0,
+		Width:          5.0,
+		Model:          "New model 1615/17",
 	}
 
 	t.Run("should update vehicle", func(t *testing.T) {
@@ -32,6 +36,11 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			WithWaterCapacity(input.WaterCapacity),
 			WithVehicleStatus(input.Status),
 			WithVehicleType(input.Type),
+			WithModel(input.Model),
+			WithDrivingLicense(input.DrivingLicense),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
 		)
 		gotByID, _ := r.GetByID(context.Background(), 1)
 
@@ -46,6 +55,11 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		assert.Equal(t, input.WaterCapacity, gotByID.WaterCapacity)
 		assert.Equal(t, input.Type, gotByID.Type)
 		assert.Equal(t, input.Status, gotByID.Status)
+		assert.Equal(t, input.DrivingLicense, gotByID.DrivingLicense)
+		assert.Equal(t, input.Model, gotByID.Model)
+		assert.Equal(t, input.Height, gotByID.Height)
+		assert.Equal(t, input.Length, gotByID.Length)
+		assert.Equal(t, input.Width, gotByID.Width)
 	})
 
 	t.Run("should return error when update vehicle with duplicate plate", func(t *testing.T) {
@@ -95,6 +109,28 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 		// when
 		got, err := r.Update(context.Background(), 2, WithNumberPlate(""))
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when update vehicle with zero size measurement", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+		// when
+		got, err := r.Update(context.Background(), 2, WithHeight(0), WithLength(0), WithWidth(0))
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when update vehicle with wrong driving license", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+		// when
+		got, err := r.Update(context.Background(), 2, WithDrivingLicense(""))
 
 		// then
 		assert.Error(t, err)

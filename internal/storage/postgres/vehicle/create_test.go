@@ -12,10 +12,15 @@ func TestVehicleRepository_Create(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 	input := entities.Vehicle{
-		Description:   "Big car",
-		WaterCapacity: 2000,
-		Type:          entities.VehicleTypeTrailer,
-		Status:        entities.VehicleStatusNotAvailable,
+		Description:    "Big car",
+		WaterCapacity:  2000,
+		Type:           entities.VehicleTypeTrailer,
+		Status:         entities.VehicleStatusNotAvailable,
+		DrivingLicense: entities.DrivingLicenseTrailer,
+		Height:         1.5,
+		Length:         2.0,
+		Width:          2.0,
+		Model:          "1615/17 - Conrad - MAN TGE 3.180",
 	}
 
 	t.Run("should create vehicle", func(t *testing.T) {
@@ -32,6 +37,11 @@ func TestVehicleRepository_Create(t *testing.T) {
 			WithWaterCapacity(input.WaterCapacity),
 			WithVehicleStatus(input.Status),
 			WithVehicleType(input.Type),
+			WithModel(input.Model),
+			WithDrivingLicense(input.DrivingLicense),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
 		)
 
 		// then
@@ -42,9 +52,14 @@ func TestVehicleRepository_Create(t *testing.T) {
 		assert.Equal(t, input.WaterCapacity, got.WaterCapacity)
 		assert.Equal(t, input.Type, got.Type)
 		assert.Equal(t, input.Status, got.Status)
+		assert.Equal(t, input.DrivingLicense, got.DrivingLicense)
+		assert.Equal(t, input.Height, got.Height)
+		assert.Equal(t, input.Length, got.Length)
+		assert.Equal(t, input.Width, got.Width)
+		assert.Equal(t, input.Model, got.Model)
 	})
 
-	t.Run("should create vehicle with no description, type and status", func(t *testing.T) {
+	t.Run("should create vehicle with no description, type, model, driving license and status", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
@@ -55,16 +70,24 @@ func TestVehicleRepository_Create(t *testing.T) {
 			context.Background(),
 			WithNumberPlate(numberPlate),
 			WithWaterCapacity(input.WaterCapacity),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
 		)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, "", got.Description)
+		assert.Equal(t, "", got.Model)
 		assert.Equal(t, numberPlate, got.NumberPlate)
 		assert.Equal(t, input.WaterCapacity, got.WaterCapacity)
 		assert.Equal(t, entities.VehicleTypeUnknown, got.Type)
 		assert.Equal(t, entities.VehicleStatusUnknown, got.Status)
+		assert.Equal(t, entities.DrivingLicenseCar, got.DrivingLicense)
+		assert.Equal(t, input.Height, got.Height)
+		assert.Equal(t, input.Length, got.Length)
+		assert.Equal(t, input.Width, got.Width)
 	})
 
 	t.Run("should return error when create vehicle with zero water capacity", func(t *testing.T) {
@@ -77,12 +100,16 @@ func TestVehicleRepository_Create(t *testing.T) {
 			WithDescription(input.Description),
 			WithNumberPlate(input.NumberPlate),
 			WithWaterCapacity(0),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
 		)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
+
 	t.Run("should return error when create vehicle with no number plate", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
@@ -93,6 +120,52 @@ func TestVehicleRepository_Create(t *testing.T) {
 			WithDescription(input.Description),
 			WithNumberPlate(""),
 			WithWaterCapacity(input.WaterCapacity),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
+		)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when create vehicle with zero size measurements", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+
+		numberPlate := "FL ZB 9876"
+
+		// when
+		got, err := r.Create(
+			context.Background(),
+			WithDescription(input.Description),
+			WithNumberPlate(numberPlate),
+			WithWaterCapacity(input.WaterCapacity),
+			WithHeight(0),
+			WithLength(0),
+			WithWidth(0),
+		)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when create vehicle with wrong driving license", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
+
+		// when
+		got, err := r.Create(
+			context.Background(),
+			WithDescription(input.Description),
+			WithNumberPlate(input.NumberPlate),
+			WithWaterCapacity(input.WaterCapacity),
+			WithDrivingLicense(""),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
 		)
 
 		// then
@@ -114,6 +187,9 @@ func TestVehicleRepository_Create(t *testing.T) {
 			WithWaterCapacity(input.WaterCapacity),
 			WithVehicleStatus(input.Status),
 			WithVehicleType(input.Type),
+			WithHeight(input.Height),
+			WithLength(input.Length),
+			WithWidth(input.Width),
 		)
 		assert.NoError(t, err)
 		assert.NotNil(t, firstVehicle)

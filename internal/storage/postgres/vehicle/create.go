@@ -10,11 +10,16 @@ import (
 
 func defaultVehicle() *entities.Vehicle {
 	return &entities.Vehicle{
-		NumberPlate:   "",
-		Description:   "",
-		WaterCapacity: 0,
-		Type:          entities.VehicleTypeUnknown,
-		Status:        entities.VehicleStatusUnknown,
+		NumberPlate:    "",
+		Description:    "",
+		WaterCapacity:  0,
+		Type:           entities.VehicleTypeUnknown,
+		Status:         entities.VehicleStatusUnknown,
+		Model:          "",
+		DrivingLicense: entities.DrivingLicenseCar,
+		Height:         0,
+		Length:         0,
+		Width:          0,
 	}
 }
 
@@ -24,12 +29,8 @@ func (r *VehicleRepository) Create(ctx context.Context, vFn ...entities.EntityFu
 		fn(entity)
 	}
 
-	if entity.WaterCapacity == 0 {
-		return nil, errors.New("water capacity is required and can not be 0")
-	}
-
-	if entity.NumberPlate == "" {
-		return nil, errors.New("number plate is required")
+	if err := r.validateVehicle(entity); err != nil {
+		return nil, err
 	}
 
 	id, err := r.createEntity(ctx, entity)
@@ -43,11 +44,16 @@ func (r *VehicleRepository) Create(ctx context.Context, vFn ...entities.EntityFu
 
 func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.Vehicle) (*int32, error) {
 	args := sqlc.CreateVehicleParams{
-		NumberPlate:   entity.NumberPlate,
-		Description:   entity.Description,
-		WaterCapacity: entity.WaterCapacity,
-		Type:          sqlc.VehicleType(entity.Type),
-		Status:        sqlc.VehicleStatus(entity.Status),
+		NumberPlate:    entity.NumberPlate,
+		Description:    entity.Description,
+		WaterCapacity:  entity.WaterCapacity,
+		Type:           sqlc.VehicleType(entity.Type),
+		Status:         sqlc.VehicleStatus(entity.Status),
+		DrivingLicense: sqlc.DrivingLicense(entity.DrivingLicense),
+		Model:          entity.Model,
+		Width:          entity.Width,
+		Height:         entity.Height,
+		Length:         entity.Length,
 	}
 
 	id, err := r.store.CreateVehicle(ctx, &args)
@@ -56,4 +62,24 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 	}
 
 	return &id, nil
+}
+
+func (r *VehicleRepository) validateVehicle(entity *entities.Vehicle) error {
+	if entity.WaterCapacity == 0 {
+		return errors.New("water capacity is required and can not be 0")
+	}
+
+	if entity.Length == 0 || entity.Width == 0 || entity.Height == 0 {
+		return errors.New("size measurements are required and can not be 0")
+	}
+
+	if entity.NumberPlate == "" {
+		return errors.New("number plate is required")
+	}
+
+	if entity.DrivingLicense == "" {
+		return errors.New("driving license is required and should be either B, BE or C")
+	}
+
+	return nil
 }
