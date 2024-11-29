@@ -12,7 +12,10 @@ ALTER SEQUENCE watering_plans_id_seq RESTART WITH 6;
 INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id) VALUES 
 (1, 1),
 (2, 1),
-(2, 2);
+(2, 2),
+(2, 3),
+(2, 4),
+(2, 5);
 
 INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id) VALUES 
 (1, 1),

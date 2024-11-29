@@ -32,6 +32,18 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[i].WateringPlanStatus, wp.WateringPlanStatus)
 			assert.Equal(t, allTestWateringPlans[i].Distance, wp.Distance)
 			assert.Equal(t, allTestWateringPlans[i].TotalWaterRequired, wp.TotalWaterRequired)
+			
+			// assert transporter
+			assert.Equal(t, allTestWateringPlans[i].Transporter.ID, wp.Transporter.ID)
+
+			// assert trailer
+			if allTestWateringPlans[i].Trailer == nil {
+				assert.Nil(t, wp.Trailer)
+				assert.NoError(t, err)
+			} else {
+				assert.NotNil(t, wp.Trailer)
+				assert.Equal(t, allTestWateringPlans[i].Trailer.ID, wp.Trailer.ID)
+			}
 		}
 	})
 
@@ -135,6 +147,126 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 	})
 }
 
+func TestWateringPlanRepository_GetLinkedVehicleByID(t *testing.T) {
+	ctx := context.Background()
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+
+	t.Run("should return vehicle with type transporter by watering plan id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		shouldReturn := allTestVehicles[1]
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeTransporter)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, shouldReturn.ID, got.ID)
+		assert.Equal(t, shouldReturn.NumberPlate, got.NumberPlate)
+		assert.Equal(t, shouldReturn.Description, got.Description)
+		assert.Equal(t, shouldReturn.WaterCapacity, got.WaterCapacity)
+		assert.Equal(t, entities.VehicleTypeTransporter, got.Type)
+		assert.Equal(t, shouldReturn.Status, got.Status)
+		assert.NotZero(t, got.CreatedAt)
+		assert.NotZero(t, got.UpdatedAt)
+	})
+
+	t.Run("should return vehicle with type trailer by watering plan id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		shouldReturn := allTestVehicles[0]
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeTrailer)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, shouldReturn.ID, got.ID)
+		assert.Equal(t, shouldReturn.NumberPlate, got.NumberPlate)
+		assert.Equal(t, shouldReturn.Description, got.Description)
+		assert.Equal(t, shouldReturn.WaterCapacity, got.WaterCapacity)
+		assert.Equal(t, entities.VehicleTypeTrailer, got.Type)
+		assert.Equal(t, shouldReturn.Status, got.Status)
+		assert.NotZero(t, got.CreatedAt)
+		assert.NotZero(t, got.UpdatedAt)
+	})
+
+	t.Run("should return error when watering plan not found", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(99), entities.VehicleTypeTrailer)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when vehicle with type trailer is not found", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(2), entities.VehicleTypeTrailer)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when watering plan id is negative", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(-1), entities.VehicleTypeTransporter)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when watering plan id is zero", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(0), entities.VehicleTypeTransporter)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when vehicle type is not trailer or transporter", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeUnknown)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.GetLinkedVehicleByID(ctx, int32(1), entities.VehicleTypeTransporter)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+}
+
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 1,
@@ -143,6 +275,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusPlanned,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
+		Transporter: allTestVehicles[1],
+		Trailer: allTestVehicles[0],
 	},
 	{
 		ID:                 2,
@@ -151,6 +285,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusActive,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
+		Transporter: allTestVehicles[1],
+		Trailer: nil,
 	},
 	{
 		ID:                 3,
@@ -159,6 +295,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusFinished,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
+		Transporter: allTestVehicles[1],
+		Trailer: nil,
 	},
 	{
 		ID:                 4,
@@ -167,6 +305,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusNotCompeted,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
+		Transporter: allTestVehicles[1],
+		Trailer: nil,
 	},
 	{
 		ID:                 5,
@@ -175,5 +315,26 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusCanceled,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
+		Transporter: allTestVehicles[1],
+		Trailer: nil,
+	},
+}
+
+var allTestVehicles = []*entities.Vehicle{
+	{
+		ID:            1,
+		NumberPlate:   "B-1234",
+		Description:   "Test vehicle 1",
+		WaterCapacity: 100.0,
+		Type:          entities.VehicleTypeTrailer,
+		Status:        entities.VehicleStatusActive,
+	},
+	{
+		ID:            2,
+		NumberPlate:   "B-5678",
+		Description:   "Test vehicle 2",
+		WaterCapacity: 150.0,
+		Type:          entities.VehicleTypeTransporter,
+		Status:        entities.VehicleStatusUnknown,
 	},
 }
