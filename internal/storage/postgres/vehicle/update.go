@@ -2,7 +2,6 @@ package vehicle
 
 import (
 	"context"
-	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -18,12 +17,8 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, vFn ...entitie
 		fn(entity)
 	}
 
-	if entity.WaterCapacity == 0 {
-		return nil, errors.New("water capacity is required and can not be 0")
-	}
-
-	if entity.NumberPlate == "" {
-		return nil, errors.New("number plate is required")
+	if err := r.validateVehicle(entity); err != nil {
+		return nil, err
 	}
 
 	if err := r.updateEntity(ctx, entity); err != nil {
@@ -35,12 +30,17 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, vFn ...entitie
 
 func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.Vehicle) error {
 	params := sqlc.UpdateVehicleParams{
-		ID:            vehicle.ID,
-		NumberPlate:   vehicle.NumberPlate,
-		Description:   vehicle.Description,
-		WaterCapacity: vehicle.WaterCapacity,
-		Type:          sqlc.VehicleType(vehicle.Type),
-		Status:        sqlc.VehicleStatus(vehicle.Status),
+		ID:             vehicle.ID,
+		NumberPlate:    vehicle.NumberPlate,
+		Description:    vehicle.Description,
+		WaterCapacity:  vehicle.WaterCapacity,
+		Type:           sqlc.VehicleType(vehicle.Type),
+		Status:         sqlc.VehicleStatus(vehicle.Status),
+		DrivingLicense: sqlc.DrivingLicense(vehicle.DrivingLicense),
+		Model:          vehicle.Model,
+		Height:         vehicle.Height,
+		Length:         vehicle.Length,
+		Width:          vehicle.Width,
 	}
 
 	return r.store.UpdateVehicle(ctx, &params)

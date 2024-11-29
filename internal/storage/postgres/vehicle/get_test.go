@@ -28,6 +28,11 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestVehicles[i].WaterCapacity, vehicle.WaterCapacity)
 			assert.Equal(t, allTestVehicles[i].Type, vehicle.Type)
 			assert.Equal(t, allTestVehicles[i].Status, vehicle.Status)
+			assert.Equal(t, allTestVehicles[i].DrivingLicense, vehicle.DrivingLicense)
+			assert.Equal(t, allTestVehicles[i].Height, vehicle.Height)
+			assert.Equal(t, allTestVehicles[i].Width, vehicle.Width)
+			assert.Equal(t, allTestVehicles[i].Length, vehicle.Length)
+			assert.Equal(t, allTestVehicles[i].Model, vehicle.Model)
 			assert.NotZero(t, vehicle.CreatedAt)
 			assert.NotZero(t, vehicle.UpdatedAt)
 		}
@@ -81,6 +86,11 @@ func TestVehicleRepository_GetByID(t *testing.T) {
 		assert.Equal(t, shouldReturn.WaterCapacity, got.WaterCapacity)
 		assert.Equal(t, shouldReturn.Type, got.Type)
 		assert.Equal(t, shouldReturn.Status, got.Status)
+		assert.Equal(t, shouldReturn.DrivingLicense, got.DrivingLicense)
+		assert.Equal(t, shouldReturn.Height, got.Height)
+		assert.Equal(t, shouldReturn.Length, got.Length)
+		assert.Equal(t, shouldReturn.Width, got.Width)
+		assert.Equal(t, shouldReturn.Model, got.Model)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 	})
@@ -179,6 +189,11 @@ func TestVehicleRepository_GetByPlate(t *testing.T) {
 			assert.Equal(t, tt.want.WaterCapacity, got.WaterCapacity)
 			assert.Equal(t, tt.want.Type, got.Type)
 			assert.Equal(t, tt.want.Status, got.Status)
+			assert.Equal(t, tt.want.DrivingLicense, got.DrivingLicense)
+			assert.Equal(t, tt.want.Height, got.Height)
+			assert.Equal(t, tt.want.Length, got.Length)
+			assert.Equal(t, tt.want.Width, got.Width)
+			assert.Equal(t, tt.want.Model, got.Model)
 			assert.NotZero(t, got.CreatedAt)
 			assert.NotZero(t, got.UpdatedAt)
 		})
@@ -227,19 +242,29 @@ func TestVehicleRepository_GetByPlate(t *testing.T) {
 
 var allTestVehicles = []*entities.Vehicle{
 	{
-		ID:            1,
-		NumberPlate:   "B-1234",
-		Description:   "Test vehicle 1",
-		WaterCapacity: 100.0,
-		Type:          entities.VehicleTypeTrailer,
-		Status:        entities.VehicleStatusActive,
+		ID:             1,
+		NumberPlate:    "B-1234",
+		Description:    "Test vehicle 1",
+		WaterCapacity:  100.0,
+		Type:           entities.VehicleTypeTrailer,
+		Status:         entities.VehicleStatusActive,
+		Model:          "1615/17 - Conrad - MAN TGE 3.180",
+		DrivingLicense: entities.DrivingLicenseTrailer,
+		Height:         1.5,
+		Length:         2.0,
+		Width:          2.0,
 	},
 	{
-		ID:            2,
-		NumberPlate:   "B-5678",
-		Description:   "Test vehicle 2",
-		WaterCapacity: 150.0,
-		Type:          entities.VehicleTypeTransporter,
-		Status:        entities.VehicleStatusUnknown,
+		ID:             2,
+		NumberPlate:    "B-5678",
+		Description:    "Test vehicle 2",
+		WaterCapacity:  150.0,
+		Type:           entities.VehicleTypeTransporter,
+		Status:         entities.VehicleStatusUnknown,
+		Model:          "Actros L Mercedes Benz",
+		DrivingLicense: entities.DrivingLicenseTransporter,
+		Height:         2.1,
+		Length:         5.0,
+		Width:          2.4,
 	},
 }

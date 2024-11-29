@@ -8,7 +8,7 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
-// goverter:extend MapVehicleStatus MapVehicleType MapVehicleStatusReq MapVehicleTypeReq
+// goverter:extend MapVehicleStatus MapVehicleType MapVehicleStatusReq MapVehicleTypeReq MapDrivingLicense MapDrivingLicenseReq
 type VehicleHTTPMapper interface {
 	FormResponse(*domain.Vehicle) *entities.VehicleResponse
 	FromResponseList([]*domain.Vehicle) []*entities.VehicleResponse
@@ -24,10 +24,18 @@ func MapVehicleType(vehicleType domain.VehicleType) entities.VehicleType {
 	return entities.VehicleType(vehicleType)
 }
 
+func MapDrivingLicense(drivingLicense domain.DrivingLicense) entities.DrivingLicense {
+	return entities.DrivingLicense(drivingLicense)
+}
+
 func MapVehicleStatusReq(vehicleStatus entities.VehicleStatus) domain.VehicleStatus {
 	return domain.VehicleStatus(vehicleStatus)
 }
 
 func MapVehicleTypeReq(vehicleType entities.VehicleType) domain.VehicleType {
 	return domain.VehicleType(vehicleType)
+}
+
+func MapDrivingLicenseReq(drivingLicense entities.DrivingLicense) domain.DrivingLicense {
+	return domain.DrivingLicense(drivingLicense)
 }
