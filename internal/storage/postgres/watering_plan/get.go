@@ -37,7 +37,7 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 	if err := w.mapFields(ctx, wp); err != nil {
 		return nil, err
 	}
-	
+
 	// TODO: get mapped data like users, treecluster
 	return wp, nil
 }
@@ -47,12 +47,12 @@ func (w *WateringPlanRepository) GetLinkedVehicleByID(ctx context.Context, id in
 	var err error
 
 	switch vehicleType {
-		case entities.VehicleTypeTrailer:
-			row, err = w.store.GetTrailerByWateringPlanID(ctx, id)
-		case entities.VehicleTypeTransporter:
-			row, err = w.store.GetTransporterByWateringPlanID(ctx, id)
-		default:
-			return nil, fmt.Errorf("unsupported vehicle type: %v", vehicleType)
+	case entities.VehicleTypeTrailer:
+		row, err = w.store.GetTrailerByWateringPlanID(ctx, id)
+	case entities.VehicleTypeTransporter:
+		row, err = w.store.GetTransporterByWateringPlanID(ctx, id)
+	default:
+		return nil, fmt.Errorf("unsupported vehicle type: %v", vehicleType)
 	}
 
 	if err != nil {
@@ -63,20 +63,20 @@ func (w *WateringPlanRepository) GetLinkedVehicleByID(ctx context.Context, id in
 }
 
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
-    var err error
+	var err error
 
-    wp.Transporter, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTransporter)
-    if err != nil {
-        return w.store.HandleError(err)
-    }
+	wp.Transporter, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTransporter)
+	if err != nil {
+		return w.store.HandleError(err)
+	}
 
-    wp.Trailer, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTrailer)
-    if err != nil {
+	wp.Trailer, err = w.GetLinkedVehicleByID(ctx, wp.ID, entities.VehicleTypeTrailer)
+	if err != nil {
 		if !errors.Is(err, storage.ErrEntityNotFound) {
-        	return w.store.HandleError(err)
+			return w.store.HandleError(err)
 		}
 		wp.Trailer = nil
-    }
+	}
 
-    return nil
+	return nil
 }

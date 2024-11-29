@@ -93,24 +93,9 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 
 	// TODO: Link treecluster and users in pivot table
 
-	// link transporter as vehicle
-	err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
-		WateringPlanID:  id,
-		VehicleID: entity.Transporter.ID,
-	})
+	err = w.setLinkedVehicles(ctx, entity, id)
 	if err != nil {
 		return nil, w.store.HandleError(err)
-	}
-
-	// link trailer as vehicle
-	if entity.Trailer != nil {
-		err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
-			WateringPlanID:  id,
-			VehicleID: entity.Trailer.ID,
-		})
-		if err != nil {
-			return nil, w.store.HandleError(err)
-		}
 	}
 
 	return &id, nil
@@ -131,6 +116,29 @@ func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringP
 
 	if len(entity.Treecluster) == 0 {
 		return errors.New("watering plan requires tree cluster")
+	}
+
+	return nil
+}
+
+func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *entities.WateringPlan, id int32) error {
+	err := w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
+		WateringPlanID: id,
+		VehicleID:      entity.Transporter.ID,
+	})
+	if err != nil {
+		return w.store.HandleError(err)
+	}
+
+	// link trailer as vehicle
+	if entity.Trailer != nil {
+		err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
+			WateringPlanID: id,
+			VehicleID:      entity.Trailer.ID,
+		})
+		if err != nil {
+			return w.store.HandleError(err)
+		}
 	}
 
 	return nil

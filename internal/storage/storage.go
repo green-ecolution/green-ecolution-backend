@@ -82,7 +82,7 @@ type WateringPlanRepository interface {
 	GetAll(ctx context.Context) ([]*entities.WateringPlan, error)
 	// GetByID returns one watering plan by id
 	GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error)
-	// Get vehicles linked to a watering plan by its id
+	// Get vehicles linked to a watering plan by its id and the vehicle type
 	GetLinkedVehicleByID(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error)
 	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.
 	Create(ctx context.Context, fn func(tc *entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error)

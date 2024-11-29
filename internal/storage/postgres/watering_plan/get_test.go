@@ -32,7 +32,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[i].WateringPlanStatus, wp.WateringPlanStatus)
 			assert.Equal(t, allTestWateringPlans[i].Distance, wp.Distance)
 			assert.Equal(t, allTestWateringPlans[i].TotalWaterRequired, wp.TotalWaterRequired)
-			
+
 			// assert transporter
 			assert.Equal(t, allTestWateringPlans[i].Transporter.ID, wp.Transporter.ID)
 
@@ -308,8 +308,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusPlanned,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
-		Transporter: allTestVehicles[1],
-		Trailer: allTestVehicles[0],
+		Transporter:        allTestVehicles[1],
+		Trailer:            allTestVehicles[0],
 	},
 	{
 		ID:                 2,
@@ -318,8 +318,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusActive,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
-		Transporter: allTestVehicles[1],
-		Trailer: nil,
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
 	},
 	{
 		ID:                 3,
@@ -328,8 +328,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusFinished,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
-		Transporter: allTestVehicles[1],
-		Trailer: nil,
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
 	},
 	{
 		ID:                 4,
@@ -338,8 +338,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusNotCompeted,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
-		Transporter: allTestVehicles[1],
-		Trailer: nil,
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
 	},
 	{
 		ID:                 5,
@@ -348,8 +348,8 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusCanceled,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
-		Transporter: allTestVehicles[1],
-		Trailer: nil,
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
 	},
 }
 

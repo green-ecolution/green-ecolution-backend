@@ -24,6 +24,10 @@ AND v.type = 'trailer';
 INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id)
 VALUES ($1, $2);
 
+-- name: DeleteAllVehiclesWateringPlan :exec
+DELETE FROM vehicle_watering_plans
+WHERE watering_plan_id = $1;
+
 -- name: CreateWateringPlan :one
 INSERT INTO watering_plans (
   date, description, watering_plan_status, distance, total_water_required

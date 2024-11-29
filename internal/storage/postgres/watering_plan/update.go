@@ -59,7 +59,21 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}
 
-	// TODO: update linked vehicles, treecluster, users
+	err = w.store.UpdateWateringPlan(ctx, &params)
+	if err != nil {
+		return w.store.HandleError(err)
+	}
+
+	if err := w.DeleteAllVehicles(ctx, entity.ID); err != nil {
+		return w.store.HandleError(err)
+	}
+
+	err = w.setLinkedVehicles(ctx, entity, entity.ID)
+	if err != nil {
+		return w.store.HandleError(err)
+	}
+
+	// TODO: update linked treecluster, users
 
 	return w.store.UpdateWateringPlan(ctx, &params)
 }
