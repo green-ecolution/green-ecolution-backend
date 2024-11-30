@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/stretchr/testify/assert"
@@ -31,10 +32,9 @@ func TestMain(m *testing.M) {
 }
 
 func TestWateringPlanRepository_Delete(t *testing.T) {
-	suite.ResetDB(t)
-	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
-
 	t.Run("should delete watering plan", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
@@ -46,6 +46,52 @@ func TestWateringPlanRepository_Delete(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Error(t, errGot)
 		assert.Nil(t, got)
+	})
+
+	t.Run("should delete watering plan and linked vehicles in pivot table", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		gotBeforeTransporter, errBeforeTransporter := r.GetLinkedVehicleByIDAndType(context.Background(), 1, entities.VehicleTypeTransporter)
+		assert.NoError(t, errBeforeTransporter)
+		assert.NotNil(t, gotBeforeTransporter)
+
+		gotBeforeTrailer, errBeforeTrailer := r.GetLinkedVehicleByIDAndType(context.Background(), 1, entities.VehicleTypeTrailer)
+		assert.NoError(t, errBeforeTrailer)
+		assert.NotNil(t, gotBeforeTrailer)
+
+		// when
+		err := r.Delete(context.Background(), 1)
+		transporter, errGotTransporter := r.GetLinkedVehicleByIDAndType(context.Background(), 1, entities.VehicleTypeTransporter)
+		trailer, errGotTrailer := r.GetLinkedVehicleByIDAndType(context.Background(), 1, entities.VehicleTypeTrailer)
+
+		// then
+		assert.NoError(t, err)
+		assert.Error(t, errGotTransporter)
+		assert.Error(t, errGotTrailer)
+		assert.Nil(t, transporter)
+		assert.Nil(t, trailer)
+	})
+
+	t.Run("should delete watering plan and linked treecluster in pivot table", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		gotBefore, errBefore := r.GetLinkedTreeClustersByID(context.Background(), 1)
+		assert.NoError(t, errBefore)
+		assert.NotNil(t, gotBefore)
+
+		// when
+		err := r.Delete(context.Background(), 1)
+		treecluster, _ := r.GetLinkedTreeClustersByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, []*entities.TreeCluster{}, treecluster)
 	})
 
 	t.Run("should return error when watering plan not found", func(t *testing.T) {
@@ -83,5 +129,5 @@ func TestWateringPlanRepository_Delete(t *testing.T) {
 		assert.Error(t, err)
 	})
 
-	// TODO: Add test cases to check if the correct entities in the pivot tables are deleted
+	// TODO: Add test cases to check if the user in the pivot table are deleted
 }
