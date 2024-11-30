@@ -328,7 +328,6 @@ func TestWateringPlanRepository_GetLinkedVehicleByIDAndType(t *testing.T) {
 }
 
 func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
-	ctx := context.Background()
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 
@@ -338,19 +337,18 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 		shouldReturn := allTestClusters[0:2]
 
 		// when
-		got, err := r.GetLinkedTreeClustersByID(ctx, int32(1))
+		got, err := r.GetLinkedTreeClustersByID(context.Background(), 1)
 
 		// then
 		assert.NoError(t, err)
 		assert.Len(t, got, len(shouldReturn))
 		for i, tc := range got {
 			assert.Equal(t, shouldReturn[i].ID, tc.ID)
-			assert.Equal(t, shouldReturn[i].Region.ID, tc.Region.ID)
-			assert.Len(t, shouldReturn[i].Trees, len(tc.Trees))
+			assert.Equal(t, shouldReturn[i].Name, tc.Name)
 		}
 	})
 
-	t.Run("should return error when watering plan with non-existing id", func(t *testing.T) {
+	t.Run("should return empty list when watering plan is not found", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
@@ -358,11 +356,11 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 		got, err := r.GetLinkedTreeClustersByID(context.Background(), 99)
 
 		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
+		assert.NoError(t, err)
+		assert.Empty(t, got)
 	})
 
-	t.Run("should return error when watering plan with negative id", func(t *testing.T) {
+	t.Run("should return empty list when watering plan with negative id", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
@@ -370,11 +368,11 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 		got, err := r.GetLinkedTreeClustersByID(context.Background(), -1)
 
 		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
+		assert.NoError(t, err)
+		assert.Empty(t, got)
 	})
 
-	t.Run("should return error when watering plan with zero id", func(t *testing.T) {
+	t.Run("should return empty list when watering plan with zero id", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
@@ -382,8 +380,8 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 		got, err := r.GetLinkedTreeClustersByID(context.Background(), 0)
 
 		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
+		assert.NoError(t, err)
+		assert.Empty(t, got)
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -397,7 +395,7 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
+		assert.Empty(t, got)
 	})
 }
 
