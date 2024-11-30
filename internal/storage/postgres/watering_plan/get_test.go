@@ -83,7 +83,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 	})
 }
 
-func TestTreeClusterRepository_GetByID(t *testing.T) {
+func TestWateringPlanRepository_GetByID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 
@@ -327,7 +327,7 @@ func TestWateringPlanRepository_GetLinkedVehicleByIDAndType(t *testing.T) {
 	})
 }
 
-func WateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
+func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 	ctx := context.Background()
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
