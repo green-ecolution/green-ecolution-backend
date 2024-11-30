@@ -63,7 +63,7 @@ func (w *WateringPlanRepository) GetLinkedVehicleByIDAndType(ctx context.Context
 }
 
 func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, id int32) ([]*entities.TreeCluster, error) {
-	rows, err := w.store.GetTreeClustersByWateringPlanID(ctx)
+	rows, err := w.store.GetTreeClustersByWateringPlanID(ctx, id)
 	if err != nil {
 		return nil, w.store.HandleError(err)
 	}
