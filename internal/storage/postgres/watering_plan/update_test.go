@@ -86,7 +86,14 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, input.Trailer.ID, got.Trailer.ID)
 		assert.Equal(t, input.Trailer.NumberPlate, got.Trailer.NumberPlate)
 
-		// TODO: test linkd treeclusters, vehicles and users
+		// assert treecluster
+		assert.Len(t, input.Treecluster, len(got.Treecluster))
+		for i, tc := range got.Treecluster {
+			assert.Equal(t, input.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
+		}
+
+		// TODO: test linked users
 	})
 
 	t.Run("should update watering plan and unlink trailer", func(t *testing.T) {
@@ -126,7 +133,14 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// assert nil trailer
 		assert.Nil(t, got.Trailer)
 
-		// TODO: test linkd treeclusters, vehicles and users
+		// assert treecluster
+		assert.Len(t, input.Treecluster, len(got.Treecluster))
+		for i, tc := range got.Treecluster {
+			assert.Equal(t, input.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
+		}
+
+		// TODO: test linked users
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {

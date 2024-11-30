@@ -89,9 +89,10 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Trailer.NumberPlate, getWp.Trailer.NumberPlate)
 
 		// assert treecluster
+		assert.Len(t, input.Treecluster, len(getWp.Treecluster))
 		for i, tc := range getWp.Treecluster {
-			assert.Equal(t, getWp.Treecluster[i].ID, tc.ID)
-			assert.Equal(t, getWp.Treecluster[i].Name, tc.Name)
+			assert.Equal(t, input.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
 		}
 
 		// TODO: test linkd users
@@ -133,9 +134,10 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Nil(t, got.Trailer)
 
 		// assert treecluster
+		assert.Len(t, input.Treecluster, len(getWp.Treecluster))
 		for i, tc := range getWp.Treecluster {
-			assert.Equal(t, getWp.Treecluster[i].ID, tc.ID)
-			assert.Equal(t, getWp.Treecluster[i].Name, tc.Name)
+			assert.Equal(t, input.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
 		}
 
 		// TODO: test linkd users

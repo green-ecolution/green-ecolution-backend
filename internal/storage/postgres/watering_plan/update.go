@@ -64,7 +64,7 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return w.store.HandleError(err)
 	}
 
-	if err := w.store.DeleteAllVehiclesWateringPlan(ctx, entity.ID); err != nil {
+	if err := w.store.DeleteAllVehiclesFromWateringPlan(ctx, entity.ID); err != nil {
 		return w.store.HandleError(err)
 	}
 
@@ -72,7 +72,15 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return w.store.HandleError(err)
 	}
 
-	// TODO: update linked treecluster, users
+	if err := w.store.DeleteAllTreeClusterFromWateringPlan(ctx, entity.ID); err != nil {
+		return w.store.HandleError(err)
+	}
+
+	if err := w.setLinkedTreeClusters(ctx, entity, entity.ID); err != nil {
+		return w.store.HandleError(err)
+	}
+
+	// TODO: update linked users
 
 	return w.store.UpdateWateringPlan(ctx, &params)
 }

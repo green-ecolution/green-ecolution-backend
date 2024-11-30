@@ -39,7 +39,7 @@ AND v.type = 'trailer';
 INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id)
 VALUES ($1, $2);
 
--- name: DeleteAllVehiclesWateringPlan :exec
+-- name: DeleteAllVehiclesFromWateringPlan :exec
 DELETE FROM vehicle_watering_plans
 WHERE watering_plan_id = $1;
 
@@ -52,3 +52,7 @@ WHERE tcwp.watering_plan_id = $1;
 -- name: SetTreeclusterToWateringPlan :exec
 INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id)
 VALUES ($1, $2);
+
+-- name: DeleteAllTreeClusterFromWateringPlan :exec
+DELETE FROM tree_cluster_watering_plans
+WHERE watering_plan_id = $1;
