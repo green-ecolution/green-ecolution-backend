@@ -23,7 +23,7 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 		}
 	}
 
-	// TODO: get mapped data like users, treecluster
+	// TODO: get mapped data like users
 	return data, nil
 }
 
@@ -38,7 +38,7 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 		return nil, err
 	}
 
-	// TODO: get mapped data like users, treecluster
+	// TODO: get mapped data like users
 	return wp, nil
 }
 
@@ -73,6 +73,11 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
 	var err error
+
+	wp.Treecluster, err = w.GetLinkedTreeClustersByID(ctx, wp.ID)
+	if err != nil {
+		return w.store.HandleError(err)
+	}
 
 	wp.Transporter, err = w.GetLinkedVehicleByIDAndType(ctx, wp.ID, entities.VehicleTypeTransporter)
 	if err != nil {

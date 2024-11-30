@@ -2,6 +2,7 @@ package wateringplan
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -43,6 +44,15 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			} else {
 				assert.NotNil(t, wp.Trailer)
 				assert.Equal(t, allTestWateringPlans[i].Trailer.ID, wp.Trailer.ID)
+			}
+
+			// assert treecluster
+			fmt.Println("-----")
+			fmt.Println(allTestWateringPlans[i].Treecluster)
+			fmt.Println(wp.Treecluster)
+			assert.Len(t, allTestWateringPlans[i].Treecluster, len(wp.Treecluster))
+			for j, tc := range wp.Treecluster {
+				assert.Equal(t, allTestWateringPlans[i].Treecluster[j].ID, tc.ID)
 			}
 		}
 	})
@@ -308,7 +318,7 @@ func WateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 	t.Run("should return treecluster by watering plan id", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		shouldReturn := allTestCluster[0:2]
+		shouldReturn := allTestClusters[0:2]
 
 		// when
 		got, err := r.GetLinkedTreeClustersByID(ctx, int32(1))
@@ -318,8 +328,8 @@ func WateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 		assert.Len(t, got, len(shouldReturn))
 		for i, tc := range got {
 			assert.Equal(t, shouldReturn[i].ID, tc.ID)
-			assert.Equal(t, shouldReturn[i].RegionID, tc.Region.ID)
-			assert.Len(t, shouldReturn[i].TreeIDs, len(tc.Trees))
+			assert.Equal(t, shouldReturn[i].Region.ID, tc.Region.ID)
+			assert.Len(t, shouldReturn[i].Trees, len(tc.Trees))
 		}
 	})
 
@@ -384,6 +394,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
+		Treecluster:        allTestClusters[0:1],
 	},
 	{
 		ID:                 2,
@@ -394,6 +405,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
+		Treecluster:        allTestClusters[2:2],
 	},
 	{
 		ID:                 3,
@@ -404,6 +416,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
+		Treecluster:        allTestClusters[0:2],
 	},
 	{
 		ID:                 4,
@@ -414,6 +427,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
+		Treecluster:        allTestClusters[2:2],
 	},
 	{
 		ID:                 5,
@@ -423,7 +437,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
-		Trailer:            nil,
+		Treecluster:        allTestClusters[2:2],
 	},
 }
 
@@ -446,42 +460,61 @@ var allTestVehicles = []*entities.Vehicle{
 	},
 }
 
-type testTreeCluster struct {
-	ID       int32
-	Name     string
-	RegionID int32
-	TreeIDs  []int32
-}
-
-var allTestCluster = []*testTreeCluster{
+var allTestClusters = []*entities.TreeCluster{
 	{
-		ID:       1,
-		Name:     "Solitüde Strand",
-		RegionID: 1,
-		TreeIDs:  []int32{1, 2, 3},
+		ID:             1,
+		Name:           "Solitüde Strand",
+		WateringStatus: entities.WateringStatusGood,
+		MoistureLevel:  0.75,
+		Region: &entities.Region{
+			ID:   1,
+			Name: "Mürwik",
+		},
+		Address:       "Solitüde Strand",
+		Description:   "Alle Bäume am Strand",
+		SoilCondition: entities.TreeSoilConditionSandig,
+		Latitude:      utils.P(54.820940),
+		Longitude:     utils.P(9.489022),
+		Trees: []*entities.Tree{
+			{ID: 1},
+			{ID: 2},
+			{ID: 3},
+		},
 	},
 	{
-		ID:       2,
-		Name:     "Sankt-Jürgen-Platz",
-		RegionID: 1,
-		TreeIDs:  []int32{4, 5, 6},
+		ID:             2,
+		Name:           "Sankt-Jürgen-Platz",
+		WateringStatus: entities.WateringStatusModerate,
+		MoistureLevel:  0.5,
+		Region: &entities.Region{
+			ID:   1,
+			Name: "Mürwik",
+		},
+		Address:       "Ulmenstraße",
+		Description:   "Bäume beim Sankt-Jürgen-Platz",
+		SoilCondition: entities.TreeSoilConditionSchluffig,
+		Latitude:      utils.P(54.78805731048199),
+		Longitude:     utils.P(9.44400186680097),
+		Trees: []*entities.Tree{
+			{ID: 4},
+			{ID: 5},
+			{ID: 6},
+		},
 	},
 	{
-		ID:       3,
-		Name:     "Flensburger Stadion",
-		RegionID: 1,
-		TreeIDs:  []int32{16, 17, 18, 19, 20},
-	},
-	{
-		ID:       4,
-		Name:     "Campus Hochschule",
-		RegionID: 4,
-		TreeIDs:  []int32{12, 13, 14, 15},
-	},
-	{
-		ID:       5,
-		Name:     "Mathildenstraße",
-		RegionID: 10,
-		TreeIDs:  []int32{7, 8, 9, 10, 11},
+		ID:             3,
+		Name:           "Flensburger Stadion",
+		WateringStatus: "unknown",
+		MoistureLevel:  0.7,
+		Region: &entities.Region{
+			ID:   1,
+			Name: "Mürwik",
+		},
+		Address:       "Flensburger Stadion",
+		Description:   "Alle Bäume in der Gegend des Stadions in Mürwik",
+		SoilCondition: "schluffig",
+		Latitude:      utils.P(54.802163),
+		Longitude:     utils.P(9.446398),
+		Trees:         []*entities.Tree{},
 	},
 }

@@ -44,7 +44,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		TotalWaterRequired: utils.P(30000.0),
 		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
 		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:5],
+		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:3],
 		Users:              []*entities.User{testUser},
 	}
 
@@ -87,6 +87,13 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// assert linked trailer
 		assert.NotNil(t, getWp.Trailer)
 		assert.Equal(t, input.Trailer.NumberPlate, getWp.Trailer.NumberPlate)
+
+		// assert linked treecluster
+		// for i, tc := range got {
+		// 	assert.Equal(t, shouldReturn[i].ID, tc.ID)
+		// 	assert.Equal(t, shouldReturn[i].RegionID, tc.Region.ID)
+		// 	assert.Len(t, shouldReturn[i].TreeIDs, len(tc.Trees))
+		// }
 
 		// TODO: test linkd treeclusters, vehicles and users
 	})

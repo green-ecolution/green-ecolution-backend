@@ -21,8 +21,11 @@ INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id) VALU
 (1, 1),
 (2, 1),
 (3, 2),
-(4, 2),
-(5, 2);
+(1, 3),
+(2, 3),
+(3, 3),
+(3, 4),
+(3, 5);
 -- +goose StatementEnd
 
 -- +goose Down

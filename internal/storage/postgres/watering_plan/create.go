@@ -91,10 +91,13 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 		return nil, w.store.HandleError(err)
 	}
 
-	// TODO: Link treecluster and users in pivot table
+	// TODO: Link users in pivot table
 
-	err = w.setLinkedVehicles(ctx, entity, id)
-	if err != nil {
+	if err := w.setLinkedVehicles(ctx, entity, id); err != nil {
+		return nil, w.store.HandleError(err)
+	}
+
+	if err := w.setLinkedTreeClusters(ctx, entity, id); err != nil {
 		return nil, w.store.HandleError(err)
 	}
 
@@ -136,6 +139,20 @@ func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *
 		err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
 			WateringPlanID: id,
 			VehicleID:      entity.Trailer.ID,
+		})
+		if err != nil {
+			return w.store.HandleError(err)
+		}
+	}
+
+	return nil
+}
+
+func (w *WateringPlanRepository) setLinkedTreeClusters(ctx context.Context, entity *entities.WateringPlan, id int32) error {
+	for _, tc := range entity.Treecluster {
+		err := w.store.SetTreeclusterToWateringPlan(ctx, &sqlc.SetTreeclusterToWateringPlanParams{
+			WateringPlanID: id,
+			TreeClusterID:  tc.ID,
 		})
 		if err != nil {
 			return w.store.HandleError(err)

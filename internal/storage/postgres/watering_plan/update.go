@@ -68,8 +68,7 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return w.store.HandleError(err)
 	}
 
-	err = w.setLinkedVehicles(ctx, entity, entity.ID)
-	if err != nil {
+	if err := w.setLinkedVehicles(ctx, entity, entity.ID); err != nil {
 		return w.store.HandleError(err)
 	}
 
