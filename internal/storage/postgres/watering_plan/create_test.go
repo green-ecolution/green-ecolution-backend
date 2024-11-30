@@ -95,7 +95,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
 		}
 
-		// TODO: test linkd users
+		// TODO: test linked users
 	})
 
 	t.Run("should create watering plan with default values", func(t *testing.T) {
@@ -140,7 +140,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
 		}
 
-		// TODO: test linkd users
+		// TODO: test linked users
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
