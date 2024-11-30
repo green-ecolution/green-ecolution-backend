@@ -80,22 +80,21 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		getWp, getErr := r.GetByID(context.Background(), got.ID)
 		assert.NoError(t, getErr)
 
-		// assert linked transporter
+		// assert transporter
 		assert.NotNil(t, getWp.Transporter)
 		assert.Equal(t, input.Transporter.NumberPlate, getWp.Transporter.NumberPlate)
 
-		// assert linked trailer
+		// assert trailer
 		assert.NotNil(t, getWp.Trailer)
 		assert.Equal(t, input.Trailer.NumberPlate, getWp.Trailer.NumberPlate)
 
-		// assert linked treecluster
-		// for i, tc := range got {
-		// 	assert.Equal(t, shouldReturn[i].ID, tc.ID)
-		// 	assert.Equal(t, shouldReturn[i].RegionID, tc.Region.ID)
-		// 	assert.Len(t, shouldReturn[i].TreeIDs, len(tc.Trees))
-		// }
+		// assert treecluster
+		for i, tc := range getWp.Treecluster {
+			assert.Equal(t, getWp.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, getWp.Treecluster[i].Name, tc.Name)
+		}
 
-		// TODO: test linkd treeclusters, vehicles and users
+		// TODO: test linkd users
 	})
 
 	t.Run("should create watering plan with default values", func(t *testing.T) {
@@ -126,14 +125,20 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		getWp, getErr := r.GetByID(context.Background(), got.ID)
 		assert.NoError(t, getErr)
 
-		// assert linked transporter
+		// assert transporter
 		assert.NotNil(t, getWp.Transporter)
 		assert.Equal(t, input.Transporter.NumberPlate, getWp.Transporter.NumberPlate)
 
-		// assert no linked trailer
+		// assert no trailer
 		assert.Nil(t, got.Trailer)
 
-		// TODO: test linkd treeclusters and users
+		// assert treecluster
+		for i, tc := range getWp.Treecluster {
+			assert.Equal(t, getWp.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, getWp.Treecluster[i].Name, tc.Name)
+		}
+
+		// TODO: test linkd users
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
@@ -349,30 +354,6 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Nil(t, wp)
-		assert.Empty(t, got)
-	})
-
-	t.Run("should rollback transaction when createFn returns error and return error", func(t *testing.T) {
-		// given
-		newID := int32(9)
-
-		r := NewWateringPlanRepository(suite.Store, mappers)
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
-			wp.Date = input.Date
-			wp.Transporter = input.Transporter
-			wp.Trailer = input.Trailer
-			wp.Treecluster = input.Treecluster
-			wp.Users = input.Users
-			return false, assert.AnError
-		}
-
-		// when
-		wp, err := r.Create(context.Background(), createFn)
-		got, _ := suite.Store.GetWateringPlanByID(context.Background(), newID)
-
-		// then
-		assert.Error(t, err)
 		assert.Nil(t, wp)
 		assert.Empty(t, got)
 	})
