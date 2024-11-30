@@ -8,16 +8,18 @@ type PluginResponse struct {
 	HostPath    string `json:"host_path"`
 } // @name Plugin
 
+type PluginAuth struct {
+	ClientID     string `json:"client_id"`
+	ClientSecret string `json:"client_secret"`
+} // @name PluginAuth
+
 type PluginRegisterRequest struct {
-	Slug        string `json:"slug"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Version     string `json:"version"`
-	Path        string `json:"path"`
-	Auth        struct {
-		ClientID     string `json:"client_id"`
-		ClientSecret string `json:"client_secret"`
-	} `json:"auth"`
+	Slug        string     `json:"slug"`
+	Name        string     `json:"name"`
+	Description string     `json:"description"`
+	Version     string     `json:"version"`
+	Path        string     `json:"path"`
+	Auth        PluginAuth `json:"auth"`
 } // @name PluginRegisterRequest
 
 type PluginRegisterResponse struct {
