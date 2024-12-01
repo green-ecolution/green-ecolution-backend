@@ -58,7 +58,7 @@ type InfoService interface {
 
 type MqttService interface {
 	Service
-	HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.MqttPayload, error)
+	HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error)
 	SetConnected(bool)
 }
 

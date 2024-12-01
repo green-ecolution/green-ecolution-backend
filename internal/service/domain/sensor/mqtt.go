@@ -23,13 +23,13 @@ func NewMqttService(sensorRepository storage.SensorRepository) *MqttService {
 		validator:  validator.New()}
 }
 
-func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.MqttPayload, error) {
+func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error) {
 	if payload == nil {
 		return nil, handleError(errors.New("mqtt payload is nil"))
 	}
 
 	if err := s.validator.Struct(payload); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, service.ErrValidation.Error()).Error())
 	}
 
 	sensor, err := s.sensorRepo.GetByID(ctx, payload.DeviceID)
@@ -62,7 +62,11 @@ func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPay
 		}
 	}
 
-	return payload, nil
+	sensorData, err := s.sensorRepo.GetSensorDataByID(ctx, sensor.ID)
+	if err != nil {
+		return nil, err
+	}
+	return sensorData, nil
 }
 
 func (s *MqttService) SetConnected(ready bool) {
