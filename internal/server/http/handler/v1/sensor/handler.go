@@ -1,8 +1,6 @@
 package sensor
 
 import (
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -68,13 +66,9 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 func GetSensorByID(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("id"))
-		if err != nil {
-			err := service.NewError(service.BadRequest, "invalid ID format")
-			return errorhandler.HandleError(err)
-		}
+		id := c.Params("id")
 
-		domainData, err := svc.GetByID(ctx, int32(id))
+		domainData, err := svc.GetByID(ctx, id)
 
 		if err != nil {
 			return errorhandler.HandleError(err)
@@ -172,13 +166,10 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 func DeleteSensor(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("id"))
-		if err != nil {
-			err = service.NewError(service.BadRequest, "invalid ID format")
-			return errorhandler.HandleError(err)
-		}
+		id := c.Params("id")
 
-		err = svc.Delete(ctx, int32(id))
+		err := svc.Delete(ctx, id)
+		
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
