@@ -3,6 +3,7 @@ package vehicle
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -104,7 +105,7 @@ func GetVehicleByPlate(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		plate := c.Params("plate")
+		plate := strings.Clone(c.Params("plate"))
 		if plate == "" {
 			fmt.Print(plate)
 			err := service.NewError(service.BadRequest, "invalid Plate format")

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -17,7 +18,8 @@ func TestRegisterTreeRoutes(t *testing.T) {
 	t.Run("/v1/tree", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
-			app := RegisterRoutes(mockTreeService)
+			app := fiber.New()
+			RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().GetAll(
 				mock.Anything,
@@ -35,7 +37,8 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 		t.Run("should call POST", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
-			app := RegisterRoutes(mockTreeService)
+			app := fiber.New()
+			RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().Create(
 				mock.Anything,
@@ -58,7 +61,8 @@ func TestRegisterTreeRoutes(t *testing.T) {
 	t.Run("/v1/tree/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
-			app := RegisterRoutes(mockTreeService)
+			app := fiber.New()
+			RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().GetByID(
 				mock.Anything,
@@ -77,7 +81,8 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 		t.Run("should call PUT handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
-			app := RegisterRoutes(mockTreeService)
+			app := fiber.New()
+			RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().Update(
 				mock.Anything,
@@ -99,7 +104,8 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 		t.Run("should call DELETE", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
-			app := RegisterRoutes(mockTreeService)
+			app := fiber.New()
+			RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().Delete(
 				mock.Anything,
@@ -120,8 +126,10 @@ func TestRegisterTreeRoutes(t *testing.T) {
 	t.Run("/v1/tree/sensor/:sensor_id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
-			app := RegisterRoutes(mockTreeService)
 			sensorID := "sensor-1"
+			app := fiber.New()
+			RegisterRoutes(app, mockTreeService)
+
 			mockTreeService.EXPECT().GetBySensorID(
 				mock.Anything,
 				sensorID,

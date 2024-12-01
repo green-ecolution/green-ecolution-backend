@@ -5,36 +5,83 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/fileimport"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/plugin"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (s *Server) privateRoutes(app *fiber.App) {
-	grp := app.Group("/api/v1")
-
-	grp.Mount("/info", info.RegisterRoutes(s.services.InfoService))
-	grp.Mount("/cluster", treecluster.RegisterRoutes(s.services.TreeClusterService))
-	grp.Mount("/tree", tree.RegisterRoutes(s.services.TreeService))
-	grp.Mount("/sensor", sensor.RegisterRoutes(s.services.SensorService))
-	grp.Mount("/user", user.RegisterRoutes(s.services.AuthService))
-	grp.Mount("/role", user.RegisterRoutes(s.services.AuthService))
-	grp.Mount("/region", region.RegisterRoutes(s.services.RegionService))
-	grp.Mount("/vehicle", vehicle.RegisterRoutes(s.services.VehicleService))
-	grp.Mount("/import", fileimport.RegisterRoutes(s.services.TreeService))
-}
-
-func (s *Server) publicRoutes(app *fiber.App) {
-	app.Use("/", middleware.HealthCheck(s.services))
-	app.Get("/", func(c *fiber.Ctx) error {
+func (s *Server) root(router fiber.Router, authMiddlewares ...fiber.Handler) {
+	router.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
+	s.api(router, authMiddlewares...)
+}
 
-	grp := app.Group("/api/v1")
-	grp.Get("/swagger/*", swagger.HandlerDefault)
-	grp.Mount("/user", user.RegisterPublicRoutes(s.services.AuthService))
+func (s *Server) api(router fiber.Router, authMiddlewares ...fiber.Handler) {
+	router.Route("/api", func(router fiber.Router) { s.v1(router, authMiddlewares...) })
+}
+
+func (s *Server) v1(router fiber.Router, authMiddlewares ...fiber.Handler) {
+	authMiddleware := utils.Map(authMiddlewares, func(m fiber.Handler) any { return m })
+
+	app := router.Group("/v1")
+
+	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	app.Route("/info", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		info.RegisterRoutes(router, s.services.InfoService)
+	})
+
+	app.Route("/cluster", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		treecluster.RegisterRoutes(router, s.services.TreeClusterService)
+	})
+
+	app.Route("/tree", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		tree.RegisterRoutes(router, s.services.TreeService)
+	})
+
+	app.Route("/sensor", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		sensor.RegisterRoutes(router, s.services.SensorService)
+	})
+
+	app.Route("/user", func(router fiber.Router) {
+		user.RegisterPublicRoutes(router, s.services.AuthService)
+		router.Use(authMiddleware...)
+		user.RegisterRoutes(router, s.services.AuthService)
+	})
+
+	// app.Route("/role", func(router fiber.Router) {
+	// 	router.Use(authMiddleware...)
+	// 	user.RegisterRoutes(router, s.services.AuthService)
+	// })
+
+	app.Route("/region", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		region.RegisterRoutes(router, s.services.RegionService)
+	})
+
+	app.Route("/vehicle", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		vehicle.RegisterRoutes(router, s.services.VehicleService)
+	})
+
+	app.Route("/import", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		fileimport.RegisterRoutes(router, s.services.TreeService)
+	})
+
+	app.Route("/plugin", func(router fiber.Router) {
+		plugin.RegisterRoutes(router, s.services.PluginService)
+		router.Use(authMiddleware...)
+		plugin.RegisterPrivateRoutes(router, s.services.PluginService)
+	})
 }

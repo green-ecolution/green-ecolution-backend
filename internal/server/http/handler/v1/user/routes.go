@@ -5,26 +5,18 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.AuthService) *fiber.App {
-	app := fiber.New()
-
-	app.Post("/", Register(svc))
-	app.Get("/", GetAllUsers(svc))
-	app.Get("/:id", GetUserByID(svc))
-	app.Put("/:id", UpdateUserByID(svc))
-	app.Delete("/:id", DeleteUserByID(svc))
-	app.Get("/:id/roles", GetUserRoles(svc))
-
-	return app
+func RegisterRoutes(r fiber.Router, svc service.AuthService) {
+	r.Post("/", Register(svc))
+	r.Get("/", GetAllUsers(svc))
+	r.Get("/:id", GetUserByID(svc))
+	r.Put("/:id", UpdateUserByID(svc))
+	r.Delete("/:id", DeleteUserByID(svc))
+	r.Get("/:id/roles", GetUserRoles(svc))
 }
 
-func RegisterPublicRoutes(svc service.AuthService) *fiber.App {
-	app := fiber.New()
-
-	app.Post("/logout", Logout(svc))
-	app.Get("/login", Login(svc))
-	app.Post("/login/token", RequestToken(svc))
-	app.Post("/token/refresh", RefreshToken(svc))
-
-	return app
+func RegisterPublicRoutes(r fiber.Router, svc service.AuthService) {
+	r.Post("/logout", Logout(svc))
+	r.Get("/login", Login(svc))
+	r.Post("/login/token", RequestToken(svc))
+	r.Post("/token/refresh", RefreshToken(svc))
 }

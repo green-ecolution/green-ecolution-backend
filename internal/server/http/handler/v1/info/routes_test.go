@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gofiber/fiber/v2"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,7 +15,8 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/info", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockInfoService := serviceMock.NewMockInfoService(t)
-			app := RegisterRoutes(mockInfoService)
+			app := fiber.New()
+			RegisterRoutes(app, mockInfoService)
 
 			mockInfoService.EXPECT().GetAppInfoResponse(
 				mock.Anything,

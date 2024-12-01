@@ -7,10 +7,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 )
 
-func (s *Server) middleware(
-	initPublicRoutes func(app *fiber.App),
-	initPrivateRoutes func(app *fiber.App),
-) *fiber.App {
+func (s *Server) middleware() *fiber.App {
 	slog.Info("Setting up fiber middlewares")
 
 	app := fiber.New()
@@ -19,10 +16,8 @@ func (s *Server) middleware(
 	app.Use(middleware.HTTPLogger())
 	app.Use(middleware.RequestID())
 
-	initPublicRoutes(app)
-
-	app.Use(middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService))
-	initPrivateRoutes(app)
+	authMiddlware := middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService)
+	s.root(app, authMiddlware)
 	slog.Info("Fiber middlewares setup complete")
 
 	return app

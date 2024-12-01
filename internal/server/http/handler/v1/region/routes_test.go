@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
@@ -15,7 +16,8 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/region", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
-			app := RegisterRoutes(mockRegionService)
+			app := fiber.New()
+			RegisterRoutes(app, mockRegionService)
 
 			expectedRegions := []*entities.Region{
 				{ID: 1, Name: "Region A"},
@@ -40,7 +42,8 @@ func TestRegisterRoutes(t *testing.T) {
 	t.Run("/v1/region/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockRegionService := serviceMock.NewMockRegionService(t)
-			app := RegisterRoutes(mockRegionService)
+			app := fiber.New()
+			RegisterRoutes(app, mockRegionService)
 
 			mockRegionService.EXPECT().GetByID(
 				mock.Anything,
