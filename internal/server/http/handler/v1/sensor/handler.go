@@ -1,6 +1,8 @@
 package sensor
 
 import (
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -66,7 +68,11 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 func GetSensorByID(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id := c.Params("id")
+		id := strings.Clone(c.Params("id"))
+		if id == "" {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
 
 		domainData, err := svc.GetByID(ctx, id)
 
@@ -166,7 +172,11 @@ func UpdateSensor(_ service.Service) fiber.Handler {
 func DeleteSensor(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id := c.Params("id")
+		id := strings.Clone(c.Params("id"))
+		if id == "" {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
 
 		err := svc.Delete(ctx, id)
 		

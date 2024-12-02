@@ -56,11 +56,11 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockSensorService.EXPECT().GetByID(
 				mock.Anything,
-				int32(1),
+				"sensor-1",
 			).Return(TestSensor, nil)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor-1", nil)
 
 			// then
 			resp, err := app.Test(req)
@@ -75,7 +75,7 @@ func TestRegisterRoutes(t *testing.T) {
 			RegisterRoutes(app, mockSensorService)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/sensor-1", nil)
 
 			// then
 			resp, err := app.Test(req)
@@ -96,11 +96,11 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockSensorService.EXPECT().Delete(
 				mock.Anything,
-				int32(1),
+				"sensor-1",
 			).Return(nil)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/sensor-1", nil)
 
 			// then
 			resp, err := app.Test(req)
@@ -117,7 +117,7 @@ func TestRegisterRoutes(t *testing.T) {
 			RegisterRoutes(app, mockSensorService)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1/data", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor-1/data", nil)
 
 			// then
 			resp, err := app.Test(req)

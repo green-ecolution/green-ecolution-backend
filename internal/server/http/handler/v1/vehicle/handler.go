@@ -1,7 +1,6 @@
 package vehicle
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -107,7 +106,6 @@ func GetVehicleByPlate(svc service.VehicleService) fiber.Handler {
 
 		plate := strings.Clone(c.Params("plate"))
 		if plate == "" {
-			fmt.Print(plate)
 			err := service.NewError(service.BadRequest, "invalid Plate format")
 			return errorhandler.HandleError(err)
 		}
