@@ -13,7 +13,7 @@ import (
 func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, error) {
 	rows, err := r.store.GetAllSensors(ctx)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSqlList(rows), nil
@@ -22,7 +22,7 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, erro
 func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Sensor, error) {
 	row, err := r.store.GetSensorByID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -31,7 +31,7 @@ func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Se
 func (r *SensorRepository) GetStatusByID(ctx context.Context, id string) (*entities.SensorStatus, error) {
 	sensor, err := r.GetByID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return &sensor.Status, nil
@@ -44,7 +44,7 @@ func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entiti
 
 	row, err := r.store.GetSensorByStatus(ctx, sqlc.SensorStatus(*status))
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSqlList(row), nil
@@ -53,7 +53,7 @@ func (r *SensorRepository) GetSensorByStatus(ctx context.Context, status *entiti
 func (r *SensorRepository) GetSensorDataByID(ctx context.Context, id string) ([]*entities.SensorData, error) {
 	rows, err := r.store.GetSensorDataBySensorID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	domainData := make([]*entities.SensorData, len(rows))
