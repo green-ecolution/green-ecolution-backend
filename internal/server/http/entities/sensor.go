@@ -42,6 +42,7 @@ type SensorDataListResponse struct {
 } // @Name SensorDataList
 
 type SensorCreateRequest struct {
+	ID               string  `json:"id"`
 	Status    SensorStatus `json:"status"`
 	Latitude  float64      `json:"latitude"`
 	Longitude float64      `json:"longitude"`
