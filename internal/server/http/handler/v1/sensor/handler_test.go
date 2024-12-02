@@ -219,6 +219,7 @@ func TestDeleteSensor(t *testing.T) {
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
+		
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
