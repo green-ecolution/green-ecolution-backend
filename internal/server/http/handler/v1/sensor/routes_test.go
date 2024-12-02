@@ -88,12 +88,7 @@ func TestRegisterRoutes(t *testing.T) {
 			mockSensorService := serviceMock.NewMockSensorService(t)
 			app := fiber.New()
 			RegisterRoutes(app, mockSensorService)
-
-			mockSensorService.EXPECT().Delete(
-				mock.Anything,
-				int32(1),
-			).Return(nil)
-
+			
 			mockSensorService.EXPECT().Delete(
 				mock.Anything,
 				"sensor-1",

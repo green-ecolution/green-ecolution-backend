@@ -211,22 +211,6 @@ func TestDeleteSensor(t *testing.T) {
 		mockSensorService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
-		mockSensorService := serviceMock.NewMockSensorService(t)
-		app := fiber.New()
-		handler := DeleteSensor(mockSensorService)
-
-		app.Delete("/v1/sensor/:id", handler)
-
-		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/sensor/invalid", nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	})
-
 	t.Run("should return 404 for non-existing sensor", func(t *testing.T) {
 		mockSensorService := serviceMock.NewMockSensorService(t)
 		app := fiber.New()
