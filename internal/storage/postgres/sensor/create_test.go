@@ -146,12 +146,12 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
-		_, err := r.Create(context.Background(), 
-			WithSensorID(input.ID), 
+		_, err := r.Create(context.Background(),
+			WithSensorID(input.ID),
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status))
-		
+
 		assert.NoError(t, err)
 
 		// when
@@ -166,12 +166,12 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 	t.Run("should return error when data is empty", func(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
-		_, err := r.Create(context.Background(), 
-			WithSensorID("sensor-124"), 
+		_, err := r.Create(context.Background(),
+			WithSensorID("sensor-124"),
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status))
-		
+
 		assert.NoError(t, err)
 
 		var data []*entities.SensorData
@@ -237,9 +237,9 @@ var inputPayload = &entities.MqttPayload{
 }
 
 var input = *&entities.SensorCreate{
-	ID: "sensor-123",
-	Status:    entities.SensorStatusOnline,
-	Data:      []*entities.SensorData{
+	ID:     "sensor-123",
+	Status: entities.SensorStatusOnline,
+	Data: []*entities.SensorData{
 		{
 			ID:        1,
 			CreatedAt: time.Now(),

@@ -88,7 +88,7 @@ func TestSensorService_GetByID(t *testing.T) {
 
 func TestSensorService_Create(t *testing.T) {
 	newSensor := &entities.SensorCreate{
-		ID: "sensor-1",
+		ID:        "sensor-1",
 		Status:    entities.SensorStatusOnline,
 		Data:      sensorUtils.TestSensor.Data,
 		Latitude:  9.446741,
@@ -197,7 +197,6 @@ func TestSensorService_Create(t *testing.T) {
 		assert.Contains(t, err.Error(), "validation error")
 	})
 
-	
 	t.Run("should return an error when creating sensor fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
@@ -208,8 +207,8 @@ func TestSensorService_Create(t *testing.T) {
 
 		newSensor.ID = "sensor-23"
 		newSensor.Status = entities.SensorStatusOffline
-		newSensor.Latitude =  9.446741
-		newSensor.Longitude =  54.801539
+		newSensor.Latitude = 9.446741
+		newSensor.Longitude = 54.801539
 
 		sensorRepo.EXPECT().Create(
 			context.Background(),

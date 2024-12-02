@@ -17,7 +17,7 @@ type SensorService struct {
 	sensorRepo    storage.SensorRepository
 	treeRepo      storage.TreeRepository
 	flowerbedRepo storage.FlowerbedRepository
-	validator       *validator.Validate
+	validator     *validator.Validate
 }
 
 func NewSensorService(
@@ -29,7 +29,7 @@ func NewSensorService(
 		sensorRepo:    sensorRepo,
 		treeRepo:      treeRepo,
 		flowerbedRepo: flowerbedRepo,
-		validator: validator.New(),
+		validator:     validator.New(),
 	}
 }
 
@@ -69,7 +69,7 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 }
 
 func (s *SensorService) Update(ctx context.Context, id string, su *entities.SensorUpdate) (*entities.Sensor, error) {
-	fmt.Println(su);
+	fmt.Println(su)
 	if err := s.validator.Struct(su); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
