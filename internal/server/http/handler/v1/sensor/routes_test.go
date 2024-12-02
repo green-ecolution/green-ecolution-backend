@@ -94,6 +94,11 @@ func TestRegisterRoutes(t *testing.T) {
 				int32(1),
 			).Return(nil)
 
+			mockSensorService.EXPECT().Delete(
+				mock.Anything,
+				int32(1),
+			).Return(nil)
+
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
 
