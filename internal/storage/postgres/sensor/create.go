@@ -26,7 +26,7 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 		fn(entity)
 	}
 
-	sensor, err := r.GetByID(ctx, entity.ID)
+	sensor, _ := r.GetByID(ctx, entity.ID)
 	if sensor != nil {
 		return nil, errors.New("sensor with same ID already exists")
 	}
