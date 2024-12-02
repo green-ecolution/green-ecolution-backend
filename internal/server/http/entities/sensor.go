@@ -17,7 +17,8 @@ type SensorResponse struct {
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 	Status    SensorStatus `json:"status"`
-	Type      string       `json:"type"`
+	Latitude  float64      `json:"latitude"`
+	Longitude float64      `json:"longitude"`
 } // @Name Sensor
 
 type SensorListResponse struct {
@@ -41,11 +42,13 @@ type SensorDataListResponse struct {
 } // @Name SensorDataList
 
 type SensorCreateRequest struct {
-	Status SensorStatus `json:"status"`
-	Type   string       `json:"type"`
+	Status    SensorStatus `json:"status"`
+	Latitude  float64      `json:"latitude"`
+	Longitude float64      `json:"longitude"`
 } // @Name SensorCreate
 
 type SensorUpdateRequest struct {
-	Status SensorStatus `json:"status"`
-	Type   string       `json:"type"`
+	Status    SensorStatus `json:"status"`
+	Latitude  float64      `json:"latitude"`
+	Longitude float64      `json:"longitude"`
 } // @Name SensorUpdate

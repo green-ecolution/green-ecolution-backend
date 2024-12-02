@@ -9,10 +9,12 @@ import (
 
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
-// goverter:extend MapSensorStatus
+// goverter:extend MapSensorStatus MapSensorStatusReq
 type SensorHTTPMapper interface {
-	// goverter:ignore Type
 	FromResponse(src *domain.Sensor) *entities.SensorResponse
+
+	// goverter:ignore Data
+	FromCreateRequest(*entities.SensorCreateRequest) *domain.SensorCreate
 }
 
 func MapSensorData(src []byte) (*domain.MqttPayload, error) {
@@ -26,4 +28,8 @@ func MapSensorData(src []byte) (*domain.MqttPayload, error) {
 
 func MapSensorStatus(src domain.SensorStatus) entities.SensorStatus {
 	return entities.SensorStatus(src)
+}
+
+func MapSensorStatusReq(src entities.SensorStatus) domain.SensorStatus {
+	return domain.SensorStatus(src)
 }
