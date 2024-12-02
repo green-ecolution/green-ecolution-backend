@@ -226,82 +226,104 @@ func TestSensorService_Create(t *testing.T) {
 	})
 }
 
-// func TestSensorService_Update(t *testing.T) {
-// 	updateSensor := &entities.SensorUpdate{
-// 		Status: entities.SensorStatusOnline,
-// 		Data:   sensorUtils.TestSensor.Data,
-// 	}
+func TestSensorService_Update(t *testing.T) {
+	updateSensor := &entities.SensorUpdate{
+		Status:    entities.SensorStatusOnline,
+		Data:      sensorUtils.TestSensor.Data,
+		Latitude:  9.446741,
+		Longitude: 54.801539,
+	}
 
-// 	t.Run("should successfully update a sensor", func(t *testing.T) {
-// 		// given
-// 		id := "sensor-1"
-// 		sensorRepo := storageMock.NewMockSensorRepository(t)
-// 		treeRepo := storageMock.NewMockTreeRepository(t)
-// 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-// 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+	t.Run("should successfully update a sensor", func(t *testing.T) {
+		// given
+		id := "sensor-1"
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
-// 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
 
-// 		sensorRepo.EXPECT().Update(
-// 			context.Background(),
-// 			id,
-// 			mock.Anything,
-// 			mock.Anything,
-// 		).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().Update(
+			context.Background(),
+			id,
+			mock.Anything,
+			mock.Anything,
+		).Return(sensorUtils.TestSensor, nil)
 
-// 		// when
-// 		result, err := svc.Update(context.Background(), id, updateSensor)
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
 
-// 		// then
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, sensorUtils.TestSensor, result)
-// 	})
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, sensorUtils.TestSensor, result)
+	})
 
-// 	t.Run("should return an error when sensor ID does not exist", func(t *testing.T) {
-// 		// given
-// 		id := "notFoundID"
-// 		sensorRepo := storageMock.NewMockSensorRepository(t)
-// 		treeRepo := storageMock.NewMockTreeRepository(t)
-// 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-// 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
-// 		expectedErr := errors.New("failed to update cluster")
+	t.Run("should return an error when sensor ID does not exist", func(t *testing.T) {
+		// given
+		id := "notFoundID"
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		expectedErr := errors.New("failed to update cluster")
 
-// 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(nil, expectedErr)
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(nil, expectedErr)
 
-// 		// when
-// 		result, err := svc.Update(context.Background(), id, updateSensor)
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
 
-// 		// then
-// 		assert.Nil(t, result)
-// 		assert.EqualError(t, err, handleError(expectedErr).Error())
-// 	})
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
 
-// 	t.Run("should return an error when the update fails", func(t *testing.T) {
-// 		// given
-// 		id := "sensor-1"
-// 		sensorRepo := storageMock.NewMockSensorRepository(t)
-// 		treeRepo := storageMock.NewMockTreeRepository(t)
-// 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-// 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
-// 		expectedErr := errors.New("failed to update cluster")
+	t.Run("should return an error when the update fails", func(t *testing.T) {
+		// given
+		id := "sensor-1"
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		expectedErr := errors.New("failed to update cluster")
 
-// 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
 
-// 		sensorRepo.EXPECT().Update(
-// 			context.Background(),
-// 			id,
-// 			mock.Anything,
-// 			mock.Anything,
-// 		).Return(nil, expectedErr)
+		sensorRepo.EXPECT().Update(
+			context.Background(),
+			id,
+			mock.Anything,
+			mock.Anything,
+		).Return(nil, expectedErr)
 
-// 		// when
-// 		result, err := svc.Update(context.Background(), id, updateSensor)
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
 
-// 		// then
-// 		assert.Nil(t, result)
-// 		assert.EqualError(t, err, handleError(expectedErr).Error())
-// 	})
-// }
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, handleError(expectedErr).Error())
+	})
+
+	t.Run("should return validation error on invalid latitude and longitude", func(t *testing.T) {
+		// given
+		id := "sensor-1"
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+
+		updateSensor.Latitude = 200
+		updateSensor.Longitude = 200
+
+		// when
+		result, err := svc.Update(context.Background(), id, updateSensor)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+}
 
 func TestSensorService_Delete(t *testing.T) {
 	ctx := context.Background()
