@@ -28,10 +28,11 @@ type SensorData struct {
 }
 
 type SensorCreate struct {
-	Status    SensorStatus
+	ID 			string `validate:"required"`
+	Status    SensorStatus `validate:"oneof=online offline unknown"`
 	Data      []*SensorData
-	Latitude  float64
-	Longitude float64
+	Latitude  float64 `validate:"required,max=90,min=-90"`
+	Longitude float64 `validate:"required,max=180,min=-180"`
 }
 
 type SensorUpdate struct {

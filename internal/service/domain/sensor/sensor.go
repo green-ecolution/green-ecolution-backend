@@ -2,8 +2,10 @@ package sensor
 
 import (
 	"context"
-	"errors"
 
+	"github.com/pkg/errors"
+
+	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -14,6 +16,7 @@ type SensorService struct {
 	sensorRepo    storage.SensorRepository
 	treeRepo      storage.TreeRepository
 	flowerbedRepo storage.FlowerbedRepository
+	validator       *validator.Validate
 }
 
 func NewSensorService(
@@ -25,6 +28,7 @@ func NewSensorService(
 		sensorRepo:    sensorRepo,
 		treeRepo:      treeRepo,
 		flowerbedRepo: flowerbedRepo,
+		validator: validator.New(),
 	}
 }
 
@@ -47,6 +51,10 @@ func (s *SensorService) GetByID(ctx context.Context, id string) (*entities.Senso
 }
 
 func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (*entities.Sensor, error) {
+	if err := s.validator.Struct(sc); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+
 	created, err := s.sensorRepo.Create(ctx,
 		sensor.WithData(sc.Data),
 		sensor.WithStatus(sc.Status),
@@ -60,6 +68,10 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 }
 
 func (s *SensorService) Update(ctx context.Context, id string, su *entities.SensorUpdate) (*entities.Sensor, error) {
+	if err := s.validator.Struct(su); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+
 	_, err := s.sensorRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)

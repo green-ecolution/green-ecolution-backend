@@ -26,6 +26,11 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 		fn(entity)
 	}
 
+	sensor, err := r.GetByID(ctx, entity.ID)
+	if sensor != nil {
+		return nil, errors.New("sensor with same ID already exists")
+	}
+
 	if err := r.validateSensorEntity(entity); err != nil {
 		return nil, err
 	}
@@ -86,13 +91,13 @@ func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Se
 }
 
 func (r *SensorRepository) validateSensorEntity(sensor *entities.Sensor) error {
-	if sensor == nil {
-		return errors.New("sensor is nil")
+	if sensor.ID == "" {
+		return errors.New("sensor id cannot be empty")
 	}
-	if sensor.Latitude < -90 || sensor.Latitude > 90 {
+	if sensor.Latitude < -90 || sensor.Latitude > 90 || sensor.Latitude == 0 {
 		return storage.ErrInvalidLatitude
 	}
-	if sensor.Longitude < -180 || sensor.Longitude > 180 {
+	if sensor.Longitude < -180 || sensor.Longitude > 180 || sensor.Longitude == 0 {
 		return storage.ErrInvalidLongitude
 	}
 

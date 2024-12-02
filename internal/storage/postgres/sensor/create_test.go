@@ -3,71 +3,69 @@ package sensor
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSensorRepository_Create(t *testing.T) {
+	suite.ResetDB(t)
+
 	t.Run("should create sensor", func(t *testing.T) {
-		suite.ResetDB(t)
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		sensorID := "sensor-4"
-		sensorData := sensorUtils.TestSensorData[1]
-		sensorDataList := []*entities.SensorData{sensorData}
 
 		// when
 		got, err := r.Create(
 			context.Background(),
-			WithSensorID(sensorID),
-			WithStatus(entities.SensorStatusOnline),
-			WithData(sensorDataList),
+			WithSensorID(input.ID),
+			WithLatitude(input.Latitude),
+			WithLongitude(input.Longitude),
+			WithStatus(input.Status),
+			WithData(input.Data),
 		)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
-		assert.Equal(t, float64(0), got.Latitude)
-		assert.Equal(t, float64(0), got.Longitude)
-		assert.Equal(t, entities.SensorStatusOnline, got.Status)
+		assert.Equal(t, input.Latitude, got.Latitude)
+		assert.Equal(t, input.Longitude, got.Longitude)
+		assert.Equal(t, input.Status, got.Status)
 		assert.NotZero(t, got.ID)
 	})
 
 	t.Run("should create sensor with empty data and unknown status", func(t *testing.T) {
-		suite.ResetDB(t)
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
 		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-5"),
-			WithLatitude(54.801539),
-			WithLongitude(9.446741))
+			WithSensorID("sensor-124"),
+			WithLatitude(input.Latitude),
+			WithLongitude(input.Longitude))
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, entities.SensorStatusUnknown, got.Status)
 		assert.Equal(t, []*entities.SensorData(nil), got.Data)
-		assert.Equal(t, 54.801539, got.Latitude)
-		assert.Equal(t, 9.446741, got.Longitude)
+		assert.Equal(t, input.Latitude, got.Latitude)
+		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.NotZero(t, got.ID)
 	})
 
 	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
-		suite.ResetDB(t)
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
 		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-5"),
+			WithSensorID("sensor-125"),
 			WithLatitude(-200),
-			WithLongitude(0))
+			WithLongitude(input.Longitude))
 
 		// then
 		assert.Error(t, err)
@@ -76,14 +74,13 @@ func TestSensorRepository_Create(t *testing.T) {
 	})
 
 	t.Run("should return error if longitude is out of bounds", func(t *testing.T) {
-		suite.ResetDB(t)
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
 		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-5"),
-			WithLatitude(0),
+			WithSensorID("sensor-125"),
+			WithLatitude(input.Latitude),
 			WithLongitude(200))
 
 		// then
@@ -92,9 +89,43 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.Nil(t, got)
 	})
 
+	t.Run("should return error if sensor id is invalid", func(t *testing.T) {
+		// given
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.Create(context.Background(),
+			WithLatitude(input.Latitude),
+			WithLongitude(input.Longitude))
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, err.Error(), "sensor id cannot be empty")
+		assert.Nil(t, got)
+	})
+
+	t.Run("should return error if sensor with same id already exists", func(t *testing.T) {
+		// given
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.Create(
+			context.Background(),
+			WithSensorID(input.ID),
+			WithLatitude(input.Latitude),
+			WithLongitude(input.Longitude),
+			WithStatus(input.Status),
+			WithData(input.Data),
+		)
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "sensor with same ID already exists")
+		assert.Nil(t, got)
+	})
+
 	t.Run("should return error when context is canceled", func(t *testing.T) {
 		// given
-		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
@@ -109,46 +140,49 @@ func TestSensorRepository_Create(t *testing.T) {
 }
 
 func TestSensorRepository_InsertSensorData(t *testing.T) {
+	suite.ResetDB(t)
+
 	t.Run("should insert sensor data successfully", func(t *testing.T) {
 		// given
-		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		sensor := &entities.Sensor{ID: "sensor-1", Latitude: 54.82124518093376, Longitude: 9.485702120628517, Status: entities.SensorStatusOnline}
 
-		_, err := r.Create(context.Background(), WithSensorID(sensorUtils.TestSensorID), WithStatus(sensor.Status))
+		_, err := r.Create(context.Background(), 
+			WithSensorID(input.ID), 
+			WithLatitude(input.Latitude),
+			WithLongitude(input.Longitude),
+			WithStatus(input.Status))
+		
 		assert.NoError(t, err)
 
-		data := []*entities.SensorData{
-			{
-				ID:   1,
-				Data: sensorUtils.TestMqttPayload,
-			},
-		}
-
 		// when
-		got, err := r.InsertSensorData(context.Background(), data, sensor.ID)
+		got, err := r.InsertSensorData(context.Background(), input.Data, input.ID)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, data, got)
+		assert.NotNil(t, got)
+		assert.Equal(t, input.Data, got)
 	})
 
 	t.Run("should return error when data is empty", func(t *testing.T) {
-		suite.ResetDB(t)
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		sensor := &entities.Sensor{ID: "sensor-1", Latitude: 54.82124518093376, Longitude: 9.485702120628517, Status: entities.SensorStatusOnline}
 
-		_, err := r.Create(context.Background(), WithSensorID(sensorUtils.TestSensorID), WithStatus(sensor.Status))
+		_, err := r.Create(context.Background(), 
+			WithSensorID("sensor-124"), 
+			WithLatitude(input.Latitude),
+			WithLongitude(input.Longitude),
+			WithStatus(input.Status))
+		
 		assert.NoError(t, err)
 
 		var data []*entities.SensorData
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), data, sensor.ID)
+		got, err := r.InsertSensorData(context.Background(), data, input.ID)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
+		assert.Equal(t, err.Error(), "data cannot be empty")
 	})
 
 	t.Run("should return error when data is nil", func(t *testing.T) {
@@ -163,4 +197,62 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
+
+	t.Run("should return error when sensor id is invalid", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.InsertSensorData(context.Background(), input.Data, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+}
+
+var inputPayload = &entities.MqttPayload{
+	DeviceID:    "sensor-123",
+	Battery:     34.0,
+	Humidity:    50,
+	Temperature: 20,
+	Watermarks: []entities.Watermark{
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      30,
+		},
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      60,
+		},
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      90,
+		},
+	},
+}
+
+var input = *&entities.SensorCreate{
+	ID: "sensor-123",
+	Status:    entities.SensorStatusOnline,
+	Data:      []*entities.SensorData{
+		{
+			ID:        1,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Data:      inputPayload,
+		},
+		{
+			ID:        2,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Data:      inputPayload,
+		},
+	},
+	Latitude:  9.446741,
+	Longitude: 54.801539,
 }
