@@ -1,9 +1,7 @@
 package sensor
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"testing"
@@ -177,84 +175,6 @@ func TestGetSensorById(t *testing.T) {
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/sensor-1", nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-
-		mockSensorService.AssertExpectations(t)
-	})
-}
-
-func TestCreateSensor(t *testing.T) {
-	t.Run("should create sensor successfully", func(t *testing.T) {
-		app := fiber.New()
-		mockSensorService := serviceMock.NewMockSensorService(t)
-		handler := CreateSensor(mockSensorService)
-		app.Post("/v1/sensor", handler)
-
-		mockSensorService.EXPECT().Create(
-			mock.Anything,
-			mock.AnythingOfType("*entities.SensorCreate"),
-		).Return(TestSensor, nil)
-
-		// when
-		body, _ := json.Marshal(TestSensorRequest)
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/sensor", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusCreated, resp.StatusCode)
-
-		var response serverEntities.SensorCreateRequest
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		assert.NoError(t, err)
-		assert.Equal(t, TestSensor.Latitude, response.Latitude)
-		assert.Equal(t, TestSensor.Longitude, response.Longitude)
-
-		mockSensorService.AssertExpectations(t)
-	})
-
-	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
-		app := fiber.New()
-		mockSensorService := serviceMock.NewMockSensorService(t)
-		handler := CreateSensor(mockSensorService)
-		app.Post("/v1/sensor", handler)
-
-		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
-
-		// when
-		body, _ := json.Marshal(invalidRequestBody)
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/sensor", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	})
-
-	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
-		app := fiber.New()
-		mockSensorService := serviceMock.NewMockSensorService(t)
-		handler := CreateSensor(mockSensorService)
-		app.Post("/v1/sensor", handler)
-
-		mockSensorService.EXPECT().Create(
-			mock.Anything,
-			mock.AnythingOfType("*entities.SensorCreate"),
-		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
-
-		// when
-		body, _ := json.Marshal(TestSensorRequest)
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/sensor", bytes.NewBuffer(body))
-		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 

@@ -40,16 +40,3 @@ type SensorDataListResponse struct {
 	Data       []*SensorDataResponse `json:"data"`
 	Pagination Pagination            `json:"pagination"`
 } // @Name SensorDataList
-
-type SensorCreateRequest struct {
-	ID        string       `json:"id"`
-	Status    SensorStatus `json:"status"`
-	Latitude  float64      `json:"latitude"`
-	Longitude float64      `json:"longitude"`
-} // @Name SensorCreate
-
-type SensorUpdateRequest struct {
-	Status    SensorStatus `json:"status"`
-	Latitude  float64      `json:"latitude"`
-	Longitude float64      `json:"longitude"`
-} // @Name SensorUpdate

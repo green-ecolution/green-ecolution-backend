@@ -112,61 +112,6 @@ func GetSensorDataByID(_ service.Service) fiber.Handler {
 	}
 }
 
-// @Summary		Create sensor
-// @Description	Create sensor
-// @Id				create-sensor
-// @Tags			Sensor
-// @Produce		json
-// @Success		200	{object}	entities.SensorResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/ [post]
-// @Security		Keycloak
-// @Param			body	body	entities.SensorCreateRequest	true	"Sensor to create"
-func CreateSensor(svc service.SensorService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-		var req entities.SensorCreateRequest
-		if err := c.BodyParser(&req); err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, err.Error())
-		}
-
-		domainReq := sensorMapper.FromCreateRequest(&req)
-		domainData, err := svc.Create(ctx, domainReq)
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		data := mapToDto(domainData)
-		return c.Status(fiber.StatusCreated).JSON(data)
-	}
-}
-
-// @Summary		Update sensor
-// @Description	Update sensor
-// @Id				update-sensor
-// @Tags			Sensor
-// @Produce		json
-// @Success		200	{object}	entities.SensorResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/{sensor_id} [put]
-// @Param			sensor_id	path	string	true	"Sensor ID"
-// @Security		Keycloak
-// @Param			body	body	entities.SensorUpdateRequest	true	"Sensor information to update"
-func UpdateSensor(_ service.Service) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
 // @Summary		Delete sensor
 // @Description	Delete sensor
 // @Id				delete-sensor

@@ -12,9 +12,6 @@ import (
 // goverter:extend MapSensorStatus MapSensorStatusReq
 type SensorHTTPMapper interface {
 	FromResponse(src *domain.Sensor) *entities.SensorResponse
-
-	// goverter:ignore Data
-	FromCreateRequest(*entities.SensorCreateRequest) *domain.SensorCreate
 }
 
 func MapSensorData(src []byte) (*domain.MqttPayload, error) {
