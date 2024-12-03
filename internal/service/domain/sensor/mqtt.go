@@ -32,13 +32,9 @@ func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPay
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, service.ErrValidation.Error()).Error())
 	}
 
-	sensor, err := s.sensorRepo.GetByID(ctx, payload.DeviceID)
+	sensor, err := s.getSensor(ctx, payload)
 	if err != nil {
 		return nil, handleError(err)
-	}
-
-	if sensor == nil {
-		return nil, handleError(storage.ErrSensorNotFound)
 	}
 
 	data := []*domain.SensorData{
@@ -46,20 +42,9 @@ func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPay
 			Data: payload,
 		},
 	}
-	_, err = s.sensorRepo.InsertSensorData(ctx, data, payload.DeviceID)
+	_, err = s.sensorRepo.InsertSensorData(ctx, data, sensor.ID)
 	if err != nil {
 		return nil, handleError(err)
-	}
-
-	if sensor.Latitude != payload.Latitude || sensor.Longitude != payload.Longitude {
-		_, err = s.sensorRepo.Update(
-			ctx,
-			sensor.ID,
-			storageSensor.WithLatitude(payload.Latitude),
-			storageSensor.WithLongitude(payload.Longitude))
-		if err != nil {
-			return nil, handleError(err)
-		}
 	}
 
 	sensorData, err := s.sensorRepo.GetSensorDataByID(ctx, sensor.ID)
@@ -67,6 +52,32 @@ func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPay
 		return nil, err
 	}
 	return sensorData, nil
+}
+
+func (s *MqttService) getSensor(ctx context.Context, payload *domain.MqttPayload) (*domain.Sensor, error) {
+	sensor, err := s.sensorRepo.GetByID(ctx, payload.DeviceID)
+	if err == nil && sensor != nil {
+		if sensor.Latitude != payload.Latitude || sensor.Longitude != payload.Longitude || sensor.Status != domain.SensorStatusOnline {
+			sensor, err = s.sensorRepo.Update(
+				ctx,
+				sensor.ID,
+				storageSensor.WithLatitude(payload.Latitude),
+				storageSensor.WithLongitude(payload.Longitude),
+				storageSensor.WithStatus(domain.SensorStatusOnline))
+			if err != nil {
+				return nil, err
+			}
+		}
+		return sensor, nil
+	}
+	sensor, err = s.sensorRepo.Create(ctx, storageSensor.WithSensorID(payload.DeviceID),
+		storageSensor.WithLatitude(payload.Latitude),
+		storageSensor.WithLongitude(payload.Longitude),
+		storageSensor.WithStatus(domain.SensorStatusOnline))
+	if err != nil {
+		return nil, err
+	}
+	return sensor, nil
 }
 
 func (s *MqttService) SetConnected(ready bool) {

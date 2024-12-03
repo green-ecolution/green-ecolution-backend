@@ -82,12 +82,22 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entitie
 }
 
 func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Sensor) (string, error) {
-	return r.store.CreateSensor(ctx, &sqlc.CreateSensorParams{
-		ID:        sensor.ID,
-		Status:    sqlc.SensorStatus(sensor.Status),
+	id, err := r.store.CreateSensor(ctx, &sqlc.CreateSensorParams{
+		ID:     sensor.ID,
+		Status: sqlc.SensorStatus(sensor.Status),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if err := r.store.SetSensorLocation(ctx, &sqlc.SetSensorLocationParams{
+		ID:        id,
 		Latitude:  sensor.Latitude,
 		Longitude: sensor.Longitude,
-	})
+	}); err != nil {
+		return "", err
+	}
+	return id, nil
 }
 
 func (r *SensorRepository) validateSensorEntity(sensor *entities.Sensor) error {
