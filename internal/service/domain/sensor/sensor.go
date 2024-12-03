@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 
@@ -69,7 +68,6 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 }
 
 func (s *SensorService) Update(ctx context.Context, id string, su *entities.SensorUpdate) (*entities.Sensor, error) {
-	fmt.Println(su)
 	if err := s.validator.Struct(su); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}

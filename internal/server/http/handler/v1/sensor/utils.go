@@ -88,11 +88,4 @@ var (
 			Data:      TestMqttPayload,
 		},
 	}
-
-	TestSensorRequest = entities.SensorCreate{
-		Status:    entities.SensorStatusOnline,
-		Data:      TestSensorData[0:2],
-		Latitude:  9.446741,
-		Longitude: 54.801539,
-	}
 )
