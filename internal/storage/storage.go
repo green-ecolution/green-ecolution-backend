@@ -141,6 +141,7 @@ type TreeRepository interface {
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
 	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	GetCenterPoint(ctx context.Context, id []int32) (float64, float64, error)
+	FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 }
 
 type SensorRepository interface {
