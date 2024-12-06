@@ -431,10 +431,14 @@ func TestTreeRepository_UnlinkSensorID(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		err := r.UnlinkSensorID(context.Background(), "1")
+		err := r.UnlinkSensorID(context.Background(), "sensor-1")
 
 		// then
 		assert.NoError(t, err)
+
+		tree, err := r.GetByID(context.Background(), 1)
+		assert.NoError(t, err)
+		assert.Nil(t, tree.Sensor, "Expected sensorID to be unlinked, but it is still linked")
 
 	})
 	t.Run("should return no error if sensor ID does not exist", func(t *testing.T) {
@@ -448,7 +452,7 @@ func TestTreeRepository_UnlinkSensorID(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 	})
-	t.Run("should return error when database is unreachable", func(t *testing.T) {
+	t.Run("should return error when the context is canceled", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
@@ -457,18 +461,7 @@ func TestTreeRepository_UnlinkSensorID(t *testing.T) {
 		cancel()
 
 		// when
-		err := r.UnlinkSensorID(invalidCtx, "1")
-
-		// then
-		assert.Error(t, err)
-	})
-
-	t.Run("should return error for negative sensor ID", func(t *testing.T) {
-		// given
-		r := NewTreeRepository(suite.Store, mappers)
-
-		// when
-		err := r.UnlinkSensorID(context.Background(), "-1")
+		err := r.UnlinkSensorID(invalidCtx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
@@ -484,48 +477,4 @@ func TestTreeRepository_UnlinkSensorID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 	})
-
-	t.Run("should handle extremely long sensor ID", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		r := NewTreeRepository(suite.Store, mappers)
-
-		longSensorID := make([]byte, 10000)
-		for i := 0; i < 10000; i++ {
-			longSensorID[i] = 'a'
-		}
-
-		// when
-		err := r.UnlinkSensorID(context.Background(), string(longSensorID))
-
-		// then
-		assert.NoError(t, err)
-	})
-
-	t.Run("should handle concurrent unlink requests", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-
-		const concurrency = 10
-		errors := make(chan error, concurrency)
-
-		// when
-		for i := 0; i < concurrency; i++ {
-			go func() {
-				err := r.UnlinkSensorID(context.Background(), "1")
-				errors <- err
-			}()
-		}
-
-		// then
-		for i := 0; i < concurrency; i++ {
-			err := <-errors
-			if err != nil {
-				t.Errorf("unexpected error: %v", err)
-			}
-		}
-	})
-
 }

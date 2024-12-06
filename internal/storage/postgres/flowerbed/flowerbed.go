@@ -179,13 +179,8 @@ func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) err
 }
 
 func (r *FlowerbedRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {
-
 	if sensorID == "" {
 		return errors.New("sensorID cannot be empty")
-	}
-
-	if len(sensorID) > 0 && sensorID[0] == '-' {
-		return errors.New("sensorID cannot start with negative")
 	}
 	return r.store.UnlinkSensorIDFromFlowerbeds(ctx, &sensorID)
 }

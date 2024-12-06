@@ -173,9 +173,5 @@ func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID string) er
 	if sensorID == "" {
 		return errors.New("sensorID cannot be empty")
 	}
-
-	if len(sensorID) > 0 && sensorID[0] == '-' {
-		return errors.New("sensorID cannot start with negative")
-	}
 	return r.store.UnlinkSensorIDFromTrees(ctx, &sensorID)
 }
