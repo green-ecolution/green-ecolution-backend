@@ -123,6 +123,7 @@ type VehicleService interface {
 type WateringPlanService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.WateringPlan, error)
+	GetByID(ctx context.Context, id int32) (*domain.WateringPlan, error)
 }
 
 type PluginService interface {

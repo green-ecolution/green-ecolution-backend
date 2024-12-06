@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -51,12 +52,49 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, vehicles)
+		assert.Nil(t, wateringPlans)
 		assert.Equal(t, "500: GetAll failed", err.Error())
+	})
+}
+
+func TestWateringPlanService_GetByID(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should return watering plan when found", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo)
+
+		id := int32(1)
+		expectedPlan := allTestWateringPlans[0]
+		wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(expectedPlan, nil)
+
+		// when
+		wateringPlan, err := svc.GetByID(ctx, id)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedPlan, wateringPlan)
+	})
+
+	t.Run("should return error if watering plan not found", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo)
+
+		id := int32(1)
+		expectedErr := storage.ErrEntityNotFound
+		wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
+
+		// when
+		wateringPlan, err := svc.GetByID(ctx, id)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, wateringPlan)
+		assert.Equal(t, "404: watering plan not found", err.Error())
 	})
 }
 

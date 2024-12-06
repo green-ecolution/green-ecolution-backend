@@ -31,6 +31,15 @@ func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringP
 	return plans, nil
 }
 
+func (w *WateringPlanService) GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error) {
+	got, err := w.wateringPlanRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return got, nil
+}
+
 func (w *WateringPlanService) Ready() bool {
 	return w.wateringPlanRepo != nil
 }
