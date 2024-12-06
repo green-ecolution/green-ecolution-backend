@@ -13,8 +13,8 @@ import (
 
 type WateringPlanService struct {
 	wateringPlanRepo storage.WateringPlanRepository
-	clusterRepo storage.TreeClusterRepository
-	vehicleRepo storage.VehicleRepository
+	clusterRepo      storage.TreeClusterRepository
+	vehicleRepo      storage.VehicleRepository
 	validator        *validator.Validate
 }
 
@@ -25,8 +25,8 @@ func NewWateringPlanService(
 ) service.WateringPlanService {
 	return &WateringPlanService{
 		wateringPlanRepo: wateringPlanRepository,
-		clusterRepo: clusterRepository,
-		vehicleRepo: vehicleRepository,
+		clusterRepo:      clusterRepository,
+		vehicleRepo:      vehicleRepository,
 		validator:        validator.New(),
 	}
 }
@@ -49,8 +49,8 @@ func (w *WateringPlanService) GetByID(ctx context.Context, id int32) (*entities.
 	return got, nil
 }
 
-func (w *WateringPlanService) Create(ctx context.Context, createWP *entities.WateringPlanCreate) (*entities.WateringPlan, error) {
-	if err := w.validator.Struct(createWP); err != nil {
+func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.WateringPlanCreate) (*entities.WateringPlan, error) {
+	if err := w.validator.Struct(createWp); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
@@ -59,8 +59,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWP *entities.Wat
 	// TODO: calculare distance
 
 	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
-		wp.Date = createWP.Date
-		wp.Description = createWP.Description
+		wp.Date = createWp.Date
+		wp.Description = createWp.Description
 
 		return true, nil
 	})
@@ -70,6 +70,42 @@ func (w *WateringPlanService) Create(ctx context.Context, createWP *entities.Wat
 	}
 
 	return created, nil
+}
+
+func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *entities.WateringPlanUpdate) (*entities.WateringPlan, error) {
+	if err := w.validator.Struct(updateWp); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+
+	// TODO: get clusters, vehicles, users
+	// TODO: calculate required water
+	// TODO: calculare distance
+
+	err := w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
+		wp.Date = updateWp.Date
+		wp.Description = updateWp.Description
+
+		return true, nil
+	})
+
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return w.GetByID(ctx, id)
+}
+
+func (w *WateringPlanService) Delete(ctx context.Context, id int32) error {
+	_, err := w.wateringPlanRepo.GetByID(ctx, id)
+	if err != nil {
+		return handleError(err)
+	}
+
+	if err := w.wateringPlanRepo.Delete(ctx, id); err != nil {
+		return handleError(err)
+	}
+
+	return nil
 }
 
 func (w *WateringPlanService) Ready() bool {

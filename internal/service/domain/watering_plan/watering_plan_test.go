@@ -176,6 +176,101 @@ func TestWateringPlanService_Create(t *testing.T) {
 	})
 }
 
+func TestWateringPlanService_Update(t *testing.T) {
+	ctx := context.Background()
+	wateringPlanID := int32(1)
+	updatedWateringPlan := &entities.WateringPlanUpdate{
+		Date:               time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		Description:        "New watering plan for the east side of the city",
+	}
+
+	t.Run("should successfully update a watering plan", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+		
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			wateringPlanID,
+			mock.Anything,
+		).Return(nil)
+
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx, 
+			wateringPlanID,
+		).Return(allTestWateringPlans[1], nil)
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, allTestWateringPlans[1], result)
+	})
+
+	t.Run("should return an error when watering plan does not exist", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			wateringPlanID,
+			mock.Anything,
+		).Return(storage.ErrEntityNotFound)
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "404: watering plan not found")
+	})
+
+	t.Run("should return an error when the update fails", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		expectedErr := errors.New("failed to update cluster")
+
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			wateringPlanID,
+			mock.Anything,
+		).Return(expectedErr)
+
+		// when
+		result, err := svc.Update(context.Background(), wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "500: failed to update cluster")
+	})
+
+	t.Run("should return validation error on empty date", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		updatedWateringPlan.Date = time.Time{}
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+}
+
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 1,
