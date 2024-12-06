@@ -7,6 +7,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
 func defaultTree() entities.Tree {
@@ -25,48 +26,166 @@ func defaultTree() entities.Tree {
 	}
 }
 
-func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
+func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
 	}
 
-	if err := r.validateTreeEntity(&entity); err != nil {
+	var createdTr *entities.Tree
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
+
+		entity := defaultTree()
+		created, err := createFn(&entity)
+		if err != nil {
+			return err
+		}
+
+		if !created {
+			return nil
+		}
+
+		if err := r.validateTreeEntity(&entity); err != nil {
+			return err
+		}
+
+		id, err := r.createEntity(ctx, &entity)
+		if err != nil {
+			return err
+		}
+
+		createdTr, err = r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
-	id, err := r.createEntity(ctx, &entity)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-	entity.ID = id
-
-	return r.GetByID(ctx, id)
+	return createdTr, nil
 }
 
-func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	createdEntity, err := r.Create(ctx, tFn...)
+func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
+	}
+
+	var createdTr *entities.Tree
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
+
+		entity := defaultTree()
+		created, err := createFn(&entity)
+		if err != nil {
+			return err
+		}
+		
+		if !created {
+			return nil
+		}
+
+		if err := r.validateTreeEntity(&entity); err != nil {
+			return err
+		}
+
+		id, err := r.createEntity(ctx, &entity)
+		if err != nil {
+			return err
+		}
+
+		createdTr, err = r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		if entity.Images != nil {
+			if err := r.handleImages(ctx, id, entity.Images); err != nil {
+				return err
+			}
+
+			linkedImages, err := r.GetAllImagesByID(ctx, id)
+			if err != nil {
+				return err
+			}
+			createdTr.Images = linkedImages
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
 
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
+	return createdTr, nil
+}
+
+func (r *TreeRepository) transaction(
+	ctx context.Context,
+	createFn func(*entities.Tree) (bool, error),
+	handler func(context.Context, *entities.Tree, string) error,
+) (*entities.Tree, error) {
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
 	}
 
-	if entity.Images != nil {
-		if err := r.handleImages(ctx, createdEntity.ID, entity.Images); err != nil {
-			return nil, err
-		}
-		linkedImages, err := r.GetAllImagesByID(ctx, createdEntity.ID)
+	var createdTr *entities.Tree
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
+
+		entity := defaultTree()
+		created, err := createFn(&entity)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		createdEntity.Images = linkedImages
+		if !created {
+			return nil
+		}
+
+		if err := r.validateTreeEntity(&entity); err != nil {
+			return err
+		}
+
+		id, err := r.createEntity(ctx, &entity)
+		if err != nil {
+			return err
+		}
+
+		createdTr, err = r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		if handler != nil {
+			if err := handler(ctx, createdTr, id); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return createdEntity, nil
+	return createdTr, nil
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {

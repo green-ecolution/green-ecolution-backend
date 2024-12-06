@@ -107,12 +107,7 @@ type GeoClusterLocator interface {
 }
 
 type SensorService interface {
-	Service
-	GetAll(ctx context.Context) ([]*domain.Sensor, error)
-	GetByID(ctx context.Context, id string) (*domain.Sensor, error)
-	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
-	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
-	Delete(ctx context.Context, id string) error
+	CrudService[domain.Sensor, domain.SensorCreate, domain.SensorUpdate]
 }
 
 type CrudService[T any, CreateType any, UpdateType any] interface {
@@ -121,13 +116,13 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 }
 
 type VehicleService interface {
-	Service
-	GetAll(ctx context.Context) ([]*domain.Vehicle, error)
-	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
+	CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
-	Create(ctx context.Context, vh *domain.VehicleCreate) (*domain.Vehicle, error)
-	Update(tx context.Context, id int32, vh *domain.VehicleUpdate) (*domain.Vehicle, error)
-	Delete(ctx context.Context, id int32) error
+}
+
+type WateringPlanService interface {
+	Service
+	GetAll(ctx context.Context) ([]*domain.WateringPlan, error)
 }
 
 type PluginService interface {
@@ -154,6 +149,7 @@ type Services struct {
 	SensorService      SensorService
 	VehicleService     VehicleService
 	PluginService      PluginService
+	WateringPlanService WateringPlanService
 }
 
 func (s *Services) AllServicesReady() bool {

@@ -11,6 +11,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/vehicle"
+	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/watering_plan"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -27,5 +28,6 @@ func NewService(cfg *config.Config, repos *storage.Repository) *service.Services
 		VehicleService:     vehicle.NewVehicleService(repos.Vehicle),
 		SensorService:      sensor.NewSensorService(repos.Sensor, repos.Tree, repos.Flowerbed),
 		PluginService:      plugin.NewPluginManager(repos.Auth),
+		WateringPlanService: wateringplan.NewWateringPlanService(repos.WateringPlan),
 	}
 }
