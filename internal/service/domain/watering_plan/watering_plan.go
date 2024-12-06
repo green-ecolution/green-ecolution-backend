@@ -13,12 +13,20 @@ import (
 
 type WateringPlanService struct {
 	wateringPlanRepo storage.WateringPlanRepository
+	clusterRepo storage.TreeClusterRepository
+	vehicleRepo storage.VehicleRepository
 	validator        *validator.Validate
 }
 
-func NewWateringPlanService(wateringPlanRepository storage.WateringPlanRepository) service.WateringPlanService {
+func NewWateringPlanService(
+	wateringPlanRepository storage.WateringPlanRepository,
+	clusterRepository storage.TreeClusterRepository,
+	vehicleRepository storage.VehicleRepository,
+) service.WateringPlanService {
 	return &WateringPlanService{
 		wateringPlanRepo: wateringPlanRepository,
+		clusterRepo: clusterRepository,
+		vehicleRepo: vehicleRepository,
 		validator:        validator.New(),
 	}
 }
@@ -47,6 +55,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWP *entities.Wat
 	}
 
 	// TODO: get clusters, vehicles, users
+	// TODO: calculate required water
+	// TODO: calculare distance
 
 	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
 		wp.Date = createWP.Date

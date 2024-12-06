@@ -19,7 +19,9 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 	t.Run("should return all watering plans when successful", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, nil)
 
@@ -33,7 +35,9 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 	t.Run("should return empty slice when no watering plans are found", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, nil)
 
@@ -47,7 +51,9 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 	t.Run("should return error when GetAll fails", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		expectedErr := errors.New("GetAll failed")
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
@@ -67,7 +73,9 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 
 	t.Run("should return watering plan when found", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		id := int32(1)
 		expectedPlan := allTestWateringPlans[0]
@@ -83,7 +91,9 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 
 	t.Run("should return error if watering plan not found", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		id := int32(1)
 		expectedErr := storage.ErrEntityNotFound
@@ -104,11 +114,14 @@ func TestWateringPlanService_Create(t *testing.T) {
 	newWateringPlan := &entities.WateringPlanCreate{
 		Date:               time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan",
+		// TODO: add clusters, vehicles, and users
 	}
 
 	t.Run("should successfully create a new watering plan", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		wateringPlanRepo.EXPECT().Create(
 			ctx,
@@ -122,6 +135,45 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, allTestWateringPlans[0], result)
 	})
+
+	t.Run("should return an error when creating watering plan fails", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		expectedErr := errors.New("Failed to create watering plan")
+
+		wateringPlanRepo.EXPECT().Create(
+			ctx,
+			mock.Anything,
+		).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "500: Failed to create watering plan")
+	})
+
+	t.Run("should return validation error on empty date", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		newWateringPlan.Date = time.Time{}
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
 }
 
 var allTestWateringPlans = []*entities.WateringPlan{
@@ -130,8 +182,11 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the west side of the city",
 		WateringPlanStatus: entities.WateringPlanStatusPlanned,
-		Distance:           utils.P(0.0),
-		TotalWaterRequired: utils.P(0.0),
+		Distance:           utils.P(63.0),
+		TotalWaterRequired: utils.P(6000.0),
+		Transporter:        allTestVehicles[1],
+		Trailer:            allTestVehicles[0],
+		Treecluster:        allTestClusters[0:2],
 	},
 	{
 		ID:                 2,
@@ -140,5 +195,118 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		WateringPlanStatus: entities.WateringPlanStatusActive,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
+		Treecluster:        allTestClusters[2:3],
+	},
+	{
+		ID:                 3,
+		Date:               time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
+		Description:        "Very important watering plan due to no rainfall",
+		WateringPlanStatus: entities.WateringPlanStatusFinished,
+		Distance:           utils.P(63.0),
+		TotalWaterRequired: utils.P(6000.0),
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
+		Treecluster:        allTestClusters[0:3],
+	},
+	{
+		ID:                 4,
+		Date:               time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
+		Description:        "New watering plan for the south side of the city",
+		WateringPlanStatus: entities.WateringPlanStatusNotCompeted,
+		Distance:           utils.P(63.0),
+		TotalWaterRequired: utils.P(6000.0),
+		Transporter:        allTestVehicles[1],
+		Trailer:            nil,
+		Treecluster:        allTestClusters[2:3],
+	},
+	{
+		ID:                 5,
+		Date:               time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
+		Description:        "Canceled due to flood",
+		WateringPlanStatus: entities.WateringPlanStatusCanceled,
+		Distance:           utils.P(63.0),
+		TotalWaterRequired: utils.P(6000.0),
+		Transporter:        allTestVehicles[1],
+		Treecluster:        allTestClusters[2:3],
+	},
+}
+
+var allTestVehicles = []*entities.Vehicle{
+	{
+		ID:            1,
+		NumberPlate:   "B-1234",
+		Description:   "Test vehicle 1",
+		WaterCapacity: 100.0,
+		Type:          entities.VehicleTypeTrailer,
+		Status:        entities.VehicleStatusActive,
+	},
+	{
+		ID:            2,
+		NumberPlate:   "B-5678",
+		Description:   "Test vehicle 2",
+		WaterCapacity: 150.0,
+		Type:          entities.VehicleTypeTransporter,
+		Status:        entities.VehicleStatusUnknown,
+	},
+}
+
+var allTestClusters = []*entities.TreeCluster{
+	{
+		ID:             1,
+		Name:           "Solitüde Strand",
+		WateringStatus: entities.WateringStatusGood,
+		MoistureLevel:  0.75,
+		Region: &entities.Region{
+			ID:   1,
+			Name: "Mürwik",
+		},
+		Address:       "Solitüde Strand",
+		Description:   "Alle Bäume am Strand",
+		SoilCondition: entities.TreeSoilConditionSandig,
+		Latitude:      utils.P(54.820940),
+		Longitude:     utils.P(9.489022),
+		Trees: []*entities.Tree{
+			{ID: 1},
+			{ID: 2},
+			{ID: 3},
+		},
+	},
+	{
+		ID:             2,
+		Name:           "Sankt-Jürgen-Platz",
+		WateringStatus: entities.WateringStatusModerate,
+		MoistureLevel:  0.5,
+		Region: &entities.Region{
+			ID:   1,
+			Name: "Mürwik",
+		},
+		Address:       "Ulmenstraße",
+		Description:   "Bäume beim Sankt-Jürgen-Platz",
+		SoilCondition: entities.TreeSoilConditionSchluffig,
+		Latitude:      utils.P(54.78805731048199),
+		Longitude:     utils.P(9.44400186680097),
+		Trees: []*entities.Tree{
+			{ID: 4},
+			{ID: 5},
+			{ID: 6},
+		},
+	},
+	{
+		ID:             3,
+		Name:           "Flensburger Stadion",
+		WateringStatus: "unknown",
+		MoistureLevel:  0.7,
+		Region: &entities.Region{
+			ID:   1,
+			Name: "Mürwik",
+		},
+		Address:       "Flensburger Stadion",
+		Description:   "Alle Bäume in der Gegend des Stadions in Mürwik",
+		SoilCondition: "schluffig",
+		Latitude:      utils.P(54.802163),
+		Longitude:     utils.P(9.446398),
+		Trees:         []*entities.Tree{},
 	},
 }

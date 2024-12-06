@@ -28,6 +28,6 @@ func NewService(cfg *config.Config, repos *storage.Repository) *service.Services
 		VehicleService:     vehicle.NewVehicleService(repos.Vehicle),
 		SensorService:      sensor.NewSensorService(repos.Sensor, repos.Tree, repos.Flowerbed),
 		PluginService:      plugin.NewPluginManager(repos.Auth),
-		WateringPlanService: wateringplan.NewWateringPlanService(repos.WateringPlan),
+		WateringPlanService: wateringplan.NewWateringPlanService(repos.WateringPlan, repos.TreeCluster, repos.Vehicle),
 	}
 }
