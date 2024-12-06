@@ -11,6 +11,7 @@ import (
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestWateringPlanService_GetAll(t *testing.T) {
@@ -98,44 +99,45 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 	})
 }
 
+func TestWateringPlanService_Create(t *testing.T) {
+	ctx := context.Background()
+	newWateringPlan := &entities.WateringPlanCreate{
+		Date:               time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+		Description:        "New watering plan",
+	}
+
+	t.Run("should successfully create a new watering plan", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo)
+
+		wateringPlanRepo.EXPECT().Create(
+			ctx,
+			mock.Anything,
+		).Return(allTestWateringPlans[0], nil)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, allTestWateringPlans[0], result)
+	})
+}
+
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 1,
 		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the west side of the city",
-		WateringPlanStatus: "planned",
-		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
+		WateringPlanStatus: entities.WateringPlanStatusPlanned,
+		Distance:           utils.P(0.0),
+		TotalWaterRequired: utils.P(0.0),
 	},
 	{
 		ID:                 2,
 		Date:               time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the east side of the city",
-		WateringPlanStatus: "active",
-		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
-	},
-	{
-		ID:                 3,
-		Date:               time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
-		Description:        "Very important watering plan due to no rainfall",
-		WateringPlanStatus: "finished",
-		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
-	},
-	{
-		ID:                 4,
-		Date:               time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
-		Description:        "New watering plan for the south side of the city",
-		WateringPlanStatus: "not competed",
-		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
-	},
-	{
-		ID:                 5,
-		Date:               time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
-		Description:        "Canceled due to flood",
-		WateringPlanStatus: "canceled",
+		WateringPlanStatus: entities.WateringPlanStatusActive,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},

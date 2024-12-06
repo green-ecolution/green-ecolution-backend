@@ -2,7 +2,8 @@ package wateringplan
 
 import (
 	"context"
-	"errors"
+
+	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -38,6 +39,27 @@ func (w *WateringPlanService) GetByID(ctx context.Context, id int32) (*entities.
 	}
 
 	return got, nil
+}
+
+func (w *WateringPlanService) Create(ctx context.Context, createWP *entities.WateringPlanCreate) (*entities.WateringPlan, error) {
+	if err := w.validator.Struct(createWP); err != nil {
+		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+	}
+
+	// TODO: get clusters, vehicles, users
+
+	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
+		wp.Date = createWP.Date
+		wp.Description = createWP.Description
+
+		return true, nil
+	})
+
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return created, nil
 }
 
 func (w *WateringPlanService) Ready() bool {
