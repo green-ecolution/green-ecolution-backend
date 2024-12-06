@@ -107,7 +107,12 @@ type GeoClusterLocator interface {
 }
 
 type SensorService interface {
-	CrudService[domain.Sensor, domain.SensorCreate, domain.SensorUpdate]
+	Service
+	GetAll(ctx context.Context) ([]*domain.Sensor, error)
+	GetByID(ctx context.Context, id string) (*domain.Sensor, error)
+	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
+	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type CrudService[T any, CreateType any, UpdateType any] interface {
