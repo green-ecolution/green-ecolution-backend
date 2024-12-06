@@ -37,6 +37,16 @@ var (
 		ID:        TestSensorID,
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
+		Latitude:  54.82124518093376,
+		Longitude: 9.485702120628517,
+		Status:    entities.SensorStatusOnline,
+		Data:      []*entities.SensorData{TestSensorData[0]},
+	}
+
+	TestSensorNearestTree = &entities.Sensor{
+		ID:        "sensor-05",
+		CreatedAt: currentTime,
+		UpdatedAt: currentTime,
 		Latitude:  54.821535,
 		Longitude: 9.487200,
 		Status:    entities.SensorStatusOnline,

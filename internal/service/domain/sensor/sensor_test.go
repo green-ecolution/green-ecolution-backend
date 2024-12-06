@@ -435,6 +435,7 @@ func TestSensorService_Delete(t *testing.T) {
 		assert.EqualError(t, err, "500: failed to delete")
 	})
 }
+
 func TestSensorService_MapSensorToTree(t *testing.T) {
 	t.Run("should successfully map sensor to the nearest tree", func(t *testing.T) {
 		// given
@@ -442,7 +443,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 
 		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		testSensor := sensorUtils.TestSensor
+		testSensor := sensorUtils.TestSensorNearestTree
 		testTree := treeUtils.TestNearestTree
 
 		treeRepo.EXPECT().
@@ -498,7 +499,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		testSensor := sensorUtils.TestSensor
+		testSensor := sensorUtils.TestSensorNearestTree
 
 		treeRepo.EXPECT().
 			FindNearestTree(context.Background(), testSensor.Latitude, testSensor.Longitude).
@@ -517,7 +518,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		testSensor := sensorUtils.TestSensor
+		testSensor := sensorUtils.TestSensorNearestTree
 		testTree := treeUtils.TestNearestTree
 
 		treeRepo.EXPECT().
@@ -536,6 +537,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		assert.Contains(t, err.Error(), "update failed")
 	})
 }
+
 func TestReady(t *testing.T) {
 	t.Run("should return true if the service is ready", func(t *testing.T) {
 		// given
