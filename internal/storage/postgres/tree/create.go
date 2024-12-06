@@ -91,7 +91,7 @@ func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, createFn func(
 		if err != nil {
 			return err
 		}
-		
+
 		if !created {
 			return nil
 		}

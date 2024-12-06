@@ -19,15 +19,15 @@ func NewService(cfg *config.Config, repos *storage.Repository) *service.Services
 	geoLocator := treecluster.NewGeoLocation(repos.Tree, repos.Region)
 
 	return &service.Services{
-		InfoService:        info.NewInfoService(repos.Info),
-		MqttService:        sensor.NewMqttService(repos.Sensor),
-		TreeService:        tree.NewTreeService(repos.Tree, repos.Sensor, repos.Image, repos.TreeCluster, geoLocator),
-		AuthService:        auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
-		RegionService:      region.NewRegionService(repos.Region),
-		TreeClusterService: treecluster.NewTreeClusterService(repos.TreeCluster, repos.Tree, repos.Region, geoLocator),
-		VehicleService:     vehicle.NewVehicleService(repos.Vehicle),
-		SensorService:      sensor.NewSensorService(repos.Sensor, repos.Tree, repos.Flowerbed),
-		PluginService:      plugin.NewPluginManager(repos.Auth),
+		InfoService:         info.NewInfoService(repos.Info),
+		MqttService:         sensor.NewMqttService(repos.Sensor),
+		TreeService:         tree.NewTreeService(repos.Tree, repos.Sensor, repos.Image, repos.TreeCluster, geoLocator),
+		AuthService:         auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
+		RegionService:       region.NewRegionService(repos.Region),
+		TreeClusterService:  treecluster.NewTreeClusterService(repos.TreeCluster, repos.Tree, repos.Region, geoLocator),
+		VehicleService:      vehicle.NewVehicleService(repos.Vehicle),
+		SensorService:       sensor.NewSensorService(repos.Sensor, repos.Tree, repos.Flowerbed),
+		PluginService:       plugin.NewPluginManager(repos.Auth),
 		WateringPlanService: wateringplan.NewWateringPlanService(repos.WateringPlan, repos.TreeCluster, repos.Vehicle),
 	}
 }

@@ -139,15 +139,15 @@ type Service interface {
 }
 
 type Services struct {
-	InfoService        InfoService
-	MqttService        MqttService
-	TreeService        TreeService
-	AuthService        AuthService
-	RegionService      RegionService
-	TreeClusterService TreeClusterService
-	SensorService      SensorService
-	VehicleService     VehicleService
-	PluginService      PluginService
+	InfoService         InfoService
+	MqttService         MqttService
+	TreeService         TreeService
+	AuthService         AuthService
+	RegionService       RegionService
+	TreeClusterService  TreeClusterService
+	SensorService       SensorService
+	VehicleService      VehicleService
+	PluginService       PluginService
 	WateringPlanService WateringPlanService
 }
 

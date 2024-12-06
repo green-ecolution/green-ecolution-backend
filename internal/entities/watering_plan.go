@@ -31,8 +31,8 @@ type WateringPlan struct {
 }
 
 type WateringPlanCreate struct {
-	Date               time.Time `validate:"required"`
-	Description        string 
+	Date        time.Time `validate:"required"`
+	Description string
 	// TreeclusterIDs        []*int32 `validate:"required"`
 	// TransporterID        *int32 `validate:"required"`
 	// TrailerID           *int32
@@ -40,8 +40,8 @@ type WateringPlanCreate struct {
 }
 
 type WateringPlanUpdate struct {
-	Date               time.Time `validate:"required"`
-	Description        string 
+	Date        time.Time `validate:"required"`
+	Description string
 	// TreeclusterIDs        []*int32 `validate:"required"`
 	// TransporterID        *int32 `validate:"required"`
 	// TrailerID           *int32
