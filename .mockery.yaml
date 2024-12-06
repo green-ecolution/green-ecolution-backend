@@ -14,6 +14,7 @@ packages:
       SensorService:
       VehicleService:
       PluginService:
+      WateringPlanService:
       Service:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
