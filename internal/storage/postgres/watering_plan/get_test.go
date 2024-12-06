@@ -164,7 +164,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		ID:                 4,
 		Date:               time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the south side of the city",
-		WateringPlanStatus: entities.WateringPlanStatusFinished,
+		WateringPlanStatus: entities.WateringPlanStatusNotCompeted,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
