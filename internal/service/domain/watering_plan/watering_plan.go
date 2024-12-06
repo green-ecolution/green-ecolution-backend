@@ -58,9 +58,21 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	// TODO: calculate required water
 	// TODO: calculare distance
 
+	transporter, err := w.getVehicle(ctx, createWp.TransporterID)
+	if err != nil {
+		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+	}
+
+	trailer, err := w.getVehicle(ctx, createWp.TrailerID)
+	if err != nil && !errors.Is(err, storage.ErrVehicleNotFound){
+		return nil, service.NewError(service.InternalError, err.Error())
+	}
+
 	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
 		wp.Date = createWp.Date
 		wp.Description = createWp.Description
+		wp.Transporter = transporter
+		wp.Trailer = trailer
 
 		return true, nil
 	})
@@ -77,13 +89,25 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// TODO: get clusters, vehicles, users
+	// TODO: get clusters & users
 	// TODO: calculate required water
 	// TODO: calculare distance
+
+	// transporter, err := w.getVehicle(ctx, updateWp.TransporterID)
+	// if err != nil {
+	// 	return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+	// }
+
+	// trailer, err := w.getVehicle(ctx, updateWp.TrailerID)
+	// if err != nil && !errors.Is(err, storage.ErrVehicleNotFound){
+	// 	return nil, service.NewError(service.InternalError, err.Error())
+	// }
 
 	err := w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
 		wp.Date = updateWp.Date
 		wp.Description = updateWp.Description
+		// wp.Transporter = transporter
+		// wp.Trailer = trailer
 
 		return true, nil
 	})
@@ -118,4 +142,14 @@ func handleError(err error) error {
 	}
 
 	return service.NewError(service.InternalError, err.Error())
+}
+
+func (w *WateringPlanService) getVehicle(ctx context.Context, id *int32) (*entities.Vehicle, error) {
+	var err error
+	vehicle, err := w.vehicleRepo.GetByID(ctx, *id)
+	if err != nil {
+		return nil, err
+	}
+
+	return vehicle, nil
 }

@@ -114,7 +114,8 @@ func TestWateringPlanService_Create(t *testing.T) {
 	newWateringPlan := &entities.WateringPlanCreate{
 		Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 		Description: "New watering plan",
-		// TODO: add clusters, vehicles, and users
+		TransporterID: utils.P(int32(2)),
+		TrailerID: utils.P(int32(1)),
 	}
 
 	t.Run("should successfully create a new watering plan", func(t *testing.T) {
@@ -122,6 +123,18 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(allTestVehicles[1], nil)
+
+		// check trailer
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestVehicles[0], nil)
 
 		wateringPlanRepo.EXPECT().Create(
 			ctx,
@@ -136,13 +149,102 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0], result)
 	})
 
-	t.Run("should return an error when creating watering plan fails", func(t *testing.T) {
+	t.Run("should successfully create a new watering plan without a trailer", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(allTestVehicles[1], nil)
+
+		// check trailer
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(nil, storage.ErrVehicleNotFound)
+
+		wateringPlanRepo.EXPECT().Create(
+			ctx,
+			mock.Anything,
+		).Return(allTestWateringPlans[0], nil)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, allTestWateringPlans[0], result)
+	})
+
+	t.Run("should return an error when transporter is not found", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(nil, storage.ErrVehicleNotFound)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "404: vehicle not found")
+	})
+
+	t.Run("should return error create when the trailer is returning an error that is not 404", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(allTestVehicles[1], nil)
+
+		// check trailer
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(nil, storage.ErrToManyRows)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "500: receive more rows then expected")
+	})
+
+	t.Run("should return an error when creating cluster fails", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		expectedErr := errors.New("Failed to create watering plan")
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(allTestVehicles[1], nil)
+
+		// check trailer
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(nil, storage.ErrVehicleNotFound)
 
 		wateringPlanRepo.EXPECT().Create(
 			ctx,

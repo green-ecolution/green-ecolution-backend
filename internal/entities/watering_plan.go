@@ -34,8 +34,8 @@ type WateringPlanCreate struct {
 	Date        time.Time `validate:"required"`
 	Description string
 	// TreeclusterIDs        []*int32 `validate:"required"`
-	// TransporterID        *int32 `validate:"required"`
-	// TrailerID           *int32
+	TransporterID        *int32 `validate:"required"`
+	TrailerID           *int32
 	// Users           []*int32
 }
 
