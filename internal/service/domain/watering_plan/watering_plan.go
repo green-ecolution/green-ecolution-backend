@@ -54,7 +54,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// TODO: get clusters, vehicles, users
+	// TODO: get clusters & users
 	// TODO: calculate required water
 	// TODO: calculare distance
 
@@ -63,9 +63,12 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
 	}
 
-	trailer, err := w.getVehicle(ctx, createWp.TrailerID)
-	if err != nil && !errors.Is(err, storage.ErrVehicleNotFound){
-		return nil, service.NewError(service.InternalError, err.Error())
+	var trailer *entities.Vehicle
+	if createWp.TrailerID != nil {
+		trailer, err = w.getVehicle(ctx, createWp.TrailerID)
+		if err != nil {
+			return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+		}
 	}
 
 	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
@@ -93,21 +96,24 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	// TODO: calculate required water
 	// TODO: calculare distance
 
-	// transporter, err := w.getVehicle(ctx, updateWp.TransporterID)
-	// if err != nil {
-	// 	return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
-	// }
+	transporter, err := w.getVehicle(ctx, updateWp.TransporterID)
+	if err != nil {
+		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+	}
 
-	// trailer, err := w.getVehicle(ctx, updateWp.TrailerID)
-	// if err != nil && !errors.Is(err, storage.ErrVehicleNotFound){
-	// 	return nil, service.NewError(service.InternalError, err.Error())
-	// }
+	var trailer *entities.Vehicle
+	if updateWp.TrailerID != nil {
+		trailer, err = w.getVehicle(ctx, updateWp.TrailerID)
+		if err != nil {
+			return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+		}
+	}
 
-	err := w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
+	err = w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
 		wp.Date = updateWp.Date
 		wp.Description = updateWp.Description
-		// wp.Transporter = transporter
-		// wp.Trailer = trailer
+		wp.Transporter = transporter
+		wp.Trailer = trailer
 
 		return true, nil
 	})
