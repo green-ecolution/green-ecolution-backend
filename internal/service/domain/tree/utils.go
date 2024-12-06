@@ -115,4 +115,17 @@ var (
 		Longitude:     testLongitude,
 		Description:   "Updated description",
 	}
+
+	TestNearestTree = &entities.Tree{
+		ID:           5,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		Species:      "Oak",
+		Number:       "T001",
+		Latitude:     54.8215076622281,
+		Longitude:    9.487153277881877,
+		Description:  "A mature oak tree",
+		PlantingYear: 2023,
+		Readonly:     true,
+	}
 )

@@ -664,7 +664,64 @@ func TestTreeRepository_GetTreeClusterByTreeID(t *testing.T) {
 		assert.Nil(t, treeCluster)
 	})
 }
+func TestTreeRepository_FindNearestTree(t *testing.T) {
+	t.Run("should return the nearest tree for given latitude and longitude", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
 
+		// when
+		tree, err := r.GetByID(context.Background(), 2)
+		assert.NoError(t, err)
+		assert.NotNil(t, tree)
+
+		sensorLatitude := 54.821517
+		sensorLongitude := 9.487169
+
+		// when
+		nearestTree, errFind := r.FindNearestTree(context.Background(), sensorLatitude, sensorLongitude)
+
+		// then
+		assert.NoError(t, errFind, "Expected no error while finding the nearest tree")
+		assert.NotNil(t, nearestTree, "Expected to find a nearest tree")
+		assertExpectedEqualToTree(t, tree, nearestTree)
+	})
+
+	t.Run("Should return error when no tree found within the required distance", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		sensorLatitude := 54.821535
+		sensorLongitude := 9.487200
+
+		// when
+		nearestTree, err := r.FindNearestTree(context.Background(), sensorLatitude, sensorLongitude)
+
+		// then
+		assert.Error(t, err, "Expected error while finding the nearest tree")
+		assert.Nil(t, nearestTree, "no tree should be found")
+	})
+
+	t.Run("should return error if context is canceled", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		tree, err := r.FindNearestTree(ctx, 54.82124518093376, 9.485702120628517)
+
+		// then
+		assert.Error(t, err, "Expected error when context is canceled")
+		assert.Nil(t, tree, "Expected no tree to be returned when context is canceled")
+	})
+}
 func assertExpectedEqualToTree(t *testing.T, expectedTree, tree *entities.Tree) {
 	assert.Equal(t, expectedTree.ID, tree.ID, "ID does not match")
 	assert.Equal(t, expectedTree.PlantingYear, tree.PlantingYear, "PlantingYear does not match")

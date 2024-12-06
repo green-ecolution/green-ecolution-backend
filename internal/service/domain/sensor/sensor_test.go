@@ -6,7 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	treeUtils "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
@@ -431,7 +435,107 @@ func TestSensorService_Delete(t *testing.T) {
 		assert.EqualError(t, err, "500: failed to delete")
 	})
 }
+func TestSensorService_MapSensorToTree(t *testing.T) {
+	t.Run("should successfully map sensor to the nearest tree", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
 
+		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
+		testSensor := sensorUtils.TestSensor
+		testTree := treeUtils.TestNearestTree
+
+		treeRepo.EXPECT().
+			FindNearestTree(context.Background(), mock.Anything, mock.Anything).
+			Return(testTree, nil)
+
+		treeRepo.EXPECT().
+			Update(context.Background(), testTree.ID, mock.Anything).
+			Return(testTree, nil)
+
+		// when
+		err := svc.MapSensorToTree(context.Background(), testSensor)
+
+		// then
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error if sensor is nil", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
+
+		// when
+		err := svc.MapSensorToTree(context.Background(), nil)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "sensor cannot be nil")
+	})
+
+	t.Run("should return validation error for invalid longitude", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
+		invalidSensor := &entities.Sensor{Latitude: 37.7749, Longitude: 181.0}
+
+		treeRepo.EXPECT().
+			FindNearestTree(context.Background(), mock.Anything, mock.Anything).
+			Return(nil, service.ErrValidation)
+
+		// when
+		err := svc.MapSensorToTree(context.Background(), invalidSensor)
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), service.ErrValidation.Error())
+	})
+
+	t.Run("should return error if nearest tree is not found", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
+		testSensor := sensorUtils.TestSensor
+
+		treeRepo.EXPECT().
+			FindNearestTree(context.Background(), testSensor.Latitude, testSensor.Longitude).
+			Return(nil, errors.New("tree not found"))
+
+		// when
+		err := svc.MapSensorToTree(context.Background(), testSensor)
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "tree not found")
+	})
+
+	t.Run("should return error if updating tree with sensor fails", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
+		testSensor := sensorUtils.TestSensor
+		testTree := treeUtils.TestNearestTree
+
+		treeRepo.EXPECT().
+			FindNearestTree(context.Background(), mock.Anything, mock.Anything).
+			Return(testTree, nil)
+
+		treeRepo.EXPECT().
+			Update(context.Background(), testTree.ID, mock.Anything).
+			Return(nil, errors.New("update failed"))
+
+		// when
+		err := svc.MapSensorToTree(context.Background(), testSensor)
+
+		// then
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "update failed")
+	})
+}
 func TestReady(t *testing.T) {
 	t.Run("should return true if the service is ready", func(t *testing.T) {
 		// given
