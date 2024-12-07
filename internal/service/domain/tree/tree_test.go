@@ -85,7 +85,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, trees)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "404: trees not found")
 	})
 }
 
@@ -126,7 +126,7 @@ func TestTreeService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, tree)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "404: tree not found")
 	})
 
 	t.Run("should return error for unexpected repository error", func(t *testing.T) {
@@ -142,7 +142,7 @@ func TestTreeService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, tree)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "500: unexpected error")
 	})
 }
 
@@ -329,7 +329,7 @@ func TestTreeService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "404: tree cluster not found")
 	})
 
 	t.Run("should return error when fetching Sensor fails", func(t *testing.T) {
@@ -355,7 +355,7 @@ func TestTreeService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "404: sensor not found")
 	})
 
 	t.Run("should return error when creating tree fails", func(t *testing.T) {
@@ -391,7 +391,7 @@ func TestTreeService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "500: tree creation failed")
 	})
 
 	t.Run("should return error when updating cluster fails", func(t *testing.T) {
@@ -429,7 +429,7 @@ func TestTreeService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "500: cluster update failed")
 	})
 }
 
@@ -482,7 +482,7 @@ func TestTreeService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "404: tree not found")
 	})
 
 	t.Run("should return error if tree deletion fails", func(t *testing.T) {
@@ -507,7 +507,7 @@ func TestTreeService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "500: deletion failed")
 	})
 
 	t.Run("should return error if updating cluster fails after deleting tree", func(t *testing.T) {
@@ -534,7 +534,7 @@ func TestTreeService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "500: cluster update failed")
 	})
 
 	t.Run("should delete a tree without triggering cluster update when tree has no cluster", func(t *testing.T) {
@@ -660,7 +660,7 @@ func TestTreeService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "404: tree not found")
 	})
 
 	t.Run("should return error if TreeCluster not found", func(t *testing.T) {
@@ -763,7 +763,7 @@ func TestTreeService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, handleError(expectedError).Error())
+		assert.EqualError(t, err, "500: update failed")
 	})
 }
 
