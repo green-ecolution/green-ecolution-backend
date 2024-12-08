@@ -21,15 +21,15 @@ func TestAllServiceReady(t *testing.T) {
 		pluginSvc := serviceMock.NewMockPluginService(t)
 		wateringPlanSvc := serviceMock.NewMockWateringPlanService(t)
 		svc := Services{
-			InfoService:        infoSvc,
-			MqttService:        mqttSvc,
-			TreeService:        treeSvc,
-			AuthService:        authSvc,
-			RegionService:      regionSvc,
-			TreeClusterService: treeClusterSvc,
-			SensorService:      sensorSvc,
-			VehicleService:     vehicleSvc,
-			PluginService:      pluginSvc,
+			InfoService:         infoSvc,
+			MqttService:         mqttSvc,
+			TreeService:         treeSvc,
+			AuthService:         authSvc,
+			RegionService:       regionSvc,
+			TreeClusterService:  treeClusterSvc,
+			SensorService:       sensorSvc,
+			VehicleService:      vehicleSvc,
+			PluginService:       pluginSvc,
 			WateringPlanService: wateringPlanSvc,
 		}
 
