@@ -1,4 +1,5 @@
 .gitignore
+.openapi-generator-ignore
 .travis.yml
 README.md
 api/openapi.yaml
@@ -124,4 +125,16 @@ model_vehicle_type.go
 model_vehicle_update.go
 model_watering_status.go
 response.go
+test/api_file_import_test.go
+test/api_info_test.go
+test/api_plugin_test.go
+test/api_region_test.go
+test/api_role_test.go
+test/api_sensor_test.go
+test/api_tree_cluster_test.go
+test/api_tree_images_test.go
+test/api_tree_sensor_test.go
+test/api_tree_test.go
+test/api_user_test.go
+test/api_vehicle_test.go
 utils.go

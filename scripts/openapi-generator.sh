@@ -16,6 +16,10 @@ generate_client_docker() {
   exit_on_error "Could not create the client"
 }
 
+cleanup() {
+  rm -rf $API_DOCS_DIR
+}
+
 exit_on_error() {
   if [ $? -ne 0 ]; then
     echo "❌ $1"
@@ -23,4 +27,5 @@ exit_on_error() {
   fi
 }
 
+cleanup
 generate_client_docker
