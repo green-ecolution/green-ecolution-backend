@@ -31,21 +31,6 @@ func TestRegisterRoutes(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
-
-		t.Run("should call POST handler", func(t *testing.T) {
-			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := fiber.New()
-			RegisterRoutes(app, mockSensorService)
-
-			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", nil)
-
-			// then
-			resp, err := app.Test(req)
-			defer resp.Body.Close()
-			assert.NoError(t, err)
-			assert.Equal(t, http.StatusNotImplemented, resp.StatusCode)
-		})
 	})
 
 	t.Run("/v1/sensor/:id", func(t *testing.T) {
@@ -54,29 +39,19 @@ func TestRegisterRoutes(t *testing.T) {
 			app := fiber.New()
 			RegisterRoutes(app, mockSensorService)
 
+			mockSensorService.EXPECT().GetByID(
+				mock.Anything,
+				"sensor-1",
+			).Return(TestSensor, nil)
+
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor-1", nil)
 
 			// then
 			resp, err := app.Test(req)
 			defer resp.Body.Close()
 			assert.NoError(t, err)
-			assert.Equal(t, http.StatusNotImplemented, resp.StatusCode)
-		})
-
-		t.Run("should call PUT handler", func(t *testing.T) {
-			mockSensorService := serviceMock.NewMockSensorService(t)
-			app := fiber.New()
-			RegisterRoutes(app, mockSensorService)
-
-			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", nil)
-
-			// then
-			resp, err := app.Test(req)
-			defer resp.Body.Close()
-			assert.NoError(t, err)
-			assert.Equal(t, http.StatusNotImplemented, resp.StatusCode)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
 
 		t.Run("should call DELETE handler", func(t *testing.T) {
@@ -84,14 +59,19 @@ func TestRegisterRoutes(t *testing.T) {
 			app := fiber.New()
 			RegisterRoutes(app, mockSensorService)
 
+			mockSensorService.EXPECT().Delete(
+				mock.Anything,
+				"sensor-1",
+			).Return(nil)
+
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/sensor-1", nil)
 
 			// then
 			resp, err := app.Test(req)
 			defer resp.Body.Close()
 			assert.NoError(t, err)
-			assert.Equal(t, http.StatusNotImplemented, resp.StatusCode)
+			assert.Equal(t, http.StatusNoContent, resp.StatusCode)
 		})
 	})
 
@@ -102,7 +82,7 @@ func TestRegisterRoutes(t *testing.T) {
 			RegisterRoutes(app, mockSensorService)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1/data", nil)
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/sensor-1/data", nil)
 
 			// then
 			resp, err := app.Test(req)

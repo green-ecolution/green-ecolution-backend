@@ -11,7 +11,6 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend MapSensorStatus
 type SensorHTTPMapper interface {
-	// goverter:ignore Type
 	FromResponse(src *domain.Sensor) *entities.SensorResponse
 }
 

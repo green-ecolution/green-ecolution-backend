@@ -56,10 +56,10 @@ func (r *SensorRepository) updateEntity(ctx context.Context, sensor *entities.Se
 	return r.store.UpdateSensor(ctx, &params)
 }
 func (r *SensorRepository) validateCoordinates(locationParams *sqlc.SetSensorLocationParams) error {
-	if locationParams.Latitude < -90 || locationParams.Latitude > 90 {
+	if locationParams.Latitude < -90 || locationParams.Latitude > 90 || locationParams.Latitude == 0 {
 		return storage.ErrInvalidLatitude
 	}
-	if locationParams.Longitude < -180 || locationParams.Longitude > 180 {
+	if locationParams.Longitude < -180 || locationParams.Longitude > 180 || locationParams.Longitude == 0 {
 		return storage.ErrInvalidLongitude
 	}
 
