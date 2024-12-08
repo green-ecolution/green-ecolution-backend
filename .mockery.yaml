@@ -16,6 +16,7 @@ packages:
       PluginService:
       WateringPlanService:
       Service:
+      ServicesInterface:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
       dir: ./internal/storage/_mock

@@ -148,6 +148,10 @@ type Services struct {
 	WateringPlanService WateringPlanService
 }
 
+type ServicesInterface interface {
+  AllServicesReady() bool
+}
+
 func (s *Services) AllServicesReady() bool {
 	v := reflect.ValueOf(s).Elem()
 	for i := 0; i < v.NumField(); i++ {

@@ -8,22 +8,15 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/healthcheck"
+	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHealthCheck(t *testing.T) {
 	app := fiber.New()
-
-	handler := healthcheck.New(healthcheck.Config{
-		LivenessProbe: func(_ *fiber.Ctx) bool {
-			return true
-		},
-		LivenessEndpoint: "/health",
-		ReadinessProbe: func(_ *fiber.Ctx) bool {
-			return true
-		},
-		ReadinessEndpoint: "/ready",
-	})
+  svc := serviceMock.NewMockServicesInterface(t)
+  svc.EXPECT().AllServicesReady().Return(true)
+  handler := HealthCheck(svc)
 	app.Use(handler)
 
 	t.Run("should return 200 OK for liveness probe", func(t *testing.T) {
