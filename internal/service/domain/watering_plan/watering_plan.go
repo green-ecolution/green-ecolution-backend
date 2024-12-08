@@ -54,9 +54,17 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// TODO: get clusters & users
+	// TODO: get users
 	// TODO: calculate required water
 	// TODO: calculare distance
+
+	clusters, err := w.getTreeClusters(ctx, createWp.TreeclusterIDs)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	if len(clusters) == 0 {
+		return nil, service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
+	}
 
 	transporter, err := w.getVehicle(ctx, createWp.TransporterID)
 	if err != nil {
@@ -76,7 +84,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.Description = createWp.Description
 		wp.Transporter = transporter
 		wp.Trailer = trailer
-
+		wp.Treecluster = clusters
+	
 		return true, nil
 	})
 
@@ -92,9 +101,17 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// TODO: get clusters & users
+	// TODO: get users
 	// TODO: calculate required water
 	// TODO: calculare distance
+
+	clusters, err := w.getTreeClusters(ctx, updateWp.TreeclusterIDs)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	if len(clusters) == 0 {
+		return nil, service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
+	}
 
 	transporter, err := w.getVehicle(ctx, updateWp.TransporterID)
 	if err != nil {
@@ -142,14 +159,6 @@ func (w *WateringPlanService) Ready() bool {
 	return w.wateringPlanRepo != nil
 }
 
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, storage.ErrWateringPlanNotFound.Error())
-	}
-
-	return service.NewError(service.InternalError, err.Error())
-}
-
 func (w *WateringPlanService) getVehicle(ctx context.Context, id *int32) (*entities.Vehicle, error) {
 	var err error
 	vehicle, err := w.vehicleRepo.GetByID(ctx, *id)
@@ -158,4 +167,21 @@ func (w *WateringPlanService) getVehicle(ctx context.Context, id *int32) (*entit
 	}
 
 	return vehicle, nil
+}
+
+func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32) ([]*entities.TreeCluster, error) {
+	clusterIDs := make([]int32, len(ids))
+	for i, id := range ids {
+		clusterIDs[i] = *id
+	}
+
+	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
+}
+
+func handleError(err error) error {
+	if errors.Is(err, storage.ErrEntityNotFound) {
+		return service.NewError(service.NotFound, storage.ErrWateringPlanNotFound.Error())
+	}
+
+	return service.NewError(service.InternalError, err.Error())
 }
