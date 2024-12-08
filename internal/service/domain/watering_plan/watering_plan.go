@@ -85,7 +85,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.Transporter = transporter
 		wp.Trailer = trailer
 		wp.Treecluster = clusters
-	
+
 		return true, nil
 	})
 
