@@ -27,3 +27,23 @@ jobs:
 
       - name: Test
         run: make test
+
+  test_pkg_client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Dependencies
+        run: sudo apt-get update && sudo apt-get install -y make build-essential libgeos-dev libproj-dev
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Setup
+        run: make setup/ci
+
+      - name: Test
+        run: cd pkg/client && go test ./...
+
