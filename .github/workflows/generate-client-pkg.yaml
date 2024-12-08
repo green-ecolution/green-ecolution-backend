@@ -1,0 +1,40 @@
+name: "Generate Green Ecolution Client Package"
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  generate-client-pkg:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Dependencies
+        run: sudo apt update && sudo apt install -y make build-essential
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Setup
+        run: make setup/ci
+
+      - name: Generate Client Package
+        run: make generate/client
+
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+
+      - name: Commit changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GREEN_ECOLUTION_PAT }}
+        run: |
+          git add pkg/client
+          git commit -m "chore: update client package" && git push origin develop || echo "No changes to commit"
