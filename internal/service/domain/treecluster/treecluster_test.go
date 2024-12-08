@@ -70,7 +70,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, clusters)
-		assert.EqualError(t, err, handleError(expectedErr).Error())
+		assert.EqualError(t, err, "500: failed to get all tree clusters")
 	})
 }
 
@@ -256,7 +256,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "500: validation error")
 	})
 }
 
@@ -437,7 +437,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 }
 

@@ -33,6 +33,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
+
 	})
 
 	t.Run("should do nothing when clusterID is nil", func(t *testing.T) {
@@ -68,7 +69,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, expectedError, err)
+		assert.Equal(t, expectedError, err, "400: empty geometry")
 	})
 
 	t.Run("should return error when getRegionByID fails", func(t *testing.T) {
@@ -93,7 +94,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, expectedError, err)
+		assert.Equal(t, expectedError, err, "500: get region failed")
 	})
 
 	t.Run("should remove cluster coordinates when cluster has no trees", func(t *testing.T) {

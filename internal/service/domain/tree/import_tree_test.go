@@ -130,6 +130,6 @@ func TestTreeService_ImportTree(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.ErrorContains(t, err, expectedErr.Error())
+		assert.ErrorContains(t, err, "500: error deleting tree")
 	})
 }

@@ -305,7 +305,7 @@ func TestTreeService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 
 	t.Run("should return error when fetching TreeCluster fails", func(t *testing.T) {
@@ -636,7 +636,7 @@ func TestTreeService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "validation error")
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 
 	t.Run("should return error if tree not found", func(t *testing.T) {
@@ -690,7 +690,7 @@ func TestTreeService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.ErrorContains(t, err, expectedError.Error())
+		assert.ErrorContains(t, err, "404: tree cluster not found")
 	})
 
 	t.Run("should return error if Sensor not found", func(t *testing.T) {
@@ -722,7 +722,7 @@ func TestTreeService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.ErrorContains(t, err, expectedError.Error())
+		assert.ErrorContains(t, err, "404: sensor not found")
 	})
 
 	t.Run("should return error if updating tree fails", func(t *testing.T) {
