@@ -1,4 +1,4 @@
-module github.com/GIT_USER_ID/GIT_REPO_ID
+module github.com/green-ecolution/green-ecolution-backend/client
 
 go 1.18
 

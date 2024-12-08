@@ -7,7 +7,11 @@ generate_client_docker() {
     -i /local/docs/swagger.yaml \
     -o /local/$API_DOCS_DIR \
     -g go \
-    --package-name client
+    --package-name client \
+    --git-host github.com \
+    --git-user-id green-ecolution \
+    --git-repo-id green-ecolution-backend \
+    --additional-properties=isGoSubmodule=true 
 
   exit_on_error "Could not create the client"
 }
