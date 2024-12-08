@@ -202,11 +202,5 @@ func (s *TreeClusterService) getTrees(ctx context.Context, ids []*int32) ([]*dom
 		treeIDs[i] = *id
 	}
 
-	var err error
-	trees, err := s.treeRepo.GetTreesByIDs(ctx, treeIDs)
-	if err != nil {
-		return nil, err
-	}
-
-	return trees, nil
+	return s.treeRepo.GetTreesByIDs(ctx, treeIDs)
 }

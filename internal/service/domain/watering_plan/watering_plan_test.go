@@ -116,6 +116,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		Description:   "New watering plan",
 		TransporterID: utils.P(int32(2)),
 		TrailerID:     utils.P(int32(1)),
+		TreeclusterIDs:       []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully create a new watering plan", func(t *testing.T) {
@@ -123,6 +124,12 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -159,7 +166,14 @@ func TestWateringPlanService_Create(t *testing.T) {
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 			Description:   "New watering plan",
 			TransporterID: utils.P(int32(2)),
+			TreeclusterIDs:       []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -180,11 +194,57 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0], result)
 	})
 
+	t.Run("should return an error when finding treeclusters fails", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(nil, storage.ErrConnectionClosed)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "500: connection is closed")
+	})
+
+	t.Run("should return an error when treecluster are empty", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return([]*entities.TreeCluster{}, nil)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "404: treecluster not found")
+	})
+
 	t.Run("should return an error when transporter is not found", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -200,13 +260,19 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.EqualError(t, err, "404: vehicle not found")
 	})
 
-	t.Run("should return an error when creating cluster fails", func(t *testing.T) {
+	t.Run("should return an error when creating watering plan fails", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		expectedErr := errors.New("Failed to create watering plan")
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -270,6 +336,27 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "validation error")
 	})
+
+	t.Run("should return validation error on empty treeclusters", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		newWateringPlan := &entities.WateringPlanCreate{
+			Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description: "New watering plan",
+			TransporterID: utils.P(int32(2)),
+		}
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
 }
 
 func TestWateringPlanService_Update(t *testing.T) {
@@ -280,6 +367,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		Description:   "New watering plan for the east side of the city",
 		TransporterID: utils.P(int32(2)),
 		TrailerID:     utils.P(int32(1)),
+		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully update a watering plan", func(t *testing.T) {
@@ -287,6 +375,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -329,7 +423,14 @@ func TestWateringPlanService_Update(t *testing.T) {
 			Date:          time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 			Description:   "New watering plan for the east side of the city",
 			TransporterID: utils.P(int32(2)),
+			TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -362,6 +463,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
+
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
 			ctx,
@@ -376,11 +483,57 @@ func TestWateringPlanService_Update(t *testing.T) {
 		assert.EqualError(t, err, "404: vehicle not found")
 	})
 
+	t.Run("should return an error when finding treeclusters fails", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(nil, storage.ErrConnectionClosed)
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "500: connection is closed")
+	})
+
+	t.Run("should return an error when treecluster are empty", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return([]*entities.TreeCluster{}, nil)
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "404: treecluster not found")
+	})
+
 	t.Run("should return an error when watering plan does not exist", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -415,6 +568,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		expectedErr := errors.New("failed to update watering plan")
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
 
 		// check transporter
 		vehicleRepo.EXPECT().GetByID(
@@ -470,6 +629,27 @@ func TestWateringPlanService_Update(t *testing.T) {
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 			Description: "New watering plan for the east side of the city",
+		}
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+
+	t.Run("should return validation error on empty treeclusters", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		updatedWateringPlan := &entities.WateringPlanUpdate{
+			Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description: "Updated watering plan",
+			TransporterID: utils.P(int32(2)),
 		}
 
 		// when
