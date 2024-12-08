@@ -112,11 +112,11 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 func TestWateringPlanService_Create(t *testing.T) {
 	ctx := context.Background()
 	newWateringPlan := &entities.WateringPlanCreate{
-		Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
-		Description:   "New watering plan",
-		TransporterID: utils.P(int32(2)),
-		TrailerID:     utils.P(int32(1)),
-		TreeclusterIDs:       []*int32{utils.P(int32(1)), utils.P(int32(2))},
+		Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+		Description:    "New watering plan",
+		TransporterID:  utils.P(int32(2)),
+		TrailerID:      utils.P(int32(1)),
+		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully create a new watering plan", func(t *testing.T) {
@@ -163,10 +163,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
-			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
-			Description:   "New watering plan",
-			TransporterID: utils.P(int32(2)),
-			TreeclusterIDs:       []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description:    "New watering plan",
+			TransporterID:  utils.P(int32(2)),
+			TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
 
 		// check treecluster
@@ -344,8 +344,8 @@ func TestWateringPlanService_Create(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
-			Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
-			Description: "New watering plan",
+			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description:   "New watering plan",
 			TransporterID: utils.P(int32(2)),
 		}
 
@@ -363,10 +363,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 	ctx := context.Background()
 	wateringPlanID := int32(1)
 	updatedWateringPlan := &entities.WateringPlanUpdate{
-		Date:          time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-		Description:   "New watering plan for the east side of the city",
-		TransporterID: utils.P(int32(2)),
-		TrailerID:     utils.P(int32(1)),
+		Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		Description:    "New watering plan for the east side of the city",
+		TransporterID:  utils.P(int32(2)),
+		TrailerID:      utils.P(int32(1)),
 		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
@@ -420,9 +420,9 @@ func TestWateringPlanService_Update(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
-			Date:          time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-			Description:   "New watering plan for the east side of the city",
-			TransporterID: utils.P(int32(2)),
+			Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			Description:    "New watering plan for the east side of the city",
+			TransporterID:  utils.P(int32(2)),
 			TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
 
@@ -647,8 +647,8 @@ func TestWateringPlanService_Update(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
-			Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
-			Description: "Updated watering plan",
+			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description:   "Updated watering plan",
 			TransporterID: utils.P(int32(2)),
 		}
 

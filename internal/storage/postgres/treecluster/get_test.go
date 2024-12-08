@@ -184,7 +184,7 @@ func TestTreeClusterRepository_GetByIDs(t *testing.T) {
 		for i, cluster := range got {
 			assert.Equal(t, allTestCluster[i].ID, cluster.ID)
 			assert.Equal(t, allTestCluster[i].Name, cluster.Name)
-	
+
 			// assert region
 			if allTestCluster[i].RegionID == -1 {
 				assert.Nil(t, cluster.Region)
@@ -193,13 +193,13 @@ func TestTreeClusterRepository_GetByIDs(t *testing.T) {
 				assert.NotNil(t, cluster.Region)
 				assert.Equal(t, allTestCluster[i].RegionID, cluster.Region.ID)
 			}
-	
+
 			// assert trees
 			assert.Len(t, cluster.Trees, len(allTestCluster[i].TreeIDs))
 			if len(allTestCluster[i].TreeIDs) == 0 {
 				assert.Empty(t, cluster.Trees)
 			}
-	
+
 			for j, tree := range cluster.Trees {
 				assert.NotZero(t, tree)
 				assert.Equal(t, allTestCluster[i].TreeIDs[j], tree.ID)
