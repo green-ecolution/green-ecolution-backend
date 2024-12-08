@@ -110,14 +110,15 @@ func main() {
 		Auth: keycloakRepo.Auth,
 		User: keycloakRepo.User,
 
-		Info:        localRepo.Info,
-		Sensor:      postgresRepo.Sensor,
-		Tree:        postgresRepo.Tree,
-		TreeCluster: postgresRepo.TreeCluster,
-		Vehicle:     postgresRepo.Vehicle,
-		Flowerbed:   postgresRepo.Flowerbed,
-		Image:       postgresRepo.Image,
-		Region:      postgresRepo.Region,
+		Info:         localRepo.Info,
+		Sensor:       postgresRepo.Sensor,
+		Tree:         postgresRepo.Tree,
+		TreeCluster:  postgresRepo.TreeCluster,
+		Vehicle:      postgresRepo.Vehicle,
+		Flowerbed:    postgresRepo.Flowerbed,
+		Image:        postgresRepo.Image,
+		Region:       postgresRepo.Region,
+		WateringPlan: postgresRepo.WateringPlan,
 	}
 
 	services := domain.NewService(cfg, repositories)
