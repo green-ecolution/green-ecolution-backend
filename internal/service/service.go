@@ -121,13 +121,12 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 }
 
 type VehicleService interface {
-	Service
-	GetAll(ctx context.Context) ([]*domain.Vehicle, error)
-	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
+	CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
-	Create(ctx context.Context, vh *domain.VehicleCreate) (*domain.Vehicle, error)
-	Update(tx context.Context, id int32, vh *domain.VehicleUpdate) (*domain.Vehicle, error)
-	Delete(ctx context.Context, id int32) error
+}
+
+type WateringPlanService interface {
+	CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
 }
 
 type PluginService interface {
@@ -145,15 +144,16 @@ type Service interface {
 }
 
 type Services struct {
-	InfoService        InfoService
-	MqttService        MqttService
-	TreeService        TreeService
-	AuthService        AuthService
-	RegionService      RegionService
-	TreeClusterService TreeClusterService
-	SensorService      SensorService
-	VehicleService     VehicleService
-	PluginService      PluginService
+	InfoService         InfoService
+	MqttService         MqttService
+	TreeService         TreeService
+	AuthService         AuthService
+	RegionService       RegionService
+	TreeClusterService  TreeClusterService
+	SensorService       SensorService
+	VehicleService      VehicleService
+	PluginService       PluginService
+	WateringPlanService WateringPlanService
 }
 
 func (s *Services) AllServicesReady() bool {

@@ -17,6 +17,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		Description:        "",
 		Distance:           utils.P(0.0),
 		TotalWaterRequired: utils.P(0.0),
+		WateringPlanStatus: entities.WateringPlanStatusPlanned,
 		Users:              make([]*entities.User, 0),
 		Treecluster:        make([]*entities.TreeCluster, 0),
 		Transporter:        nil,

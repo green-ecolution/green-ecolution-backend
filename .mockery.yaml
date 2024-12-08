@@ -14,6 +14,7 @@ packages:
       SensorService:
       VehicleService:
       PluginService:
+      WateringPlanService:
       Service:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
@@ -29,6 +30,7 @@ packages:
       ImageRepository:
       VehicleRepository:
       FlowerbedRepository:
+      WateringPlanRepository:
   github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc:
     config: 
       dir: ./internal/storage/_mock

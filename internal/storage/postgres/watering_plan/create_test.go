@@ -75,6 +75,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Description, got.Description)
 		assert.Equal(t, input.Distance, got.Distance)
 		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, entities.WateringPlanStatusPlanned, got.WateringPlanStatus)
 
 		// TODO: test linkd treeclusters, vehicles and users
 	})
@@ -102,6 +103,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, "", got.Description)
 		assert.Equal(t, utils.P(float64(0)), got.Distance)
 		assert.Equal(t, utils.P(float64(0)), got.TotalWaterRequired)
+		assert.Equal(t, entities.WateringPlanStatusPlanned, got.WateringPlanStatus)
 
 		// TODO: test linkd treeclusters, vehicles and users
 	})
