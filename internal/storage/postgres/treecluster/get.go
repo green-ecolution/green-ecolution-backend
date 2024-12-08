@@ -16,12 +16,9 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 	}
 
 	data := r.mapper.FromSqlList(rows)
-	for _, f := range data {
-		f.Region, _ = r.GetRegionByTreeClusterID(ctx, f.ID) // Error can be ignored when region is not found
-
-		f.Trees, err = r.GetLinkedTreesByTreeClusterID(ctx, f.ID)
-		if err != nil {
-			return nil, err
+	for _, tc := range data {
+		if err := r.mapFields(ctx, tc); err != nil {
+			return nil, r.store.HandleError(err)
 		}
 	}
 
@@ -34,20 +31,28 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 		return nil, r.store.HandleError(err)
 	}
 
-	data := r.mapper.FromSql(row)
-	data.Region, err = r.GetRegionByTreeClusterID(ctx, id)
+	tc := r.mapper.FromSql(row)
+	if err := r.mapFields(ctx, tc); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	return tc, nil
+}
+
+func (r *TreeClusterRepository) GetByIDs(ctx context.Context, ids []int32) ([]*entities.TreeCluster, error) {
+	rows, err := r.store.GetTreesClustersByIDs(ctx, ids)
 	if err != nil {
-		if !errors.Is(err, storage.ErrRegionNotFound) { // If region is not found, we can still return the tree cluster
-			return nil, err
+		return nil, r.store.HandleError(err)
+	}
+
+	tc := r.mapper.FromSqlList(rows)
+	for _, cluster := range tc {
+		if err := r.mapFields(ctx, cluster); err != nil {
+			return nil, r.store.HandleError(err)
 		}
 	}
 
-	data.Trees, err = r.GetLinkedTreesByTreeClusterID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return tc, nil
 }
 
 func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error) {
@@ -91,6 +96,41 @@ func (r *TreeClusterRepository) tcIDExists(ctx context.Context, id int32) error 
 		}
 		return err
 	}
+
+	return nil
+}
+
+func (r *TreeClusterRepository) mapFields(ctx context.Context, tc *entities.TreeCluster) error {
+	if err := r.mapRegion(ctx, tc); err != nil {
+		return r.store.HandleError(err)
+	}
+
+	if err := r.mapTrees(ctx, tc); err != nil {
+		return r.store.HandleError(err)
+	}
+
+	return nil
+}
+
+func (r *TreeClusterRepository) mapRegion(ctx context.Context, tc *entities.TreeCluster) error {
+	region, err := r.GetRegionByTreeClusterID(ctx, tc.ID)
+	if err != nil {
+		// If region is not found, we can still return the tree cluster
+		if !errors.Is(err, storage.ErrRegionNotFound) {
+			return err
+		}
+	}
+	tc.Region = region
+
+	return nil
+}
+
+func (r *TreeClusterRepository) mapTrees(ctx context.Context, tc *entities.TreeCluster) error {
+	trees, err := r.GetLinkedTreesByTreeClusterID(ctx, tc.ID)
+	if err != nil {
+		return err
+	}
+	tc.Trees = trees
 
 	return nil
 }
