@@ -147,7 +147,7 @@ func TestTreeRepository_GetByID(t *testing.T) {
 func TestTreeRepository_GetBySensorID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-
+	
 	t.Run("should return the correct tree by linked sensor ID", func(t *testing.T) {
 		// given
 		r := NewTreeRepository(suite.Store, mappers)

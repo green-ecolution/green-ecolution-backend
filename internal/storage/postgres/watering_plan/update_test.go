@@ -42,9 +42,9 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		Description:        "Updated watering plan",
 		Distance:           utils.P(50.0),
 		TotalWaterRequired: utils.P(30000.0),
-		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
-		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:5],
+		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[2],
+		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[3],
+		Treecluster:        mappers.clusterMapper.FromSqlList(testCluster)[0:3],
 		Users:              []*entities.User{testUser},
 	}
 
@@ -78,7 +78,69 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, input.Distance, got.Distance)
 		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
 
-		// TODO: test linkd treeclusters, vehicles and users
+		// assert transporter
+		assert.Equal(t, input.Transporter.ID, got.Transporter.ID)
+		assert.Equal(t, input.Transporter.NumberPlate, got.Transporter.NumberPlate)
+
+		// assert trailer
+		assert.Equal(t, input.Trailer.ID, got.Trailer.ID)
+		assert.Equal(t, input.Trailer.NumberPlate, got.Trailer.NumberPlate)
+
+		// assert treecluster
+		assert.Len(t, input.Treecluster, len(got.Treecluster))
+		for i, tc := range got.Treecluster {
+			assert.Equal(t, input.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
+		}
+
+		// TODO: test linked users
+	})
+
+	t.Run("should update watering plan and unlink trailer", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Description = input.Description
+			wp.Distance = input.Distance
+			wp.TotalWaterRequired = input.TotalWaterRequired
+			wp.Transporter = input.Transporter
+			wp.Trailer = nil
+			wp.Treecluster = input.Treecluster
+			wp.Users = input.Users
+			return true, nil
+		}
+
+		// when
+		updateErr := r.Update(context.Background(), 2, updateFn)
+		got, getErr := r.GetByID(context.Background(), 2)
+
+		// then
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.NotZero(t, got.ID)
+		assert.Equal(t, input.Date, got.Date)
+		assert.Equal(t, input.Description, got.Description)
+		assert.Equal(t, input.Distance, got.Distance)
+		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
+
+		// assert transporter
+		assert.Equal(t, input.Transporter.ID, got.Transporter.ID)
+		assert.Equal(t, input.Transporter.NumberPlate, got.Transporter.NumberPlate)
+
+		// assert nil trailer
+		assert.Nil(t, got.Trailer)
+
+		// assert treecluster
+		assert.Len(t, input.Treecluster, len(got.Treecluster))
+		for i, tc := range got.Treecluster {
+			assert.Equal(t, input.Treecluster[i].ID, tc.ID)
+			assert.Equal(t, input.Treecluster[i].Name, tc.Name)
+		}
+
+		// TODO: test linked users
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
