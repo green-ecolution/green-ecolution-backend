@@ -4,6 +4,9 @@ SELECT * FROM tree_clusters;
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
 
+-- name: GetTreesClustersByIDs :many
+SELECT * FROM tree_clusters WHERE id = ANY($1::int[]);
+
 -- name: GetRegionByTreeClusterID :one
 SELECT regions.* FROM regions JOIN tree_clusters ON regions.id = tree_clusters.region_id WHERE tree_clusters.id = $1;
 
