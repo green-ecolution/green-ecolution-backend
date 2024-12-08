@@ -1,261 +1,211 @@
 package middleware
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
+	"crypto/x509"
+	"encoding/base64"
+	"log"
+	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/pkg/errors"
+	"github.com/gofiber/fiber/v2"
+	golangJwt "github.com/golang-jwt/jwt/v5"
+	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-//Tests the initialization of the JWT middleware to ensure that it is created correctly.
+func validKey(t testing.TB) *rsa.PrivateKey {
+	t.Helper()
+	t.Log("Generating a valid public key")
+	random := rand.Reader
+	key, err := rsa.GenerateKey(random, 512)
+	if err != nil {
+		t.Fatalf("Failed to generate key: %v", err)
+	}
 
-//func TestNewJWTMiddleware(t *testing.T) {
+	return key
+}
 
-//}
+func base64EncodePublicKey(key *rsa.PublicKey) string {
+	pubKeyBytes, err := x509.MarshalPKIXPublicKey(key)
+	if err != nil {
+		log.Fatalf("Failed to marshal public key: %v", err)
+	}
+	return base64.StdEncoding.EncodeToString(pubKeyBytes)
+}
 
-func TestGenerateJWTToken(t *testing.T) {
-	t.Run("should generate a valid JWT token", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(time.Hour).Unix(),
+func signJWT(t *testing.T, key *rsa.PrivateKey) string {
+	t.Helper()
+	token := golangJwt.New(golangJwt.SigningMethodRS256)
+	tokenString, err := token.SignedString(key)
+	if err != nil {
+		t.Fatalf("Failed to sign token: %v", err)
+	}
+
+	return tokenString
+}
+
+func Test_NewJWTMiddleware(t *testing.T) {
+	t.Run("should return a new JWT middleware", func(t *testing.T) {
+		// given
+		authSvc := serviceMock.NewMockAuthService(t)
+		validKey := validKey(t)
+		base64Key := base64EncodePublicKey(&validKey.PublicKey)
+		cfg := &config.IdentityAuthConfig{
+			OidcProvider: config.OidcProvider{
+				PublicKey: config.OidcPublicKey{
+					StaticKey: base64Key,
+				},
+			},
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
+		// when
+		got := NewJWTMiddleware(cfg, authSvc)
 
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string")
-	})
-	t.Run("should handle empty secret without error but with non-empty token", func(t *testing.T) {
-		claims := jwt.MapClaims{"sub": "1234567890"}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected no error when signing token with empty secret")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string even with empty secret")
+		// then
+		assert.NotNil(t, got)
 	})
 
-	t.Run("should generate token with future expiration time", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(24 * time.Hour).Unix(),
+	t.Run("should return a handler with error on invalid public key", func(t *testing.T) {
+		// given
+		authSvc := serviceMock.NewMockAuthService(t)
+		cfg := &config.IdentityAuthConfig{
+			OidcProvider: config.OidcProvider{
+				PublicKey: config.OidcPublicKey{
+					StaticKey: "invalid_base64_encoded_key",
+				},
+			},
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
+		// when
+		middleware := NewJWTMiddleware(cfg, authSvc)
+		app := fiber.New()
+		app.Use(middleware)
+		app.Get("/", func(c *fiber.Ctx) error {
+			return c.SendString("Hello, World!")
+		})
 
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string")
-	})
+		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
+		resp, _ := app.Test(req)
+		body := new(bytes.Buffer)
+		body.ReadFrom(resp.Body)
 
-	t.Run("should fail to generate token with past expiration time", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(-time.Hour).Unix(),
-		}
-
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed even with past expiration time")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string, even if expired")
-	})
-
-	t.Run("should generate token with multiple claims", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub":         "1234567890",
-			"exp":         time.Now().Add(time.Hour).Unix(),
-			"role":        "admin",
-			"permissions": []string{"read", "write", "delete"},
-		}
-
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed with multiple claims")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string")
-	})
-
-	t.Run("should handle large payload in claims", func(t *testing.T) {
-
-		largePayload := make(map[string]string)
-		for i := 0; i < 1000; i++ {
-			largePayload[fmt.Sprintf("key%d", i)] = "value"
-		}
-
-		claims := jwt.MapClaims{
-			"sub":  "1234567890",
-			"exp":  time.Now().Add(time.Hour).Unix(),
-			"data": largePayload,
-		}
-
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed with a large payload")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string")
-	})
-
-	t.Run("should generate token with nil claims", func(t *testing.T) {
-		token := jwt.New(jwt.SigningMethodHS256)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed with nil claims")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string")
-	})
-
-	t.Run("should generate token with empty claims", func(t *testing.T) {
-		claims := jwt.MapClaims{}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed with empty claims")
-		assert.NotEmpty(t, tokenString, "Expected a non-empty token string")
+		// then
+		assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
+		assert.Contains(t, body.String(), "failed to parse public key")
 	})
 }
 
-// Utility function to generate a test RSA private key
-func generateTestRSAPrivateKey() *rsa.PrivateKey {
-	privateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
-	return privateKey
+func Test_parsePublicKey(t *testing.T) {
+	t.Run("should return a public key", func(t *testing.T) {
+		// given
+		base64Key := base64EncodePublicKey(&validKey(t).PublicKey)
+
+		// when
+		got, err := parsePublicKey(base64Key)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+	})
+
+	t.Run("should return error on invalid base64 key", func(t *testing.T) {
+		// given
+		invalidBase64Key := "invalid_base64_encoded_key"
+
+		// when
+		got, err := parsePublicKey(invalidBase64Key)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
 }
 
-func TestVerifyJWTToken(t *testing.T) {
-	t.Run("should verify a valid JWT token", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(time.Hour).Unix(),
+func Test_successHandler(t *testing.T) {
+	t.Run("should success on introspect token", func(t *testing.T) {
+		// given
+		authSvc := serviceMock.NewMockAuthService(t)
+		validKey := validKey(t)
+		base64Key := base64EncodePublicKey(&validKey.PublicKey)
+		cfg := &config.IdentityAuthConfig{
+			OidcProvider: config.OidcProvider{
+				PublicKey: config.OidcPublicKey{
+					StaticKey: base64Key,
+				},
+			},
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed")
-
-		parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("unexpected signing method")
-			}
-			return secret, nil
+		// when
+		authSvc.EXPECT().RetrospectToken(mock.Anything, mock.Anything).Return(&entities.IntroSpectTokenResult{Active: utils.P(true)}, nil)
+		got := NewJWTMiddleware(cfg, authSvc)
+		app := fiber.New()
+		app.Use(got)
+		app.Get("/", func(c *fiber.Ctx) error {
+			return c.SendString("Hello, World!")
 		})
-		assert.NoError(t, err, "Expected token parsing to succeed")
-		assert.True(t, parsedToken.Valid, "Expected token to be valid")
+
+		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
+		req.Header.Set("Authorization", "Bearer "+signJWT(t, validKey))
+		resp, _ := app.Test(req)
+
+		// then
+		assert.NotNil(t, got)
+		assert.Equal(t, fiber.StatusOK, resp.StatusCode)
 	})
 
-	t.Run("should fail to verify a JWT token with an invalid signature", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(time.Hour).Unix(),
+	t.Run("should return code 500 on error", func(t *testing.T) {
+		// given
+		mockSvc := serviceMock.NewMockAuthService(t)
+		app := fiber.New()
+		handler := NewJWTMiddleware(&config.IdentityAuthConfig{}, mockSvc)
+		app.Use(handler)
+		app.Get("/", func(c *fiber.Ctx) error {
+			return c.SendString("Hello, World!")
+		})
+
+		// when
+		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
+		resp, _ := app.Test(req)
+
+		// then
+		assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
+	})
+
+	t.Run("should return code 401 on inactive token", func(t *testing.T) {
+		// given
+		authSvc := serviceMock.NewMockAuthService(t)
+		validKey := validKey(t)
+		base64Key := base64EncodePublicKey(&validKey.PublicKey)
+		cfg := &config.IdentityAuthConfig{
+			OidcProvider: config.OidcProvider{
+				PublicKey: config.OidcPublicKey{
+					StaticKey: base64Key,
+				},
+			},
 		}
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-		tokenString, _ := token.SignedString(secret)
-
-		invalidSecret := []byte("invalid_secret")
-		parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("unexpected signing method")
-			}
-			return invalidSecret, nil
+		// when
+		authSvc.EXPECT().RetrospectToken(mock.Anything, mock.Anything).Return(&entities.IntroSpectTokenResult{Active: utils.P(false)}, nil)
+		got := NewJWTMiddleware(cfg, authSvc)
+		app := fiber.New()
+		app.Use(got)
+		app.Get("/", func(c *fiber.Ctx) error {
+			return c.SendString("Hello, World!")
 		})
 
-		assert.Error(t, err, "Expected token parsing to fail with invalid signature")
-		assert.False(t, parsedToken.Valid, "Expected token to be invalid with wrong signature")
+		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
+		req.Header.Set("Authorization", "Bearer "+signJWT(t, validKey))
+		resp, _ := app.Test(req)
+
+		// then
+		assert.NotNil(t, got)
+		assert.Equal(t, fiber.StatusUnauthorized, resp.StatusCode)
 	})
-
-	t.Run("should fail verification for expired token", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(-time.Hour).Unix(),
-		}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed")
-
-		parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return secret, nil
-		})
-
-		assert.Error(t, err, "Expected error due to expired token")
-		assert.False(t, parsedToken.Valid, "Expected token to be invalid")
-	})
-
-	t.Run("should fail verification with missing expiration claim", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-		}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed")
-
-		parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return secret, nil
-		})
-
-		assert.NoError(t, err, "Expected parsing to succeed without expiration claim")
-		assert.True(t, parsedToken.Valid, "Expected token to be valid without expiration claim")
-	})
-
-	t.Run("should fail verification with modified token payload", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(time.Hour).Unix(),
-		}
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		secret := []byte("secret")
-
-		tokenString, err := token.SignedString(secret)
-		assert.NoError(t, err, "Expected token signing to succeed")
-
-		modifiedTokenString := tokenString[:len(tokenString)-1] + "x"
-
-		parsedToken, err := jwt.Parse(modifiedTokenString, func(token *jwt.Token) (interface{}, error) {
-			return secret, nil
-		})
-
-		assert.Error(t, err, "Expected error due to modified token")
-		assert.False(t, parsedToken.Valid, "Expected token to be invalid due to modification")
-	})
-
-	t.Run("should fail verification with unsupported signing method", func(t *testing.T) {
-		claims := jwt.MapClaims{
-			"sub": "1234567890",
-			"exp": time.Now().Add(time.Hour).Unix(),
-		}
-		token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-		privateKey := generateTestRSAPrivateKey()
-		tokenString, err := token.SignedString(privateKey)
-		assert.NoError(t, err, "Expected token signing to succeed with RS256")
-
-		secret := []byte("secret")
-		parsedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("unsupported signing method")
-			}
-			return secret, nil
-		})
-
-		assert.Error(t, err, "Expected error due to unsupported signing method")
-		assert.False(t, parsedToken.Valid, "Expected token to be invalid with unsupported signing method")
-	})
-
 }
