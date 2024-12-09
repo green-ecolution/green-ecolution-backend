@@ -1,0 +1,22 @@
+package mapper
+
+import (
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+)
+
+// goverter:converter
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
+// goverter:extend MapWateringPlanStatus MapVehicleStatus MapVehicleType MapDrivingLicense
+type WateringPlanHTTPMapper interface {
+	// goverter:ignore Users Treecluster
+	FromResponse(*domain.WateringPlan) *entities.WateringPlanResponse
+	FromResponseList([]*domain.WateringPlan) []*entities.WateringPlanResponse
+	FromCreateRequest(*entities.WateringPlanCreateRequest) *domain.WateringPlanCreate
+	FromUpdateRequest(*entities.WateringPlanUpdateRequest) *domain.WateringPlanUpdate
+}
+
+func MapWateringPlanStatus(status domain.WateringPlanStatus) entities.WateringPlanStatus {
+	return entities.WateringPlanStatus(status)
+}

@@ -227,7 +227,7 @@ func DeleteVehicle(svc service.VehicleService) fiber.Handler {
 }
 
 func mapVehicleToDto(v *domain.Vehicle) *entities.VehicleResponse {
-	dto := vehicleMapper.FormResponse(v)
+	dto := vehicleMapper.FromResponse(v)
 
 	return dto
 }
