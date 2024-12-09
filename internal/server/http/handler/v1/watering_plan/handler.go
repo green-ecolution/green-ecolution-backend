@@ -1,6 +1,7 @@
 package wateringplan
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -46,24 +47,28 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	}
 }
 
-//	@Summary		Get watering plan by ID
-//	@Description	Get watering plan by ID
-//	@Id				get-watering-plan-by-id
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		200	{object}	entities.WateringPlanResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan/{id} [get]
-//	@Param			watering_plan_od	path	string	true	"Watering Plan ID"
-//	@Security		Keycloak
+// @Summary		Get watering plan by ID
+// @Description	Get watering plan by ID
+// @Id				get-watering-plan-by-id
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		200	{object}	entities.WateringPlanResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan/{id} [get]
+// @Param			id	path	string	true	"Watering Plan ID"
+// @Security		Keycloak
 func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
+		fmt.Println("-----")
+		fmt.Println(strconv.Atoi(c.Params("id")))
 		id, err := strconv.Atoi(c.Params("id"))
+		fmt.Print(id)
+		fmt.Print(err)
 		if err != nil {
 			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
@@ -115,21 +120,21 @@ func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	}
 }
 
-//	@Summary		Update watering plan
-//	@Description	Update watering plan
-//	@Id				update-watering-plan
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		200	{object}	entities.WateringPlanResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan/{id} [put]
-//	@Param			id		path	string								true	"Watering Plan ID"
-//	@Param			body	body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
-//	@Security		Keycloak
+// @Summary		Update watering plan
+// @Description	Update watering plan
+// @Id				update-watering-plan
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		200	{object}	entities.WateringPlanResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan/{id} [put]
+// @Param			id		path	string								true	"Watering Plan ID"
+// @Param			body	body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
+// @Security		Keycloak
 func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
