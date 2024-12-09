@@ -52,5 +52,6 @@ func TestRestrospectToken(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "500: failed to retrospect token")
 	})
 }

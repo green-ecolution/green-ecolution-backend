@@ -70,7 +70,7 @@ func TestRegisterUser(t *testing.T) {
 		resp, err := svc.Register(context.Background(), &entities.RegisterUser{})
 
 		// then
-		assert.Error(t, err)
+		assert.Error(t, err, "500: failed to register user")
 		assert.Nil(t, resp)
 	})
 
@@ -85,7 +85,7 @@ func TestRegisterUser(t *testing.T) {
 		resp, err := svc.Register(context.Background(), &entities.RegisterUser{})
 
 		// then
-		assert.Error(t, err)
+		assert.Error(t, err, "400: validation error")
 		assert.Nil(t, resp)
 	})
 }
@@ -162,7 +162,7 @@ func TestLoginRequest(t *testing.T) {
 		_, err := svc.LoginRequest(context.Background(), loginRequest)
 
 		// then
-		assert.Error(t, err)
+		assert.Error(t, err, "500: failed to parse auth url in config")
 	})
 }
 
@@ -210,6 +210,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "400: validation error")
 	})
 
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
@@ -233,7 +234,7 @@ func TestClientTokenCallback(t *testing.T) {
 		_, err := svc.ClientTokenCallback(context.Background(), loginCallback)
 
 		// then
-		assert.Error(t, err)
+		assert.Error(t, err, "500: failed to get access token")
 	})
 }
 
@@ -270,7 +271,7 @@ func TestLogoutRequest(t *testing.T) {
 		err := svc.LogoutRequest(context.Background(), invalidLogoutRequest)
 
 		// then
-		assert.Error(t, err)
+		assert.Error(t, err, "400: validation error")
 	})
 
 	t.Run("should return error when session removal fails", func(t *testing.T) {
@@ -288,6 +289,6 @@ func TestLogoutRequest(t *testing.T) {
 		err := svc.LogoutRequest(context.Background(), logoutRequest)
 
 		// then
-		assert.Error(t, err)
+		assert.Error(t, err, "500: failed to remove session")
 	})
 }
