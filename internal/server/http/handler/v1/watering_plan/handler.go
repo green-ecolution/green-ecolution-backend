@@ -1,6 +1,8 @@
 package wateringplan
 
 import (
+	"strconv"
+
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -55,9 +57,24 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 //	@Param			id	path		string	true	"Watering plan ID"
 //	@Router			/v1/watering-plan/{id} [get]
 //	@Security		Keycloak
-func GetWateringPlanByID(_ service.WateringPlanService) fiber.Handler {
+func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("watering_plan_id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, err := svc.GetByID(ctx, int32(id))
+
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapWateringPlanToDto(domainData)
+
+		return c.JSON(data)
 	}
 }
 
