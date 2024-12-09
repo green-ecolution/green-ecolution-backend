@@ -113,13 +113,15 @@ func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringP
 		return errors.New("trailer vehicle requires a vehicle of type trailer")
 	}
 
-	if len(entity.Users) == 0 {
-		return errors.New("watering plan requires employees")
-	}
+	// TODO: please comment also the test cases back in as soon as the empoyees are ready
+	// if len(entity.Users) == 0 {
+	// 	return errors.New("watering plan requires employees")
+	// }
 
-	if len(entity.Treecluster) == 0 {
-		return errors.New("watering plan requires tree cluster")
-	}
+	// TODO: please comment also the test cases back in as soon as the treecluster are ready
+	// if len(entity.Treecluster) == 0 {
+	// 	return errors.New("watering plan requires tree cluster")
+	// }
 
 	return nil
 }

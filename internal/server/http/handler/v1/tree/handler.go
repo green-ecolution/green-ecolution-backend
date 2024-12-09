@@ -29,10 +29,9 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [get]
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			age				query	string	false	"Age"
-// @Param			treecluster_id	query	string	false	"Tree Cluster ID"
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			age		query	string	false	"Age"
 // @Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

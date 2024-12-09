@@ -186,27 +186,27 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, "trailer vehicle requires a vehicle of type trailer", err.Error())
 	})
 
-	t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
-		// given
-		r := NewWateringPlanRepository(suite.Store, mappers)
+	// t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
+	// 	// given
+	// 	r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
-			wp.Date = input.Date
-			wp.Transporter = input.Transporter
-			wp.Trailer = input.Trailer
-			wp.Treecluster = input.Treecluster
-			wp.Users = []*entities.User{}
-			return true, nil
-		}
+	// 	createFn := func(wp *entities.WateringPlan) (bool, error) {
+	// 		wp.Date = input.Date
+	// 		wp.Transporter = input.Transporter
+	// 		wp.Trailer = input.Trailer
+	// 		wp.Treecluster = input.Treecluster
+	// 		wp.Users = []*entities.User{}
+	// 		return true, nil
+	// 	}
 
-		// when
-		got, err := r.Create(context.Background(), createFn)
+	// 	// when
+	// 	got, err := r.Create(context.Background(), createFn)
 
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-		assert.Equal(t, "watering plan requires employees", err.Error())
-	})
+	// 	// then
+	// 	assert.Error(t, err)
+	// 	assert.Nil(t, got)
+	// 	assert.Equal(t, "watering plan requires employees", err.Error())
+	// })
 
 	t.Run("should return error when transporter has not correct vehilce type", func(t *testing.T) {
 		// given
@@ -252,27 +252,27 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, "watering plan requires a valid transporter", err.Error())
 	})
 
-	t.Run("should return error when no treecluster are linked", func(t *testing.T) {
-		// given
-		r := NewWateringPlanRepository(suite.Store, mappers)
+	// t.Run("should return error when no treecluster are linked", func(t *testing.T) {
+	// 	// given
+	// 	r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
-			wp.Date = input.Date
-			wp.Transporter = input.Transporter
-			wp.Trailer = input.Trailer
-			wp.Treecluster = []*entities.TreeCluster{}
-			wp.Users = input.Users
-			return true, nil
-		}
+	// 	createFn := func(wp *entities.WateringPlan) (bool, error) {
+	// 		wp.Date = input.Date
+	// 		wp.Transporter = input.Transporter
+	// 		wp.Trailer = input.Trailer
+	// 		wp.Treecluster = []*entities.TreeCluster{}
+	// 		wp.Users = input.Users
+	// 		return true, nil
+	// 	}
 
-		// when
-		got, err := r.Create(context.Background(), createFn)
+	// 	// when
+	// 	got, err := r.Create(context.Background(), createFn)
 
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-		assert.Equal(t, "watering plan requires tree cluster", err.Error())
-	})
+	// 	// then
+	// 	assert.Error(t, err)
+	// 	assert.Nil(t, got)
+	// 	assert.Equal(t, "watering plan requires tree cluster", err.Error())
+	// })
 
 	t.Run("should return error when watering plan is invalid", func(t *testing.T) {
 		// given
