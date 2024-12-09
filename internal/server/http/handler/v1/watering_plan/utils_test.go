@@ -65,7 +65,6 @@ var (
 			Treecluster:        TestClusters[2:3],
 		},
 	}
-
 	TestVehicles = []*entities.Vehicle{
 		{
 			ID:            1,
@@ -84,7 +83,6 @@ var (
 			Status:        entities.VehicleStatusUnknown,
 		},
 	}
-
 	TestClusters = []*entities.TreeCluster{
 		{
 			ID:             1,
