@@ -1,7 +1,9 @@
 package wateringplan_test
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -95,7 +97,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 	})
 }
 
-func TestGetTreeClusterByID(t *testing.T) {
+func TestGetWateringPlanByID(t *testing.T) {
 	t.Run("should return watering plan successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
@@ -176,6 +178,84 @@ func TestGetTreeClusterByID(t *testing.T) {
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/watering-plan/1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockWateringPlanService.AssertExpectations(t)
+	})
+}
+
+func TestCreateWateringPlan(t *testing.T) {
+	t.Run("should create watering plan successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.CreateWateringPlan(mockWateringPlanService)
+		app.Post("/v1/watering-plan", handler)
+
+		mockWateringPlanService.EXPECT().Create(
+			mock.Anything,
+			mock.AnythingOfType("*entities.WateringPlanCreate"),
+		).Return(TestWateringPlans[0], nil)
+
+		// when
+		body, _ := json.Marshal(TestWateringPlanRequest)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/watering-plan", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusCreated, resp.StatusCode)
+
+		var response serverEntities.WateringPlanResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.NoError(t, err)
+		assert.Equal(t, TestWateringPlans[0].Date, response.Date)
+		assert.Equal(t, TestWateringPlans[0].Transporter.NumberPlate, response.Transporter.NumberPlate)
+
+		mockWateringPlanService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.CreateWateringPlan(mockWateringPlanService)
+		app.Post("/v1/watering-plan", handler)
+
+		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
+
+		// when
+		body, _ := json.Marshal(invalidRequestBody)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/watering-plan", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.CreateWateringPlan(mockWateringPlanService)
+		app.Post("/v1/watering-plan", handler)
+
+		mockWateringPlanService.EXPECT().Create(
+			mock.Anything,
+			mock.AnythingOfType("*entities.WateringPlanCreate"),
+		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+
+		// when
+		body, _ := json.Marshal(TestWateringPlanRequest)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/v1/watering-plan", bytes.NewBuffer(body))
+		req.Header.Set("Content-Type", "application/json")
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
