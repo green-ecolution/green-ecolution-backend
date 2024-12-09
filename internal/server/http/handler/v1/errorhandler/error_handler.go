@@ -19,6 +19,7 @@ var notFoundErrors = []error{
 	storage.ErrTreeClusterNotFound,
 	storage.ErrTreeNotFound,
 	storage.ErrVehicleNotFound,
+	storage.ErrWateringPlanNotFound,
 }
 
 func HandleError(err error) *fiber.Error {
