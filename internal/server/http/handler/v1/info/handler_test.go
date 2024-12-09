@@ -1,4 +1,4 @@
-package info
+package info_test
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +19,7 @@ func TestGetAppInfo(t *testing.T) {
 	t.Run("should return app info successfully", func(t *testing.T) {
 		mockInfoService := serviceMock.NewMockInfoService(t)
 		app := fiber.New()
-		handler := GetAppInfo(mockInfoService)
+		handler := info.GetAppInfo(mockInfoService)
 
 		mockInfoService.EXPECT().GetAppInfoResponse(
 			mock.Anything,
@@ -45,7 +46,7 @@ func TestGetAppInfo(t *testing.T) {
 	t.Run("should return 500 when service returns an error", func(t *testing.T) {
 		mockInfoService := serviceMock.NewMockInfoService(t)
 		app := fiber.New()
-		handler := GetAppInfo(mockInfoService)
+		handler := info.GetAppInfo(mockInfoService)
 
 		mockInfoService.EXPECT().GetAppInfoResponse(
 			mock.Anything,
