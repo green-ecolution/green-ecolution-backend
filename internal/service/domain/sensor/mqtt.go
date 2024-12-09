@@ -29,7 +29,7 @@ func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPay
 	}
 
 	if err := s.validator.Struct(payload); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, service.ErrValidation.Error()).Error())
+		return nil, handleError(service.ErrValidation)
 	}
 
 	sensor, err := s.getSensor(ctx, payload)
