@@ -92,9 +92,23 @@ func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 //	@Router			/v1/watering-plan [post]
 //	@Param			body	body	entities.WateringPlanCreateRequest	true	"Watering Plan Create Request"
 //	@Security		Keycloak
-func CreateWateringPlan(_ service.WateringPlanService) fiber.Handler {
+func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+
+		var req entities.WateringPlanCreateRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := wateringPlanMapper.FromCreateRequest(&req)
+		domainData, err := svc.Create(ctx, domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapWateringPlanToDto(domainData)
+		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
 
