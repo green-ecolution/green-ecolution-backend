@@ -15,17 +15,17 @@ var (
 	wateringPlanMapper = generated.WateringPlanHTTPMapperImpl{}
 )
 
-//	@Summary		Get all watering plans
-//	@Description	Get all watering plans
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		200		{object}	entities.WateringPlanListResponse
-//	@Failure		400		{object}	HTTPError
-//	@Failure		500		{object}	HTTPError
-//	@Param			page	query		string	false	"Page"
-//	@Param			limit	query		string	false	"Limit"
-//	@Router			/v1/watering-plan [get]
-//	@Security		Keycloak
+// @Summary		Get all watering plans
+// @Description	Get all watering plans
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		200		{object}	entities.WateringPlanListResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Param			page	query		string	false	"Page"
+// @Param			limit	query		string	false	"Limit"
+// @Router			/v1/watering-plan [get]
+// @Security		Keycloak
 func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -81,20 +81,20 @@ func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	}
 }
 
-//	@Summary		Create watering plan
-//	@Description	Create watering plan
-//	@Id				create-watering-plan
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		201	{object}	entities.WateringPlanResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan [post]
-//	@Param			body	body	entities.WateringPlanCreateRequest	true	"Watering Plan Create Request"
-//	@Security		Keycloak
+// @Summary		Create watering plan
+// @Description	Create watering plan
+// @Id				create-watering-plan
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		201	{object}	entities.WateringPlanResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan [post]
+// @Param			body	body	entities.WateringPlanCreateRequest	true	"Watering Plan Create Request"
+// @Security		Keycloak
 func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -115,21 +115,21 @@ func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	}
 }
 
-//	@Summary		Update watering plan
-//	@Description	Update watering plan
-//	@Id				update-watering-plan
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		200	{object}	entities.WateringPlanResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan/{id} [put]
-//	@Param			id	path	string								true	"Watering Plan ID"
-//	@Param			body				body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
-//	@Security		Keycloak
+// @Summary		Update watering plan
+// @Description	Update watering plan
+// @Id				update-watering-plan
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		200	{object}	entities.WateringPlanResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan/{id} [put]
+// @Param			id	path	string								true	"Watering Plan ID"
+// @Param			body				body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
+// @Security		Keycloak
 func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -155,20 +155,20 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	}
 }
 
-//	@Summary		Delete watering plan
-//	@Description	Delete watering plan
-//	@Id				delete-watering-plan
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		204
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan/{id} [delete]
-//	@Param			id	path	string	true	"Watering Plan ID"
-//	@Security		Keycloak
+// @Summary		Delete watering plan
+// @Description	Delete watering plan
+// @Id				delete-watering-plan
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		204
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan/{id} [delete]
+// @Param			id	path	string	true	"Watering Plan ID"
+// @Security		Keycloak
 func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()

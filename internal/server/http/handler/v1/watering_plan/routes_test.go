@@ -79,47 +79,47 @@ func TestRegisterRoutes(t *testing.T) {
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
 
-	// 	t.Run("should call PUT handler", func(t *testing.T) {
-	// 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
-	// 		app := fiber.New()
-	// 		wateringplan.RegisterRoutes(app, mockWateringPlanService)
+		// 	t.Run("should call PUT handler", func(t *testing.T) {
+		// 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		// 		app := fiber.New()
+		// 		wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-	// 		mockWateringPlanService.EXPECT().Update(
-	// 			mock.Anything,
-	// 			int32(1),
-	// 			mock.Anything,
-	// 		).Return(TestWateringPlans[0], nil)
+		// 		mockWateringPlanService.EXPECT().Update(
+		// 			mock.Anything,
+		// 			int32(1),
+		// 			mock.Anything,
+		// 		).Return(TestWateringPlans[0], nil)
 
-	// 		// when
-	// 		body, _ := json.Marshal(TestWateringPlanRequest)
-	// 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", bytes.NewBuffer(body))
-	// 		req.Header.Set("Content-Type", "application/json")
+		// 		// when
+		// 		body, _ := json.Marshal(TestWateringPlanRequest)
+		// 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", bytes.NewBuffer(body))
+		// 		req.Header.Set("Content-Type", "application/json")
 
-	// 		// then
-	// 		resp, err := app.Test(req)
-	// 		defer resp.Body.Close()
-	// 		assert.NoError(t, err)
-	// 		assert.Equal(t, http.StatusOK, resp.StatusCode)
-	// 	})
+		// 		// then
+		// 		resp, err := app.Test(req)
+		// 		defer resp.Body.Close()
+		// 		assert.NoError(t, err)
+		// 		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		// 	})
 
-	// 	t.Run("should call DELETE handler", func(t *testing.T) {
-	// 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
-	// 		app := fiber.New()
-	// 		wateringplan.RegisterRoutes(app, mockWateringPlanService)
+		// 	t.Run("should call DELETE handler", func(t *testing.T) {
+		// 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		// 		app := fiber.New()
+		// 		wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-	// 		mockWateringPlanService.EXPECT().Delete(
-	// 			mock.Anything,
-	// 			int32(1),
-	// 		).Return(nil)
+		// 		mockWateringPlanService.EXPECT().Delete(
+		// 			mock.Anything,
+		// 			int32(1),
+		// 		).Return(nil)
 
-	// 		// when
-	// 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
+		// 		// when
+		// 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/1", nil)
 
-	// 		// then
-	// 		resp, err := app.Test(req)
-	// 		defer resp.Body.Close()
-	// 		assert.NoError(t, err)
-	// 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
-	// 	})
+		// 		// then
+		// 		resp, err := app.Test(req)
+		// 		defer resp.Body.Close()
+		// 		assert.NoError(t, err)
+		// 		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+		// 	})
 	})
 }
