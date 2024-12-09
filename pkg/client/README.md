@@ -187,8 +187,8 @@ Authentication schemes defined for the API:
 
 
 - **Type**: OAuth
-- **Flow**: password
-- **Authorization URL**: 
+- **Flow**: accessCode
+- **Authorization URL**: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
 - **Scopes**: N/A
 
 Example

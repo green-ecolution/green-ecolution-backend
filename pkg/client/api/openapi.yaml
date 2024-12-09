@@ -3844,7 +3844,8 @@ components:
   securitySchemes:
     Keycloak:
       flows:
-        password:
+        authorizationCode:
+          authorizationUrl: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
           scopes: {}
           tokenUrl: https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/token
       type: oauth2
