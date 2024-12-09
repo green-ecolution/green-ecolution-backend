@@ -11,13 +11,10 @@ generate_client_docker() {
     --git-host github.com \
     --git-user-id green-ecolution \
     --git-repo-id green-ecolution-backend \
-    --additional-properties=isGoSubmodule=true 
+    --skip-overwrite \
+    --additional-properties=isGoSubmodule=true
 
   exit_on_error "Could not create the client"
-}
-
-cleanup() {
-  rm -rf $API_DOCS_DIR
 }
 
 exit_on_error() {
@@ -27,5 +24,4 @@ exit_on_error() {
   fi
 }
 
-cleanup
 generate_client_docker
