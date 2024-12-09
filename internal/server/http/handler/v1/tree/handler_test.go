@@ -1,4 +1,4 @@
-package tree
+package tree_test
 
 import (
 	"bytes"
@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	httpEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -23,7 +24,7 @@ func TestGetAllTrees(t *testing.T) {
 	t.Run("should return all trees successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("/v1/tree", GetAllTrees(mockTreeService))
+		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 		).Return(TestTrees, nil)
@@ -42,7 +43,7 @@ func TestGetAllTrees(t *testing.T) {
 	t.Run("should return an empty list when no trees are available", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("/v1/tree", GetAllTrees(mockTreeService))
+		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 		).Return([]*entities.Tree{}, nil)
@@ -61,7 +62,7 @@ func TestGetAllTrees(t *testing.T) {
 	t.Run("should return 500 when internal server error occurs", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("/v1/tree", GetAllTrees(mockTreeService))
+		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
@@ -84,7 +85,7 @@ func TestGetTreeBySensorID(t *testing.T) {
 	t.Run("should return tree successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
+		app.Get("v1/tree/sensor/:sensor_id", tree.GetTreeBySensorID(mockTreeService))
 
 		sensorID := "sensor-1"
 		mockTreeService.EXPECT().GetBySensorID(
@@ -105,7 +106,7 @@ func TestGetTreeBySensorID(t *testing.T) {
 	t.Run("should return 404 when tree not found", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
+		app.Get("v1/tree/sensor/:sensor_id", tree.GetTreeBySensorID(mockTreeService))
 
 		sensorID := "sensor-999"
 		mockTreeService.EXPECT().GetBySensorID(
@@ -125,7 +126,7 @@ func TestGetTreeBySensorID(t *testing.T) {
 	t.Run("should return 500 when internal server error occurs", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Get("/v1/tree/sensor/:sensor_id", GetTreeBySensorID(mockTreeService))
+		app.Get("/v1/tree/sensor/:sensor_id", tree.GetTreeBySensorID(mockTreeService))
 
 		sensorID := "sensor-1"
 		mockTreeService.EXPECT().GetBySensorID(
@@ -147,7 +148,7 @@ func TestCreateTree(t *testing.T) {
 	t.Run("should create tree cluster successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Post("/v1/tree", CreateTree(mockTreeService))
+		app.Post("/v1/tree", tree.CreateTree(mockTreeService))
 
 		testTree := TestTrees[0]
 		mockTreeService.EXPECT().Create(
@@ -179,7 +180,7 @@ func TestCreateTree(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Post("/v1/tree", CreateTree(mockTreeService))
+		app.Post("/v1/tree", tree.CreateTree(mockTreeService))
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
 
 		// when
@@ -197,7 +198,7 @@ func TestCreateTree(t *testing.T) {
 	t.Run("should return 500 when internal server error occurs", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Post("/v1/tree", CreateTree(mockTreeService))
+		app.Post("/v1/tree", tree.CreateTree(mockTreeService))
 		mockTreeService.EXPECT().Create(
 			mock.Anything,
 			mock.AnythingOfType("*entities.TreeCreate"),
@@ -221,7 +222,7 @@ func TestUpdateTree(t *testing.T) {
 	t.Run("should update tree successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Put("/v1/tree/:id", UpdateTree(mockTreeService))
+		app.Put("/v1/tree/:id", tree.UpdateTree(mockTreeService))
 		testTree := TestTrees[0]
 		treeID := int32(1)
 		mockTreeService.EXPECT().Update(
@@ -253,7 +254,7 @@ func TestUpdateTree(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		handler := UpdateTree(mockTreeService)
+		handler := tree.UpdateTree(mockTreeService)
 		app.Put("/v1/tree/:id", handler)
 
 		// when
@@ -269,7 +270,7 @@ func TestUpdateTree(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Put("/v1/tree/:id", UpdateTree(mockTreeService))
+		app.Put("/v1/tree/:id", tree.UpdateTree(mockTreeService))
 
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
 		// when
@@ -285,7 +286,7 @@ func TestUpdateTree(t *testing.T) {
 	t.Run("should return 404 Not Found when tree does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Put("/v1/tree/:id", UpdateTree(mockTreeService))
+		app.Put("/v1/tree/:id", tree.UpdateTree(mockTreeService))
 
 		treeID := int32(999)
 		mockTreeService.EXPECT().Update(
@@ -311,7 +312,7 @@ func TestUpdateTree(t *testing.T) {
 	t.Run("should return 500 Internal Server Error on service error", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Put("/v1/tree/:id", UpdateTree(mockTreeService))
+		app.Put("/v1/tree/:id", tree.UpdateTree(mockTreeService))
 
 		treeID := int32(1)
 		mockTreeService.EXPECT().Update(
@@ -338,7 +339,7 @@ func TestDeleteTree(t *testing.T) {
 	t.Run("should delete tree successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Delete("/v1/tree/:id", DeleteTree(mockTreeService))
+		app.Delete("/v1/tree/:id", tree.DeleteTree(mockTreeService))
 		treeID := int32(1)
 
 		mockTreeService.EXPECT().Delete(
@@ -360,7 +361,7 @@ func TestDeleteTree(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid tree ID", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Delete("/v1/tree/:id", DeleteTree(mockTreeService))
+		app.Delete("/v1/tree/:id", tree.DeleteTree(mockTreeService))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/tree/invalid", nil)
@@ -375,7 +376,7 @@ func TestDeleteTree(t *testing.T) {
 	t.Run("should return 404 Not Found when tree does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Delete("/v1/tree/:id", DeleteTree(mockTreeService))
+		app.Delete("/v1/tree/:id", tree.DeleteTree(mockTreeService))
 
 		treeID := int32(999)
 		mockTreeService.EXPECT().Delete(
@@ -397,7 +398,7 @@ func TestDeleteTree(t *testing.T) {
 	t.Run("should return 500 Internal Server Error on service error", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)
-		app.Delete("/v1/tree/:id", DeleteTree(mockTreeService))
+		app.Delete("/v1/tree/:id", tree.DeleteTree(mockTreeService))
 
 		treeID := int32(1)
 		mockTreeService.EXPECT().Delete(

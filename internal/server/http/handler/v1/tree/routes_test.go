@@ -1,4 +1,4 @@
-package tree
+package tree_test
 
 import (
 	"bytes"
@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 )
 
@@ -19,7 +20,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockTreeService)
+			tree.RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().GetAll(
 				mock.Anything,
@@ -38,7 +39,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		t.Run("should call POST", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockTreeService)
+			tree.RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().Create(
 				mock.Anything,
@@ -62,7 +63,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockTreeService)
+			tree.RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().GetByID(
 				mock.Anything,
@@ -82,7 +83,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		t.Run("should call PUT handler", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockTreeService)
+			tree.RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().Update(
 				mock.Anything,
@@ -105,7 +106,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 		t.Run("should call DELETE", func(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockTreeService)
+			tree.RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().Delete(
 				mock.Anything,
@@ -128,7 +129,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 			mockTreeService := serviceMock.NewMockTreeService(t)
 			sensorID := "sensor-1"
 			app := fiber.New()
-			RegisterRoutes(app, mockTreeService)
+			tree.RegisterRoutes(app, mockTreeService)
 
 			mockTreeService.EXPECT().GetBySensorID(
 				mock.Anything,
@@ -143,34 +144,6 @@ func TestRegisterTreeRoutes(t *testing.T) {
 			defer resp.Body.Close()
 			assert.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
-		})
-	})
-
-	t.Run("/v1/tree/:id/images", func(t *testing.T) {
-		t.Run("should call GET handler", func(t *testing.T) {
-			//TODO: Implement test for GetTreeImages
-		})
-
-		t.Run("should call POST handler", func(t *testing.T) {
-			//TODO: Implement test for AddTreeImage
-		})
-
-		t.Run("should call DELETE handler", func(t *testing.T) {
-			//TODO: Implement test for RemoveTreeImage
-		})
-	})
-
-	t.Run("/v1/tree/:id/sensor", func(t *testing.T) {
-		t.Run("should call GET handler", func(t *testing.T) {
-			//TODO: Implement test for GetTreeSensor
-		})
-
-		t.Run("should call POST handler", func(t *testing.T) {
-			//TODO: Implement test for AddTreeSensor
-		})
-
-		t.Run("should call DELETE handler", func(t *testing.T) {
-			//TODO: Implement test for RemoveTreeSensor
 		})
 	})
 }
