@@ -11,6 +11,6 @@ func RegisterRoutes(r fiber.Router, svc service.TreeService) {
 	r.Put("/:id", UpdateTree(svc))
 	r.Post("/", CreateTree(svc))
 	r.Delete("/:id", DeleteTree(svc))
-	
+
 	r.Get("/sensor/:sensor_id", GetTreeBySensorID(svc))
 }
