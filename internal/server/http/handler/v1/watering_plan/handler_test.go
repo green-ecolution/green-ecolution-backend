@@ -103,7 +103,7 @@ func TestGetWateringPlanByID(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.GetWateringPlanByID(mockWateringPlanService)
-		app.Get("/v1/watering-plan/:watering_plan_id", handler)
+		app.Get("/v1/watering-plan/:id", handler)
 
 		mockWateringPlanService.EXPECT().GetByID(
 			mock.Anything,
@@ -131,7 +131,7 @@ func TestGetWateringPlanByID(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.GetWateringPlanByID(mockWateringPlanService)
-		app.Get("/v1/watering-plan/:watering_plan_id", handler)
+		app.Get("/v1/watering-plan/:id", handler)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/watering-plan/invalid", nil)
@@ -147,7 +147,7 @@ func TestGetWateringPlanByID(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.GetWateringPlanByID(mockWateringPlanService)
-		app.Get("/v1/watering-plan/:watering_plan_id", handler)
+		app.Get("/v1/watering-plan/:id", handler)
 
 		mockWateringPlanService.EXPECT().GetByID(
 			mock.Anything,
@@ -170,7 +170,7 @@ func TestGetWateringPlanByID(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.GetWateringPlanByID(mockWateringPlanService)
-		app.Get("/v1/watering-plan/:watering_plan_id", handler)
+		app.Get("/v1/watering-plan/:id", handler)
 
 		mockWateringPlanService.EXPECT().GetByID(
 			mock.Anything,
@@ -273,7 +273,7 @@ func TestUpdateWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.UpdateWateringPlan(mockWateringPlanService)
-		app.Put("/v1/watering-plan/:watering_plan_id", handler)
+		app.Put("/v1/watering-plan/:id", handler)
 
 		mockWateringPlanService.EXPECT().Update(
 			mock.Anything,
@@ -304,7 +304,7 @@ func TestUpdateWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.UpdateWateringPlan(mockWateringPlanService)
-		app.Put("/v1/watering-plan/:watering_plan_id", handler)
+		app.Put("/v1/watering-plan/:id", handler)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/v1/watering-plan/invalid", nil)
@@ -320,7 +320,7 @@ func TestUpdateWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.UpdateWateringPlan(mockWateringPlanService)
-		app.Put("/v1/watering-plan/:watering_plan_id", handler)
+		app.Put("/v1/watering-plan/:id", handler)
 
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
 
@@ -340,7 +340,7 @@ func TestUpdateWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.UpdateWateringPlan(mockWateringPlanService)
-		app.Put("/v1/watering-plan/:watering_plan_id", handler)
+		app.Put("/v1/watering-plan/:id", handler)
 
 		mockWateringPlanService.EXPECT().Update(
 			mock.Anything,
@@ -366,7 +366,7 @@ func TestUpdateWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.UpdateWateringPlan(mockWateringPlanService)
-		app.Put("/v1/watering-plan/:watering_plan_id", handler)
+		app.Put("/v1/watering-plan/:id", handler)
 
 		mockWateringPlanService.EXPECT().Update(mock.Anything, int32(1), mock.Anything).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
@@ -389,7 +389,7 @@ func TestDeleteWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.DeleteWateringPlan(mockWateringPlanService)
-		app.Delete("/v1/watering-plan/:watering_plan_id", handler)
+		app.Delete("/v1/watering-plan/:id", handler)
 
 		wateringPlanID := 1
 		mockWateringPlanService.EXPECT().Delete(mock.Anything, int32(wateringPlanID)).Return(nil)
@@ -410,7 +410,7 @@ func TestDeleteWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.DeleteWateringPlan(mockWateringPlanService)
-		app.Delete("/v1/watering-plan/:watering_plan_id", handler)
+		app.Delete("/v1/watering-plan/:id", handler)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/watering-plan/invalid_id", nil)
@@ -426,7 +426,7 @@ func TestDeleteWateringPlan(t *testing.T) {
 		app := fiber.New()
 		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 		handler := wateringplan.DeleteWateringPlan(mockWateringPlanService)
-		app.Delete("/v1/watering-plan/:watering_plan_id", handler)
+		app.Delete("/v1/watering-plan/:id", handler)
 
 		wateringPlanID := 999
 		mockWateringPlanService.EXPECT().Delete(
