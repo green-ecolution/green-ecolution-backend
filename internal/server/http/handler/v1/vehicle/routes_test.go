@@ -1,4 +1,4 @@
-package vehicle
+package vehicle_test
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,7 +19,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockVehicleService)
+			vehicle.RegisterRoutes(app, mockVehicleService)
 
 			mockVehicleService.EXPECT().GetAll(
 				mock.Anything,
@@ -37,7 +38,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call POST handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockVehicleService)
+			vehicle.RegisterRoutes(app, mockVehicleService)
 
 			mockVehicleService.EXPECT().Create(
 				mock.Anything,
@@ -61,7 +62,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockVehicleService)
+			vehicle.RegisterRoutes(app, mockVehicleService)
 
 			mockVehicleService.EXPECT().GetByID(
 				mock.Anything,
@@ -81,7 +82,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call PUT handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockVehicleService)
+			vehicle.RegisterRoutes(app, mockVehicleService)
 
 			mockVehicleService.EXPECT().Update(
 				mock.Anything,
@@ -104,7 +105,7 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call DELETE handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()
-			RegisterRoutes(app, mockVehicleService)
+			vehicle.RegisterRoutes(app, mockVehicleService)
 
 			mockVehicleService.EXPECT().Delete(
 				mock.Anything,

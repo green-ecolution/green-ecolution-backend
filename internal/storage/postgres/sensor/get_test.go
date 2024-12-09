@@ -3,9 +3,9 @@ package sensor
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,12 +21,12 @@ func TestSensorRepository_GetAll(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, len(sensorUtils.TestSensorList), len(got))
+		assert.Equal(t, len(TestSensorList), len(got))
 		for i, sensor := range got {
-			assert.Equal(t, sensorUtils.TestSensorList[i].ID, sensor.ID)
-			assert.Equal(t, sensorUtils.TestSensorList[i].Status, sensor.Status)
-			assert.Equal(t, sensorUtils.TestSensorList[i].Latitude, sensor.Latitude)
-			assert.Equal(t, sensorUtils.TestSensorList[i].Longitude, sensor.Longitude)
+			assert.Equal(t, TestSensorList[i].ID, sensor.ID)
+			assert.Equal(t, TestSensorList[i].Status, sensor.Status)
+			assert.Equal(t, TestSensorList[i].Latitude, sensor.Latitude)
+			assert.Equal(t, TestSensorList[i].Longitude, sensor.Longitude)
 			assert.NotZero(t, sensor.CreatedAt)
 			assert.NotZero(t, sensor.UpdatedAt)
 		}
@@ -69,14 +69,14 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetByID(ctx, sensorUtils.TestSensorID)
+		got, err := r.GetByID(ctx, "sensor-1")
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor.ID, got.ID)
-		assert.Equal(t, sensorUtils.TestSensor.Status, got.Status)
-		assert.Equal(t, sensorUtils.TestSensor.Latitude, got.Latitude)
-		assert.Equal(t, sensorUtils.TestSensor.Longitude, got.Longitude)
+		assert.Equal(t, TestSensorList[0].ID, got.ID)
+		assert.Equal(t, TestSensorList[0].Status, got.Status)
+		assert.Equal(t, TestSensorList[0].Latitude, got.Latitude)
+		assert.Equal(t, TestSensorList[0].Longitude, got.Longitude)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 
@@ -89,7 +89,7 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetByID(ctx, sensorUtils.TestSensorID)
+		got, err := r.GetByID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
@@ -148,7 +148,7 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetStatusByID(ctx, sensorUtils.TestSensorID)
+		got, err := r.GetStatusByID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
@@ -177,7 +177,7 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetStatusByID(ctx, sensorUtils.TestSensorID)
+		got, err := r.GetStatusByID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
@@ -194,9 +194,9 @@ func TestSensorRepository_GetSensorByStatus(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetSensorByStatus(ctx, &sensorUtils.TestSensor.Status)
+		got, err := r.GetSensorByStatus(ctx, &TestSensorList[1].Status)
 
-		testSensorList := []*entities.Sensor{sensorUtils.TestSensorList[0], sensorUtils.TestSensorList[3]}
+		testSensorList := []*entities.Sensor{TestSensorList[1]}
 
 		// then
 
@@ -249,7 +249,7 @@ func TestSensorRepository_GetSensorByStatus(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetSensorByStatus(ctx, &sensorUtils.TestSensor.Status)
+		got, err := r.GetSensorByStatus(ctx, &TestSensorList[0].Status)
 
 		// then
 		assert.Error(t, err)
@@ -266,7 +266,7 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, sensorUtils.TestSensorID)
+		got, err := r.GetSensorDataByID(ctx, "sensor-1")
 
 		// then
 		assert.NoError(t, err)
@@ -300,10 +300,88 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, sensorUtils.TestSensorID)
+		got, err := r.GetSensorDataByID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
+}
+
+var TestSensorList = []*entities.Sensor{
+	{
+		ID:        "sensor-1",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.82124518093376,
+		Longitude: 9.485702120628517,
+		Status:    entities.SensorStatusOnline,
+		Data:      []*entities.SensorData{TestSensorData[0]},
+	},
+	{
+		ID:        "sensor-2",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.78780993841013,
+		Longitude: 9.444052105200551,
+		Status:    entities.SensorStatusOffline,
+		Data:      []*entities.SensorData{},
+	},
+	{
+		ID:        "sensor-3",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.77933725347423,
+		Longitude: 9.426465409018832,
+		Status:    entities.SensorStatusUnknown,
+		Data:      []*entities.SensorData{},
+	},
+	{
+		ID:        "sensor-4",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.82078826498143,
+		Longitude: 9.489684366114483,
+		Status:    entities.SensorStatusOnline,
+		Data:      []*entities.SensorData{},
+	},
+}
+
+var TestSensorData = []*entities.SensorData{
+	{
+		ID:        1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data:      TestMqttPayload,
+	},
+	{
+		ID:        2,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data:      TestMqttPayload,
+	},
+}
+
+var TestMqttPayload = &entities.MqttPayload{
+	DeviceID:    "sensor-123",
+	Battery:     34.0,
+	Humidity:    50,
+	Temperature: 20,
+	Watermarks: []entities.Watermark{
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      30,
+		},
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      60,
+		},
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      90,
+		},
+	},
 }

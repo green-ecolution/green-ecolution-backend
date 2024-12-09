@@ -1,4 +1,4 @@
-package vehicle
+package vehicle_test
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -21,7 +22,7 @@ func TestGetAllVehicles(t *testing.T) {
 	t.Run("should return all vehicles successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetAllVehicles(mockVehicleService)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
@@ -49,7 +50,7 @@ func TestGetAllVehicles(t *testing.T) {
 	t.Run("should return an empty list when no vehicles are available", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetAllVehicles(mockVehicleService)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
@@ -77,7 +78,7 @@ func TestGetAllVehicles(t *testing.T) {
 	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetAllVehicles(mockVehicleService)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
@@ -101,7 +102,7 @@ func TestGetVehicleByID(t *testing.T) {
 	t.Run("should return vehicle successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByID(mockVehicleService)
+		handler := vehicle.GetVehicleByID(mockVehicleService)
 		app.Get("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().GetByID(
@@ -129,7 +130,7 @@ func TestGetVehicleByID(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid vehicle ID", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByID(mockVehicleService)
+		handler := vehicle.GetVehicleByID(mockVehicleService)
 		app.Get("/v1/vehicle/:id", handler)
 
 		// when
@@ -145,7 +146,7 @@ func TestGetVehicleByID(t *testing.T) {
 	t.Run("should return 404 Not Found if vehicle does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByID(mockVehicleService)
+		handler := vehicle.GetVehicleByID(mockVehicleService)
 		app.Get("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().GetByID(
@@ -168,7 +169,7 @@ func TestGetVehicleByID(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByID(mockVehicleService)
+		handler := vehicle.GetVehicleByID(mockVehicleService)
 		app.Get("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().GetByID(
@@ -193,7 +194,7 @@ func TestGetVehicleByPlate(t *testing.T) {
 	t.Run("should return vehicle successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByPlate(mockVehicleService)
+		handler := vehicle.GetVehicleByPlate(mockVehicleService)
 		app.Get("/v1/vehicle/plate/:plate", handler)
 		plate := "FL%20TBZ%201234"
 
@@ -222,7 +223,7 @@ func TestGetVehicleByPlate(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid vehicle plate", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByID(mockVehicleService)
+		handler := vehicle.GetVehicleByID(mockVehicleService)
 		app.Get("/v1/vehicle/plate/:plate", handler)
 		plate := "%20"
 
@@ -239,7 +240,7 @@ func TestGetVehicleByPlate(t *testing.T) {
 	t.Run("should return 404 Not Found if vehicle does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByPlate(mockVehicleService)
+		handler := vehicle.GetVehicleByPlate(mockVehicleService)
 		app.Get("/v1/vehicle/plate/:plate", handler)
 		plate := "FL%20TBZ%201244"
 
@@ -262,7 +263,7 @@ func TestGetVehicleByPlate(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := GetVehicleByPlate(mockVehicleService)
+		handler := vehicle.GetVehicleByPlate(mockVehicleService)
 		app.Get("/v1/vehicle/plate/:plate", handler)
 		plate := "FL%20TBZ%201244"
 
@@ -288,7 +289,7 @@ func TestCreateVehicle(t *testing.T) {
 	t.Run("should create vehicle successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := CreateVehicle(mockVehicleService)
+		handler := vehicle.CreateVehicle(mockVehicleService)
 		app.Post("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().Create(
@@ -318,7 +319,7 @@ func TestCreateVehicle(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := CreateVehicle(mockVehicleService)
+		handler := vehicle.CreateVehicle(mockVehicleService)
 		app.Post("/v1/vehicle", handler)
 
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
@@ -337,7 +338,7 @@ func TestCreateVehicle(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := CreateVehicle(mockVehicleService)
+		handler := vehicle.CreateVehicle(mockVehicleService)
 		app.Post("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().Create(
@@ -364,7 +365,7 @@ func TestUpdateVehicle(t *testing.T) {
 	t.Run("should update vehicle successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := UpdateVehicle(mockVehicleService)
+		handler := vehicle.UpdateVehicle(mockVehicleService)
 		app.Put("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().Update(
@@ -395,7 +396,7 @@ func TestUpdateVehicle(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid vehicle ID", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := UpdateVehicle(mockVehicleService)
+		handler := vehicle.UpdateVehicle(mockVehicleService)
 		app.Put("/v1/vehicle/:id", handler)
 
 		// when
@@ -413,7 +414,7 @@ func TestUpdateVehicle(t *testing.T) {
 	t.Run("should return 400 Bad Request for invalid request body", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := UpdateVehicle(mockVehicleService)
+		handler := vehicle.UpdateVehicle(mockVehicleService)
 		app.Put("/v1/vehicle/:id", handler)
 
 		invalidRequestBody := []byte(`{"invalid_field": "value"}`)
@@ -433,7 +434,7 @@ func TestUpdateVehicle(t *testing.T) {
 	t.Run("should return 404 Not Found if cluster does not exist", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := UpdateVehicle(mockVehicleService)
+		handler := vehicle.UpdateVehicle(mockVehicleService)
 		app.Put("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().Update(
@@ -459,7 +460,7 @@ func TestUpdateVehicle(t *testing.T) {
 	t.Run("should return 500 Internal Server Error for service failure", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := UpdateVehicle(mockVehicleService)
+		handler := vehicle.UpdateVehicle(mockVehicleService)
 		app.Put("/v1/vehicle/:id", handler)
 
 		mockVehicleService.EXPECT().Update(
@@ -487,7 +488,7 @@ func TestDeleteVehicle(t *testing.T) {
 	t.Run("should delete vehicle successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := DeleteVehicle(mockVehicleService)
+		handler := vehicle.DeleteVehicle(mockVehicleService)
 		app.Delete("/v1/vehicle/:id", handler)
 
 		clusterID := 1
@@ -511,7 +512,7 @@ func TestDeleteVehicle(t *testing.T) {
 	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := DeleteVehicle(mockVehicleService)
+		handler := vehicle.DeleteVehicle(mockVehicleService)
 		app.Delete("/v1/vehicle/:id", handler)
 
 		// when
@@ -529,7 +530,7 @@ func TestDeleteVehicle(t *testing.T) {
 	t.Run("should return 404 for non-existing vehicle", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := DeleteVehicle(mockVehicleService)
+		handler := vehicle.DeleteVehicle(mockVehicleService)
 		app.Delete("/v1/vehicle/:id", handler)
 
 		clusterID := 999
