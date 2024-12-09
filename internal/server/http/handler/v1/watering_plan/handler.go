@@ -127,9 +127,28 @@ func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 //	@Param			watering_plan_id	path	string								true	"Watering Plan ID"
 //	@Param			body				body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
 //	@Security		Keycloak
-func UpdateWateringPlan(_ service.WateringPlanService) fiber.Handler {
+func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("watering_plan_id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		var req entities.WateringPlanUpdateRequest
+		if err = c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainReq := wateringPlanMapper.FromUpdateRequest(&req)
+		domainData, err := svc.Update(ctx, int32(id), domainReq)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := mapWateringPlanToDto(domainData)
+		return c.JSON(data)
 	}
 }
 
