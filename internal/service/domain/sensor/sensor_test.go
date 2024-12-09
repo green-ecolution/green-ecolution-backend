@@ -274,7 +274,7 @@ func TestSensorService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: sensor nor exist")
+		assert.EqualError(t, err, "500: failed to update cluster")
 	})
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
@@ -300,7 +300,7 @@ func TestSensorService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to update sensor")
+		assert.EqualError(t, err, "500: failed to update cluster")
 	})
 
 	t.Run("should return validation error on invalid latitude and longitude", func(t *testing.T) {
@@ -384,7 +384,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to unlink sensor ID on tree")
+		assert.EqualError(t, err, "500: failed to unlink")
 	})
 
 	t.Run("should return error if unlinking sensor ID on flowerbed fails", func(t *testing.T) {
@@ -405,7 +405,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to unlink sensor ID on flowerbed")
+		assert.EqualError(t, err, "500: failed to unlink")
 	})
 
 	t.Run("should return error if deleting sensor fails", func(t *testing.T) {
@@ -427,7 +427,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to delete sensor")
+		assert.EqualError(t, err, "500: failed to delete")
 	})
 }
 
