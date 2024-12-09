@@ -12,7 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
-	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/watering_plan"
+	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/watering_plan"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 

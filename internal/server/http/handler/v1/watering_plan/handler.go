@@ -2,8 +2,15 @@ package wateringplan
 
 import (
 	"github.com/gofiber/fiber/v2"
-	_ "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+	wateringPlanMapper = generated.WateringPlanHTTPMapperImpl{}
 )
 
 //	@Summary		Get all watering plans
@@ -17,9 +24,23 @@ import (
 //	@Param			limit	query		string	false	"Limit"
 //	@Router			/v1/watering-plan [get]
 //	@Security		Keycloak
-func GetAllWateringPlans(_ service.WateringPlanService) fiber.Handler {
+func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		domainData, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := make([]*entities.WateringPlanResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = mapWateringPlanToDto(domain)
+		}
+
+		return c.JSON(entities.WateringPlanListResponse{
+			Data:       data,
+			Pagination: &entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
@@ -99,4 +120,10 @@ func DeleteWateringPlan(_ service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotImplemented)
 	}
+}
+
+func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanResponse {
+	dto := wateringPlanMapper.FromResponse(wp)
+
+	return dto
 }
