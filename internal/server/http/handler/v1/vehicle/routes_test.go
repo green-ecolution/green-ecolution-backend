@@ -58,7 +58,7 @@ func TestRegisterRoutes(t *testing.T) {
 		})
 	})
 
-	t.Run("/v1/cluster/:id", func(t *testing.T) {
+	t.Run("/v1/vehicle/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()

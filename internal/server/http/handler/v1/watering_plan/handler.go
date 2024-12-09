@@ -46,21 +46,24 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	}
 }
 
-//	@Summary		Get a watering plan by ID
-//	@Description	Get a watering plan by ID
-//	@Tags			Watering Plan
-//	@Produce		json
-//	@Success		200	{object}	entities.WateringPlanResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Param			id	path		string	true	"Watering plan ID"
-//	@Router			/v1/watering-plan/{id} [get]
-//	@Security		Keycloak
+// @Summary		Get watering plan by ID
+// @Description	Get watering plan by ID
+// @Id				get-watering-plan-by-id
+// @Tags			Watering Plan
+// @Produce		json
+// @Success		200	{object}	entities.WateringPlanResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan/{id} [get]
+// @Param			watering_plan_od	path	string	true	"Watering Plan ID"
+// @Security		Keycloak
 func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("watering_plan_id"))
+		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
 			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
@@ -123,14 +126,14 @@ func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 //	@Failure		403	{object}	HTTPError
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan/{watering_plan_id} [put]
-//	@Param			watering_plan_id	path	string								true	"Watering Plan ID"
+//	@Router			/v1/watering-plan/{id} [put]
+//	@Param			id	path	string								true	"Watering Plan ID"
 //	@Param			body				body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
 //	@Security		Keycloak
 func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("watering_plan_id"))
+		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
 			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
@@ -163,13 +166,13 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 //	@Failure		403	{object}	HTTPError
 //	@Failure		404	{object}	HTTPError
 //	@Failure		500	{object}	HTTPError
-//	@Router			/v1/watering-plan/{watering_plan_id} [delete]
-//	@Param			watering_plan_id	path	string	true	"Watering Plan ID"
+//	@Router			/v1/watering-plan/{id} [delete]
+//	@Param			id	path	string	true	"Watering Plan ID"
 //	@Security		Keycloak
 func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("watering_plan_id"))
+		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
 			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
