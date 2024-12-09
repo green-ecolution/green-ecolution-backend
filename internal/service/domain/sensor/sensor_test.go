@@ -221,7 +221,7 @@ func TestSensorService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to create sensor")
+		assert.EqualError(t, err, "500: Failed to create sensor")
 	})
 }
 
