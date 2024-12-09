@@ -11,7 +11,7 @@ import (
 // goverter:extend MapWateringStatus MapSoilCondition MapSoilConditionReq
 type TreeClusterHTTPMapper interface {
 	// goverter:ignore Region Trees
-	FormResponse(*domain.TreeCluster) *entities.TreeClusterResponse
+	FromResponse(*domain.TreeCluster) *entities.TreeClusterResponse
 
 	FromCreateRequest(*entities.TreeClusterCreateRequest) *domain.TreeClusterCreate
 	FromUpdateRequest(*entities.TreeClusterUpdateRequest) *domain.TreeClusterUpdate

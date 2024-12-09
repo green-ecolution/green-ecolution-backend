@@ -19,7 +19,7 @@ type WateringPlanResponse struct {
 	UpdatedAt          time.Time              `json:"updated_at"`
 	Date               time.Time              `json:"date"`
 	Description        string                 `json:"description"`
-	Status             WateringStatus         `json:"status"`
+	WateringPlanStatus WateringPlanStatus      `json:"watering_plan_status"`
 	Distance           *float64               `json:"distance"`
 	TotalWaterRequired *float64               `json:"total_water_required"`
 	Users              []*UserResponse        `json:"users"`
