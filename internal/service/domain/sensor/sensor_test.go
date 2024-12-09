@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
@@ -22,12 +22,12 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		// when
-		sensorRepo.EXPECT().GetAll(context.Background()).Return(sensorUtils.TestSensorList, nil)
+		sensorRepo.EXPECT().GetAll(context.Background()).Return(TestSensorList, nil)
 		sensors, err := svc.GetAll(context.Background())
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensorList, sensors)
+		assert.Equal(t, TestSensorList, sensors)
 	})
 
 	t.Run("should return error when repository fails", func(t *testing.T) {
@@ -55,14 +55,14 @@ func TestSensorService_GetByID(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
-		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
 		// when
 		sensor, err := svc.GetByID(context.Background(), id)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor, sensor)
+		assert.Equal(t, TestSensor, sensor)
 	})
 
 	t.Run("should return error if sensor not found", func(t *testing.T) {
@@ -90,7 +90,7 @@ func TestSensorService_Create(t *testing.T) {
 	newSensor := &entities.SensorCreate{
 		ID:        "sensor-1",
 		Status:    entities.SensorStatusOnline,
-		Data:      sensorUtils.TestSensor.Data,
+		Data:      TestSensor.Data,
 		Latitude:  9.446741,
 		Longitude: 54.801539,
 	}
@@ -106,14 +106,14 @@ func TestSensorService_Create(t *testing.T) {
 			context.Background(),
 			mock.Anything,
 			mock.Anything,
-		).Return(sensorUtils.TestSensor, nil)
+		).Return(TestSensor, nil)
 
 		// when
 		result, err := svc.Create(context.Background(), newSensor)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor, result)
+		assert.Equal(t, TestSensor, result)
 	})
 
 	t.Run("should successfully create a new sensor without data", func(t *testing.T) {
@@ -129,14 +129,14 @@ func TestSensorService_Create(t *testing.T) {
 			context.Background(),
 			mock.Anything,
 			mock.Anything,
-		).Return(sensorUtils.TestSensor, nil)
+		).Return(TestSensor, nil)
 
 		// when
 		result, err := svc.Create(context.Background(), newSensor)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor, result)
+		assert.Equal(t, TestSensor, result)
 	})
 
 	t.Run("should return validation error on no status", func(t *testing.T) {
@@ -228,7 +228,7 @@ func TestSensorService_Create(t *testing.T) {
 func TestSensorService_Update(t *testing.T) {
 	updateSensor := &entities.SensorUpdate{
 		Status:    entities.SensorStatusOnline,
-		Data:      sensorUtils.TestSensor.Data,
+		Data:      TestSensor.Data,
 		Latitude:  9.446741,
 		Longitude: 54.801539,
 	}
@@ -241,21 +241,21 @@ func TestSensorService_Update(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
-		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
 		sensorRepo.EXPECT().Update(
 			context.Background(),
 			id,
 			mock.Anything,
 			mock.Anything,
-		).Return(sensorUtils.TestSensor, nil)
+		).Return(TestSensor, nil)
 
 		// when
 		result, err := svc.Update(context.Background(), id, updateSensor)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, sensorUtils.TestSensor, result)
+		assert.Equal(t, TestSensor, result)
 	})
 
 	t.Run("should return an error when sensor ID does not exist", func(t *testing.T) {
@@ -286,7 +286,7 @@ func TestSensorService_Update(t *testing.T) {
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 		expectedErr := errors.New("failed to update cluster")
 
-		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
 		sensorRepo.EXPECT().Update(
 			context.Background(),
@@ -335,7 +335,7 @@ func TestSensorService_Delete(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
-		sensorRepo.EXPECT().GetByID(ctx, id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
 		treeRepo.EXPECT().UnlinkSensorID(ctx, id).Return(nil)
 		flowerbedRepo.EXPECT().UnlinkSensorID(ctx, id).Return(nil)
 		sensorRepo.EXPECT().Delete(ctx, id).Return(nil)
@@ -376,7 +376,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		expectedErr := errors.New("failed to unlink")
 
-		sensorRepo.EXPECT().GetByID(ctx, id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
 		treeRepo.EXPECT().UnlinkSensorID(ctx, id).Return(expectedErr)
 
 		// when
@@ -396,7 +396,7 @@ func TestSensorService_Delete(t *testing.T) {
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 		expectedErr := errors.New("failed to unlink")
 
-		sensorRepo.EXPECT().GetByID(ctx, id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
 		treeRepo.EXPECT().UnlinkSensorID(ctx, id).Return(nil)
 		flowerbedRepo.EXPECT().UnlinkSensorID(ctx, id).Return(expectedErr)
 
@@ -417,7 +417,7 @@ func TestSensorService_Delete(t *testing.T) {
 		svc := NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 		expectedErr := errors.New("failed to delete")
 
-		sensorRepo.EXPECT().GetByID(ctx, id).Return(sensorUtils.TestSensor, nil)
+		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
 		treeRepo.EXPECT().UnlinkSensorID(ctx, id).Return(nil)
 		flowerbedRepo.EXPECT().UnlinkSensorID(ctx, id).Return(nil)
 		sensorRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
@@ -456,4 +456,84 @@ func TestReady(t *testing.T) {
 		// then
 		assert.False(t, ready)
 	})
+}
+
+var TestMqttPayload = &entities.MqttPayload{
+	DeviceID:    "sensor-123",
+	Battery:     34.0,
+	Humidity:    50,
+	Temperature: 20,
+	Watermarks: []entities.Watermark{
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      30,
+		},
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      60,
+		},
+		{
+			Resistance: 23,
+			Centibar:   38,
+			Depth:      90,
+		},
+	},
+}
+
+var TestSensor = &entities.Sensor{
+	ID:        "sensor-1",
+	CreatedAt: time.Now(),
+	UpdatedAt: time.Now(),
+	Latitude:  54.82124518093376,
+	Longitude: 9.485702120628517,
+	Status:    entities.SensorStatusOnline,
+	Data:      []*entities.SensorData{TestSensorData[0]},
+}
+
+var TestSensorList = []*entities.Sensor{
+	TestSensor,
+	{
+		ID:        "sensor-2",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.78780993841013,
+		Longitude: 9.444052105200551,
+		Status:    entities.SensorStatusOffline,
+		Data:      []*entities.SensorData{},
+	},
+	{
+		ID:        "sensor-3",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.77933725347423,
+		Longitude: 9.426465409018832,
+		Status:    entities.SensorStatusUnknown,
+		Data:      []*entities.SensorData{},
+	},
+	{
+		ID:        "sensor-4",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.82078826498143,
+		Longitude: 9.489684366114483,
+		Status:    entities.SensorStatusOnline,
+		Data:      []*entities.SensorData{},
+	},
+}
+
+var TestSensorData = []*entities.SensorData{
+	{
+		ID:        1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data:      TestMqttPayload,
+	},
+	{
+		ID:        2,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data:      TestMqttPayload,
+	},
 }
