@@ -9,7 +9,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	treeUtils "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
@@ -473,25 +472,6 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.EqualError(t, err, "sensor cannot be nil")
-	})
-
-	t.Run("should return validation error for invalid longitude", func(t *testing.T) {
-		// given
-		sensorRepo := storageMock.NewMockSensorRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		invalidSensor := &entities.Sensor{Latitude: 37.7749, Longitude: 181.0}
-
-		treeRepo.EXPECT().
-			FindNearestTree(context.Background(), mock.Anything, mock.Anything).
-			Return(nil, service.ErrValidation)
-
-		// when
-		err := svc.MapSensorToTree(context.Background(), invalidSensor)
-
-		// then
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), service.ErrValidation.Error())
 	})
 
 	t.Run("should return error if nearest tree is not found", func(t *testing.T) {

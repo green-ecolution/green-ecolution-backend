@@ -117,10 +117,6 @@ func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Senso
 		return errors.New("sensor cannot be nil")
 	}
 
-	if err := s.validator.Struct(sen); err != nil {
-		return service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
-	}
-
 	nearestTree, err := s.treeRepo.FindNearestTree(ctx, sen.Latitude, sen.Longitude)
 	if err != nil {
 		return handleError(err)
