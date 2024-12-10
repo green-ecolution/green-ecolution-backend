@@ -56,7 +56,7 @@ func (a *TreeAPIService) CreateTree(ctx context.Context) ApiCreateTreeRequest {
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -388,7 +388,7 @@ func (a *TreeAPIService) GetAllTrees(ctx context.Context) ApiGetAllTreesRequest 
 }
 
 // Execute executes the request
-//  @return TreeList
+//	@return	TreeList
 func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -556,7 +556,7 @@ func (a *TreeAPIService) GetTrees(ctx context.Context, treeId string) ApiGetTree
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -720,7 +720,7 @@ func (a *TreeAPIService) UpdateTree(ctx context.Context, treeId string) ApiUpdat
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPut

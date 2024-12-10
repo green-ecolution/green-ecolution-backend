@@ -63,7 +63,7 @@ func (a *RoleAPIService) V1RoleGet(ctx context.Context) ApiV1RoleGetRequest {
 }
 
 // Execute executes the request
-//  @return RoleList
+//	@return	RoleList
 func (a *RoleAPIService) V1RoleGetExecute(r ApiV1RoleGetRequest) (*RoleList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -192,7 +192,7 @@ func (a *RoleAPIService) V1RoleIdGet(ctx context.Context, id string) ApiV1RoleId
 }
 
 // Execute executes the request
-//  @return Role
+//	@return	Role
 func (a *RoleAPIService) V1RoleIdGetExecute(r ApiV1RoleIdGetRequest) (*Role, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet

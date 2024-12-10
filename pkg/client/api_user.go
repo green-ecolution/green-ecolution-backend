@@ -63,7 +63,7 @@ func (a *UserAPIService) V1UserGet(ctx context.Context) ApiV1UserGetRequest {
 }
 
 // Execute executes the request
-//  @return UserList
+//	@return	UserList
 func (a *UserAPIService) V1UserGetExecute(r ApiV1UserGetRequest) (*UserList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -194,7 +194,7 @@ func (a *UserAPIService) V1UserLoginGet(ctx context.Context) ApiV1UserLoginGetRe
 }
 
 // Execute executes the request
-//  @return LoginResponse
+//	@return	LoginResponse
 func (a *UserAPIService) V1UserLoginGetExecute(r ApiV1UserLoginGetRequest) (*LoginResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -330,7 +330,7 @@ func (a *UserAPIService) V1UserLoginTokenPost(ctx context.Context) ApiV1UserLogi
 }
 
 // Execute executes the request
-//  @return ClientToken
+//	@return	ClientToken
 func (a *UserAPIService) V1UserLoginTokenPostExecute(r ApiV1UserLoginTokenPostRequest) (*ClientToken, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -464,7 +464,7 @@ func (a *UserAPIService) V1UserLogoutPost(ctx context.Context) ApiV1UserLogoutPo
 }
 
 // Execute executes the request
-//  @return string
+//	@return	string
 func (a *UserAPIService) V1UserLogoutPostExecute(r ApiV1UserLogoutPostRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -596,7 +596,7 @@ func (a *UserAPIService) V1UserPost(ctx context.Context) ApiV1UserPostRequest {
 }
 
 // Execute executes the request
-//  @return User
+//	@return	User
 func (a *UserAPIService) V1UserPostExecute(r ApiV1UserPostRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -728,7 +728,7 @@ func (a *UserAPIService) V1UserTokenRefreshPost(ctx context.Context) ApiV1UserTo
 }
 
 // Execute executes the request
-//  @return ClientToken
+//	@return	ClientToken
 func (a *UserAPIService) V1UserTokenRefreshPostExecute(r ApiV1UserTokenRefreshPostRequest) (*ClientToken, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -856,7 +856,7 @@ func (a *UserAPIService) V1UserUserIdDelete(ctx context.Context, userId string) 
 }
 
 // Execute executes the request
-//  @return string
+//	@return	string
 func (a *UserAPIService) V1UserUserIdDeleteExecute(r ApiV1UserUserIdDeleteRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete
@@ -991,7 +991,7 @@ func (a *UserAPIService) V1UserUserIdGet(ctx context.Context, userId string) Api
 }
 
 // Execute executes the request
-//  @return User
+//	@return	User
 func (a *UserAPIService) V1UserUserIdGetExecute(r ApiV1UserUserIdGetRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -1133,7 +1133,7 @@ func (a *UserAPIService) V1UserUserIdPut(ctx context.Context, userId string) Api
 }
 
 // Execute executes the request
-//  @return User
+//	@return	User
 func (a *UserAPIService) V1UserUserIdPutExecute(r ApiV1UserUserIdPutRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPut
@@ -1287,7 +1287,7 @@ func (a *UserAPIService) V1UserUserIdRolesGet(ctx context.Context, userId string
 }
 
 // Execute executes the request
-//  @return RoleList
+//	@return	RoleList
 func (a *UserAPIService) V1UserUserIdRolesGetExecute(r ApiV1UserUserIdRolesGetRequest) (*RoleList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet

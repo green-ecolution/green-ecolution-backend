@@ -59,7 +59,7 @@ func (a *TreeSensorAPIService) AddSensorToTree(ctx context.Context, treeId strin
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -221,7 +221,7 @@ func (a *TreeSensorAPIService) GetTreeBySensorId(ctx context.Context, sensorId s
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -378,7 +378,7 @@ func (a *TreeSensorAPIService) GetTreeSensor(ctx context.Context, treeId string)
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -538,7 +538,7 @@ func (a *TreeSensorAPIService) RemoveSensorFromTree(ctx context.Context, treeId 
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFromTreeRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete

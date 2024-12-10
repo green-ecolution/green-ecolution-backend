@@ -59,7 +59,7 @@ func (a *TreeImagesAPIService) AddImagesToTree(ctx context.Context, treeId strin
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -235,7 +235,7 @@ func (a *TreeImagesAPIService) GetTreeImages(ctx context.Context, treeId string)
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -401,7 +401,7 @@ func (a *TreeImagesAPIService) RemoveImageFromTree(ctx context.Context, treeId s
 }
 
 // Execute executes the request
-//  @return Tree
+//	@return	Tree
 func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTreeRequest) (*Tree, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete

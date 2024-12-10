@@ -63,7 +63,7 @@ func (a *RegionAPIService) V1RegionGet(ctx context.Context) ApiV1RegionGetReques
 }
 
 // Execute executes the request
-//  @return RegionList
+//	@return	RegionList
 func (a *RegionAPIService) V1RegionGetExecute(r ApiV1RegionGetRequest) (*RegionList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -192,7 +192,7 @@ func (a *RegionAPIService) V1RegionIdGet(ctx context.Context, id string) ApiV1Re
 }
 
 // Execute executes the request
-//  @return Region
+//	@return	Region
 func (a *RegionAPIService) V1RegionIdGetExecute(r ApiV1RegionIdGetRequest) (*Region, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
