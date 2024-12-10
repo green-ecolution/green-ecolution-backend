@@ -36,6 +36,7 @@ help:
 	@echo "  build/windows                     Build for windows"
 	@echo "  build                             Build"
 	@echo "  generate                          Generate"
+	@echo "  generate/client                   Generate client pkg"
 	@echo "  setup                             Install dependencies"
 	@echo "  setup/macos                       Install dependencies for macOS"
 	@echo "  setup/ci                          Install dependencies for CI"
@@ -97,6 +98,11 @@ generate:
 	@echo "Generating..."
 	sqlc generate
 	go generate 
+
+.PHONY: generate/client
+generate/client: generate
+	@echo "Generating client..."
+	@./scripts/openapi-generator.sh
 
 .PHONY: setup
 setup:

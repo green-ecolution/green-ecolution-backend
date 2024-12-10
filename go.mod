@@ -4,7 +4,6 @@ go 1.23.2
 
 require (
 	github.com/Nerzal/gocloak/v13 v13.9.0
-	github.com/antihax/optional v1.0.0
 	github.com/docker/go-connections v0.5.0
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/go-playground/validator/v10 v10.22.0
@@ -26,7 +25,6 @@ require (
 	github.com/twpayne/go-geos v0.18.1
 	github.com/twpayne/pgx-geos v0.0.3
 	golang.org/x/sync v0.8.0
-	golang.org/x/oauth2 v0.18.0
 )
 
 require (
@@ -59,7 +57,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -120,8 +117,6 @@ require (
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
-	google.golang.org/appengine v1.6.8 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

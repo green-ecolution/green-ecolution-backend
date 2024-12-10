@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 )
@@ -86,6 +87,8 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 	token := &Token{
 		AccessToken:  tokenResp.AccessToken,
 		RefreshToken: tokenResp.RefreshToken,
+		ExpiresIn:    int64(tokenResp.ExpiresIn),
+		Expiry:       time.Now().Add(time.Duration(tokenResp.ExpiresIn) * time.Second),
 	}
 
 	w.cfg.token = token
