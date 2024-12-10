@@ -107,4 +107,35 @@ var (
 			Data:      TestListMQTTPayload[2],
 		},
 	}
+
+	TestSensorList = []*domain.Sensor{
+		TestSensor,
+		{
+			ID:        "sensor-2",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Latitude:  54.78780993841013,
+			Longitude: 9.444052105200551,
+			Status:    domain.SensorStatusOffline,
+			Data:      []*domain.SensorData{},
+		},
+		{
+			ID:        "sensor-3",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Latitude:  54.77933725347423,
+			Longitude: 9.426465409018832,
+			Status:    domain.SensorStatusUnknown,
+			Data:      []*domain.SensorData{},
+		},
+		{
+			ID:        "sensor-4",
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Latitude:  54.82078826498143,
+			Longitude: 9.489684366114483,
+			Status:    domain.SensorStatusOnline,
+			Data:      []*domain.SensorData{},
+		},
+	}
 )
