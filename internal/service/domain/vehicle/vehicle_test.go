@@ -169,6 +169,11 @@ func TestVehicleService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 		).Return(expectedVehicle, nil)
 
 		// when
@@ -192,6 +197,11 @@ func TestVehicleService_Create(t *testing.T) {
 
 		vehicleRepo.EXPECT().Create(
 			ctx,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
@@ -354,6 +364,11 @@ func TestVehicleService_Update(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 		).Return(expectedVehicle, nil)
 
 		// when
@@ -401,6 +416,11 @@ func TestVehicleService_Update(t *testing.T) {
 		vehicleRepo.EXPECT().Update(
 			ctx,
 			vehicleID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
