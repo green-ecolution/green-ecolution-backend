@@ -169,6 +169,11 @@ func TestVehicleService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 		).Return(expectedVehicle, nil)
 
 		// when
@@ -192,6 +197,11 @@ func TestVehicleService_Create(t *testing.T) {
 
 		vehicleRepo.EXPECT().Create(
 			ctx,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
@@ -341,14 +351,14 @@ func TestVehicleService_Update(t *testing.T) {
 			vehicleID,
 		).Return(expectedVehicle, nil)
 
-		vehicleRepo.EXPECT().GetByPlate(
-			ctx,
-			input.NumberPlate,
-		).Return(nil, nil)
-
 		vehicleRepo.EXPECT().Update(
 			ctx,
 			vehicleID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
@@ -393,14 +403,14 @@ func TestVehicleService_Update(t *testing.T) {
 			vehicleID,
 		).Return(expectedVehicle, nil)
 
-		vehicleRepo.EXPECT().GetByPlate(
-			ctx,
-			input.NumberPlate,
-		).Return(nil, nil)
-
 		vehicleRepo.EXPECT().Update(
 			ctx,
 			vehicleID,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
@@ -420,6 +430,8 @@ func TestVehicleService_Update(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
+		input.NumberPlate = "1234"
+
 		vehicleRepo.EXPECT().GetByID(
 			ctx,
 			vehicleID,
@@ -428,7 +440,7 @@ func TestVehicleService_Update(t *testing.T) {
 		vehicleRepo.EXPECT().GetByPlate(
 			ctx,
 			input.NumberPlate,
-		).Return(getTestVehicles()[0], nil)
+		).Return(getTestVehicles()[1], nil)
 
 		// when
 		result, err := svc.Update(ctx, vehicleID, input)
