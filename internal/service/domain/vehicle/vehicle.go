@@ -92,7 +92,7 @@ func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.Vehi
 		return nil, handleError(err)
 	}
 
-	if (oldValue.NumberPlate != vh.NumberPlate) {
+	if oldValue.NumberPlate != vh.NumberPlate {
 		if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
 			return nil, err
 		} else if isTaken {
