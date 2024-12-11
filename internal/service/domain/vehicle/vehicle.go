@@ -87,15 +87,17 @@ func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.Vehi
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	_, err := v.vehicleRepo.GetByID(ctx, id)
+	oldValue, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
-		return nil, err
-	} else if isTaken {
-		return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
+	if (oldValue.NumberPlate != vh.NumberPlate) {
+		if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
+			return nil, err
+		} else if isTaken {
+			return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
+		}
 	}
 
 	updated, err := v.vehicleRepo.Update(ctx,
