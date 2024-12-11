@@ -170,5 +170,8 @@ func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID 
 }
 
 func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {
+	if sensorID == "" {
+		return errors.New("sensorID cannot be empty")
+	}
 	return r.store.UnlinkSensorIDFromTrees(ctx, &sensorID)
 }
