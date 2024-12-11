@@ -68,6 +68,11 @@ func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate)
 		vehicle.WithWaterCapacity(vh.WaterCapacity),
 		vehicle.WithVehicleStatus(vh.Status),
 		vehicle.WithVehicleType(vh.Type),
+		vehicle.WithHeight(vh.Height),
+		vehicle.WithLength(vh.Length),
+		vehicle.WithModel(vh.Model),
+		vehicle.WithWidth(vh.Width),
+		vehicle.WithDrivingLicense(vh.DrivingLicense),
 	)
 
 	if err != nil {
@@ -100,6 +105,11 @@ func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.Vehi
 		vehicle.WithWaterCapacity(vh.WaterCapacity),
 		vehicle.WithVehicleStatus(vh.Status),
 		vehicle.WithVehicleType(vh.Type),
+		vehicle.WithHeight(vh.Height),
+		vehicle.WithLength(vh.Length),
+		vehicle.WithModel(vh.Model),
+		vehicle.WithWidth(vh.Width),
+		vehicle.WithDrivingLicense(vh.DrivingLicense),
 	)
 	if err != nil {
 		return nil, handleError(err)
@@ -136,7 +146,7 @@ func handleError(err error) error {
 
 func (v *VehicleService) isVehicleNumberPlateTaken(ctx context.Context, plate string) (bool, error) {
 	existingVehicle, err := v.vehicleRepo.GetByPlate(ctx, plate)
-	if err != nil && !errors.Is(err, storage.ErrVehicleNotFound) {
+	if err != nil && !errors.Is(err, storage.ErrEntityNotFound) {
 		return false, handleError(err)
 	}
 	return existingVehicle != nil, nil
