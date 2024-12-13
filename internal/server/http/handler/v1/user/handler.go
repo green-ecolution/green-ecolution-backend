@@ -187,9 +187,30 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user [get]
 // @Security		Keycloak
-func GetAllUsers(_ service.AuthService) fiber.Handler {
+func GetAllUsers(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+
+		users, err := svc.GetAllUsers(ctx)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error()))
+		}
+		response := make([]entities.UserResponse, len(users))
+
+		for i, user := range users {
+			response[i] = entities.UserResponse{
+				ID:            user.ID.String(),
+				CreatedAt:     user.CreatedAt,
+				Email:         user.Email,
+				FirstName:     user.FirstName,
+				LastName:      user.LastName,
+				Username:      user.Username,
+				EmployeeID:    user.EmployeeID,
+				PhoneNumber:   user.PhoneNumber,
+				EmailVerified: user.EmailVerified,
+			}
+		}
+		return c.Status(fiber.StatusOK).JSON(response)
 	}
 }
 

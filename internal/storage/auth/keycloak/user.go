@@ -82,6 +82,34 @@ func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string)
 	}
 	return nil
 }
+func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
+	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to log in to Keycloak")
+	}
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+	users, err := client.GetUsers(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get users from Keycloak")
+	}
+
+	var allUsers []*entities.User
+
+	for _, kcUser := range users {
+		userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, *kcUser.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("failed to get created user by id: '%v'", *kcUser.ID))
+		}
+		user, err := keyCloakUserToUser(userKeyCloak)
+
+		if err != nil {
+			continue
+		}
+		allUsers = append(allUsers, user)
+	}
+
+	return allUsers, nil
+}
 
 func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	userID, err := uuid.Parse(*user.ID)
