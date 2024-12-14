@@ -112,6 +112,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "water capacity is required and can not be 0")
 		assert.Nil(t, got)
 	})
 
@@ -124,7 +125,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
-			vh.WaterCapacity = 0
+			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
 
@@ -133,6 +134,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "number plate is required")
 		assert.Nil(t, got)
 	})
 
@@ -147,7 +149,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = 0
 			vh.Length = 0
 			vh.Width = 0
-			vh.WaterCapacity = 0
+			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
 
@@ -156,6 +158,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "size measurements are required and can not be 0")
 		assert.Nil(t, got)
 	})
 
@@ -178,6 +181,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "number plate is required")
 		assert.Nil(t, got)
 	})
 
@@ -205,6 +209,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		secondVehicle, err := r.Create(context.Background(), createFn)
 
 		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "violates unique constraint")
 		assert.Nil(t, secondVehicle)
 	})
 

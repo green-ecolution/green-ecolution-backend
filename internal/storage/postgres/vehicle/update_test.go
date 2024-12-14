@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -89,6 +90,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		errSecond := r.Update(context.Background(), 2, firstFn)
 
 		assert.Error(t, errSecond)
+		assert.Contains(t, errSecond.Error(), "violates unique constraint")
 	})
 
 	t.Run("should return error when update vehicle with zero water capacity", func(t *testing.T) {
@@ -109,6 +111,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "water capacity is required and can not be 0")
 	})
 
 	t.Run("should return error when update vehicle with no number plate", func(t *testing.T) {
@@ -129,6 +132,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "number plate is required")
 	})
 
 	t.Run("should return error when update vehicle with zero size measurement", func(t *testing.T) {
@@ -149,6 +153,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "size measurements are required and can not be 0")
 	})
 
 	t.Run("should return error when update vehicle with wrong driving license", func(t *testing.T) {
@@ -161,7 +166,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Length = input.Length
 			vh.Width = input.Width
 			vh.WaterCapacity = input.WaterCapacity
-			vh.DrivingLicense = "ABC"
+			vh.DrivingLicense = ""
 			return true, nil
 		}
 
@@ -170,6 +175,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "driving license is required and should be either B, BE or C")
 	})
 
 	t.Run("should return error when update vehicle with negative id", func(t *testing.T) {
@@ -232,6 +238,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.Equal(t, err, storage.ErrEntityNotFound)
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
