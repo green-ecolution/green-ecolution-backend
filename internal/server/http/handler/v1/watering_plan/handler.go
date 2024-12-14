@@ -1,7 +1,6 @@
 package wateringplan
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +17,7 @@ var (
 
 // @Summary		Get all watering plans
 // @Description	Get all watering plans
+// @Id				get-all-watering-plans
 // @Tags			Watering Plan
 // @Produce		json
 // @Success		200		{object}	entities.WateringPlanListResponse
@@ -64,11 +64,7 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		fmt.Println("-----")
-		fmt.Println(strconv.Atoi(c.Params("id")))
 		id, err := strconv.Atoi(c.Params("id"))
-		fmt.Print(id)
-		fmt.Print(err)
 		if err != nil {
 			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
