@@ -2,30 +2,45 @@ package vehicle
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
-func (r *VehicleRepository) Update(ctx context.Context, id int32, vFn ...entities.EntityFunc[entities.Vehicle]) (*entities.Vehicle, error) {
-	entity, err := r.GetByID(ctx, id)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
+func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Vehicle) (bool, error)) error {
+	return r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
 
-	for _, fn := range vFn {
-		fn(entity)
-	}
+		vh, err := r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
 
-	if err := r.validateVehicle(entity); err != nil {
-		return nil, err
-	}
+		if updateFn == nil {
+			return errors.New("updateFn is nil")
+		}
 
-	if err := r.updateEntity(ctx, entity); err != nil {
-		return nil, err
-	}
+		updated, err := updateFn(vh)
+		if err != nil {
+			return err
+		}
 
-	return r.GetByID(ctx, entity.ID)
+		if !updated {
+			return nil
+		}
+
+		if err := r.validateVehicle(vh); err != nil {
+			return err
+		}
+
+		return r.updateEntity(ctx, vh)
+	})
 }
 
 func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.Vehicle) error {
