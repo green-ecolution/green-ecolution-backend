@@ -70,8 +70,10 @@ func TestRegisterUser(t *testing.T) {
 		resp, err := svc.Register(context.Background(), &entities.RegisterUser{})
 
 		// then
-		assert.Error(t, err, "500: failed to register user")
+		assert.Error(t, err)
 		assert.Nil(t, resp)
+		assert.ErrorContains(t, err, "400: validation error")
+
 	})
 
 	t.Run("should return error when validation error", func(t *testing.T) {
@@ -85,8 +87,10 @@ func TestRegisterUser(t *testing.T) {
 		resp, err := svc.Register(context.Background(), &entities.RegisterUser{})
 
 		// then
-		assert.Error(t, err, "400: validation error")
+		assert.Error(t, err)
 		assert.Nil(t, resp)
+		assert.ErrorContains(t, err, "400: validation error")
+
 	})
 }
 
@@ -162,7 +166,8 @@ func TestLoginRequest(t *testing.T) {
 		_, err := svc.LoginRequest(context.Background(), loginRequest)
 
 		// then
-		assert.Error(t, err, "500: failed to parse auth url in config")
+		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to parse auth url in config: parse \"not_a_valid_url\": invalid URI for request")
 	})
 }
 
@@ -210,7 +215,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "400: validation error")
+		assert.EqualError(t, err, "400: validation error: Key: 'LoginCallback.Code' Error:Field validation for 'Code' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
@@ -234,7 +239,8 @@ func TestClientTokenCallback(t *testing.T) {
 		_, err := svc.ClientTokenCallback(context.Background(), loginCallback)
 
 		// then
-		assert.Error(t, err, "500: failed to get access token")
+		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to get access token: assert.AnError general error for testing")
 	})
 }
 
@@ -255,6 +261,7 @@ func TestLogoutRequest(t *testing.T) {
 
 		// when
 		assert.NoError(t, err)
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("should return error when validation fails", func(t *testing.T) {
@@ -271,7 +278,8 @@ func TestLogoutRequest(t *testing.T) {
 		err := svc.LogoutRequest(context.Background(), invalidLogoutRequest)
 
 		// then
-		assert.Error(t, err, "400: validation error")
+		assert.Error(t, err)
+		assert.EqualError(t, err, "400: validation error: Key: 'Logout.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when session removal fails", func(t *testing.T) {
@@ -283,12 +291,13 @@ func TestLogoutRequest(t *testing.T) {
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		logoutRequest := &entities.Logout{RefreshToken: "valid-refresh-token"}
-		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(errors.New("Internal error"))
+		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(errors.New(""))
 
 		// when
 		err := svc.LogoutRequest(context.Background(), logoutRequest)
 
 		// then
-		assert.Error(t, err, "500: failed to remove session")
+		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to remove user session: ")
 	})
 }

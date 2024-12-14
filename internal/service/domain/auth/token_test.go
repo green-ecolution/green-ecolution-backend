@@ -47,11 +47,11 @@ func TestRestrospectToken(t *testing.T) {
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		// when
-		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New("failed to retrospect token"))
+		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New(""))
 		_, err := svc.RetrospectToken(context.Background(), token)
 
 		// then
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "500: failed to retrospect token")
+		assert.EqualError(t, err, "500: failed to retrospect token: ")
 	})
 }

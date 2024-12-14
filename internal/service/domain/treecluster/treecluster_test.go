@@ -256,7 +256,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.Contains(t, err.Error(), "400: validation error")
+		assert.EqualError(t, err, "400: validation error: Key: 'TreeClusterCreate.Name' Error:Field validation for 'Name' failed on the 'required' tag")
 	})
 }
 
@@ -462,6 +462,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
+		assert.Equal(t, nil, err)
 	})
 
 	t.Run("should return error if tree cluster not found", func(t *testing.T) {

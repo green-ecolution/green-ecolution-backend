@@ -60,7 +60,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 			ID:    clusterID,
 			Trees: []*entities.Tree{{ID: 1}, {ID: 2}},
 		}
-		expectedError := errors.New("empty geometry")
+		expectedError := errors.New("400: empty geometry")
 
 		treeRepo.EXPECT().GetCenterPoint(context.Background(), []int32{1, 2}).Return(0, 0, expectedError)
 
@@ -69,7 +69,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, expectedError, err, "400: empty geometry")
+		assert.EqualError(t, err, "400: empty geometry")
 	})
 
 	t.Run("should return error when getRegionByID fails", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 			Trees: []*entities.Tree{{ID: 1}, {ID: 2}},
 		}
 		expectedLat, expectedLong := 54.801539, 9.446741
-		expectedError := errors.New("get region failed")
+		expectedError := errors.New("500: get region failed")
 
 		treeRepo.EXPECT().GetCenterPoint(context.Background(), []int32{1, 2}).Return(expectedLat, expectedLong, nil)
 		regionRepo.EXPECT().GetByPoint(context.Background(), expectedLat, expectedLong).Return(nil, expectedError)
@@ -94,7 +94,7 @@ func TestGeoClusterLocator_UpdateCluster(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, expectedError, err, "500: get region failed")
+		assert.EqualError(t, err, "500: get region failed")
 	})
 
 	t.Run("should remove cluster coordinates when cluster has no trees", func(t *testing.T) {

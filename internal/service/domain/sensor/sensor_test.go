@@ -43,6 +43,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, sensors)
+		assert.EqualError(t, err, "500: sensor not found")
 	})
 }
 
