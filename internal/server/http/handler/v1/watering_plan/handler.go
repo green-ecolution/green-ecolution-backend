@@ -20,12 +20,16 @@ var (
 // @Id				get-all-watering-plans
 // @Tags			Watering Plan
 // @Produce		json
-// @Success		200		{object}	entities.WateringPlanListResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
+// @Success		200	{object}	entities.WateringPlanListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan [get]
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			status	query	string	false	"Status"
 // @Security		Keycloak
 func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
