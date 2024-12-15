@@ -261,7 +261,6 @@ func TestLogoutRequest(t *testing.T) {
 
 		// when
 		assert.NoError(t, err)
-		assert.Equal(t, nil, err)
 	})
 
 	t.Run("should return error when validation fails", func(t *testing.T) {
