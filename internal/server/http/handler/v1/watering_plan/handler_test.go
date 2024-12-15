@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -380,5 +381,67 @@ func TestUpdateWateringPlan(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
+	})
+}
+
+func TestDeleteWateringPlan(t *testing.T) {
+	t.Run("should delete watering plan successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.DeleteWateringPlan(mockWateringPlanService)
+		app.Delete("/v1/watering-plan/:watering_plan_id", handler)
+
+		wateringPlanID := 1
+		mockWateringPlanService.EXPECT().Delete(mock.Anything, int32(wateringPlanID)).Return(nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/watering-plan/"+strconv.Itoa(wateringPlanID), nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNoContent, resp.StatusCode)
+
+		mockWateringPlanService.AssertExpectations(t)
+	})
+
+	t.Run("should return 400 for invalid ID format", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.DeleteWateringPlan(mockWateringPlanService)
+		app.Delete("/v1/watering-plan/:watering_plan_id", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/watering-plan/invalid_id", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 404 for non-existing tree cluster", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.DeleteWateringPlan(mockWateringPlanService)
+		app.Delete("/v1/watering-plan/:watering_plan_id", handler)
+
+		wateringPlanID := 999
+		mockWateringPlanService.EXPECT().Delete(
+			mock.Anything,
+			int32(wateringPlanID),
+		).Return(storage.ErrWateringPlanNotFound)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/watering-plan/"+strconv.Itoa(wateringPlanID), nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+		mockWateringPlanService.AssertExpectations(t)
 	})
 }

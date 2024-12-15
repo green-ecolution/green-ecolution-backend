@@ -166,9 +166,21 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 //	@Router			/v1/watering-plan/{watering_plan_id} [delete]
 //	@Param			watering_plan_id	path	string	true	"Watering Plan ID"
 //	@Security		Keycloak
-func DeleteWateringPlan(_ service.WateringPlanService) fiber.Handler {
+func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("watering_plan_id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		err = svc.Delete(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 

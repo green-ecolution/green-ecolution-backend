@@ -12,7 +12,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -20,7 +19,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TesttreeclusterGetAllTreeClusters(t *testing.T) {
+func TestGetAllTreeCluster(t *testing.T) {
 	t.Run("should return all tree clusters successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
@@ -434,7 +433,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 		mockClusterService.EXPECT().Delete(
 			mock.Anything,
 			int32(clusterID),
-		).Return(service.NewError(service.NotFound, "tree cluster not found"))
+		).Return(storage.ErrTreeClusterNotFound)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/"+strconv.Itoa(clusterID), nil)
