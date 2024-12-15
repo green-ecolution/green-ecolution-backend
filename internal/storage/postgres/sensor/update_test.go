@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +19,7 @@ func TestSensorRepository_Update(t *testing.T) {
 		newLong := 9.489684366114483
 
 		got, err := r.Update(context.Background(),
-			sensorUtils.TestSensorID,
+			"sensor-1",
 			WithStatus(entities.SensorStatusOffline),
 			WithLatitude(newLat),
 			WithLongitude(newLong))
@@ -39,7 +37,7 @@ func TestSensorRepository_Update(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Update(context.Background(), sensorUtils.TestSensorID, WithStatus(""))
+		got, err := r.Update(context.Background(), "sensor-1", WithStatus(""))
 
 		// then
 		assert.Error(t, err)
@@ -77,7 +75,7 @@ func TestSensorRepository_Update(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Update(ctx, sensorUtils.TestSensorID, WithStatus(entities.SensorStatusOffline))
+		got, err := r.Update(ctx, "sensor-1", WithStatus(entities.SensorStatusOffline))
 
 		// then
 		assert.Error(t, err)
