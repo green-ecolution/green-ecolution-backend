@@ -72,6 +72,8 @@ func TestRegisterUser(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, resp)
+		assert.ErrorContains(t, err, "400: validation error")
+
 	})
 
 	t.Run("should return error when validation error", func(t *testing.T) {
@@ -87,6 +89,8 @@ func TestRegisterUser(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, resp)
+		assert.ErrorContains(t, err, "400: validation error")
+
 	})
 }
 
@@ -163,6 +167,7 @@ func TestLoginRequest(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to parse auth url in config: parse \"not_a_valid_url\": invalid URI for request")
 	})
 }
 
@@ -210,6 +215,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "400: validation error: Key: 'LoginCallback.Code' Error:Field validation for 'Code' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
@@ -234,6 +240,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to get access token: assert.AnError general error for testing")
 	})
 }
 
@@ -271,6 +278,7 @@ func TestLogoutRequest(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "400: validation error: Key: 'Logout.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when session removal fails", func(t *testing.T) {
@@ -282,12 +290,13 @@ func TestLogoutRequest(t *testing.T) {
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		logoutRequest := &entities.Logout{RefreshToken: "valid-refresh-token"}
-		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(errors.New("Internal error"))
+		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(errors.New(""))
 
 		// when
 		err := svc.LogoutRequest(context.Background(), logoutRequest)
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to remove user session: ")
 	})
 }

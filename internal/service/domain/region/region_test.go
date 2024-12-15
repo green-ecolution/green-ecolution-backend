@@ -42,8 +42,8 @@ func TestRegionService_GetAll(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, "500: GetAll failed", err.Error())
 		assert.Nil(t, regions)
+		assert.EqualError(t, err, "500: GetAll failed")
 	})
 }
 
@@ -74,8 +74,8 @@ func TestRegionService_GetByID(t *testing.T) {
 		region, err := svc.GetByID(context.Background(), 3)
 
 		// then
-		assert.Equal(t, "404: region not found", err.Error())
 		assert.Nil(t, region)
+		assert.EqualError(t, err, "404: region not found")
 	})
 }
 
