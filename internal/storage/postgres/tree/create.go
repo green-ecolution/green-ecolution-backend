@@ -93,7 +93,7 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 		Longitude:      entity.Longitude,
 		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
 		Description:    &entity.Description,
-		Number:     entity.Number,
+		Number:         entity.Number,
 	}
 
 	id, err := r.store.CreateTree(ctx, &args)

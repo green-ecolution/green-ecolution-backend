@@ -102,7 +102,7 @@ var allTestTrees = []*sqlc.Tree{
 		WateringStatus: sqlc.WateringStatusGood,
 		Readonly:       true,
 		Description:    utils.P("Newly planted tree"),
-		Number:     "P 1234",
+		Number:         "P 1234",
 	},
 	{
 		ID:             2,
@@ -115,6 +115,6 @@ var allTestTrees = []*sqlc.Tree{
 		WateringStatus: sqlc.WateringStatusModerate,
 		Readonly:       true,
 		Description:    utils.P("Also newly planted tree"),
-		Number:     "P 2345",
+		Number:         "P 2345",
 	},
 }
