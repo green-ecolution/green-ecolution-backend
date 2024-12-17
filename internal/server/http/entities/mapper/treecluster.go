@@ -12,7 +12,7 @@ import (
 type TreeClusterHTTPMapper interface {
 	// goverter:ignore Region Trees
 	FromResponse(*domain.TreeCluster) *entities.TreeClusterResponse
-
+	FromResponseList([]*domain.TreeCluster) []*entities.TreeClusterResponse
 	FromCreateRequest(*entities.TreeClusterCreateRequest) *domain.TreeClusterCreate
 	FromUpdateRequest(*entities.TreeClusterUpdateRequest) *domain.TreeClusterUpdate
 }

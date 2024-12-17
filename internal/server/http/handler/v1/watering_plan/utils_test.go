@@ -143,10 +143,10 @@ var (
 	}
 
 	TestWateringPlanRequest = &entities.WateringPlanCreate{
-		Date:          time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
-		Description:   "New watering plan for the west side of the city",
-		TransporterID: utils.P(int32(1)),
-		TrailerID:     utils.P(int32(2)),
-		// TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+		Date:           time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
+		Description:    "New watering plan for the west side of the city",
+		TransporterID:  utils.P(int32(1)),
+		TrailerID:      utils.P(int32(2)),
+		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 )

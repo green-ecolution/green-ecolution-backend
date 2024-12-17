@@ -13,6 +13,8 @@ import (
 
 var (
 	wateringPlanMapper = generated.WateringPlanHTTPMapperImpl{}
+	treeClusterMapper  = generated.TreeClusterHTTPMapperImpl{}
+	treeMapper         = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all watering plans
@@ -194,6 +196,15 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 
 func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanResponse {
 	dto := wateringPlanMapper.FromResponse(wp)
+
+	// Map each tree cluster and its trees
+	dto.Treecluster = make([]*entities.TreeClusterResponse, len(wp.Treecluster))
+	for i, tc := range wp.Treecluster {
+		mappedCluster := treeClusterMapper.FromResponse(tc)
+		mappedCluster.Trees = treeMapper.FromResponseList(tc.Trees)
+
+		dto.Treecluster[i] = mappedCluster
+	}
 
 	return dto
 }
