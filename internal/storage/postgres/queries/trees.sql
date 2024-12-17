@@ -38,7 +38,7 @@ UPDATE trees SET
   sensor_id = $3,
   planting_year = $4,
   species = $5,
-  tree_number = $6,
+  number = $6,
   readonly = $7,
   watering_status = $8,
   description = $9

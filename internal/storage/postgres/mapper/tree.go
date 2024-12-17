@@ -12,7 +12,6 @@ import (
 // goverter:extend MapWateringStatus MapSoilCondition
 type InternalTreeRepoMapper interface {
 	// goverter:ignore Sensor Images TreeCluster
-	// goverter:map TreeNumber Number
 	FromSql(*sqlc.Tree) *entities.Tree
 	FromSqlList([]*sqlc.Tree) []*entities.Tree
 }

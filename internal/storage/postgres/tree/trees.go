@@ -87,7 +87,7 @@ func WithLongitude(long float64) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithTreeNumber(number string) entities.EntityFunc[entities.Tree] {
+func WithNumber(number string) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.Number = number
 	}

@@ -93,7 +93,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		tree.WithReadonly(treeCreate.Readonly),
 		tree.WithPlantingYear(treeCreate.PlantingYear),
 		tree.WithSpecies(treeCreate.Species),
-		tree.WithTreeNumber(treeCreate.Number),
+		tree.WithNumber(treeCreate.Number),
 		tree.WithLatitude(treeCreate.Latitude),
 		tree.WithLongitude(treeCreate.Longitude),
 	)
@@ -169,7 +169,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),
 		tree.WithSpecies(tu.Species),
-		tree.WithTreeNumber(tu.Number),
+		tree.WithNumber(tu.Number),
 		tree.WithLatitude(tu.Latitude),
 		tree.WithLongitude(tu.Longitude),
 		tree.WithDescription(tu.Description))
