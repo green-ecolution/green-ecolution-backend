@@ -6,7 +6,7 @@ SELECT * FROM watering_plans WHERE id = $1;
 
 -- name: CreateWateringPlan :one
 INSERT INTO watering_plans (
-  date, description, watering_plan_status, distance, total_water_required
+  date, description, status, distance, total_water_required
 ) VALUES (
   $1, $2, $3, $4, $5
 ) RETURNING id;
@@ -15,7 +15,7 @@ INSERT INTO watering_plans (
 UPDATE watering_plans SET
   date = $2,
   description = $3,
-  watering_plan_status = $4,
+  status = $4,
   distance = $5,
   total_water_required = $6
 WHERE id = $1;

@@ -29,7 +29,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[i].ID, wp.ID)
 			assert.Equal(t, allTestWateringPlans[i].Date, wp.Date)
 			assert.Equal(t, allTestWateringPlans[i].Description, wp.Description)
-			assert.Equal(t, allTestWateringPlans[i].WateringPlanStatus, wp.WateringPlanStatus)
+			assert.Equal(t, allTestWateringPlans[i].Status, wp.Status)
 			assert.Equal(t, allTestWateringPlans[i].Distance, wp.Distance)
 			assert.Equal(t, allTestWateringPlans[i].TotalWaterRequired, wp.TotalWaterRequired)
 
@@ -100,7 +100,7 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].ID, got.ID)
 		assert.Equal(t, allTestWateringPlans[0].Date, got.Date)
 		assert.Equal(t, allTestWateringPlans[0].Description, got.Description)
-		assert.Equal(t, allTestWateringPlans[0].WateringPlanStatus, got.WateringPlanStatus)
+		assert.Equal(t, allTestWateringPlans[0].Status, got.Status)
 		assert.Equal(t, allTestWateringPlans[0].Distance, got.Distance)
 		assert.Equal(t, allTestWateringPlans[0].TotalWaterRequired, got.TotalWaterRequired)
 
@@ -135,7 +135,7 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[1].ID, got.ID)
 		assert.Equal(t, allTestWateringPlans[1].Date, got.Date)
 		assert.Equal(t, allTestWateringPlans[1].Description, got.Description)
-		assert.Equal(t, allTestWateringPlans[1].WateringPlanStatus, got.WateringPlanStatus)
+		assert.Equal(t, allTestWateringPlans[1].Status, got.Status)
 		assert.Equal(t, allTestWateringPlans[1].Distance, got.Distance)
 		assert.Equal(t, allTestWateringPlans[1].TotalWaterRequired, got.TotalWaterRequired)
 
@@ -404,7 +404,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		ID:                 1,
 		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the west side of the city",
-		WateringPlanStatus: entities.WateringPlanStatusPlanned,
+		Status:             entities.WateringPlanStatusPlanned,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
@@ -415,7 +415,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		ID:                 2,
 		Date:               time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the east side of the city",
-		WateringPlanStatus: entities.WateringPlanStatusActive,
+		Status:             entities.WateringPlanStatusActive,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
@@ -426,7 +426,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		ID:                 3,
 		Date:               time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
 		Description:        "Very important watering plan due to no rainfall",
-		WateringPlanStatus: entities.WateringPlanStatusFinished,
+		Status:             entities.WateringPlanStatusFinished,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
@@ -437,7 +437,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		ID:                 4,
 		Date:               time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
 		Description:        "New watering plan for the south side of the city",
-		WateringPlanStatus: entities.WateringPlanStatusNotCompeted,
+		Status:             entities.WateringPlanStatusNotCompeted,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
@@ -448,7 +448,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		ID:                 5,
 		Date:               time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
 		Description:        "Canceled due to flood",
-		WateringPlanStatus: entities.WateringPlanStatusCanceled,
+		Status:             entities.WateringPlanStatusCanceled,
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],

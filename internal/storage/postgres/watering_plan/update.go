@@ -56,7 +56,7 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		Description:        entity.Description,
 		Distance:           entity.Distance,
 		TotalWaterRequired: entity.TotalWaterRequired,
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}
 
 	err = w.store.UpdateWateringPlan(ctx, &params)

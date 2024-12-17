@@ -17,7 +17,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		Description:        "",
 		Distance:           utils.P(0.0),
 		TotalWaterRequired: utils.P(0.0),
-		WateringPlanStatus: entities.WateringPlanStatusPlanned,
+		Status:             entities.WateringPlanStatusPlanned,
 		Users:              make([]*entities.User, 0),
 		Treecluster:        make([]*entities.TreeCluster, 0),
 		Transporter:        nil,
@@ -83,7 +83,7 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 		Description:        entity.Description,
 		Distance:           entity.Distance,
 		TotalWaterRequired: entity.TotalWaterRequired,
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}
 
 	id, err := w.store.CreateWateringPlan(ctx, &args)
