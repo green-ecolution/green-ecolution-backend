@@ -27,7 +27,7 @@ SELECT tree_clusters.* FROM tree_clusters JOIN trees ON tree_clusters.id = trees
 
 -- name: CreateTree :one
 INSERT INTO trees (
-  tree_cluster_id, sensor_id, planting_year, species, tree_number, readonly, description, watering_status, latitude, longitude
+  tree_cluster_id, sensor_id, planting_year, species, number, readonly, description, watering_status, latitude, longitude
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 ) RETURNING id;
