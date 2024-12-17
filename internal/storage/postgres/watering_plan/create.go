@@ -118,10 +118,9 @@ func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringP
 	// 	return errors.New("watering plan requires employees")
 	// }
 
-	// TODO: please comment also the test cases back in as soon as the treecluster are ready
-	// if len(entity.Treecluster) == 0 {
-	// 	return errors.New("watering plan requires tree cluster")
-	// }
+	if len(entity.Treecluster) == 0 {
+		return errors.New("watering plan requires tree cluster")
+	}
 
 	return nil
 }
