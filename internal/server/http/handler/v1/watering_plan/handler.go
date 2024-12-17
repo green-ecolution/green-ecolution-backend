@@ -206,5 +206,8 @@ func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanRespons
 		dto.Treecluster[i] = mappedCluster
 	}
 
+	// TODO: map correct users
+	dto.Users = []*entities.UserResponse{}
+
 	return dto
 }
