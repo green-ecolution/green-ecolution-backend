@@ -664,6 +664,7 @@ func TestTreeRepository_GetTreeClusterByTreeID(t *testing.T) {
 		assert.Nil(t, treeCluster)
 	})
 }
+
 func TestTreeRepository_FindNearestTree(t *testing.T) {
 	t.Run("should return the nearest tree for given latitude and longitude", func(t *testing.T) {
 		// given
@@ -688,7 +689,7 @@ func TestTreeRepository_FindNearestTree(t *testing.T) {
 		assertExpectedEqualToTree(t, tree, nearestTree)
 	})
 
-	t.Run("Should return error when no tree found within the required distance", func(t *testing.T) {
+	t.Run("should return error when no tree found within the required distance", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
@@ -722,6 +723,7 @@ func TestTreeRepository_FindNearestTree(t *testing.T) {
 		assert.Nil(t, tree, "Expected no tree to be returned when context is canceled")
 	})
 }
+
 func assertExpectedEqualToTree(t *testing.T, expectedTree, tree *entities.Tree) {
 	assert.Equal(t, expectedTree.ID, tree.ID, "ID does not match")
 	assert.Equal(t, expectedTree.PlantingYear, tree.PlantingYear, "PlantingYear does not match")
