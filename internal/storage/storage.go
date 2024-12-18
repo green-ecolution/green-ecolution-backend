@@ -73,8 +73,18 @@ type ImageRepository interface {
 }
 
 type VehicleRepository interface {
-	BasicCrudRepository[entities.Vehicle]
+	// GetAll returns all vehicles
+	GetAll(ctx context.Context) ([]*entities.Vehicle, error)
+	// GetByID returns one vehicle by id
+	GetByID(ctx context.Context, id int32) (*entities.Vehicle, error)
+	// GetByPlate returns one vehicle by its plate
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
+	// Create creates a new vehicle. It accepts a function that takes a vehicle that can be modified. Any changes made to the vehicle will be saved in the storage. If the function returns true, the vehicle will be created, otherwise it will not be created.
+	Create(ctx context.Context, fn func(tc *entities.Vehicle) (bool, error)) (*entities.Vehicle, error)
+	// Update updates a vehicle by id. It takes the id of the vehicle to update and a function that takes a vehicle that can be modified. Any changes made to the vehicle will be saved updated in the storage. If the function returns true, the vehicle will be updated, otherwise it will not be updated.
+	Update(ctx context.Context, id int32, fn func(tc *entities.Vehicle) (bool, error)) error
+	// Delete deletes a vehicle by id
+	Delete(ctx context.Context, id int32) error
 }
 
 type WateringPlanRepository interface {
