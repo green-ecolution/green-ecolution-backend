@@ -25,7 +25,7 @@ type WateringPlan struct {
 	Distance           *float64
 	TotalWaterRequired *float64
 	Users              []*User
-	TreeClusters        []*TreeCluster
+	TreeClusters       []*TreeCluster
 	Transporter        *Vehicle
 	Trailer            *Vehicle
 }

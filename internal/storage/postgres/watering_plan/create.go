@@ -19,7 +19,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		TotalWaterRequired: utils.P(0.0),
 		Status:             entities.WateringPlanStatusPlanned,
 		Users:              make([]*entities.User, 0),
-		TreeClusters:        make([]*entities.TreeCluster, 0),
+		TreeClusters:       make([]*entities.TreeCluster, 0),
 		Transporter:        nil,
 		Trailer:            nil,
 	}

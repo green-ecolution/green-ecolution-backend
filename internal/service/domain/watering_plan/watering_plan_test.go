@@ -722,7 +722,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
-		TreeClusters:        allTestClusters[0:2],
+		TreeClusters:       allTestClusters[0:2],
 	},
 	{
 		ID:                 2,
@@ -733,7 +733,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
-		TreeClusters:        allTestClusters[2:3],
+		TreeClusters:       allTestClusters[2:3],
 	},
 	{
 		ID:                 3,
@@ -744,7 +744,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		TreeClusters:        allTestClusters[0:3],
+		TreeClusters:       allTestClusters[0:3],
 	},
 	{
 		ID:                 4,
@@ -755,7 +755,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		TreeClusters:        allTestClusters[2:3],
+		TreeClusters:       allTestClusters[2:3],
 	},
 	{
 		ID:                 5,
@@ -766,7 +766,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		TreeClusters:        allTestClusters[2:3],
+		TreeClusters:       allTestClusters[2:3],
 	},
 }
 

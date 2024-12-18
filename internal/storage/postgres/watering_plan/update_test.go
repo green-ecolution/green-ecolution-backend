@@ -44,7 +44,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		TotalWaterRequired: utils.P(30000.0),
 		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[2],
 		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[3],
-		TreeClusters:        mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		TreeClusters:       mappers.clusterMapper.FromSqlList(testCluster)[0:3],
 		Users:              []*entities.User{testUser},
 	}
 

@@ -191,7 +191,7 @@ VALUES
     }');
 
 
-INSERT INTO watering_plans (id, date, description, watering_plan_status, distance, total_water_required)
+INSERT INTO watering_plans (id, date, description, status, distance, total_water_required)
 VALUES 
   (1, '2024-09-22', 'New watering plan for the west side of the city', 'planned', 63.0, 6000.0),
   (2, '2024-08-03', 'New watering plan for the east side of the city', 'active', 63.0, 6000.0),

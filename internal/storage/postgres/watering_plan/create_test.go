@@ -44,7 +44,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		TotalWaterRequired: utils.P(30000.0),
 		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
 		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		TreeClusters:        mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		TreeClusters:       mappers.clusterMapper.FromSqlList(testCluster)[0:3],
 		Users:              []*entities.User{testUser},
 	}
 

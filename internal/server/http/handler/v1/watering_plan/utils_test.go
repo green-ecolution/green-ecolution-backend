@@ -18,7 +18,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            TestVehicles[0],
-			TreeClusters:        TestClusters[0:2],
+			TreeClusters:       TestClusters[0:2],
 		},
 		{
 			ID:                 2,
@@ -29,7 +29,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            TestVehicles[0],
-			TreeClusters:        TestClusters[2:3],
+			TreeClusters:       TestClusters[2:3],
 		},
 		{
 			ID:                 3,
@@ -40,7 +40,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
-			TreeClusters:        TestClusters[0:3],
+			TreeClusters:       TestClusters[0:3],
 		},
 		{
 			ID:                 4,
@@ -51,7 +51,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
-			TreeClusters:        TestClusters[2:3],
+			TreeClusters:       TestClusters[2:3],
 		},
 		{
 			ID:                 5,
@@ -62,7 +62,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
-			TreeClusters:        TestClusters[2:3],
+			TreeClusters:       TestClusters[2:3],
 		},
 	}
 	TestVehicles = []*entities.Vehicle{
