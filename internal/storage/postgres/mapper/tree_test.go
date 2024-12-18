@@ -28,7 +28,7 @@ func TestTreeMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
 		assert.Equal(t, src.PlantingYear, got.PlantingYear)
 		assert.Equal(t, src.Species, got.Species)
-		assert.Equal(t, src.TreeNumber, got.Number)
+		assert.Equal(t, src.Number, got.Number)
 		assert.Equal(t, src.Latitude, got.Latitude)
 		assert.Equal(t, src.Longitude, got.Longitude)
 		assert.Equal(t, src.WateringStatus, sqlc.WateringStatus(got.WateringStatus))
@@ -69,7 +69,7 @@ func TestTreeMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.UpdatedAt.Time, got[i].UpdatedAt)
 			assert.Equal(t, src.PlantingYear, got[i].PlantingYear)
 			assert.Equal(t, src.Species, got[i].Species)
-			assert.Equal(t, src.TreeNumber, got[i].Number)
+			assert.Equal(t, src.Number, got[i].Number)
 			assert.Equal(t, src.Latitude, got[i].Latitude)
 			assert.Equal(t, src.Longitude, got[i].Longitude)
 			assert.Equal(t, src.WateringStatus, sqlc.WateringStatus(got[i].WateringStatus))
@@ -102,7 +102,7 @@ var allTestTrees = []*sqlc.Tree{
 		WateringStatus: sqlc.WateringStatusGood,
 		Readonly:       true,
 		Description:    utils.P("Newly planted tree"),
-		TreeNumber:     "P 1234",
+		Number:         "P 1234",
 	},
 	{
 		ID:             2,
@@ -115,6 +115,6 @@ var allTestTrees = []*sqlc.Tree{
 		WateringStatus: sqlc.WateringStatusModerate,
 		Readonly:       true,
 		Description:    utils.P("Also newly planted tree"),
-		TreeNumber:     "P 2345",
+		Number:         "P 2345",
 	},
 }

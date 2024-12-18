@@ -28,7 +28,7 @@ func TestTreeRepository_Update(t *testing.T) {
 			context.Background(),
 			treeID,
 			WithSpecies(newSpecies),
-			WithTreeNumber(newNumber),
+			WithNumber(newNumber),
 			WithLatitude(newLatitude),
 			WithLongitude(newLongitude),
 			WithPlantingYear(newPlantingYear),

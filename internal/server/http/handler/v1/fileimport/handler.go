@@ -203,10 +203,10 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*d
 		return nil, errorhandler.HandleError(errors.New("invalid 'Straße' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
-	treeNumberIdx := headerIndexMap[expectedCSVHeaders[2]]
-	treeNumber := row[treeNumberIdx]
+	numberIdx := headerIndexMap[expectedCSVHeaders[2]]
+	number := row[numberIdx]
 
-	if treeNumber == "" {
+	if number == "" {
 		return nil, errorhandler.HandleError(errors.New("invalid 'BaumNr.' value at row: " + strconv.Itoa(rowIdx)))
 	}
 
@@ -241,7 +241,7 @@ func parseRowToTree(rowIdx int, row []string, headerIndexMap map[string]int) (*d
 
 	tree := &domain.TreeImport{
 		Area:         area,
-		Number:       treeNumber,
+		Number:       number,
 		Species:      species,
 		Latitude:     latitude,
 		Longitude:    longitude,

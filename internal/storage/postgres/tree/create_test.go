@@ -58,7 +58,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		// when
 		got, err := r.Create(context.Background(),
 			WithSpecies("Oak"),
-			WithTreeNumber("T001"),
+			WithNumber("T001"),
 			WithPlantingYear(2023),
 			WithLatitude(54.801539),
 			WithLongitude(9.446741),
@@ -174,7 +174,7 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		// when
 		tree, createErr := r.CreateAndLinkImages(context.Background(),
 			WithSpecies("Oak"),
-			WithTreeNumber("T001"),
+			WithNumber("T001"),
 			WithLatitude(54.801539),
 			WithLongitude(9.446741),
 			WithPlantingYear(2023),
@@ -220,7 +220,7 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		// when
 		tree, createErr := r.CreateAndLinkImages(context.Background(),
 			WithSpecies("Oak"),
-			WithTreeNumber("T001"),
+			WithNumber("T001"),
 			WithLatitude(54.801539),
 			WithLongitude(9.446741),
 			WithPlantingYear(2023),

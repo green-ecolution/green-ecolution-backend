@@ -14,7 +14,7 @@ type TreeResponse struct {
 	Readonly       bool           `json:"readonly"`
 	PlantingYear   int32          `json:"planting_year"`
 	Species        string         `json:"species"`
-	Number         string         `json:"tree_number"`
+	Number         string         `json:"number"`
 	Latitude       float64        `json:"latitude"`
 	Longitude      float64        `json:"longitude"`
 	WateringStatus WateringStatus `json:"watering_status"`
@@ -31,7 +31,7 @@ type TreeCreateRequest struct {
 	Readonly      bool    `json:"readonly"`
 	PlantingYear  int32   `json:"planting_year"`
 	Species       string  `json:"species"`
-	Number        string  `json:"tree_number"`
+	Number        string  `json:"number"`
 	Latitude      float64 `json:"latitude"`
 	Longitude     float64 `json:"longitude"`
 	SensorID      *string `json:"sensor_id" validate:"optional"`
@@ -43,7 +43,7 @@ type TreeUpdateRequest struct {
 	Readonly      bool    `json:"readonly"`
 	PlantingYear  int32   `json:"planting_year"`
 	Species       string  `json:"species"`
-	Number        string  `json:"tree_number"`
+	Number        string  `json:"number"`
 	Latitude      float64 `json:"latitude"`
 	Longitude     float64 `json:"longitude"`
 	SensorID      *string `json:"sensor_id" validate:"optional"`

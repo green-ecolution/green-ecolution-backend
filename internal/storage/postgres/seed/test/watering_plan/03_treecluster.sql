@@ -24,7 +24,7 @@ VALUES
     ('sensor-4', 'online', 54.82078826498143, 9.489684366114483, ST_SetSRID(ST_MakePoint(54.82078826498143, 9.489684366114483), 4326));
 
 
-INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, tree_number, latitude, longitude, geometry, readonly, watering_status, description)
+INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, readonly, watering_status, description)
 VALUES 
   (1, 1, 'sensor-1', 2021, 'Quercus robur', 1005, 54.82124518093376, 9.485702120628517, ST_SetSRID(ST_MakePoint(54.82124518093376, 9.485702120628517), 4326), true, 'unknown', 'Dieser Baum wurde im August das lezte mal gestuzt'),
   (2, 1, NULL, 2022, 'Quercus robur', 1006, 54.8215076622281, 9.487153277881877, ST_SetSRID(ST_MakePoint(54.8215076622281, 9.487153277881877), 4326), true, 'good', ''),
