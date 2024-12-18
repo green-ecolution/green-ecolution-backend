@@ -299,6 +299,29 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.EqualError(t, err, "500: Failed to create watering plan")
 	})
 
+	t.Run("should return validation error when TreeClusterIDs contains nil pointers", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+	
+		newWateringPlan := &entities.WateringPlanCreate{
+			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description:    "New watering plan with nil TreeClusterIDs",
+			TransporterID:  utils.P(int32(2)),
+			TreeClusterIDs: []*int32{nil, nil},
+		}
+	
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+	
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+
 	t.Run("should return validation error on empty date", func(t *testing.T) {
 		// given
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
@@ -599,6 +622,29 @@ func TestWateringPlanService_Update(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, "500: failed to update watering plan")
+	})
+
+	t.Run("should return validation error when TreeClusterIDs contains nil pointers", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+	
+		updatedWateringPlan := &entities.WateringPlanUpdate{
+			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
+			Description:    "New watering plan with nil TreeClusterIDs",
+			TransporterID:  utils.P(int32(2)),
+			TreeClusterIDs: []*int32{nil, nil},
+		}
+	
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+	
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
 	})
 
 	t.Run("should return validation error on empty date", func(t *testing.T) {
