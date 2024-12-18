@@ -46,10 +46,10 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			}
 
 			// assert treecluster
-			assert.Len(t, allTestWateringPlans[i].Treecluster, len(wp.Treecluster))
-			for j, tc := range wp.Treecluster {
-				assert.Equal(t, allTestWateringPlans[i].Treecluster[j].ID, tc.ID)
-				assert.Equal(t, allTestWateringPlans[i].Treecluster[j].Name, tc.Name)
+			assert.Len(t, allTestWateringPlans[i].TreeClusters, len(wp.TreeClusters))
+			for j, tc := range wp.TreeClusters {
+				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].ID, tc.ID)
+				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].Name, tc.Name)
 			}
 
 			// TODO: assert user
@@ -113,10 +113,10 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].Trailer.Type, got.Trailer.Type)
 
 		// assert treecluster
-		assert.Len(t, got.Treecluster, 2)
-		for i, tc := range got.Treecluster {
-			assert.Equal(t, allTestWateringPlans[0].Treecluster[i].ID, tc.ID)
-			assert.Equal(t, allTestWateringPlans[0].Treecluster[i].Name, tc.Name)
+		assert.Len(t, got.TreeClusters, 2)
+		for i, tc := range got.TreeClusters {
+			assert.Equal(t, allTestWateringPlans[0].TreeClusters[i].ID, tc.ID)
+			assert.Equal(t, allTestWateringPlans[0].TreeClusters[i].Name, tc.Name)
 		}
 
 		// TODO: assert user
@@ -147,10 +147,10 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Nil(t, got.Trailer)
 
 		// assert treecluster
-		assert.Len(t, got.Treecluster, 1)
-		for i, tc := range got.Treecluster {
-			assert.Equal(t, allTestWateringPlans[1].Treecluster[i].ID, tc.ID)
-			assert.Equal(t, allTestWateringPlans[1].Treecluster[i].Name, tc.Name)
+		assert.Len(t, got.TreeClusters, 1)
+		for i, tc := range got.TreeClusters {
+			assert.Equal(t, allTestWateringPlans[1].TreeClusters[i].ID, tc.ID)
+			assert.Equal(t, allTestWateringPlans[1].TreeClusters[i].Name, tc.Name)
 		}
 
 		// TODO: assert user
@@ -409,7 +409,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
-		Treecluster:        allTestClusters[0:2],
+		TreeClusters:        allTestClusters[0:2],
 	},
 	{
 		ID:                 2,
@@ -420,7 +420,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		Treecluster:        allTestClusters[2:3],
+		TreeClusters:        allTestClusters[2:3],
 	},
 	{
 		ID:                 3,
@@ -431,7 +431,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		Treecluster:        allTestClusters[0:3],
+		TreeClusters:        allTestClusters[0:3],
 	},
 	{
 		ID:                 4,
@@ -442,7 +442,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		Treecluster:        allTestClusters[2:3],
+		TreeClusters:        allTestClusters[2:3],
 	},
 	{
 		ID:                 5,
@@ -452,7 +452,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
-		Treecluster:        allTestClusters[2:3],
+		TreeClusters:        allTestClusters[2:3],
 	},
 }
 

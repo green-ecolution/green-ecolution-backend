@@ -18,7 +18,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            TestVehicles[0],
-			Treecluster:        TestClusters[0:2],
+			TreeClusters:        TestClusters[0:2],
 		},
 		{
 			ID:                 2,
@@ -29,7 +29,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            TestVehicles[0],
-			Treecluster:        TestClusters[2:3],
+			TreeClusters:        TestClusters[2:3],
 		},
 		{
 			ID:                 3,
@@ -40,7 +40,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
-			Treecluster:        TestClusters[0:3],
+			TreeClusters:        TestClusters[0:3],
 		},
 		{
 			ID:                 4,
@@ -51,7 +51,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
-			Treecluster:        TestClusters[2:3],
+			TreeClusters:        TestClusters[2:3],
 		},
 		{
 			ID:                 5,
@@ -62,7 +62,7 @@ var (
 			TotalWaterRequired: utils.P(6000.0),
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
-			Treecluster:        TestClusters[2:3],
+			TreeClusters:        TestClusters[2:3],
 		},
 	}
 	TestVehicles = []*entities.Vehicle{
@@ -147,6 +147,6 @@ var (
 		Description:    "New watering plan for the west side of the city",
 		TransporterID:  utils.P(int32(1)),
 		TrailerID:      utils.P(int32(2)),
-		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+		TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 )

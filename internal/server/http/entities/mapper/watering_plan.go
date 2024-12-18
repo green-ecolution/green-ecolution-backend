@@ -10,7 +10,7 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
 // goverter:extend MapWateringPlanStatus MapVehicleStatus MapVehicleType MapDrivingLicense
 type WateringPlanHTTPMapper interface {
-	// goverter:ignore Users Treecluster
+	// goverter:ignore Users TreeClusters
 	FromResponse(*domain.WateringPlan) *entities.WateringPlanResponse
 	FromResponseList([]*domain.WateringPlan) []*entities.WateringPlanResponse
 	FromCreateRequest(*entities.WateringPlanCreateRequest) *domain.WateringPlanCreate

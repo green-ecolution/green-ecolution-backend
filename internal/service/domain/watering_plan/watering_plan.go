@@ -58,7 +58,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	// TODO: calculate required water
 	// TODO: calculare distance
 
-	clusters, err := w.getTreeClusters(ctx, createWp.TreeclusterIDs)
+	clusters, err := w.getTreeClusters(ctx, createWp.TreeClusterIDs)
 	if err != nil {
 		return nil, handleError(err)
 	}
@@ -84,7 +84,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.Description = createWp.Description
 		wp.Transporter = transporter
 		wp.Trailer = trailer
-		wp.Treecluster = clusters
+		wp.TreeClusters = clusters
 
 		return true, nil
 	})
@@ -105,7 +105,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	// TODO: calculate required water
 	// TODO: calculare distance
 
-	clusters, err := w.getTreeClusters(ctx, updateWp.TreeclusterIDs)
+	clusters, err := w.getTreeClusters(ctx, updateWp.TreeClusterIDs)
 	if err != nil {
 		return nil, handleError(err)
 	}

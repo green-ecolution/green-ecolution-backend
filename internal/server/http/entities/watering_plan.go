@@ -23,7 +23,7 @@ type WateringPlanResponse struct {
 	Distance           *float64               `json:"distance"`
 	TotalWaterRequired *float64               `json:"total_water_required"`
 	Users              []*UserResponse        `json:"users"`
-	Treecluster        []*TreeClusterResponse `json:"treecluster"`
+	TreeClusters        []*TreeClusterResponse `json:"treeclusters"`
 	Transporter        *VehicleResponse       `json:"transporter"`
 	Trailer            *VehicleResponse       `json:"trailer" validate:"optional"`
 } // @Name WateringPlan
@@ -36,7 +36,7 @@ type WateringPlanListResponse struct {
 type WateringPlanCreateRequest struct {
 	Date           time.Time `json:"date"`
 	Description    string    `json:"description"`
-	TreeclusterIDs []*int32  `json:"tree_cluster_ids"`
+	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
 	TransporterID  *int32    `json:"transporter_id"`
 	TrailerID      *int32    `json:"trailer_id"`
 	Users          []*int32  `json:"users_ids"`
@@ -45,7 +45,7 @@ type WateringPlanCreateRequest struct {
 type WateringPlanUpdateRequest struct {
 	Date           time.Time `json:"date"`
 	Description    string    `json:"description"`
-	TreeclusterIDs []*int32  `json:"tree_cluster_ids"`
+	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
 	TransporterID  *int32    `json:"transporter_id"`
 	TrailerID      *int32    `json:"trailer_id"`
 	Users          []*int32  `json:"users_ids"`

@@ -25,7 +25,7 @@ type WateringPlan struct {
 	Distance           *float64
 	TotalWaterRequired *float64
 	Users              []*User
-	Treecluster        []*TreeCluster
+	TreeClusters        []*TreeCluster
 	Transporter        *Vehicle
 	Trailer            *Vehicle
 }
@@ -33,7 +33,7 @@ type WateringPlan struct {
 type WateringPlanCreate struct {
 	Date           time.Time `validate:"required"`
 	Description    string
-	TreeclusterIDs []*int32 `validate:"required"`
+	TreeClusterIDs []*int32 `validate:"required"`
 	TransporterID  *int32   `validate:"required"`
 	TrailerID      *int32
 	// Users           []*int32
@@ -42,7 +42,7 @@ type WateringPlanCreate struct {
 type WateringPlanUpdate struct {
 	Date           time.Time `validate:"required"`
 	Description    string
-	TreeclusterIDs []*int32 `validate:"required"`
+	TreeClusterIDs []*int32 `validate:"required"`
 	TransporterID  *int32   `validate:"required"`
 	TrailerID      *int32
 	// Users           []*int32

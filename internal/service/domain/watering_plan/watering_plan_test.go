@@ -116,7 +116,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		Description:    "New watering plan",
 		TransporterID:  utils.P(int32(2)),
 		TrailerID:      utils.P(int32(1)),
-		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+		TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully create a new watering plan", func(t *testing.T) {
@@ -166,7 +166,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 			Description:    "New watering plan",
 			TransporterID:  utils.P(int32(2)),
-			TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
 
 		// check treecluster
@@ -367,7 +367,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		Description:    "New watering plan for the east side of the city",
 		TransporterID:  utils.P(int32(2)),
 		TrailerID:      utils.P(int32(1)),
-		TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+		TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 	}
 
 	t.Run("should successfully update a watering plan", func(t *testing.T) {
@@ -423,7 +423,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 			Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 			Description:    "New watering plan for the east side of the city",
 			TransporterID:  utils.P(int32(2)),
-			TreeclusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
 
 		// check treecluster
@@ -722,7 +722,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
-		Treecluster:        allTestClusters[0:2],
+		TreeClusters:        allTestClusters[0:2],
 	},
 	{
 		ID:                 2,
@@ -733,7 +733,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
-		Treecluster:        allTestClusters[2:3],
+		TreeClusters:        allTestClusters[2:3],
 	},
 	{
 		ID:                 3,
@@ -744,7 +744,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		Treecluster:        allTestClusters[0:3],
+		TreeClusters:        allTestClusters[0:3],
 	},
 	{
 		ID:                 4,
@@ -755,7 +755,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		Treecluster:        allTestClusters[2:3],
+		TreeClusters:        allTestClusters[2:3],
 	},
 	{
 		ID:                 5,
@@ -766,7 +766,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
-		Treecluster:        allTestClusters[2:3],
+		TreeClusters:        allTestClusters[2:3],
 	},
 }
 
