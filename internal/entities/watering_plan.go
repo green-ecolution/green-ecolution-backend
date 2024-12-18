@@ -21,7 +21,7 @@ type WateringPlan struct {
 	UpdatedAt          time.Time
 	Date               time.Time
 	Description        string
-	WateringPlanStatus WateringPlanStatus
+	Status             WateringPlanStatus
 	Distance           *float64
 	TotalWaterRequired *float64
 	Users              []*User

@@ -33,7 +33,7 @@ func TestWateringPlanMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.Description, got.Description)
 		assert.Equal(t, src.Distance, got.Distance)
 		assert.Equal(t, src.TotalWaterRequired, got.TotalWaterRequired)
-		assert.Equal(t, src.WateringPlanStatus, sqlc.WateringPlanStatus(got.WateringPlanStatus))
+		assert.Equal(t, src.Status, sqlc.WateringPlanStatus(got.Status))
 	})
 
 	t.Run("should return nil for nil input", func(t *testing.T) {
@@ -72,7 +72,7 @@ func TestWateringPlanMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.Description, got[i].Description)
 			assert.Equal(t, src.Distance, got[i].Distance)
 			assert.Equal(t, src.TotalWaterRequired, got[i].TotalWaterRequired)
-			assert.Equal(t, src.WateringPlanStatus, sqlc.WateringPlanStatus(got[i].WateringPlanStatus))
+			assert.Equal(t, src.Status, sqlc.WateringPlanStatus(got[i].Status))
 		}
 	})
 
@@ -96,7 +96,7 @@ var allTestWateringPlans = []*sqlc.WateringPlan{
 			Valid: true,
 		},
 		Description:        "New watering plan for the west side of the city",
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
@@ -107,7 +107,7 @@ var allTestWateringPlans = []*sqlc.WateringPlan{
 			Valid: true,
 		},
 		Description:        "New watering plan for the east side of the city",
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusActive),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusActive),
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
@@ -118,7 +118,7 @@ var allTestWateringPlans = []*sqlc.WateringPlan{
 			Valid: true,
 		},
 		Description:        "Very important watering plan due to no rainfall",
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusFinished),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusFinished),
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
@@ -129,7 +129,7 @@ var allTestWateringPlans = []*sqlc.WateringPlan{
 			Valid: true,
 		},
 		Description:        "New watering plan for the south side of the city",
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusNotCompeted),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusNotCompeted),
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
@@ -140,7 +140,7 @@ var allTestWateringPlans = []*sqlc.WateringPlan{
 			Valid: true,
 		},
 		Description:        "Canceled due to flood",
-		WateringPlanStatus: sqlc.WateringPlanStatus(entities.WateringPlanStatusCanceled),
+		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusCanceled),
 		Distance:           utils.P(63.0),
 		TotalWaterRequired: utils.P(6000.0),
 	},
