@@ -9,7 +9,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/vehicle"
 )
 
 type VehicleService struct {
@@ -51,29 +50,31 @@ func (v *VehicleService) GetByPlate(ctx context.Context, plate string) (*entitie
 	return got, nil
 }
 
-func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate) (*entities.Vehicle, error) {
-	if err := v.validator.Struct(vh); err != nil {
+func (v *VehicleService) Create(ctx context.Context, createData *entities.VehicleCreate) (*entities.Vehicle, error) {
+	if err := v.validator.Struct(createData); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
+	if isTaken, err := v.isVehicleNumberPlateTaken(ctx, createData.NumberPlate); err != nil {
 		return nil, err
 	} else if isTaken {
 		return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
 	}
 
-	created, err := v.vehicleRepo.Create(ctx,
-		vehicle.WithNumberPlate(vh.NumberPlate),
-		vehicle.WithDescription(vh.Description),
-		vehicle.WithWaterCapacity(vh.WaterCapacity),
-		vehicle.WithVehicleStatus(vh.Status),
-		vehicle.WithVehicleType(vh.Type),
-		vehicle.WithHeight(vh.Height),
-		vehicle.WithLength(vh.Length),
-		vehicle.WithModel(vh.Model),
-		vehicle.WithWidth(vh.Width),
-		vehicle.WithDrivingLicense(vh.DrivingLicense),
-	)
+	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
+		vh.NumberPlate = createData.NumberPlate
+		vh.Description = createData.Description
+		vh.WaterCapacity = createData.WaterCapacity
+		vh.Status = createData.Status
+		vh.Type = createData.Type
+		vh.Height = createData.Height
+		vh.Length = createData.Length
+		vh.Width = createData.Width
+		vh.Model = createData.Model
+		vh.DrivingLicense = createData.DrivingLicense
+
+		return true, nil
+	})
 
 	if err != nil {
 		return nil, handleError(err)
@@ -82,8 +83,8 @@ func (v *VehicleService) Create(ctx context.Context, vh *entities.VehicleCreate)
 	return created, nil
 }
 
-func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.VehicleUpdate) (*entities.Vehicle, error) {
-	if err := v.validator.Struct(vh); err != nil {
+func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entities.VehicleUpdate) (*entities.Vehicle, error) {
+	if err := v.validator.Struct(updateData); err != nil {
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
@@ -92,32 +93,34 @@ func (v *VehicleService) Update(ctx context.Context, id int32, vh *entities.Vehi
 		return nil, handleError(err)
 	}
 
-	if oldValue.NumberPlate != vh.NumberPlate {
-		if isTaken, err := v.isVehicleNumberPlateTaken(ctx, vh.NumberPlate); err != nil {
+	if oldValue.NumberPlate != updateData.NumberPlate {
+		if isTaken, err := v.isVehicleNumberPlateTaken(ctx, updateData.NumberPlate); err != nil {
 			return nil, err
 		} else if isTaken {
 			return nil, service.NewError(service.BadRequest, errors.New("Number plate is already taken").Error())
 		}
 	}
 
-	updated, err := v.vehicleRepo.Update(ctx,
-		id,
-		vehicle.WithNumberPlate(vh.NumberPlate),
-		vehicle.WithDescription(vh.Description),
-		vehicle.WithWaterCapacity(vh.WaterCapacity),
-		vehicle.WithVehicleStatus(vh.Status),
-		vehicle.WithVehicleType(vh.Type),
-		vehicle.WithHeight(vh.Height),
-		vehicle.WithLength(vh.Length),
-		vehicle.WithModel(vh.Model),
-		vehicle.WithWidth(vh.Width),
-		vehicle.WithDrivingLicense(vh.DrivingLicense),
-	)
+	err = v.vehicleRepo.Update(ctx, id, func(vh *entities.Vehicle) (bool, error) {
+		vh.NumberPlate = updateData.NumberPlate
+		vh.Description = updateData.Description
+		vh.WaterCapacity = updateData.WaterCapacity
+		vh.Status = updateData.Status
+		vh.Type = updateData.Type
+		vh.Height = updateData.Height
+		vh.Length = updateData.Length
+		vh.Width = updateData.Width
+		vh.Model = updateData.Model
+		vh.DrivingLicense = updateData.DrivingLicense
+
+		return true, nil
+	})
+
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	return updated, nil
+	return v.GetByID(ctx, id)
 }
 
 func (v *VehicleService) Delete(ctx context.Context, id int32) error {
