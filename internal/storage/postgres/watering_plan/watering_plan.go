@@ -56,7 +56,7 @@ func WithDescription(description string) entities.EntityFunc[entities.WateringPl
 	}
 }
 
-func WithWateringPlanStatus(status entities.WateringPlanStatus) entities.EntityFunc[entities.WateringPlan] {
+func WithStatus(status entities.WateringPlanStatus) entities.EntityFunc[entities.WateringPlan] {
 	return func(wp *entities.WateringPlan) {
 		slog.Debug("updating watering plan status", "watering plan status", status)
 		wp.Status = status
