@@ -74,7 +74,7 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
 	var err error
 
-	wp.Treecluster, err = w.GetLinkedTreeClustersByID(ctx, wp.ID)
+	wp.TreeClusters, err = w.GetLinkedTreeClustersByID(ctx, wp.ID)
 	if err != nil {
 		return w.store.HandleError(err)
 	}

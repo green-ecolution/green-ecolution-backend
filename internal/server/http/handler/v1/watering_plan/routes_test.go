@@ -1,4 +1,4 @@
-package vehicle_test
+package wateringplan_test
 
 import (
 	"bytes"
@@ -8,22 +8,22 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
+	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/watering_plan"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestRegisterRoutes(t *testing.T) {
-	t.Run("/v1/vehicle", func(t *testing.T) {
+	t.Run("/v1/watering-plan", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
-			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 			app := fiber.New()
-			vehicle.RegisterRoutes(app, mockVehicleService)
+			wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-			mockVehicleService.EXPECT().GetAll(
+			mockWateringPlanService.EXPECT().GetAll(
 				mock.Anything,
-			).Return(TestVehicles, nil)
+			).Return(TestWateringPlans, nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
@@ -36,17 +36,17 @@ func TestRegisterRoutes(t *testing.T) {
 		})
 
 		t.Run("should call POST handler", func(t *testing.T) {
-			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 			app := fiber.New()
-			vehicle.RegisterRoutes(app, mockVehicleService)
+			wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-			mockVehicleService.EXPECT().Create(
+			mockWateringPlanService.EXPECT().Create(
 				mock.Anything,
-				mock.AnythingOfType("*entities.VehicleCreate"),
-			).Return(TestVehicle, nil)
+				mock.AnythingOfType("*entities.WateringPlanCreate"),
+			).Return(TestWateringPlans[0], nil)
 
 			// when
-			body, _ := json.Marshal(TestVehicleRequest)
+			body, _ := json.Marshal(TestWateringPlanRequest)
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPost, "/", bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 
@@ -58,16 +58,16 @@ func TestRegisterRoutes(t *testing.T) {
 		})
 	})
 
-	t.Run("/v1/vehicle/:id", func(t *testing.T) {
+	t.Run("/v1/watering-plan/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
-			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 			app := fiber.New()
-			vehicle.RegisterRoutes(app, mockVehicleService)
+			wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-			mockVehicleService.EXPECT().GetByID(
+			mockWateringPlanService.EXPECT().GetByID(
 				mock.Anything,
 				int32(1),
-			).Return(TestVehicle, nil)
+			).Return(TestWateringPlans[0], nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/1", nil)
@@ -80,18 +80,18 @@ func TestRegisterRoutes(t *testing.T) {
 		})
 
 		t.Run("should call PUT handler", func(t *testing.T) {
-			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 			app := fiber.New()
-			vehicle.RegisterRoutes(app, mockVehicleService)
+			wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-			mockVehicleService.EXPECT().Update(
+			mockWateringPlanService.EXPECT().Update(
 				mock.Anything,
 				int32(1),
 				mock.Anything,
-			).Return(TestVehicle, nil)
+			).Return(TestWateringPlans[0], nil)
 
 			// when
-			body, _ := json.Marshal(TestVehicleRequest)
+			body, _ := json.Marshal(TestWateringPlanRequest)
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodPut, "/1", bytes.NewBuffer(body))
 			req.Header.Set("Content-Type", "application/json")
 
@@ -103,11 +103,11 @@ func TestRegisterRoutes(t *testing.T) {
 		})
 
 		t.Run("should call DELETE handler", func(t *testing.T) {
-			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
 			app := fiber.New()
-			vehicle.RegisterRoutes(app, mockVehicleService)
+			wateringplan.RegisterRoutes(app, mockWateringPlanService)
 
-			mockVehicleService.EXPECT().Delete(
+			mockWateringPlanService.EXPECT().Delete(
 				mock.Anything,
 				int32(1),
 			).Return(nil)

@@ -49,7 +49,7 @@ FROM tree_clusters tc
 JOIN tree_cluster_watering_plans tcwp ON tc.id = tcwp.tree_cluster_id
 WHERE tcwp.watering_plan_id = $1;
 
--- name: SetTreeclusterToWateringPlan :exec
+-- name: SetTreeClusterToWateringPlan :exec
 INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id)
 VALUES ($1, $2);
 

@@ -164,6 +164,78 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 	})
 }
 
+func TestTreeClusterRepository_GetByIDs(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+
+	t.Run("should return tree clusters by ids", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		ids := []int32{1, 2}
+
+		// when
+		got, err := r.GetByIDs(context.Background(), ids)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.Len(t, got, 2)
+
+		for i, cluster := range got {
+			assert.Equal(t, allTestCluster[i].ID, cluster.ID)
+			assert.Equal(t, allTestCluster[i].Name, cluster.Name)
+
+			// assert region
+			if allTestCluster[i].RegionID == -1 {
+				assert.Nil(t, cluster.Region)
+				assert.NoError(t, err)
+			} else {
+				assert.NotNil(t, cluster.Region)
+				assert.Equal(t, allTestCluster[i].RegionID, cluster.Region.ID)
+			}
+
+			// assert trees
+			assert.Len(t, cluster.Trees, len(allTestCluster[i].TreeIDs))
+			if len(allTestCluster[i].TreeIDs) == 0 {
+				assert.Empty(t, cluster.Trees)
+			}
+
+			for j, tree := range cluster.Trees {
+				assert.NotZero(t, tree)
+				assert.Equal(t, allTestCluster[i].TreeIDs[j], tree.ID)
+			}
+		}
+	})
+
+	t.Run("should return empty list if no trees are found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		ids := []int32{99, 100, -1, 0}
+
+		// when
+		got, err := r.GetByIDs(context.Background(), ids)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		trees, err := r.GetByIDs(ctx, []int32{1, 2})
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, trees)
+	})
+}
+
 func TestTreeClusterRepository_GetRegionByTreeClusterID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")

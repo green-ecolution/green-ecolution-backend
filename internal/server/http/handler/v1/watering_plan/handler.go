@@ -1,8 +1,7 @@
-package vehicle
+package wateringplan
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -13,26 +12,28 @@ import (
 )
 
 var (
-	vehicleMapper = generated.VehicleHTTPMapperImpl{}
+	wateringPlanMapper = generated.WateringPlanHTTPMapperImpl{}
+	treeClusterMapper  = generated.TreeClusterHTTPMapperImpl{}
+	treeMapper         = generated.TreeHTTPMapperImpl{}
 )
 
-// @Summary		Get all vehicles
-// @Description	Get all vehicles
-// @Id				get-all-vehicles
-// @Tags			Vehicle
+// @Summary		Get all watering plans
+// @Description	Get all watering plans
+// @Id				get-all-watering-plans
+// @Tags			Watering Plan
 // @Produce		json
-// @Success		200	{object}	entities.VehicleListResponse
+// @Success		200	{object}	entities.WateringPlanListResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle [get]
+// @Router			/v1/watering-plan [get]
 // @Param			page	query	string	false	"Page"
 // @Param			limit	query	string	false	"Limit"
 // @Param			status	query	string	false	"Status"
 // @Security		Keycloak
-func GetAllVehicles(svc service.VehicleService) fiber.Handler {
+func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		domainData, err := svc.GetAll(ctx)
@@ -40,33 +41,33 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := make([]*entities.VehicleResponse, len(domainData))
+		data := make([]*entities.WateringPlanResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = mapVehicleToDto(domain)
+			data[i] = mapWateringPlanToDto(domain)
 		}
 
-		return c.JSON(entities.VehicleListResponse{
+		return c.JSON(entities.WateringPlanListResponse{
 			Data:       data,
 			Pagination: &entities.Pagination{}, // TODO: Handle pagination
 		})
 	}
 }
 
-// @Summary		Get vehicle by ID
-// @Description	Get vehicle by ID
-// @Id				get-vehicle-by-id
-// @Tags			Vehicle
+// @Summary		Get watering plan by ID
+// @Description	Get watering plan by ID
+// @Id				get-watering-plan-by-id
+// @Tags			Watering Plan
 // @Produce		json
-// @Success		200	{object}	entities.VehicleResponse
+// @Success		200	{object}	entities.WateringPlanResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle/{id} [get]
-// @Param			id	path	string	true	"Vehicle ID"
+// @Router			/v1/watering-plan/{id} [get]
+// @Param			id	path	string	true	"Watering Plan ID"
 // @Security		Keycloak
-func GetVehicleByID(svc service.VehicleService) fiber.Handler {
+func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
@@ -81,95 +82,62 @@ func GetVehicleByID(svc service.VehicleService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapVehicleToDto(domainData)
+		data := mapWateringPlanToDto(domainData)
+
 		return c.JSON(data)
 	}
 }
 
-// @Summary		Get vehicle by plate
-// @Description	Get vehicle by plate
-// @Id				get-vehicle-by-plate
-// @Tags			Vehicle
+// @Summary		Create watering plan
+// @Description	Create watering plan
+// @Id				create-watering-plan
+// @Tags			Watering Plan
 // @Produce		json
-// @Success		200	{object}	entities.VehicleResponse
+// @Success		201	{object}	entities.WateringPlanResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle/plate/{plate} [get]
-// @Param			plate	path	string	true	"Vehicle plate number"
+// @Router			/v1/watering-plan [post]
+// @Param			body	body	entities.WateringPlanCreateRequest	true	"Watering Plan Create Request"
 // @Security		Keycloak
-func GetVehicleByPlate(svc service.VehicleService) fiber.Handler {
+func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		plate := strings.Clone(c.Params("plate"))
-		if plate == "" {
-			err := service.NewError(service.BadRequest, "invalid Plate format")
-			return errorhandler.HandleError(err)
-		}
-
-		domainData, err := svc.GetByPlate(ctx, plate)
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		data := mapVehicleToDto(domainData)
-		return c.JSON(data)
-	}
-}
-
-// @Summary		Create vehicle
-// @Description	Create vehicle
-// @Id				create-vehicle
-// @Tags			Vehicle
-// @Produce		json
-// @Success		201	{object}	entities.VehicleResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle [post]
-// @Param			body	body	entities.VehicleCreateRequest	true	"Vehicle Create Request"
-// @Security		Keycloak
-func CreateVehicle(svc service.VehicleService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-
-		var req entities.VehicleCreateRequest
+		var req entities.WateringPlanCreateRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		domainReq := vehicleMapper.FromCreateRequest(&req)
+		domainReq := wateringPlanMapper.FromCreateRequest(&req)
 		domainData, err := svc.Create(ctx, domainReq)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapVehicleToDto(domainData)
+		data := mapWateringPlanToDto(domainData)
 		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
 
-// @Summary		Update vehicle
-// @Description	Update vehicle
-// @Id				update-vehicle
-// @Tags			Vehicle
+// @Summary		Update watering plan
+// @Description	Update watering plan
+// @Id				update-watering-plan
+// @Tags			Watering Plan
 // @Produce		json
-// @Success		200	{object}	entities.VehicleResponse
+// @Success		200	{object}	entities.WateringPlanResponse
 // @Failure		400	{object}	HTTPError
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle/{id} [put]
-// @Param			id		path	string							true	"Vehicle ID"
-// @Param			body	body	entities.VehicleUpdateRequest	true	"Vehicle Update Request"
+// @Router			/v1/watering-plan/{id} [put]
+// @Param			id		path	string								true	"Watering Plan ID"
+// @Param			body	body	entities.WateringPlanUpdateRequest	true	"Watering Plan Update Request"
 // @Security		Keycloak
-func UpdateVehicle(svc service.VehicleService) fiber.Handler {
+func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
@@ -178,26 +146,26 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		var req entities.VehicleUpdateRequest
+		var req entities.WateringPlanUpdateRequest
 		if err = c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		domainReq := vehicleMapper.FromUpdateRequest(&req)
+		domainReq := wateringPlanMapper.FromUpdateRequest(&req)
 		domainData, err := svc.Update(ctx, int32(id), domainReq)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapVehicleToDto(domainData)
+		data := mapWateringPlanToDto(domainData)
 		return c.JSON(data)
 	}
 }
 
-// @Summary		Delete vehicle
-// @Description	Delete vehicle
-// @Id				delete-vehicle
-// @Tags			Vehicle
+// @Summary		Delete watering plan
+// @Description	Delete watering plan
+// @Id				delete-watering-plan
+// @Tags			Watering Plan
 // @Produce		json
 // @Success		204
 // @Failure		400	{object}	HTTPError
@@ -205,10 +173,10 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/vehicle/{id} [delete]
-// @Param			id	path	string	true	"Vehicle ID"
+// @Router			/v1/watering-plan/{id} [delete]
+// @Param			id	path	string	true	"Watering Plan ID"
 // @Security		Keycloak
-func DeleteVehicle(svc service.VehicleService) fiber.Handler {
+func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
@@ -226,8 +194,20 @@ func DeleteVehicle(svc service.VehicleService) fiber.Handler {
 	}
 }
 
-func mapVehicleToDto(v *domain.Vehicle) *entities.VehicleResponse {
-	dto := vehicleMapper.FromResponse(v)
+func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanResponse {
+	dto := wateringPlanMapper.FromResponse(wp)
+
+	// Map each tree cluster and its trees
+	dto.TreeClusters = make([]*entities.TreeClusterResponse, len(wp.TreeClusters))
+	for i, tc := range wp.TreeClusters {
+		mappedCluster := treeClusterMapper.FromResponse(tc)
+		mappedCluster.Trees = treeMapper.FromResponseList(tc.Trees)
+
+		dto.TreeClusters[i] = mappedCluster
+	}
+
+	// TODO: map correct users
+	dto.Users = []*entities.UserResponse{}
 
 	return dto
 }

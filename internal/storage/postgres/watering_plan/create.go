@@ -19,7 +19,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		TotalWaterRequired: utils.P(0.0),
 		Status:             entities.WateringPlanStatusPlanned,
 		Users:              make([]*entities.User, 0),
-		Treecluster:        make([]*entities.TreeCluster, 0),
+		TreeClusters:       make([]*entities.TreeCluster, 0),
 		Transporter:        nil,
 		Trailer:            nil,
 	}
@@ -113,11 +113,12 @@ func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringP
 		return errors.New("trailer vehicle requires a vehicle of type trailer")
 	}
 
-	if len(entity.Users) == 0 {
-		return errors.New("watering plan requires employees")
-	}
+	// TODO: please comment also the test cases back in as soon as the empoyees are ready
+	// if len(entity.Users) == 0 {
+	// 	return errors.New("watering plan requires employees")
+	// }
 
-	if len(entity.Treecluster) == 0 {
+	if len(entity.TreeClusters) == 0 {
 		return errors.New("watering plan requires tree cluster")
 	}
 
@@ -149,8 +150,8 @@ func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *
 }
 
 func (w *WateringPlanRepository) setLinkedTreeClusters(ctx context.Context, entity *entities.WateringPlan, id int32) error {
-	for _, tc := range entity.Treecluster {
-		err := w.store.SetTreeclusterToWateringPlan(ctx, &sqlc.SetTreeclusterToWateringPlanParams{
+	for _, tc := range entity.TreeClusters {
+		err := w.store.SetTreeClusterToWateringPlan(ctx, &sqlc.SetTreeClusterToWateringPlanParams{
 			WateringPlanID: id,
 			TreeClusterID:  tc.ID,
 		})

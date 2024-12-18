@@ -12,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/user"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
+	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/watering_plan"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -72,6 +73,11 @@ func (s *Server) v1(router fiber.Router, authMiddlewares ...fiber.Handler) {
 	app.Route("/vehicle", func(router fiber.Router) {
 		router.Use(authMiddleware...)
 		vehicle.RegisterRoutes(router, s.services.VehicleService)
+	})
+
+	app.Route("/watering-plan", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		wateringplan.RegisterRoutes(router, s.services.WateringPlanService)
 	})
 
 	app.Route("/import", func(router fiber.Router) {
