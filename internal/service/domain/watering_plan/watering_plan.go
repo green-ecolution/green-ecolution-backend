@@ -58,24 +58,21 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	// TODO: calculate required water
 	// TODO: calculare distance
 
-	clusters, err := w.getTreeClusters(ctx, createWp.TreeClusterIDs)
+	treeClusters, err := w.fetchTreeClusters(ctx, createWp.TreeClusterIDs)
 	if err != nil {
-		return nil, handleError(err)
-	}
-	if len(clusters) == 0 {
-		return nil, service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
+		return nil, err
 	}
 
-	transporter, err := w.getVehicle(ctx, createWp.TransporterID)
+	transporter, err := w.fetchVehicle(ctx, *createWp.TransporterID)
 	if err != nil {
-		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+		return nil, err
 	}
 
 	var trailer *entities.Vehicle
 	if createWp.TrailerID != nil {
-		trailer, err = w.getVehicle(ctx, createWp.TrailerID)
+		trailer, err = w.fetchVehicle(ctx, *createWp.TrailerID)
 		if err != nil {
-			return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+			return nil, err
 		}
 	}
 
@@ -84,7 +81,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.Description = createWp.Description
 		wp.Transporter = transporter
 		wp.Trailer = trailer
-		wp.TreeClusters = clusters
+		wp.TreeClusters = treeClusters
 
 		return true, nil
 	})
@@ -105,24 +102,21 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	// TODO: calculate required water
 	// TODO: calculare distance
 
-	clusters, err := w.getTreeClusters(ctx, updateWp.TreeClusterIDs)
+	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
 	if err != nil {
-		return nil, handleError(err)
-	}
-	if len(clusters) == 0 {
-		return nil, service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
+		return nil, err
 	}
 
-	transporter, err := w.getVehicle(ctx, updateWp.TransporterID)
+	transporter, err := w.fetchVehicle(ctx, *updateWp.TransporterID)
 	if err != nil {
-		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+		return nil, err
 	}
 
 	var trailer *entities.Vehicle
 	if updateWp.TrailerID != nil {
-		trailer, err = w.getVehicle(ctx, updateWp.TrailerID)
+		trailer, err = w.fetchVehicle(ctx, *updateWp.TrailerID)
 		if err != nil {
-			return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+			return nil, err
 		}
 	}
 
@@ -131,6 +125,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.Description = updateWp.Description
 		wp.Transporter = transporter
 		wp.Trailer = trailer
+		wp.TreeClusters = treeClusters
 
 		return true, nil
 	})
@@ -159,14 +154,25 @@ func (w *WateringPlanService) Ready() bool {
 	return w.wateringPlanRepo != nil
 }
 
-func (w *WateringPlanService) getVehicle(ctx context.Context, id *int32) (*entities.Vehicle, error) {
-	var err error
-	vehicle, err := w.vehicleRepo.GetByID(ctx, *id)
+func (w *WateringPlanService) fetchVehicle(ctx context.Context, vehicleID int32) (*entities.Vehicle, error) {
+	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
 	if err != nil {
-		return nil, err
+		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
 	}
 
 	return vehicle, nil
+}
+
+func (w *WateringPlanService) fetchTreeClusters(ctx context.Context, treeClusterIDs []*int32) ([]*entities.TreeCluster, error) {
+	clusters, err := w.getTreeClusters(ctx, treeClusterIDs)
+	if err != nil {
+		return nil, handleError(err)
+	}
+	if len(clusters) == 0 {
+		return nil, service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
+	}
+
+	return clusters, nil
 }
 
 func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32) ([]*entities.TreeCluster, error) {

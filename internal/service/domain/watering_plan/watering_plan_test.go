@@ -305,17 +305,17 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
-	
+
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 			Description:    "New watering plan with nil TreeClusterIDs",
 			TransporterID:  utils.P(int32(2)),
 			TreeClusterIDs: []*int32{nil, nil},
 		}
-	
+
 		// when
 		result, err := svc.Create(ctx, newWateringPlan)
-	
+
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
@@ -630,17 +630,17 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
-	
+
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 			Description:    "New watering plan with nil TreeClusterIDs",
 			TransporterID:  utils.P(int32(2)),
 			TreeClusterIDs: []*int32{nil, nil},
 		}
-	
+
 		// when
 		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
-	
+
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
