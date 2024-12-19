@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
@@ -81,9 +80,7 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
-
-		return c.JSON(data)
+		return c.JSON(treeClusterMapper.FromResponse(domainData))
 	}
 }
 
@@ -116,7 +113,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
+		data := treeClusterMapper.FromResponse(domainData)
 		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
@@ -156,8 +153,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
-		return c.JSON(data)
+		return c.JSON(treeClusterMapper.FromResponse(domainData))
 	}
 }
 
@@ -191,10 +187,4 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
-}
-
-func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
-	dto := treeClusterMapper.FromResponse(t)
-
-	return dto
 }
