@@ -197,15 +197,6 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanResponse {
 	dto := wateringPlanMapper.FromResponse(wp)
 
-	// Map each tree cluster and its trees
-	dto.TreeClusters = make([]*entities.TreeClusterResponse, len(wp.TreeClusters))
-	for i, tc := range wp.TreeClusters {
-		mappedCluster := treeClusterMapper.FromResponse(tc)
-		mappedCluster.Trees = treeMapper.FromResponseList(tc.Trees)
-
-		dto.TreeClusters[i] = mappedCluster
-	}
-
 	// TODO: map correct users
 	dto.Users = []*entities.UserResponse{}
 

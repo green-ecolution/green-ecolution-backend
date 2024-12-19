@@ -23,7 +23,7 @@ type WateringPlanResponse struct {
 	Distance           *float64               `json:"distance"`
 	TotalWaterRequired *float64               `json:"total_water_required"`
 	Users              []*UserResponse        `json:"users"`
-	TreeClusters       []*TreeClusterResponse `json:"treeclusters"`
+	TreeClusters       []*TreeClusterInListResponse `json:"treeclusters"`
 	Transporter        *VehicleResponse       `json:"transporter"`
 	Trailer            *VehicleResponse       `json:"trailer" validate:"optional"`
 } // @Name WateringPlan

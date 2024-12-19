@@ -40,9 +40,9 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := make([]*entities.TreeClusterResponse, len(domainData))
+		data := make([]*entities.TreeClusterInListResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = mapTreeClusterToDto(domain)
+			data[i] = treeClusterMapper.FromInListResponse(domain)
 		}
 
 		return c.JSON(entities.TreeClusterListResponse{
@@ -195,15 +195,6 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 
 func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
 	dto := treeClusterMapper.FromResponse(t)
-
-	if t.Region != nil {
-		dto.Region = &entities.RegionResponse{
-			ID:   t.Region.ID,
-			Name: t.Region.Name,
-		}
-	}
-
-	dto.Trees = treeMapper.FromResponseList(t.Trees)
 
 	return dto
 }
