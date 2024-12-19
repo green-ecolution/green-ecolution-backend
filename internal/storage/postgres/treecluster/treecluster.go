@@ -37,7 +37,6 @@ func NewTreeClusterRepositoryMappers(
 }
 
 func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storage.TreeClusterRepository {
-	s.SetEntityType(store.TreeCluster)
 	return &TreeClusterRepository{
 		store:              s,
 		TreeClusterMappers: mappers,

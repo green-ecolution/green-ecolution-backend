@@ -27,7 +27,6 @@ func NewVehicleRepositoryMappers(vMapper mapper.InternalVehicleRepoMapper) Vehic
 }
 
 func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
-	s.SetEntityType(store.Vehicle)
 	return &VehicleRepository{
 		store:                    s,
 		VehicleRepositoryMappers: mappers,

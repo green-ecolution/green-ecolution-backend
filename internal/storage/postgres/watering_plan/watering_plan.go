@@ -35,7 +35,6 @@ func NewWateringPlanRepositoryMappers(
 }
 
 func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) storage.WateringPlanRepository {
-	s.SetEntityType(store.WateringPlan)
 	return &WateringPlanRepository{
 		store:               s,
 		WateringPlanMappers: mappers,

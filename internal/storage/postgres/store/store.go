@@ -5,29 +5,22 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type EntityType string
-
-const (
-	Sensor       EntityType = "sensor"
-	Image        EntityType = "image"
-	Flowerbed    EntityType = "flowerbed"
-	TreeCluster  EntityType = "treecluster"
-	Tree         EntityType = "tree"
-	Vehicle      EntityType = "vehicle"
-	Region       EntityType = "region"
-	WateringPlan EntityType = "watering plan"
+var (
+	regionMapper = generated.InternalRegionRepoMapperImpl{}
+	treeMapper = generated.InternalTreeRepoMapperImpl{}
 )
 
 type Store struct {
 	sqlc.Querier
 	db         *pgxpool.Pool
-	entityType EntityType
 }
 
 func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
@@ -49,11 +42,6 @@ func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
 
 func (s *Store) DB() *pgxpool.Pool {
 	return s.db
-}
-
-// TODO: Remove
-func (s *Store) SetEntityType(entityType EntityType) {
-	s.entityType = entityType
 }
 
 // TODO: Improve error handling
@@ -99,4 +87,40 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 
 func (s *Store) Close() {
 	s.db.Close()
+}
+
+// I really do not like the placement of this function
+func (s *Store) MapClusterFields(ctx context.Context, tc *entities.TreeCluster) error {
+	if err := s.mapRegion(ctx, tc); err != nil {
+		return s.HandleError(err)
+	}
+
+	if err := s.mapTrees(ctx, tc); err != nil {
+		return s.HandleError(err)
+	}
+
+	return nil
+}
+
+func (s *Store) mapRegion(ctx context.Context, tc *entities.TreeCluster) error {
+	region, err := s.GetRegionByTreeClusterID(ctx, tc.ID)
+	if err != nil {
+		// If region is not found, we can still return the tree cluster
+		if !errors.Is(err, storage.ErrRegionNotFound) {
+			return err
+		}
+	}
+	tc.Region = regionMapper.FromSql(region)
+
+	return nil
+}
+
+func (s *Store) mapTrees(ctx context.Context, tc *entities.TreeCluster) error {
+	trees, err := s.GetLinkedTreesByTreeClusterID(ctx, tc.ID)
+	if err != nil {
+		return err
+	}
+	tc.Trees = treeMapper.FromSqlList(trees)
+
+	return nil
 }

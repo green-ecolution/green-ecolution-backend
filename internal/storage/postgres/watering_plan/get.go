@@ -68,7 +68,14 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 		return nil, w.store.HandleError(err)
 	}
 
-	return w.clusterMapper.FromSqlList(rows), nil
+	tc := w.clusterMapper.FromSqlList(rows)
+	for _, cluster := range tc {
+		if err := w.store.MapClusterFields(ctx, cluster); err != nil {
+			return nil, w.store.HandleError(err)
+		}
+	}
+
+	return tc, nil
 }
 
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
