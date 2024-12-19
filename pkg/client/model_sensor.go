@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,12 +22,12 @@ var _ MappedNullable = &Sensor{}
 
 // Sensor struct for Sensor
 type Sensor struct {
-	CreatedAt string `json:"created_at"`
-	Id string `json:"id"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	Status SensorStatus `json:"status"`
-	UpdatedAt string `json:"updated_at"`
+	CreatedAt string       `json:"created_at"`
+	Id        string       `json:"id"`
+	Latitude  float32      `json:"latitude"`
+	Longitude float32      `json:"longitude"`
+	Status    SensorStatus `json:"status"`
+	UpdatedAt string       `json:"updated_at"`
 }
 
 type _Sensor Sensor
@@ -200,7 +200,7 @@ func (o *Sensor) SetUpdatedAt(v string) {
 }
 
 func (o Sensor) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -236,10 +236,10 @@ func (o *Sensor) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -295,5 +295,3 @@ func (v *NullableSensor) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

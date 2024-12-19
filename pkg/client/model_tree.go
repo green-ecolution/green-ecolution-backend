@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,19 +22,19 @@ var _ MappedNullable = &Tree{}
 
 // Tree struct for Tree
 type Tree struct {
-	CreatedAt string `json:"created_at"`
-	Description string `json:"description"`
-	Id int32 `json:"id"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	PlantingYear int32 `json:"planting_year"`
+	CreatedAt    string  `json:"created_at"`
+	Description  string  `json:"description"`
+	Id           int32   `json:"id"`
+	Latitude     float32 `json:"latitude"`
+	Longitude    float32 `json:"longitude"`
+	PlantingYear int32   `json:"planting_year"`
 	// Images              []*ImageResponse `json:\"images\"`
-	Readonly bool `json:"readonly"`
-	Sensor *Sensor `json:"sensor,omitempty"`
-	Species string `json:"species"`
-	TreeClusterId *int32 `json:"tree_cluster_id,omitempty"`
-	TreeNumber string `json:"tree_number"`
-	UpdatedAt string `json:"updated_at"`
+	Readonly       bool           `json:"readonly"`
+	Sensor         *Sensor        `json:"sensor,omitempty"`
+	Species        string         `json:"species"`
+	TreeClusterId  *int32         `json:"tree_cluster_id,omitempty"`
+	TreeNumber     string         `json:"tree_number"`
+	UpdatedAt      string         `json:"updated_at"`
 	WateringStatus WateringStatus `json:"watering_status"`
 }
 
@@ -397,7 +397,7 @@ func (o *Tree) SetWateringStatus(v WateringStatus) {
 }
 
 func (o Tree) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -449,10 +449,10 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -508,5 +508,3 @@ func (v *NullableTree) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

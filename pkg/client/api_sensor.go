@@ -20,14 +20,13 @@ import (
 	"strings"
 )
 
-
 // SensorAPIService SensorAPI service
 type SensorAPIService service
 
 type ApiDeleteSensorRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *SensorAPIService
-	sensorId string
+	sensorId   string
 }
 
 func (r ApiDeleteSensorRequest) Execute() (*http.Response, error) {
@@ -39,24 +38,24 @@ DeleteSensor Delete sensor
 
 Delete sensor
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param sensorId Sensor ID
- @return ApiDeleteSensorRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param sensorId Sensor ID
+	@return ApiDeleteSensorRequest
 */
 func (a *SensorAPIService) DeleteSensor(ctx context.Context, sensorId string) ApiDeleteSensorRequest {
 	return ApiDeleteSensorRequest{
 		ApiService: a,
-		ctx: ctx,
-		sensorId: sensorId,
+		ctx:        ctx,
+		sensorId:   sensorId,
 	}
 }
 
 // Execute executes the request
 func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodDelete
-		localVarPostBody     interface{}
-		formFiles            []formFile
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SensorAPIService.DeleteSensor")
@@ -117,8 +116,8 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -128,8 +127,8 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -139,8 +138,8 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -150,8 +149,8 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -161,8 +160,8 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}
@@ -171,11 +170,11 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 }
 
 type ApiGetAllSensorsRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *SensorAPIService
-	status *string
-	page *string
-	limit *string
+	status     *string
+	page       *string
+	limit      *string
 }
 
 // Sensor Status
@@ -205,24 +204,25 @@ GetAllSensors Get all sensors
 
 Get all sensors
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetAllSensorsRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetAllSensorsRequest
 */
 func (a *SensorAPIService) GetAllSensors(ctx context.Context) ApiGetAllSensorsRequest {
 	return ApiGetAllSensorsRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	SensorList
 func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*SensorList, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *SensorList
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *SensorList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SensorAPIService.GetAllSensors")
@@ -291,8 +291,8 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -302,8 +302,8 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -313,8 +313,8 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -324,8 +324,8 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -335,8 +335,8 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -354,9 +354,9 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 }
 
 type ApiGetSensorByIdRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *SensorAPIService
-	sensorId string
+	sensorId   string
 }
 
 func (r ApiGetSensorByIdRequest) Execute() (*Sensor, *http.Response, error) {
@@ -368,26 +368,27 @@ GetSensorById Get sensor by ID
 
 Get sensor by ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param sensorId Sensor ID
- @return ApiGetSensorByIdRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param sensorId Sensor ID
+	@return ApiGetSensorByIdRequest
 */
 func (a *SensorAPIService) GetSensorById(ctx context.Context, sensorId string) ApiGetSensorByIdRequest {
 	return ApiGetSensorByIdRequest{
 		ApiService: a,
-		ctx: ctx,
-		sensorId: sensorId,
+		ctx:        ctx,
+		sensorId:   sensorId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Sensor
 func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sensor, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Sensor
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Sensor
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SensorAPIService.GetSensorById")
@@ -448,8 +449,8 @@ func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -459,8 +460,8 @@ func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -470,8 +471,8 @@ func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -481,8 +482,8 @@ func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -492,8 +493,8 @@ func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sen
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -511,13 +512,13 @@ func (a *SensorAPIService) GetSensorByIdExecute(r ApiGetSensorByIdRequest) (*Sen
 }
 
 type ApiGetSensorDataByIdRequest struct {
-	ctx context.Context
-	ApiService *SensorAPIService
-	sensorId string
-	page *string
-	limit *string
-	startTime *string
-	endTime *string
+	ctx           context.Context
+	ApiService    *SensorAPIService
+	sensorId      string
+	page          *string
+	limit         *string
+	startTime     *string
+	endTime       *string
 	treeclusterId *string
 }
 
@@ -560,26 +561,27 @@ GetSensorDataById Get sensor data by ID
 
 Get sensor data by ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param sensorId Sensor ID
- @return ApiGetSensorDataByIdRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param sensorId Sensor ID
+	@return ApiGetSensorDataByIdRequest
 */
 func (a *SensorAPIService) GetSensorDataById(ctx context.Context, sensorId string) ApiGetSensorDataByIdRequest {
 	return ApiGetSensorDataByIdRequest{
 		ApiService: a,
-		ctx: ctx,
-		sensorId: sensorId,
+		ctx:        ctx,
+		sensorId:   sensorId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	SensorDataList
 func (a *SensorAPIService) GetSensorDataByIdExecute(r ApiGetSensorDataByIdRequest) (*SensorDataList, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *SensorDataList
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *SensorDataList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SensorAPIService.GetSensorDataById")
@@ -655,8 +657,8 @@ func (a *SensorAPIService) GetSensorDataByIdExecute(r ApiGetSensorDataByIdReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -666,8 +668,8 @@ func (a *SensorAPIService) GetSensorDataByIdExecute(r ApiGetSensorDataByIdReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -677,8 +679,8 @@ func (a *SensorAPIService) GetSensorDataByIdExecute(r ApiGetSensorDataByIdReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -688,8 +690,8 @@ func (a *SensorAPIService) GetSensorDataByIdExecute(r ApiGetSensorDataByIdReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -699,8 +701,8 @@ func (a *SensorAPIService) GetSensorDataByIdExecute(r ApiGetSensorDataByIdReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

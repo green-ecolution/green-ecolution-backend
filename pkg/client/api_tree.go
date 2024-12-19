@@ -20,14 +20,13 @@ import (
 	"strings"
 )
 
-
 // TreeAPIService TreeAPI service
 type TreeAPIService service
 
 type ApiCreateTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeAPIService
-	body *TreeCreate
+	body       *TreeCreate
 }
 
 // Tree to create
@@ -45,24 +44,25 @@ CreateTree Create tree
 
 Create tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateTreeRequest
 */
 func (a *TreeAPIService) CreateTree(ctx context.Context) ApiCreateTreeRequest {
 	return ApiCreateTreeRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeAPIService.CreateTree")
@@ -127,8 +127,8 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -138,8 +138,8 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -149,8 +149,8 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -160,8 +160,8 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -171,8 +171,8 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -190,9 +190,9 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 }
 
 type ApiDeleteTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeAPIService
-	treeId string
+	treeId     string
 }
 
 func (r ApiDeleteTreeRequest) Execute() (*http.Response, error) {
@@ -204,24 +204,24 @@ DeleteTree Delete tree
 
 Delete tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiDeleteTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiDeleteTreeRequest
 */
 func (a *TreeAPIService) DeleteTree(ctx context.Context, treeId string) ApiDeleteTreeRequest {
 	return ApiDeleteTreeRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
 func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodDelete
-		localVarPostBody     interface{}
-		formFiles            []formFile
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeAPIService.DeleteTree")
@@ -282,8 +282,8 @@ func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Respon
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -293,8 +293,8 @@ func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Respon
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -304,8 +304,8 @@ func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Respon
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -315,8 +315,8 @@ func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Respon
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -326,8 +326,8 @@ func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Respon
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}
@@ -336,11 +336,11 @@ func (a *TreeAPIService) DeleteTreeExecute(r ApiDeleteTreeRequest) (*http.Respon
 }
 
 type ApiGetAllTreesRequest struct {
-	ctx context.Context
-	ApiService *TreeAPIService
-	page *string
-	limit *string
-	age *string
+	ctx           context.Context
+	ApiService    *TreeAPIService
+	page          *string
+	limit         *string
+	age           *string
 	treeclusterId *string
 }
 
@@ -377,24 +377,25 @@ GetAllTrees Get all trees
 
 Get all trees
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetAllTreesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetAllTreesRequest
 */
 func (a *TreeAPIService) GetAllTrees(ctx context.Context) ApiGetAllTreesRequest {
 	return ApiGetAllTreesRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	TreeList
 func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *TreeList
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TreeList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeAPIService.GetAllTrees")
@@ -466,8 +467,8 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -477,8 +478,8 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -488,8 +489,8 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -499,8 +500,8 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -510,8 +511,8 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -529,9 +530,9 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 }
 
 type ApiGetTreesRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeAPIService
-	treeId string
+	treeId     string
 }
 
 func (r ApiGetTreesRequest) Execute() (*Tree, *http.Response, error) {
@@ -543,26 +544,27 @@ GetTrees Get tree by ID
 
 Get tree by ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiGetTreesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiGetTreesRequest
 */
 func (a *TreeAPIService) GetTrees(ctx context.Context, treeId string) ApiGetTreesRequest {
 	return ApiGetTreesRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeAPIService.GetTrees")
@@ -623,8 +625,8 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -634,8 +636,8 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -645,8 +647,8 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -656,8 +658,8 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -667,8 +669,8 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -686,10 +688,10 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 }
 
 type ApiUpdateTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeAPIService
-	treeId string
-	body *TreeUpdate
+	treeId     string
+	body       *TreeUpdate
 }
 
 // Tree to update
@@ -707,26 +709,27 @@ UpdateTree Update tree
 
 Update tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiUpdateTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiUpdateTreeRequest
 */
 func (a *TreeAPIService) UpdateTree(ctx context.Context, treeId string) ApiUpdateTreeRequest {
 	return ApiUpdateTreeRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodPut
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeAPIService.UpdateTree")
@@ -792,8 +795,8 @@ func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -803,8 +806,8 @@ func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -814,8 +817,8 @@ func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -825,8 +828,8 @@ func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -836,8 +839,8 @@ func (a *TreeAPIService) UpdateTreeExecute(r ApiUpdateTreeRequest) (*Tree, *http
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

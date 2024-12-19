@@ -21,8 +21,8 @@ type DrivingLicense string
 
 // List of DrivingLicense
 const (
-	DrivingLicenseCar DrivingLicense = "B"
-	DrivingLicenseTrailer DrivingLicense = "BE"
+	DrivingLicenseCar         DrivingLicense = "B"
+	DrivingLicenseTrailer     DrivingLicense = "BE"
 	DrivingLicenseTransporter DrivingLicense = "C"
 )
 
@@ -111,4 +111,3 @@ func (v *NullableDrivingLicense) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

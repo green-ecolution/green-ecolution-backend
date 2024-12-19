@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,11 +22,11 @@ var _ MappedNullable = &TreeClusterUpdate{}
 
 // TreeClusterUpdate struct for TreeClusterUpdate
 type TreeClusterUpdate struct {
-	Address string `json:"address"`
-	Description string `json:"description"`
-	Name string `json:"name"`
+	Address       string        `json:"address"`
+	Description   string        `json:"description"`
+	Name          string        `json:"name"`
 	SoilCondition SoilCondition `json:"soil_condition"`
-	TreeIds []int32 `json:"tree_ids"`
+	TreeIds       []int32       `json:"tree_ids"`
 }
 
 type _TreeClusterUpdate TreeClusterUpdate
@@ -174,7 +174,7 @@ func (o *TreeClusterUpdate) SetTreeIds(v []int32) {
 }
 
 func (o TreeClusterUpdate) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -208,10 +208,10 @@ func (o *TreeClusterUpdate) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -267,5 +267,3 @@ func (v *NullableTreeClusterUpdate) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -2,6 +2,9 @@ package sensor
 
 import (
 	"context"
+	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -9,7 +12,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
-	"github.com/pkg/errors"
 )
 
 type SensorService struct {
@@ -17,6 +19,7 @@ type SensorService struct {
 	treeRepo      storage.TreeRepository
 	flowerbedRepo storage.FlowerbedRepository
 	validator     *validator.Validate
+	StatusUpdater *StatusUpdater
 }
 
 func NewSensorService(
@@ -29,6 +32,7 @@ func NewSensorService(
 		treeRepo:      treeRepo,
 		flowerbedRepo: flowerbedRepo,
 		validator:     validator.New(),
+		StatusUpdater: &StatusUpdater{sensorRepo: sensorRepo},
 	}
 }
 
@@ -110,6 +114,10 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+func (s *SensorService) RunStatusUpdater(ctx context.Context, interval time.Duration) {
+	s.StatusUpdater.RunStatusUpdater(ctx, interval)
 }
 
 func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Sensor) error {

@@ -20,15 +20,14 @@ import (
 	"strings"
 )
 
-
 // TreeImagesAPIService TreeImagesAPI service
 type TreeImagesAPIService service
 
 type ApiAddImagesToTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeImagesAPIService
-	treeId string
-	body *TreeAddImages
+	treeId     string
+	body       *TreeAddImages
 }
 
 // Images to add
@@ -46,26 +45,27 @@ AddImagesToTree Add images to a tree
 
 Add images to a tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiAddImagesToTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiAddImagesToTreeRequest
 */
 func (a *TreeImagesAPIService) AddImagesToTree(ctx context.Context, treeId string) ApiAddImagesToTreeRequest {
 	return ApiAddImagesToTreeRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeImagesAPIService.AddImagesToTree")
@@ -131,8 +131,8 @@ func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -142,8 +142,8 @@ func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -153,8 +153,8 @@ func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -164,8 +164,8 @@ func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -175,8 +175,8 @@ func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -194,11 +194,11 @@ func (a *TreeImagesAPIService) AddImagesToTreeExecute(r ApiAddImagesToTreeReques
 }
 
 type ApiGetTreeImagesRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeImagesAPIService
-	treeId string
-	page *string
-	limit *string
+	treeId     string
+	page       *string
+	limit      *string
 }
 
 // Page
@@ -222,26 +222,27 @@ GetTreeImages Get images of a tree
 
 Get images of a tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiGetTreeImagesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiGetTreeImagesRequest
 */
 func (a *TreeImagesAPIService) GetTreeImages(ctx context.Context, treeId string) ApiGetTreeImagesRequest {
 	return ApiGetTreeImagesRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeImagesAPIService.GetTreeImages")
@@ -308,8 +309,8 @@ func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -319,8 +320,8 @@ func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -330,8 +331,8 @@ func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -341,8 +342,8 @@ func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -352,8 +353,8 @@ func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -371,10 +372,10 @@ func (a *TreeImagesAPIService) GetTreeImagesExecute(r ApiGetTreeImagesRequest) (
 }
 
 type ApiRemoveImageFromTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeImagesAPIService
-	treeId string
-	imageId string
+	treeId     string
+	imageId    string
 }
 
 func (r ApiRemoveImageFromTreeRequest) Execute() (*Tree, *http.Response, error) {
@@ -386,28 +387,29 @@ RemoveImageFromTree Remove image from a tree
 
 Remove image from a tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @param imageId Image ID
- @return ApiRemoveImageFromTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@param imageId Image ID
+	@return ApiRemoveImageFromTreeRequest
 */
 func (a *TreeImagesAPIService) RemoveImageFromTree(ctx context.Context, treeId string, imageId string) ApiRemoveImageFromTreeRequest {
 	return ApiRemoveImageFromTreeRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
-		imageId: imageId,
+		ctx:        ctx,
+		treeId:     treeId,
+		imageId:    imageId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTreeRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodDelete
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodDelete
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeImagesAPIService.RemoveImageFromTree")
@@ -469,8 +471,8 @@ func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTr
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -480,8 +482,8 @@ func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTr
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -491,8 +493,8 @@ func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTr
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -502,8 +504,8 @@ func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTr
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -513,8 +515,8 @@ func (a *TreeImagesAPIService) RemoveImageFromTreeExecute(r ApiRemoveImageFromTr
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
