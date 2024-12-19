@@ -6,6 +6,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/utils"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -17,7 +18,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 
 	data := r.mapper.FromSqlList(rows)
 	for _, tc := range data {
-		if err := r.store.MapClusterFields(ctx, tc); err != nil {
+		if err := utils.MapClusterFields(ctx, *r.store, tc); err != nil {
 			return nil, r.store.HandleError(err)
 		}
 	}
@@ -32,7 +33,7 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 	}
 
 	tc := r.mapper.FromSql(row)
-	if err := r.store.MapClusterFields(ctx, tc); err != nil {
+	if err := utils.MapClusterFields(ctx, *r.store, tc); err != nil {
 		return nil, r.store.HandleError(err)
 	}
 
@@ -47,7 +48,7 @@ func (r *TreeClusterRepository) GetByIDs(ctx context.Context, ids []int32) ([]*e
 
 	tc := r.mapper.FromSqlList(rows)
 	for _, cluster := range tc {
-		if err := r.store.MapClusterFields(ctx, cluster); err != nil {
+		if err := utils.MapClusterFields(ctx, *r.store, cluster); err != nil {
 			return nil, r.store.HandleError(err)
 		}
 	}
