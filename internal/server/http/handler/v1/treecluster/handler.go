@@ -12,7 +12,6 @@ import (
 
 var (
 	treeClusterMapper = generated.TreeClusterHTTPMapperImpl{}
-	treeMapper        = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all tree clusters

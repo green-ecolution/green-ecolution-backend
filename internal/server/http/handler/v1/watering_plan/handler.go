@@ -12,8 +12,6 @@ import (
 
 var (
 	wateringPlanMapper = generated.WateringPlanHTTPMapperImpl{}
-	treeClusterMapper  = generated.TreeClusterHTTPMapperImpl{}
-	treeMapper         = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all watering plans
