@@ -100,5 +100,8 @@ func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.Wat
 		wp.Trailer = nil
 	}
 
+	// TODO: map correct users
+	wp.Users = []*entities.User{}
+
 	return nil
 }

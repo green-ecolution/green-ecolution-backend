@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
@@ -43,7 +42,7 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 
 		data := make([]*entities.WateringPlanResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = mapWateringPlanToDto(domain)
+			data[i] = wateringPlanMapper.FromResponse(domain)
 		}
 
 		return c.JSON(entities.WateringPlanListResponse{
@@ -82,9 +81,7 @@ func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapWateringPlanToDto(domainData)
-
-		return c.JSON(data)
+		return c.JSON(wateringPlanMapper.FromResponse(domainData))
 	}
 }
 
@@ -117,7 +114,7 @@ func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapWateringPlanToDto(domainData)
+		data := wateringPlanMapper.FromResponse(domainData)
 		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
@@ -157,8 +154,7 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapWateringPlanToDto(domainData)
-		return c.JSON(data)
+		return c.JSON(wateringPlanMapper.FromResponse(domainData))
 	}
 }
 
@@ -192,13 +188,4 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
-}
-
-func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanResponse {
-	dto := wateringPlanMapper.FromResponse(wp)
-
-	// TODO: map correct users
-	dto.Users = []*entities.UserResponse{}
-
-	return dto
 }

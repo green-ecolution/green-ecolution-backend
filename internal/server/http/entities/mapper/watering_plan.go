@@ -8,11 +8,12 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:UUIDToString
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:URLToString
 // goverter:extend MapWateringPlanStatus MapVehicleStatus MapVehicleType MapDrivingLicense
 // goverter:extend MapWateringStatus MapSensorStatus MapSoilCondition
 // goverter:ignoreMissing
 type WateringPlanHTTPMapper interface {
-	// goverter:ignore Users
 	FromResponse(*domain.WateringPlan) *entities.WateringPlanResponse
 	FromResponseList([]*domain.WateringPlan) []*entities.WateringPlanResponse
 	FromCreateRequest(*entities.WateringPlanCreateRequest) *domain.WateringPlanCreate
@@ -20,5 +21,9 @@ type WateringPlanHTTPMapper interface {
 }
 
 func MapWateringPlanStatus(status domain.WateringPlanStatus) entities.WateringPlanStatus {
+	return entities.WateringPlanStatus(status)
+}
+
+func MapUsers(status domain.WateringPlanStatus) entities.WateringPlanStatus {
 	return entities.WateringPlanStatus(status)
 }
