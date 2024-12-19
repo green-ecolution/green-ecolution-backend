@@ -225,29 +225,28 @@ func TestStringPtrToString(t *testing.T) {
 }
 
 func TestUUIDToString(t *testing.T) {
-    t.Run("should return string representation of UUID", func(t *testing.T) {
-        // given
-        testUUID := uuid.New()
+	t.Run("should return string representation of UUID", func(t *testing.T) {
+		// given
+		testUUID := uuid.New()
 
-        // when
-        result := UUIDToString(testUUID)
+		// when
+		result := UUIDToString(testUUID)
 
-        // then
-        assert.Equal(t, testUUID.String(), result)
-    })
+		// then
+		assert.Equal(t, testUUID.String(), result)
+	})
 
-    t.Run("should return empty string for nil UUID", func(t *testing.T) {
-        // given
-        var nilUUID uuid.UUID
+	t.Run("should return empty string for nil UUID", func(t *testing.T) {
+		// given
+		var nilUUID uuid.UUID
 
-        // when
-        result := UUIDToString(nilUUID)
+		// when
+		result := UUIDToString(nilUUID)
 
-        // then
-        assert.Equal(t, "", result)
-    })
+		// then
+		assert.Equal(t, "", result)
+	})
 }
-
 
 func TestURLToString(t *testing.T) {
 	t.Run("should return empty string when URL is nil", func(t *testing.T) {

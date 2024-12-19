@@ -2,12 +2,8 @@ package treecluster
 
 import (
 	"context"
-	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/utils"
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, error) {
@@ -18,7 +14,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 
 	data := r.mapper.FromSqlList(rows)
 	for _, tc := range data {
-		if err := utils.MapClusterFields(ctx, *r.store, tc); err != nil {
+		if err := r.store.MapClusterFields(ctx, tc); err != nil {
 			return nil, r.store.HandleError(err)
 		}
 	}
@@ -33,7 +29,7 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 	}
 
 	tc := r.mapper.FromSql(row)
-	if err := utils.MapClusterFields(ctx, *r.store, tc); err != nil {
+	if err := r.store.MapClusterFields(ctx, tc); err != nil {
 		return nil, r.store.HandleError(err)
 	}
 
@@ -48,55 +44,10 @@ func (r *TreeClusterRepository) GetByIDs(ctx context.Context, ids []int32) ([]*e
 
 	tc := r.mapper.FromSqlList(rows)
 	for _, cluster := range tc {
-		if err := utils.MapClusterFields(ctx, *r.store, cluster); err != nil {
+		if err := r.store.MapClusterFields(ctx, cluster); err != nil {
 			return nil, r.store.HandleError(err)
 		}
 	}
 
 	return tc, nil
-}
-
-func (r *TreeClusterRepository) GetRegionByTreeClusterID(ctx context.Context, id int32) (*entities.Region, error) {
-	if err := r.tcIDExists(ctx, id); err != nil {
-		return nil, err
-	}
-
-	row, err := r.store.GetRegionByTreeClusterID(ctx, id)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, storage.ErrRegionNotFound
-		}
-		return nil, r.store.HandleError(err)
-	}
-
-	return r.regionMapper.FromSql(row), nil
-}
-
-func (r *TreeClusterRepository) GetLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
-	if err := r.tcIDExists(ctx, id); err != nil {
-		return nil, err
-	}
-
-	rows, err := r.store.GetLinkedTreesByTreeClusterID(ctx, id)
-
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return []*entities.Tree{}, nil
-		}
-		return nil, r.store.HandleError(err)
-	}
-
-	return r.treeMapper.FromSqlList(rows), nil
-}
-
-func (r *TreeClusterRepository) tcIDExists(ctx context.Context, id int32) error {
-	_, err := r.store.GetTreeClusterByID(ctx, id)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return storage.ErrTreeClusterNotFound
-		}
-		return err
-	}
-
-	return nil
 }

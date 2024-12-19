@@ -39,10 +39,10 @@ func StringPtrToString(source *string) string {
 
 // Helper function to parse a UUID to a string
 func UUIDToString(u uuid.UUID) string {
-    if u == uuid.Nil {
-        return ""
-    }
-    return u.String()
+	if u == uuid.Nil {
+		return ""
+	}
+	return u.String()
 }
 
 // Helper function to parse an url to a string

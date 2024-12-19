@@ -8,7 +8,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/utils"
 )
 
 func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {
@@ -71,7 +70,7 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 
 	tc := w.clusterMapper.FromSqlList(rows)
 	for _, cluster := range tc {
-		if err := utils.MapClusterFields(ctx, *w.store, cluster); err != nil {
+		if err := w.store.MapClusterFields(ctx, cluster); err != nil {
 			return nil, w.store.HandleError(err)
 		}
 	}
