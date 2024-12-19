@@ -13,7 +13,7 @@ import (
 
 type Store struct {
 	sqlc.Querier
-	db         *pgxpool.Pool
+	db *pgxpool.Pool
 }
 
 func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {

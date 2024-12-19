@@ -14,18 +14,18 @@ const (
 )
 
 type WateringPlanResponse struct {
-	ID                 int32                  `json:"id"`
-	CreatedAt          time.Time              `json:"created_at"`
-	UpdatedAt          time.Time              `json:"updated_at"`
-	Date               time.Time              `json:"date"`
-	Description        string                 `json:"description"`
-	Status             WateringPlanStatus     `json:"status"`
-	Distance           *float64               `json:"distance"`
-	TotalWaterRequired *float64               `json:"total_water_required"`
-	Users              []*UserResponse        `json:"users"`
+	ID                 int32                        `json:"id"`
+	CreatedAt          time.Time                    `json:"created_at"`
+	UpdatedAt          time.Time                    `json:"updated_at"`
+	Date               time.Time                    `json:"date"`
+	Description        string                       `json:"description"`
+	Status             WateringPlanStatus           `json:"status"`
+	Distance           *float64                     `json:"distance"`
+	TotalWaterRequired *float64                     `json:"total_water_required"`
+	Users              []*UserResponse              `json:"users"`
 	TreeClusters       []*TreeClusterInListResponse `json:"treeclusters"`
-	Transporter        *VehicleResponse       `json:"transporter"`
-	Trailer            *VehicleResponse       `json:"trailer" validate:"optional"`
+	Transporter        *VehicleResponse             `json:"transporter"`
+	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
 } // @Name WateringPlan
 
 type WateringPlanListResponse struct {

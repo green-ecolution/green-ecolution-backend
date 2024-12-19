@@ -12,11 +12,11 @@ import (
 
 var (
 	regionMapper = generated.InternalRegionRepoMapperImpl{}
-	treeMapper = generated.InternalTreeRepoMapperImpl{}
+	treeMapper   = generated.InternalTreeRepoMapperImpl{}
 )
 
-// This function is required as soon as you want to add data to the TreeCluster object 
-// from the database, e.g. the linked region or the linked trees. 
+// This function is required as soon as you want to add data to the TreeCluster object
+// from the database, e.g. the linked region or the linked trees.
 // As this function is required in different repositories, it has been outsourced.
 func MapClusterFields(ctx context.Context, s store.Store, tc *entities.TreeCluster) error {
 	if err := mapRegion(ctx, s, tc); err != nil {

@@ -45,14 +45,14 @@ type TreeClusterInListResponse struct {
 	Archived       bool              `json:"archived"`
 	Latitude       *float64          `json:"latitude"`
 	Longitude      *float64          `json:"longitude"`
-	TreeIDs          []*int32   `json:"tree_ids" validate:"optional"`
+	TreeIDs        []*int32          `json:"tree_ids" validate:"optional"`
 	SoilCondition  TreeSoilCondition `json:"soil_condition"`
 	Name           string            `json:"name"`
 } // @Name TreeClusterInList
 
 type TreeClusterListResponse struct {
 	Data       []*TreeClusterInListResponse `json:"data"`
-	Pagination *Pagination            `json:"pagination"`
+	Pagination *Pagination                  `json:"pagination"`
 } // @Name TreeClusterList
 
 type TreeClusterCreateRequest struct {

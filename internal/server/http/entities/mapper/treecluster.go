@@ -33,11 +33,11 @@ func MapSoilConditionReq(condition entities.TreeSoilCondition) domain.TreeSoilCo
 }
 
 func MapTreesToIDs(trees []*domain.Tree) []*int32 {
-    var ids []*int32
-    for _, tree := range trees {
-        if tree != nil {
-            ids = append(ids, &tree.ID)
-        }
-    }
-    return ids
+	var ids []*int32
+	for _, tree := range trees {
+		if tree != nil {
+			ids = append(ids, &tree.ID)
+		}
+	}
+	return ids
 }
