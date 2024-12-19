@@ -23,7 +23,3 @@ type WateringPlanHTTPMapper interface {
 func MapWateringPlanStatus(status domain.WateringPlanStatus) entities.WateringPlanStatus {
 	return entities.WateringPlanStatus(status)
 }
-
-func MapUsers(status domain.WateringPlanStatus) entities.WateringPlanStatus {
-	return entities.WateringPlanStatus(status)
-}
