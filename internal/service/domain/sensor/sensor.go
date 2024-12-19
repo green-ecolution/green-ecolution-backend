@@ -3,13 +3,13 @@ package sensor
 import (
 	"context"
 
-	"github.com/pkg/errors"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
+	"github.com/pkg/errors"
 )
 
 type SensorService struct {
@@ -107,6 +107,26 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 	err = s.sensorRepo.Delete(ctx, id)
 	if err != nil {
 		return handleError(err)
+	}
+
+	return nil
+}
+
+func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Sensor) error {
+	if sen == nil {
+		return errors.New("sensor cannot be nil")
+	}
+
+	nearestTree, err := s.treeRepo.FindNearestTree(ctx, sen.Latitude, sen.Longitude)
+	if err != nil {
+		return handleError(err)
+	}
+
+	if nearestTree != nil {
+		_, err = s.treeRepo.Update(ctx, nearestTree.ID, tree.WithSensor(sen))
+		if err != nil {
+			return handleError(err)
+		}
 	}
 
 	return nil

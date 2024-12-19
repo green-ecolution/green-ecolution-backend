@@ -218,3 +218,21 @@ func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) er
 	t.TreeCluster = treeCluster
 	return nil
 }
+
+func (r *TreeRepository) FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error) {
+	params := &sqlc.FindNearestTreeParams{
+		StMakepoint:   latitude,
+		StMakepoint_2: longitude,
+	}
+
+	nearestTree, err := r.store.FindNearestTree(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+
+	tree := r.mapper.FromSql(nearestTree)
+	if err := r.mapFields(ctx, tree); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	return tree, nil
+}
