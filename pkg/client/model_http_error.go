@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,10 +22,10 @@ var _ MappedNullable = &HTTPError{}
 
 // HTTPError struct for HTTPError
 type HTTPError struct {
-	Code int32 `json:"code"`
-	Error string `json:"error"`
+	Code   int32  `json:"code"`
+	Error  string `json:"error"`
 	Method string `json:"method"`
-	Path string `json:"path"`
+	Path   string `json:"path"`
 }
 
 type _HTTPError HTTPError
@@ -148,7 +148,7 @@ func (o *HTTPError) SetPath(v string) {
 }
 
 func (o HTTPError) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -180,10 +180,10 @@ func (o *HTTPError) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -239,5 +239,3 @@ func (v *NullableHTTPError) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

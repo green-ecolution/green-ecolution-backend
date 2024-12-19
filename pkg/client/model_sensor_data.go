@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,13 +22,13 @@ var _ MappedNullable = &SensorData{}
 
 // SensorData struct for SensorData
 type SensorData struct {
-	BatteryLevel float32 `json:"battery_level"`
-	Depth float32 `json:"depth"`
-	Humidity float32 `json:"humidity"`
-	Id string `json:"id"`
+	BatteryLevel     float32 `json:"battery_level"`
+	Depth            float32 `json:"depth"`
+	Humidity         float32 `json:"humidity"`
+	Id               string  `json:"id"`
 	SoilWaterTension float32 `json:"soil_water_tension"`
-	Temperature float32 `json:"temperature"`
-	TrunkMoisture float32 `json:"trunk_moisture"`
+	Temperature      float32 `json:"temperature"`
+	TrunkMoisture    float32 `json:"trunk_moisture"`
 }
 
 type _SensorData SensorData
@@ -226,7 +226,7 @@ func (o *SensorData) SetTrunkMoisture(v float32) {
 }
 
 func (o SensorData) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -264,10 +264,10 @@ func (o *SensorData) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -323,5 +323,3 @@ func (v *NullableSensorData) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

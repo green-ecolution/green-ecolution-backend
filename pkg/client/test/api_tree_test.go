@@ -11,10 +11,11 @@ package client
 
 import (
 	"context"
+	"testing"
+
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_TreeAPIService(t *testing.T) {
@@ -24,7 +25,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	t.Run("Test TreeAPIService CreateTree", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.TreeAPI.CreateTree(context.Background()).Execute()
 
@@ -36,7 +37,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	t.Run("Test TreeAPIService DeleteTree", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var treeId string
 
@@ -49,7 +50,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	t.Run("Test TreeAPIService GetAllTrees", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.TreeAPI.GetAllTrees(context.Background()).Execute()
 
@@ -61,7 +62,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	t.Run("Test TreeAPIService GetTrees", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var treeId string
 
@@ -75,7 +76,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	t.Run("Test TreeAPIService UpdateTree", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var treeId string
 

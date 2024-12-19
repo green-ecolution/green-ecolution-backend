@@ -20,15 +20,14 @@ import (
 	"strings"
 )
 
-
 // TreeSensorAPIService TreeSensorAPI service
 type TreeSensorAPIService service
 
 type ApiAddSensorToTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeSensorAPIService
-	treeId string
-	body *TreeAddSensor
+	treeId     string
+	body       *TreeAddSensor
 }
 
 // Sensor to add
@@ -46,26 +45,27 @@ AddSensorToTree Add sensor to a tree
 
 Add sensor to a tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiAddSensorToTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiAddSensorToTreeRequest
 */
 func (a *TreeSensorAPIService) AddSensorToTree(ctx context.Context, treeId string) ApiAddSensorToTreeRequest {
 	return ApiAddSensorToTreeRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeSensorAPIService.AddSensorToTree")
@@ -131,8 +131,8 @@ func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -142,8 +142,8 @@ func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -153,8 +153,8 @@ func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -164,8 +164,8 @@ func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -175,8 +175,8 @@ func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeReques
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -194,9 +194,9 @@ func (a *TreeSensorAPIService) AddSensorToTreeExecute(r ApiAddSensorToTreeReques
 }
 
 type ApiGetTreeBySensorIdRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeSensorAPIService
-	sensorId string
+	sensorId   string
 }
 
 func (r ApiGetTreeBySensorIdRequest) Execute() (*Tree, *http.Response, error) {
@@ -208,26 +208,27 @@ GetTreeBySensorId Get tree by sensor ID
 
 Get tree by sensor ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param sensorId Sensor ID
- @return ApiGetTreeBySensorIdRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param sensorId Sensor ID
+	@return ApiGetTreeBySensorIdRequest
 */
 func (a *TreeSensorAPIService) GetTreeBySensorId(ctx context.Context, sensorId string) ApiGetTreeBySensorIdRequest {
 	return ApiGetTreeBySensorIdRequest{
 		ApiService: a,
-		ctx: ctx,
-		sensorId: sensorId,
+		ctx:        ctx,
+		sensorId:   sensorId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeSensorAPIService.GetTreeBySensorId")
@@ -288,8 +289,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -299,8 +300,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -310,8 +311,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -321,8 +322,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -332,8 +333,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -351,9 +352,9 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 }
 
 type ApiGetTreeSensorRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeSensorAPIService
-	treeId string
+	treeId     string
 }
 
 func (r ApiGetTreeSensorRequest) Execute() (*Tree, *http.Response, error) {
@@ -365,26 +366,27 @@ GetTreeSensor Get sensor of a tree
 
 Get sensor of a tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @return ApiGetTreeSensorRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@return ApiGetTreeSensorRequest
 */
 func (a *TreeSensorAPIService) GetTreeSensor(ctx context.Context, treeId string) ApiGetTreeSensorRequest {
 	return ApiGetTreeSensorRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
+		ctx:        ctx,
+		treeId:     treeId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeSensorAPIService.GetTreeSensor")
@@ -445,8 +447,8 @@ func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -456,8 +458,8 @@ func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -467,8 +469,8 @@ func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -478,8 +480,8 @@ func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -489,8 +491,8 @@ func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -508,10 +510,10 @@ func (a *TreeSensorAPIService) GetTreeSensorExecute(r ApiGetTreeSensorRequest) (
 }
 
 type ApiRemoveSensorFromTreeRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeSensorAPIService
-	treeId string
-	sensorId string
+	treeId     string
+	sensorId   string
 }
 
 func (r ApiRemoveSensorFromTreeRequest) Execute() (*Tree, *http.Response, error) {
@@ -523,28 +525,29 @@ RemoveSensorFromTree Remove sensor from a tree
 
 Remove sensor from a tree
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param treeId Tree ID
- @param sensorId Sensor ID
- @return ApiRemoveSensorFromTreeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param treeId Tree ID
+	@param sensorId Sensor ID
+	@return ApiRemoveSensorFromTreeRequest
 */
 func (a *TreeSensorAPIService) RemoveSensorFromTree(ctx context.Context, treeId string, sensorId string) ApiRemoveSensorFromTreeRequest {
 	return ApiRemoveSensorFromTreeRequest{
 		ApiService: a,
-		ctx: ctx,
-		treeId: treeId,
-		sensorId: sensorId,
+		ctx:        ctx,
+		treeId:     treeId,
+		sensorId:   sensorId,
 	}
 }
 
 // Execute executes the request
+//
 //	@return	Tree
 func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFromTreeRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodDelete
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodDelete
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeSensorAPIService.RemoveSensorFromTree")
@@ -606,8 +609,8 @@ func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFrom
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -617,8 +620,8 @@ func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFrom
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -628,8 +631,8 @@ func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFrom
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -639,8 +642,8 @@ func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFrom
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -650,8 +653,8 @@ func (a *TreeSensorAPIService) RemoveSensorFromTreeExecute(r ApiRemoveSensorFrom
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

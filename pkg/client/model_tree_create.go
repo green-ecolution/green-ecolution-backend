@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,15 +22,15 @@ var _ MappedNullable = &TreeCreate{}
 
 // TreeCreate struct for TreeCreate
 type TreeCreate struct {
-	Description string `json:"description"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	PlantingYear int32 `json:"planting_year"`
-	Readonly bool `json:"readonly"`
-	SensorId *string `json:"sensor_id,omitempty"`
-	Species string `json:"species"`
-	TreeClusterId *int32 `json:"tree_cluster_id,omitempty"`
-	TreeNumber string `json:"tree_number"`
+	Description   string  `json:"description"`
+	Latitude      float32 `json:"latitude"`
+	Longitude     float32 `json:"longitude"`
+	PlantingYear  int32   `json:"planting_year"`
+	Readonly      bool    `json:"readonly"`
+	SensorId      *string `json:"sensor_id,omitempty"`
+	Species       string  `json:"species"`
+	TreeClusterId *int32  `json:"tree_cluster_id,omitempty"`
+	TreeNumber    string  `json:"tree_number"`
 }
 
 type _TreeCreate TreeCreate
@@ -292,7 +292,7 @@ func (o *TreeCreate) SetTreeNumber(v string) {
 }
 
 func (o TreeCreate) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -336,10 +336,10 @@ func (o *TreeCreate) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -395,5 +395,3 @@ func (v *NullableTreeCreate) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

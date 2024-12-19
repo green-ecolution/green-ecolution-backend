@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,13 +22,13 @@ var _ MappedNullable = &UserUpdate{}
 
 // UserUpdate struct for UserUpdate
 type UserUpdate struct {
-	AvatarUrl string `json:"avatar_url"`
-	Email string `json:"email"`
-	EmployeeId string `json:"employee_id"`
-	FirstName string `json:"first_name"`
-	LastName string `json:"last_name"`
+	AvatarUrl   string `json:"avatar_url"`
+	Email       string `json:"email"`
+	EmployeeId  string `json:"employee_id"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
 	PhoneNumber string `json:"phone_number"`
-	Username string `json:"username"`
+	Username    string `json:"username"`
 }
 
 type _UserUpdate UserUpdate
@@ -226,7 +226,7 @@ func (o *UserUpdate) SetUsername(v string) {
 }
 
 func (o UserUpdate) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -264,10 +264,10 @@ func (o *UserUpdate) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -323,5 +323,3 @@ func (v *NullableUserUpdate) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

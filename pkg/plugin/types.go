@@ -15,12 +15,12 @@ import "time"
 //
 // Example usage:
 //
-//	token := &Token{
-//		AccessToken:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-//		RefreshToken: "dGVzdF9yZWZyZXNoX3Rva2VuX3ZhbHVl...",
-//    Expiry:       time.Now().Add(1 * time.Hour),
-//    ExpiresIn:    1 * time.Hour,
-//	}
+//		token := &Token{
+//			AccessToken:  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+//			RefreshToken: "dGVzdF9yZWZyZXNoX3Rva2VuX3ZhbHVl...",
+//	   Expiry:       time.Now().Add(1 * time.Hour),
+//	   ExpiresIn:    1 * time.Hour,
+//		}
 type Token struct {
 	AccessToken  string
 	RefreshToken string

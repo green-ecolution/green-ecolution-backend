@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,16 +22,16 @@ var _ MappedNullable = &User{}
 
 // User struct for User
 type User struct {
-	AvatarUrl string `json:"avatar_url"`
-	CreatedAt string `json:"created_at"`
-	Email string `json:"email"`
-	EmailVerified bool `json:"email_verified"`
-	EmployeeId string `json:"employee_id"`
-	FirstName string `json:"first_name"`
-	Id string `json:"id"`
-	LastName string `json:"last_name"`
-	PhoneNumber string `json:"phone_number"`
-	Username string `json:"username"`
+	AvatarUrl     string `json:"avatar_url"`
+	CreatedAt     string `json:"created_at"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+	EmployeeId    string `json:"employee_id"`
+	FirstName     string `json:"first_name"`
+	Id            string `json:"id"`
+	LastName      string `json:"last_name"`
+	PhoneNumber   string `json:"phone_number"`
+	Username      string `json:"username"`
 }
 
 type _User User
@@ -304,7 +304,7 @@ func (o *User) SetUsername(v string) {
 }
 
 func (o User) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -348,10 +348,10 @@ func (o *User) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -407,5 +407,3 @@ func (v *NullableUser) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

@@ -11,10 +11,11 @@ package client
 
 import (
 	"context"
+	"testing"
+
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_TreeImagesAPIService(t *testing.T) {
@@ -24,7 +25,7 @@ func Test_client_TreeImagesAPIService(t *testing.T) {
 
 	t.Run("Test TreeImagesAPIService AddImagesToTree", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var treeId string
 
@@ -38,7 +39,7 @@ func Test_client_TreeImagesAPIService(t *testing.T) {
 
 	t.Run("Test TreeImagesAPIService GetTreeImages", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var treeId string
 
@@ -52,7 +53,7 @@ func Test_client_TreeImagesAPIService(t *testing.T) {
 
 	t.Run("Test TreeImagesAPIService RemoveImageFromTree", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var treeId string
 		var imageId string
