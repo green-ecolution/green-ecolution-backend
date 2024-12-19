@@ -43,16 +43,6 @@ var (
 		Data:      []*entities.SensorData{TestSensorData[0]},
 	}
 
-	TestSensorNearestTree = &entities.Sensor{
-		ID:        "sensor-05",
-		CreatedAt: currentTime,
-		UpdatedAt: currentTime,
-		Latitude:  54.821535,
-		Longitude: 9.487200,
-		Status:    entities.SensorStatusOnline,
-		Data:      []*entities.SensorData{TestSensorData[0]},
-	}
-
 	TestSensorList = []*entities.Sensor{
 		TestSensor,
 		{

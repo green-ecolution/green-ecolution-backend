@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sensorUtils "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
 	treeUtils "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
@@ -442,7 +441,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 
 		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		testSensor := sensorUtils.TestSensorNearestTree
+		testSensor := TestSensorNearestTree
 		testTree := treeUtils.TestNearestTree
 
 		treeRepo.EXPECT().
@@ -479,7 +478,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		testSensor := sensorUtils.TestSensorNearestTree
+		testSensor := TestSensorNearestTree
 
 		treeRepo.EXPECT().
 			FindNearestTree(context.Background(), testSensor.Latitude, testSensor.Longitude).
@@ -498,7 +497,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := SensorService{sensorRepo: sensorRepo, treeRepo: treeRepo, validator: validator.New()}
-		testSensor := sensorUtils.TestSensorNearestTree
+		testSensor := TestSensorNearestTree
 		testTree := treeUtils.TestNearestTree
 
 		treeRepo.EXPECT().
@@ -623,4 +622,14 @@ var TestSensorData = []*entities.SensorData{
 		UpdatedAt: time.Now(),
 		Data:      TestMqttPayload,
 	},
+}
+
+var TestSensorNearestTree = &entities.Sensor{
+	ID:        "sensor-05",
+	CreatedAt: time.Now(),
+	UpdatedAt: time.Now(),
+	Latitude:  54.821535,
+	Longitude: 9.487200,
+	Status:    entities.SensorStatusOnline,
+	Data:      []*entities.SensorData{TestSensorData[0]},
 }
