@@ -170,7 +170,7 @@ func (w *WateringPlanRepository) setLinkedTreeClusters(ctx context.Context, enti
 }
 
 // This function calculates approximately how much water the irrigation schedule needs
-// Each tree in a linked tree cluster requires approximately 120 litres of water
+// Each tree in a linked tree cluster requires approximately 120 liters of water
 func (w *WateringPlanRepository) calculateRequiredWater(ctx context.Context, tc []*entities.TreeCluster) (float64, error) {
 	totalRequiredWater := 0.0
 
