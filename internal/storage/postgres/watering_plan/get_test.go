@@ -32,6 +32,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[i].Status, wp.Status)
 			assert.Equal(t, allTestWateringPlans[i].Distance, wp.Distance)
 			assert.Equal(t, allTestWateringPlans[i].TotalWaterRequired, wp.TotalWaterRequired)
+			assert.Equal(t, allTestWateringPlans[i].CancellationNote, wp.CancellationNote)
 
 			// assert transporter
 			assert.Equal(t, allTestWateringPlans[i].Transporter.ID, wp.Transporter.ID)
@@ -103,6 +104,7 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].Status, got.Status)
 		assert.Equal(t, allTestWateringPlans[0].Distance, got.Distance)
 		assert.Equal(t, allTestWateringPlans[0].TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, allTestWateringPlans[0].CancellationNote, got.CancellationNote)
 
 		// assert transporter
 		assert.Equal(t, allTestWateringPlans[0].Transporter.ID, got.Transporter.ID)
@@ -138,6 +140,7 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[1].Status, got.Status)
 		assert.Equal(t, allTestWateringPlans[1].Distance, got.Distance)
 		assert.Equal(t, allTestWateringPlans[1].TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, allTestWateringPlans[1].CancellationNote, got.CancellationNote)
 
 		// assert transporter
 		assert.Equal(t, allTestWateringPlans[1].Transporter.ID, got.Transporter.ID)
@@ -410,6 +413,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
 		TreeClusters:       allTestClusters[0:2],
+		CancellationNote: "",
 	},
 	{
 		ID:                 2,
@@ -421,6 +425,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
+		CancellationNote: "",
 	},
 	{
 		ID:                 3,
@@ -432,6 +437,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
+		CancellationNote: "",
 	},
 	{
 		ID:                 4,
@@ -443,6 +449,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
+		CancellationNote: "",
 	},
 	{
 		ID:                 5,
@@ -453,6 +460,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TotalWaterRequired: utils.P(6000.0),
 		Transporter:        allTestVehicles[1],
 		TreeClusters:       allTestClusters[2:3],
+		CancellationNote: "The watering plan was cancelled due to various reasons.",
 	},
 }
 
