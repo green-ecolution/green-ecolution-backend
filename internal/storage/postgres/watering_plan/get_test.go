@@ -31,7 +31,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[i].Description, wp.Description)
 			assert.Equal(t, allTestWateringPlans[i].Status, wp.Status)
 			assert.Equal(t, allTestWateringPlans[i].Distance, wp.Distance)
-			assert.Equal(t, allTestWateringPlans[i].TotalWaterRequired, wp.TotalWaterRequired)
+			assert.Equal(t, *allTestWateringPlans[i].TotalWaterRequired, *wp.TotalWaterRequired)
 			assert.Equal(t, allTestWateringPlans[i].CancellationNote, wp.CancellationNote)
 
 			// assert transporter
@@ -103,7 +103,7 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[0].Description, got.Description)
 		assert.Equal(t, allTestWateringPlans[0].Status, got.Status)
 		assert.Equal(t, allTestWateringPlans[0].Distance, got.Distance)
-		assert.Equal(t, allTestWateringPlans[0].TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, *allTestWateringPlans[0].TotalWaterRequired, *got.TotalWaterRequired)
 		assert.Equal(t, allTestWateringPlans[0].CancellationNote, got.CancellationNote)
 
 		// assert transporter
@@ -139,7 +139,7 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[1].Description, got.Description)
 		assert.Equal(t, allTestWateringPlans[1].Status, got.Status)
 		assert.Equal(t, allTestWateringPlans[1].Distance, got.Distance)
-		assert.Equal(t, allTestWateringPlans[1].TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, *allTestWateringPlans[1].TotalWaterRequired, *got.TotalWaterRequired)
 		assert.Equal(t, allTestWateringPlans[1].CancellationNote, got.CancellationNote)
 
 		// assert transporter
@@ -409,7 +409,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Description:        "New watering plan for the west side of the city",
 		Status:             entities.WateringPlanStatusPlanned,
 		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
+		TotalWaterRequired: utils.P(720.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            allTestVehicles[0],
 		TreeClusters:       allTestClusters[0:2],
@@ -421,7 +421,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Description:        "New watering plan for the east side of the city",
 		Status:             entities.WateringPlanStatusActive,
 		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
+		TotalWaterRequired: utils.P(0.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
@@ -433,7 +433,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Description:        "Very important watering plan due to no rainfall",
 		Status:             entities.WateringPlanStatusFinished,
 		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
+		TotalWaterRequired: utils.P(0.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
@@ -445,7 +445,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Description:        "New watering plan for the south side of the city",
 		Status:             entities.WateringPlanStatusNotCompeted,
 		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
+		TotalWaterRequired: utils.P(0.0),
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
@@ -457,7 +457,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Description:        "Canceled due to flood",
 		Status:             entities.WateringPlanStatusCanceled,
 		Distance:           utils.P(63.0),
-		TotalWaterRequired: utils.P(6000.0),
+		TotalWaterRequired: utils.P(0.0),
 		Transporter:        allTestVehicles[1],
 		TreeClusters:       allTestClusters[2:3],
 		CancellationNote:   "The watering plan was cancelled due to various reasons.",
