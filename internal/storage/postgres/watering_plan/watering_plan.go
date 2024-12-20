@@ -104,6 +104,13 @@ func WithTrailer(trailer *entities.Vehicle) entities.EntityFunc[entities.Waterin
 	}
 }
 
+func WithCanellationNote(cancellationNote string) entities.EntityFunc[entities.WateringPlan] {
+	return func(wp *entities.WateringPlan) {
+		slog.Debug("updating cancellation note", "canellation note", cancellationNote)
+		wp.CancellationNote = cancellationNote
+	}
+}
+
 func (w *WateringPlanRepository) Delete(ctx context.Context, id int32) error {
 	_, err := w.store.DeleteWateringPlan(ctx, id)
 	if err != nil {

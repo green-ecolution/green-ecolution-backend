@@ -22,6 +22,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		TreeClusters:       make([]*entities.TreeCluster, 0),
 		Transporter:        nil,
 		Trailer:            nil,
+		CancellationNote:   utils.P(""),
 	}
 }
 
