@@ -38,16 +38,17 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	}
 
 	input := entities.WateringPlan{
-		Date:               time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC),
-		Description:        "Updated watering plan",
-		Distance:           utils.P(50.0),
-		TotalWaterRequired: utils.P(30000.0),
-		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[2],
-		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[3],
-		TreeClusters:       mappers.clusterMapper.FromSqlList(testCluster)[0:3],
-		Users:              []*entities.User{testUser},
-		Status:             entities.WateringPlanStatusActive,
+		Date:         time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC),
+		Description:  "Updated watering plan",
+		Distance:     utils.P(50.0),
+		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[2],
+		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[3],
+		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		Users:        []*entities.User{testUser},
+		Status:       entities.WateringPlanStatusActive,
 	}
+
+	expectedTotalWater := 720.0
 
 	t.Run("should update watering plan", func(t *testing.T) {
 		// given
@@ -57,7 +58,6 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
-			wp.TotalWaterRequired = input.TotalWaterRequired
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
@@ -78,7 +78,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, input.Date, got.Date)
 		assert.Equal(t, input.Description, got.Description)
 		assert.Equal(t, input.Distance, got.Distance)
-		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, expectedTotalWater, *got.TotalWaterRequired)
 		assert.Equal(t, input.Status, got.Status)
 
 		// assert transporter
@@ -107,7 +107,6 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
-			wp.TotalWaterRequired = input.TotalWaterRequired
 			wp.Transporter = input.Transporter
 			wp.Trailer = nil
 			wp.TreeClusters = input.TreeClusters
@@ -128,7 +127,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, input.Date, got.Date)
 		assert.Equal(t, input.Description, got.Description)
 		assert.Equal(t, input.Distance, got.Distance)
-		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, expectedTotalWater, *got.TotalWaterRequired)
 		assert.Equal(t, input.Status, got.Status)
 
 		// assert transporter
@@ -158,7 +157,6 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
-			wp.TotalWaterRequired = input.TotalWaterRequired
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
 			wp.Users = input.Users
@@ -188,7 +186,6 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		updateFn := func(wp *entities.WateringPlan) (bool, error) {
 			wp.Date = input.Date
 			wp.Distance = input.Distance
-			wp.TotalWaterRequired = input.TotalWaterRequired
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
 			wp.Users = input.Users

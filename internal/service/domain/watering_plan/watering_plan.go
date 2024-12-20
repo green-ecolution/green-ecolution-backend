@@ -55,7 +55,6 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	// TODO: get users
-	// TODO: calculate required water
 	// TODO: calculare distance
 
 	treeClusters, err := w.fetchTreeClusters(ctx, createWp.TreeClusterIDs)
@@ -104,7 +103,6 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	}
 
 	// TODO: get users
-	// TODO: calculate required water
 	// TODO: calculare distance
 
 	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
