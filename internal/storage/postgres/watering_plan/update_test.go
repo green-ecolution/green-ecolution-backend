@@ -185,7 +185,6 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-
 		updateFn := func(wp *entities.WateringPlan) (bool, error) {
 			wp.Date = input.Date
 			wp.Distance = input.Distance

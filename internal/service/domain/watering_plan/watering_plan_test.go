@@ -386,12 +386,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 	ctx := context.Background()
 	wateringPlanID := int32(1)
 	updatedWateringPlan := &entities.WateringPlanUpdate{
-		Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-		Description:    "New watering plan for the east side of the city",
-		TransporterID:  utils.P(int32(2)),
-		TrailerID:      utils.P(int32(1)),
-		TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
-		Status: 		entities.WateringPlanStatusActive,
+		Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		Description:      "New watering plan for the east side of the city",
+		TransporterID:    utils.P(int32(2)),
+		TrailerID:        utils.P(int32(1)),
+		TreeClusterIDs:   []*int32{utils.P(int32(1)), utils.P(int32(2))},
+		Status:           entities.WateringPlanStatusActive,
 		CancellationNote: "",
 	}
 
@@ -445,12 +445,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
-			Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-			Status: 		entities.WateringPlanStatusActive,
+			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			Status:           entities.WateringPlanStatusActive,
 			CancellationNote: "",
-			Description:    "New watering plan for the east side of the city",
-			TransporterID:  utils.P(int32(2)),
-			TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			Description:      "New watering plan for the east side of the city",
+			TransporterID:    utils.P(int32(2)),
+			TreeClusterIDs:   []*int32{utils.P(int32(1)), utils.P(int32(2))},
 		}
 
 		// check treecluster
@@ -669,6 +669,24 @@ func TestWateringPlanService_Update(t *testing.T) {
 		assert.Contains(t, err.Error(), "validation error")
 	})
 
+	t.Run("should return validation error on wrong status", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		updatedWateringPlan.Status = "test"
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.Contains(t, err.Error(), "validation error")
+	})
+
 	t.Run("should return validation error on empty transporter", func(t *testing.T) {
 		// given
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
@@ -678,6 +696,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			Status:      entities.WateringPlanStatusActive,
 			Description: "New watering plan for the east side of the city",
 		}
 
@@ -699,6 +718,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
 			Description:   "Updated watering plan",
+			Status:        entities.WateringPlanStatusActive,
 			TransporterID: utils.P(int32(2)),
 		}
 
@@ -821,7 +841,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Transporter:        allTestVehicles[1],
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
-		CancellationNote: "The watering plan was cancelled due to various reasons.",
+		CancellationNote:   "The watering plan was cancelled due to various reasons.",
 	},
 }
 

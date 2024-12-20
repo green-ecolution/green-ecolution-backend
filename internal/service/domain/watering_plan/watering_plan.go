@@ -98,7 +98,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// Set canellation note to nothing if the current status is not fitting 
+	// Set canellation note to nothing if the current status is not fitting
 	if updateWp.CancellationNote != "" && updateWp.Status != entities.WateringPlanStatusCanceled {
 		updateWp.CancellationNote = ""
 	}
