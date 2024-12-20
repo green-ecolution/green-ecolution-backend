@@ -38,7 +38,6 @@ func NewTreeRepositoryMappers(
 }
 
 func NewTreeRepository(s *store.Store, mappers TreeMappers) storage.TreeRepository {
-	s.SetEntityType(store.Tree)
 	return &TreeRepository{
 		store:       s,
 		TreeMappers: mappers,

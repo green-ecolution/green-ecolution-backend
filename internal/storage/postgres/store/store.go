@@ -11,23 +11,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type EntityType string
-
-const (
-	Sensor       EntityType = "sensor"
-	Image        EntityType = "image"
-	Flowerbed    EntityType = "flowerbed"
-	TreeCluster  EntityType = "treecluster"
-	Tree         EntityType = "tree"
-	Vehicle      EntityType = "vehicle"
-	Region       EntityType = "region"
-	WateringPlan EntityType = "watering plan"
-)
-
 type Store struct {
 	sqlc.Querier
-	db         *pgxpool.Pool
-	entityType EntityType
+	db *pgxpool.Pool
 }
 
 func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
@@ -49,11 +35,6 @@ func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
 
 func (s *Store) DB() *pgxpool.Pool {
 	return s.db
-}
-
-// TODO: Remove
-func (s *Store) SetEntityType(entityType EntityType) {
-	s.entityType = entityType
 }
 
 // TODO: Improve error handling

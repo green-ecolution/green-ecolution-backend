@@ -3,9 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
 	"runtime"
+
+	"github.com/google/uuid"
 )
 
 // P returns a pointer to the value passed as an argument.
@@ -32,4 +35,20 @@ func StringPtrToString(source *string) string {
 		return ""
 	}
 	return *source
+}
+
+// Helper function to parse a UUID to a string
+func UUIDToString(u uuid.UUID) string {
+	if u == uuid.Nil {
+		return ""
+	}
+	return u.String()
+}
+
+// Helper function to parse an url to a string
+func URLToString(u *url.URL) string {
+	if u == nil {
+		return ""
+	}
+	return u.String()
 }

@@ -38,7 +38,6 @@ func NewFlowerbedMappers(
 }
 
 func NewFlowerbedRepository(s *store.Store, mappers FlowerbedMappers) storage.FlowerbedRepository {
-	s.SetEntityType(store.Flowerbed)
 	return &FlowerbedRepository{
 		store:            s,
 		FlowerbedMappers: mappers,

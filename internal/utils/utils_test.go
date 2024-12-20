@@ -4,9 +4,11 @@ import (
 	"io"
 
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -219,5 +221,70 @@ func TestStringPtrToString(t *testing.T) {
 
 		// then
 		assert.Equal(t, source, result)
+	})
+}
+
+func TestUUIDToString(t *testing.T) {
+	t.Run("should return string representation of UUID", func(t *testing.T) {
+		// given
+		testUUID := uuid.New()
+
+		// when
+		result := UUIDToString(testUUID)
+
+		// then
+		assert.Equal(t, testUUID.String(), result)
+	})
+
+	t.Run("should return empty string for nil UUID", func(t *testing.T) {
+		// given
+		var nilUUID uuid.UUID
+
+		// when
+		result := UUIDToString(nilUUID)
+
+		// then
+		assert.Equal(t, "", result)
+	})
+}
+
+func TestURLToString(t *testing.T) {
+	t.Run("should return empty string when URL is nil", func(t *testing.T) {
+		// given
+		var u *url.URL
+
+		// when
+		result := URLToString(u)
+
+		// then
+		assert.Equal(t, "", result)
+	})
+
+	t.Run("should return string representation of URL when URL is valid", func(t *testing.T) {
+		// given
+		u, err := url.Parse("https://example.com/path?query=value")
+		if err != nil {
+			t.Fatalf("Failed to parse URL: %v", err)
+		}
+
+		// when
+		result := URLToString(u)
+
+		// then
+		assert.Equal(t, "https://example.com/path?query=value", result)
+	})
+
+	t.Run("should return empty string when URL is an empty URL", func(t *testing.T) {
+		// given
+		u, err := url.Parse("")
+		if err != nil {
+			t.Fatalf("Failed to parse URL: %v", err)
+		}
+
+		// when
+		result := URLToString(u)
+
+		// then
+		assert.Equal(t, "", result)
 	})
 }

@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
@@ -13,8 +12,6 @@ import (
 
 var (
 	wateringPlanMapper = generated.WateringPlanHTTPMapperImpl{}
-	treeClusterMapper  = generated.TreeClusterHTTPMapperImpl{}
-	treeMapper         = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all watering plans
@@ -43,7 +40,7 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 
 		data := make([]*entities.WateringPlanResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = mapWateringPlanToDto(domain)
+			data[i] = wateringPlanMapper.FromResponse(domain)
 		}
 
 		return c.JSON(entities.WateringPlanListResponse{
@@ -82,9 +79,7 @@ func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapWateringPlanToDto(domainData)
-
-		return c.JSON(data)
+		return c.JSON(wateringPlanMapper.FromResponse(domainData))
 	}
 }
 
@@ -117,7 +112,7 @@ func CreateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapWateringPlanToDto(domainData)
+		data := wateringPlanMapper.FromResponse(domainData)
 		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
@@ -157,8 +152,7 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapWateringPlanToDto(domainData)
-		return c.JSON(data)
+		return c.JSON(wateringPlanMapper.FromResponse(domainData))
 	}
 }
 
@@ -192,22 +186,4 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
-}
-
-func mapWateringPlanToDto(wp *domain.WateringPlan) *entities.WateringPlanResponse {
-	dto := wateringPlanMapper.FromResponse(wp)
-
-	// Map each tree cluster and its trees
-	dto.TreeClusters = make([]*entities.TreeClusterResponse, len(wp.TreeClusters))
-	for i, tc := range wp.TreeClusters {
-		mappedCluster := treeClusterMapper.FromResponse(tc)
-		mappedCluster.Trees = treeMapper.FromResponseList(tc.Trees)
-
-		dto.TreeClusters[i] = mappedCluster
-	}
-
-	// TODO: map correct users
-	dto.Users = []*entities.UserResponse{}
-
-	return dto
 }

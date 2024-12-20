@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
@@ -13,7 +12,6 @@ import (
 
 var (
 	treeClusterMapper = generated.TreeClusterHTTPMapperImpl{}
-	treeMapper        = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all tree clusters
@@ -40,9 +38,9 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := make([]*entities.TreeClusterResponse, len(domainData))
+		data := make([]*entities.TreeClusterInListResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = mapTreeClusterToDto(domain)
+			data[i] = treeClusterMapper.FromInListResponse(domain)
 		}
 
 		return c.JSON(entities.TreeClusterListResponse{
@@ -81,9 +79,7 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
-
-		return c.JSON(data)
+		return c.JSON(treeClusterMapper.FromResponse(domainData))
 	}
 }
 
@@ -116,7 +112,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
+		data := treeClusterMapper.FromResponse(domainData)
 		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
@@ -156,8 +152,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
-		return c.JSON(data)
+		return c.JSON(treeClusterMapper.FromResponse(domainData))
 	}
 }
 
@@ -191,19 +186,4 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
-}
-
-func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
-	dto := treeClusterMapper.FromResponse(t)
-
-	if t.Region != nil {
-		dto.Region = &entities.RegionResponse{
-			ID:   t.Region.ID,
-			Name: t.Region.Name,
-		}
-	}
-
-	dto.Trees = treeMapper.FromResponseList(t.Trees)
-
-	return dto
 }

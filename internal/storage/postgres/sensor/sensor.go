@@ -25,7 +25,6 @@ func NewSensorRepositoryMappers(sMapper mapper.InternalSensorRepoMapper) SensorR
 }
 
 func NewSensorRepository(s *store.Store, mappers SensorRepositoryMappers) storage.SensorRepository {
-	s.SetEntityType(store.Sensor)
 	return &SensorRepository{
 		store:                   s,
 		SensorRepositoryMappers: mappers,
