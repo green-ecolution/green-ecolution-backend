@@ -181,6 +181,31 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, canellationNote, got.CancellationNote)
 	})
 
+	t.Run("should return error when canellation note is not empty and the status is not canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Distance = input.Distance
+			wp.TotalWaterRequired = input.TotalWaterRequired
+			wp.Transporter = input.Transporter
+			wp.TreeClusters = input.TreeClusters
+			wp.Users = input.Users
+			wp.Status = entities.WateringPlanStatusActive
+			wp.CancellationNote = "This watering plan is canceled"
+			return true, nil
+		}
+
+		// when
+		err := r.Update(context.Background(), 2, updateFn)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "cancellation note should be empty, as the current watering plan is not canceled", err.Error())
+	})
+
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)

@@ -49,6 +49,10 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 	if err != nil {
 		return errors.New("failed to convert date")
 	}
+	
+	if entity.CancellationNote != "" && entity.Status != entities.WateringPlanStatusCanceled {
+		return errors.New("cancellation note should be empty, as the current watering plan is not canceled")
+	}
 
 	params := sqlc.UpdateWateringPlanParams{
 		ID:                 entity.ID,
