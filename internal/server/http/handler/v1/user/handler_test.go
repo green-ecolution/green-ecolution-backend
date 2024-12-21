@@ -534,6 +534,101 @@ func TestRefreshToken(t *testing.T) {
 	})
 }
 
+func TestGetAllUsers(t *testing.T) {
+	t.Run("should return all users successfully", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user", GetAllUsers(mockAuthService))
+
+		mockUUID1 := uuid.New()
+		mockUUID2 := uuid.New()
+
+		expectedUsers := []*domain.User{
+			{
+				ID:          mockUUID1,
+				CreatedAt:   time.Now(),
+				Email:       "user1@example.com",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Username:    "johndoe",
+				EmployeeID:  "1234",
+				PhoneNumber: "+123456789",
+			},
+			{
+				ID:          mockUUID2,
+				CreatedAt:   time.Now(),
+				Email:       "user2@example.com",
+				FirstName:   "Jane",
+				LastName:    "Doe",
+				Username:    "janedoe",
+				EmployeeID:  "5678",
+				PhoneNumber: "+987654321",
+			},
+		}
+
+		mockAuthService.EXPECT().GetAllUsers(mock.Anything).Return(expectedUsers, nil)
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response []entities.UserResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.Nil(t, err)
+		assert.Equal(t, len(expectedUsers), len(response))
+		for i, user := range expectedUsers {
+			assert.Equal(t, user.ID.String(), response[i].ID)
+			assert.Equal(t, user.Email, response[i].Email)
+			assert.Equal(t, user.FirstName, response[i].FirstName)
+			assert.Equal(t, user.LastName, response[i].LastName)
+			assert.Equal(t, user.Username, response[i].Username)
+			assert.Equal(t, user.EmployeeID, response[i].EmployeeID)
+			assert.Equal(t, user.PhoneNumber, response[i].PhoneNumber)
+		}
+	})
+
+	t.Run("should return 500 internal server error when service fails", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user", GetAllUsers(mockAuthService))
+
+		mockAuthService.EXPECT().GetAllUsers(mock.Anything).Return(nil, service.NewError(service.InternalError, "service error"))
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	})
+
+	t.Run("should return 400 bad request for invalid query parameters", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user", GetAllUsers(mockAuthService))
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user?page=invalid&limit=invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		mockAuthService.AssertExpectations(t)
+	})
+}
+
 func generateJWT(t testing.TB, sub string) string {
 	t.Helper()
 

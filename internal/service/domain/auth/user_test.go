@@ -300,3 +300,61 @@ func TestLogoutRequest(t *testing.T) {
 		assert.EqualError(t, err, "500: failed to remove user session: ")
 	})
 }
+
+func TestAuthService_GetAllUsers(t *testing.T) {
+	t.Run("should return all users successfully", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+		uuid01, _ := uuid.NewRandom()
+		uuid02, _ := uuid.NewRandom()
+
+		expectedUsers := []*entities.User{
+			{
+				ID:          uuid01,
+				Username:    "user1",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Email:       "john.doe@example.com",
+				PhoneNumber: "+123456789",
+			},
+			{
+				ID:          uuid02,
+				Username:    "user2",
+				FirstName:   "Jane",
+				LastName:    "Smith",
+				Email:       "jane.smith@example.com",
+				PhoneNumber: "+987654321",
+			},
+		}
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(expectedUsers, nil)
+
+		// when
+		users, err := svc.GetAllUsers(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+	})
+
+	t.Run("should return error when user repository fails", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(nil, errors.New("repository error"))
+
+		// when
+		users, err := svc.GetAllUsers(context.Background())
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to get all users")
+	})
+}

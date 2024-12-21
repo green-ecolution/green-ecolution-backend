@@ -82,8 +82,9 @@ func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string)
 	}
 	return nil
 }
+
 func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
-	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to log in to Keycloak")
 	}
