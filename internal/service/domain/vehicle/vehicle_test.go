@@ -73,7 +73,7 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(expectedVehicles, nil)
 
 		// when
-		vehicles, err := svc.GetAllByType(ctx, "transporter")
+		vehicles, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
@@ -84,10 +84,10 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
-		vehicleRepo.EXPECT().GetAllByType(ctx, entities.DrivingLicenseTransporter).Return([]*entities.Vehicle{}, nil)
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return([]*entities.Vehicle{}, nil)
 
 		// when
-		vehicles, err := svc.GetAllByType(ctx, "transporter")
+		vehicles, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
@@ -99,10 +99,10 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		expectedErr := errors.New("GetAllByType failed")
-		vehicleRepo.EXPECT().GetAllByType(ctx, entities.DrivingLicenseTransporter).Return(nil, expectedErr)
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(nil, expectedErr)
 
 		// when
-		vehicles, err := svc.GetAllByType(ctx, "transporter")
+		vehicles, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
 
 		// then
 		assert.Error(t, err)
