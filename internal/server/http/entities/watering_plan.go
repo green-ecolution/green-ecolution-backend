@@ -52,4 +52,11 @@ type WateringPlanUpdateRequest struct {
 	Users            []*int32           `json:"users_ids"`
 	CancellationNote string             `json:"cancellation_note"`
 	Status           WateringPlanStatus `json:"status"`
+	ConsumedWaterList []*ConsumedWaterItem `json:"consumed_water_list"`
 } // @Name WateringPlanUpdate
+
+type ConsumedWaterItem struct {
+	WateringPlanID int32
+	TreeClusterID  int32
+	ConsumedWater  *float64
+} // @Name ConsumedWaterItem

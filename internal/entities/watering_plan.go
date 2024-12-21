@@ -41,12 +41,19 @@ type WateringPlanCreate struct {
 }
 
 type WateringPlanUpdate struct {
-	Date             time.Time `validate:"required"`
-	Description      string
-	TreeClusterIDs   []*int32 `validate:"required,min=1,dive,required"`
-	TransporterID    *int32   `validate:"required"`
-	TrailerID        *int32
-	CancellationNote string
-	Status           WateringPlanStatus `validate:"oneof=planned active canceled finished 'not competed' unknown"`
+	Date                 time.Time `validate:"required"`
+	Description          string
+	TreeClusterIDs       []*int32 `validate:"required,min=1,dive,required"`
+	TransporterID        *int32   `validate:"required"`
+	TrailerID            *int32
+	CancellationNote     string
+	Status               WateringPlanStatus `validate:"oneof=planned active canceled finished 'not competed' unknown"`
+	ConsumedWaterList []*ConsumedWaterItem
 	// Users           []*int32
+}
+
+type ConsumedWaterItem struct {
+	WateringPlanID int32
+	TreeClusterID  int32
+	ConsumedWater  *float64
 }
