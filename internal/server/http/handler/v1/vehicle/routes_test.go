@@ -58,6 +58,28 @@ func TestRegisterRoutes(t *testing.T) {
 		})
 	})
 
+	t.Run("/v1/vehicle/type", func(t *testing.T) {
+		t.Run("should call GET handler", func(t *testing.T) {
+			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			app := fiber.New()
+			vehicle.RegisterRoutes(app, mockVehicleService)
+
+			mockVehicleService.EXPECT().GetAllByType(
+				mock.Anything,
+				"transporter",
+			).Return(TestVehicles, nil)
+
+			// when
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/transporter", nil)
+
+			// then
+			resp, err := app.Test(req)
+			defer resp.Body.Close()
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+		})
+	})
+
 	t.Run("/v1/vehicle/:id", func(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
