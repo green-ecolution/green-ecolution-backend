@@ -11,7 +11,7 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgDateToTime
 // goverter:extend MapWateringPlanStatus
 type InternalWateringPlanRepoMapper interface {
-	// goverter:ignore Users TreeClusters Transporter Trailer
+	// goverter:ignore Users TreeClusters Transporter Trailer ConsumedWaterList
 	FromSql(src *sqlc.WateringPlan) *entities.WateringPlan
 	FromSqlList(src []*sqlc.WateringPlan) []*entities.WateringPlan
 }
