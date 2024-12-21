@@ -17,12 +17,12 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, er
 }
 
 func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
-    rows, err := r.store.GetAllVehiclesByType(ctx, sqlc.VehicleType(vehicleType))
-    if err != nil {
-        return nil, r.store.HandleError(err)
-    }
+	rows, err := r.store.GetAllVehiclesByType(ctx, sqlc.VehicleType(vehicleType))
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
 
-    return r.mapper.FromSqlList(rows), nil
+	return r.mapper.FromSqlList(rows), nil
 }
 
 func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {

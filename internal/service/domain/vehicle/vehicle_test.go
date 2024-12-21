@@ -62,6 +62,55 @@ func TestVehicleService_GetAll(t *testing.T) {
 	})
 }
 
+func TestVehicleService_GetAllByType(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("should return all vehicles of type transporter when successful", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		expectedVehicles := []*entities.Vehicle{getTestVehicles()[0]}
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(expectedVehicles, nil)
+
+		// when
+		vehicles, err := svc.GetAll(ctx)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVehicles, vehicles)
+	})
+
+	t.Run("should return empty slice when no vehicles are found", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.DrivingLicenseTransporter).Return([]*entities.Vehicle{}, nil)
+
+		// when
+		vehicles, err := svc.GetAll(ctx)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, vehicles)
+	})
+
+	t.Run("should return error when GetAllByType fails", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		expectedErr := errors.New("GetAllByType failed")
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.DrivingLicenseTransporter).Return(nil, expectedErr)
+
+		// when
+		vehicles, err := svc.GetAll(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, vehicles)
+		assert.EqualError(t, err, "500: GetAllByType failed")
+	})
+}
+
 func TestVehicleService_GetByID(t *testing.T) {
 	ctx := context.Background()
 

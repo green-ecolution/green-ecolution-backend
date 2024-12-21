@@ -32,6 +32,15 @@ func (v *VehicleService) GetAll(ctx context.Context) ([]*entities.Vehicle, error
 	return vehicles, nil
 }
 
+func (v *VehicleService) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
+	vehicles, err := v.vehicleRepo.GetAllByType(ctx, vehicleType)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	return vehicles, nil
+}
+
 func (v *VehicleService) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
 	got, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {

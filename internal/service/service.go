@@ -122,6 +122,7 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 
 type VehicleService interface {
 	CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
+	GetAllByType(ctx context.Context, vehicleType domain.VehicleType) ([]*domain.Vehicle, error)
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
 }
 

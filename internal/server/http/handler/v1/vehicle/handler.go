@@ -1,6 +1,7 @@
 package vehicle
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -36,6 +37,49 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		domainData, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := make([]*entities.VehicleResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = mapVehicleToDto(domain)
+		}
+
+		return c.JSON(entities.VehicleListResponse{
+			Data:       data,
+			Pagination: &entities.Pagination{}, // TODO: Handle pagination
+		})
+	}
+}
+
+// @Summary		Get all vehicles by type
+// @Description	Get all vehicles by type
+// @Id				get-all-vehicles-by-type
+// @Tags			Vehicle
+// @Produce		json
+// @Success		200	{object}	entities.VehicleListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/type/{type} [get]
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			status	query	string	false	"Status"
+// @Param			type	path	string	true	"Vehicle Type"
+// @Security		Keycloak
+func GetAllVehiclesByType(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		vehicleTypeStr := c.Params("type")
+		vehicleType, err := parseVehicleType(vehicleTypeStr)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, err := svc.GetAllByType(ctx, vehicleType)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -230,4 +274,15 @@ func mapVehicleToDto(v *domain.Vehicle) *entities.VehicleResponse {
 	dto := vehicleMapper.FromResponse(v)
 
 	return dto
+}
+
+func parseVehicleType(vehicleTypeStr string) (domain.VehicleType, error) {
+	switch vehicleTypeStr {
+	case string(domain.VehicleTypeTrailer):
+		return domain.VehicleTypeTrailer, nil
+	case string(domain.VehicleTypeTransporter):
+		return domain.VehicleTypeTransporter, nil
+	default:
+		return domain.VehicleTypeUnknown, fmt.Errorf("invalid vehicle type: %s", vehicleTypeStr)
+	}
 }
