@@ -1,7 +1,6 @@
 package vehicle
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -283,6 +282,6 @@ func parseVehicleType(vehicleTypeStr string) (domain.VehicleType, error) {
 	case string(domain.VehicleTypeTransporter):
 		return domain.VehicleTypeTransporter, nil
 	default:
-		return domain.VehicleTypeUnknown, fmt.Errorf("invalid vehicle type: %s", vehicleTypeStr)
+		return domain.VehicleTypeUnknown, service.NewError(service.BadRequest, "invalid vehicle type")
 	}
 }

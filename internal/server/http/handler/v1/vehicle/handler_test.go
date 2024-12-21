@@ -179,6 +179,24 @@ func TestGetAllVehiclesByType(t *testing.T) {
 
 		mockVehicleService.AssertExpectations(t)
 	})
+
+	t.Run("should return 400 Bad Request Error when service fails", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := vehicle.GetAllVehiclesByType(mockVehicleService)
+		app.Get("/v1/vehicle/type/:type", handler)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/type/invalid", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
 }
 
 func TestGetVehicleByID(t *testing.T) {
