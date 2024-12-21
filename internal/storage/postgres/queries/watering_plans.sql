@@ -23,17 +23,11 @@ WHERE id = $1;
 -- name: DeleteWateringPlan :one
 DELETE FROM watering_plans WHERE id = $1 RETURNING id;
 
--- name: GetTransporterByWateringPlanID :one
+-- name: GetVehicleByWateringPlanID :one
 SELECT v.* FROM vehicles v
 JOIN vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
 WHERE vwp.watering_plan_id = $1
-AND v.type = 'transporter';
-
--- name: GetTrailerByWateringPlanID :one
-SELECT v.* FROM vehicles v
-JOIN vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
-WHERE vwp.watering_plan_id = $1
-AND v.type = 'trailer';
+AND v.type = $2;
 
 -- name: SetVehicleToWateringPlan :exec
 INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id)
