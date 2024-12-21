@@ -73,7 +73,7 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(expectedVehicles, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAllByType(ctx, "transporter")
 
 		// then
 		assert.NoError(t, err)
@@ -87,7 +87,7 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByType(ctx, entities.DrivingLicenseTransporter).Return([]*entities.Vehicle{}, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAllByType(ctx, "transporter")
 
 		// then
 		assert.NoError(t, err)
@@ -102,7 +102,7 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByType(ctx, entities.DrivingLicenseTransporter).Return(nil, expectedErr)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAllByType(ctx, "transporter")
 
 		// then
 		assert.Error(t, err)

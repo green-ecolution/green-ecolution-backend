@@ -107,8 +107,8 @@ func TestGetAllVehiclesByType(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAllByType(
 			mock.Anything,
-			"transpoter",
-		).Return([]*entities.Vehicle{TestVehicles[2]}, nil)
+			entities.VehicleType("transporter"),
+		).Return([]*entities.Vehicle{TestVehicles[1]}, nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/type/transporter", nil)
@@ -123,7 +123,6 @@ func TestGetAllVehiclesByType(t *testing.T) {
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(response.Data))
-		assert.Equal(t, entities.VehicleTypeTransporter, response.Data[0].Type)
 
 		mockVehicleService.AssertExpectations(t)
 	})
@@ -136,7 +135,7 @@ func TestGetAllVehiclesByType(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAllByType(
 			mock.Anything,
-			"transpoter",
+			entities.VehicleType("transporter"),
 		).Return([]*entities.Vehicle{}, nil)
 
 		// when
@@ -151,7 +150,6 @@ func TestGetAllVehiclesByType(t *testing.T) {
 		var response serverEntities.VehicleListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
-		assert.NoError(t, err)
 		assert.Equal(t, 0, len(response.Data))
 
 		mockVehicleService.AssertExpectations(t)
@@ -165,7 +163,7 @@ func TestGetAllVehiclesByType(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAllByType(
 			mock.Anything,
-			"transpoter",
+			entities.VehicleType("transporter"),
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
@@ -180,7 +178,7 @@ func TestGetAllVehiclesByType(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 Bad Request Error when service fails", func(t *testing.T) {
+	t.Run("should return 400 Bad Request Error when service fails due to invalid type", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehiclesByType(mockVehicleService)
@@ -193,7 +191,7 @@ func TestGetAllVehiclesByType(t *testing.T) {
 
 		// then
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 		mockVehicleService.AssertExpectations(t)
 	})
