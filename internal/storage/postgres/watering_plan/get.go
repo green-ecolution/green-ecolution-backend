@@ -78,13 +78,13 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 	return tc, nil
 }
 
-func (w *WateringPlanRepository) GetTreeClusterWateringPlanList(ctx context.Context, id int32) ([]*entities.TreeClusterWateringPlan, error) {
+func (w *WateringPlanRepository) GetEvaluationValues(ctx context.Context, id int32) ([]*entities.EvaluationValue, error) {
 	rows, err := w.store.GetAllTreeClusterWateringPlanByID(ctx, id)
 	if err != nil {
 		return nil, w.store.HandleError(err)
 	}
 
-	return w.mapper.TreeClusterWateringPlanFromSqlList(rows), nil
+	return w.mapper.EvaluationFromSqlList(rows), nil
 }
 
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
@@ -109,7 +109,7 @@ func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.Wat
 	}
 
 	if wp.Status == entities.WateringPlanStatusFinished {
-		wp.TreeClusterWateringPlanList, err = w.GetTreeClusterWateringPlanList(ctx, wp.ID)
+		wp.Evaluation, err = w.GetEvaluationValues(ctx, wp.ID)
 		if err != nil {
 			return w.store.HandleError(err)
 		}

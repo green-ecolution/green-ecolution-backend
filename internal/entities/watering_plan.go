@@ -29,7 +29,7 @@ type WateringPlan struct {
 	Transporter                 *Vehicle
 	Trailer                     *Vehicle
 	CancellationNote            string
-	TreeClusterWateringPlanList []*TreeClusterWateringPlan
+	Evaluation []*EvaluationValue
 }
 
 type WateringPlanCreate struct {
@@ -49,11 +49,11 @@ type WateringPlanUpdate struct {
 	TrailerID                   *int32
 	CancellationNote            string
 	Status                      WateringPlanStatus `validate:"oneof=planned active canceled finished 'not competed' unknown"`
-	TreeClusterWateringPlanList []*TreeClusterWateringPlan
+	Evaluation []*EvaluationValue
 	// Users           []*int32
 }
 
-type TreeClusterWateringPlan struct {
+type EvaluationValue struct {
 	WateringPlanID int32
 	TreeClusterID  int32
 	ConsumedWater  *float64

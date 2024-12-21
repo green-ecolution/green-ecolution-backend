@@ -97,11 +97,11 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 // This function updates the consumed water values for each tree cluster in a finished watering plan.
 // To save the consumed water values, the watering plan must be »finished«
 func (w *WateringPlanRepository) updateConsumedWaterValues(ctx context.Context, entity *entities.WateringPlan) error {
-	if entity.Status != entities.WateringPlanStatusFinished || len(entity.TreeClusterWateringPlanList) == 0 {
+	if entity.Status != entities.WateringPlanStatusFinished || len(entity.Evaluation) == 0 {
 		return nil
 	}
 
-	for _, value := range entity.TreeClusterWateringPlanList {
+	for _, value := range entity.Evaluation {
 		if err := w.store.UpdateTreeClusterWateringPlan(ctx, &sqlc.UpdateTreeClusterWateringPlanParams{
 			WateringPlanID: entity.ID,
 			TreeClusterID:  value.TreeClusterID,

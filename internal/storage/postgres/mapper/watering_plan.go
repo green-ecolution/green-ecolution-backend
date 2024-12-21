@@ -11,11 +11,11 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgDateToTime
 // goverter:extend MapWateringPlanStatus
 type InternalWateringPlanRepoMapper interface {
-	// goverter:ignore Users TreeClusters Transporter Trailer TreeClusterWateringPlanList
+	// goverter:ignore Users TreeClusters Transporter Trailer Evaluation
 	FromSql(src *sqlc.WateringPlan) *entities.WateringPlan
 	FromSqlList(src []*sqlc.WateringPlan) []*entities.WateringPlan
 
-	TreeClusterWateringPlanFromSqlList(src []*sqlc.TreeClusterWateringPlan) []*entities.TreeClusterWateringPlan
+	EvaluationFromSqlList(src []*sqlc.TreeClusterWateringPlan) []*entities.EvaluationValue
 }
 
 func MapWateringPlanStatus(wateringPlanStatus sqlc.WateringPlanStatus) entities.WateringPlanStatus {

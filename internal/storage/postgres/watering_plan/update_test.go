@@ -50,7 +50,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 
 	expectedTotalWater := 720.0
 
-	treeClusterWateringPlanList := []*entities.TreeClusterWateringPlan{
+	evaluation := []*entities.EvaluationValue{
 		{
 			WateringPlanID: 1,
 			TreeClusterID:  1,
@@ -208,7 +208,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.TreeClusters = input.TreeClusters
 			wp.Users = input.Users
 			wp.Status = entities.WateringPlanStatusNotCompeted
-			wp.TreeClusterWateringPlanList = treeClusterWateringPlanList
+			wp.Evaluation = evaluation
 			return true, nil
 		}
 
@@ -224,13 +224,13 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, entities.WateringPlanStatusNotCompeted, got.Status)
 
 		// assert consumed water list
-		consumedWaterValues, err := r.GetTreeClusterWateringPlanList(context.Background(), 1)
+		gotEvaluation, err := r.GetEvaluationValues(context.Background(), 1)
 		assert.NoError(t, err)
-		assert.NotNil(t, consumedWaterValues)
-		for i, value := range consumedWaterValues {
-			assert.Equal(t, int32(1), value.WateringPlanID)
-			assert.Equal(t, treeClusterWateringPlanList[i].TreeClusterID, value.TreeClusterID)
-			assert.Equal(t, 0.0, *value.ConsumedWater) // should be still zero due to no update
+		assert.NotNil(t, gotEvaluation)
+		for i, evaluationValue := range gotEvaluation {
+			assert.Equal(t, int32(1), evaluationValue.WateringPlanID)
+			assert.Equal(t, evaluation[i].TreeClusterID, evaluationValue.TreeClusterID)
+			assert.Equal(t, 0.0, *evaluationValue.ConsumedWater) // should be still zero due to no update
 		}
 	})
 
@@ -247,7 +247,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.TreeClusters = input.TreeClusters
 			wp.Users = input.Users
 			wp.Status = entities.WateringPlanStatusFinished
-			wp.TreeClusterWateringPlanList = treeClusterWateringPlanList
+			wp.Evaluation = evaluation
 			return true, nil
 		}
 
@@ -263,14 +263,14 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, entities.WateringPlanStatusFinished, got.Status)
 
 		// assert consumed water list
-		consumedWaterValues, err := r.GetTreeClusterWateringPlanList(context.Background(), 1)
+		gotEvaluation, err := r.GetEvaluationValues(context.Background(), 1)
 		assert.NoError(t, err)
-		assert.NotNil(t, consumedWaterValues)
-		assert.Len(t, consumedWaterValues, len(treeClusterWateringPlanList))
-		for i, value := range consumedWaterValues {
-			assert.Equal(t, int32(1), value.WateringPlanID)
-			assert.Equal(t, treeClusterWateringPlanList[i].TreeClusterID, value.TreeClusterID)
-			assert.Equal(t, treeClusterWateringPlanList[i].ConsumedWater, value.ConsumedWater) // should be updated
+		assert.NotNil(t, gotEvaluation)
+		assert.Len(t, gotEvaluation, len(evaluation))
+		for i, evaluationValue := range evaluation {
+			assert.Equal(t, int32(1), evaluationValue.WateringPlanID)
+			assert.Equal(t, evaluation[i].TreeClusterID, evaluationValue.TreeClusterID)
+			assert.Equal(t, evaluation[i].ConsumedWater, evaluationValue.ConsumedWater) // should be updated
 		}
 	})
 

@@ -54,13 +54,13 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 			}
 
 			// assert consumed water values
-			if allTestWateringPlans[i].TreeClusterWateringPlanList == nil {
+			if allTestWateringPlans[i].Evaluation == nil {
 			} else {
-				assert.Len(t, allTestWateringPlans[i].TreeClusterWateringPlanList, len(wp.TreeClusterWateringPlanList))
-				for j, value := range wp.TreeClusterWateringPlanList {
-					assert.Equal(t, allTestWateringPlans[i].TreeClusterWateringPlanList[j].WateringPlanID, value.WateringPlanID)
-					assert.Equal(t, allTestWateringPlans[i].TreeClusterWateringPlanList[j].TreeClusterID, value.TreeClusterID)
-					assert.Equal(t, allTestWateringPlans[i].TreeClusterWateringPlanList[j].ConsumedWater, value.ConsumedWater)
+				assert.Len(t, allTestWateringPlans[i].Evaluation, len(wp.Evaluation))
+				for j, value := range wp.Evaluation {
+					assert.Equal(t, allTestWateringPlans[i].Evaluation[j].WateringPlanID, value.WateringPlanID)
+					assert.Equal(t, allTestWateringPlans[i].Evaluation[j].TreeClusterID, value.TreeClusterID)
+					assert.Equal(t, allTestWateringPlans[i].Evaluation[j].ConsumedWater, value.ConsumedWater)
 				}
 			}
 
@@ -449,7 +449,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
 		CancellationNote:   "",
-		TreeClusterWateringPlanList: []*entities.TreeClusterWateringPlan{
+		Evaluation: []*entities.EvaluationValue{
 			{
 				WateringPlanID: 1,
 				TreeClusterID:  1,
