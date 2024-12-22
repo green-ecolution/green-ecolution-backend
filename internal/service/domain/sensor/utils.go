@@ -138,4 +138,14 @@ var (
 			Data:      []*domain.SensorData{},
 		},
 	}
+
+	TestSensorNearestTree = &domain.Sensor{
+		ID:        "sensor-05",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.821535,
+		Longitude: 9.487200,
+		Status:    domain.SensorStatusOnline,
+		Data:      []*domain.SensorData{TestSensorData[0]},
+	}
 )

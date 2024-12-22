@@ -3,9 +3,6 @@ package sensor
 import (
 	"context"
 	"errors"
-	"testing"
-	"time"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	treeUtils "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
@@ -13,6 +10,7 @@ import (
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"testing"
 )
 
 func TestSensorService_GetAll(t *testing.T) {
@@ -542,94 +540,4 @@ func TestReady(t *testing.T) {
 		// then
 		assert.False(t, ready)
 	})
-}
-
-var TestMqttPayload = &entities.MqttPayload{
-	DeviceID:    "sensor-123",
-	Battery:     34.0,
-	Humidity:    50,
-	Temperature: 20,
-	Watermarks: []entities.Watermark{
-		{
-			Resistance: 23,
-			Centibar:   38,
-			Depth:      30,
-		},
-		{
-			Resistance: 23,
-			Centibar:   38,
-			Depth:      60,
-		},
-		{
-			Resistance: 23,
-			Centibar:   38,
-			Depth:      90,
-		},
-	},
-}
-
-var TestSensor = &entities.Sensor{
-	ID:        "sensor-1",
-	CreatedAt: time.Now(),
-	UpdatedAt: time.Now(),
-	Latitude:  54.82124518093376,
-	Longitude: 9.485702120628517,
-	Status:    entities.SensorStatusOnline,
-	Data:      []*entities.SensorData{TestSensorData[0]},
-}
-
-var TestSensorList = []*entities.Sensor{
-	TestSensor,
-	{
-		ID:        "sensor-2",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.78780993841013,
-		Longitude: 9.444052105200551,
-		Status:    entities.SensorStatusOffline,
-		Data:      []*entities.SensorData{},
-	},
-	{
-		ID:        "sensor-3",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.77933725347423,
-		Longitude: 9.426465409018832,
-		Status:    entities.SensorStatusUnknown,
-		Data:      []*entities.SensorData{},
-	},
-	{
-		ID:        "sensor-4",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.82078826498143,
-		Longitude: 9.489684366114483,
-		Status:    entities.SensorStatusOnline,
-		Data:      []*entities.SensorData{},
-	},
-}
-
-var TestSensorData = []*entities.SensorData{
-	{
-		ID:        1,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Data:      TestMqttPayload,
-	},
-	{
-		ID:        2,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Data:      TestMqttPayload,
-	},
-}
-
-var TestSensorNearestTree = &entities.Sensor{
-	ID:        "sensor-05",
-	CreatedAt: time.Now(),
-	UpdatedAt: time.Now(),
-	Latitude:  54.821535,
-	Longitude: 9.487200,
-	Status:    entities.SensorStatusOnline,
-	Data:      []*entities.SensorData{TestSensorData[0]},
 }
