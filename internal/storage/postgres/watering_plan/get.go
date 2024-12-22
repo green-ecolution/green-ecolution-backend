@@ -108,11 +108,14 @@ func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.Wat
 		wp.Trailer = nil
 	}
 
+	// Only load evaluation values if the watering plan is set to »finished«
 	if wp.Status == entities.WateringPlanStatusFinished {
 		wp.Evaluation, err = w.GetEvaluationValues(ctx, wp.ID)
 		if err != nil {
 			return w.store.HandleError(err)
 		}
+	} else {
+		wp.Evaluation = []*entities.EvaluationValue{}
 	}
 
 	// TODO: map correct users
