@@ -13,17 +13,16 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/vehicle"
 	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/watering_plan"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
-func NewService(cfg *config.Config, repos *storage.Repository) *service.Services {
-	geoLocator := treecluster.NewGeoLocation(repos.Tree, repos.Region)
-
+func NewService(cfg *config.Config, repos *storage.Repository, eventMananger *worker.EventManager) *service.Services {
 	return &service.Services{
 		InfoService:         info.NewInfoService(repos.Info),
-		TreeService:         tree.NewTreeService(repos.Tree, repos.Sensor, repos.Image, repos.TreeCluster, geoLocator),
+		TreeService:         tree.NewTreeService(repos.Tree, repos.Sensor, repos.Image, repos.TreeCluster, eventMananger),
 		AuthService:         auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
 		RegionService:       region.NewRegionService(repos.Region),
-		TreeClusterService:  treecluster.NewTreeClusterService(repos.TreeCluster, repos.Tree, repos.Region, geoLocator),
+		TreeClusterService:  treecluster.NewTreeClusterService(repos.TreeCluster, repos.Tree, repos.Region, eventMananger),
 		VehicleService:      vehicle.NewVehicleService(repos.Vehicle),
 		SensorService:       sensor.NewSensorService(repos.Sensor, repos.Tree, repos.Flowerbed),
 		PluginService:       plugin.NewPluginManager(repos.Auth),

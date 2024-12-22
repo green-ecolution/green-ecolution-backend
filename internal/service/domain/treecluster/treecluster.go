@@ -10,28 +10,29 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
 type TreeClusterService struct {
 	treeClusterRepo storage.TreeClusterRepository
 	treeRepo        storage.TreeRepository
 	regionRepo      storage.RegionRepository
-	locator         service.GeoClusterLocator
 	validator       *validator.Validate
+	eventManager    *worker.EventManager
 }
 
 func NewTreeClusterService(
 	treeClusterRepo storage.TreeClusterRepository,
 	treeRepo storage.TreeRepository,
 	regionRepo storage.RegionRepository,
-	locator service.GeoClusterLocator,
+	eventManager *worker.EventManager,
 ) service.TreeClusterService {
 	return &TreeClusterService{
 		treeClusterRepo: treeClusterRepo,
 		treeRepo:        treeRepo,
 		regionRepo:      regionRepo,
-		locator:         locator,
 		validator:       validator.New(),
+		eventManager:    eventManager,
 	}
 }
 
@@ -51,6 +52,86 @@ func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.Tre
 	}
 
 	return treeCluster, nil
+}
+
+func (s *TreeClusterService) getUpdatedLatLong(ctx context.Context, tc *domain.TreeCluster) (lat, long *float64, region *domain.Region, err error) {
+	if len(tc.Trees) == 0 {
+		return nil, nil, nil, nil
+	}
+
+	latitude, longitude, err := s.treeClusterRepo.GetCenterPoint(ctx, tc.ID)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	region, err = s.regionRepo.GetByPoint(ctx, latitude, longitude)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return &latitude, &longitude, region, nil
+}
+
+func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, oldTc *domain.TreeCluster) error {
+	slog.Debug("publish new event", "event", domain.EventTypeUpdateTreeCluster, "service", "TreeClusterService")
+	updatedTc, err := s.treeClusterRepo.GetByID(ctx, oldTc.ID)
+	if err != nil {
+		return err
+	}
+	event := domain.NewEventUpdateTreeCluster(*oldTc, *updatedTc)
+	err = s.eventManager.Publish(event)
+	if err != nil {
+		slog.Error("error while sending event after updating tree cluster", "err", err)
+	}
+
+	return nil
+}
+
+func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event domain.EventUpdateTree) error {
+	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+	oldTc := event.Old.TreeCluster
+	newTc := event.New.TreeCluster
+
+	if oldTc == nil && newTc == nil {
+		return nil
+	}
+
+	treePosSame := event.Old.Latitude == event.New.Latitude && event.Old.Longitude == event.New.Longitude
+	tcSame := oldTc != nil && newTc != nil && oldTc.ID == newTc.ID
+
+	if treePosSame && tcSame {
+		return nil
+	}
+
+	updateFn := func(tc *domain.TreeCluster) (bool, error) {
+		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
+		if err != nil {
+			return false, err
+		}
+
+		tc.Latitude = lat
+		tc.Longitude = long
+		tc.Region = region
+
+		return true, nil
+	}
+
+	if oldTc != nil {
+		if err := s.treeClusterRepo.Update(ctx, oldTc.ID, updateFn); err == nil {
+			if err := s.publishUpdateEvent(ctx, oldTc); err != nil {
+				return err
+			}
+		}
+	}
+	if !tcSame && newTc != nil {
+		if err := s.treeClusterRepo.Update(ctx, newTc.ID, updateFn); err == nil {
+			if err := s.publishUpdateEvent(ctx, newTc); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
@@ -73,9 +154,14 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		tc.Description = createTc.Description
 		tc.Trees = trees
 
-		if err = s.locator.UpdateCluster(ctx, tc); err != nil {
-			return false, handleError(err)
+		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
+		if err != nil {
+			return false, nil
 		}
+
+		tc.Latitude = lat
+		tc.Longitude = long
+		tc.Region = region
 
 		return true, nil
 	})
@@ -97,6 +183,11 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		return nil, handleError(err)
 	}
 
+	oldTc, err := s.treeClusterRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
 	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		tc.Trees = trees
 		tc.Name = tcUpdate.Name
@@ -104,14 +195,23 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
 
-		if err := s.locator.UpdateCluster(ctx, tc); err != nil {
-			return false, err
+		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
+		if err != nil {
+			return false, nil
 		}
+
+		tc.Latitude = lat
+		tc.Longitude = long
+		tc.Region = region
 
 		return true, nil
 	})
 
 	if err != nil {
+		return nil, handleError(err)
+	}
+
+	if err := s.publishUpdateEvent(ctx, oldTc); err != nil {
 		return nil, handleError(err)
 	}
 
@@ -172,13 +272,24 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 
 		slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
 
-		err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, func(tc *domain.TreeCluster) (bool, error) {
-			if err := s.locator.UpdateCluster(ctx, tc); err != nil {
+		updateFn := func(tc *domain.TreeCluster) (bool, error) {
+			lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
+			if err != nil {
 				return false, err
 			}
+
+			tc.Latitude = lat
+			tc.Longitude = long
+			tc.Region = region
+
 			return true, nil
-		})
-		if err != nil {
+		}
+
+		if err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, updateFn); err != nil {
+			return err
+		}
+
+		if err := s.publishUpdateEvent(ctx, tree.TreeCluster); err != nil {
 			return err
 		}
 

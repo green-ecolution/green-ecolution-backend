@@ -9,7 +9,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
-	"github.com/twpayne/go-geos"
 )
 
 func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
@@ -79,25 +78,6 @@ func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*ent
 	}
 
 	return t, nil
-}
-
-func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, long float64, err error) {
-	geoStr, err := r.store.CalculateGroupedCentroids(ctx, ids)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	// Parse geoStr to get latitude and longitude
-	g, err := geos.NewGeomFromWKT(geoStr)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	if g.IsEmpty() {
-		return 0, 0, errors.New("empty geometry")
-	}
-
-	return g.X(), g.Y(), nil
 }
 
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {

@@ -20,6 +20,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/docs"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
@@ -28,6 +29,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
@@ -122,16 +125,28 @@ func main() {
 		WateringPlan: postgresRepo.WateringPlan,
 	}
 
-	services := domain.NewService(cfg, repositories)
+	eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+	services := domain.NewService(cfg, repositories, eventManager)
 	httpServer := http.NewServer(cfg, services)
 	mqttServer := mqtt.NewMqtt(cfg, services)
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(4)
 
 	go func() {
 		defer wg.Done()
 		mqttServer.RunSubscriber(ctx)
+	}()
+
+	go func() {
+		defer wg.Done()
+		eventManager.Run(ctx)
+
+	}()
+
+	go func() {
+		defer wg.Done()
+		_ = eventManager.RunSubscription(ctx, subscriber.NewUpdateTreeSubscriber(services.TreeClusterService))
 	}()
 
 	go func() {

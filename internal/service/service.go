@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -82,23 +83,7 @@ type RegionService interface {
 type TreeClusterService interface {
 	Service
 	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
-}
-
-type GeoClusterLocator interface {
-	// UpdateCluster updates the center coordinates and region of the specified TreeCluster based on its contained trees.
-	//
-	// This method recalculates the cluster's latitude and longitude by computing the center point of all trees within the cluster.
-	// If the cluster contains no trees, the center coordinates and region are cleared.
-	//
-	// Only the TreeCluster object provided via the pointer is modified. The underlying storage remains unaffected.
-	//
-	// Parameters:
-	//   - ctx: The context for managing request-scoped values, cancellation, and timeouts.
-	//   - cluster: A pointer to the TreeCluster to be updated.
-	//
-	// Returns:
-	//   An error if the update process fails, otherwise nil.
-	UpdateCluster(ctx context.Context, cluster *domain.TreeCluster) error
+	HandleUpdateTree(context.Context, entities.EventUpdateTree) error
 }
 
 type SensorService interface {
