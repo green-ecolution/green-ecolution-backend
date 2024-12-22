@@ -18,14 +18,14 @@ INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id) VALUES
 (2, 5);
 
 INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id, consumed_water) VALUES 
-(1, 1, 0.0),
-(2, 1, 0.0),
-(3, 2, 0.0),
-(1, 3, 0.0),
-(2, 3, 0.0),
-(3, 3, 0.0),
-(3, 4, 0.0),
-(3, 5, 0.0);
+(1, 1, 10.0),
+(2, 1, 10.0),
+(3, 2, 10.0),
+(1, 3, 10.0),
+(2, 3, 10.0),
+(3, 3, 10.0),
+(3, 4, 10.0),
+(3, 5, 10.0);
 -- +goose StatementEnd
 
 -- +goose Down
