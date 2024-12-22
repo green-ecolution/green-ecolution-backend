@@ -35,6 +35,9 @@ INSERT INTO sensors (id, status, latitude, longitude, geometry)
 VALUES
     ('sensor-4', 'online', 54.82042158396298, 9.488535474607701, ST_SetSRID(ST_MakePoint(54.82042158396298, 9.488535474607701), 4326));
 
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('tree-sensor', 'online', 54.774932, 9.450000, ST_SetSRID(ST_MakePoint(54.774932, 9.450000), 4326));
 
 INSERT INTO trees (tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, readonly, watering_status, description)
 VALUES 
