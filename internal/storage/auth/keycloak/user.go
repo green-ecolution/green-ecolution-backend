@@ -25,6 +25,8 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 	}
 }
 
+const millisecondsInSecond = 1000
+
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
 	slog.Debug("Creating user in keycloak", "user", user)
 	if user == nil {
@@ -84,11 +86,12 @@ func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string)
 }
 
 func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
-	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to log in to Keycloak")
 	}
 	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+
 	users, err := client.GetUsers(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get users from Keycloak")
@@ -97,12 +100,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	var allUsers []*entities.User
 
 	for _, kcUser := range users {
-		userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, *kcUser.ID)
-		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("failed to get created user by id: '%v'", *kcUser.ID))
-		}
-		user, err := keyCloakUserToUser(userKeyCloak)
-
+		user, err := keyCloakUserToUser(kcUser)
 		if err != nil {
 			continue
 		}
@@ -117,16 +115,20 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to parse user id: '%v'", *user.ID))
 	}
-	var phoneNumber string
-	var employeeID string
+	var phoneNumber, employeeID string
 	if user.Attributes != nil {
-		phoneNumber = (*user.Attributes)["phone_number"][0]
-		employeeID = (*user.Attributes)["employee_id"][0]
+		if val, ok := (*user.Attributes)["phone_number"]; ok && len(val) > 0 {
+			phoneNumber = val[0]
+		}
+
+		if val, ok := (*user.Attributes)["employee_id"]; ok && len(val) > 0 {
+			employeeID = val[0]
+		}
 	}
 
 	return &entities.User{
 		ID:          userID,
-		CreatedAt:   time.Unix(*user.CreatedTimestamp, 0),
+		CreatedAt:   time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
 		Username:    *user.Username,
 		FirstName:   *user.FirstName,
 		LastName:    *user.LastName,

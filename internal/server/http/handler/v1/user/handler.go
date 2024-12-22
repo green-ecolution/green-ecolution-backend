@@ -210,6 +210,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 				EmailVerified: user.EmailVerified,
 			}
 		}
+
 		return c.Status(fiber.StatusOK).JSON(response)
 	}
 }

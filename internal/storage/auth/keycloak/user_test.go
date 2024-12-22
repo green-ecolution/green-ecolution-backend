@@ -2,8 +2,6 @@ package keycloak
 
 import (
 	"context"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
 
@@ -300,120 +298,55 @@ func TestKeyCloakUserRepo_UserToKeyCloakUser(t *testing.T) {
 	})
 }
 
-type MockGoCloakClient struct {
-	mock.Mock
-}
+func TestKeyCloakUserRepo_GetAll(t *testing.T) {
+	t.Run("should get all users successfully", func(t *testing.T) {
+		// given
+		identityConfig := suite.IdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
 
-func (m *MockGoCloakClient) GetUsers(ctx context.Context, token, realm string, params gocloak.GetUsersParams) ([]*gocloak.User, error) {
-	args := m.Called(ctx, token, realm, params)
-	return args.Get(0).([]*gocloak.User), args.Error(1)
-}
+		// Create mock users in Keycloak
+		user1 := &entities.User{
+			Username:    "user1",
+			FirstName:   "John",
+			LastName:    "Doe",
+			Email:       "john.doe@green-ecolution.de",
+			EmployeeID:  "EMP001",
+			PhoneNumber: "+49 123456789",
+		}
+		user2 := &entities.User{
+			Username:    "user2",
+			FirstName:   "Jane",
+			LastName:    "Doe",
+			Email:       "jane.doe@green-ecolution.de",
+			EmployeeID:  "EMP002",
+			PhoneNumber: "+49 987654321",
+		}
 
-func (m *MockGoCloakClient) GetUserByID(ctx context.Context, token, realm, userID string) (*gocloak.User, error) {
-	args := m.Called(ctx, token, realm, userID)
-	return args.Get(0).(*gocloak.User), args.Error(1)
-}
+		suite.EnsureUserExists(t, user1)
+		suite.EnsureUserExists(t, user2)
 
-func TestUserRepository_GetAll(t *testing.T) {
-	type fields struct {
-		cfg *config.IdentityAuthConfig
-	}
-	type args struct {
-		ctx context.Context
-	}
-	tests := []struct {
-		name      string
-		fields    fields
-		args      args
-		mockSetup func(client *MockGoCloakClient)
-		want      []*entities.User
-		wantErr   bool
-	}{
-		{
-			name: "should get all users successfully",
-			fields: fields{
-				cfg: suite.IdentityConfig(t, context.Background()),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			mockSetup: func(client *MockGoCloakClient) {
-				mockUUID1, _ := uuid.NewRandom()
-				mockUUID2, _ := uuid.NewRandom()
-				client.On("GetUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*gocloak.User{
-					{
-						ID:               gocloak.StringP(mockUUID1.String()),
-						Username:         gocloak.StringP("user1"),
-						FirstName:        gocloak.StringP("John"),
-						LastName:         gocloak.StringP("Doe"),
-						Email:            gocloak.StringP("john.doe@example.com"),
-						CreatedTimestamp: gocloak.Int64P(1632457600),
-					},
-					{
-						ID:               gocloak.StringP(mockUUID2.String()),
-						Username:         gocloak.StringP("user2"),
-						FirstName:        gocloak.StringP("Jane"),
-						LastName:         gocloak.StringP("Doe"),
-						Email:            gocloak.StringP("jane.doe@example.com"),
-						CreatedTimestamp: gocloak.Int64P(1632457700),
-					},
-				}, nil)
-			},
-			wantErr: false,
-		},
-		{
-			name: "should return error if GetUsers fails",
-			fields: fields{
-				cfg: suite.IdentityConfig(t, context.Background()),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			mockSetup: func(client *MockGoCloakClient) {
-				client.On("GetUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.New("failed to get users from Keycloak"))
-			},
-			wantErr: true,
-		},
-		{
-			name: "should return error if GetUserByID fails",
-			fields: fields{
-				cfg: suite.IdentityConfig(t, context.Background()),
-			},
-			args: args{
-				ctx: context.Background(),
-			},
-			mockSetup: func(client *MockGoCloakClient) {
-				mockUUID, _ := uuid.NewRandom()
-				client.On("GetUsers", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]*gocloak.User{
-					{
-						ID: gocloak.StringP(mockUUID.String()),
-					},
-				}, nil)
-				client.On("GetUserByID", mock.Anything, mock.Anything, mock.Anything, mockUUID.String()).Return(nil, errors.New("failed to get user by ID"))
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mockClient := new(MockGoCloakClient)
-			tt.mockSetup(mockClient)
+		// when
+		users, err := userRepo.GetAll(context.Background())
 
-			r := &UserRepository{
-				cfg: tt.fields.cfg,
-			}
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.GreaterOrEqual(t, len(users), 2) // At least 2 users should exist
+		assert.Contains(t, users, user1)        // Verify user1 is in the list
+		assert.Contains(t, users, user2)        // Verify user2 is in the list
+	})
 
-			got, err := r.GetAll(tt.args.ctx)
-			if tt.wantErr {
-				assert.Error(t, err)
-				assert.Nil(t, got)
-			} else {
-				assert.NoError(t, err)
-				assert.NotNil(t, got)
-				assert.Greater(t, len(got), 0)
-			}
+	t.Run("should return error when login fails", func(t *testing.T) {
+		// given
+		identityConfig := suite.InvalidIdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
 
-			mockClient.AssertExpectations(t)
-		})
-	}
+		// when
+		users, err := userRepo.GetAll(context.Background())
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to log in to Keycloak")
+	})
 }

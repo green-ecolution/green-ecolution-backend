@@ -76,6 +76,28 @@ func (s *KeycloakTestSuite) IdentityConfig(t testing.TB, ctx context.Context) *c
 	}
 }
 
+func (s *KeycloakTestSuite) InvalidIdentityConfig(t testing.TB, ctx context.Context) *config.IdentityAuthConfig {
+	t.Helper()
+	backendClient := s.GetBackendClient(t, ctx)
+	frontendClient := s.GetFrontendClient(t, ctx)
+	return &config.IdentityAuthConfig{
+		OidcProvider: config.OidcProvider{
+			BaseURL:    "http://invalid-url", // Invalid BaseURL
+			DomainName: s.RealmName,
+			AuthURL:    "http://invalid-url/realms/" + s.RealmName + "/protocol/openid-connect/auth",
+			TokenURL:   "http://invalid-url/realms/" + s.RealmName + "/protocol/openid-connect/token",
+			Backend: config.OidcClient{
+				ClientID:     s.BackendClientID,
+				ClientSecret: *backendClient.Secret,
+			},
+			Frontend: config.OidcClient{
+				ClientID:     s.FrontendClientID,
+				ClientSecret: *frontendClient.Secret,
+			},
+		},
+	}
+}
+
 func (s *KeycloakTestSuite) GetAdminClient(t testing.TB, ctx context.Context) *keycloak.AdminClient {
 	t.Helper()
 	adminClient, err := s.Container.GetAdminClient(ctx)
