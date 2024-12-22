@@ -11,7 +11,6 @@ func TestAllServiceReady(t *testing.T) {
 	t.Run("should return true if all service implemented the ServiceReady interface", func(t *testing.T) {
 		// given
 		infoSvc := serviceMock.NewMockInfoService(t)
-		mqttSvc := serviceMock.NewMockMqttService(t)
 		treeSvc := serviceMock.NewMockTreeService(t)
 		authSvc := serviceMock.NewMockAuthService(t)
 		regionSvc := serviceMock.NewMockRegionService(t)
@@ -34,7 +33,6 @@ func TestAllServiceReady(t *testing.T) {
 
 		// when
 		infoSvc.EXPECT().Ready().Return(true)
-		mqttSvc.EXPECT().Ready().Return(true)
 		treeSvc.EXPECT().Ready().Return(true)
 		authSvc.EXPECT().Ready().Return(true)
 		regionSvc.EXPECT().Ready().Return(true)
