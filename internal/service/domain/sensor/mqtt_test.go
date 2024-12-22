@@ -3,6 +3,7 @@ package sensor
 import (
 	"context"
 	"errors"
+	"github.com/go-playground/validator/v10"
 	"testing"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -14,19 +15,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewSensorService(t *testing.T) {
-	repo := storageMock.NewMockSensorRepository(t)
-	t.Run("should create a new service", func(t *testing.T) {
-		svc := NewMqttService(repo)
-		assert.NotNil(t, svc)
-	})
-}
-
 func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should process MQTT payload successfully", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		testPayLoad := TestListMQTTPayload[0]
 		insertData := []*domain.SensorData{
@@ -63,7 +56,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error if sensor update fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		testPayload := TestListMQTTPayload[0]
 
@@ -87,7 +80,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should process MQTT payload and create a new sensor if not found", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		testPayLoad := TestListMQTTPayload[0]
 
@@ -127,7 +120,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error if sensor creation fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		testPayload := TestListMQTTPayload[0]
 
@@ -151,7 +144,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error when payload is nil", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), nil)
@@ -164,7 +157,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return validation error for invalid latitude", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), TestMQTTPayLoadInvalidLat)
@@ -178,7 +171,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return validation error for invalid longitude", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), TestMQTTPayLoadInvalidLong)
@@ -192,7 +185,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error if InsertSensorData fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewMqttService(sensorRepo)
+		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
 
 		testPayLoad := TestListMQTTPayload[0]
 		insertData := []*domain.SensorData{

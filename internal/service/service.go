@@ -56,12 +56,6 @@ type InfoService interface {
 	GetAppInfoResponse(context.Context) (*domain.App, error)
 }
 
-type MqttService interface {
-	Service
-	HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error)
-	SetConnected(bool)
-}
-
 type TreeService interface {
 	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
@@ -113,6 +107,7 @@ type SensorService interface {
 	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
 	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
 	Delete(ctx context.Context, id string) error
+	HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error)
 }
 
 type CrudService[T any, CreateType any, UpdateType any] interface {
@@ -146,7 +141,6 @@ type Service interface {
 
 type Services struct {
 	InfoService         InfoService
-	MqttService         MqttService
 	TreeService         TreeService
 	AuthService         AuthService
 	RegionService       RegionService

@@ -143,6 +143,7 @@ func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Senso
 func (s *SensorService) Ready() bool {
 	return s.sensorRepo != nil
 }
+
 func handleError(err error) error {
 	if errors.Is(err, storage.ErrEntityNotFound) {
 		return service.NewError(service.NotFound, storage.ErrSensorNotFound.Error())

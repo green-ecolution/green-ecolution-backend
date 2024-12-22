@@ -22,7 +22,6 @@ func TestAllServiceReady(t *testing.T) {
 		wateringPlanSvc := serviceMock.NewMockWateringPlanService(t)
 		svc := Services{
 			InfoService:         infoSvc,
-			MqttService:         mqttSvc,
 			TreeService:         treeSvc,
 			AuthService:         authSvc,
 			RegionService:       regionSvc,
