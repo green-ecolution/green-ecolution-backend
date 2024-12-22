@@ -723,7 +723,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: Evaluation values can only be set if the watering plan has been finalised")
+		assert.EqualError(t, err, "400: Evaluation values can only be set if the watering plan has been finished")
 	})
 
 	t.Run("should return validation error when TreeClusterIDs contains nil pointers", func(t *testing.T) {

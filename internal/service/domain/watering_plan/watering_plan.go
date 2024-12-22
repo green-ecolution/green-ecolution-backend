@@ -196,7 +196,7 @@ func (w *WateringPlanService) validateStatusDependentValues(entity *entities.Wat
 	}
 
 	if entity.Status != entities.WateringPlanStatusFinished && len(entity.Evaluation) > 0 {
-		return service.NewError(service.BadRequest, "Evaluation values can only be set if the watering plan has been finalised")
+		return service.NewError(service.BadRequest, "Evaluation values can only be set if the watering plan has been finished")
 	}
 
 	return nil
