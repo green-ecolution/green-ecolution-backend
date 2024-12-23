@@ -151,7 +151,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		canellationNote := "This watering plan is canceled"
+		cancellationNote := "This watering plan is canceled"
 
 		updateFn := func(wp *entities.WateringPlan) (bool, error) {
 			wp.Date = input.Date
@@ -161,7 +161,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.TreeClusters = input.TreeClusters
 			wp.Users = input.Users
 			wp.Status = entities.WateringPlanStatusCanceled
-			wp.CancellationNote = canellationNote
+			wp.CancellationNote = cancellationNote
 			return true, nil
 		}
 
@@ -176,10 +176,10 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.NotZero(t, got.ID)
 		assert.Equal(t, input.Date, got.Date)
 		assert.Equal(t, entities.WateringPlanStatusCanceled, got.Status)
-		assert.Equal(t, canellationNote, got.CancellationNote)
+		assert.Equal(t, cancellationNote, got.CancellationNote)
 	})
 
-	t.Run("should return error when canellation note is not empty and the status is not canceled", func(t *testing.T) {
+	t.Run("should return error when cancellation note is not empty and the status is not canceled", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
