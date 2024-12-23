@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/url"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -189,6 +190,16 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Security		Keycloak
 func GetAllUsers(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		page := c.Query("page")
+		limit := c.Query("limit")
+
+		if page != "" && !isNumeric(page) {
+			return c.Status(fiber.StatusBadRequest).JSON("Invalid page parameter")
+		}
+		if limit != "" && !isNumeric(limit) {
+			return c.Status(fiber.StatusBadRequest).JSON("Invalid limit parameter")
+		}
+
 		ctx := c.Context()
 
 		users, err := svc.GetAllUsers(ctx)
@@ -343,4 +354,9 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 
 		return c.JSON(response)
 	}
+}
+
+func isNumeric(s string) bool {
+	_, err := strconv.Atoi(s)
+	return err == nil
 }

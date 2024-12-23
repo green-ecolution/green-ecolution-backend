@@ -301,7 +301,7 @@ func TestLogoutRequest(t *testing.T) {
 	})
 }
 
-func TestAuthService_GetAllUsers(t *testing.T) {
+func TestGetAllUsers(t *testing.T) {
 	t.Run("should return all users successfully", func(t *testing.T) {
 		// given
 		userRepo := storageMock.NewMockUserRepository(t)

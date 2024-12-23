@@ -627,6 +627,7 @@ func TestGetAllUsers(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 		mockAuthService.AssertExpectations(t)
 	})
+
 }
 
 func generateJWT(t testing.TB, sub string) string {

@@ -25,8 +25,6 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 	}
 }
 
-const millisecondsInSecond = 1000
-
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
 	slog.Debug("Creating user in keycloak", "user", user)
 	if user == nil {
@@ -125,7 +123,7 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 			employeeID = val[0]
 		}
 	}
-
+	const millisecondsInSecond = 1000
 	return &entities.User{
 		ID:          userID,
 		CreatedAt:   time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
