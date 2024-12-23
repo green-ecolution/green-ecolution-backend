@@ -4,6 +4,7 @@ package worker
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"sync"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -128,6 +129,7 @@ func (e *EventManager) Subscribe(eventType entities.EventType) (int, <-chan enti
 	e.subscriber[eventType][id] = ch
 	e.nextID++
 
+	slog.Info("start to subscribe an event", "event_type", eventType, "event_id", id)
 	return id, ch, nil
 }
 
@@ -157,6 +159,7 @@ func (e *EventManager) Unsubscribe(eventType entities.EventType, id int) error {
 	e.rwMutex.Lock()
 	defer e.rwMutex.Unlock()
 
+	slog.Info("unsubscribe to an event", "event_type", eventType, "event_id", id)
 	return e.unsubscribe(eventType, id)
 }
 
@@ -177,6 +180,7 @@ func (e *EventManager) unsubscribe(eventType entities.EventType, id int) error {
 //
 // This method is called internally to release resources and ensure that all channels are closed.
 func (e *EventManager) cleanup() {
+	slog.Info("cleanup event manager")
 	e.rwMutex.Lock()
 	defer e.rwMutex.Unlock()
 
@@ -211,6 +215,7 @@ func (e *EventManager) Stop() {
 //	// Perform operations...
 //	cancel()
 func (e *EventManager) Run(ctx context.Context) {
+	slog.Info("starting event manager")
 	defer e.cleanup()
 	for {
 		select {
