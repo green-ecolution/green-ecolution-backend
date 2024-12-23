@@ -2,6 +2,8 @@ package entities
 
 import (
 	"time"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
 )
 
 type SensorStatus string // @Name SensorStatus
@@ -13,12 +15,13 @@ const (
 )
 
 type SensorResponse struct {
-	ID        string       `json:"id"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	Status    SensorStatus `json:"status"`
-	Latitude  float64      `json:"latitude"`
-	Longitude float64      `json:"longitude"`
+	ID         string              `json:"id"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
+	Status     SensorStatus        `json:"status"`
+	LatestData *SensorDataResponse `json:"latest_data"`
+	Latitude   float64             `json:"latitude"`
+	Longitude  float64             `json:"longitude"`
 } // @Name Sensor
 
 type SensorListResponse struct {
@@ -27,13 +30,11 @@ type SensorListResponse struct {
 } // @Name SensorList
 
 type SensorDataResponse struct {
-	ID               string  `json:"id"`
-	BatteryLevel     float64 `json:"battery_level"`
-	Temperature      float64 `json:"temperature"`
-	Humidity         float64 `json:"humidity"`
-	TrunkMoisture    float64 `json:"trunk_moisture"`
-	SoilWaterTension float64 `json:"soil_water_tension"`
-	Depth            float64 `json:"depth"`
+	ID        int32                       `json:"id"`
+	SensorID  string                      `json:"sensor_id"`
+	CreatedAt time.Time                   `json:"created_at"`
+	UpdatedAt time.Time                   `json:"updated_at"`
+	Data      *sensor.MqttPayloadResponse `json:"data"`
 } // @Name SensorData
 
 type SensorDataListResponse struct {

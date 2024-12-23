@@ -9,7 +9,7 @@ import (
 
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
-// goverter:extend MapSensorStatus
+// goverter:extend MapSensorStatus MapSensorData
 type SensorHTTPMapper interface {
 	FromResponse(src *domain.Sensor) *entities.SensorResponse
 }
