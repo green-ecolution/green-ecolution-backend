@@ -41,7 +41,8 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 
 		vehicleTypeStr := c.Query("type")
 		if vehicleTypeStr != "" {
-			vehicleType, err := parseVehicleType(vehicleTypeStr)
+			var vehicleType domain.VehicleType
+			vehicleType, err = parseVehicleType(vehicleTypeStr)
 			if err != nil {
 				return errorhandler.HandleError(err)
 			}
