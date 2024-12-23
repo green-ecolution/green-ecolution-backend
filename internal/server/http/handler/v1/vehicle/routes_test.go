@@ -36,7 +36,6 @@ func TestRegisterRoutes(t *testing.T) {
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
 
-
 		t.Run("should call GET handler with vehicle type parameter", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()

@@ -53,7 +53,7 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
-		
+
 		data := make([]*entities.VehicleResponse, len(domainData))
 		for i, domain := range domainData {
 			data[i] = mapVehicleToDto(domain)
