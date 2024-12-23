@@ -125,8 +125,8 @@ func TestSensorRepository_GetByID(t *testing.T) {
 	})
 }
 
-func TestSensorRepository_GetStatusByID(t *testing.T) {
-	t.Run("should return sensor status by id", func(t *testing.T) {
+func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
+	t.Run("should return last sensor data for valid id", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -134,148 +134,14 @@ func TestSensorRepository_GetStatusByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetStatusByID(ctx, "sensor-1")
+		data, err := r.GetLastSensorDataByID(ctx, "sensor-1")
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, entities.SensorStatusOnline, *got)
-	})
-
-	t.Run("should return error when sensor not found", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetStatusByID(ctx, "sensor-1")
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("should return error when sensor id is empty", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetStatusByID(ctx, "")
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("should return error when context is canceled", func(t *testing.T) {
-		// given
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		suite.ResetDB(t)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		// when
-		got, err := r.GetStatusByID(ctx, "sensor-1")
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-}
-
-func TestSensorRepository_GetSensorByStatus(t *testing.T) {
-	t.Run("should return sensors by status", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetSensorByStatus(ctx, &TestSensorList[1].Status)
-
-		testSensorList := []*entities.Sensor{TestSensorList[1]}
-
-		// then
-
-		assert.NoError(t, err)
-		assert.NotEmpty(t, got)
-		assert.Len(t, got, len(testSensorList))
-		for i := range got {
-			assert.Equal(t, testSensorList[i].ID, got[i].ID)
-			assert.Equal(t, testSensorList[i].Status, got[i].Status)
-			assert.Equal(t, testSensorList[i].Latitude, got[i].Latitude)
-			assert.Equal(t, testSensorList[i].Longitude, got[i].Longitude)
-			assert.NotZero(t, got[i].CreatedAt)
-			assert.NotZero(t, got[i].UpdatedAt)
-		}
-	})
-
-	t.Run("should return empty slice when no sensors match status", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		status := entities.SensorStatus("offline")
-		got, err := r.GetSensorByStatus(ctx, &status)
-
-		// then
-		assert.NoError(t, err)
-		assert.Empty(t, got)
-	})
-
-	t.Run("should return error when status is nil", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetSensorByStatus(ctx, nil)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-
-	t.Run("should return error when context is canceled", func(t *testing.T) {
-		// given
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		// when
-		got, err := r.GetSensorByStatus(ctx, &TestSensorList[0].Status)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
-	})
-}
-
-func TestSensorRepository_GetSensorDataByID(t *testing.T) {
-	t.Run("should return sensor data for valid id", func(t *testing.T) {
-		// given
-		ctx := context.Background()
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
-		r := NewSensorRepository(suite.Store, defaultSensorMappers())
-
-		// when
-		got, err := r.GetSensorDataByID(ctx, "sensor-1")
-
-		// then
-		assert.NoError(t, err)
-		assert.NotEmpty(t, got)
-		for _, data := range got {
-			assert.Equal(t, int32(1), data.ID)
-			assert.NotZero(t, data.CreatedAt)
-			assert.NotZero(t, data.UpdatedAt)
-		}
+		assert.NotEmpty(t, data)
+		assert.Equal(t, int32(1), data.ID)
+		assert.NotZero(t, data.CreatedAt)
+		assert.NotZero(t, data.UpdatedAt)
 	})
 
 	t.Run("should return empty slice when no data found", func(t *testing.T) {
@@ -285,7 +151,7 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, "notFoundID")
+		got, err := r.GetLastSensorDataByID(ctx, "notFoundID")
 
 		// then
 		assert.NoError(t, err)
@@ -300,7 +166,7 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetSensorDataByID(ctx, "sensor-1")
+		got, err := r.GetLastSensorDataByID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)
@@ -310,40 +176,40 @@ func TestSensorRepository_GetSensorDataByID(t *testing.T) {
 
 var TestSensorList = []*entities.Sensor{
 	{
-		ID:        "sensor-1",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.82124518093376,
-		Longitude: 9.485702120628517,
-		Status:    entities.SensorStatusOnline,
-		Data:      []*entities.SensorData{TestSensorData[0]},
+		ID:         "sensor-1",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Latitude:   54.82124518093376,
+		Longitude:  9.485702120628517,
+		Status:     entities.SensorStatusOnline,
+		LatestData: TestSensorData[0],
 	},
 	{
-		ID:        "sensor-2",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.78780993841013,
-		Longitude: 9.444052105200551,
-		Status:    entities.SensorStatusOffline,
-		Data:      []*entities.SensorData{},
+		ID:         "sensor-2",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Latitude:   54.78780993841013,
+		Longitude:  9.444052105200551,
+		Status:     entities.SensorStatusOffline,
+		LatestData: nil,
 	},
 	{
-		ID:        "sensor-3",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.77933725347423,
-		Longitude: 9.426465409018832,
-		Status:    entities.SensorStatusUnknown,
-		Data:      []*entities.SensorData{},
+		ID:         "sensor-3",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Latitude:   54.77933725347423,
+		Longitude:  9.426465409018832,
+		Status:     entities.SensorStatusUnknown,
+		LatestData: nil,
 	},
 	{
-		ID:        "sensor-4",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.82078826498143,
-		Longitude: 9.489684366114483,
-		Status:    entities.SensorStatusOnline,
-		Data:      []*entities.SensorData{},
+		ID:         "sensor-4",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Latitude:   54.82078826498143,
+		Longitude:  9.489684366114483,
+		Status:     entities.SensorStatusOnline,
+		LatestData: nil,
 	},
 }
 

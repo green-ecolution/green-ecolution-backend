@@ -14,13 +14,11 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend MapSensorStatus
 type InternalSensorRepoMapper interface {
-	// goverter:ignore Data
+	// goverter:ignore LatestData
 	FromSql(src *sqlc.Sensor) *entities.Sensor
 	FromSqlList(src []*sqlc.Sensor) []*entities.Sensor
-
 	// goverter:ignore Data
 	FromSqlSensorData(src *sqlc.SensorDatum) *entities.SensorData
-
 	FromDomainSensorData(src *entities.MqttPayload) *mqtt.MqttPayload
 }
 

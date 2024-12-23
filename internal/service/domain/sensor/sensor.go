@@ -60,7 +60,7 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 	}
 
 	created, err := s.sensorRepo.Create(ctx,
-		sensor.WithData(sc.Data),
+		//sensor.WithLatestData(sc.Data),
 		sensor.WithStatus(sc.Status),
 	)
 
@@ -82,7 +82,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 	}
 
 	updated, err := s.sensorRepo.Update(ctx, id,
-		sensor.WithData(su.Data),
+		//sensor.WithData(su.Data),
 		sensor.WithStatus(su.Status),
 	)
 	if err != nil {

@@ -153,10 +153,8 @@ type SensorRepository interface {
 	Update(ctx context.Context, id string, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
 	Delete(ctx context.Context, id string) error
 
-	GetStatusByID(ctx context.Context, id string) (*entities.SensorStatus, error)
-	GetSensorByStatus(ctx context.Context, status *entities.SensorStatus) ([]*entities.Sensor, error)
-	GetSensorDataByID(ctx context.Context, id string) ([]*entities.SensorData, error)
-	InsertSensorData(ctx context.Context, data []*entities.SensorData, id string) ([]*entities.SensorData, error)
+	GetLastSensorDataByID(ctx context.Context, id string) (*entities.SensorData, error)
+	InsertSensorData(ctx context.Context, data *entities.SensorData, id string) error
 }
 
 type FlowerbedRepository interface {

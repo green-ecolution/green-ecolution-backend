@@ -13,10 +13,10 @@ import (
 
 func defaultSensor() *entities.Sensor {
 	return &entities.Sensor{
-		Status:    entities.SensorStatusUnknown,
-		Data:      make([]*entities.SensorData, 0),
-		Latitude:  0,
-		Longitude: 0,
+		Status:     entities.SensorStatusUnknown,
+		LatestData: nil,
+		Latitude:   0,
+		Longitude:  0,
 	}
 }
 
@@ -41,8 +41,8 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	}
 
 	entity.ID = id
-	if len(entity.Data) > 0 {
-		_, err = r.InsertSensorData(ctx, entity.Data, id)
+	if entity.LatestData != nil {
+		err = r.InsertSensorData(ctx, entity.LatestData, id)
 		if err != nil {
 			return nil, err
 		}
@@ -51,34 +51,32 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	return r.GetByID(ctx, id)
 }
 
-func (r *SensorRepository) InsertSensorData(ctx context.Context, data []*entities.SensorData, id string) ([]*entities.SensorData, error) {
-	if len(data) == 0 {
-		return nil, errors.New("data cannot be empty")
+func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *entities.SensorData, id string) error {
+	if latestData != nil {
+		return errors.New("latest data cannot be empty")
 	}
 
 	if id == "" {
-		return nil, r.store.HandleError(errors.New("sensor id cannot be empty"))
+		return r.store.HandleError(errors.New("sensor id cannot be empty"))
 	}
 
-	for _, d := range data {
-		mqttData := r.mapper.FromDomainSensorData(d.Data)
-		raw, err := json.Marshal(mqttData)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshal mqtt data")
-		}
-
-		params := &sqlc.InsertSensorDataParams{
-			SensorID: id,
-			Data:     raw,
-		}
-
-		err = r.store.InsertSensorData(ctx, params)
-		if err != nil {
-			return nil, err
-		}
+	mqttData := r.mapper.FromDomainSensorData(latestData.Data)
+	raw, err := json.Marshal(mqttData)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal mqtt data")
 	}
 
-	return data, nil
+	params := &sqlc.InsertSensorDataParams{
+		SensorID: id,
+		Data:     raw,
+	}
+
+	err = r.store.InsertSensorData(ctx, params)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Sensor) (string, error) {

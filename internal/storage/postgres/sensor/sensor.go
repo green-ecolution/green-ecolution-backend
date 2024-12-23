@@ -37,9 +37,9 @@ func WithStatus(status entities.SensorStatus) entities.EntityFunc[entities.Senso
 	}
 }
 
-func WithData(data []*entities.SensorData) entities.EntityFunc[entities.Sensor] {
+func WithLatestData(data *entities.SensorData) entities.EntityFunc[entities.Sensor] {
 	return func(s *entities.Sensor) {
-		s.Data = data
+		s.LatestData = data
 	}
 }
 
