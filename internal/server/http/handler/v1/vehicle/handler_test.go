@@ -47,63 +47,11 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return an empty list when no vehicles are available", func(t *testing.T) {
+	t.Run("should return all vehicles by one type successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
-
-		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-		).Return([]*entities.Vehicle{}, nil)
-
-		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-		var response serverEntities.VehicleListResponse
-		err = utils.ParseJSONResponse(resp, &response)
-		assert.NoError(t, err)
-		assert.NoError(t, err)
-		assert.Equal(t, 0, len(response.Data))
-
-		mockVehicleService.AssertExpectations(t)
-	})
-
-	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
-		app := fiber.New()
-		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := vehicle.GetAllVehicles(mockVehicleService)
-		app.Get("/v1/vehicle", handler)
-
-		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
-
-		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
-
-		mockVehicleService.AssertExpectations(t)
-	})
-}
-
-func TestGetAllVehiclesByType(t *testing.T) {
-	t.Run("should return all vehicles of transporter successfully", func(t *testing.T) {
-		app := fiber.New()
-		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := vehicle.GetAllVehiclesByType(mockVehicleService)
-		app.Get("/v1/vehicle/type/:type", handler)
 
 		mockVehicleService.EXPECT().GetAllByType(
 			mock.Anything,
@@ -111,7 +59,7 @@ func TestGetAllVehiclesByType(t *testing.T) {
 		).Return([]*entities.Vehicle{TestVehicles[1]}, nil)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/type/transporter", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?type=transporter", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -130,16 +78,15 @@ func TestGetAllVehiclesByType(t *testing.T) {
 	t.Run("should return an empty list when no vehicles are available", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := vehicle.GetAllVehiclesByType(mockVehicleService)
-		app.Get("/v1/vehicle/type/:type", handler)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
 
-		mockVehicleService.EXPECT().GetAllByType(
+		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			entities.VehicleType("transporter"),
 		).Return([]*entities.Vehicle{}, nil)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/type/transporter", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -150,6 +97,7 @@ func TestGetAllVehiclesByType(t *testing.T) {
 		var response serverEntities.VehicleListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
+		assert.NoError(t, err)
 		assert.Equal(t, 0, len(response.Data))
 
 		mockVehicleService.AssertExpectations(t)
@@ -158,16 +106,15 @@ func TestGetAllVehiclesByType(t *testing.T) {
 	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := vehicle.GetAllVehiclesByType(mockVehicleService)
-		app.Get("/v1/vehicle/type/:type", handler)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
 
-		mockVehicleService.EXPECT().GetAllByType(
+		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			entities.VehicleType("transporter"),
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/type/transporter", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -178,14 +125,14 @@ func TestGetAllVehiclesByType(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 Bad Request Error when service fails due to invalid type", func(t *testing.T) {
+	t.Run("should return 400 Bad Request Error when service fails due to invalid type parameter", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
-		handler := vehicle.GetAllVehiclesByType(mockVehicleService)
-		app.Get("/v1/vehicle/type/:type", handler)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle/type/invalid", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?type=invalid", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 

@@ -7,7 +7,6 @@ import (
 
 func RegisterRoutes(r fiber.Router, svc service.VehicleService) {
 	r.Get("/", GetAllVehicles(svc))
-	r.Get("/type/:type", GetAllVehiclesByType(svc))
 	r.Get("/:id", GetVehicleByID(svc))
 	r.Get("/plate/:plate", GetVehicleByPlate(svc))
 	r.Post("/", CreateVehicle(svc))
