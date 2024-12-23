@@ -78,6 +78,15 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 	return tc, nil
 }
 
+func (w *WateringPlanRepository) GetTreeClusterWateringPlanList(ctx context.Context, id int32) ([]*entities.TreeClusterWateringPlan, error) {
+	rows, err := w.store.GetAllTreeClusterWateringPlanByID(ctx, id)
+	if err != nil {
+		return nil, w.store.HandleError(err)
+	}
+
+	return w.mapper.TreeClusterWateringPlanFromSqlList(rows), nil
+}
+
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
 	var err error
 
@@ -97,6 +106,13 @@ func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.Wat
 			return w.store.HandleError(err)
 		}
 		wp.Trailer = nil
+	}
+
+	if wp.Status == entities.WateringPlanStatusFinished {
+		wp.TreeClusterWateringPlanList, err = w.GetTreeClusterWateringPlanList(ctx, wp.ID)
+		if err != nil {
+			return w.store.HandleError(err)
+		}
 	}
 
 	// TODO: map correct users

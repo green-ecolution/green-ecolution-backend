@@ -53,6 +53,17 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].Name, tc.Name)
 			}
 
+			// assert consumed water values
+			if allTestWateringPlans[i].TreeClusterWateringPlanList == nil {
+			} else {
+				assert.Len(t, allTestWateringPlans[i].TreeClusterWateringPlanList, len(wp.TreeClusterWateringPlanList))
+				for j, value := range wp.TreeClusterWateringPlanList {
+					assert.Equal(t, allTestWateringPlans[i].TreeClusterWateringPlanList[j].WateringPlanID, value.WateringPlanID)
+					assert.Equal(t, allTestWateringPlans[i].TreeClusterWateringPlanList[j].TreeClusterID, value.TreeClusterID)
+					assert.Equal(t, allTestWateringPlans[i].TreeClusterWateringPlanList[j].ConsumedWater, value.ConsumedWater)
+				}
+			}
+
 			// TODO: assert user
 		}
 	})
@@ -438,6 +449,23 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
 		CancellationNote:   "",
+		TreeClusterWateringPlanList: []*entities.TreeClusterWateringPlan{
+			{
+				WateringPlanID: 1,
+				TreeClusterID:  1,
+				ConsumedWater:  utils.P(10.0),
+			},
+			{
+				WateringPlanID: 1,
+				TreeClusterID:  2,
+				ConsumedWater:  utils.P(10.0),
+			},
+			{
+				WateringPlanID: 1,
+				TreeClusterID:  3,
+				ConsumedWater:  utils.P(10.0),
+			},
+		},
 	},
 	{
 		ID:                 4,

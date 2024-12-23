@@ -69,11 +69,6 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		CancellationNote:   entity.CancellationNote,
 	}
 
-	err = w.store.UpdateWateringPlan(ctx, &params)
-	if err != nil {
-		return w.store.HandleError(err)
-	}
-
 	if err := w.store.DeleteAllVehiclesFromWateringPlan(ctx, entity.ID); err != nil {
 		return w.store.HandleError(err)
 	}
@@ -90,7 +85,31 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return w.store.HandleError(err)
 	}
 
+	if err := w.updateConsumedWaterValues(ctx, entity); err != nil {
+		return w.store.HandleError(err)
+	}
+
 	// TODO: update linked users
 
 	return w.store.UpdateWateringPlan(ctx, &params)
+}
+
+// This function updates the consumed water values for each tree cluster in a finished watering plan.
+// To save the consumed water values, the watering plan must be »finished«
+func (w *WateringPlanRepository) updateConsumedWaterValues(ctx context.Context, entity *entities.WateringPlan) error {
+	if entity.Status != entities.WateringPlanStatusFinished || len(entity.TreeClusterWateringPlanList) == 0 {
+		return nil
+	}
+
+	for _, value := range entity.TreeClusterWateringPlanList {
+		if err := w.store.UpdateTreeClusterWateringPlan(ctx, &sqlc.UpdateTreeClusterWateringPlanParams{
+			WateringPlanID: entity.ID,
+			TreeClusterID:  value.TreeClusterID,
+			ConsumedWater:  *value.ConsumedWater,
+		}); err != nil {
+			return w.store.HandleError(err)
+		}
+	}
+
+	return nil
 }

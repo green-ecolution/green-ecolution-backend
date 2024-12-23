@@ -50,6 +50,24 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 
 	expectedTotalWater := 720.0
 
+	treeClusterWateringPlanList := []*entities.TreeClusterWateringPlan{
+		{
+			WateringPlanID: 1,
+			TreeClusterID:  1,
+			ConsumedWater:  utils.P(10.0),
+		},
+		{
+			WateringPlanID: 1,
+			TreeClusterID:  2,
+			ConsumedWater:  utils.P(10.0),
+		},
+		{
+			WateringPlanID: 1,
+			TreeClusterID:  3,
+			ConsumedWater:  utils.P(10.0),
+		},
+	}
+
 	t.Run("should update watering plan", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
@@ -177,6 +195,83 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, input.Date, got.Date)
 		assert.Equal(t, entities.WateringPlanStatusCanceled, got.Status)
 		assert.Equal(t, cancellationNote, got.CancellationNote)
+	})
+
+	t.Run("should not update consumed water values if status is not finished", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Distance = input.Distance
+			wp.Transporter = input.Transporter
+			wp.TreeClusters = input.TreeClusters
+			wp.Users = input.Users
+			wp.Status = entities.WateringPlanStatusNotCompeted
+			wp.TreeClusterWateringPlanList = treeClusterWateringPlanList
+			return true, nil
+		}
+
+		// when
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.NotZero(t, got.ID)
+		assert.Equal(t, entities.WateringPlanStatusNotCompeted, got.Status)
+
+		// assert consumed water list
+		consumedWaterValues, err := r.GetTreeClusterWateringPlanList(context.Background(), 1)
+		assert.NoError(t, err)
+		assert.NotNil(t, consumedWaterValues)
+		for i, value := range consumedWaterValues {
+			assert.Equal(t, int32(1), value.WateringPlanID)
+			assert.Equal(t, treeClusterWateringPlanList[i].TreeClusterID, value.TreeClusterID)
+			assert.Equal(t, 0.0, *value.ConsumedWater) // should be still zero due to no update
+		}
+	})
+
+	t.Run("should update watering plan to finished and set consumed water values", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Description = input.Description
+			wp.Distance = input.Distance
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.TreeClusters = input.TreeClusters
+			wp.Users = input.Users
+			wp.Status = entities.WateringPlanStatusFinished
+			wp.TreeClusterWateringPlanList = treeClusterWateringPlanList
+			return true, nil
+		}
+
+		// when
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.NotZero(t, got.ID)
+		assert.Equal(t, entities.WateringPlanStatusFinished, got.Status)
+
+		// assert consumed water list
+		consumedWaterValues, err := r.GetTreeClusterWateringPlanList(context.Background(), 1)
+		assert.NoError(t, err)
+		assert.NotNil(t, consumedWaterValues)
+		assert.Len(t, consumedWaterValues, len(treeClusterWateringPlanList))
+		for i, value := range consumedWaterValues {
+			assert.Equal(t, int32(1), value.WateringPlanID)
+			assert.Equal(t, treeClusterWateringPlanList[i].TreeClusterID, value.TreeClusterID)
+			assert.Equal(t, treeClusterWateringPlanList[i].ConsumedWater, value.ConsumedWater) // should be updated
+		}
 	})
 
 	t.Run("should return error when cancellation note is not empty and the status is not canceled", func(t *testing.T) {
