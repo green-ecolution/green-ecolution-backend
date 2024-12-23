@@ -40,7 +40,6 @@ func TestNewService(t *testing.T) {
 		assert.NotNil(t, svc)
 		assert.IsType(t, &service.Services{}, svc)
 		assert.NotNil(t, svc.InfoService)
-		assert.NotNil(t, svc.MqttService)
 		assert.NotNil(t, svc.TreeService)
 		assert.NotNil(t, svc.AuthService)
 		assert.NotNil(t, svc.RegionService)

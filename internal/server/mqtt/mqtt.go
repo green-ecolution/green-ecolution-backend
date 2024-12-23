@@ -37,11 +37,9 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 
 	opts.OnConnect = func(_ MQTT.Client) {
 		slog.Info("Connected to MQTT Broker")
-		m.svc.MqttService.SetConnected(true)
 	}
 	opts.OnConnectionLost = func(_ MQTT.Client, err error) {
 		slog.Error("Connection to MQTT Broker lost", "error", err)
-		m.svc.MqttService.SetConnected(false)
 	}
 
 	client := MQTT.NewClient(opts)
@@ -71,7 +69,7 @@ func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 	slog.Info("Logging sensor data", "sensorData", sensorData)
 
 	domainPayload := m.mapper.FromResponse(sensorData)
-	_, err = m.svc.MqttService.HandleMessage(context.Background(), domainPayload)
+	_, err = m.svc.SensorService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
 		slog.Error("Error handling message", "error", err)
 		return

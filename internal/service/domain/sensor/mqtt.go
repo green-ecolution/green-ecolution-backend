@@ -3,27 +3,13 @@ package sensor
 import (
 	"context"
 
-	"github.com/go-playground/validator/v10"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageSensor "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/pkg/errors"
 )
 
-type MqttService struct {
-	sensorRepo  storage.SensorRepository
-	isConnected bool
-	validator   *validator.Validate
-}
-
-func NewMqttService(sensorRepository storage.SensorRepository) *MqttService {
-	return &MqttService{
-		sensorRepo: sensorRepository,
-		validator:  validator.New()}
-}
-
-func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error) {
+func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error) {
 	if payload == nil {
 		return nil, handleError(errors.New("mqtt payload is nil"))
 	}
@@ -54,7 +40,7 @@ func (s *MqttService) HandleMessage(ctx context.Context, payload *domain.MqttPay
 	return sensorData, nil
 }
 
-func (s *MqttService) getSensor(ctx context.Context, payload *domain.MqttPayload) (*domain.Sensor, error) {
+func (s *SensorService) getSensor(ctx context.Context, payload *domain.MqttPayload) (*domain.Sensor, error) {
 	sensor, err := s.sensorRepo.GetByID(ctx, payload.DeviceID)
 	if err == nil && sensor != nil {
 		if sensor.Latitude != payload.Latitude || sensor.Longitude != payload.Longitude || sensor.Status != domain.SensorStatusOnline {
@@ -78,12 +64,4 @@ func (s *MqttService) getSensor(ctx context.Context, payload *domain.MqttPayload
 		return nil, err
 	}
 	return sensor, nil
-}
-
-func (s *MqttService) SetConnected(ready bool) {
-	s.isConnected = ready
-}
-
-func (s *MqttService) Ready() bool {
-	return s.isConnected
 }

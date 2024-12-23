@@ -20,7 +20,6 @@ func NewService(cfg *config.Config, repos *storage.Repository) *service.Services
 
 	return &service.Services{
 		InfoService:         info.NewInfoService(repos.Info),
-		MqttService:         sensor.NewMqttService(repos.Sensor),
 		TreeService:         tree.NewTreeService(repos.Tree, repos.Sensor, repos.Image, repos.TreeCluster, geoLocator),
 		AuthService:         auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
 		RegionService:       region.NewRegionService(repos.Region),
