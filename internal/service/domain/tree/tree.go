@@ -68,15 +68,28 @@ func (s *TreeService) GetBySensorID(ctx context.Context, id string) (*entities.T
 	return tr, nil
 }
 
-func (s *TreeService) publishUpdateTreeEvent(ctx context.Context, prevTree, updatedTree *entities.Tree) error {
+func (s *TreeService) publishUpdateTreeEvent(prevTree, updatedTree *entities.Tree) {
 	slog.Debug("publish new event", "event", entities.EventTypeUpdateTree, "service", "TreeService")
 	event := entities.NewEventUpdateTree(*prevTree, *updatedTree)
-	err := s.eventManager.Publish(event)
-	if err != nil {
-		slog.Error("error while sending event after updating tree cluster", "err", err)
+	if err := s.eventManager.Publish(event); err != nil {
+		slog.Error("error while sending event after updating tree", "err", err, "tree_id", prevTree.ID)
 	}
+}
 
-	return nil
+func (s *TreeService) publishCreateTreeEvent(newTree *entities.Tree) {
+	slog.Debug("publish new event", "event", entities.EventTypeUpdateTree, "service", "TreeService")
+	event := entities.NewEventCreateTree(*newTree)
+	if err := s.eventManager.Publish(event); err != nil {
+		slog.Error("error while sending event after creating tree", "err", err, "tree_id", newTree.ID)
+	}
+}
+
+func (s *TreeService) publishDeleteTreeEvent(prevTree *entities.Tree) {
+	slog.Debug("publish new event", "event", entities.EventTypeUpdateTree, "service", "TreeService")
+	event := entities.NewEventDeleteTree(*prevTree)
+	if err := s.eventManager.Publish(event); err != nil {
+		slog.Error("error while sending event after deleting tree", "err", err, "tree_id", prevTree.ID)
+	}
 }
 
 func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreate) (*entities.Tree, error) {
@@ -114,16 +127,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		return nil, handleError(err)
 	}
 
-	if treeCreate.TreeClusterID != nil {
-		_, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
-		if err != nil {
-			return nil, handleError(err)
-		}
-		// TODO: publish create tree event
-		// if err = s.locator.UpdateCluster(ctx, tc); err != nil {
-		// 	return nil, handleError(err)
-		// }
-	}
+	s.publishCreateTreeEvent(newTree)
 	return newTree, nil
 }
 
@@ -135,12 +139,8 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 	if err := s.treeRepo.Delete(ctx, id); err != nil {
 		return handleError(err)
 	}
-	if treeEntity.TreeCluster != nil {
-		// TODO: publish delete tree event
-		// if err := s.locator.UpdateCluster(ctx, treeEntity.TreeCluster); err != nil {
-		// 	return handleError(err)
-		// }
-	}
+
+	s.publishDeleteTreeEvent(treeEntity)
 	return nil
 }
 
@@ -194,12 +194,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, handleError(err)
 	}
 
-	if updatedTree.TreeCluster != nil {
-		if err := s.publishUpdateTreeEvent(ctx, prevTree, updatedTree); err != nil {
-			return nil, handleError(err)
-		}
-	}
-
+	s.publishUpdateTreeEvent(prevTree, updatedTree)
 	return updatedTree, nil
 }
 

@@ -668,7 +668,53 @@ func TestTreeService_Update(t *testing.T) {
 }
 
 func TestTreeService_EventSystem(t *testing.T) {
-	t.Run("should publish update tree event on update tree when tree has a cluster", func(t *testing.T) {
+	t.Run("should publish create tree event on create tree", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+
+		expectedTree := *TestTreesList[0]
+		createTree := &entities.TreeCreate{
+			Species:      "Oak",
+			Latitude:     testLatitude,
+			Longitude:    testLongitude,
+			PlantingYear: 2023,
+			Number:       "T001",
+		}
+
+		// EventSystem
+		eventManager := worker.NewEventManager(entities.EventTypeCreateTree)
+		expectedEvent := entities.NewEventCreateTree(expectedTree)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		// Mock expectations
+		treeRepo.EXPECT().Create(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&expectedTree, nil)
+
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
+
+		// when
+		subID, ch, err := eventManager.Subscribe(entities.EventTypeCreateTree)
+		if err != nil {
+			t.Fatal("failed to subscribe to event manager")
+		}
+		svc.Create(ctx, createTree)
+
+		// then
+		select {
+		case recievedEvent := <-ch:
+			assert.Equal(t, recievedEvent, expectedEvent)
+		case <-time.After(1 * time.Second):
+			t.Fatal("event was not received")
+		}
+
+		_ = eventManager.Unsubscribe(entities.EventTypeCreateTree, subID)
+	})
+
+	t.Run("should publish update tree event on update tree", func(t *testing.T) {
 		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
@@ -728,61 +774,44 @@ func TestTreeService_EventSystem(t *testing.T) {
 		_ = eventManager.Unsubscribe(entities.EventTypeUpdateTree, subID)
 	})
 
-	t.Run("should not publish update tree event on update tree when tree has no cluster", func(t *testing.T) {
+	t.Run("should publish delete tree event on delete tree", func(t *testing.T) {
 		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
 		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
 
-		expectedTree := *TestTreesList[0]
-		expectedTree.TreeCluster = nil
+		treeToDelete := *TestTreesList[0]
 
-		// Event
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
+		// EventSystem
+		eventManager := worker.NewEventManager(entities.EventTypeDeleteTree)
+		expectedEvent := entities.NewEventDeleteTree(treeToDelete)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go eventManager.Run(ctx)
 
 		// Mock expectations
-		treeRepo.EXPECT().GetByID(ctx, expectedTree.ID).Return(&expectedTree, nil)
-		treeRepo.EXPECT().Update(ctx, expectedTree.ID,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything).Return(&expectedTree, nil)
+		treeRepo.EXPECT().GetByID(ctx, treeToDelete.ID).Return(&treeToDelete, nil)
+		treeRepo.EXPECT().Delete(ctx, treeToDelete.ID).Return(nil)
 
 		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
 
 		// when
-		subID, ch, err := eventManager.Subscribe(entities.EventTypeUpdateTree)
+		subID, ch, err := eventManager.Subscribe(entities.EventTypeDeleteTree)
 		if err != nil {
 			t.Fatal("failed to subscribe to event manager")
 		}
-		_, _ = svc.Update(ctx, expectedTree.ID, &entities.TreeUpdate{
-			TreeClusterID: nil,
-			SensorID:      nil,
-			PlantingYear:  expectedTree.PlantingYear,
-			Species:       expectedTree.Species,
-			Number:        expectedTree.Number,
-			Latitude:      expectedTree.Latitude,
-			Longitude:     expectedTree.Longitude,
-			Description:   expectedTree.Description,
-		})
+		svc.Delete(ctx, treeToDelete.ID)
 
 		// then
 		select {
 		case recievedEvent := <-ch:
-			t.Fatalf("event has been send, event: %v", recievedEvent)
+			assert.Equal(t, recievedEvent, expectedEvent)
 		case <-time.After(1 * time.Second):
-			// success
+			t.Fatal("event was not received")
 		}
 
-		_ = eventManager.Unsubscribe(entities.EventTypeUpdateTree, subID)
+		_ = eventManager.Unsubscribe(entities.EventTypeDeleteTree, subID)
 	})
 }
 

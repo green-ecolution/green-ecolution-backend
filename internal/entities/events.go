@@ -8,6 +8,8 @@ type Event interface {
 
 const (
 	EventTypeUpdateTree        EventType = "update tree"
+	EventTypeCreateTree                  = "create tree"
+	EventTypeDeleteTree                  = "delete tree"
 	EventTypeUpdateTreeCluster           = "update tree cluster"
 )
 
@@ -30,6 +32,30 @@ func NewEventUpdateTree(prev, new Tree) EventUpdateTree {
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTree},
 		Prev:       prev,
 		New:        new,
+	}
+}
+
+type EventCreateTree struct {
+	BasicEvent
+	New Tree
+}
+
+func NewEventCreateTree(new Tree) EventCreateTree {
+	return EventCreateTree{
+		BasicEvent: BasicEvent{eventType: EventTypeCreateTree},
+		New:        new,
+	}
+}
+
+type EventDeleteTree struct {
+	BasicEvent
+	Prev Tree
+}
+
+func NewEventDeleteTree(prev Tree) EventDeleteTree {
+	return EventDeleteTree{
+		BasicEvent: BasicEvent{eventType: EventTypeDeleteTree},
+		Prev:       prev,
 	}
 }
 

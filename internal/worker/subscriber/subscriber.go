@@ -25,3 +25,41 @@ func (s *UpdateTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event
 	event := e.(entities.EventUpdateTree)
 	return s.tcs.HandleUpdateTree(ctx, event)
 }
+
+type CreateTreeSubscriber struct {
+	tcs service.TreeClusterService
+}
+
+func NewCreateTreeSubscriber(tcs service.TreeClusterService) *CreateTreeSubscriber {
+	return &CreateTreeSubscriber{
+		tcs: tcs,
+	}
+}
+
+func (s *CreateTreeSubscriber) EventType() entities.EventType {
+	return entities.EventTypeUpdateTree
+}
+
+func (s *CreateTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
+	event := e.(entities.EventUpdateTree)
+	return s.tcs.HandleUpdateTree(ctx, event)
+}
+
+type DeleteTreeSubscriber struct {
+	tcs service.TreeClusterService
+}
+
+func NewDeleteTreeSubscriber(tcs service.TreeClusterService) *DeleteTreeSubscriber {
+	return &DeleteTreeSubscriber{
+		tcs: tcs,
+	}
+}
+
+func (s *DeleteTreeSubscriber) EventType() entities.EventType {
+	return entities.EventTypeUpdateTree
+}
+
+func (s *DeleteTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
+	event := e.(entities.EventUpdateTree)
+	return s.tcs.HandleUpdateTree(ctx, event)
+}
