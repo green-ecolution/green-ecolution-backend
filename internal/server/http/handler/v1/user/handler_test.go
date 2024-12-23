@@ -567,7 +567,7 @@ func TestGetAllUsers(t *testing.T) {
 			},
 		}
 
-		mockAuthService.EXPECT().GetAllUsers(mock.Anything).Return(expectedUsers, nil)
+		mockAuthService.EXPECT().GetAll(mock.Anything).Return(expectedUsers, nil)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
@@ -599,7 +599,7 @@ func TestGetAllUsers(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user", GetAllUsers(mockAuthService))
 
-		mockAuthService.EXPECT().GetAllUsers(mock.Anything).Return(nil, service.NewError(service.InternalError, "service error"))
+		mockAuthService.EXPECT().GetAll(mock.Anything).Return(nil, service.NewError(service.InternalError, "service error"))
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
@@ -611,23 +611,28 @@ func TestGetAllUsers(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 	})
 
-	t.Run("should return 400 bad request for invalid query parameters", func(t *testing.T) {
+	t.Run("should return empty slice when no users are found", func(t *testing.T) {
 		// given
 		app := fiber.New()
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user", GetAllUsers(mockAuthService))
 
+		mockAuthService.EXPECT().GetAll(mock.Anything).Return([]*domain.User{}, nil)
+
 		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user?page=invalid&limit=invalid", nil)
+		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-		mockAuthService.AssertExpectations(t)
-	})
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
+		var response []entities.UserResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.Nil(t, err)
+		assert.Empty(t, response)
+	})
 }
 
 func generateJWT(t testing.TB, sub string) string {

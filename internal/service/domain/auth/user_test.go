@@ -333,7 +333,7 @@ func TestGetAllUsers(t *testing.T) {
 		userRepo.EXPECT().GetAll(context.Background()).Return(expectedUsers, nil)
 
 		// when
-		users, err := svc.GetAllUsers(context.Background())
+		users, err := svc.GetAll(context.Background())
 
 		// then
 		assert.NoError(t, err)
@@ -350,11 +350,29 @@ func TestGetAllUsers(t *testing.T) {
 		userRepo.EXPECT().GetAll(context.Background()).Return(nil, errors.New("repository error"))
 
 		// when
-		users, err := svc.GetAllUsers(context.Background())
+		users, err := svc.GetAll(context.Background())
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, users)
 		assert.Contains(t, err.Error(), "failed to get all users")
+	})
+
+	t.Run("should return empty slice when no users are found", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetAll(context.Background()).Return([]*entities.User{}, nil)
+
+		// when
+		users, err := svc.GetAll(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.Empty(t, users)
 	})
 }

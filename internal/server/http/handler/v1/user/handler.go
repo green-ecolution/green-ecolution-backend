@@ -2,16 +2,20 @@ package user
 
 import (
 	"net/url"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/singleflight"
+)
+
+var (
+	userMapper = generated.UserHTTPMapperImpl{}
 )
 
 // @Summary	Request to login
@@ -157,17 +161,7 @@ func Register(svc service.AuthService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		response := entities.UserResponse{
-			ID:            u.ID.String(),
-			CreatedAt:     u.CreatedAt,
-			Email:         u.Email,
-			FirstName:     u.FirstName,
-			LastName:      u.LastName,
-			Username:      u.Username,
-			EmployeeID:    u.EmployeeID,
-			PhoneNumber:   u.PhoneNumber,
-			EmailVerified: u.EmailVerified,
-		}
+		response := userMapper.FromResponse(u)
 
 		return c.Status(fiber.StatusCreated).JSON(response)
 	}
@@ -190,36 +184,17 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Security		Keycloak
 func GetAllUsers(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		page := c.Query("page")
-		limit := c.Query("limit")
-
-		if page != "" && !isNumeric(page) {
-			return c.Status(fiber.StatusBadRequest).JSON("Invalid page parameter")
-		}
-		if limit != "" && !isNumeric(limit) {
-			return c.Status(fiber.StatusBadRequest).JSON("Invalid limit parameter")
-		}
-
 		ctx := c.Context()
 
-		users, err := svc.GetAllUsers(ctx)
+		users, err := svc.GetAll(ctx)
 		if err != nil {
 			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error()))
 		}
 		response := make([]entities.UserResponse, len(users))
 
 		for i, user := range users {
-			response[i] = entities.UserResponse{
-				ID:            user.ID.String(),
-				CreatedAt:     user.CreatedAt,
-				Email:         user.Email,
-				FirstName:     user.FirstName,
-				LastName:      user.LastName,
-				Username:      user.Username,
-				EmployeeID:    user.EmployeeID,
-				PhoneNumber:   user.PhoneNumber,
-				EmailVerified: user.EmailVerified,
-			}
+			userResponse := userMapper.FromResponse(user)
+			response[i] = *userResponse
 		}
 
 		return c.Status(fiber.StatusOK).JSON(response)
@@ -354,9 +329,4 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 
 		return c.JSON(response)
 	}
-}
-
-func isNumeric(s string) bool {
-	_, err := strconv.Atoi(s)
-	return err == nil
 }

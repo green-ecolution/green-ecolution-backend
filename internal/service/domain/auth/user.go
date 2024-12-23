@@ -67,7 +67,7 @@ func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.L
 	return nil
 }
 
-func (s *AuthService) GetAllUsers(ctx context.Context) ([]*domain.User, error) {
+func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
 	users, err := s.userRepo.GetAll(ctx)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error())
