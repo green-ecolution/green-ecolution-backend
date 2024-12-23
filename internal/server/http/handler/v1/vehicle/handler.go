@@ -31,11 +31,26 @@ var (
 // @Param			page	query	string	false	"Page"
 // @Param			limit	query	string	false	"Limit"
 // @Param			status	query	string	false	"Status"
+// @Param			type	query	string	false	"Vehicle Type"
 // @Security		Keycloak
 func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+		var domainData []*domain.Vehicle
+		var err error
+
+		vehicleTypeStr := c.Query("type")
+		if vehicleTypeStr != "" {
+			var vehicleType domain.VehicleType
+			vehicleType, err = parseVehicleType(vehicleTypeStr)
+			if err != nil {
+				return errorhandler.HandleError(err)
+			}
+			domainData, err = svc.GetAllByType(ctx, vehicleType)
+		} else {
+			domainData, err = svc.GetAll(ctx)
+		}
+
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -230,4 +245,15 @@ func mapVehicleToDto(v *domain.Vehicle) *entities.VehicleResponse {
 	dto := vehicleMapper.FromResponse(v)
 
 	return dto
+}
+
+func parseVehicleType(vehicleTypeStr string) (domain.VehicleType, error) {
+	switch vehicleTypeStr {
+	case string(domain.VehicleTypeTrailer):
+		return domain.VehicleTypeTrailer, nil
+	case string(domain.VehicleTypeTransporter):
+		return domain.VehicleTypeTransporter, nil
+	default:
+		return domain.VehicleTypeUnknown, service.NewError(service.BadRequest, "invalid vehicle type")
+	}
 }

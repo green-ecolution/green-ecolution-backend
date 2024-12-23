@@ -66,6 +66,69 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 	})
 }
 
+func TestVehicleRepository_GetAllByType(t *testing.T) {
+	t.Run("should return all verhicles of type transporter", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		// when
+		got, err := r.GetAllByType(context.Background(), entities.VehicleTypeTransporter)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(got))
+		for _, vehicle := range got {
+			assert.Equal(t, entities.VehicleTypeTransporter, vehicle.Type)
+		}
+	})
+
+	t.Run("should return all verhicles of type trailer", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		// when
+		got, err := r.GetAllByType(context.Background(), entities.VehicleTypeTrailer)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(got))
+		for _, vehicle := range got {
+			assert.Equal(t, entities.VehicleTypeTrailer, vehicle.Type)
+		}
+	})
+
+	t.Run("should return empty slice when db is empty", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		// when
+		got, err := r.GetAllByType(context.Background(), entities.VehicleTypeUnknown)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.GetAllByType(ctx, entities.VehicleTypeUnknown)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+}
+
 func TestVehicleRepository_GetByID(t *testing.T) {
 	t.Run("should return verhicle by id", func(t *testing.T) {
 		// given

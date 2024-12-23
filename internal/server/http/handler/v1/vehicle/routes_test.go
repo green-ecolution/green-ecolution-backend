@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
@@ -27,6 +28,26 @@ func TestRegisterRoutes(t *testing.T) {
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+
+			// then
+			resp, err := app.Test(req)
+			defer resp.Body.Close()
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+		})
+
+		t.Run("should call GET handler with vehicle type parameter", func(t *testing.T) {
+			mockVehicleService := serviceMock.NewMockVehicleService(t)
+			app := fiber.New()
+			vehicle.RegisterRoutes(app, mockVehicleService)
+
+			mockVehicleService.EXPECT().GetAllByType(
+				mock.Anything,
+				entities.VehicleType("transporter"),
+			).Return(TestVehicles, nil)
+
+			// when
+			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/?type=transporter", nil)
 
 			// then
 			resp, err := app.Test(req)

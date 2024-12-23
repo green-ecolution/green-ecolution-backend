@@ -4,10 +4,20 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
 
 func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, error) {
 	rows, err := r.store.GetAllVehicles(ctx)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	return r.mapper.FromSqlList(rows), nil
+}
+
+func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
+	rows, err := r.store.GetAllVehiclesByType(ctx, sqlc.VehicleType(vehicleType))
 	if err != nil {
 		return nil, r.store.HandleError(err)
 	}

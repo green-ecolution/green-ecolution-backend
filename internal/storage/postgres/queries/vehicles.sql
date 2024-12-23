@@ -1,6 +1,9 @@
 -- name: GetAllVehicles :many
 SELECT * FROM vehicles;
 
+-- name: GetAllVehiclesByType :many
+SELECT * FROM vehicles WHERE type = $1;
+
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;
 

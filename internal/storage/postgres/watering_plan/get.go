@@ -3,7 +3,6 @@ package wateringplan
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -43,17 +42,10 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 }
 
 func (w *WateringPlanRepository) GetLinkedVehicleByIDAndType(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error) {
-	var row *sqlc.Vehicle
-	var err error
-
-	switch vehicleType {
-	case entities.VehicleTypeTrailer:
-		row, err = w.store.GetTrailerByWateringPlanID(ctx, id)
-	case entities.VehicleTypeTransporter:
-		row, err = w.store.GetTransporterByWateringPlanID(ctx, id)
-	default:
-		return nil, fmt.Errorf("unsupported vehicle type: %v", vehicleType)
-	}
+	row, err := w.store.GetVehicleByWateringPlanID(ctx, &sqlc.GetVehicleByWateringPlanIDParams{
+		WateringPlanID: id,
+		Type:           sqlc.VehicleType(vehicleType),
+	})
 
 	if err != nil {
 		return nil, w.store.HandleError(err)
