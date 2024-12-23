@@ -438,7 +438,60 @@ func TestWateringPlanService_Update(t *testing.T) {
 		assert.Equal(t, allTestWateringPlans[1], result)
 	})
 
-	t.Run("should return error update a watering plan without a trailer", func(t *testing.T) {
+	t.Run("should successfully update a watering plan with evaluation", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		updatedWateringPlan := &entities.WateringPlanUpdate{
+			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			Status:           entities.WateringPlanStatusFinished,
+			CancellationNote: "",
+			Description:      "New watering plan for the east side of the city",
+			TransporterID:    utils.P(int32(2)),
+			TreeClusterIDs:   []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			Evaluation: []*entities.EvaluationValue{
+				{
+					WateringPlanID: wateringPlanID,
+					TreeClusterID:  1,
+					ConsumedWater:  utils.P(100.00),
+				},
+			},
+		}
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(allTestVehicles[1], nil)
+
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			wateringPlanID,
+			mock.Anything,
+		).Return(nil)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			wateringPlanID,
+		).Return(allTestWateringPlans[2], nil)
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, allTestWateringPlans[2], result)
+	})
+
+	t.Run("should successfully update a watering plan without a trailer", func(t *testing.T) {
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
@@ -626,6 +679,51 @@ func TestWateringPlanService_Update(t *testing.T) {
 		// then
 		assert.Nil(t, result)
 		assert.EqualError(t, err, "500: failed to update watering plan")
+	})
+
+	t.Run("should return error if cancellation note is not empty but the status is not »canceled«", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		updatedWateringPlan.Status = entities.WateringPlanStatusActive
+		updatedWateringPlan.CancellationNote = "This is a note"
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "400: Cancellation note can only be set if watering plan is canceled")
+	})
+
+	t.Run("should return error if the evaluation is not empty but the status is not »finished«", func(t *testing.T) {
+		// given
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo)
+
+		updatedWateringPlan.Status = entities.WateringPlanStatusPlanned
+		updatedWateringPlan.CancellationNote = ""
+		updatedWateringPlan.Evaluation = []*entities.EvaluationValue{
+			{
+				WateringPlanID: wateringPlanID,
+				TreeClusterID:  1,
+				ConsumedWater:  utils.P(100.00),
+			},
+		}
+
+		// when
+		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "400: Evaluation values can only be set if the watering plan has been finalised")
 	})
 
 	t.Run("should return validation error when TreeClusterIDs contains nil pointers", func(t *testing.T) {
@@ -818,6 +916,23 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
 		CancellationNote:   "",
+		Evaluation: []*entities.EvaluationValue{
+			{
+				WateringPlanID: 3,
+				TreeClusterID:  1,
+				ConsumedWater:  utils.P(10.0),
+			},
+			{
+				WateringPlanID: 3,
+				TreeClusterID:  2,
+				ConsumedWater:  utils.P(10.0),
+			},
+			{
+				WateringPlanID: 3,
+				TreeClusterID:  3,
+				ConsumedWater:  utils.P(10.0),
+			},
+		},
 	},
 	{
 		ID:                 4,
