@@ -72,13 +72,13 @@ func (s *TreeClusterService) getUpdatedLatLong(ctx context.Context, tc *domain.T
 	return &latitude, &longitude, region, nil
 }
 
-func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, oldTc *domain.TreeCluster) error {
+func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, prevTc *domain.TreeCluster) error {
 	slog.Debug("publish new event", "event", domain.EventTypeUpdateTreeCluster, "service", "TreeClusterService")
-	updatedTc, err := s.treeClusterRepo.GetByID(ctx, oldTc.ID)
+	updatedTc, err := s.GetByID(ctx, prevTc.ID)
 	if err != nil {
 		return err
 	}
-	event := domain.NewEventUpdateTreeCluster(*oldTc, *updatedTc)
+	event := domain.NewEventUpdateTreeCluster(*prevTc, *updatedTc)
 	err = s.eventManager.Publish(event)
 	if err != nil {
 		slog.Error("error while sending event after updating tree cluster", "err", err)
@@ -89,15 +89,15 @@ func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, oldTc *doma
 
 func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event domain.EventUpdateTree) error {
 	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
-	oldTc := event.Old.TreeCluster
+	prevTc := event.Prev.TreeCluster
 	newTc := event.New.TreeCluster
 
-	if oldTc == nil && newTc == nil {
+	if prevTc == nil && newTc == nil {
 		return nil
 	}
 
-	treePosSame := event.Old.Latitude == event.New.Latitude && event.Old.Longitude == event.New.Longitude
-	tcSame := oldTc != nil && newTc != nil && oldTc.ID == newTc.ID
+	treePosSame := event.Prev.Latitude == event.New.Latitude && event.Prev.Longitude == event.New.Longitude
+	tcSame := prevTc != nil && newTc != nil && prevTc.ID == newTc.ID
 
 	if treePosSame && tcSame {
 		return nil
@@ -116,9 +116,9 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event domain.
 		return true, nil
 	}
 
-	if oldTc != nil {
-		if err := s.treeClusterRepo.Update(ctx, oldTc.ID, updateFn); err == nil {
-			if err := s.publishUpdateEvent(ctx, oldTc); err != nil {
+	if prevTc != nil {
+		if err := s.treeClusterRepo.Update(ctx, prevTc.ID, updateFn); err == nil {
+			if err := s.publishUpdateEvent(ctx, prevTc); err != nil {
 				return err
 			}
 		}
@@ -183,7 +183,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		return nil, handleError(err)
 	}
 
-	oldTc, err := s.treeClusterRepo.GetByID(ctx, id)
+	prevTc, err := s.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
 	}
@@ -211,7 +211,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		return nil, handleError(err)
 	}
 
-	if err := s.publishUpdateEvent(ctx, oldTc); err != nil {
+	if err := s.publishUpdateEvent(ctx, prevTc); err != nil {
 		return nil, handleError(err)
 	}
 

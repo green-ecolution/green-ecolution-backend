@@ -21,28 +21,28 @@ func (e BasicEvent) Type() EventType {
 
 type EventUpdateTree struct {
 	BasicEvent
-	Old Tree
-	New Tree
+	Prev Tree
+	New  Tree
 }
 
-func NewEventUpdateTree(old, new Tree) EventUpdateTree {
+func NewEventUpdateTree(prev, new Tree) EventUpdateTree {
 	return EventUpdateTree{
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTree},
-		Old:        old,
+		Prev:       prev,
 		New:        new,
 	}
 }
 
 type EventUpdateTreeCluster struct {
 	BasicEvent
-	Old TreeCluster
-	New TreeCluster
+	Prev TreeCluster
+	New  TreeCluster
 }
 
-func NewEventUpdateTreeCluster(old, new TreeCluster) EventUpdateTreeCluster {
+func NewEventUpdateTreeCluster(prev, new TreeCluster) EventUpdateTreeCluster {
 	return EventUpdateTreeCluster{
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTreeCluster},
-		Old:        old,
+		Prev:       prev,
 		New:        new,
 	}
 }
