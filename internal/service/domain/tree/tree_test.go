@@ -686,7 +686,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 
 		// EventSystem
 		eventManager := worker.NewEventManager(entities.EventTypeCreateTree)
-		expectedEvent := entities.NewEventCreateTree(expectedTree)
+		expectedEvent := entities.NewEventCreateTree(&expectedTree)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go eventManager.Run(ctx)
@@ -701,7 +701,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 		if err != nil {
 			t.Fatal("failed to subscribe to event manager")
 		}
-		svc.Create(ctx, createTree)
+		_, _ = svc.Create(ctx, createTree)
 
 		// then
 		select {
@@ -727,7 +727,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 
 		// Event
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
-		expectedEvent := entities.NewEventUpdateTree(prevTree, expectedTree)
+		expectedEvent := entities.NewEventUpdateTree(&prevTree, &expectedTree)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go eventManager.Run(ctx)
@@ -785,7 +785,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 
 		// EventSystem
 		eventManager := worker.NewEventManager(entities.EventTypeDeleteTree)
-		expectedEvent := entities.NewEventDeleteTree(treeToDelete)
+		expectedEvent := entities.NewEventDeleteTree(&treeToDelete)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go eventManager.Run(ctx)
@@ -801,7 +801,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 		if err != nil {
 			t.Fatal("failed to subscribe to event manager")
 		}
-		svc.Delete(ctx, treeToDelete.ID)
+		_ = svc.Delete(ctx, treeToDelete.ID)
 
 		// then
 		select {

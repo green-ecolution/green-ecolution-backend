@@ -24,6 +24,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
@@ -39,6 +40,8 @@ import (
 )
 
 var version = "develop"
+
+const waitGroupSize = 4
 
 //	@title			Green Space Management API
 //	@version		develop
@@ -64,7 +67,6 @@ func main() {
 	}
 
 	fmt.Printf("Version: %s\n", version)
-
 	fmt.Println("Server Port: ", viper.GetInt("server.port"))
 
 	if cfg.Server.Development {
@@ -82,12 +84,20 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
+	repositories := createRepos(ctx, cfg)
+	eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+	services := domain.NewService(cfg, repositories, eventManager)
+
+	startAppServices(ctx, cfg, eventManager, services)
+}
+
+func postgresRepo(ctx context.Context, cfg *config.Config) *storage.Repository {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Server.Database.Host, cfg.Server.Database.Port, cfg.Server.Database.Username, cfg.Server.Database.Password, cfg.Server.Database.Name)
 
 	pgxConfig, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
 		slog.Error("Error while parsing PostgreSQL connection string", "error", err)
-		return
+		return nil
 	}
 
 	pgxConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
@@ -97,20 +107,24 @@ func main() {
 	pool, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		slog.Error("Error while connecting to PostgreSQL", "error", err)
-		return
+		return nil
 	}
 	defer pool.Close()
 
-	postgresRepo := postgres.NewRepository(pool)
+	return postgres.NewRepository(pool)
+}
 
+func createRepos(ctx context.Context, cfg *config.Config) *storage.Repository {
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
 		slog.Error("Error while creating local repository", "error", err)
-		return
+		return nil
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
-	repositories := &storage.Repository{
+	postgresRepo := postgresRepo(ctx, cfg)
+
+	return &storage.Repository{
 		Auth: keycloakRepo.Auth,
 		User: keycloakRepo.User,
 
@@ -124,14 +138,14 @@ func main() {
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,
 	}
+}
 
-	eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
-	services := domain.NewService(cfg, repositories, eventManager)
+func startAppServices(ctx context.Context, cfg *config.Config, em *worker.EventManager, services *service.Services) {
 	httpServer := http.NewServer(cfg, services)
 	mqttServer := mqtt.NewMqtt(cfg, services)
 
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(waitGroupSize)
 
 	go func() {
 		defer wg.Done()
@@ -140,13 +154,12 @@ func main() {
 
 	go func() {
 		defer wg.Done()
-		eventManager.Run(ctx)
-
+		em.Run(ctx)
 	}()
 
 	go func() {
 		defer wg.Done()
-		_ = eventManager.RunSubscription(ctx, subscriber.NewUpdateTreeSubscriber(services.TreeClusterService))
+		_ = em.RunSubscription(ctx, subscriber.NewUpdateTreeSubscriber(services.TreeClusterService))
 	}()
 
 	go func() {

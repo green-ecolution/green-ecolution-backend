@@ -56,7 +56,7 @@ func TestEventManager_Publish(t *testing.T) {
 		err := em.Publish(event)
 
 		// then
-		assert.ErrorIs(t, err, UnknownEventTypeErr)
+		assert.ErrorIs(t, err, ErrUnknownEventTypeErr)
 	})
 }
 
@@ -82,7 +82,7 @@ func TestEventManager_Subscribe(t *testing.T) {
 		id, ch, err := em.Subscribe(EventTypeTest)
 
 		// then
-		assert.ErrorIs(t, err, UnknownEventTypeErr)
+		assert.ErrorIs(t, err, ErrUnknownEventTypeErr)
 		assert.Nil(t, ch)
 		assert.Equal(t, -1, id)
 	})
@@ -109,7 +109,7 @@ func TestEventManager_Unsubscribe(t *testing.T) {
 		err := em.Unsubscribe(EventTypeTest, 42)
 
 		// then
-		assert.ErrorIs(t, err, NotSubscribedErr)
+		assert.ErrorIs(t, err, ErrNotSubscribedErr)
 	})
 }
 

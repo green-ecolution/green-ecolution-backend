@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -83,7 +82,7 @@ type RegionService interface {
 type TreeClusterService interface {
 	Service
 	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
-	HandleUpdateTree(context.Context, entities.EventUpdateTree) error
+	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
 }
 
 type SensorService interface {

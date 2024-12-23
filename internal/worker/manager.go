@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	UnknownEventTypeErr = errors.New("unsupported event type")
-	NotSubscribedErr    = errors.New("not subscribed")
+	ErrUnknownEventTypeErr = errors.New("unsupported event type")
+	ErrNotSubscribedErr    = errors.New("not subscribed")
 )
 
 // Subscriber defines the interface for handling events of a specific type.
@@ -89,7 +89,7 @@ func NewEventManager(eventTypes ...entities.EventType) *EventManager {
 //	}
 func (e *EventManager) Publish(event entities.Event) error {
 	if _, ok := e.eventTypes[event.Type()]; !ok {
-		return UnknownEventTypeErr
+		return ErrUnknownEventTypeErr
 	}
 
 	e.eventCh <- event
@@ -116,21 +116,21 @@ func (e *EventManager) Publish(event entities.Event) error {
 //	if err != nil {
 //		log.Fatalf("Failed to subscribe: %v", err)
 //	}
-func (e *EventManager) Subscribe(eventType entities.EventType) (int, <-chan entities.Event, error) {
+func (e *EventManager) Subscribe(eventType entities.EventType) (id int, ch <-chan entities.Event, err error) {
 	if _, ok := e.eventTypes[eventType]; !ok {
-		return -1, nil, UnknownEventTypeErr
+		return -1, nil, ErrUnknownEventTypeErr
 	}
 
 	e.rwMutex.Lock()
 	defer e.rwMutex.Unlock()
 
-	ch := make(chan entities.Event)
-	id := e.nextID
-	e.subscriber[eventType][id] = ch
+	channel := make(chan entities.Event)
+	subID := e.nextID
+	e.subscriber[eventType][id] = channel
 	e.nextID++
 
-	slog.Info("start to subscribe an event", "event_type", eventType, "event_id", id)
-	return id, ch, nil
+	slog.Info("start to subscribe an event", "event_type", eventType, "event_id", subID)
+	return subID, channel, nil
 }
 
 // Unsubscribe removes a subscription identified by its event type and ID.
@@ -153,7 +153,7 @@ func (e *EventManager) Subscribe(eventType entities.EventType) (int, <-chan enti
 //	}
 func (e *EventManager) Unsubscribe(eventType entities.EventType, id int) error {
 	if _, ok := e.eventTypes[eventType]; !ok {
-		return UnknownEventTypeErr
+		return ErrUnknownEventTypeErr
 	}
 
 	e.rwMutex.Lock()
@@ -167,7 +167,7 @@ func (e *EventManager) Unsubscribe(eventType entities.EventType, id int) error {
 func (e *EventManager) unsubscribe(eventType entities.EventType, id int) error {
 	ch, ok := e.subscriber[eventType][id]
 	if !ok {
-		return NotSubscribedErr
+		return ErrNotSubscribedErr
 	}
 
 	close(ch)
@@ -263,12 +263,14 @@ func (e *EventManager) Run(ctx context.Context) {
 //			log.Printf("Subscription error: %v", err)
 //		}
 //	}()
-func (em *EventManager) RunSubscription(ctx context.Context, sub Subscriber) error {
-	id, ch, err := em.Subscribe(sub.EventType())
+func (e *EventManager) RunSubscription(ctx context.Context, sub Subscriber) error {
+	id, ch, err := e.Subscribe(sub.EventType())
 	if err != nil {
 		return err
 	}
-	defer em.Unsubscribe(sub.EventType(), id)
+	defer func() {
+		_ = e.Unsubscribe(sub.EventType(), id)
+	}()
 	for {
 		select {
 		case <-ctx.Done():

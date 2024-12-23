@@ -8,9 +8,9 @@ type Event interface {
 
 const (
 	EventTypeUpdateTree        EventType = "update tree"
-	EventTypeCreateTree                  = "create tree"
-	EventTypeDeleteTree                  = "delete tree"
-	EventTypeUpdateTreeCluster           = "update tree cluster"
+	EventTypeCreateTree        EventType = "create tree"
+	EventTypeDeleteTree        EventType = "delete tree"
+	EventTypeUpdateTreeCluster EventType = "update tree cluster"
 )
 
 type BasicEvent struct {
@@ -23,36 +23,36 @@ func (e BasicEvent) Type() EventType {
 
 type EventUpdateTree struct {
 	BasicEvent
-	Prev Tree
-	New  Tree
+	Prev *Tree
+	New  *Tree
 }
 
-func NewEventUpdateTree(prev, new Tree) EventUpdateTree {
+func NewEventUpdateTree(prev, newTree *Tree) EventUpdateTree {
 	return EventUpdateTree{
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTree},
 		Prev:       prev,
-		New:        new,
+		New:        newTree,
 	}
 }
 
 type EventCreateTree struct {
 	BasicEvent
-	New Tree
+	New *Tree
 }
 
-func NewEventCreateTree(new Tree) EventCreateTree {
+func NewEventCreateTree(newTree *Tree) EventCreateTree {
 	return EventCreateTree{
 		BasicEvent: BasicEvent{eventType: EventTypeCreateTree},
-		New:        new,
+		New:        newTree,
 	}
 }
 
 type EventDeleteTree struct {
 	BasicEvent
-	Prev Tree
+	Prev *Tree
 }
 
-func NewEventDeleteTree(prev Tree) EventDeleteTree {
+func NewEventDeleteTree(prev *Tree) EventDeleteTree {
 	return EventDeleteTree{
 		BasicEvent: BasicEvent{eventType: EventTypeDeleteTree},
 		Prev:       prev,
@@ -61,14 +61,14 @@ func NewEventDeleteTree(prev Tree) EventDeleteTree {
 
 type EventUpdateTreeCluster struct {
 	BasicEvent
-	Prev TreeCluster
-	New  TreeCluster
+	Prev *TreeCluster
+	New  *TreeCluster
 }
 
-func NewEventUpdateTreeCluster(prev, new TreeCluster) EventUpdateTreeCluster {
+func NewEventUpdateTreeCluster(prev, newTc *TreeCluster) EventUpdateTreeCluster {
 	return EventUpdateTreeCluster{
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTreeCluster},
 		Prev:       prev,
-		New:        new,
+		New:        newTc,
 	}
 }

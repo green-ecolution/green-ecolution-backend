@@ -23,7 +23,7 @@ func (s *UpdateTreeSubscriber) EventType() entities.EventType {
 
 func (s *UpdateTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
 	event := e.(entities.EventUpdateTree)
-	return s.tcs.HandleUpdateTree(ctx, event)
+	return s.tcs.HandleUpdateTree(ctx, &event)
 }
 
 type CreateTreeSubscriber struct {
@@ -42,7 +42,7 @@ func (s *CreateTreeSubscriber) EventType() entities.EventType {
 
 func (s *CreateTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
 	event := e.(entities.EventUpdateTree)
-	return s.tcs.HandleUpdateTree(ctx, event)
+	return s.tcs.HandleUpdateTree(ctx, &event)
 }
 
 type DeleteTreeSubscriber struct {
@@ -61,5 +61,5 @@ func (s *DeleteTreeSubscriber) EventType() entities.EventType {
 
 func (s *DeleteTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
 	event := e.(entities.EventUpdateTree)
-	return s.tcs.HandleUpdateTree(ctx, event)
+	return s.tcs.HandleUpdateTree(ctx, &event)
 }
