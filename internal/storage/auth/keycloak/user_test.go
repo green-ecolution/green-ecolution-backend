@@ -303,8 +303,6 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 		// given
 		identityConfig := suite.IdentityConfig(t, context.Background())
 		userRepo := NewUserRepository(identityConfig)
-
-		// Create mock users in Keycloak
 		user1 := &entities.User{
 			Username:    "user1",
 			FirstName:   "John",
@@ -331,9 +329,9 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, users)
-		assert.GreaterOrEqual(t, len(users), 2) // At least 2 users should exist
-		assert.Contains(t, users, user1)        // Verify user1 is in the list
-		assert.Contains(t, users, user2)        // Verify user2 is in the list
+		assert.GreaterOrEqual(t, len(users), 2)
+		assert.True(t, containsUser(users, *user1), "user1 should be in the list")
+		assert.True(t, containsUser(users, *user2), "user2 should be in the list")
 	})
 
 	t.Run("should return error when login fails", func(t *testing.T) {
@@ -349,4 +347,18 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 		assert.Nil(t, users)
 		assert.Contains(t, err.Error(), "failed to log in to Keycloak")
 	})
+}
+
+func containsUser(userList []*entities.User, targetUser entities.User) bool {
+	for _, user := range userList {
+		if user.Username == targetUser.Username &&
+			user.FirstName == targetUser.FirstName &&
+			user.LastName == targetUser.LastName &&
+			user.Email == targetUser.Email &&
+			user.EmployeeID == targetUser.EmployeeID &&
+			user.PhoneNumber == targetUser.PhoneNumber {
+			return true
+		}
+	}
+	return false
 }
