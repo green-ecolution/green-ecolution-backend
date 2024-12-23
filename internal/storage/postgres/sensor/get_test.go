@@ -233,8 +233,6 @@ var TestMqttPayload = &entities.MqttPayload{
 	Battery:     34.0,
 	Humidity:    50,
 	Temperature: 20,
-	Latitude:    54.82124518093376,
-	Longitude:   9.485702120628517,
 	Watermarks: []entities.Watermark{
 		{
 			Resistance: 23,

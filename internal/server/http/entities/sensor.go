@@ -2,8 +2,6 @@ package entities
 
 import (
 	"time"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
 )
 
 type SensorStatus string // @Name SensorStatus
@@ -30,14 +28,19 @@ type SensorListResponse struct {
 } // @Name SensorList
 
 type SensorDataResponse struct {
-	ID        int32                       `json:"id"`
-	SensorID  string                      `json:"sensor_id"`
-	CreatedAt time.Time                   `json:"created_at"`
-	UpdatedAt time.Time                   `json:"updated_at"`
-	Data      *sensor.MqttPayloadResponse `json:"data"`
+	Battery     float64              `json:"battery"`
+	Humidity    float64              `json:"humidity"`
+	Temperature float64              `json:"temperature"`
+	Watermarks  []*WatermarkResponse `json:"watermarks"`
 } // @Name SensorData
 
 type SensorDataListResponse struct {
 	Data       []*SensorDataResponse `json:"data"`
 	Pagination Pagination            `json:"pagination"`
 } // @Name SensorDataList
+
+type WatermarkResponse struct {
+	Centibar   int `json:"centibar"`
+	Resistance int `json:"resistance"`
+	Depth      int `json:"depth"`
+} // @Name WatermarkResponse
