@@ -14,6 +14,10 @@ type SensorHTTPMapper interface {
 }
 
 func MapLatestDataToResponse(sensorData *domain.SensorData) *entities.SensorDataResponse {
+	if sensorData.Data == nil {
+		return &entities.SensorDataResponse{}
+	}
+
 	return &entities.SensorDataResponse{
 		Battery:     sensorData.Data.Battery,
 		Humidity:    sensorData.Data.Humidity,
