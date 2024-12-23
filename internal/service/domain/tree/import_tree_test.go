@@ -5,8 +5,6 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	service "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -22,8 +20,7 @@ func TestTreeService_ImportTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
 		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
-		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
 
 		expectedTree := TestTreesList[0]
 		treeRepo.EXPECT().GetByCoordinates(ctx, TestTreeImport.Latitude, TestTreeImport.Longitude).Return(nil, nil)
@@ -50,9 +47,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
 		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
 
-		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
 
 		existingTree := TestTreesList[0]
 		updatedTree := TestTreesList[0]
@@ -82,9 +78,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
 		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
 
-		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
 
 		// Define existing tree and tree import data
 		existingTree := TestTreesList[0]
@@ -115,9 +110,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		imageRepo := storageMock.NewMockImageRepository(t)
 		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		locator := service.NewMockGeoClusterLocator(t)
 
-		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, locator)
+		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
 
 		existingTree := TestTreesList[0]
 		expectedErr := errors.New("error deleting tree")

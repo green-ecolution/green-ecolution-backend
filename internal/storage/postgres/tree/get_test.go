@@ -7,7 +7,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
-	"github.com/twpayne/go-geos"
 )
 
 func TestTreeRepository_GetAll(t *testing.T) {
@@ -254,47 +253,6 @@ func TestTreeRepository_GetTreesByIDs(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, trees)
-	})
-}
-
-func TestTreeRepository_GetCenterPoint(t *testing.T) {
-	t.Run("should successfully calculate and parse the center point", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-		ids := []int32{1, 2, 3}
-		centroids, err := suite.Store.CalculateGroupedCentroids(context.Background(), ids)
-		if err != nil {
-			t.Fatal(err)
-		}
-		g, errGeos := geos.NewGeomFromWKT(centroids)
-		if errGeos != nil {
-			t.Fatal(errGeos)
-		}
-
-		// when
-		lat, long, errRepo := r.GetCenterPoint(context.Background(), ids)
-
-		// then
-		assert.NoError(t, errRepo)
-		assert.Equal(t, g.X(), lat, "Latitude does not match")
-		assert.Equal(t, g.Y(), long, "Longitude does not match")
-	})
-
-	t.Run("should return error if ids list is empty", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-
-		// when
-		lat, long, err := r.GetCenterPoint(context.Background(), []int32{})
-
-		// then
-		assert.Error(t, err)
-		assert.Equal(t, 0.0, lat)
-		assert.Equal(t, 0.0, long)
 	})
 }
 

@@ -4,9 +4,11 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,7 +37,8 @@ func TestNewService(t *testing.T) {
 			Vehicle:     mockVehicleRepo,
 		}
 
-		svc := NewService(mockConfig, mockRepos)
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+		svc := NewService(mockConfig, mockRepos, eventManager)
 
 		assert.NotNil(t, svc)
 		assert.IsType(t, &service.Services{}, svc)

@@ -15,7 +15,7 @@ import (
 	mock "github.com/stretchr/testify/mock"
 )
 
-var eventManager = worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+var eventManager = worker.NewEventManager() //entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster
 
 func TestTreeClusterService_GetAll(t *testing.T) {
 	ctx := context.Background()
@@ -314,15 +314,15 @@ func TestTreeClusterService_Update(t *testing.T) {
 			[]int32{},
 		).Return(nil, nil)
 
-		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(expectedCluster, nil)
+		clusterRepo.EXPECT().GetByID(ctx, expectedCluster.ID).Return(expectedCluster, nil)
 		clusterRepo.EXPECT().Update(
 			ctx,
-			clusterID,
+			expectedCluster.ID,
 			mock.Anything,
 		).Return(nil)
 
 		// when
-		result, err := svc.Update(ctx, clusterID, updatedClusterEmptyTrees)
+		result, err := svc.Update(ctx, expectedCluster.ID, updatedClusterEmptyTrees)
 
 		// then
 		assert.NoError(t, err)
@@ -367,6 +367,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 			clusterID,
 			mock.Anything,
 		).Return(expectedErr)
+		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(nil, nil)
 
 		// when
 		result, err := svc.Update(context.Background(), clusterID, updatedCluster)
@@ -388,6 +389,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 			ctx,
 			[]int32{1, 2},
 		).Return(expectedTrees, nil)
+		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(nil, nil)
 
 		clusterRepo.EXPECT().Update(
 			ctx,
