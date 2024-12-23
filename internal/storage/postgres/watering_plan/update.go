@@ -50,13 +50,23 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return errors.New("failed to convert date")
 	}
 
+	totalWaterRequired, err := w.calculateRequiredWater(ctx, entity.TreeClusters)
+	if err != nil {
+		return err
+	}
+
+	if entity.CancellationNote != "" && entity.Status != entities.WateringPlanStatusCanceled {
+		return errors.New("cancellation note should be empty, as the current watering plan is not canceled")
+	}
+
 	params := sqlc.UpdateWateringPlanParams{
 		ID:                 entity.ID,
 		Date:               date,
 		Description:        entity.Description,
 		Distance:           entity.Distance,
-		TotalWaterRequired: entity.TotalWaterRequired,
-		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
+		TotalWaterRequired: &totalWaterRequired,
+		Status:             sqlc.WateringPlanStatus(entity.Status),
+		CancellationNote:   entity.CancellationNote,
 	}
 
 	err = w.store.UpdateWateringPlan(ctx, &params)

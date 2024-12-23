@@ -22,6 +22,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		TreeClusters:       make([]*entities.TreeCluster, 0),
 		Transporter:        nil,
 		Trailer:            nil,
+		CancellationNote:   "",
 	}
 }
 
@@ -78,11 +79,16 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 		return nil, errors.New("failed to convert date")
 	}
 
+	totalWaterRequired, err := w.calculateRequiredWater(ctx, entity.TreeClusters)
+	if err != nil {
+		return nil, err
+	}
+
 	args := sqlc.CreateWateringPlanParams{
 		Date:               date,
 		Description:        entity.Description,
 		Distance:           entity.Distance,
-		TotalWaterRequired: entity.TotalWaterRequired,
+		TotalWaterRequired: &totalWaterRequired,
 		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
 	}
 
@@ -161,4 +167,22 @@ func (w *WateringPlanRepository) setLinkedTreeClusters(ctx context.Context, enti
 	}
 
 	return nil
+}
+
+// This function calculates approximately how much water the irrigation schedule needs
+// Each tree in a linked tree cluster requires approximately 120 liters of water
+func (w *WateringPlanRepository) calculateRequiredWater(ctx context.Context, tc []*entities.TreeCluster) (float64, error) {
+	totalRequiredWater := 0.0
+
+	for _, cluster := range tc {
+		if err := w.store.MapClusterFields(ctx, cluster); err != nil {
+			return 0.0, errors.New("error on mapping treecluster fields")
+		}
+	}
+
+	for _, cluster := range tc {
+		totalRequiredWater += 120.0 * float64(len(cluster.Trees))
+	}
+
+	return totalRequiredWater, nil
 }

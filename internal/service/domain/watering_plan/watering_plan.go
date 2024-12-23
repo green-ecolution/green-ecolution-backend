@@ -55,7 +55,6 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	// TODO: get users
-	// TODO: calculate required water
 	// TODO: calculare distance
 
 	treeClusters, err := w.fetchTreeClusters(ctx, createWp.TreeClusterIDs)
@@ -98,8 +97,12 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
+	// Set cancellation note to nothing if the current status is not fitting
+	if updateWp.CancellationNote != "" && updateWp.Status != entities.WateringPlanStatusCanceled {
+		updateWp.CancellationNote = ""
+	}
+
 	// TODO: get users
-	// TODO: calculate required water
 	// TODO: calculare distance
 
 	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
@@ -126,6 +129,8 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.Transporter = transporter
 		wp.Trailer = trailer
 		wp.TreeClusters = treeClusters
+		wp.Status = updateWp.Status
+		wp.CancellationNote = updateWp.CancellationNote
 
 		return true, nil
 	})

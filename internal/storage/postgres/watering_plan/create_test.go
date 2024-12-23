@@ -38,15 +38,16 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	}
 
 	input := entities.WateringPlan{
-		Date:               time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
-		Description:        "New watering plan",
-		Distance:           utils.P(50.0),
-		TotalWaterRequired: utils.P(30000.0),
-		Trailer:            mappers.vehicleMapper.FromSqlList(testVehicles)[0],
-		Transporter:        mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		TreeClusters:       mappers.clusterMapper.FromSqlList(testCluster)[0:3],
-		Users:              []*entities.User{testUser},
+		Date:         time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
+		Description:  "New watering plan",
+		Distance:     utils.P(50.0),
+		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[0],
+		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[1],
+		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		Users:        []*entities.User{testUser},
 	}
+
+	expectedTotalWater := 720.0
 
 	t.Run("should create watering plan with all values", func(t *testing.T) {
 		// given
@@ -56,7 +57,6 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
-			wp.TotalWaterRequired = input.TotalWaterRequired
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
@@ -74,8 +74,9 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Date, got.Date)
 		assert.Equal(t, input.Description, got.Description)
 		assert.Equal(t, input.Distance, got.Distance)
-		assert.Equal(t, input.TotalWaterRequired, got.TotalWaterRequired)
+		assert.Equal(t, expectedTotalWater, *got.TotalWaterRequired)
 		assert.Equal(t, entities.WateringPlanStatusPlanned, got.Status)
+		assert.Equal(t, "", got.CancellationNote)
 
 		getWp, getErr := r.GetByID(context.Background(), got.ID)
 		assert.NoError(t, getErr)
@@ -120,8 +121,9 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Date, got.Date)
 		assert.Equal(t, "", got.Description)
 		assert.Equal(t, utils.P(float64(0)), got.Distance)
-		assert.Equal(t, utils.P(float64(0)), got.TotalWaterRequired)
+		assert.Equal(t, expectedTotalWater, *got.TotalWaterRequired)
 		assert.Equal(t, entities.WateringPlanStatusPlanned, got.Status)
+		assert.Equal(t, "", got.CancellationNote)
 
 		getWp, getErr := r.GetByID(context.Background(), got.ID)
 		assert.NoError(t, getErr)

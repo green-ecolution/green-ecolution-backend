@@ -19,6 +19,7 @@ var (
 			Transporter:        TestVehicles[1],
 			Trailer:            TestVehicles[0],
 			TreeClusters:       TestClusters[0:2],
+			CancellationNote:   "",
 		},
 		{
 			ID:                 2,
@@ -30,6 +31,7 @@ var (
 			Transporter:        TestVehicles[1],
 			Trailer:            TestVehicles[0],
 			TreeClusters:       TestClusters[2:3],
+			CancellationNote:   "",
 		},
 		{
 			ID:                 3,
@@ -41,6 +43,7 @@ var (
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
 			TreeClusters:       TestClusters[0:3],
+			CancellationNote:   "",
 		},
 		{
 			ID:                 4,
@@ -52,6 +55,7 @@ var (
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
 			TreeClusters:       TestClusters[2:3],
+			CancellationNote:   "",
 		},
 		{
 			ID:                 5,
@@ -63,6 +67,7 @@ var (
 			Transporter:        TestVehicles[1],
 			Trailer:            nil,
 			TreeClusters:       TestClusters[2:3],
+			CancellationNote:   "The watering plan was cancelled due to various reasons.",
 		},
 	}
 	TestVehicles = []*entities.Vehicle{
