@@ -97,13 +97,12 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// Set cancellation note to nothing if the current status is not fitting
-	if updateWp.CancellationNote != "" && updateWp.Status != entities.WateringPlanStatusCanceled {
-		updateWp.CancellationNote = ""
-	}
-
 	// TODO: get users
-	// TODO: calculare distance
+	// TODO: calculate distance
+
+	if err := w.validateStatusDependentValues(updateWp); err != nil {
+		return nil, err
+	}
 
 	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
 	if err != nil {
@@ -131,6 +130,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.TreeClusters = treeClusters
 		wp.Status = updateWp.Status
 		wp.CancellationNote = updateWp.CancellationNote
+		wp.Evaluation = updateWp.Evaluation
 
 		return true, nil
 	})
@@ -187,6 +187,19 @@ func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32)
 	}
 
 	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
+}
+
+func (w *WateringPlanService) validateStatusDependentValues(entity *entities.WateringPlanUpdate) error {
+	// Set cancellation note to nothing if the current status is not fitting
+	if entity.CancellationNote != "" && entity.Status != entities.WateringPlanStatusCanceled {
+		return service.NewError(service.BadRequest, "Cancellation note can only be set if watering plan is canceled")
+	}
+
+	if entity.Status != entities.WateringPlanStatusFinished && len(entity.Evaluation) > 0 {
+		return service.NewError(service.BadRequest, "Evaluation values can only be set if the watering plan has been finished")
+	}
+
+	return nil
 }
 
 func handleError(err error) error {

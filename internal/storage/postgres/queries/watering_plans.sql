@@ -57,3 +57,14 @@ VALUES ($1, $2);
 -- name: DeleteAllTreeClusterFromWateringPlan :exec
 DELETE FROM tree_cluster_watering_plans
 WHERE watering_plan_id = $1;
+
+-- name: UpdateTreeClusterWateringPlan :exec
+UPDATE tree_cluster_watering_plans 
+SET consumed_water = $3
+WHERE watering_plan_id = $1
+AND tree_cluster_id = $2;
+
+-- name: GetAllTreeClusterWateringPlanByID :many
+SELECT *
+FROM tree_cluster_watering_plans
+WHERE watering_plan_id = $1;

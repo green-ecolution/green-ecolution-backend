@@ -53,6 +53,21 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].Name, tc.Name)
 			}
 
+			// assert evaluation
+			if allTestWateringPlans[i].Evaluation == nil {
+				assert.Len(t, allTestWateringPlans[i].Evaluation, 0)
+				// check if evaluation is empty if the status is not finished
+				assert.NotEqual(t, entities.WateringPlanStatusFinished, wp.Status)
+			} else {
+				assert.Equal(t, len(allTestWateringPlans[i].Evaluation), len(wp.Evaluation))
+				assert.Equal(t, entities.WateringPlanStatusFinished, wp.Status)
+				for j, value := range wp.Evaluation {
+					assert.Equal(t, allTestWateringPlans[i].Evaluation[j].WateringPlanID, value.WateringPlanID)
+					assert.Equal(t, allTestWateringPlans[i].Evaluation[j].TreeClusterID, value.TreeClusterID)
+					assert.Equal(t, *allTestWateringPlans[i].Evaluation[j].ConsumedWater, *value.ConsumedWater)
+				}
+			}
+
 			// TODO: assert user
 		}
 	})
@@ -121,6 +136,9 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[0].TreeClusters[i].Name, tc.Name)
 		}
 
+		// assert evaluation
+		assert.Len(t, allTestWateringPlans[0].Evaluation, 0)
+
 		// TODO: assert user
 	})
 
@@ -157,6 +175,28 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 		}
 
 		// TODO: assert user
+	})
+
+	t.Run("should return watering plan by id with evaluation", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetByID(context.Background(), 3)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.Equal(t, entities.WateringPlanStatusFinished, got.Status)
+
+		// assert evaluation
+		assert.Equal(t, len(allTestWateringPlans[2].Evaluation), len(got.Evaluation))
+		assert.Equal(t, entities.WateringPlanStatusFinished, got.Status)
+		for j, value := range got.Evaluation {
+			assert.Equal(t, allTestWateringPlans[2].Evaluation[j].WateringPlanID, value.WateringPlanID)
+			assert.Equal(t, allTestWateringPlans[2].Evaluation[j].TreeClusterID, value.TreeClusterID)
+			assert.Equal(t, *allTestWateringPlans[2].Evaluation[j].ConsumedWater, *value.ConsumedWater)
+		}
 	})
 
 	t.Run("should return error when watering plan with non-existing id", func(t *testing.T) {
@@ -402,6 +442,79 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 	})
 }
 
+func TestWateringPlanRepository_GetEvaluationValues(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+
+	t.Run("should return evaluation values by watering plan id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		shouldReturn := allTestWateringPlans[2].Evaluation
+
+		// when
+		got, err := r.GetEvaluationValues(context.Background(), 3)
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, len(shouldReturn))
+		for i, value := range got {
+			assert.Equal(t, shouldReturn[i].WateringPlanID, value.WateringPlanID)
+			assert.Equal(t, shouldReturn[i].TreeClusterID, value.TreeClusterID)
+			assert.Equal(t, shouldReturn[i].ConsumedWater, value.ConsumedWater)
+		}
+	})
+
+	t.Run("should return empty list when watering plan is not found", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetEvaluationValues(context.Background(), 99)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return empty list when watering plan with negative id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetEvaluationValues(context.Background(), -1)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return empty list when watering plan with zero id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetEvaluationValues(context.Background(), 0)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.GetEvaluationValues(ctx, 1)
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+	})
+}
+
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 1,
@@ -438,6 +551,23 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
 		CancellationNote:   "",
+		Evaluation: []*entities.EvaluationValue{
+			{
+				WateringPlanID: 3,
+				TreeClusterID:  1,
+				ConsumedWater:  utils.P(10.0),
+			},
+			{
+				WateringPlanID: 3,
+				TreeClusterID:  2,
+				ConsumedWater:  utils.P(10.0),
+			},
+			{
+				WateringPlanID: 3,
+				TreeClusterID:  3,
+				ConsumedWater:  utils.P(10.0),
+			},
+		},
 	},
 	{
 		ID:                 4,

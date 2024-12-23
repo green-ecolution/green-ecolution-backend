@@ -38,9 +38,9 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := make([]*entities.WateringPlanResponse, len(domainData))
+		data := make([]*entities.WateringPlanInListResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = wateringPlanMapper.FromResponse(domain)
+			data[i] = wateringPlanMapper.FromInListResponse(domain)
 		}
 
 		return c.JSON(entities.WateringPlanListResponse{

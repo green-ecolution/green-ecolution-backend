@@ -44,6 +44,23 @@ var (
 			Trailer:            nil,
 			TreeClusters:       TestClusters[0:3],
 			CancellationNote:   "",
+			Evaluation: []*entities.EvaluationValue{
+				{
+					WateringPlanID: 3,
+					TreeClusterID:  1,
+					ConsumedWater:  utils.P(10.0),
+				},
+				{
+					WateringPlanID: 3,
+					TreeClusterID:  2,
+					ConsumedWater:  utils.P(10.0),
+				},
+				{
+					WateringPlanID: 3,
+					TreeClusterID:  3,
+					ConsumedWater:  utils.P(10.0),
+				},
+			},
 		},
 		{
 			ID:                 4,

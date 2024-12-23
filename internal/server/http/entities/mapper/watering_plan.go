@@ -18,8 +18,9 @@ type WateringPlanHTTPMapper interface {
 	FromCreateRequest(*entities.WateringPlanCreateRequest) *domain.WateringPlanCreate
 	FromUpdateRequest(*entities.WateringPlanUpdateRequest) *domain.WateringPlanUpdate
 
+	FromInListResponse(*domain.WateringPlan) *entities.WateringPlanInListResponse
 	// goverter:map Trees TreeIDs
-	FromInListResponse(*domain.TreeCluster) *entities.TreeClusterInListResponse
+	FromTreeClusterInListResponse(*domain.TreeCluster) *entities.TreeClusterInListResponse
 }
 
 func MapWateringPlanStatus(status domain.WateringPlanStatus) entities.WateringPlanStatus {

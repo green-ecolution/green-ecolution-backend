@@ -77,6 +77,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, expectedTotalWater, *got.TotalWaterRequired)
 		assert.Equal(t, entities.WateringPlanStatusPlanned, got.Status)
 		assert.Equal(t, "", got.CancellationNote)
+		assert.Equal(t, 0, len(got.Evaluation))
 
 		getWp, getErr := r.GetByID(context.Background(), got.ID)
 		assert.NoError(t, getErr)
@@ -124,6 +125,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, expectedTotalWater, *got.TotalWaterRequired)
 		assert.Equal(t, entities.WateringPlanStatusPlanned, got.Status)
 		assert.Equal(t, "", got.CancellationNote)
+		assert.Equal(t, 0, len(got.Evaluation))
 
 		getWp, getErr := r.GetByID(context.Background(), got.ID)
 		assert.NoError(t, getErr)
