@@ -17,6 +17,7 @@ type User struct {
 	EmployeeID     string
 	PhoneNumber    string
 	EmailVerified  bool
+	Roles          []Role
 	Avatar         *url.URL
 	DrivingLicense DrivingLicense
 }

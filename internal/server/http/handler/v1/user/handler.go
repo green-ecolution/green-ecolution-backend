@@ -218,6 +218,76 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 	}
 }
 
+// @Summary		Get users by role
+// @Description	Get users by role
+// @Tags			User
+// @Produce		json
+// @Success		200		{object}	entities.UserListResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Param			page	query		string	false	"Page"
+// @Param			limit	query		string	false	"Limit"
+// @Param			limit	query		string	false	"Role"
+// @Router			/v1/user [get]
+// @Security		Keycloak
+func GetUsersByRole(svc service.AuthService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+
+		role := strings.Clone(c.Params("Role"))
+		if role == "" {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role format"))
+		}
+
+		userRole := domain.ParseUserRole(role)
+		if userRole == domain.UserRoleUnknown {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role name"))
+		}
+
+		users, err := svc.GetAllByRole(ctx, domain.Role{Name: userRole})
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by role").Error()))
+		}
+		response := make([]entities.UserResponse, len(users))
+
+		for i, user := range users {
+			userResponse := userMapper.FromResponse(user)
+			response[i] = *userResponse
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
+	}
+}
+
+// @Summary		Get a user by ID
+// @Description	Get a user by ID
+// @Tags			User
+// @Produce		json
+// @Success		200		{object}	entities.UserResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		404		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Param			user_id	path		string	true	"User ID"
+// @Router			/v1/user/{user_id} [get]
+// @Security		Keycloak
+func GetUserByID(_ service.AuthService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusNotImplemented)
+	}
+}
+
+		data := make([]*entities.UserResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = userMapper.FromResponse(domain)
+		}
+
+		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
+	}
+}
+
 var group singleflight.Group
 
 // @Summary		Refresh token

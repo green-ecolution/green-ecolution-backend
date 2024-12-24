@@ -15,6 +15,7 @@ type UserResponse struct {
 	PhoneNumber    string         `json:"phone_number"`
 	EmailVerified  bool           `json:"email_verified"`
 	Avatar         string         `json:"avatar_url"`
+	Roles          []RoleResponse `json:"roles"`
 	DrivingLicense DrivingLicense `json:"driving_license"`
 } // @Name User
 
