@@ -100,7 +100,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	for _, kcUser := range users {
 		user, err := keyCloakUserToUser(kcUser)
 		if err != nil {
-			continue
+			return nil, errors.Wrap(err, "failed to convert keyCloak User")
 		}
 		allUsers = append(allUsers, user)
 	}
