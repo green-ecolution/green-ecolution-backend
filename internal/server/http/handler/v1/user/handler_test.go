@@ -792,7 +792,7 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService.EXPECT().GetAll(mock.Anything).Return([]*domain.User{}, nil)
 
 		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
+		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/Admin", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
