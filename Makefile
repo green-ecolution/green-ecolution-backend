@@ -45,7 +45,8 @@ help:
 	@echo "  run/live                          Run live"
 	@echo "  run/docker ENV=[dev,stage,prod]   Run docker container (default: dev)"
 	@echo "  infra/up                          Run infrastructure in docker compose (postgres and pgadmin)"
-	@echo "  infra/down                        Run infrastructure down"
+	@echo "  infra/stop                        Run infrastructure stop"
+	@echo "  infra/down                        Run infrastructure down (delete)"
 	@echo "  migrate/new name=<name>           Create new migration"
 	@echo "  migrate/up                        Migrate up"
 	@echo "  migrate/down                      Migrate down"
@@ -194,12 +195,17 @@ run/docker: run/docker/prepare
 .PHONY: infra/up
 infra/up:
 	@echo "Running infra..."
-	docker-compose -f .docker/docker-compose.infra.yaml up -d
+	docker compose -f .docker/docker-compose.infra.yaml up -d
+
+.PHONY: infra/stop
+infra/down:
+	@echo "Running infra stop..."
+	docker compose -f .docker/docker-compose.infra.yaml stop
 
 .PHONY: infra/down
 infra/down:
-	@echo "Running infra down..."
-	docker-compose -f .docker/docker-compose.infra.yaml down
+	@echo "Running infra delete..."
+	docker compose -f .docker/docker-compose.infra.yaml down
 
 .PHONY: migrate/new
 migrate/new:
