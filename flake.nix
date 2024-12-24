@@ -20,6 +20,21 @@
             gotest.enable = true;
           };
         };
+
+        goverter = pkgs.buildGoModule rec {
+          pname = "goverter";
+          version = "1.7.0";
+
+          src = pkgs.fetchFromGitHub {
+            owner = "jmattheis";
+            repo = "goverter";
+            tag = "v${version}";
+            sha256 = "sha256-VgwmnB6FP7hlUrZpKun38T4K2YSDl9yYuMjdzsEhCF4=";
+          };
+
+          vendorHash = "sha256-uQ1qKZLRwsgXKqSAERSqf+1cYKp6MTeVbfGs+qcdakE=";
+          subPackages = [ "cmd/goverter" ];
+        };
       in {
       # devShells."x86_64-linux".default = import ./shell.nix { inherit pkgs; };
       devShells.default = pkgs.mkShell {
@@ -28,9 +43,11 @@
           go_1_23
           air
           go-swag
-          goose sqlc
+          goose
+          sqlc
           delve
           golangci-lint
+          goverter
 
           docker
           docker-compose
@@ -43,12 +60,7 @@
         ];
 
       shellHook = ''
-        export PATH="$(go env GOPATH)/bin:$PATH"
-        go install github.com/jmattheis/goverter/cmd/goverter@latest
-
         go mod download
-        git flow init -d -f -t v
-
         ${pre-commit-check.shellHook}
       '';
       };
