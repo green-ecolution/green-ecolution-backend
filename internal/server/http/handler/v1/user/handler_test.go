@@ -683,6 +683,130 @@ func TestGetAllUsers(t *testing.T) {
 	})
 }
 
+func TestGetUsersByRole(t *testing.T) {
+	t.Run("should return users successfully for a given role", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
+
+		mockUUID1 := uuid.New()
+		mockUUID2 := uuid.New()
+
+		users := []*domain.User{
+			{
+				ID:          mockUUID1,
+				CreatedAt:   time.Now(),
+				Email:       "user1@example.com",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Username:    "johndoe",
+				EmployeeID:  "1234",
+				PhoneNumber: "+123456789",
+				Roles: []domain.Role{
+					{Name: domain.UserRoleAdmin},
+				},
+			},
+			{
+				ID:          mockUUID2,
+				CreatedAt:   time.Now(),
+				Email:       "user2@example.com",
+				FirstName:   "Jane",
+				LastName:    "Doe",
+				Username:    "janedoe",
+				EmployeeID:  "5678",
+				PhoneNumber: "+987654321",
+				Roles: []domain.Role{
+					{Name: domain.UserRoleEngineer},
+				},
+			},
+		}
+		expectedUsers := []*domain.User{users[1]}
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleEngineer}).Return(expectedUsers, nil)
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/Engineer", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response []entities.UserResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.Nil(t, err)
+		assert.Equal(t, len(expectedUsers), len(response))
+		for i, user := range expectedUsers {
+			assert.Equal(t, user.ID.String(), response[i].ID)
+			assert.Equal(t, user.Email, response[i].Email)
+			assert.Equal(t, user.FirstName, response[i].FirstName)
+			assert.Equal(t, user.LastName, response[i].LastName)
+			assert.Equal(t, user.Username, response[i].Username)
+			assert.Equal(t, user.EmployeeID, response[i].EmployeeID)
+			assert.Equal(t, user.PhoneNumber, response[i].PhoneNumber)
+		}
+	})
+
+	t.Run("should return 400 bad request when role is invalid", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/InvalidRole", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+	})
+
+	t.Run("should return 500 internal server error when service fails", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
+
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleAdmin}).
+			Return(nil, service.NewError(service.InternalError, "service error"))
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/Admin", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+	})
+
+	t.Run("should return empty slice when no users are found", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user/role/:role", GetAllUsers(mockAuthService))
+
+		mockAuthService.EXPECT().GetAll(mock.Anything).Return([]*domain.User{}, nil)
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response []entities.UserResponse
+		err = json.NewDecoder(resp.Body).Decode(&response)
+		assert.Nil(t, err)
+		assert.Empty(t, response)
+	})
+}
+
 func generateJWT(t testing.TB, sub string) string {
 	t.Helper()
 

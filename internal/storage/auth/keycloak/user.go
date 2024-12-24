@@ -153,7 +153,6 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 
 		if val, ok := (*user.Attributes)["user_roles"]; ok && len(val) > 0 {
 			userRoles = val
-
 		}
 	}
 	var roles []entities.Role
