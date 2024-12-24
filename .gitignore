@@ -276,3 +276,5 @@ _sqlc
 config/config.stage.yaml
 config/config.prod.yaml
 config/config.dev.yaml
+.direnv
+.pre-commit-config.yaml
