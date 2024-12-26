@@ -88,7 +88,7 @@ func (s *Store) getRegionByTreeClusterID(ctx context.Context, id int32) (*entiti
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrRegionNotFound
 		}
-		return nil, s.HandleError(err)
+		return nil, s.HandleError(err, "Failed to fetch linked trees by TreeClusterID")
 	}
 
 	return regionMapper.FromSql(row), nil
