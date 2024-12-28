@@ -2,6 +2,7 @@ package wateringplan
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -16,6 +17,7 @@ type WateringPlanService struct {
 	clusterRepo      storage.TreeClusterRepository
 	vehicleRepo      storage.VehicleRepository
 	validator        *validator.Validate
+	statusSchedular  *StatusSchedular
 }
 
 func NewWateringPlanService(
@@ -28,7 +30,12 @@ func NewWateringPlanService(
 		clusterRepo:      clusterRepository,
 		vehicleRepo:      vehicleRepository,
 		validator:        validator.New(),
+		statusSchedular:  &StatusSchedular{wateringPlanRepo: wateringPlanRepository},
 	}
+}
+
+func (w *WateringPlanService) RunStatusSchedular(ctx context.Context, interval time.Duration) {
+	w.statusSchedular.RunStatusSchedular(ctx, interval)
 }
 
 func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {

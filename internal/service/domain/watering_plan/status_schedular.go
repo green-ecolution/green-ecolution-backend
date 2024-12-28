@@ -38,7 +38,7 @@ func (s *StatusSchedular) RunStatusSchedular(ctx context.Context, interval time.
 	}
 }
 
-// This function updates the status of all watering plans that are marked as »planned« and whose date has passed. 
+// This function updates the status of all watering plans that are marked as »planned« and whose date has passed.
 // If the date is in the past, the status is updated to "not competed«.
 func (s *StatusSchedular) updatePlannedWateringPlanStates(ctx context.Context) error {
 	wateringPlans, err := s.wateringPlanRepo.GetAllByStatus(ctx, entities.WateringPlanStatusPlanned)
@@ -54,7 +54,7 @@ func (s *StatusSchedular) updatePlannedWateringPlanStates(ctx context.Context) e
 			})
 			if err != nil {
 				slog.Error(
-					"Failed to update watering plan status to not completed", 
+					"Failed to update watering plan status to not completed",
 					"id", fmt.Sprintf("%d", wateringPlan.ID),
 					"error", err.Error(),
 				)

@@ -99,6 +99,42 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 	})
 }
 
+func TestWateringPlanRepository_GetAllByStatus(t *testing.T) {
+	t.Run("should return all watering plans with status »planned«", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetAllByStatus(context.Background(), entities.WateringPlanStatusPlanned)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, 1)
+		for i, wp := range got {
+			assert.Equal(t, allTestWateringPlans[i].ID, wp.ID)
+			assert.Equal(t, allTestWateringPlans[i].Date, wp.Date)
+			assert.Equal(t, entities.WateringPlanStatusPlanned, wp.Status)
+		}
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		_, err := r.GetAllByStatus(ctx, entities.WateringPlanStatusNotCompeted)
+
+		// then
+		assert.Error(t, err)
+	})
+}
+
 func TestWateringPlanRepository_GetByID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")

@@ -15,10 +15,10 @@ import (
 )
 
 type SensorService struct {
-	sensorRepo    storage.SensorRepository
-	treeRepo      storage.TreeRepository
-	flowerbedRepo storage.FlowerbedRepository
-	validator     *validator.Validate
+	sensorRepo      storage.SensorRepository
+	treeRepo        storage.TreeRepository
+	flowerbedRepo   storage.FlowerbedRepository
+	validator       *validator.Validate
 	statusSchedular *StatusSchedular
 }
 
@@ -28,10 +28,10 @@ func NewSensorService(
 	flowerbedRepo storage.FlowerbedRepository,
 ) service.SensorService {
 	return &SensorService{
-		sensorRepo:    sensorRepo,
-		treeRepo:      treeRepo,
-		flowerbedRepo: flowerbedRepo,
-		validator:     validator.New(),
+		sensorRepo:      sensorRepo,
+		treeRepo:        treeRepo,
+		flowerbedRepo:   flowerbedRepo,
+		validator:       validator.New(),
 		statusSchedular: &StatusSchedular{sensorRepo: sensorRepo},
 	}
 }

@@ -12,26 +12,27 @@ import (
 )
 
 func TestWateringPlanService_RunStatusSchedular(t *testing.T) {
-	t.Run("should update planned sensor states periodically", func(t *testing.T) {
+	t.Run("should check for not competed watering plans periodically", func(t *testing.T) {
 		ctx := context.Background()
 		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
 		svc := NewStatusSchedular(wateringPlanRepo)
 
 		staleWateringPlan := &entities.WateringPlan{
-			ID:        1,
-			Date: time.Now().Add(-73 * time.Hour), // 73 hours ago
+			ID:     1,
+			Date:   time.Now().Add(-73 * time.Hour), // 73 hours ago
 			Status: entities.WateringPlanStatusPlanned,
 		}
 		recentWateringPlan := &entities.WateringPlan{
-			ID:        1,
-			Date: time.Now().Add(73 * time.Hour), // 73 hours ahead
+			ID:     1,
+			Date:   time.Now().Add(73 * time.Hour), // 73 hours ahead
 			Status: entities.WateringPlanStatusPlanned,
 		}
 
 		wateringPlanRepo.EXPECT().GetAllByStatus(
-			mock.Anything, 
+			mock.Anything,
 			entities.WateringPlanStatusPlanned,
 		).Return([]*entities.WateringPlan{staleWateringPlan, recentWateringPlan}, nil)
+
 		wateringPlanRepo.EXPECT().Update(mock.Anything, staleWateringPlan.ID, mock.Anything).Return(nil)
 
 		go func() {
@@ -40,7 +41,7 @@ func TestWateringPlanService_RunStatusSchedular(t *testing.T) {
 
 		time.Sleep(100 * time.Millisecond)
 
-		wateringPlanRepo.AssertCalled(t, "GetAllByStatus", mock.Anything)
+		wateringPlanRepo.AssertCalled(t, "GetAllByStatus", mock.Anything, entities.WateringPlanStatusPlanned)
 		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, staleWateringPlan.ID, mock.Anything)
 		wateringPlanRepo.AssertExpectations(t)
 	})
@@ -69,7 +70,7 @@ func TestWateringPlanService_RunStatusSchedular(t *testing.T) {
 		svc := NewStatusSchedular(wateringPlanRepo)
 
 		wateringPlanRepo.EXPECT().GetAllByStatus(
-			mock.Anything, 
+			mock.Anything,
 			entities.WateringPlanStatusPlanned,
 		).Return(nil, errors.New("db error"))
 
@@ -79,7 +80,7 @@ func TestWateringPlanService_RunStatusSchedular(t *testing.T) {
 
 		time.Sleep(50 * time.Millisecond)
 
-		wateringPlanRepo.AssertCalled(t, "GetAllByStatus", mock.Anything)
+		wateringPlanRepo.AssertCalled(t, "GetAllByStatus", mock.Anything, entities.WateringPlanStatusPlanned)
 		wateringPlanRepo.AssertNotCalled(t, "Update")
 		wateringPlanRepo.AssertExpectations(t)
 	})
@@ -91,8 +92,8 @@ func TestWateringPlanService_RunStatusSchedular(t *testing.T) {
 		svc := NewStatusSchedular(wateringPlanRepo)
 
 		staleWateringPlan := &entities.WateringPlan{
-			ID:        1,
-			Date: time.Now().Add(-73 * time.Hour), // 73 hours ago
+			ID:     1,
+			Date:   time.Now().Add(-73 * time.Hour), // 73 hours ago
 			Status: entities.WateringPlanStatusPlanned,
 		}
 
@@ -108,7 +109,7 @@ func TestWateringPlanService_RunStatusSchedular(t *testing.T) {
 
 		time.Sleep(50 * time.Millisecond)
 
-		wateringPlanRepo.AssertCalled(t, "GetAllByStatus", mock.Anything)
+		wateringPlanRepo.AssertCalled(t, "GetAllByStatus", mock.Anything, entities.WateringPlanStatusPlanned)
 		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, staleWateringPlan.ID, mock.Anything)
 		wateringPlanRepo.AssertExpectations(t)
 	})
