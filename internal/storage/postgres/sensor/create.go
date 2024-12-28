@@ -14,7 +14,7 @@ import (
 func defaultSensor() *entities.Sensor {
 	return &entities.Sensor{
 		Status:     entities.SensorStatusUnknown,
-		LatestData: &entities.SensorData{},
+		LatestData: nil,
 		Latitude:   0,
 		Longitude:  0,
 	}

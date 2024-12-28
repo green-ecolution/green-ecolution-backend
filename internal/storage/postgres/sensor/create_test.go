@@ -56,7 +56,7 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, entities.SensorStatusUnknown, got.Status)
-		assert.Equal(t, &entities.SensorData{}, got.LatestData)
+		assert.Nil(t, got.LatestData)
 		assert.Equal(t, input.Latitude, got.Latitude)
 		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.NotZero(t, got.ID)

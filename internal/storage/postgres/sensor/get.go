@@ -59,12 +59,8 @@ func (r *SensorRepository) mapFields(ctx context.Context, sn *entities.Sensor) e
 	var err error
 
 	sn.LatestData, err = r.GetLastSensorDataByID(ctx, sn.ID)
-	if err != nil {
-		if err == storage.ErrEntityNotFound {
-			sn.LatestData = &entities.SensorData{}
-		} else {
-			return r.store.HandleError(err)
-		}
+	if err != nil && !errors.Is(err, storage.ErrEntityNotFound) {
+		return r.store.HandleError(err)
 	}
 
 	return nil
