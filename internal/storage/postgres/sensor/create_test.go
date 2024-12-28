@@ -2,7 +2,6 @@ package sensor
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -36,6 +35,11 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.Equal(t, input.Status, got.Status)
 		assert.NotZero(t, got.ID)
+
+		// assert latest data
+		assert.NotZero(t, got.LatestData.UpdatedAt)
+		assert.NotZero(t, got.LatestData.CreatedAt)
+		assert.Equal(t, input.LatestData.Data, got.LatestData.Data)
 	})
 
 	t.Run("should create sensor with empty data and unknown status", func(t *testing.T) {
@@ -48,7 +52,6 @@ func TestSensorRepository_Create(t *testing.T) {
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude))
 
-			fmt.Println(err)
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
@@ -57,6 +60,9 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Latitude, got.Latitude)
 		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.NotZero(t, got.ID)
+
+		// assert latest data
+		assert.Nil(t, got.LatestData)
 	})
 
 	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
@@ -208,7 +214,6 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 }
 
 var inputPayload = &entities.MqttPayload{
-	DeviceID:    "sensor-123",
 	Battery:     34.0,
 	Humidity:    50,
 	Temperature: 20,

@@ -3,6 +3,7 @@ package sensor
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
@@ -17,12 +18,19 @@ func TestSensorRepository_Update(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 		newLat := 54.82078826498143
 		newLong := 9.489684366114483
+		newLatestData := &entities.SensorData{
+			ID:        1,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Data:      TestMqttPayload,
+		}
 
 		got, err := r.Update(context.Background(),
 			"sensor-1",
 			WithStatus(entities.SensorStatusOffline),
 			WithLatitude(newLat),
-			WithLongitude(newLong))
+			WithLongitude(newLong),
+			WithLatestData(newLatestData))
 
 		// then
 		assert.NoError(t, err)
@@ -30,6 +38,10 @@ func TestSensorRepository_Update(t *testing.T) {
 		assert.Equal(t, entities.SensorStatusOffline, got.Status)
 		assert.Equal(t, newLat, got.Latitude)
 		assert.Equal(t, newLong, got.Longitude)
+
+		assert.NotZero(t, got.LatestData.UpdatedAt)
+		assert.NotZero(t, got.LatestData.CreatedAt)
+		assert.Equal(t, TestMqttPayload, got.LatestData.Data)
 	})
 
 	t.Run("should return error when update sensor with empty name", func(t *testing.T) {

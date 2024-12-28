@@ -11,5 +11,7 @@ type MqttPayload struct {
 	Battery     float64     `json:"battery"`
 	Humidity    float64     `json:"humidity"`
 	Temperature float64     `json:"temperature"`
+	Latitude    float64     `json:"latitude"`
+	Longitude   float64     `json:"longitude"`
 	Watermarks  []Watermark `json:"watermarks"`
 }

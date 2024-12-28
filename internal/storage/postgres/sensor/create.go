@@ -3,7 +3,6 @@ package sensor
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
@@ -32,8 +31,6 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 		return nil, errors.New("sensor with same ID already exists")
 	}
 
-	fmt.Println("hallo")
-
 	if err := r.validateSensorEntity(entity); err != nil {
 		return nil, err
 	}
@@ -42,8 +39,6 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	if err != nil {
 		return nil, r.store.HandleError(err)
 	}
-
-	fmt.Println(id)
 
 	entity.ID = id
 	if entity.LatestData != nil && entity.LatestData.Data != nil {

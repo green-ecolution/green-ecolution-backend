@@ -30,6 +30,13 @@ func TestSensorRepository_GetAll(t *testing.T) {
 			assert.Equal(t, TestSensorList[i].Longitude, sensor.Longitude)
 			assert.NotZero(t, sensor.CreatedAt)
 			assert.NotZero(t, sensor.UpdatedAt)
+
+			// assert latest data
+			if TestSensorList[i].LatestData != nil {
+				assert.NotZero(t, sensor.LatestData.UpdatedAt)
+				assert.NotZero(t, sensor.LatestData.CreatedAt)
+				assert.Equal(t, TestSensorList[i].LatestData.Data, sensor.LatestData.Data)
+			}
 		}
 	})
 
@@ -81,6 +88,10 @@ func TestSensorRepository_GetByID(t *testing.T) {
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
 
+		// assert latest data
+		assert.NotZero(t, got.LatestData.UpdatedAt)
+		assert.NotZero(t, got.LatestData.CreatedAt)
+		assert.Equal(t, TestSensorList[0].LatestData.Data, got.LatestData.Data)
 	})
 
 	t.Run("should return error when sensor not found", func(t *testing.T) {
@@ -178,63 +189,51 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 
 var TestSensorList = []*entities.Sensor{
 	{
-		ID:         "sensor-1",
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
-		Latitude:   54.82124518093376,
-		Longitude:  9.485702120628517,
-		Status:     entities.SensorStatusOnline,
-		LatestData: TestSensorData[0],
-	},
-	{
-		ID:         "sensor-2",
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
-		Latitude:   54.78780993841013,
-		Longitude:  9.444052105200551,
-		Status:     entities.SensorStatusOffline,
-		LatestData: &entities.SensorData{},
-	},
-	{
-		ID:         "sensor-3",
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
-		Latitude:   54.77933725347423,
-		Longitude:  9.426465409018832,
-		Status:     entities.SensorStatusUnknown,
-		LatestData: &entities.SensorData{},
-	},
-	{
-		ID:         "sensor-4",
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
-		Latitude:   54.82078826498143,
-		Longitude:  9.489684366114483,
-		Status:     entities.SensorStatusOnline,
-		LatestData: &entities.SensorData{},
-	},
-}
-
-var TestSensorData = []*entities.SensorData{
-	{
-		ID:        1,
+		ID:        "sensor-1",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Data:      TestMqttPayload,
+		Latitude:  54.82124518093376,
+		Longitude: 9.485702120628517,
+		Status:    entities.SensorStatusOnline,
+		LatestData: &entities.SensorData{
+			ID:        1,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Data:      TestMqttPayload,
+		},
 	},
 	{
-		ID:        2,
+		ID:        "sensor-2",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Data:      TestMqttPayload,
+		Latitude:  54.78780993841013,
+		Longitude: 9.444052105200551,
+		Status:    entities.SensorStatusOffline,
+	},
+	{
+		ID:        "sensor-3",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.77933725347423,
+		Longitude: 9.426465409018832,
+		Status:    entities.SensorStatusUnknown,
+	},
+	{
+		ID:        "sensor-4",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.82078826498143,
+		Longitude: 9.489684366114483,
+		Status:    entities.SensorStatusOnline,
 	},
 }
 
 var TestMqttPayload = &entities.MqttPayload{
-	DeviceID:    "sensor-123",
 	Battery:     34.0,
 	Humidity:    50,
 	Temperature: 20,
+	Latitude:    54.82124518093376,
+	Longitude:   9.485702120628517,
 	Watermarks: []entities.Watermark{
 		{
 			Resistance: 23,
