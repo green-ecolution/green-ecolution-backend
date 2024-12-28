@@ -10,17 +10,17 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 )
 
-type StatusUpdater struct {
+type StatusSchedular struct {
 	sensorRepo storage.SensorRepository
 }
 
-func NewStatusUpdater(sensorRepo storage.SensorRepository) *StatusUpdater {
-	return &StatusUpdater{
+func NewStatusSchedular(sensorRepo storage.SensorRepository) *StatusSchedular {
+	return &StatusSchedular{
 		sensorRepo: sensorRepo,
 	}
 }
 
-func (s *StatusUpdater) RunStatusUpdater(ctx context.Context, interval time.Duration) {
+func (s *StatusSchedular) RunStatusSchedular(ctx context.Context, interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
@@ -38,7 +38,7 @@ func (s *StatusUpdater) RunStatusUpdater(ctx context.Context, interval time.Dura
 	}
 }
 
-func (s *StatusUpdater) updateStaleSensorStatuses(ctx context.Context) error {
+func (s *StatusSchedular) updateStaleSensorStatuses(ctx context.Context) error {
 	sensors, err := s.sensorRepo.GetAll(ctx)
 	if err != nil {
 		return err

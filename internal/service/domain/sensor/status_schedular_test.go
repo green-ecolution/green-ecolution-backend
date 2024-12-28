@@ -15,7 +15,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 	t.Run("should update stale sensor statuses periodically", func(t *testing.T) {
 		ctx := context.Background()
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewStatusUpdater(sensorRepo)
+		svc := NewStatusSchedular(sensorRepo)
 
 		staleSensor := &entities.Sensor{
 			ID:        "sensor-1",
@@ -30,7 +30,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 		sensorRepo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
 
 		go func() {
-			svc.RunStatusUpdater(ctx, 10*time.Millisecond)
+			svc.RunStatusSchedular(ctx, 10*time.Millisecond)
 		}()
 
 		time.Sleep(100 * time.Millisecond)
@@ -44,11 +44,11 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewStatusUpdater(sensorRepo)
+		svc := NewStatusSchedular(sensorRepo)
 
 		// No GetAll or Update expected, since context will be canceled early
 		go func() {
-			svc.RunStatusUpdater(ctx, 10*time.Millisecond)
+			svc.RunStatusSchedular(ctx, 10*time.Millisecond)
 		}()
 
 		time.Sleep(20 * time.Millisecond)
@@ -62,12 +62,12 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 		// given
 		ctx := context.Background()
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewStatusUpdater(sensorRepo)
+		svc := NewStatusSchedular(sensorRepo)
 
 		sensorRepo.EXPECT().GetAll(mock.Anything).Return(nil, errors.New("db error"))
 
 		go func() {
-			svc.RunStatusUpdater(ctx, 10*time.Millisecond) // Run every 10ms
+			svc.RunStatusSchedular(ctx, 10*time.Millisecond) // Run every 10ms
 		}()
 
 		time.Sleep(50 * time.Millisecond)
@@ -81,7 +81,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 		// given
 		ctx := context.Background()
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := NewStatusUpdater(sensorRepo)
+		svc := NewStatusSchedular(sensorRepo)
 
 		staleSensor := &entities.Sensor{
 			ID:        "sensor-1",
@@ -92,7 +92,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 		sensorRepo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
 		go func() {
-			svc.RunStatusUpdater(ctx, 10*time.Millisecond)
+			svc.RunStatusSchedular(ctx, 10*time.Millisecond)
 		}()
 
 		time.Sleep(50 * time.Millisecond)

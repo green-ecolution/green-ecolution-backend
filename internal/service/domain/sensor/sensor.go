@@ -19,7 +19,7 @@ type SensorService struct {
 	treeRepo      storage.TreeRepository
 	flowerbedRepo storage.FlowerbedRepository
 	validator     *validator.Validate
-	StatusUpdater *StatusUpdater
+	statusSchedular *StatusSchedular
 }
 
 func NewSensorService(
@@ -32,7 +32,7 @@ func NewSensorService(
 		treeRepo:      treeRepo,
 		flowerbedRepo: flowerbedRepo,
 		validator:     validator.New(),
-		StatusUpdater: &StatusUpdater{sensorRepo: sensorRepo},
+		statusSchedular: &StatusSchedular{sensorRepo: sensorRepo},
 	}
 }
 
@@ -116,8 +116,8 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *SensorService) RunStatusUpdater(ctx context.Context, interval time.Duration) {
-	s.StatusUpdater.RunStatusUpdater(ctx, interval)
+func (s *SensorService) RunStatusSchedular(ctx context.Context, interval time.Duration) {
+	s.statusSchedular.RunStatusSchedular(ctx, interval)
 }
 
 func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Sensor) error {
