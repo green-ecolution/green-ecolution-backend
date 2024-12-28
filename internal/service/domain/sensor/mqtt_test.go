@@ -100,7 +100,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		insertData := &domain.SensorData{
 			Data: testPayLoad,
 		}
-
+	
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.DeviceID).Return(nil, storage.ErrSensorNotFound).Once()
 		sensorRepo.EXPECT().Create(context.Background(),
 			mock.Anything,
@@ -111,11 +111,11 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, TestSensor.ID).Return(nil).Once()
 		sensorRepo.EXPECT().GetLastSensorDataByID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil).Once()
 		sensorRepo.EXPECT().GetByID(context.Background(), TestSensor.ID).Return(TestSensor, nil).Once()
-
+	
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)
 		sensor, errCreateSens := sensorRepo.GetByID(context.Background(), TestSensor.ID)
-
+	
 		// then
 		assert.NoError(t, err)
 		assert.NoError(t, errCreateSens)
@@ -127,7 +127,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		assert.Equal(t, sensor.Longitude, TestSensor.Longitude)
 		assert.Equal(t, sensor.Status, domain.SensorStatusOnline)
 	})
-
+	
 	t.Run("should return error if sensor creation fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
@@ -219,7 +219,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything).Return(TestSensor, nil)
-		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.DeviceID).Return(errors.New("insert error"))
+			sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.DeviceID).Return(errors.New("insert error"))
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)
