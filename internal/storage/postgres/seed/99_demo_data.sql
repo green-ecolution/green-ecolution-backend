@@ -103,6 +103,7 @@ VALUES
 INSERT INTO sensor_data (sensor_id, data)
 VALUES
     ('sensor-1', '{
+        "device": "sensor-1",
         "temperature": 20.0,
         "humidity": 0.5,
         "battery": 34,
@@ -113,6 +114,7 @@ VALUES
         ]
     }'),
     ('sensor-1', '{
+        "device": "sensor-2",
         "temperature": 21.5,
         "humidity": 0.6,
         "battery": 36,
@@ -123,6 +125,7 @@ VALUES
         ]
     }'),
     ('sensor-1', '{
+        "device": "sensor-1",
         "temperature": 22.0,
         "humidity": 0.7,
         "battery": 32,
@@ -133,6 +136,7 @@ VALUES
         ]
     }'),
     ('sensor-2', '{
+        "device": "sensor-2",
         "temperature": 20.0,
         "humidity": 0.5,
         "battery": 40,
@@ -143,6 +147,7 @@ VALUES
         ]
     }'),
     ('sensor-2', '{
+        "device": "sensor-2",
         "temperature": 21.0,
         "humidity": 0.6,
         "battery": 39,
@@ -153,6 +158,7 @@ VALUES
         ]
     }'),
     ('sensor-2', '{
+        "device": "sensor-2",
         "temperature": 22.0,
         "humidity": 0.7,
         "battery": 38,
@@ -163,6 +169,7 @@ VALUES
         ]
     }'),
     ('sensor-3', '{
+        "device": "sensor-3",
         "temperature": 19.5,
         "humidity": 0.4,
         "battery": 37,
@@ -173,6 +180,7 @@ VALUES
         ]
     }'),
     ('sensor-3', '{
+        "device": "sensor-3",
         "temperature": 20.5,
         "humidity": 0.5,
         "battery": 36,
@@ -183,6 +191,7 @@ VALUES
         ]
     }'),
     ('sensor-3', '{
+        "device": "sensor-3",
         "temperature": 21.5,
         "humidity": 0.6,
         "battery": 35,

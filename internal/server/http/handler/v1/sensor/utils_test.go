@@ -10,7 +10,7 @@ var (
 	currentTime     = time.Now()
 	TestSensorID    = "sensor-1"
 	TestMqttPayload = &entities.MqttPayload{
-		DeviceID:    "sensor-123",
+		Device:      "sensor-123",
 		Battery:     34.0,
 		Humidity:    50,
 		Temperature: 20,

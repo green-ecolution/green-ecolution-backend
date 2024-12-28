@@ -9,7 +9,7 @@ import (
 var (
 	TestListMQTTPayload = []*domain.MqttPayload{
 		{
-			DeviceID:    "sensor001",
+			Device:      "sensor001",
 			Battery:     45.3,
 			Humidity:    0.75,
 			Temperature: 22.5,
@@ -22,7 +22,7 @@ var (
 			},
 		},
 		{
-			DeviceID:    "sensor002",
+			Device:      "sensor002",
 			Battery:     78.9,
 			Humidity:    0.60,
 			Temperature: 18.3,
@@ -35,7 +35,7 @@ var (
 			},
 		},
 		{
-			DeviceID:    "sensor003",
+			Device:      "sensor003",
 			Battery:     32.1,
 			Humidity:    0.85,
 			Temperature: 28.0,
@@ -50,7 +50,7 @@ var (
 	}
 
 	TestMQTTPayLoadInvalidLong = &domain.MqttPayload{
-		DeviceID:    "sensor001",
+		Device:      "sensor001",
 		Battery:     45.3,
 		Humidity:    0.75,
 		Temperature: 22.5,
@@ -64,7 +64,7 @@ var (
 	}
 
 	TestMQTTPayLoadInvalidLat = &domain.MqttPayload{
-		DeviceID:    "sensor001",
+		Device:      "sensor001",
 		Battery:     45.3,
 		Humidity:    0.75,
 		Temperature: 22.5,

@@ -229,6 +229,7 @@ var TestSensorList = []*entities.Sensor{
 }
 
 var TestMqttPayload = &entities.MqttPayload{
+	Device: "sensor-123",
 	Battery:     34.0,
 	Humidity:    50,
 	Temperature: 20,

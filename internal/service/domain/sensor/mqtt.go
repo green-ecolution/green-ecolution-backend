@@ -40,7 +40,7 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 }
 
 func (s *SensorService) getSensor(ctx context.Context, payload *domain.MqttPayload) (*domain.Sensor, error) {
-	sensor, err := s.sensorRepo.GetByID(ctx, payload.DeviceID)
+	sensor, err := s.sensorRepo.GetByID(ctx, payload.Device)
 	if err == nil && sensor != nil {
 		if sensor.Latitude != payload.Latitude || sensor.Longitude != payload.Longitude || sensor.Status != domain.SensorStatusOnline {
 			sensor, err = s.sensorRepo.Update(
@@ -55,7 +55,7 @@ func (s *SensorService) getSensor(ctx context.Context, payload *domain.MqttPaylo
 		}
 		return sensor, nil
 	}
-	sensor, err = s.sensorRepo.Create(ctx, storageSensor.WithSensorID(payload.DeviceID),
+	sensor, err = s.sensorRepo.Create(ctx, storageSensor.WithSensorID(payload.Device),
 		storageSensor.WithLatitude(payload.Latitude),
 		storageSensor.WithLongitude(payload.Longitude),
 		storageSensor.WithStatus(domain.SensorStatusOnline))

@@ -82,7 +82,7 @@ func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPaylo
 		return nil, fmt.Errorf("error unmarshalling JSON: %w", err)
 	}
 
-	endDeviceIDs := raw["end_device_ids"].(map[string]any)
+	endDevices := raw["end_device_ids"].(map[string]any)
 	uplinkMessage := raw["uplink_message"].(map[string]any)
 	decodedPayload := uplinkMessage["decoded_payload"].(map[string]any)
 
@@ -93,7 +93,7 @@ func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPaylo
 	}
 
 	payload := &sensor.MqttPayloadResponse{
-		DeviceID:    endDeviceIDs["device_id"].(string),
+		Device:      endDevices["device"].(string),
 		Battery:     decodedPayload["battery"].(float64),
 		Humidity:    decodedPayload["humidity"].(float64),
 		Temperature: temperature,

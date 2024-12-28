@@ -214,6 +214,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 }
 
 var inputPayload = &entities.MqttPayload{
+	Device: "sensor-123",
 	Battery:     34.0,
 	Humidity:    50,
 	Temperature: 20,

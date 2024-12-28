@@ -7,7 +7,7 @@ type Watermark struct {
 }
 
 type MqttPayload struct {
-	DeviceID    string      `json:"device_id"`
+	Device      string      `json:"device"`
 	Battery     float64     `json:"battery"`
 	Humidity    float64     `json:"humidity"`
 	Temperature float64     `json:"temperature"`
