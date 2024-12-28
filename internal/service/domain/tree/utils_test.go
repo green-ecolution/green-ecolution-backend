@@ -1,4 +1,4 @@
-package tree
+package tree_test
 
 import (
 	"time"
@@ -68,22 +68,22 @@ var (
 
 	TestSensors = []*entities.Sensor{
 		{
-			ID:        "sensor-1",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Status:    entities.SensorStatusUnknown,
-			Latitude:  54.82124518093376,
-			Longitude: 9.485702120628517,
-			Data:      nil,
+			ID:         "sensor-1",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+			Status:     entities.SensorStatusUnknown,
+			Latitude:   54.82124518093376,
+			Longitude:  9.485702120628517,
+			LatestData: &entities.SensorData{},
 		},
 		{
-			ID:        "sensor-2",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Status:    entities.SensorStatusUnknown,
-			Latitude:  54.787809938410133,
-			Longitude: 9.444052105200551,
-			Data:      nil,
+			ID:         "sensor-2",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+			Status:     entities.SensorStatusUnknown,
+			Latitude:   54.787809938410133,
+			Longitude:  9.444052105200551,
+			LatestData: &entities.SensorData{},
 		},
 	}
 
@@ -114,18 +114,5 @@ var (
 		Latitude:      testLatitude,
 		Longitude:     testLongitude,
 		Description:   "Updated description",
-	}
-
-	TestNearestTree = &entities.Tree{
-		ID:           5,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
-		Species:      "Oak",
-		Number:       "T001",
-		Latitude:     54.8215076622281,
-		Longitude:    9.487153277881877,
-		Description:  "A mature oak tree",
-		PlantingYear: 2023,
-		Readonly:     true,
 	}
 )

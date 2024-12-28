@@ -25,7 +25,7 @@ func TestSensorRepository_Create(t *testing.T) {
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status),
-			WithLatestData(&input.Data),
+			WithLatestData(input.LatestData),
 		)
 
 		// then
@@ -51,7 +51,7 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, entities.SensorStatusUnknown, got.Status)
-		assert.Equal(t, []*entities.SensorData{}, got.LatestData)
+		assert.Equal(t, &entities.SensorData{}, got.LatestData)
 		assert.Equal(t, input.Latitude, got.Latitude)
 		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.NotZero(t, got.ID)
@@ -115,7 +115,7 @@ func TestSensorRepository_Create(t *testing.T) {
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status),
-			WithLatestData(&input.Data),
+			WithLatestData(input.LatestData),
 		)
 
 		// then
@@ -155,7 +155,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		assert.NoError(t, err)
 
 		// when
-		err = r.InsertSensorData(context.Background(), &input.Data, input.ID)
+		err = r.InsertSensorData(context.Background(), input.LatestData, input.ID)
 
 		// then
 		assert.NoError(t, err)
@@ -177,7 +177,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.Equal(t, err.Error(), "data cannot be empty")
+		assert.Equal(t, err.Error(), "latest data cannot be empty")
 	})
 
 	t.Run("should return error when data is nil", func(t *testing.T) {
@@ -198,7 +198,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		err := r.InsertSensorData(context.Background(), &input.Data, "")
+		err := r.InsertSensorData(context.Background(), input.LatestData, "")
 
 		// then
 		assert.Error(t, err)
@@ -229,10 +229,10 @@ var inputPayload = &entities.MqttPayload{
 	},
 }
 
-var input = *&entities.SensorCreate{
+var input = &entities.SensorCreate{
 	ID:     "sensor-123",
 	Status: entities.SensorStatusOnline,
-	Data: entities.SensorData{
+	LatestData: &entities.SensorData{
 		ID:        1,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),

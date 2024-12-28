@@ -1,8 +1,9 @@
-package sensor
+package sensor_test
 
 import (
 	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -78,13 +79,13 @@ var (
 	}
 
 	TestSensor = &domain.Sensor{
-		ID:        "sensor001",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.82124518093376,
-		Longitude: 9.485702120628517,
-		Status:    domain.SensorStatusOnline,
-		Data:      TestSensorData,
+		ID:         "sensor001",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Latitude:   54.82124518093376,
+		Longitude:  9.485702120628517,
+		Status:     domain.SensorStatusOnline,
+		LatestData: TestSensorData[0],
 	}
 
 	TestSensorData = []*domain.SensorData{
@@ -111,41 +112,54 @@ var (
 	TestSensorList = []*domain.Sensor{
 		TestSensor,
 		{
-			ID:        "sensor-2",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Latitude:  54.78780993841013,
-			Longitude: 9.444052105200551,
-			Status:    domain.SensorStatusOffline,
-			Data:      []*domain.SensorData{},
+			ID:         "sensor-2",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+			Latitude:   54.78780993841013,
+			Longitude:  9.444052105200551,
+			Status:     domain.SensorStatusOffline,
+			LatestData: &domain.SensorData{},
 		},
 		{
-			ID:        "sensor-3",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Latitude:  54.77933725347423,
-			Longitude: 9.426465409018832,
-			Status:    domain.SensorStatusUnknown,
-			Data:      []*domain.SensorData{},
+			ID:         "sensor-3",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+			Latitude:   54.77933725347423,
+			Longitude:  9.426465409018832,
+			Status:     domain.SensorStatusUnknown,
+			LatestData: &domain.SensorData{},
 		},
 		{
-			ID:        "sensor-4",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Latitude:  54.82078826498143,
-			Longitude: 9.489684366114483,
-			Status:    domain.SensorStatusOnline,
-			Data:      []*domain.SensorData{},
+			ID:         "sensor-4",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+			Latitude:   54.82078826498143,
+			Longitude:  9.489684366114483,
+			Status:     domain.SensorStatusOnline,
+			LatestData: &domain.SensorData{},
 		},
 	}
 
 	TestSensorNearestTree = &domain.Sensor{
-		ID:        "sensor-05",
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Latitude:  54.821535,
-		Longitude: 9.487200,
-		Status:    domain.SensorStatusOnline,
-		Data:      []*domain.SensorData{TestSensorData[0]},
+		ID:         "sensor-05",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Latitude:   54.821535,
+		Longitude:  9.487200,
+		Status:     domain.SensorStatusOnline,
+		LatestData: TestSensorData[0],
+	}
+
+	TestNearestTree = &entities.Tree{
+		ID:           5,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		Species:      "Oak",
+		Number:       "T001",
+		Latitude:     54.8215076622281,
+		Longitude:    9.487153277881877,
+		Description:  "A mature oak tree",
+		PlantingYear: 2023,
+		Readonly:     true,
 	}
 )

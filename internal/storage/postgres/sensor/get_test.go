@@ -144,7 +144,7 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 		assert.NotZero(t, data.UpdatedAt)
 	})
 
-	t.Run("should return empty slice when no data found", func(t *testing.T) {
+	t.Run("should return error when no data found", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		suite.ResetDB(t)
@@ -154,7 +154,7 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 		got, err := r.GetLastSensorDataByID(ctx, "notFoundID")
 
 		// then
-		assert.NoError(t, err)
+		assert.EqualError(t, err, "entity not found")
 		assert.Empty(t, got)
 	})
 
@@ -191,7 +191,7 @@ var TestSensorList = []*entities.Sensor{
 		Latitude:   54.78780993841013,
 		Longitude:  9.444052105200551,
 		Status:     entities.SensorStatusOffline,
-		LatestData: nil,
+		LatestData: &entities.SensorData{},
 	},
 	{
 		ID:         "sensor-3",
@@ -200,7 +200,7 @@ var TestSensorList = []*entities.Sensor{
 		Latitude:   54.77933725347423,
 		Longitude:  9.426465409018832,
 		Status:     entities.SensorStatusUnknown,
-		LatestData: nil,
+		LatestData: &entities.SensorData{},
 	},
 	{
 		ID:         "sensor-4",
@@ -209,7 +209,7 @@ var TestSensorList = []*entities.Sensor{
 		Latitude:   54.82078826498143,
 		Longitude:  9.489684366114483,
 		Status:     entities.SensorStatusOnline,
-		LatestData: nil,
+		LatestData: &entities.SensorData{},
 	},
 }
 

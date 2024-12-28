@@ -1,13 +1,13 @@
-package sensor
+package sensor_test
 
 import (
 	"context"
 	"errors"
-	"github.com/go-playground/validator/v10"
 	"testing"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/mock"
 
@@ -15,17 +15,27 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewSensorService(t *testing.T) {
+	t.Run("should create a new service", func(t *testing.T) {
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		assert.NotNil(t, svc)
+	})
+}
+
 func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should process MQTT payload successfully", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		testPayLoad := TestListMQTTPayload[0]
-		insertData := []*domain.SensorData{
-			{
-				Data: testPayLoad,
-			},
+		insertData := &domain.SensorData{
+			Data: testPayLoad,
 		}
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.DeviceID).Return(TestSensor, nil)
@@ -34,19 +44,19 @@ func TestSensorService_HandleMessage(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything).Return(TestSensor, nil)
-		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.DeviceID).Return(insertData, nil)
-		sensorRepo.EXPECT().GetSensorDataByID(context.Background(), TestSensor.ID).Return(TestSensorData, nil)
+		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.DeviceID).Return(nil)
+		sensorRepo.EXPECT().GetLastSensorDataByID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil)
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)
-		sensor, errGetSens := svc.sensorRepo.GetByID(context.Background(), TestSensor.ID)
+		sensor, errGetSens := sensorRepo.GetByID(context.Background(), TestSensor.ID)
 
 		// then
 		assert.NoError(t, err)
 		assert.NoError(t, errGetSens)
 		assert.NotNil(t, sensorData)
 		assert.NotEmpty(t, sensorData)
-		assert.Equal(t, sensorData[0].Data, insertData[0].Data)
+		assert.Equal(t, sensorData.Data, insertData.Data)
 		assert.NotNil(t, sensor)
 		assert.Equal(t, sensor.Latitude, TestSensor.Latitude)
 		assert.Equal(t, sensor.Longitude, TestSensor.Longitude)
@@ -56,7 +66,9 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error if sensor update fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		testPayload := TestListMQTTPayload[0]
 
@@ -80,14 +92,13 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should process MQTT payload and create a new sensor if not found", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		testPayLoad := TestListMQTTPayload[0]
-
-		insertData := []*domain.SensorData{
-			{
-				Data: testPayLoad,
-			},
+		insertData := &domain.SensorData{
+			Data: testPayLoad,
 		}
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.DeviceID).Return(nil, storage.ErrSensorNotFound).Once()
@@ -97,20 +108,20 @@ func TestSensorService_HandleMessage(t *testing.T) {
 			mock.Anything,
 			mock.Anything).
 			Return(TestSensor, nil).Once()
-		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, TestSensor.ID).Return(insertData, nil).Once()
-		sensorRepo.EXPECT().GetSensorDataByID(context.Background(), TestSensor.ID).Return(TestSensorData, nil).Once()
+		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, TestSensor.ID).Return(nil).Once()
+		sensorRepo.EXPECT().GetLastSensorDataByID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil).Once()
 		sensorRepo.EXPECT().GetByID(context.Background(), TestSensor.ID).Return(TestSensor, nil).Once()
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)
-		sensor, errCreateSens := svc.sensorRepo.GetByID(context.Background(), TestSensor.ID)
+		sensor, errCreateSens := sensorRepo.GetByID(context.Background(), TestSensor.ID)
 
 		// then
 		assert.NoError(t, err)
 		assert.NoError(t, errCreateSens)
 		assert.NotNil(t, sensorData)
 		assert.NotEmpty(t, sensorData)
-		assert.Equal(t, sensorData[0].Data, insertData[0].Data)
+		assert.Equal(t, sensorData.Data, insertData.Data)
 		assert.NotNil(t, sensor)
 		assert.Equal(t, sensor.Latitude, TestSensor.Latitude)
 		assert.Equal(t, sensor.Longitude, TestSensor.Longitude)
@@ -120,7 +131,9 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error if sensor creation fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		testPayload := TestListMQTTPayload[0]
 
@@ -144,7 +157,9 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error when payload is nil", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), nil)
@@ -157,7 +172,9 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return validation error for invalid latitude", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), TestMQTTPayLoadInvalidLat)
@@ -171,7 +188,9 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return validation error for invalid longitude", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), TestMQTTPayLoadInvalidLong)
@@ -185,13 +204,13 @@ func TestSensorService_HandleMessage(t *testing.T) {
 	t.Run("should return error if InsertSensorData fails", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		svc := SensorService{sensorRepo: sensorRepo, validator: validator.New()}
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
 
 		testPayLoad := TestListMQTTPayload[0]
-		insertData := []*domain.SensorData{
-			{
-				Data: testPayLoad,
-			},
+		insertData := &domain.SensorData{
+			Data: testPayLoad,
 		}
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.DeviceID).Return(TestSensor, nil)
@@ -200,7 +219,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything).Return(TestSensor, nil)
-		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.DeviceID).Return(insertData, errors.New("insert error"))
+		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.DeviceID).Return(errors.New("insert error"))
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)

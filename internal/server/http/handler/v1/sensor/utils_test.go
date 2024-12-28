@@ -40,52 +40,42 @@ var (
 		Latitude:  54.82124518093376,
 		Longitude: 9.485702120628517,
 		Status:    entities.SensorStatusOnline,
-		Data:      []*entities.SensorData{TestSensorData[0]},
-	}
-
-	TestSensorList = []*entities.Sensor{
-		TestSensor,
-		{
-			ID:        "sensor-2",
-			CreatedAt: currentTime,
-			UpdatedAt: currentTime,
-			Latitude:  54.78780993841013,
-			Longitude: 9.444052105200551,
-			Status:    entities.SensorStatusOffline,
-			Data:      []*entities.SensorData{},
-		},
-		{
-			ID:        "sensor-3",
-			CreatedAt: currentTime,
-			UpdatedAt: currentTime,
-			Latitude:  54.77933725347423,
-			Longitude: 9.426465409018832,
-			Status:    entities.SensorStatusUnknown,
-			Data:      []*entities.SensorData{},
-		},
-		{
-			ID:        "sensor-4",
-			CreatedAt: currentTime,
-			UpdatedAt: currentTime,
-			Latitude:  54.82078826498143,
-			Longitude: 9.489684366114483,
-			Status:    entities.SensorStatusOnline,
-			Data:      []*entities.SensorData{},
-		},
-	}
-
-	TestSensorData = []*entities.SensorData{
-		{
+		LatestData: &entities.SensorData{
 			ID:        1,
 			CreatedAt: currentTime,
 			UpdatedAt: currentTime,
 			Data:      TestMqttPayload,
 		},
+	}
+
+	TestSensorList = []*entities.Sensor{
+		TestSensor,
 		{
-			ID:        2,
-			CreatedAt: currentTime,
-			UpdatedAt: currentTime,
-			Data:      TestMqttPayload,
+			ID:         "sensor-2",
+			CreatedAt:  currentTime,
+			UpdatedAt:  currentTime,
+			Latitude:   54.78780993841013,
+			Longitude:  9.444052105200551,
+			Status:     entities.SensorStatusOffline,
+			LatestData: &entities.SensorData{},
+		},
+		{
+			ID:         "sensor-3",
+			CreatedAt:  currentTime,
+			UpdatedAt:  currentTime,
+			Latitude:   54.77933725347423,
+			Longitude:  9.426465409018832,
+			Status:     entities.SensorStatusUnknown,
+			LatestData: &entities.SensorData{},
+		},
+		{
+			ID:         "sensor-4",
+			CreatedAt:  currentTime,
+			UpdatedAt:  currentTime,
+			Latitude:   54.82078826498143,
+			Longitude:  9.489684366114483,
+			Status:     entities.SensorStatusOnline,
+			LatestData: &entities.SensorData{},
 		},
 	}
 )

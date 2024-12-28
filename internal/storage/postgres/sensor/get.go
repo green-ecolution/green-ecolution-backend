@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/pkg/errors"
 )
@@ -59,7 +60,11 @@ func (r *SensorRepository) mapFields(ctx context.Context, sn *entities.Sensor) e
 
 	sn.LatestData, err = r.GetLastSensorDataByID(ctx, sn.ID)
 	if err != nil {
-		return r.store.HandleError(err)
+		if err == storage.ErrEntityNotFound {
+			sn.LatestData = &entities.SensorData{}
+		} else {
+			return r.store.HandleError(err)
+		}
 	}
 
 	return nil

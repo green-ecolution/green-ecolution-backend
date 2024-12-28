@@ -14,7 +14,7 @@ import (
 func defaultSensor() *entities.Sensor {
 	return &entities.Sensor{
 		Status:     entities.SensorStatusUnknown,
-		LatestData: nil,
+		LatestData: &entities.SensorData{},
 		Latitude:   0,
 		Longitude:  0,
 	}
@@ -41,7 +41,7 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 	}
 
 	entity.ID = id
-	if entity.LatestData != nil {
+	if entity.LatestData != nil && entity.LatestData.Data != nil {
 		err = r.InsertSensorData(ctx, entity.LatestData, id)
 		if err != nil {
 			return nil, err
@@ -52,7 +52,7 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 }
 
 func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *entities.SensorData, id string) error {
-	if latestData != nil {
+	if latestData == nil || latestData.Data == nil {
 		return errors.New("latest data cannot be empty")
 	}
 

@@ -15,7 +15,7 @@ type Sensor struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 	Status     SensorStatus
-	LatestData SensorData
+	LatestData *SensorData
 	Latitude   float64
 	Longitude  float64
 }
@@ -28,16 +28,16 @@ type SensorData struct {
 }
 
 type SensorCreate struct {
-	ID        string       `validate:"required"`
-	Status    SensorStatus `validate:"oneof=online offline unknown"`
-	Data      SensorData
-	Latitude  float64 `validate:"required,max=90,min=-90"`
-	Longitude float64 `validate:"required,max=180,min=-180"`
+	ID         string       `validate:"required"`
+	Status     SensorStatus `validate:"oneof=online offline unknown"`
+	LatestData *SensorData
+	Latitude   float64 `validate:"required,max=90,min=-90"`
+	Longitude  float64 `validate:"required,max=180,min=-180"`
 }
 
 type SensorUpdate struct {
-	Status    SensorStatus `validate:"oneof=online offline unknown"`
-	Data      SensorData
-	Latitude  float64 `validate:"required,max=90,min=-90"`
-	Longitude float64 `validate:"required,max=180,min=-180"`
+	Status     SensorStatus `validate:"oneof=online offline unknown"`
+	LatestData *SensorData
+	Latitude   float64 `validate:"required,max=90,min=-90"`
+	Longitude  float64 `validate:"required,max=180,min=-180"`
 }

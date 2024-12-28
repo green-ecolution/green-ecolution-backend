@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error) {
+func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.SensorData, error) {
 	if payload == nil {
 		return nil, handleError(errors.New("mqtt payload is nil"))
 	}
@@ -23,20 +23,19 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		return nil, handleError(err)
 	}
 
-	data := []*domain.SensorData{
-		{
-			Data: payload,
-		},
+	data := domain.SensorData{
+		Data: payload,
 	}
-	_, err = s.sensorRepo.InsertSensorData(ctx, data, sensor.ID)
+	err = s.sensorRepo.InsertSensorData(ctx, &data, sensor.ID)
 	if err != nil {
 		return nil, handleError(err)
 	}
 
-	sensorData, err := s.sensorRepo.GetSensorDataByID(ctx, sensor.ID)
+	sensorData, err := s.sensorRepo.GetLastSensorDataByID(ctx, sensor.ID)
 	if err != nil {
 		return nil, err
 	}
+
 	return sensorData, nil
 }
 
