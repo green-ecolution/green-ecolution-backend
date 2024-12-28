@@ -3,6 +3,8 @@ package sensor
 import (
 	"context"
 	"errors"
+	"testing"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	treeUtils "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
@@ -10,7 +12,6 @@ import (
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func TestSensorService_GetAll(t *testing.T) {

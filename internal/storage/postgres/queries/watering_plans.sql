@@ -1,6 +1,11 @@
 -- name: GetAllWateringPlans :many
 SELECT * FROM watering_plans;
 
+-- name: GetAllWateringPlansByStatus :many
+SELECT * FROM watering_plans 
+WHERE status = $1
+ORDER BY date DESC;
+
 -- name: GetWateringPlanByID :one
 SELECT * FROM watering_plans WHERE id = $1;
 

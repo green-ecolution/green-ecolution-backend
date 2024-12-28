@@ -27,18 +27,18 @@ func (s *StatusSchedular) RunStatusSchedular(ctx context.Context, interval time.
 	for {
 		select {
 		case <-ticker.C:
-			err := s.updateStaleSensorStatuses(ctx)
+			err := s.updateStaleSensorStates(ctx)
 			if err != nil {
 				slog.Error("Failure to update sensor status", "error", err.Error())
 			}
 		case <-ctx.Done():
-			slog.Info("Stopping status updater")
+			slog.Info("Stopping sensor status schedular")
 			return
 		}
 	}
 }
 
-func (s *StatusSchedular) updateStaleSensorStatuses(ctx context.Context) error {
+func (s *StatusSchedular) updateStaleSensorStates(ctx context.Context) error {
 	sensors, err := s.sensorRepo.GetAll(ctx)
 	if err != nil {
 		return err

@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestSensorService_RunStatusUpdater(t *testing.T) {
-	t.Run("should update stale sensor statuses periodically", func(t *testing.T) {
+func TestSensorService_RunStatusSchedular(t *testing.T) {
+	t.Run("should update stale sensor states periodically", func(t *testing.T) {
 		ctx := context.Background()
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		svc := NewStatusSchedular(sensorRepo)

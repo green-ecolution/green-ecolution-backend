@@ -26,6 +26,16 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 	return data, nil
 }
 
+// Function is currently only used for status schedular and field mapping is not needed
+func (w *WateringPlanRepository) GetAllByStatus(ctx context.Context, status entities.WateringPlanStatus) ([]*entities.WateringPlan, error) {
+	rows, err := w.store.GetAllWateringPlansByStatus(ctx, sqlc.WateringPlanStatus(status))
+	if err != nil {
+		return nil, w.store.HandleError(err)
+	}
+
+	return w.mapper.FromSqlList(rows), nil
+}
+
 func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error) {
 	row, err := w.store.GetWateringPlanByID(ctx, id)
 	if err != nil {
