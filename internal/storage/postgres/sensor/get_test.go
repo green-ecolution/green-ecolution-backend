@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -154,8 +155,9 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 		got, err := r.GetLastSensorDataByID(ctx, "notFoundID")
 
 		// then
-		assert.EqualError(t, err, "entity not found")
-		assert.Empty(t, got)
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.EqualError(t, err, error.Error(storage.ErrEntityNotFound))
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {

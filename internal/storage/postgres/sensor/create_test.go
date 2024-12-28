@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -47,6 +48,7 @@ func TestSensorRepository_Create(t *testing.T) {
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude))
 
+			fmt.Println(err)
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
