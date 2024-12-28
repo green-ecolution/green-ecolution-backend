@@ -93,7 +93,7 @@ func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPaylo
 	}
 
 	payload := &sensor.MqttPayloadResponse{
-		Device:      endDevices["device"].(string),
+		Device:      endDevices["device_id"].(string),
 		Battery:     decodedPayload["battery"].(float64),
 		Humidity:    decodedPayload["humidity"].(float64),
 		Temperature: temperature,
