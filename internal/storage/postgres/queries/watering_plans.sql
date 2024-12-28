@@ -1,5 +1,6 @@
 -- name: GetAllWateringPlans :many
-SELECT * FROM watering_plans;
+SELECT * FROM watering_plans
+ORDER BY date DESC;
 
 -- name: GetWateringPlanByID :one
 SELECT * FROM watering_plans WHERE id = $1;
