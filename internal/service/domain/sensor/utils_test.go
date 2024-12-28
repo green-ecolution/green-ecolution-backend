@@ -3,7 +3,6 @@ package sensor_test
 import (
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -150,7 +149,7 @@ var (
 		LatestData: TestSensorData[0],
 	}
 
-	TestNearestTree = &entities.Tree{
+	TestNearestTree = &domain.Tree{
 		ID:           5,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),

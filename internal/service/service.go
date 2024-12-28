@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -109,7 +108,7 @@ type SensorService interface {
 	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
 	Delete(ctx context.Context, id string) error
 	HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.SensorData, error)
-	MapSensorToTree(ctx context.Context, sen *entities.Sensor) error
+	MapSensorToTree(ctx context.Context, sen *domain.Sensor) error
 }
 
 type CrudService[T any, CreateType any, UpdateType any] interface {
