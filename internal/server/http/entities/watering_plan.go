@@ -56,7 +56,7 @@ type WateringPlanCreateRequest struct {
 	Description    string    `json:"description"`
 	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
 	TransporterID  *int32    `json:"transporter_id"`
-	TrailerID      *int32    `json:"trailer_id"`
+	TrailerID      *int32    `json:"trailer_id" validate:"optional"`
 	Users          []*int32  `json:"users_ids"`
 } // @Name WateringPlanCreate
 
@@ -65,7 +65,7 @@ type WateringPlanUpdateRequest struct {
 	Description      string             `json:"description"`
 	TreeClusterIDs   []*int32           `json:"tree_cluster_ids"`
 	TransporterID    *int32             `json:"transporter_id"`
-	TrailerID        *int32             `json:"trailer_id"`
+	TrailerID        *int32             `json:"trailer_id" validate:"optional"`
 	Users            []*int32           `json:"users_ids"`
 	CancellationNote string             `json:"cancellation_note"`
 	Status           WateringPlanStatus `json:"status"`
