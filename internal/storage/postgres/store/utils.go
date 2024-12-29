@@ -15,7 +15,7 @@ import (
 var (
 	regionMapper = generated.InternalRegionRepoMapperImpl{}
 	treeMapper   = generated.InternalTreeRepoMapperImpl{}
-	sensorMapper   = generated.InternalSensorRepoMapperImpl{}
+	sensorMapper = generated.InternalSensorRepoMapperImpl{}
 )
 
 // This function is required as soon as you want to add data to the tree cluster object
@@ -61,7 +61,6 @@ func (s *Store) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*
 
 	return domainData, nil
 }
-
 
 func (s *Store) mapRegion(ctx context.Context, tc *entities.TreeCluster) error {
 	region, err := s.getRegionByTreeClusterID(ctx, tc.ID)
