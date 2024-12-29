@@ -107,7 +107,8 @@ type SensorService interface {
 	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
 	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
 	Delete(ctx context.Context, id string) error
-	HandleMessage(ctx context.Context, payload *domain.MqttPayload) ([]*domain.SensorData, error)
+	HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.SensorData, error)
+	MapSensorToTree(ctx context.Context, sen *domain.Sensor) error
 }
 
 type CrudService[T any, CreateType any, UpdateType any] interface {

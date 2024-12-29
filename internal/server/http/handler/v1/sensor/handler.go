@@ -86,32 +86,6 @@ func GetSensorByID(svc service.SensorService) fiber.Handler {
 	}
 }
 
-// @Summary		Get sensor data by ID
-// @Description	Get sensor data by ID
-// @Id				get-sensor-data-by-id
-// @Tags			Sensor
-// @Produce		json
-// @Success		200	{object}	entities.SensorDataListResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/{sensor_id}/data [get]
-// @Param			sensor_id		path	string	true	"Sensor ID"
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			start_time		query	string	false	"Start time"
-// @Param			end_time		query	string	false	"End time"
-// @Param			treecluster_id	query	string	false	"TreeCluster ID"
-// @Security		Keycloak
-func GetSensorDataByID(_ service.Service) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
 // @Summary		Delete sensor
 // @Description	Delete sensor
 // @Id				delete-sensor

@@ -13,12 +13,13 @@ const (
 )
 
 type SensorResponse struct {
-	ID        string       `json:"id"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	Status    SensorStatus `json:"status"`
-	Latitude  float64      `json:"latitude"`
-	Longitude float64      `json:"longitude"`
+	ID         string              `json:"id"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
+	Status     SensorStatus        `json:"status"`
+	LatestData *SensorDataResponse `json:"latest_data"`
+	Latitude   float64             `json:"latitude"`
+	Longitude  float64             `json:"longitude"`
 } // @Name Sensor
 
 type SensorListResponse struct {
@@ -27,16 +28,19 @@ type SensorListResponse struct {
 } // @Name SensorList
 
 type SensorDataResponse struct {
-	ID               string  `json:"id"`
-	BatteryLevel     float64 `json:"battery_level"`
-	Temperature      float64 `json:"temperature"`
-	Humidity         float64 `json:"humidity"`
-	TrunkMoisture    float64 `json:"trunk_moisture"`
-	SoilWaterTension float64 `json:"soil_water_tension"`
-	Depth            float64 `json:"depth"`
+	Battery     float64              `json:"battery"`
+	Humidity    float64              `json:"humidity"`
+	Temperature float64              `json:"temperature"`
+	Watermarks  []*WatermarkResponse `json:"watermarks"`
 } // @Name SensorData
 
 type SensorDataListResponse struct {
 	Data       []*SensorDataResponse `json:"data"`
 	Pagination Pagination            `json:"pagination"`
 } // @Name SensorDataList
+
+type WatermarkResponse struct {
+	Centibar   int `json:"centibar"`
+	Resistance int `json:"resistance"`
+	Depth      int `json:"depth"`
+} // @Name WatermarkResponse

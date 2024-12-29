@@ -7,8 +7,12 @@ SELECT * FROM sensors WHERE id = $1;
 -- name: GetSensorByStatus :many
 SELECT * FROM sensors WHERE status = $1;
 
--- name: GetSensorDataBySensorID :many
-SELECT * FROM sensor_data WHERE sensor_id = $1;
+-- name: GetLatestSensorDataByID :one
+SELECT *
+FROM sensor_data
+WHERE sensor_id = $1
+ORDER BY created_at DESC
+LIMIT 1;
 
 -- name: CreateSensor :one
 INSERT INTO sensors (

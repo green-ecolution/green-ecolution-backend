@@ -25,7 +25,7 @@ func TestSensorRepository_Create(t *testing.T) {
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status),
-			WithData(input.Data),
+			WithLatestData(input.LatestData),
 		)
 
 		// then
@@ -35,6 +35,11 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.Equal(t, input.Status, got.Status)
 		assert.NotZero(t, got.ID)
+
+		// assert latest data
+		assert.NotZero(t, got.LatestData.UpdatedAt)
+		assert.NotZero(t, got.LatestData.CreatedAt)
+		assert.Equal(t, input.LatestData.Data, got.LatestData.Data)
 	})
 
 	t.Run("should create sensor with empty data and unknown status", func(t *testing.T) {
@@ -51,10 +56,13 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, entities.SensorStatusUnknown, got.Status)
-		assert.Equal(t, []*entities.SensorData(nil), got.Data)
+		assert.Nil(t, got.LatestData)
 		assert.Equal(t, input.Latitude, got.Latitude)
 		assert.Equal(t, input.Longitude, got.Longitude)
 		assert.NotZero(t, got.ID)
+
+		// assert latest data
+		assert.Nil(t, got.LatestData)
 	})
 
 	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
@@ -115,7 +123,7 @@ func TestSensorRepository_Create(t *testing.T) {
 			WithLatitude(input.Latitude),
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status),
-			WithData(input.Data),
+			WithLatestData(input.LatestData),
 		)
 
 		// then
@@ -155,12 +163,10 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		assert.NoError(t, err)
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), input.Data, input.ID)
+		err = r.InsertSensorData(context.Background(), input.LatestData, input.ID)
 
 		// then
 		assert.NoError(t, err)
-		assert.NotNil(t, got)
-		assert.Equal(t, input.Data, got)
 	})
 
 	t.Run("should return error when data is empty", func(t *testing.T) {
@@ -174,15 +180,12 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 
 		assert.NoError(t, err)
 
-		var data []*entities.SensorData
-
 		// when
-		got, err := r.InsertSensorData(context.Background(), data, input.ID)
+		err = r.InsertSensorData(context.Background(), &entities.SensorData{}, input.ID)
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
-		assert.Equal(t, err.Error(), "data cannot be empty")
+		assert.Equal(t, err.Error(), "latest data cannot be empty")
 	})
 
 	t.Run("should return error when data is nil", func(t *testing.T) {
@@ -191,11 +194,10 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), nil, "sensor-1")
+		err := r.InsertSensorData(context.Background(), nil, "sensor-1")
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 
 	t.Run("should return error when sensor id is invalid", func(t *testing.T) {
@@ -204,16 +206,15 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.InsertSensorData(context.Background(), input.Data, "")
+		err := r.InsertSensorData(context.Background(), input.LatestData, "")
 
 		// then
 		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 }
 
 var inputPayload = &entities.MqttPayload{
-	DeviceID:    "sensor-123",
+	Device:      "sensor-123",
 	Battery:     34.0,
 	Humidity:    50,
 	Temperature: 20,
@@ -236,22 +237,14 @@ var inputPayload = &entities.MqttPayload{
 	},
 }
 
-var input = *&entities.SensorCreate{
+var input = &entities.SensorCreate{
 	ID:     "sensor-123",
 	Status: entities.SensorStatusOnline,
-	Data: []*entities.SensorData{
-		{
-			ID:        1,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Data:      inputPayload,
-		},
-		{
-			ID:        2,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-			Data:      inputPayload,
-		},
+	LatestData: &entities.SensorData{
+		ID:        1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data:      inputPayload,
 	},
 	Latitude:  9.446741,
 	Longitude: 54.801539,

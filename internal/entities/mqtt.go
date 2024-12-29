@@ -7,7 +7,7 @@ type Watermark struct {
 }
 
 type MqttPayload struct {
-	DeviceID    string `validate:"required"`
+	Device      string `validate:"required"`
 	Battery     float64
 	Humidity    float64
 	Temperature float64

@@ -33,19 +33,19 @@ func TestGetAllSensors(t *testing.T) {
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor", nil)
 		resp, err := app.Test(req, -1)
+		assert.Nil(t, err)
 		defer resp.Body.Close()
 
 		// then
-		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var response serverEntities.SensorListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 
+		// Assert response matches test data
 		assert.Len(t, response.Data, len(TestSensorList))
-		sensorData := response.Data[0]
-		assert.Equal(t, TestSensorList[0].ID, sensorData.ID)
+		assert.Equal(t, TestSensorList[0].ID, response.Data[0].ID)
 
 		mockSensorService.AssertExpectations(t)
 	})
