@@ -297,3 +297,69 @@ func TestKeyCloakUserRepo_UserToKeyCloakUser(t *testing.T) {
 		assert.Equal(t, "123456", (*got.Attributes)["employee_id"][0])
 	})
 }
+
+func TestKeyCloakUserRepo_GetAll(t *testing.T) {
+	//TODO: because of the usage of frontend client => 401 Unauthorized: unauthorized_client: Client not enabled to retrieve service account
+	//t.Run("should get all users successfully", func(t *testing.T) {
+	//	// given
+	//	identityConfig := suite.IdentityConfig(t, context.Background())
+	//	userRepo := NewUserRepository(identityConfig)
+	//	user1 := &entities.User{
+	//		Username:    "user1",
+	//		FirstName:   "John",
+	//		LastName:    "Doe",
+	//		Email:       "john.doe@green-ecolution.de",
+	//		EmployeeID:  "EMP001",
+	//		PhoneNumber: "+49 123456789",
+	//	}
+	//	user2 := &entities.User{
+	//		Username:    "user2",
+	//		FirstName:   "Jane",
+	//		LastName:    "Doe",
+	//		Email:       "jane.doe@green-ecolution.de",
+	//		EmployeeID:  "EMP002",
+	//		PhoneNumber: "+49 987654321",
+	//	}
+	//
+	//	suite.EnsureUserExists(t, user1)
+	//	suite.EnsureUserExists(t, user2)
+	//
+	//	// when
+	//	users, err := userRepo.GetAll(context.Background())
+	//
+	//	// then
+	//	assert.NoError(t, err)
+	//	assert.NotNil(t, users)
+	//	assert.GreaterOrEqual(t, len(users), 2)
+	//	assert.True(t, containsUser(users, *user1), "user1 should be in the list")
+	//	assert.True(t, containsUser(users, *user2), "user2 should be in the list")
+	//})
+
+	t.Run("should return error when login fails", func(t *testing.T) {
+		// given
+		identityConfig := suite.InvalidIdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+
+		// when
+		users, err := userRepo.GetAll(context.Background())
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to log in to Keycloak")
+	})
+}
+
+//func containsUser(userList []*entities.User, targetUser entities.User) bool {
+//	for _, user := range userList {
+//		if user.Username == targetUser.Username &&
+//			user.FirstName == targetUser.FirstName &&
+//			user.LastName == targetUser.LastName &&
+//			user.Email == targetUser.Email &&
+//			user.EmployeeID == targetUser.EmployeeID &&
+//			user.PhoneNumber == targetUser.PhoneNumber {
+//			return true
+//		}
+//	}
+//	return false
+//}

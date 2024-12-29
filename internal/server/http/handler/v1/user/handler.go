@@ -7,10 +7,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/singleflight"
+)
+
+var (
+	userMapper = generated.UserHTTPMapperImpl{}
 )
 
 // @Summary	Request to login
@@ -156,17 +161,7 @@ func Register(svc service.AuthService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		response := entities.UserResponse{
-			ID:            u.ID.String(),
-			CreatedAt:     u.CreatedAt,
-			Email:         u.Email,
-			FirstName:     u.FirstName,
-			LastName:      u.LastName,
-			Username:      u.Username,
-			EmployeeID:    u.EmployeeID,
-			PhoneNumber:   u.PhoneNumber,
-			EmailVerified: u.EmailVerified,
-		}
+		response := userMapper.FromResponse(u)
 
 		return c.Status(fiber.StatusCreated).JSON(response)
 	}
@@ -187,9 +182,22 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Param			limit	query		string	false	"Limit"
 // @Router			/v1/user [get]
 // @Security		Keycloak
-func GetAllUsers(_ service.AuthService) fiber.Handler {
+func GetAllUsers(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+
+		users, err := svc.GetAll(ctx)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error()))
+		}
+		response := make([]entities.UserResponse, len(users))
+
+		for i, user := range users {
+			userResponse := userMapper.FromResponse(user)
+			response[i] = *userResponse
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
 	}
 }
 
