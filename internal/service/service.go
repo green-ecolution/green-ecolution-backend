@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log/slog"
 	"reflect"
+	"runtime"
+	"strings"
 	"time"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -20,16 +22,38 @@ var (
 )
 
 type Error struct {
-	Message string
-	Code    ErrorCode
+	Code      ErrorCode
+	Message   string
+	Original  error
+	File      string
+	Line      int
+	Timestamp string
 }
 
 func NewError(code ErrorCode, msg string) Error {
-	return Error{Code: code, Message: msg}
+	_, file, line, ok := runtime.Caller(1)
+	if !ok {
+		file = "unknown"
+		line = 0
+	} else {
+		// Trim the path to start from green-ecolution-
+		baseMarker := "green-ecolution-"
+		if idx := strings.Index(file, baseMarker); idx != -1 {
+			file = file[idx:]
+		}
+	}
+	timestamp := time.Now().Format(time.RFC3339)
+	return Error{
+		Code:      code,
+		Message:   msg,
+		File:      file,
+		Line:      line,
+		Timestamp: timestamp,
+	}
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("%d: %s", e.Code, e.Message)
+	return fmt.Sprintf("[%d] %s (at %s:%d, %s)", e.Code, e.Message, e.File, e.Line, e.Timestamp)
 }
 
 type ErrorCode int
@@ -41,6 +65,21 @@ const (
 	NotFound      ErrorCode = 404
 	InternalError ErrorCode = 500
 )
+
+// LogAndReturnError logs the error and returns it
+func LogAndReturnError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	if structuredErr, ok := err.(*Error); ok {
+		fmt.Printf("Error: %s\n", structuredErr.Error())
+	} else {
+		fmt.Printf("Unexpected error: %v\n", err)
+	}
+
+	return err
+}
 
 type BasicCrudService[T any, CreateType any, UpdateType any] interface {
 	GetAll(ctx context.Context) ([]*T, error)

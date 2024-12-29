@@ -253,36 +253,35 @@ func poolConn(t testing.TB) *pgxpool.Pool {
 }
 
 func TestHandleErrorExpanded(t *testing.T) {
-	// Dummy Store für Tests
 	dummyStore := &store.Store{}
 
 	t.Run("HandleError with nil error", func(t *testing.T) {
-		// Simulate no error
+		// when
 		err := dummyStore.HandleError(nil, "Testing nil error")
 
-		// Assertions
+		// validate
 		assert.NoError(t, err)
 	})
 
 	t.Run("HandleError with NotFoundError", func(t *testing.T) {
-		// Simulate a "no rows" error
+		// when
 		err := dummyStore.HandleError(pgx.ErrNoRows, "Fetching entity by ID")
 
-		// Assertions
+		// validate
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "NotFoundError")
 		assert.Contains(t, err.Error(), "Fetching entity by ID")
 	})
 
 	t.Run("HandleError with DatabaseError", func(t *testing.T) {
-		// Simulate a PostgreSQL error
+		// when
 		pgErr := &pgconn.PgError{
 			Code:    "23505",
 			Message: "Duplicate key value violates unique constraint",
 		}
 		err := dummyStore.HandleError(pgErr, "Creating new entry")
 
-		// Assertions
+		// validate
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "DatabaseError")
 		assert.Contains(t, err.Error(), "Creating new entry")
@@ -290,22 +289,22 @@ func TestHandleErrorExpanded(t *testing.T) {
 	})
 
 	t.Run("HandleError with UnexpectedError", func(t *testing.T) {
-		// Simulate a generic unexpected error
+		// when
 		unexpectedErr := errors.New("unexpected issue occurred")
 		err := dummyStore.HandleError(unexpectedErr, "Unexpected operation")
 
-		// Assertions
+		// validate
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "UnexpectedError")
 		assert.Contains(t, err.Error(), "Unexpected operation")
 	})
 
 	t.Run("HandleError with empty context", func(t *testing.T) {
-		// Simulate a generic unexpected error with empty context
+		// when
 		unexpectedErr := errors.New("unexpected issue occurred")
 		err := dummyStore.HandleError(unexpectedErr)
 
-		// Assertions
+		// validate
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "UnexpectedError")
 		assert.Contains(t, err.Error(), "No context provided")

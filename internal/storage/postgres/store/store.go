@@ -62,7 +62,6 @@ type ClassifiedError struct {
 	Code      string
 }
 
-// Error implements the error interface for ClassifiedError, returning a formatted string.
 func (e *ClassifiedError) Error() string {
 	return fmt.Sprintf("%s %s (at %s:%d)%s", e.Type, e.Massage, e.File, e.Line, e.Code)
 }
