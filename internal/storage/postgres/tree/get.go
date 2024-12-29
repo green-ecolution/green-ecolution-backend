@@ -126,8 +126,8 @@ func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*ent
 	return r.iMapper.FromSqlList(rows), nil
 }
 
-func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
-	row, err := r.store.GetSensorByTreeID(ctx, flowerbedID)
+func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*entities.Sensor, error) {
+	row, err := r.store.GetSensorByTreeID(ctx, treeID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrSensorNotFound
@@ -136,7 +136,12 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, flowerbedID int3
 		}
 	}
 
-	return r.sMapper.FromSql(row), nil
+	data := r.sMapper.FromSql(row)
+	if err := r.store.MapSensorFields(ctx, data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {

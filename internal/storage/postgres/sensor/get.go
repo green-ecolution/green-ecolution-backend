@@ -35,3 +35,12 @@ func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Se
 
 	return data, nil
 }
+
+func (r *SensorRepository) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error) {
+	data, err := r.store.GetLatestSensorDataBySensorID(ctx, id)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	return data, nil
+}
