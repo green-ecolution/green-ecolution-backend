@@ -299,41 +299,46 @@ func TestKeyCloakUserRepo_UserToKeyCloakUser(t *testing.T) {
 }
 
 func TestKeyCloakUserRepo_GetAll(t *testing.T) {
-	//TODO: because of the usage of frontend client => 401 Unauthorized: unauthorized_client: Client not enabled to retrieve service account
-	//t.Run("should get all users successfully", func(t *testing.T) {
-	//	// given
-	//	identityConfig := suite.IdentityConfig(t, context.Background())
-	//	userRepo := NewUserRepository(identityConfig)
-	//	user1 := &entities.User{
-	//		Username:    "user1",
-	//		FirstName:   "John",
-	//		LastName:    "Doe",
-	//		Email:       "john.doe@green-ecolution.de",
-	//		EmployeeID:  "EMP001",
-	//		PhoneNumber: "+49 123456789",
-	//	}
-	//	user2 := &entities.User{
-	//		Username:    "user2",
-	//		FirstName:   "Jane",
-	//		LastName:    "Doe",
-	//		Email:       "jane.doe@green-ecolution.de",
-	//		EmployeeID:  "EMP002",
-	//		PhoneNumber: "+49 987654321",
-	//	}
-	//
-	//	suite.EnsureUserExists(t, user1)
-	//	suite.EnsureUserExists(t, user2)
-	//
-	//	// when
-	//	users, err := userRepo.GetAll(context.Background())
-	//
-	//	// then
-	//	assert.NoError(t, err)
-	//	assert.NotNil(t, users)
-	//	assert.GreaterOrEqual(t, len(users), 2)
-	//	assert.True(t, containsUser(users, *user1), "user1 should be in the list")
-	//	assert.True(t, containsUser(users, *user2), "user2 should be in the list")
-	//})
+	t.Run("should get all users successfully", func(t *testing.T) {
+		// given
+		identityConfig := suite.IdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+		user1 := &entities.User{
+			Username:    "user1",
+			FirstName:   "John",
+			LastName:    "Doe",
+			Email:       "john.doe@green-ecolution.de",
+			EmployeeID:  "EMP001",
+			PhoneNumber: "+49 123456789",
+		}
+		user2 := &entities.User{
+			Username:    "user2",
+			FirstName:   "Jane",
+			LastName:    "Doe",
+			Email:       "jane.doe@green-ecolution.de",
+			EmployeeID:  "EMP002",
+			PhoneNumber: "+49 987654321",
+		}
+
+		suite.EnsureUserExists(t, user1)
+		suite.EnsureUserExists(t, user2)
+
+		// when
+		users, err := userRepo.GetAll(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.GreaterOrEqual(t, len(users), 2)
+		for i, user := range users {
+			assert.Equal(t, users[i].ID, user.ID)
+			assert.Equal(t, users[i].Email, user.Email)
+			assert.Equal(t, users[i].Username, user.Username)
+			assert.Equal(t, users[i].FirstName, user.FirstName)
+			assert.Equal(t, users[i].LastName, user.LastName)
+			assert.Equal(t, users[i].PhoneNumber, user.PhoneNumber)
+		}
+	})
 
 	t.Run("should return error when login fails", func(t *testing.T) {
 		// given
@@ -350,16 +355,45 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 	})
 }
 
-//func containsUser(userList []*entities.User, targetUser entities.User) bool {
-//	for _, user := range userList {
-//		if user.Username == targetUser.Username &&
-//			user.FirstName == targetUser.FirstName &&
-//			user.LastName == targetUser.LastName &&
-//			user.Email == targetUser.Email &&
-//			user.EmployeeID == targetUser.EmployeeID &&
-//			user.PhoneNumber == targetUser.PhoneNumber {
-//			return true
-//		}
-//	}
-//	return false
-//}
+func TestKeyCloakUserRepo_GetByID(t *testing.T) {
+	t.Run("should get user by id successfully", func(t *testing.T) {
+		// given
+		identityConfig := suite.IdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+
+		user := &entities.User{
+			CreatedAt:   time.Unix(123456, 0),
+			Username:    "test02",
+			FirstName:   "Toni",
+			LastName:    "Tester",
+			Email:       "test02@green-ecolution.de",
+			PhoneNumber: "+49 123456",
+			EmployeeID:  "123456",
+		}
+
+		userID := suite.EnsureUserExists(t, user)
+
+		// when
+		user, err := userRepo.GetByID(context.Background(), userID)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, user)
+	})
+
+	t.Run("should return error when login fails", func(t *testing.T) {
+		// given
+		identityConfig := suite.InvalidIdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+
+		uuid, _ := uuid.NewRandom()
+
+		// when
+		users, err := userRepo.GetByID(context.Background(), uuid.String())
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to log in to Keycloak")
+	})
+}
