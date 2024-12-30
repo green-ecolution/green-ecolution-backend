@@ -21,7 +21,38 @@ import (
 
 func TestRegisterRoutes(t *testing.T) {
 	t.Run("v1/user", func(t *testing.T) {
-		t.Log("v1/user should call GET handler (not implemented)") // TODO: implement testcase
+		t.Run("v1/user should call GET", func(t *testing.T) {
+			mockUserService := serviceMock.NewMockAuthService(t)
+			app := fiber.New()
+			RegisterRoutes(app, mockUserService)
+			expected := []*domain.User{
+				{
+					ID:            uuid.MustParse("6be4c752-94df-4719-99b1-ce58253eaf75"),
+					CreatedAt:     time.Now(),
+					Username:      "toni_tester",
+					FirstName:     "Toni",
+					LastName:      "Tester",
+					Email:         "dev@green-ecolution.de",
+					EmployeeID:    "123456",
+					PhoneNumber:   "+49 123456",
+					EmailVerified: false,
+					Avatar:        nil,
+				},
+			}
+
+			mockUserService.EXPECT().GetAll(
+				mock.Anything,
+			).Return(expected, nil)
+
+			// when
+			req := httptest.NewRequest(http.MethodGet, "/", nil)
+
+			// then
+			resp, err := app.Test(req)
+			defer resp.Body.Close()
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+		})
 
 		t.Run("v1/user should call POST", func(t *testing.T) {
 			mockUserService := serviceMock.NewMockAuthService(t)
@@ -75,16 +106,6 @@ func TestRegisterRoutes(t *testing.T) {
 			assert.Equal(t, expected.EmployeeID, got.EmployeeID)
 			assert.Equal(t, expected.PhoneNumber, got.PhoneNumber)
 		})
-	})
-
-	t.Run("v1/user/:id", func(t *testing.T) {
-		t.Log("should call GET handler (not implemented)")    // TODO: implement testcase
-		t.Log("should call PUT handler (not implemented)")    // TODO: implement testcase
-		t.Log("should call DELETE handler (not implemented)") // TODO: implement testcase
-	})
-
-	t.Run("v1/user/:id/roles", func(t *testing.T) {
-		t.Log("should call GET handler (not implemented)") // TODO: implement testcase
 	})
 }
 
