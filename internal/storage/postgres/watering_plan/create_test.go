@@ -144,7 +144,12 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			assert.Equal(t, input.TreeClusters[i].Name, tc.Name)
 		}
 
-		// TODO: test linked users
+		// assert user
+		assert.Len(t, input.Users, len(getWp.Users))
+		for i, user := range getWp.Users {
+			assert.Equal(t, input.Users[i].ID, user.ID)
+			assert.Equal(t, input.Users[i].Email, user.Email)
+		}
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
@@ -190,27 +195,27 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, "trailer vehicle requires a vehicle of type trailer", err.Error())
 	})
 
-	// t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
-	// 	// given
-	// 	r := NewWateringPlanRepository(suite.Store, mappers)
+	t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
 
-	// 	createFn := func(wp *entities.WateringPlan) (bool, error) {
-	// 		wp.Date = input.Date
-	// 		wp.Transporter = input.Transporter
-	// 		wp.Trailer = input.Trailer
-	// 		wp.TreeClusters = input.TreeClusters
-	// 		wp.Users = []*entities.User{}
-	// 		return true, nil
-	// 	}
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.TreeClusters = input.TreeClusters
+			wp.Users = []*entities.User{}
+			return true, nil
+		}
 
-	// 	// when
-	// 	got, err := r.Create(context.Background(), createFn)
+		// when
+		got, err := r.Create(context.Background(), createFn)
 
-	// 	// then
-	// 	assert.Error(t, err)
-	// 	assert.Nil(t, got)
-	// 	assert.Equal(t, "watering plan requires employees", err.Error())
-	// })
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.Equal(t, "watering plan requires employees", err.Error())
+	})
 
 	t.Run("should return error when transporter has not correct vehilce type", func(t *testing.T) {
 		// given

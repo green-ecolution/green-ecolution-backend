@@ -108,6 +108,31 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	return allUsers, nil
 }
 
+func (r *UserRepository) GetByID(ctx context.Context, id string) (*entities.User, error) {
+	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to log in to Keycloak")
+	}
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+
+	user, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, id)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get users from Keycloak")
+	}
+
+	var allUsers []*entities.User
+
+	for _, kcUser := range users {
+		user, err := keyCloakUserToUser(kcUser)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to convert keyCloak User")
+		}
+		allUsers = append(allUsers, user)
+	}
+
+	return allUsers, nil
+}
+
 func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	userID, err := uuid.Parse(*user.ID)
 	if err != nil {
