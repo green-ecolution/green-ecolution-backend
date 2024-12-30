@@ -24,7 +24,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
@@ -84,20 +83,16 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	repositories := createRepos(ctx, cfg)
-	eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
-	services := domain.NewService(cfg, repositories, eventManager)
-
-	startAppServices(ctx, cfg, eventManager, services)
+	startAppServices(ctx, cfg)
 }
 
-func postgresRepo(ctx context.Context, cfg *config.Config) *storage.Repository {
+func postgresRepo(ctx context.Context, cfg *config.Config) (repo *storage.Repository, closeFn func()) {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Server.Database.Host, cfg.Server.Database.Port, cfg.Server.Database.Username, cfg.Server.Database.Password, cfg.Server.Database.Name)
 
 	pgxConfig, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
 		slog.Error("Error while parsing PostgreSQL connection string", "error", err)
-		return nil
+		return nil, nil
 	}
 
 	pgxConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
@@ -107,24 +102,24 @@ func postgresRepo(ctx context.Context, cfg *config.Config) *storage.Repository {
 	pool, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		slog.Error("Error while connecting to PostgreSQL", "error", err)
-		return nil
+		return nil, nil
 	}
-	defer pool.Close()
 
-	return postgres.NewRepository(pool)
+	return postgres.NewRepository(pool), pool.Close
 }
 
-func createRepos(ctx context.Context, cfg *config.Config) *storage.Repository {
+func startAppServices(ctx context.Context, cfg *config.Config) {
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
 		slog.Error("Error while creating local repository", "error", err)
-		return nil
+		return
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
-	postgresRepo := postgresRepo(ctx, cfg)
+	postgresRepo, closeFn := postgresRepo(ctx, cfg)
+	defer closeFn()
 
-	return &storage.Repository{
+	repositories := &storage.Repository{
 		Auth: keycloakRepo.Auth,
 		User: keycloakRepo.User,
 
@@ -138,9 +133,9 @@ func createRepos(ctx context.Context, cfg *config.Config) *storage.Repository {
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,
 	}
-}
 
-func startAppServices(ctx context.Context, cfg *config.Config, em *worker.EventManager, services *service.Services) {
+	em := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+	services := domain.NewService(cfg, repositories, em)
 	httpServer := http.NewServer(cfg, services)
 	mqttServer := mqtt.NewMqtt(cfg, services)
 
