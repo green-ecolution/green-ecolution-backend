@@ -11,6 +11,7 @@ const (
 	EventTypeCreateTree        EventType = "create tree"
 	EventTypeDeleteTree        EventType = "delete tree"
 	EventTypeUpdateTreeCluster EventType = "update tree cluster"
+	EventTypeNewSensorData     EventType = "receive sensor data"
 )
 
 type BasicEvent struct {
@@ -70,5 +71,17 @@ func NewEventUpdateTreeCluster(prev, newTc *TreeCluster) EventUpdateTreeCluster 
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTreeCluster},
 		Prev:       prev,
 		New:        newTc,
+	}
+}
+
+type EventNewSensorData struct {
+	BasicEvent
+	New *SensorData
+}
+
+func NewEventSensorData(newData *SensorData) EventNewSensorData {
+	return EventNewSensorData{
+		BasicEvent: BasicEvent{eventType: EventTypeNewSensorData},
+		New:        newData,
 	}
 }

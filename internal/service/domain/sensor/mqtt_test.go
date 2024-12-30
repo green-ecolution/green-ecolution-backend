@@ -9,18 +9,21 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/stretchr/testify/mock"
 
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
 
+var globalEventManager = worker.NewEventManager()
+
 func TestNewSensorService(t *testing.T) {
 	t.Run("should create a new service", func(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 		assert.NotNil(t, svc)
 	})
 }
@@ -31,7 +34,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testPayLoad := TestListMQTTPayload[0]
 		insertData := &domain.SensorData{
@@ -68,7 +71,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testPayload := TestListMQTTPayload[0]
 
@@ -94,7 +97,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testPayLoad := TestListMQTTPayload[0]
 		insertData := &domain.SensorData{
@@ -133,7 +136,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testPayload := TestListMQTTPayload[0]
 
@@ -159,7 +162,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), nil)
@@ -174,7 +177,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), TestMQTTPayLoadInvalidLat)
@@ -190,7 +193,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
 		result, err := svc.HandleMessage(context.Background(), TestMQTTPayLoadInvalidLong)
@@ -206,7 +209,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testPayLoad := TestListMQTTPayload[0]
 		insertData := &domain.SensorData{

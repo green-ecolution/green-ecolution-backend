@@ -19,7 +19,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
 		sensorRepo.EXPECT().GetAll(context.Background()).Return(TestSensorList, nil)
@@ -35,7 +35,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().GetAll(context.Background()).Return(nil, storage.ErrSensorNotFound)
 		sensors, err := svc.GetAll(context.Background())
@@ -54,7 +54,7 @@ func TestSensorService_GetByID(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
@@ -72,7 +72,7 @@ func TestSensorService_GetByID(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		expectedErr := storage.ErrEntityNotFound
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(nil, expectedErr)
@@ -101,7 +101,7 @@ func TestSensorService_Create(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().Create(
 			context.Background(),
@@ -122,7 +122,7 @@ func TestSensorService_Create(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		newSensor.LatestData = &entities.SensorData{}
 
@@ -145,7 +145,7 @@ func TestSensorService_Create(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		newSensor.Status = ""
 
@@ -163,7 +163,7 @@ func TestSensorService_Create(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		newSensor.Status = entities.SensorStatusOffline
 		newSensor.ID = ""
@@ -182,7 +182,7 @@ func TestSensorService_Create(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		newSensor.ID = "sensor-23"
 		newSensor.Status = entities.SensorStatusOffline
@@ -203,7 +203,7 @@ func TestSensorService_Create(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 		expectedErr := errors.New("Failed to create sensor")
 
 		newSensor.ID = "sensor-23"
@@ -240,7 +240,7 @@ func TestSensorService_Update(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
@@ -265,7 +265,7 @@ func TestSensorService_Update(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 		expectedErr := errors.New("failed to update cluster")
 
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(nil, expectedErr)
@@ -284,7 +284,7 @@ func TestSensorService_Update(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 		expectedErr := errors.New("failed to update cluster")
 
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
@@ -310,7 +310,7 @@ func TestSensorService_Update(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		updateSensor.Latitude = 200
 		updateSensor.Longitude = 200
@@ -334,7 +334,7 @@ func TestSensorService_Delete(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
 		treeRepo.EXPECT().UnlinkSensorID(ctx, id).Return(nil)
@@ -354,7 +354,7 @@ func TestSensorService_Delete(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		expectedErr := storage.ErrEntityNotFound
 		sensorRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
@@ -373,7 +373,7 @@ func TestSensorService_Delete(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		expectedErr := errors.New("failed to unlink")
 
@@ -394,7 +394,7 @@ func TestSensorService_Delete(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 		expectedErr := errors.New("failed to unlink")
 
 		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
@@ -415,7 +415,7 @@ func TestSensorService_Delete(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 		expectedErr := errors.New("failed to delete")
 
 		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
@@ -438,7 +438,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testSensor := TestSensorNearestTree
 		testTree := TestNearestTree
@@ -463,7 +463,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
 		err := svc.MapSensorToTree(context.Background(), nil)
@@ -478,7 +478,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testSensor := TestSensorNearestTree
 
@@ -499,7 +499,7 @@ func TestSensorService_MapSensorToTree(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		testSensor := TestSensorNearestTree
 		testTree := TestNearestTree
@@ -527,7 +527,7 @@ func TestReady(t *testing.T) {
 		repo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo)
+		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
 		ready := svc.Ready()
@@ -538,7 +538,7 @@ func TestReady(t *testing.T) {
 
 	t.Run("should return false if the service is not ready", func(t *testing.T) {
 		// give
-		svc := sensor.NewSensorService(nil, nil, nil)
+		svc := sensor.NewSensorService(nil, nil, nil, globalEventManager)
 
 		// when
 		ready := svc.Ready()

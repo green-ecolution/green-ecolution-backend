@@ -63,3 +63,22 @@ func (s *DeleteTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event
 	event := e.(entities.EventUpdateTree)
 	return s.tcs.HandleUpdateTree(ctx, &event)
 }
+
+type CreateSensorDataSubscriber struct {
+	tcs service.TreeClusterService
+}
+
+func NewSensorDataSubscriber(tcs service.TreeClusterService) *CreateSensorDataSubscriber {
+	return &CreateSensorDataSubscriber{
+		tcs: tcs,
+	}
+}
+
+func (s *CreateSensorDataSubscriber) EventType() entities.EventType {
+	return entities.EventTypeUpdateTree
+}
+
+func (s *CreateSensorDataSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
+	event := e.(entities.EventUpdateTree)
+	return s.tcs.HandleUpdateTree(ctx, &event) // TODO: change to HandleNewSensorData(...)
+}
