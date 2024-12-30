@@ -121,24 +121,32 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	return allUsers, nil
 }
 
-func (r *UserRepository) GetByID(ctx context.Context, id string) (*entities.User, error) {
+func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
 	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 	token, err := r.getClientToken(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	kcUser, err := client.GetUserByID(ctx, token, r.cfg.OidcProvider.DomainName, id)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get user from Keycloak")
+	kcUsers := make([]*gocloak.User, 0, len(ids))
+	for _, id := range ids {
+		user, err := client.GetUserByID(ctx, token, r.cfg.OidcProvider.DomainName, id)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to get user from Keycloak")
+		}
+		kcUsers = append(kcUsers, user)
 	}
 
-	user, err := keyCloakUserToUser(kcUser)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to convert Keycloak user")
+	users := make([]*entities.User, 0, len(kcUsers))
+	for _, kcUser := range kcUsers {
+		user, err := keyCloakUserToUser(kcUser)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to convert Keycloak user")
+		}
+		users = append(users, user)
 	}
 
-	return user, nil
+	return users, nil
 }
 
 func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {

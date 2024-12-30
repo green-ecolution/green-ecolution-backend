@@ -63,7 +63,7 @@ type UserRepository interface {
 	Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error)
 	RemoveSession(ctx context.Context, token string) error
 	GetAll(ctx context.Context) ([]*entities.User, error)
-	GetByID(ctx context.Context, id string) (*entities.User, error)
+	GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error)
 }
 
 type RoleRepository interface {

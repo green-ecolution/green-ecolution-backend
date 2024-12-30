@@ -71,6 +71,7 @@ type AuthService interface {
 	RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*domain.ClientToken, error)
 	GetAll(ctx context.Context) ([]*domain.User, error)
+	GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error)
 }
 
 type RegionService interface {
