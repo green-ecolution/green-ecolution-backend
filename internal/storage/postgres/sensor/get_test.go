@@ -146,7 +146,7 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		data, err := r.GetLastSensorDataByID(ctx, "sensor-1")
+		data, err := r.GetLatestSensorDataBySensorID(ctx, "sensor-1")
 
 		// then
 		assert.NoError(t, err)
@@ -163,7 +163,7 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetLastSensorDataByID(ctx, "notFoundID")
+		got, err := r.GetLatestSensorDataBySensorID(ctx, "notFoundID")
 
 		// then
 		assert.Error(t, err)
@@ -179,7 +179,7 @@ func TestSensorRepository_GetLastSensorDataByID(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetLastSensorDataByID(ctx, "sensor-1")
+		got, err := r.GetLatestSensorDataBySensorID(ctx, "sensor-1")
 
 		// then
 		assert.Error(t, err)

@@ -2,10 +2,12 @@ package store
 
 import (
 	"context"
-	"errors"
+
+	"github.com/pkg/errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/jackc/pgx/v5"
 )
@@ -13,9 +15,10 @@ import (
 var (
 	regionMapper = generated.InternalRegionRepoMapperImpl{}
 	treeMapper   = generated.InternalTreeRepoMapperImpl{}
+	sensorMapper = generated.InternalSensorRepoMapperImpl{}
 )
 
-// This function is required as soon as you want to add data to the TreeCluster object
+// This function is required as soon as you want to add data to the tree cluster object
 // from the database, e.g. the linked region or the linked trees.
 // As this function is required in different repositories, it has been outsourced.
 func (s *Store) MapClusterFields(ctx context.Context, tc *entities.TreeCluster) error {
@@ -28,6 +31,35 @@ func (s *Store) MapClusterFields(ctx context.Context, tc *entities.TreeCluster) 
 	}
 
 	return nil
+}
+
+// This function is required as soon as you want to add the data to the sensor object
+func (s *Store) MapSensorFields(ctx context.Context, sn *entities.Sensor) error {
+	var err error
+
+	sn.LatestData, err = s.GetLatestSensorDataBySensorID(ctx, sn.ID)
+	if err != nil && !errors.Is(err, storage.ErrEntityNotFound) {
+		return s.HandleError(err)
+	}
+
+	return nil
+}
+
+// This function provides the latest data from a specific sensor
+func (s *Store) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error) {
+	row, err := s.GetLatestSensorDataByID(ctx, id)
+	if err != nil {
+		return nil, s.HandleError(err)
+	}
+
+	domainData := sensorMapper.FromSqlSensorData(row)
+	data, err := mapper.MapSensorData(row.Data)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to map sensor data")
+	}
+	domainData.Data = data
+
+	return domainData, nil
 }
 
 func (s *Store) mapRegion(ctx context.Context, tc *entities.TreeCluster) error {
