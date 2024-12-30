@@ -67,9 +67,9 @@ type WateringPlanUpdateRequest struct {
 	TransporterID    *int32             `json:"transporter_id"`
 	TrailerID        *int32             `json:"trailer_id" validate:"optional"`
 	Users            []*int32           `json:"users_ids"`
-	CancellationNote string             `json:"cancellation_note"`
+	CancellationNote string             `json:"cancellation_note" validate:"optional"`
 	Status           WateringPlanStatus `json:"status"`
-	Evaluation       []*EvaluationValue `json:"evaluation"`
+	Evaluation       []*EvaluationValue `json:"evaluation" validate:"optional"`
 } // @Name WateringPlanUpdate
 
 type EvaluationValue struct {
