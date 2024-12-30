@@ -56,7 +56,6 @@ func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) 
 	}
 
 	userID, err := client.CreateUser(context.Background(), token.AccessToken, identityConfig.OidcProvider.DomainName, kcUser)
-	fmt.Println(userID)
 	if err != nil {
 		t.Log("ensureUserExists::failed to create user. maybe user already exists. error: ", err)
 	}
