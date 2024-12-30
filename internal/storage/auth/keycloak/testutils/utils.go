@@ -32,7 +32,7 @@ func (s *KeycloakTestSuite) LoginUser(t testing.TB, user *entities.User) *gocloa
 	return token
 }
 
-func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) {
+func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) string {
 	t.Helper()
 	identityConfig := s.IdentityConfig(t, context.Background())
 	client := gocloak.NewClient(identityConfig.OidcProvider.BaseURL)
@@ -56,6 +56,7 @@ func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) 
 	}
 
 	userID, err := client.CreateUser(context.Background(), token.AccessToken, identityConfig.OidcProvider.DomainName, kcUser)
+	fmt.Println(userID)
 	if err != nil {
 		t.Log("ensureUserExists::failed to create user. maybe user already exists. error: ", err)
 	}
@@ -63,6 +64,8 @@ func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) 
 	if err = client.SetPassword(context.Background(), token.AccessToken, userID, identityConfig.OidcProvider.DomainName, "test", false); err != nil {
 		t.Fatalf("ensureUserExists::failed to set password: %v", err)
 	}
+
+	return userID
 }
 
 func (s *KeycloakTestSuite) TestUserToCreateFunc() []*entities.User {
