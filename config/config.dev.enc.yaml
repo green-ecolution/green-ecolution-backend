@@ -26,7 +26,7 @@ auth:
             client_secret: ENC[AES256_GCM,data:3APu37mXm48E76s0McXEGEgyHtS5zJ8SYQCpVWyxy4s=,iv:6DsSqB8KZ4BW5yEUdvzPp/a9Plr2Vc39KEu6Z7w3JDY=,tag:RkAlOG5sa7ANt3itxbvAug==,type:str]
         backend:
             client_id: ENC[AES256_GCM,data:rIRw3jVDLRX41/fn3Q6NWOJCc6p4fe4=,iv:eACWHdzS18y9WcicLpNYNT7NZV29iFrtjhZb9OvPzpk=,tag:X6RP8E5uvjVuv8032zOa8A==,type:str]
-            client_secret: ENC[AES256_GCM,data:PFVwMyvC5nBwx2R5BTVxB0ldqUHQbP9DlPyaZUMp4RU=,iv:pHxWNeS/4gdy60AxMIQRWJviPRx02bV97IMZ2lwAYE0=,tag:W0jVFEC5FZlI/uccjf+fAg==,type:str]
+            client_secret: ENC[AES256_GCM,data:g+Rr0txIEln0Mj6vdyr3HkMf8vy3TJO4UqlPgefVMbs=,iv:fXvWMhMa3t30F/rslnvoRCg0VvGv8UkZLsJQwYvAb3E=,tag:HzTWmF44dHgMA4q2zWTprA==,type:str]
 mqtt:
     broker: ENC[AES256_GCM,data:hwLIdSSPUuPnh9+e3SXqnx3hLN0+Un9B8289tcVz7Jy74B4=,iv:7avUaJR3+uRSco3DVTo2imu/tldgHQ2eeEVQtoEzHW0=,tag:yMc5pb9jdMOQJqYuF2g4gg==,type:str]
     client_id: ENC[AES256_GCM,data:XPjPd1ZY75/kZ9Q=,iv:aLFHP1TqverO9fkRslUQwrsmuNfsg0p5fuxSCn5wHVs=,tag:0e7Xn6QsSmZ+kDjYo1F4rA==,type:str]
@@ -48,8 +48,8 @@ sops:
             bXVCbWVBWnhNdHJ6S2tnb3plSTZXek0K2Z4tUZNagHmazh/855NRQ92z5qlXf76h
             VuobaoJdT2zIWUDXXMXcRv7AY+ao6kr/UkOFWbcApxX9ESR8IO1Brg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-11-24T19:35:33Z"
-    mac: ENC[AES256_GCM,data:j7yPw5cAOqw3cYTr6MeIbLTBQEib9NHS9PEEbYHsF1dOiOWohzlsl3RKNhhA9Teut2gfWSMYnF2dMyVTOVK5BEoabjkwGbno7vcmS8/x3429jQGLbANuhlD7yZArmKbs1G1msKklNdOmYpgYyeB0aOG9HHKINe9ZDuHnWj0uqPs=,iv:uUQujn5V007546bJTeRIBDunXP7Ler378eMBfN7uBzc=,tag:Y5kmAr2NIYqek+p0uhqFVA==,type:str]
+    lastmodified: "2024-12-30T15:07:25Z"
+    mac: ENC[AES256_GCM,data:Pm4fryZracui1wPph2Zm1/W6z0h1yQptVMDtmbsI7rhABQSqClD+IpIkg3u3vrKOV9kZlTGnJbhcSngz1gWyxo1hn/vUuV7hPGtFNRT42znhQvgMJ9bTLjSrVdbZCQ+ARrDXm8Vhshy2QOep4Jmj0QdDgvbnem4twwEJHT0r9Ho=,iv:pK5/SZWkC9dQ6S9YKmIQ2/T+Ofk58Seqpy0sR650wQs=,tag:oWBOBerszVH037hd4gHm5Q==,type:str]
     pgp: []
     unencrypted_suffix: _unencrypted
-    version: 3.9.1
+    version: 3.9.2
