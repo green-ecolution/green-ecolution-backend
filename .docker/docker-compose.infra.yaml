@@ -14,7 +14,11 @@ services:
     restart: always
     ports:
       - 5050:80
+    volumes:
+      - "./infra/pgadmin/servers.json:/pgadmin4/servers.json"
     environment:
       PGADMIN_DEFAULT_EMAIL: a@a.com
       PGADMIN_DEFAULT_PASSWORD: geheim
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
 
