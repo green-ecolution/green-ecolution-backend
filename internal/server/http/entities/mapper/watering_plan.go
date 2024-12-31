@@ -1,6 +1,8 @@
 package mapper
 
 import (
+	"log"
+
 	"github.com/google/uuid"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -10,7 +12,7 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
 // goverter:extend MapWateringPlanStatus MapVehicleStatus MapVehicleType MapDrivingLicense MapWateringPlanStatusReq
-// goverter:extend MapWateringStatus MapSensorStatus MapSoilCondition MapTreesToIDs MapUUIDs
+// goverter:extend MapWateringStatus MapSensorStatus MapSoilCondition MapTreesToIDs MapUUIDs MapUUIDReq
 type WateringPlanHTTPMapper interface {
 	FromResponse(*domain.WateringPlan) *entities.WateringPlanResponse
 	FromResponseList([]*domain.WateringPlan) []*entities.WateringPlanResponse
@@ -41,4 +43,20 @@ func MapUUIDs(source []*uuid.UUID) []*uuid.UUID {
 		}
 	}
 	return target
+}
+
+func MapUUIDReq(userIDs []string) []*uuid.UUID {
+	mappedUserIDs := make([]*uuid.UUID, len(userIDs))
+	for i, userIDStr := range userIDs {
+
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			log.Printf("Error parsing UUID: %v", err)
+			mappedUserIDs[i] = nil
+		} else {
+			mappedUserIDs[i] = &userID
+		}
+	}
+
+	return mappedUserIDs
 }

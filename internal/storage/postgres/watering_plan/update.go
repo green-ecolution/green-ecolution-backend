@@ -89,7 +89,13 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		return w.store.HandleError(err)
 	}
 
-	// TODO: update linked users
+	if err := w.store.DeleteAllUsersFromWateringPlan(ctx, entity.ID); err != nil {
+		return w.store.HandleError(err)
+	}
+
+	if err := w.setLinkedUsers(ctx, entity, entity.ID); err != nil {
+		return w.store.HandleError(err)
+	}
 
 	return w.store.UpdateWateringPlan(ctx, &params)
 }

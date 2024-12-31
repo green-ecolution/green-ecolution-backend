@@ -108,7 +108,11 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			assert.Equal(t, input.TreeClusters[i].Name, tc.Name)
 		}
 
-		// TODO: test linked users
+		// assert user
+		assert.Len(t, input.UserIDs, len(got.UserIDs))
+		for i, userID := range got.UserIDs {
+			assert.Equal(t, input.UserIDs[i], userID)
+		}
 	})
 
 	t.Run("should update watering plan and unlink trailer", func(t *testing.T) {
@@ -156,7 +160,11 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			assert.Equal(t, input.TreeClusters[i].Name, tc.Name)
 		}
 
-		// TODO: test linked users
+		// assert user
+		assert.Len(t, input.UserIDs, len(got.UserIDs))
+		for i, userID := range got.UserIDs {
+			assert.Equal(t, input.UserIDs[i], userID)
+		}
 	})
 
 	t.Run("should update watering plan to canceled", func(t *testing.T) {
