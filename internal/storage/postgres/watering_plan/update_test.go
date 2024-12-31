@@ -25,16 +25,10 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uuid, _ := uuid.NewRandom()
-	testUser := &entities.User{
-		ID:          uuid,
-		CreatedAt:   time.Unix(123456, 0),
-		Username:    "test",
-		FirstName:   "Toni",
-		LastName:    "Tester",
-		Email:       "dev@green-ecolution.de",
-		PhoneNumber: "+49 123456",
-		EmployeeID:  "123456",
+	// UUID from test user in keycloak
+	testUUID, err := uuid.Parse("6a1078e8-80fd-458f-b74e-e388fe2dd6ab")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	input := entities.WateringPlan{
@@ -44,7 +38,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[2],
 		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[3],
 		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
-		Users:        []*entities.User{testUser},
+		UserIDs:      []*uuid.UUID{&testUUID},
 		Status:       entities.WateringPlanStatusActive,
 	}
 
@@ -79,7 +73,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			wp.Status = input.Status
 			return true, nil
 		}
@@ -128,7 +122,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = nil
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			wp.Status = input.Status
 			return true, nil
 		}
@@ -177,7 +171,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Distance = input.Distance
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			wp.Status = entities.WateringPlanStatusCanceled
 			wp.CancellationNote = cancellationNote
 			return true, nil
@@ -206,7 +200,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Distance = input.Distance
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			wp.Status = entities.WateringPlanStatusNotCompeted
 			wp.Evaluation = evaluation
 			return true, nil
@@ -245,7 +239,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			wp.Status = entities.WateringPlanStatusFinished
 			wp.Evaluation = evaluation
 			return true, nil
@@ -283,7 +277,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Distance = input.Distance
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			wp.Status = entities.WateringPlanStatusActive
 			wp.CancellationNote = "This watering plan is canceled"
 			return true, nil
@@ -305,7 +299,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Date = time.Time{}
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -326,7 +320,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -368,7 +362,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Trailer
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -389,7 +383,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = nil
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -410,7 +404,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = []*entities.TreeCluster{}
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -443,7 +437,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -463,7 +457,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -483,7 +477,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -502,7 +496,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -567,7 +561,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return false, nil
 		}
 

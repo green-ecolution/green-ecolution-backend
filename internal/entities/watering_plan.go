@@ -2,6 +2,8 @@ package entities
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type WateringPlanStatus string
@@ -24,7 +26,7 @@ type WateringPlan struct {
 	Status             WateringPlanStatus
 	Distance           *float64
 	TotalWaterRequired *float64
-	Users              []*User
+	UserIDs            []*uuid.UUID
 	TreeClusters       []*TreeCluster
 	Transporter        *Vehicle
 	Trailer            *Vehicle

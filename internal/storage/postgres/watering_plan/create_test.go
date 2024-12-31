@@ -25,16 +25,10 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uuid, _ := uuid.NewRandom()
-	testUser := &entities.User{
-		ID:          uuid,
-		CreatedAt:   time.Unix(123456, 0),
-		Username:    "test",
-		FirstName:   "Toni",
-		LastName:    "Tester",
-		Email:       "dev@green-ecolution.de",
-		PhoneNumber: "+49 123456",
-		EmployeeID:  "123456",
+	// UUID from test user in keycloak
+	testUUID, err := uuid.Parse("6a1078e8-80fd-458f-b74e-e388fe2dd6ab")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	input := entities.WateringPlan{
@@ -44,7 +38,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[0],
 		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[1],
 		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
-		Users:        []*entities.User{testUser},
+		UserIDs:      []*uuid.UUID{&testUUID},
 	}
 
 	expectedTotalWater := 720.0
@@ -60,7 +54,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -108,7 +102,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -145,10 +139,9 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		}
 
 		// assert user
-		assert.Len(t, input.Users, len(getWp.Users))
-		for i, user := range getWp.Users {
-			assert.Equal(t, input.Users[i].ID, user.ID)
-			assert.Equal(t, input.Users[i].Email, user.Email)
+		assert.Len(t, input.UserIDs, len(getWp.UserIDs))
+		for i, userID := range getWp.UserIDs {
+			assert.Equal(t, input.UserIDs[i], userID)
 		}
 	})
 
@@ -160,7 +153,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = time.Time{}
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -182,7 +175,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -204,7 +197,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = []*entities.User{}
+			wp.UserIDs = []*uuid.UUID{}
 			return true, nil
 		}
 
@@ -226,7 +219,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Trailer
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -248,7 +241,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = nil
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -270,7 +263,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = []*entities.TreeCluster{}
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -303,7 +296,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -355,7 +348,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return false, nil
 		}
 

@@ -1,6 +1,10 @@
 package entities
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type WateringPlanStatus string // @Name WateringPlanStatus
 
@@ -22,7 +26,7 @@ type WateringPlanResponse struct {
 	Status             WateringPlanStatus           `json:"status"`
 	Distance           *float64                     `json:"distance"`
 	TotalWaterRequired *float64                     `json:"total_water_required"`
-	Users              []*UserResponse              `json:"users"`
+	UserIDs            []*uuid.UUID                 `json:"user_ids"`
 	TreeClusters       []*TreeClusterInListResponse `json:"treeclusters"`
 	Transporter        *VehicleResponse             `json:"transporter"`
 	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
@@ -39,7 +43,7 @@ type WateringPlanInListResponse struct {
 	Status             WateringPlanStatus           `json:"status"`
 	Distance           *float64                     `json:"distance"`
 	TotalWaterRequired *float64                     `json:"total_water_required"`
-	Users              []*UserResponse              `json:"users"`
+	UserIDs            []*uuid.UUID                 `json:"user_ids"`
 	TreeClusters       []*TreeClusterInListResponse `json:"treeclusters"`
 	Transporter        *VehicleResponse             `json:"transporter"`
 	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
@@ -57,7 +61,7 @@ type WateringPlanCreateRequest struct {
 	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
 	TransporterID  *int32    `json:"transporter_id"`
 	TrailerID      *int32    `json:"trailer_id" validate:"optional"`
-	Users          []*int32  `json:"users_ids"`
+	UserIDs        []*int32  `json:"users_ids"`
 } // @Name WateringPlanCreate
 
 type WateringPlanUpdateRequest struct {
@@ -66,7 +70,7 @@ type WateringPlanUpdateRequest struct {
 	TreeClusterIDs   []*int32           `json:"tree_cluster_ids"`
 	TransporterID    *int32             `json:"transporter_id"`
 	TrailerID        *int32             `json:"trailer_id" validate:"optional"`
-	Users            []*int32           `json:"users_ids"`
+	UserIDs          []*int32           `json:"users_ids"`
 	CancellationNote string             `json:"cancellation_note"`
 	Status           WateringPlanStatus `json:"status"`
 	Evaluation       []*EvaluationValue `json:"evaluation"`
