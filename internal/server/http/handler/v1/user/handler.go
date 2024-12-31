@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -175,100 +176,44 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Description	Get all users
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	entities.UserListResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
+// @Success		200			{object}	entities.UserListResponse
+// @Failure		400			{object}	HTTPError
+// @Failure		500			{object}	HTTPError
+// @Param			page		query		string	false	"Page"
+// @Param			limit		query		string	false	"Limit"
+// @Param			limit		query		string	false	"Limit"
+// @Param			user_ids	query		string	false	"User IDs"
 // @Router			/v1/user [get]
 // @Security		Keycloak
 func GetAllUsers(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
+		var domainData []*domain.User
+		var err error
 
-		users, err := svc.GetAll(ctx)
-		if err != nil {
-			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error()))
+		userIDsParam := c.Query("user_ids")
+		if userIDsParam == "" {
+			domainData, err = svc.GetAll(ctx)
+			if err != nil {
+				return errorhandler.HandleError(err)
+			}
+		} else {
+			userIDs := strings.Split(userIDsParam, ",")
+			domainData, err = svc.GetByIDs(ctx, userIDs)
+			if err != nil {
+				return errorhandler.HandleError(err)
+			}
 		}
-		response := make([]entities.UserResponse, len(users))
 
-		for i, user := range users {
-			userResponse := userMapper.FromResponse(user)
-			response[i] = *userResponse
+		data := make([]*entities.UserResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = userMapper.FromResponse(domain)
 		}
 
-		return c.Status(fiber.StatusOK).JSON(response)
-	}
-}
-
-// @Summary		Get a user by ID
-// @Description	Get a user by ID
-// @Tags			User
-// @Produce		json
-// @Success		200		{object}	entities.UserResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Router			/v1/user/{user_id} [get]
-// @Security		Keycloak
-func GetUserByID(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Update a user by ID
-// @Description	Update a user by ID
-// @Tags			User
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	entities.UserResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string						true	"User ID"
-// @Param			user	body		entities.UserUpdateRequest	true	"User information"
-// @Router			/v1/user/{user_id} [put]
-// @Security		Keycloak
-func UpdateUserByID(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Delete a user by ID
-// @Description	Delete a user by ID
-// @Tags			User
-// @Produce		json
-// @Success		200		{string}	string
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Router			/v1/user/{user_id} [delete]
-// @Security		Keycloak
-func DeleteUserByID(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Get user roles
-// @Description	Get user roles
-// @Tags			User
-// @Produce		json
-// @Success		200		{object}	entities.RoleListResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
-// @Router			/v1/user/{user_id}/roles [get]
-// @Security		Keycloak
-func GetUserRoles(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 

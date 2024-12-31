@@ -16,6 +16,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -578,18 +579,65 @@ func TestGetAllUsers(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var response []entities.UserResponse
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		assert.Nil(t, err)
-		assert.Equal(t, len(expectedUsers), len(response))
+		var response entities.UserListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+		assert.Equal(t, 2, len(response.Data))
 		for i, user := range expectedUsers {
-			assert.Equal(t, user.ID.String(), response[i].ID)
-			assert.Equal(t, user.Email, response[i].Email)
-			assert.Equal(t, user.FirstName, response[i].FirstName)
-			assert.Equal(t, user.LastName, response[i].LastName)
-			assert.Equal(t, user.Username, response[i].Username)
-			assert.Equal(t, user.EmployeeID, response[i].EmployeeID)
-			assert.Equal(t, user.PhoneNumber, response[i].PhoneNumber)
+			assert.Equal(t, user.ID.String(), response.Data[i].ID)
+			assert.Equal(t, user.Email, response.Data[i].Email)
+			assert.Equal(t, user.FirstName, response.Data[i].FirstName)
+			assert.Equal(t, user.LastName, response.Data[i].LastName)
+			assert.Equal(t, user.Username, response.Data[i].Username)
+			assert.Equal(t, user.EmployeeID, response.Data[i].EmployeeID)
+			assert.Equal(t, user.PhoneNumber, response.Data[i].PhoneNumber)
+		}
+	})
+
+	t.Run("should return all users by ids", func(t *testing.T) {
+		// given
+		app := fiber.New()
+		mockAuthService := serviceMock.NewMockAuthService(t)
+		app.Get("/v1/user", GetAllUsers(mockAuthService))
+
+		mockUUID1 := uuid.New()
+
+		expectedUsers := []*domain.User{
+			{
+				ID:          mockUUID1,
+				CreatedAt:   time.Now(),
+				Email:       "user1@example.com",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Username:    "johndoe",
+				EmployeeID:  "1234",
+				PhoneNumber: "+123456789",
+			},
+		}
+
+		mockAuthService.EXPECT().GetByIDs(mock.Anything, []string{mockUUID1.String()}).Return(expectedUsers, nil)
+
+		// when
+		req := httptest.NewRequest(http.MethodGet, "/v1/user?user_ids="+mockUUID1.String(), nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response entities.UserListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(response.Data))
+		for i, user := range expectedUsers {
+			assert.Equal(t, user.ID.String(), response.Data[i].ID)
+			assert.Equal(t, user.Email, response.Data[i].Email)
+			assert.Equal(t, user.FirstName, response.Data[i].FirstName)
+			assert.Equal(t, user.LastName, response.Data[i].LastName)
+			assert.Equal(t, user.Username, response.Data[i].Username)
+			assert.Equal(t, user.EmployeeID, response.Data[i].EmployeeID)
+			assert.Equal(t, user.PhoneNumber, response.Data[i].PhoneNumber)
 		}
 	})
 
@@ -628,10 +676,10 @@ func TestGetAllUsers(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var response []entities.UserResponse
-		err = json.NewDecoder(resp.Body).Decode(&response)
-		assert.Nil(t, err)
-		assert.Empty(t, response)
+		var response entities.UserListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(response.Data))
 	})
 }
 

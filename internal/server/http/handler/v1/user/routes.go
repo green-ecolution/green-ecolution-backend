@@ -8,10 +8,6 @@ import (
 func RegisterRoutes(r fiber.Router, svc service.AuthService) {
 	r.Post("/", Register(svc))
 	r.Get("/", GetAllUsers(svc))
-	r.Get("/:id", GetUserByID(svc))
-	r.Put("/:id", UpdateUserByID(svc))
-	r.Delete("/:id", DeleteUserByID(svc))
-	r.Get("/:id/roles", GetUserRoles(svc))
 }
 
 func RegisterPublicRoutes(r fiber.Router, svc service.AuthService) {
