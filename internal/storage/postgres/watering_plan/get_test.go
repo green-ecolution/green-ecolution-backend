@@ -53,7 +53,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].ID, tc.ID)
 				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].Name, tc.Name)
 			}
-			
+
 			// assert user
 			assert.Len(t, allTestWateringPlans[i].UserIDs, len(wp.UserIDs))
 			for j, userID := range wp.UserIDs {

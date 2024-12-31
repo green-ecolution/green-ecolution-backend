@@ -26,6 +26,7 @@ var (
 	ErrTreeNotFound         = errors.New("tree not found")
 	ErrVehicleNotFound      = errors.New("vehicle not found")
 	ErrWateringPlanNotFound = errors.New("watering plan not found")
+	ErrUserNotFound         = errors.New("user not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")

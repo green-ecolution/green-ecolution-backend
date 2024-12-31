@@ -3,18 +3,21 @@ package wateringplan
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type WateringPlanService struct {
 	wateringPlanRepo storage.WateringPlanRepository
 	clusterRepo      storage.TreeClusterRepository
 	vehicleRepo      storage.VehicleRepository
+	userRepo         storage.UserRepository
 	validator        *validator.Validate
 }
 
@@ -22,11 +25,13 @@ func NewWateringPlanService(
 	wateringPlanRepository storage.WateringPlanRepository,
 	clusterRepository storage.TreeClusterRepository,
 	vehicleRepository storage.VehicleRepository,
+	userRepository storage.UserRepository,
 ) service.WateringPlanService {
 	return &WateringPlanService{
 		wateringPlanRepo: wateringPlanRepository,
 		clusterRepo:      clusterRepository,
 		vehicleRepo:      vehicleRepository,
+		userRepo:         userRepository,
 		validator:        validator.New(),
 	}
 }
@@ -54,8 +59,12 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// TODO: get users
-	// TODO: calculare distance
+	// TODO: get distance from valhalla
+	// TODO: validate driver licence
+
+	if err := w.validateUserIDs(ctx, createWp.UserIDs); err != nil {
+		return nil, service.NewError(service.NotFound, storage.ErrUserNotFound.Error())
+	}
 
 	treeClusters, err := w.fetchTreeClusters(ctx, createWp.TreeClusterIDs)
 	if err != nil {
@@ -81,6 +90,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.Transporter = transporter
 		wp.Trailer = trailer
 		wp.TreeClusters = treeClusters
+		wp.UserIDs = createWp.UserIDs
 
 		return true, nil
 	})
@@ -97,11 +107,15 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
-	// TODO: get users
-	// TODO: calculate distance
+	// TODO: get distance from valhalla
+	// TODO: validate driver licence
 
 	if err := w.validateStatusDependentValues(updateWp); err != nil {
 		return nil, err
+	}
+
+	if err := w.validateUserIDs(ctx, updateWp.UserIDs); err != nil {
+		return nil, service.NewError(service.NotFound, storage.ErrUserNotFound.Error())
 	}
 
 	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
@@ -131,6 +145,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.Status = updateWp.Status
 		wp.CancellationNote = updateWp.CancellationNote
 		wp.Evaluation = updateWp.Evaluation
+		wp.UserIDs = updateWp.UserIDs
 
 		return true, nil
 	})
@@ -187,6 +202,27 @@ func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32)
 	}
 
 	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
+}
+
+// Checks if the incoming user ids are belonging to valid users
+func (w *WateringPlanService) validateUserIDs(ctx context.Context, userIDs []*uuid.UUID) error {
+	var userIDStrings []string
+	for _, id := range userIDs {
+		if id != nil {
+			userIDStrings = append(userIDStrings, utils.UUIDToString(*id))
+		}
+	}
+
+	users, err := w.userRepo.GetByIDs(ctx, userIDStrings)
+	if err != nil {
+		return handleError(err)
+	}
+
+	if len(users) == 0 {
+		return storage.ErrUserNotFound
+	}
+
+	return nil
 }
 
 func (w *WateringPlanService) validateStatusDependentValues(entity *entities.WateringPlanUpdate) error {

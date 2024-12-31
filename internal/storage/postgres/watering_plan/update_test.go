@@ -332,26 +332,26 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		assert.Equal(t, "trailer vehicle requires a vehicle of type trailer", err.Error())
 	})
 
-	// t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
-	// 	// given
-	// 	r := NewWateringPlanRepository(suite.Store, mappers)
+	t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
 
-	// 	updateFn := func(wp *entities.WateringPlan) (bool, error) {
-	// 		wp.Date = input.Date
-	// 		wp.Transporter = input.Transporter
-	// 		wp.Trailer = input.Trailer
-	// 		wp.TreeClusters = input.TreeClusters
-	// 		wp.Users = []*entities.User{}
-	// 		return true, nil
-	// 	}
+		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.TreeClusters = input.TreeClusters
+			wp.UserIDs = []*uuid.UUID{}
+			return true, nil
+		}
 
-	// 	// when
-	// 	err := r.Update(context.Background(), 1, updateFn)
+		// when
+		err := r.Update(context.Background(), 1, updateFn)
 
-	// 	// then
-	// 	assert.Error(t, err)
-	// 	assert.Equal(t, "watering plan requires employees", err.Error())
-	// })
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, "watering plan requires employees", err.Error())
+	})
 
 	t.Run("should return error when transporter has not correct vehilce type", func(t *testing.T) {
 		// given
