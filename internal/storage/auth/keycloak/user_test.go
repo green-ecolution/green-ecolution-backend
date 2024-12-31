@@ -330,14 +330,8 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, users)
 		assert.GreaterOrEqual(t, len(users), 2)
-		for i, user := range users {
-			assert.Equal(t, users[i].ID, user.ID)
-			assert.Equal(t, users[i].Email, user.Email)
-			assert.Equal(t, users[i].Username, user.Username)
-			assert.Equal(t, users[i].FirstName, user.FirstName)
-			assert.Equal(t, users[i].LastName, user.LastName)
-			assert.Equal(t, users[i].PhoneNumber, user.PhoneNumber)
-		}
+		assert.True(t, containsUser(users, *user1), "user1 should be in the list")
+		assert.True(t, containsUser(users, *user2), "user1 should be in the list")
 	})
 
 	t.Run("should return error when login fails", func(t *testing.T) {
@@ -374,11 +368,20 @@ func TestKeyCloakUserRepo_GetByID(t *testing.T) {
 		userID := suite.EnsureUserExists(t, user)
 
 		// when
-		user, err := userRepo.GetByID(context.Background(), userID)
+		users, err := userRepo.GetByIDs(context.Background(), []string{userID})
 
 		// then
 		assert.NoError(t, err)
-		assert.NotNil(t, user)
+		assert.NotNil(t, users)
+		assert.Equal(t, 1, len(users))
+		for i, user := range users {
+			assert.Equal(t, users[i].ID, user.ID)
+			assert.Equal(t, users[i].Email, user.Email)
+			assert.Equal(t, users[i].Username, user.Username)
+			assert.Equal(t, users[i].FirstName, user.FirstName)
+			assert.Equal(t, users[i].LastName, user.LastName)
+			assert.Equal(t, users[i].PhoneNumber, user.PhoneNumber)
+		}
 	})
 
 	t.Run("should return error when login fails", func(t *testing.T) {
@@ -389,11 +392,25 @@ func TestKeyCloakUserRepo_GetByID(t *testing.T) {
 		uuid, _ := uuid.NewRandom()
 
 		// when
-		users, err := userRepo.GetByID(context.Background(), uuid.String())
+		users, err := userRepo.GetByIDs(context.Background(), []string{uuid.String()})
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, users)
 		assert.Contains(t, err.Error(), "failed to log in to Keycloak")
 	})
+}
+
+func containsUser(userList []*entities.User, targetUser entities.User) bool {
+	for _, user := range userList {
+		if user.Username == targetUser.Username &&
+			user.FirstName == targetUser.FirstName &&
+			user.LastName == targetUser.LastName &&
+			user.Email == targetUser.Email &&
+			user.EmployeeID == targetUser.EmployeeID &&
+			user.PhoneNumber == targetUser.PhoneNumber {
+			return true
+		}
+	}
+	return false
 }

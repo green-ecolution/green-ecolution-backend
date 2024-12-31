@@ -19,8 +19,8 @@ type UserResponse struct {
 } // @Name User
 
 type UserListResponse struct {
-	Data       []UserResponse `json:"data"`
-	Pagination Pagination     `json:"pagination"`
+	Data       []*UserResponse `json:"data"`
+	Pagination Pagination      `json:"pagination"`
 } // @Name UserList
 
 type UserRegisterRequest struct {

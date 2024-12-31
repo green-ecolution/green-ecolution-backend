@@ -75,3 +75,12 @@ func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
 
 	return users, nil
 }
+
+func (s *AuthService) GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error) {
+	users, err := s.userRepo.GetByIDs(ctx, ids)
+	if err != nil {
+		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by ids").Error())
+	}
+
+	return users, nil
+}

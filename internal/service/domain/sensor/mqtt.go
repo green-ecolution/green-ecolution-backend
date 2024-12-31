@@ -31,7 +31,7 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		return nil, handleError(err)
 	}
 
-	sensorData, err := s.sensorRepo.GetLastSensorDataByID(ctx, sensor.ID)
+	sensorData, err := s.sensorRepo.GetLatestSensorDataBySensorID(ctx, sensor.ID)
 	if err != nil {
 		return nil, err
 	}

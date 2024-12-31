@@ -73,7 +73,7 @@ type WateringPlanUpdateRequest struct {
 	UserIDs          []*int32           `json:"users_ids"`
 	CancellationNote string             `json:"cancellation_note"`
 	Status           WateringPlanStatus `json:"status"`
-	Evaluation       []*EvaluationValue `json:"evaluation"`
+	Evaluation       []*EvaluationValue `json:"evaluation" validate:"optional"`
 } // @Name WateringPlanUpdate
 
 type EvaluationValue struct {

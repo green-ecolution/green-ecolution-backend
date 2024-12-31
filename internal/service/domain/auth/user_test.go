@@ -376,3 +376,79 @@ func TestGetAllUsers(t *testing.T) {
 		assert.Empty(t, users)
 	})
 }
+
+func TestGetByIDs(t *testing.T) {
+	uuid01, _ := uuid.NewRandom()
+	uuid02, _ := uuid.NewRandom()
+	input := []string{uuid01.String(), uuid02.String()}
+
+	expectedUsers := []*entities.User{
+		{
+			ID:          uuid01,
+			Username:    "user1",
+			FirstName:   "John",
+			LastName:    "Doe",
+			Email:       "john.doe@example.com",
+			PhoneNumber: "+123456789",
+		},
+		{
+			ID:          uuid02,
+			Username:    "user2",
+			FirstName:   "Jane",
+			LastName:    "Smith",
+			Email:       "jane.smith@example.com",
+			PhoneNumber: "+987654321",
+		},
+	}
+	t.Run("should return all users by ids successfully", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+		userRepo.EXPECT().GetByIDs(context.Background(), input).Return(expectedUsers, nil)
+
+		// when
+		users, err := svc.GetByIDs(context.Background(), input)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+	})
+
+	t.Run("should return error when user repository fails", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetByIDs(context.Background(), input).Return(nil, errors.New("repository error"))
+
+		// when
+		users, err := svc.GetByIDs(context.Background(), input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to get users by ids")
+	})
+
+	t.Run("should return empty slice when no users are found", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetByIDs(context.Background(), input).Return([]*entities.User{}, nil)
+
+		// when
+		users, err := svc.GetByIDs(context.Background(), input)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.Empty(t, users)
+	})
+}
