@@ -88,8 +88,8 @@ func (w *WateringPlanRepository) GetLinkedUsersByID(ctx context.Context, id int3
 	var userUUIDs []*uuid.UUID
 	for _, pgUUID := range pgUUIDS {
 		if pgUUID.Valid {
-			uuid := uuid.UUID(pgUUID.Bytes)
-			userUUIDs = append(userUUIDs, &uuid)
+			uuidVal := uuid.UUID(pgUUID.Bytes)
+			userUUIDs = append(userUUIDs, &uuidVal)
 		}
 	}
 

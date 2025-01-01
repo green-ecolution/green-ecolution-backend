@@ -90,7 +90,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			assert.Equal(t, input.TreeClusters[i].ID, tc.ID)
 			assert.Equal(t, input.TreeClusters[i].Name, tc.Name)
 		}
-		
+
 		// assert user
 		assert.Len(t, input.UserIDs, len(getWp.UserIDs))
 		for i, userID := range getWp.UserIDs {

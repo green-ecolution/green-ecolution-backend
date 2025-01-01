@@ -60,7 +60,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	// TODO: get distance from valhalla
-	// TODO: validate driver licence
+	// TODO: validate driver license
 
 	if err := w.validateUserIDs(ctx, createWp.UserIDs); err != nil {
 		return nil, service.NewError(service.NotFound, storage.ErrUserNotFound.Error())
@@ -108,7 +108,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	}
 
 	// TODO: get distance from valhalla
-	// TODO: validate driver licence
+	// TODO: validate driver license
 
 	if err := w.validateStatusDependentValues(updateWp); err != nil {
 		return nil, err
