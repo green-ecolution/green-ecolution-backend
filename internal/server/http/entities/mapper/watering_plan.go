@@ -45,7 +45,7 @@ func MapUUIDs(source []*uuid.UUID) []*uuid.UUID {
 
 func MapUUIDReq(userIDs []string) []*uuid.UUID {
 	mappedUserIDs := make([]*uuid.UUID, len(userIDs))
-	
+
 	for i, userIDStr := range userIDs {
 		userID, err := uuid.Parse(userIDStr)
 		if err != nil {
