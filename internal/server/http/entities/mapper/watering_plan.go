@@ -1,8 +1,6 @@
 package mapper
 
 import (
-	"log"
-
 	"github.com/google/uuid"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -47,11 +45,10 @@ func MapUUIDs(source []*uuid.UUID) []*uuid.UUID {
 
 func MapUUIDReq(userIDs []string) []*uuid.UUID {
 	mappedUserIDs := make([]*uuid.UUID, len(userIDs))
+	
 	for i, userIDStr := range userIDs {
-
 		userID, err := uuid.Parse(userIDStr)
 		if err != nil {
-			log.Printf("Error parsing UUID: %v", err)
 			mappedUserIDs[i] = nil
 		} else {
 			mappedUserIDs[i] = &userID
