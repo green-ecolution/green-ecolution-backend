@@ -100,7 +100,7 @@ func (s *Store) getLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]
 		if errors.Is(err, pgx.ErrNoRows) {
 			return []*entities.Tree{}, nil
 		}
-		return nil, s.HandleError(err)
+		return nil, s.HandleError(err, "Failed to fetch linked trees for TreeClusterID")
 	}
 
 	return treeMapper.FromSqlList(rows), nil
