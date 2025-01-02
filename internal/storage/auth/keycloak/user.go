@@ -95,13 +95,13 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 		return nil, errors.Join(err, ErrGetUser)
 	}
 
-	allUsers := make([]*entities.User, 0, len(users))
-	for _, kcUser := range users {
+	allUsers := make([]*entities.User, len(users))
+	for i, kcUser := range users {
 		user, err := keyCloakUserToUser(kcUser)
 		if err != nil {
 			return nil, err
 		}
-		allUsers = append(allUsers, user)
+		allUsers[i] = user
 	}
 
 	return allUsers, nil
@@ -113,22 +113,18 @@ func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entitie
 		return nil, err
 	}
 
-	kcUsers := make([]*gocloak.User, 0, len(ids))
-	for _, id := range ids {
-		user, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
+	users := make([]*entities.User, len(ids))
+	for i, id := range ids {
+		kcUser, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
 		if err != nil {
 			return nil, err
 		}
-		kcUsers = append(kcUsers, user)
-	}
 
-	users := make([]*entities.User, 0, len(kcUsers))
-	for _, kcUser := range kcUsers {
 		user, err := keyCloakUserToUser(kcUser)
 		if err != nil {
 			return nil, err
 		}
-		users = append(users, user)
+		users[i] = user
 	}
 
 	return users, nil
