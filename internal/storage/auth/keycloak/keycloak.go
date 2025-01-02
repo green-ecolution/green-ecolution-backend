@@ -35,6 +35,37 @@ func NewKeycloakRepository(cfg *config.IdentityAuthConfig) storage.AuthRepositor
 	}
 }
 
+// loginRestAPIClient creates and authenticates a GoCloak client to interact with a Keycloak REST API.
+//
+// Parameters:
+//   - ctx: The context for the request, used to cancel or track the operation.
+//   - baseURL: The base URL of the Keycloak server, e.g., "https://keycloak.example.com".
+//   - clientID: The client ID of the Keycloak client used for authentication.
+//   - clientSecret: The secret key of the Keycloak client used for authentication.
+//   - realm: The Keycloak realm where the client is registered.
+//
+// Returns:
+//   - client: An initialized and authenticated GoCloak client that can be used for further Keycloak API interactions.
+//   - token: A JWT (JSON Web Token) representing the client’s authentication. This token can be used for additional API requests.
+//   - err: An error, if the authentication fails or another issue occurs.
+//
+// Errors:
+//   - Returns `ErrLogin` combined with the original error if authentication fails.
+//
+// Example:
+//
+//	ctx := context.Background()
+//	baseURL := "https://keycloak.example.com"
+//	clientID := "my-client-id"
+//	clientSecret := "my-client-secret"
+//	realm := "my-realm"
+//
+//	client, token, err := loginRestAPIClient(ctx, baseURL, clientID, clientSecret, realm)
+//	if err != nil {
+//	    log.Fatalf("Failed to authenticate: %v", err)
+//	}
+//
+//	fmt.Printf("Access Token: %s\n", token.AccessToken)
 func loginRestAPIClient(ctx context.Context, baseURL, clientID, clientSecret, realm string) (client *gocloak.GoCloak, token *gocloak.JWT, err error) {
 	client = gocloak.NewClient(baseURL)
 
