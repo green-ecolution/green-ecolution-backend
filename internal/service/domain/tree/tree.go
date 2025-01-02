@@ -50,7 +50,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 		return nil
 	}
 
-	status := utils.CalculateWateringStatus(t.PlantingYear, event.New)
+	status := utils.CalculateWateringStatus(t.PlantingYear, event.New.Data.Watermarks)
 
 	if status == t.WateringStatus {
 		return nil
