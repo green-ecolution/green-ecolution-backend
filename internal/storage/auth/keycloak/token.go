@@ -2,17 +2,9 @@ package keycloak
 
 import (
 	"context"
-	"errors"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-)
-
-var (
-	ErrInvalidToken     = errors.New("invalid token")
-	ErrTokenExpired     = errors.New("token expired")
-	ErrTokenNotActive   = errors.New("token not active")
-	ErrTokenInvalidType = errors.New("token invalid type")
 )
 
 func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error) {

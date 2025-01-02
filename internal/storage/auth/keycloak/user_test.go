@@ -344,8 +344,8 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.ErrorIs(t, err, ErrLogin)
 		assert.Nil(t, users)
-		assert.Contains(t, err.Error(), "failed to login to keycloak")
 	})
 }
 
@@ -396,8 +396,8 @@ func TestKeyCloakUserRepo_GetByID(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.ErrorIs(t, err, ErrLogin)
 		assert.Nil(t, users)
-		assert.Contains(t, err.Error(), "failed to login to keycloak")
 	})
 }
 
