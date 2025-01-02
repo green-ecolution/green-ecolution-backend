@@ -30,7 +30,7 @@ type Error struct {
 	Timestamp string
 }
 
-func NewError(code ErrorCode, msg string) Error {
+func NewError(code ErrorCode, msg string) *Error {
 	_, file, line, ok := runtime.Caller(1)
 	if !ok {
 		file = "unknown"
@@ -43,7 +43,7 @@ func NewError(code ErrorCode, msg string) Error {
 		}
 	}
 	timestamp := time.Now().Format(time.RFC3339)
-	return Error{
+	return &Error{
 		Code:      code,
 		Message:   msg,
 		File:      file,
@@ -52,7 +52,7 @@ func NewError(code ErrorCode, msg string) Error {
 	}
 }
 
-func (e Error) Error() string {
+func (e *Error) Error() string {
 	return fmt.Sprintf("[%d] %s (at %s:%d, %s)", e.Code, e.Message, e.File, e.Line, e.Timestamp)
 }
 

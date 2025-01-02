@@ -28,7 +28,7 @@ func TestHandleError(t *testing.T) {
 
 	t.Run("HandleError with ServiceError - NotFound and context", func(t *testing.T) {
 		// when
-		serviceErr := service.Error{Code: service.NotFound, Message: "Item not found"}
+		serviceErr := &service.Error{Code: service.NotFound, Message: "Item not found"}
 		err := HandleError(serviceErr, "Service operation")
 		// validate
 		assert.NotNil(t, err)
@@ -39,7 +39,7 @@ func TestHandleError(t *testing.T) {
 
 	t.Run("HandleError with ServiceError - BadRequest", func(t *testing.T) {
 		// when
-		serviceErr := service.Error{Code: service.BadRequest, Message: "Invalid input"}
+		serviceErr := &service.Error{Code: service.BadRequest, Message: "Invalid input"}
 		err := HandleError(serviceErr, "Invalid request")
 		// validate
 		assert.NotNil(t, err)
@@ -50,7 +50,7 @@ func TestHandleError(t *testing.T) {
 
 	t.Run("HandleError with ServiceError - Unauthorized", func(t *testing.T) {
 
-		serviceErr := service.Error{Code: service.Unauthorized, Message: "Unauthorized access"}
+		serviceErr := &service.Error{Code: service.Unauthorized, Message: "Unauthorized access"}
 		err := HandleError(serviceErr, "Accessing restricted resource")
 		// validate
 		assert.NotNil(t, err)

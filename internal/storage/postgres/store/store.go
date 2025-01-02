@@ -145,11 +145,11 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	err = fn(NewStore(s.db, qtx))
 	if err == nil {
 		slog.Info("Transaction cmmitted successfully")
-		slog.Debug("Committing transaction") //??
+		slog.Debug("Committing transaction")
 		return tx.Commit(ctx)
 	}
 
-	slog.Debug("Rolling back transaction") //??
+	slog.Debug("Rolling back transaction")
 	slog.Warn("Transaction rollback initiated due to error", "error", err)
 	rollbackErr := tx.Rollback(ctx)
 	if rollbackErr != nil {

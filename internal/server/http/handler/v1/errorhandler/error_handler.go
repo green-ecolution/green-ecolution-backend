@@ -26,7 +26,6 @@ var notFoundErrors = []error{
 }
 
 func HandleError(err error, contexts ...string) *fiber.Error {
-
 	if err == nil {
 		return nil
 	}
@@ -53,7 +52,7 @@ func HandleError(err error, contexts ...string) *fiber.Error {
 
 	// Classify the error
 	var errorType string
-	if svcErr, ok := err.(service.Error); ok {
+	if svcErr, ok := err.(*service.Error); ok {
 		errorType = "ServiceError"
 		switch svcErr.Code {
 		case service.NotFound:
