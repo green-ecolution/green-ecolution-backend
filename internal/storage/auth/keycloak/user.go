@@ -33,12 +33,11 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 
 	keyCloakUser := userToKeyCloakUser(user)
 
-	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	client, clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, *keyCloakUser)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create user")
@@ -83,28 +82,13 @@ func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string)
 	return nil
 }
 
-func (r *UserRepository) getClientToken(ctx context.Context) (string, error) {
-	clientToken, err := loginRestAPIClient(
-		ctx,
-		r.cfg.OidcProvider.BaseURL,
-		r.cfg.OidcProvider.Backend.ClientID,
-		r.cfg.OidcProvider.Backend.ClientSecret,
-		r.cfg.OidcProvider.DomainName,
-	)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to log in to Keycloak")
-	}
-	return clientToken.AccessToken, nil
-}
-
 func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
-	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
-	token, err := r.getClientToken(ctx)
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	users, err := client.GetUsers(ctx, token, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
+	users, err := client.GetUsers(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get users from Keycloak")
 	}
@@ -122,15 +106,14 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 }
 
 func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
-	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
-	token, err := r.getClientToken(ctx)
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
 	kcUsers := make([]*gocloak.User, 0, len(ids))
 	for _, id := range ids {
-		user, err := client.GetUserByID(ctx, token, r.cfg.OidcProvider.DomainName, id)
+		user, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to get user from Keycloak")
 		}
