@@ -167,7 +167,7 @@ func TestLoginRequest(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to parse auth url in config: parse \"not_a_valid_url\": invalid URI for request (at internal/service/domain/auth/user.go:28)")
+		assert.EqualError(t, err, "500: failed to parse auth url in config: parse \"not_a_valid_url\": invalid URI for request")
 	})
 }
 
@@ -215,7 +215,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "400: validation error: Key: 'LoginCallback.Code' Error:Field validation for 'Code' failed on the 'required' tag (at internal/service/domain/auth/user.go:46)")
+		assert.EqualError(t, err, "400: validation error: Key: 'LoginCallback.Code' Error:Field validation for 'Code' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
@@ -240,7 +240,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to get access token: assert.AnError general error for testing (at internal/service/domain/auth/user.go:51)")
+		assert.EqualError(t, err, "500: failed to get access token: assert.AnError general error for testing")
 	})
 }
 
@@ -278,7 +278,7 @@ func TestLogoutRequest(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "400: validation error: Key: 'Logout.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag (at internal/service/domain/auth/user.go:59)")
+		assert.EqualError(t, err, "400: validation error: Key: 'Logout.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when session removal fails", func(t *testing.T) {
@@ -297,7 +297,7 @@ func TestLogoutRequest(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to remove user session:  (at internal/service/domain/auth/user.go:64)")
+		assert.EqualError(t, err, "500: failed to remove user session: ")
 	})
 }
 

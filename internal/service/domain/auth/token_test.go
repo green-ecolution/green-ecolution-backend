@@ -52,6 +52,6 @@ func TestRestrospectToken(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to retrospect token:  (at internal/service/domain/auth/token.go:14)")
+		assert.EqualError(t, err, "500: failed to retrospect token: ")
 	})
 }

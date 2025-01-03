@@ -36,8 +36,8 @@ func NewError(code ErrorCode, msg string) *Error {
 		file = "unknown"
 		line = 0
 	} else {
-		// Trim the path
-		baseMarker := "internal/"
+		// Trim the path to start from green-ecolution-
+		baseMarker := "green-ecolution-"
 		if idx := strings.Index(file, baseMarker); idx != -1 {
 			file = file[idx:]
 		}
@@ -53,7 +53,7 @@ func NewError(code ErrorCode, msg string) *Error {
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("%d: %s (at %s:%d)", e.Code, e.Message, e.File, e.Line)
+	return fmt.Sprintf("[%d] %s (at %s:%d, %s)", e.Code, e.Message, e.File, e.Line, e.Timestamp)
 }
 
 type ErrorCode int
