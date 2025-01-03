@@ -72,6 +72,6 @@ WHERE tc.id = $1
     SELECT id
     FROM sensor_data
     WHERE sensor_id = s.id
-    ORDER BY created_at
+    ORDER BY created_at DESC
     LIMIT 1
   );
