@@ -26,6 +26,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 
 	var wateringStatus entities.WateringStatus
 	if len(sensorData) == 0 {
+		// assertion - if there is no sensor data after receiving the event, the world is ending
 		return nil
 	} else if len(sensorData) == 1 {
 		wateringStatus = tree.WateringStatus
@@ -41,7 +42,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 		}
 
 		slices.SortFunc(trees, func(a, b *entities.Tree) int {
-			return int(a.PlantingYear - b.PlantingYear)
+			return int(b.PlantingYear - a.PlantingYear)
 		})
 
 		youngestTree := trees[0]
