@@ -206,6 +206,48 @@ func TestTreeRepository_GetBySensorID(t *testing.T) {
 	})
 }
 
+func TestTreeRepository_GetBySensorIDs(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+
+	t.Run("should return sensor by multiple ids", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetBySensorIDs(context.Background(), "sensor-1", "sensor-2")
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 2)
+	})
+
+	t.Run("should return empty list when sensors is not found", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetBySensorIDs(context.Background(), "sensor-notFound", "sensor-notExists")
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 0)
+	})
+
+	t.Run("should return found sensors one min one id exists", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetBySensorIDs(context.Background(), "sensor-1", "sensor-notExists")
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 1)
+		assert.Equal(t, "sensor-1", got[0].Sensor.ID)
+	})
+}
+
 func TestTreeRepository_GetTreesByIDs(t *testing.T) {
 	t.Run("should return trees successfully by IDs", func(t *testing.T) {
 		// given

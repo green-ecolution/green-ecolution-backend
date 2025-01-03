@@ -8,7 +8,7 @@ SELECT * FROM trees WHERE id = $1;
 SELECT * FROM trees WHERE sensor_id = $1;
 
 -- name: GetTreesBySensorIDs :many
-SELECT * FROM trees WHERE sensor_id = ANY($1::string[]);
+SELECT * FROM trees WHERE sensor_id = ANY($1::text[]);
 
 -- name: GetTreesByIDs :many
 SELECT * FROM trees WHERE id = ANY($1::int[]);
