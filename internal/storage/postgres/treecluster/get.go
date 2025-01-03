@@ -75,7 +75,7 @@ func (r *TreeClusterRepository) GetCenterPoint(ctx context.Context, tcID int32) 
 }
 
 func (r *TreeClusterRepository) GetAllLatestSensorDataByClusterID(ctx context.Context, tcID int32) ([]*entities.SensorData, error) {
-	rows, err := r.store.GetAllLastSensorDataByTreeClusterID(ctx, tcID)
+	rows, err := r.store.GetAllLatestSensorDataByTreeClusterID(ctx, tcID)
 	if err != nil {
 		return nil, r.store.HandleError(err)
 	}
