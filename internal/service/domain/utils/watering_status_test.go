@@ -159,7 +159,7 @@ func Test_CalculateWateringStatus(t *testing.T) {
 			}{
 				plantingYear: int32(time.Now().Year() - 3),
 				watermarks: []entities.Watermark{
-					{Depth: 30, Centibar: 1585},
+					{Depth: 30, Centibar: 1584},
 					{Depth: 60, Centibar: 9},
 					{Depth: 90, Centibar: 24},
 				},
@@ -174,7 +174,7 @@ func Test_CalculateWateringStatus(t *testing.T) {
 			}{
 				plantingYear: int32(time.Now().Year() - 3),
 				watermarks: []entities.Watermark{
-					{Depth: 30, Centibar: 1586},
+					{Depth: 30, Centibar: 1585},
 					{Depth: 60, Centibar: 31},
 					{Depth: 90, Centibar: 31},
 				},

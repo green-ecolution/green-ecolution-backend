@@ -104,21 +104,32 @@ func CalculateWateringStatus(plantingYear int32, watermarks []entities.Watermark
 	}
 
 	statusList := make([]int, 3)
+	const (
+		lowerCentibarDefault  = 25
+		higherCentibarDefault = 33
+
+		lowerCentibarYear2Depth30  = 62
+		higherCentibarYear2Depth30 = 81
+
+		lowerCentibarYear3Depth30 = 1585
+		lowerCentibarYear3Depth60 = 80
+		lowerCentibarYear3Depth90 = 80
+		noModerate                = -1
+	)
+
 	switch treeLifetime {
-	case 0:
-		fallthrough
-	case 1:
-		statusList[0] = mapKpaRange(w30.Centibar, 25, 33)
-		statusList[1] = mapKpaRange(w60.Centibar, 25, 33)
-		statusList[2] = mapKpaRange(w90.Centibar, 25, 33)
+	case 0, 1:
+		statusList[0] = mapKpaRange(w30.Centibar, lowerCentibarDefault, higherCentibarDefault)
+		statusList[1] = mapKpaRange(w60.Centibar, lowerCentibarDefault, higherCentibarDefault)
+		statusList[2] = mapKpaRange(w90.Centibar, lowerCentibarDefault, higherCentibarDefault)
 	case 2:
-		statusList[0] = mapKpaRange(w30.Centibar, 62, 81)
-		statusList[1] = mapKpaRange(w60.Centibar, 25, 33)
-		statusList[2] = mapKpaRange(w90.Centibar, 25, 33)
+		statusList[0] = mapKpaRange(w30.Centibar, lowerCentibarYear2Depth30, higherCentibarYear2Depth30)
+		statusList[1] = mapKpaRange(w60.Centibar, lowerCentibarDefault, higherCentibarDefault)
+		statusList[2] = mapKpaRange(w90.Centibar, lowerCentibarDefault, higherCentibarDefault)
 	case 3:
-		statusList[0] = mapKpaRange(w30.Centibar, 1586, -1) // -1 means no orange
-		statusList[1] = mapKpaRange(w60.Centibar, 80, -1)
-		statusList[2] = mapKpaRange(w90.Centibar, 80, -1)
+		statusList[0] = mapKpaRange(w30.Centibar, lowerCentibarYear3Depth30, noModerate)
+		statusList[1] = mapKpaRange(w60.Centibar, lowerCentibarYear3Depth60, noModerate)
+		statusList[2] = mapKpaRange(w90.Centibar, lowerCentibarYear3Depth90, noModerate)
 	default:
 		return entities.WateringStatusUnknown
 	}
