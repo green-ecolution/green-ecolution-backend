@@ -124,7 +124,7 @@ func TestTreeClusterService_HandleNewSensorData(t *testing.T) {
 			assert.True(t, ok)
 			assert.Equal(t, e.Prev, tc)
 			assert.Equal(t, e.New, tcNew)
-		case <-time.After(1 * time.Second):
+		case <-time.After(100 * time.Millisecond):
 			t.Fatal("event was not received")
 		}
 	})
@@ -192,7 +192,7 @@ func TestTreeClusterService_HandleNewSensorData(t *testing.T) {
 			assert.True(t, ok)
 			assert.Equal(t, e.Prev, tc)
 			assert.Equal(t, e.New, tcNew)
-		case <-time.After(1 * time.Second):
+		case <-time.After(100 * time.Millisecond):
 			t.Fatal("event was not received")
 		}
 	})
