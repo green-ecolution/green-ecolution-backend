@@ -15,7 +15,7 @@ func TestKeyCloakRepo_RetrospectToken(t *testing.T) {
 		cfg := suite.IdentityConfig(t, ctx)
 		k := NewKeycloakRepository(cfg)
 
-		validToken, err := loginRestAPIClient(ctx, cfg.OidcProvider.BaseURL, cfg.OidcProvider.Backend.ClientID, cfg.OidcProvider.Backend.ClientSecret, cfg.OidcProvider.DomainName)
+		_, validToken, err := loginRestAPIClient(ctx, cfg.OidcProvider.BaseURL, cfg.OidcProvider.Backend.ClientID, cfg.OidcProvider.Backend.ClientSecret, cfg.OidcProvider.DomainName)
 		assert.NoError(t, err)
 
 		// when
