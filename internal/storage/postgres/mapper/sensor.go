@@ -17,8 +17,9 @@ type InternalSensorRepoMapper interface {
 	// goverter:ignore LatestData
 	FromSql(src *sqlc.Sensor) *entities.Sensor
 	FromSqlList(src []*sqlc.Sensor) []*entities.Sensor
-	// goverter:ignore Data
-	FromSqlSensorData(src *sqlc.SensorDatum) *entities.SensorData
+	// goverter:map Data | MapSensorData
+	FromSqlSensorData(src *sqlc.SensorDatum) (*entities.SensorData, error)
+	FromSqlSensorDataList(src []*sqlc.SensorDatum) ([]*entities.SensorData, error)
 	FromDomainSensorData(src *entities.MqttPayload) *mqtt.MqttPayload
 }
 

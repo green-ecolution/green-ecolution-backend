@@ -235,6 +235,41 @@ func TestTreeClusterRepository_GetByIDs(t *testing.T) {
 	})
 }
 
+func TestTreeClusterRepository_GetAllLatestSensorDataByClusterID(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+
+	t.Run("shold return all latest sensor data by cluster id", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		tcID := int32(50)
+
+		// when
+		got, err := r.GetAllLatestSensorDataByClusterID(context.Background(), tcID)
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 2)
+		assert.NotEqual(t, 34.0, got[0].Data.Battery) // based on seed
+		assert.Equal(t, 99.0, got[0].Data.Battery)
+		assert.NotEqual(t, 34.0, got[1].Data.Battery) // based on seed
+		assert.Equal(t, 99.0, got[1].Data.Battery)
+	})
+
+	t.Run("shold return empty array when tree cluster not exists", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		tcID := int32(99)
+
+		// when
+		got, err := r.GetAllLatestSensorDataByClusterID(context.Background(), tcID)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+}
+
 type testTreeCluster struct {
 	ID       int32
 	Name     string
@@ -288,5 +323,11 @@ var allTestCluster = []*testTreeCluster{
 		ID:       8,
 		Name:     "Gewerbegebiet Süd",
 		RegionID: -1, // no region
+	},
+	{
+		ID:       50,
+		Name:     "Gewerbegebiet Süd",
+		RegionID: -1, // no region
+		TreeIDs:  []int32{25, 26, 27, 28},
 	},
 }

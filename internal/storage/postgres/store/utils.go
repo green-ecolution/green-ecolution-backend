@@ -7,7 +7,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/jackc/pgx/v5"
 )
@@ -52,12 +51,10 @@ func (s *Store) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*
 		return nil, s.HandleError(err)
 	}
 
-	domainData := sensorMapper.FromSqlSensorData(row)
-	data, err := mapper.MapSensorData(row.Data)
+	domainData, err := sensorMapper.FromSqlSensorData(row)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to map sensor data")
 	}
-	domainData.Data = data
 
 	return domainData, nil
 }

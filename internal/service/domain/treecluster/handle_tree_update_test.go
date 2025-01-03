@@ -73,7 +73,8 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		select {
-		case recievedEvent := <-ch:
+		case recievedEvent, ok := <-ch:
+			assert.True(t, ok)
 			e := recievedEvent.(entities.EventUpdateTreeCluster)
 			assert.Equal(t, e.Prev, &prevTc)
 			assert.Equal(t, e.New, &updatedTc)
@@ -125,8 +126,8 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		select {
 		case <-ch:
 			t.Fatalf("event was triggered but shouldn't have been")
-		case <-time.After(1 * time.Second):
-			// success
+		case <-time.After(100 * time.Millisecond):
+			assert.True(t, true)
 		}
 	})
 
@@ -182,8 +183,8 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		select {
 		case <-ch:
 			t.Fatalf("event was triggered but shouldn't have been")
-		case <-time.After(1 * time.Second):
-			// success
+		case <-time.After(100 * time.Millisecond):
+			assert.True(t, true)
 		}
 	})
 
@@ -251,9 +252,9 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		regionRepo.AssertNotCalled(t, "GetByPoint")
 
 		select {
-		case <-ch:
-			// success
-		case <-time.After(1 * time.Second):
+		case _, ok := <-ch:
+			assert.True(t, ok)
+		case <-time.After(100 * time.Millisecond):
 			t.Fatal("event was not received")
 		}
 	})

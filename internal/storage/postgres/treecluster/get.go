@@ -3,6 +3,7 @@ package treecluster
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/twpayne/go-geos"
@@ -71,4 +72,17 @@ func (r *TreeClusterRepository) GetCenterPoint(ctx context.Context, tcID int32) 
 	}
 
 	return g.X(), g.Y(), nil
+}
+
+func (r *TreeClusterRepository) GetAllLatestSensorDataByClusterID(ctx context.Context, tcID int32) ([]*entities.SensorData, error) {
+	rows, err := r.store.GetAllLatestSensorDataByTreeClusterID(ctx, tcID)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	domainData, err := r.sensorMapper.FromSqlSensorDataList(rows)
+	if err != nil {
+		return nil, errors.Join(err, fmt.Errorf("failed to map sensor data"))
+	}
+
+	return domainData, nil
 }

@@ -2,6 +2,7 @@ package sensor
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/pkg/errors"
@@ -12,6 +13,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
 type SensorService struct {
@@ -20,12 +22,14 @@ type SensorService struct {
 	flowerbedRepo storage.FlowerbedRepository
 	validator     *validator.Validate
 	StatusUpdater *StatusUpdater
+	eventManager  *worker.EventManager
 }
 
 func NewSensorService(
 	sensorRepo storage.SensorRepository,
 	treeRepo storage.TreeRepository,
 	flowerbedRepo storage.FlowerbedRepository,
+	eventManager *worker.EventManager,
 ) service.SensorService {
 	return &SensorService{
 		sensorRepo:    sensorRepo,
@@ -33,6 +37,15 @@ func NewSensorService(
 		flowerbedRepo: flowerbedRepo,
 		validator:     validator.New(),
 		StatusUpdater: &StatusUpdater{sensorRepo: sensorRepo},
+		eventManager:  eventManager,
+	}
+}
+
+func (s *SensorService) publishNewSensorDataEvent(data *entities.SensorData) {
+	slog.Debug("publish new event", "event", entities.EventTypeNewSensorData, "service", "SensorService")
+	event := entities.NewEventSensorData(data)
+	if err := s.eventManager.Publish(event); err != nil {
+		slog.Error("error while sending event after new sensor data received", "err", err)
 	}
 }
 

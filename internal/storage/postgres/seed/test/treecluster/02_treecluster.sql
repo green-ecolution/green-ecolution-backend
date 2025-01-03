@@ -9,8 +9,10 @@ VALUES
   (5, 'Mathildenstraße', 'moderate', 0.4, 10, 'Mathildenstraße', 'Sehr enge Straße und dadurch schlecht zu bewässern.', 'schluffig', 54.782402, 9.424270, ST_SetSRID(ST_MakePoint(54.782402, 9.424270), 4326)),
   (6, 'Nordstadt', 'good', 0.6, 13, 'Apenrader Straße', 'Guter Baumbestand mit großen Kronen.', 'sandig', 54.807162, 9.423138, ST_SetSRID(ST_MakePoint(54.807162, 9.423138), 4326)),
   (7, 'TSB Neustadt', 'good', 0.75, 13, 'Ecknerstraße', 'Kleiner Baumbestand.', 'sandig', 54.797162, 9.419620, ST_SetSRID(ST_MakePoint(54.797162, 9.419620), 4326)),
-  (8, 'Gewerbegebiet Süd', 'bad', 0.1, NULL, 'Schleswiger Straße', 'Sehr viel versiegelter Boden.', 'sandig', 54.768115, 9.435285, ST_SetSRID(ST_MakePoint(54.768115, 9.435285), 4326));   
+  (8, 'Gewerbegebiet Süd', 'bad', 0.1, NULL, 'Schleswiger Straße', 'Sehr viel versiegelter Boden.', 'sandig', 54.768115, 9.435285, ST_SetSRID(ST_MakePoint(54.768115, 9.435285), 4326)),
+  (50, 'Gewerbegebiet Süd', 'bad', 0.1, NULL, 'Schleswiger Straße', 'Sehr viel versiegelter Boden.', 'sandig', 54.768115, 9.435285, ST_SetSRID(ST_MakePoint(54.768115, 9.435285), 4326));   
 ALTER SEQUENCE tree_clusters_id_seq RESTART WITH 9;
+-- +goose StatementEnd
 
 INSERT INTO sensors (id, status, latitude, longitude, geometry)
 VALUES
@@ -27,6 +29,30 @@ VALUES
 INSERT INTO sensors (id, status, latitude, longitude, geometry)
 VALUES
     ('sensor-4', 'online', 54.82078826498143, 9.489684366114483, ST_SetSRID(ST_MakePoint(54.82078826498143, 9.489684366114483), 4326));
+
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('sensor-11', 'online', 54.82078826498143, 9.489684366114483, ST_SetSRID(ST_MakePoint(54.82078826498143, 9.489684366114483), 4326));
+INSERT INTO sensors (id, status, latitude, longitude, geometry)
+VALUES
+    ('sensor-12', 'online', 54.82078826498143, 9.489684366114483, ST_SetSRID(ST_MakePoint(54.82078826498143, 9.489684366114483), 4326));
+
+
+INSERT INTO sensor_data (sensor_id, created_at, data)
+VALUES 
+   ('sensor-11', '2025-01-03 00:41:07.076949', '{"device": "sensor-123", "battery": 34.0, "humidity": 50.0, "temperature": 20.0, "watermarks":[{"centibar": 38, "resistance": 23, "depth": 30}, {"centibar": 38, "resistance": 23, "depth": 60}, {"centibar": 38, "resistance": 23, "depth": 90}]}');
+
+INSERT INTO sensor_data (sensor_id, created_at, data)
+VALUES 
+   ('sensor-11', '2025-01-03 00:41:08.076949', '{"device": "sensor-123", "battery": 99.0, "humidity": 50.0, "temperature": 20.0, "watermarks":[{"centibar": 38, "resistance": 23, "depth": 30}, {"centibar": 38, "resistance": 23, "depth": 60}, {"centibar": 38, "resistance": 99, "depth": 90}]}');
+
+INSERT INTO sensor_data (sensor_id, created_at, data)
+VALUES 
+   ('sensor-12', '2025-01-03 00:41:09.076949', '{"device": "sensor-123", "battery": 34.0, "humidity": 50.0, "temperature": 20.0, "watermarks":[{"centibar": 38, "resistance": 23, "depth": 30}, {"centibar": 38, "resistance": 23, "depth": 60}, {"centibar": 38, "resistance": 23, "depth": 90}]}');
+
+INSERT INTO sensor_data (sensor_id, created_at, data)
+VALUES 
+   ('sensor-12', '2025-01-03 00:41:10.076949', '{"device": "sensor-123", "battery": 99.0, "humidity": 50.0, "temperature": 20.0, "watermarks":[{"centibar": 38, "resistance": 23, "depth": 30}, {"centibar": 38, "resistance": 23, "depth": 60}, {"centibar": 38, "resistance": 99, "depth": 90}]}');
 
 INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, readonly, watering_status, description)
 VALUES 
@@ -53,12 +79,14 @@ VALUES
   (21, 6, NULL, 2023, 'Acer platanoides Schwedleri', 1039, 54.806287, 9.423469, ST_SetSRID(ST_MakePoint(54.806287, 9.423469), 4326), true, 'unknown', ''),
   (22, 6, NULL, 2023, 'Acer platanoides Schwedleri', 1040, 54.807212, 9.422752, ST_SetSRID(ST_MakePoint(54.807212, 9.422752), 4326), true, 'unknown', ''),
   (23, 6, NULL, 2023, 'Acer platanoides Schwedleri', 1041, 54.806606, 9.422773, ST_SetSRID(ST_MakePoint(54.806606, 9.422773), 4326), true, 'good', 'Dieser Baum wurde im August das lezte mal gestuzt'),
-  (24, 6, NULL, 2023, 'Acer platanoides Schwedleri', 1042, 54.807787, 9.422354, ST_SetSRID(ST_MakePoint(54.807787, 9.422354), 4326), true, 'good', 'Dieser Baum wurde im August das lezte mal gestuzt');
--- +goose StatementEnd
+  (24, 6, NULL, 2023, 'Acer platanoides Schwedleri', 1042, 54.807787, 9.422354, ST_SetSRID(ST_MakePoint(54.807787, 9.422354), 4326), true, 'good', 'Dieser Baum wurde im August das lezte mal gestuzt'),
+
+  (25, 50, NULL, 2023, 'Acer platanoides Schwedleri', 1039, 54.806287, 9.423469, ST_SetSRID(ST_MakePoint(54.806287, 9.423469), 4326), true, 'unknown', ''),
+  (26, 50, 'sensor-11', 2023, 'Acer platanoides Schwedleri', 1040, 54.807212, 9.422752, ST_SetSRID(ST_MakePoint(54.807212, 9.422752), 4326), true, 'unknown', ''),
+  (27, 50, NULL, 2023, 'Acer platanoides Schwedleri', 1041, 54.806606, 9.422773, ST_SetSRID(ST_MakePoint(54.806606, 9.422773), 4326), true, 'good', 'Dieser Baum wurde im August das lezte mal gestuzt'),
+  (28, 50, 'sensor-12', 2023, 'Acer platanoides Schwedleri', 1042, 54.807787, 9.422354, ST_SetSRID(ST_MakePoint(54.807787, 9.422354), 4326), true, 'good', 'Dieser Baum wurde im August das lezte mal gestuzt');
 
 -- +goose Down
--- +goose StatementBegin
 DELETE FROM trees;
 DELETE FROM tree_clusters;
 DELETE FROM sensor_data;
--- +goose StatementEnd

@@ -60,6 +60,7 @@ type TreeService interface {
 	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
 	GetBySensorID(ctx context.Context, id string) (*domain.Tree, error)
+	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 }
 
 type AuthService interface {
@@ -84,6 +85,7 @@ type TreeClusterService interface {
 	Service
 	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
 	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
+	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 }
 
 type SensorService interface {
