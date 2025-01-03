@@ -96,7 +96,7 @@ func CalculateWateringStatus(plantingYear int32, watermarks []entities.Watermark
 		90cm: <80kPA: green; >80kPA red
 	*/
 	currentYear := int32(time.Now().Year())
-	treeLifetime := plantingYear - currentYear
+	treeLifetime := currentYear - plantingYear
 	w30, w60, w90, err := CheckAndSortWatermarks(watermarks)
 	if err != nil {
 		slog.Error("sensor data watermarks are malformed", "watermarks", watermarks)
@@ -105,6 +105,8 @@ func CalculateWateringStatus(plantingYear int32, watermarks []entities.Watermark
 
 	statusList := make([]int, 3)
 	switch treeLifetime {
+	case 0:
+		fallthrough
 	case 1:
 		statusList[0] = mapKpaRange(w30.Centibar, 25, 33)
 		statusList[1] = mapKpaRange(w60.Centibar, 25, 33)
@@ -114,7 +116,7 @@ func CalculateWateringStatus(plantingYear int32, watermarks []entities.Watermark
 		statusList[1] = mapKpaRange(w60.Centibar, 25, 33)
 		statusList[2] = mapKpaRange(w90.Centibar, 25, 33)
 	case 3:
-		statusList[0] = mapKpaRange(w30.Centibar, 1585, -1) // -1 means no orange
+		statusList[0] = mapKpaRange(w30.Centibar, 1586, -1) // -1 means no orange
 		statusList[1] = mapKpaRange(w60.Centibar, 80, -1)
 		statusList[2] = mapKpaRange(w90.Centibar, 80, -1)
 	default:
