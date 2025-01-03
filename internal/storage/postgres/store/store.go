@@ -84,7 +84,7 @@ func (s *Store) HandleError(err error, contextMs ...string) error {
 		file = "unknown"
 		line = 0
 	} else {
-		baseMarker := "internal/"
+		baseMarker := "green-ecolution-management/"
 		if idx := strings.Index(file, baseMarker); idx != -1 {
 			file = file[idx:]
 		}
