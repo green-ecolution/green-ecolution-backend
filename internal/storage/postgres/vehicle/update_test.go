@@ -111,7 +111,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "water capacity is required and can not be 0")
+		assert.EqualError(t, err, "transaction failed: water capacity is required and can not be 0")
 	})
 
 	t.Run("should return error when update vehicle with no number plate", func(t *testing.T) {
@@ -132,7 +132,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "number plate is required")
+		assert.EqualError(t, err, "transaction failed: number plate is required")
 	})
 
 	t.Run("should return error when update vehicle with zero size measurement", func(t *testing.T) {
@@ -153,7 +153,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "size measurements are required and can not be 0")
+		assert.EqualError(t, err, "transaction failed: size measurements are required and can not be 0")
 	})
 
 	t.Run("should return error when update vehicle with wrong driving license", func(t *testing.T) {
@@ -175,7 +175,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "driving license is required and should be either B, BE or C")
+		assert.EqualError(t, err, "transaction failed: driving license is required and should be either B, BE or C")
 	})
 
 	t.Run("should return error when update vehicle with negative id", func(t *testing.T) {

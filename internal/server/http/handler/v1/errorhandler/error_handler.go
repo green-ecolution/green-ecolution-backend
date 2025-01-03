@@ -38,7 +38,7 @@ func HandleError(err error, contexts ...string) *fiber.Error {
 		line = 0
 	} else {
 		// Trim the path to start from green-ecolution-
-		baseMarker := "green-ecolution-"
+		baseMarker := "internal/"
 		if idx := strings.Index(file, baseMarker); idx != -1 {
 			file = file[idx:]
 		}
