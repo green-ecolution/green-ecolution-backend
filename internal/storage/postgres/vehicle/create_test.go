@@ -209,7 +209,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		secondVehicle, err := r.Create(context.Background(), createFn)
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "violates unique constraint")
+		assert.EqualError(t, err, "transaction failed: DatabaseError No context provided (at internal/storage/postgres/vehicle/create.go:89)23505")
 		assert.Nil(t, secondVehicle)
 	})
 

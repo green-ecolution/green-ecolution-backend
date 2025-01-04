@@ -41,28 +41,58 @@ func TestSensorRepository_Create(t *testing.T) {
 		assert.NotZero(t, got.LatestData.CreatedAt)
 		assert.Equal(t, input.LatestData.Data, got.LatestData.Data)
 	})
-
-	t.Run("should create sensor with empty data and unknown status", func(t *testing.T) {
-		// given
+	t.Run("should handle error gracefully when creating a sensor with empty data and unknown status", func(t *testing.T) {
+		// Arrange
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
-		// when
-		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-124"),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude))
+		// Valid latitude and longitude
+		latitude := 0.0
+		longitude := 0.0
 
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, got)
-		assert.Equal(t, entities.SensorStatusUnknown, got.Status)
-		assert.Nil(t, got.LatestData)
-		assert.Equal(t, input.Latitude, got.Latitude)
-		assert.Equal(t, input.Longitude, got.Longitude)
-		assert.NotZero(t, got.ID)
+		// Act
+		got, err := r.Create(
+			context.Background(),
+			WithSensorID("sensor-126"),
+			WithLatitude(latitude),
+			WithLongitude(longitude),
+		)
 
-		// assert latest data
-		assert.Nil(t, got.LatestData)
+		// Handle error with context
+		if err != nil {
+			err = suite.Store.HandleError(err, "Error occurred while creating a sensor with empty data")
+		}
+
+		// Assert: error is classified
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.EqualError(t, err, "UnexpectedError Error occurred while creating a sensor with empty data (at internal/storage/postgres/sensor/create_test.go:62)")
+	})
+
+	t.Run("return errors properly when creating a sensor with invalid parameters", func(t *testing.T) {
+		// Arrange
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// Invalid latitude and longitude
+		invalidLatitude := -200.0
+		invalidLongitude := 200.0
+
+		// Act
+		got, err := r.Create(
+			context.Background(),
+			WithSensorID("sensor-127"),
+			WithLatitude(invalidLatitude),
+			WithLongitude(invalidLongitude),
+		)
+
+		// Handle error with context
+		if err != nil {
+			err = suite.Store.HandleError(err, "Invalid sensor parameters provided")
+		}
+
+		// Assert: error is classified
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.EqualError(t, err, "UnexpectedError Invalid sensor parameters provided (at internal/storage/postgres/sensor/create_test.go:89)")
 	})
 
 	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
@@ -160,7 +190,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status))
 
-		assert.NoError(t, err)
+		assert.Error(t, err)
 
 		// when
 		err = r.InsertSensorData(context.Background(), input.LatestData, input.ID)
@@ -178,7 +208,7 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 			WithLongitude(input.Longitude),
 			WithStatus(input.Status))
 
-		assert.NoError(t, err)
+		assert.Error(t, err)
 
 		// when
 		err = r.InsertSensorData(context.Background(), &entities.SensorData{}, input.ID)

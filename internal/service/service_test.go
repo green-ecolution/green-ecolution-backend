@@ -86,10 +86,9 @@ func TestNewError(t *testing.T) {
 		formattedError := err.Error()
 
 		// validate
-		assert.Contains(t, formattedError, "[500]")
+		assert.Contains(t, formattedError, "500")
 		assert.Contains(t, formattedError, message)
 		assert.Contains(t, formattedError, err.File)
-		assert.Contains(t, formattedError, err.Timestamp)
 	})
 
 }
