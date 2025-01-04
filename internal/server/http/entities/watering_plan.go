@@ -48,7 +48,7 @@ type WateringPlanInListResponse struct {
 	Transporter        *VehicleResponse             `json:"transporter"`
 	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
 	CancellationNote   string                       `json:"cancellation_note"`
-} // @Name WateringPlanInListResponse
+} // @Name WateringPlanInList
 
 type WateringPlanListResponse struct {
 	Data       []*WateringPlanInListResponse `json:"data"`
@@ -61,7 +61,7 @@ type WateringPlanCreateRequest struct {
 	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
 	TransporterID  *int32    `json:"transporter_id"`
 	TrailerID      *int32    `json:"trailer_id" validate:"optional"`
-	UserIDs        []string  `json:"users_ids"`
+	UserIDs        []string  `json:"user_ids"`
 } // @Name WateringPlanCreate
 
 type WateringPlanUpdateRequest struct {
@@ -70,7 +70,7 @@ type WateringPlanUpdateRequest struct {
 	TreeClusterIDs   []*int32           `json:"tree_cluster_ids"`
 	TransporterID    *int32             `json:"transporter_id"`
 	TrailerID        *int32             `json:"trailer_id" validate:"optional"`
-	UserIDs          []string           `json:"users_ids"`
+	UserIDs          []string           `json:"user_ids"`
 	CancellationNote string             `json:"cancellation_note"`
 	Status           WateringPlanStatus `json:"status"`
 	Evaluation       []*EvaluationValue `json:"evaluation" validate:"optional"`
