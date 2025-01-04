@@ -23,6 +23,7 @@ POSTGRES_PASSWORD ?= postgres
 POSTGRES_DB ?= postgres
 POSTGRES_HOST ?= localhost
 POSTGRES_PORT ?= 5432
+export USER_ID ?= "$(shell id -u):$(shell id -g)"
 
 .PHONY: help
 help:
@@ -201,10 +202,15 @@ run/docker: run/docker/prepare
 .PHONY: infra/up
 infra/up:
 	@echo "Running infra..."
+	mkdir -p .docker/infra/ors/{config,elevation_cache,files,graphs,logs}
+	chown -R $(USER_ID) .docker/infra/ors
+	yq e -i '.services."ors-app".user = env(USER_ID)' .docker/docker-compose.infra.yaml
+	wget https://download.geofabrik.de/europe/germany/schleswig-holstein-latest.osm.pbf -O .docker/infra/ors/files/sh.osm.pbf
+
 	docker compose -f .docker/docker-compose.infra.yaml up -d
 
 .PHONY: infra/stop
-infra/down:
+infra/stop:
 	@echo "Running infra stop..."
 	docker compose -f .docker/docker-compose.infra.yaml stop
 
