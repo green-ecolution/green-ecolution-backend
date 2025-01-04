@@ -58,7 +58,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicles)
-		assert.EqualError(t, err, "500: GetAll failed (at internal/service/domain/vehicle/vehicle.go:149)")
+		assert.EqualError(t, err, "500: GetAll failed (at internal/service/domain/vehicle/vehicle.go:158)")
 	})
 }
 
@@ -107,7 +107,7 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicles)
-		assert.EqualError(t, err, "500: GetAllByType failed")
+		assert.EqualError(t, err, "500: GetAllByType failed (at internal/service/domain/vehicle/vehicle.go:158)")
 	})
 }
 
@@ -144,7 +144,7 @@ func TestVehicleService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicle)
-		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:146)")
+		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:155)")
 	})
 }
 
@@ -181,7 +181,7 @@ func TestVehicleService_GetByPlate(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicle)
-		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:146)")
+		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:155)")
 	})
 }
 
@@ -245,7 +245,7 @@ func TestVehicleService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: Failed to create vehicle (at internal/service/domain/vehicle/vehicle.go:149)")
+		assert.EqualError(t, err, "500: Failed to create vehicle (at internal/service/domain/vehicle/vehicle.go:158)")
 	})
 
 	t.Run("should return an error when creating vehicle fails due to dupliacte number plate", func(t *testing.T) {
@@ -263,7 +263,7 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: Number plate is already taken (at internal/service/domain/vehicle/vehicle.go:61)")
+		assert.EqualError(t, err, "400: Number plate is already taken (at internal/service/domain/vehicle/vehicle.go:70)")
 	})
 
 	t.Run("should return an error when creating vehicle fails due to error in GetByPlate", func(t *testing.T) {
@@ -283,7 +283,7 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to get vehicle (at internal/service/domain/vehicle/vehicle.go:149)")
+		assert.EqualError(t, err, "500: failed to get vehicle (at internal/service/domain/vehicle/vehicle.go:158)")
 	})
 
 	t.Run("should return validation error on empty number plate", func(t *testing.T) {
@@ -299,7 +299,7 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: validation error: Key: 'VehicleCreate.NumberPlate' Error:Field validation for 'NumberPlate' failed on the 'required' tag (at internal/service/domain/vehicle/vehicle.go:55)")
+		assert.EqualError(t, err, "400: validation error: Key: 'VehicleCreate.NumberPlate' Error:Field validation for 'NumberPlate' failed on the 'required' tag (at internal/service/domain/vehicle/vehicle.go:64)")
 	})
 
 	t.Run("should return validation error on zero water capacity", func(t *testing.T) {
@@ -316,7 +316,7 @@ func TestVehicleService_Create(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: validation error: Key: 'VehicleCreate.WaterCapacity' Error:Field validation for 'WaterCapacity' failed on the 'gt' tag (at internal/service/domain/vehicle/vehicle.go:55)")
+		assert.EqualError(t, err, "400: validation error: Key: 'VehicleCreate.WaterCapacity' Error:Field validation for 'WaterCapacity' failed on the 'gt' tag (at internal/service/domain/vehicle/vehicle.go:64)")
 	})
 
 	t.Run("should return validation error on zero size measurements", func(t *testing.T) {
@@ -415,7 +415,7 @@ func TestVehicleService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:146)")
+		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:155)")
 	})
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
@@ -441,7 +441,7 @@ func TestVehicleService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to update vehicle (at internal/service/domain/vehicle/vehicle.go:149)")
+		assert.EqualError(t, err, "500: failed to update vehicle (at internal/service/domain/vehicle/vehicle.go:158)")
 	})
 
 	t.Run("should return an error when updating vehicle fails due to dupliacte number plate", func(t *testing.T) {
@@ -466,7 +466,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: Number plate is already taken (at internal/service/domain/vehicle/vehicle.go:100)")
+		assert.EqualError(t, err, "400: Number plate is already taken (at internal/service/domain/vehicle/vehicle.go:109)")
 	})
 
 	t.Run("should return an error when updating vehicle fails due to error in GetByPlate", func(t *testing.T) {
@@ -507,7 +507,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.NumberPlate' Error:Field validation for 'NumberPlate' failed on the 'required' tag (at internal/service/domain/vehicle/vehicle.go:88)")
+		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.NumberPlate' Error:Field validation for 'NumberPlate' failed on the 'required' tag (at internal/service/domain/vehicle/vehicle.go:97)")
 	})
 
 	t.Run("should return validation error on zero water capacity", func(t *testing.T) {
@@ -524,7 +524,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.WaterCapacity' Error:Field validation for 'WaterCapacity' failed on the 'gt' tag (at internal/service/domain/vehicle/vehicle.go:88)")
+		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.WaterCapacity' Error:Field validation for 'WaterCapacity' failed on the 'gt' tag (at internal/service/domain/vehicle/vehicle.go:97)")
 	})
 
 	t.Run("should return validation error on zero size measurements", func(t *testing.T) {
@@ -542,7 +542,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.Height' Error:Field validation for 'Height' failed on the 'gt' tag (at internal/service/domain/vehicle/vehicle.go:88)")
+		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.Height' Error:Field validation for 'Height' failed on the 'gt' tag (at internal/service/domain/vehicle/vehicle.go:97)")
 	})
 
 	t.Run("should return validation error on wrong driving license format", func(t *testing.T) {
@@ -561,7 +561,7 @@ func TestVehicleService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.DrivingLicense' Error:Field validation for 'DrivingLicense' failed on the 'oneof' tag (at internal/service/domain/vehicle/vehicle.go:88)")
+		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.DrivingLicense' Error:Field validation for 'DrivingLicense' failed on the 'oneof' tag (at internal/service/domain/vehicle/vehicle.go:97)")
 	})
 }
 
@@ -597,7 +597,7 @@ func TestVehicleService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:146)")
+		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/vehicle/vehicle.go:155)")
 	})
 
 	t.Run("should return error if deleting vehicle fails", func(t *testing.T) {
@@ -615,7 +615,7 @@ func TestVehicleService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to delete (at internal/service/domain/vehicle/vehicle.go:149)")
+		assert.EqualError(t, err, "500: failed to delete (at internal/service/domain/vehicle/vehicle.go:158)")
 	})
 }
 

@@ -68,7 +68,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, wateringPlans)
-		assert.Equal(t, "500: GetAll failed (at internal/service/domain/watering_plan/watering_plan.go:192)", err.Error())
+		assert.Equal(t, "500: GetAll failed (at internal/service/domain/watering_plan/watering_plan.go:210)", err.Error())
 	})
 }
 
@@ -111,7 +111,7 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, wateringPlan)
-		assert.Equal(t, "404: watering plan not found (at internal/service/domain/watering_plan/watering_plan.go:189)", err.Error())
+		assert.Equal(t, "404: watering plan not found (at internal/service/domain/watering_plan/watering_plan.go:207)", err.Error())
 	})
 }
 
@@ -267,7 +267,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: connection is closed (at internal/service/domain/watering_plan/watering_plan.go:192)")
+		assert.EqualError(t, err, "500: connection is closed (at internal/service/domain/watering_plan/watering_plan.go:210)")
 	})
 
 	t.Run("should return an error when users are empty", func(t *testing.T) {
@@ -315,7 +315,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: treecluster not found (at internal/service/domain/watering_plan/watering_plan.go:172)")
+		assert.EqualError(t, err, "404: treecluster not found (at internal/service/domain/watering_plan/watering_plan.go:177)")
 	})
 
 	t.Run("should return an error when transporter is not found", func(t *testing.T) {
@@ -348,7 +348,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/watering_plan/watering_plan.go:160)")
+		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/watering_plan/watering_plan.go:165)")
 	})
 
 	t.Run("should return an error when creating watering plan fails", func(t *testing.T) {
@@ -394,7 +394,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: Failed to create watering plan (at internal/service/domain/watering_plan/watering_plan.go:192)")
+		assert.EqualError(t, err, "500: Failed to create watering plan (at internal/service/domain/watering_plan/watering_plan.go:210)")
 	})
 
 	t.Run("should return validation error when TreeClusterIDs contains nil pointers", func(t *testing.T) {
@@ -745,7 +745,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/watering_plan/watering_plan.go:160)")
+		assert.EqualError(t, err, "404: vehicle not found (at internal/service/domain/watering_plan/watering_plan.go:165)")
 	})
 
 	t.Run("should return an error when finding treeclusters fails", func(t *testing.T) {
@@ -772,7 +772,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: connection is closed (at internal/service/domain/watering_plan/watering_plan.go:192)")
+		assert.EqualError(t, err, "500: connection is closed (at internal/service/domain/watering_plan/watering_plan.go:210)")
 	})
 
 	t.Run("should return an error when treecluster are empty", func(t *testing.T) {
@@ -799,7 +799,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: treecluster not found (at internal/service/domain/watering_plan/watering_plan.go:172)")
+		assert.EqualError(t, err, "404: treecluster not found (at internal/service/domain/watering_plan/watering_plan.go:177)")
 	})
 
 	t.Run("should return an error when users are empty", func(t *testing.T) {
@@ -865,7 +865,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "404: watering plan not found (at internal/service/domain/watering_plan/watering_plan.go:189)")
+		assert.EqualError(t, err, "404: watering plan not found (at internal/service/domain/watering_plan/watering_plan.go:207)")
 	})
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
@@ -912,7 +912,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to update watering plan (at internal/service/domain/watering_plan/watering_plan.go:192)")
+		assert.EqualError(t, err, "500: failed to update watering plan (at internal/service/domain/watering_plan/watering_plan.go:210)")
 	})
 
 	t.Run("should return error if cancellation note is not empty but the status is not »canceled«", func(t *testing.T) {
@@ -932,7 +932,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: Cancellation note can only be set if watering plan is canceled")
+		assert.EqualError(t, err, "400: Cancellation note can only be set if watering plan is canceled (at internal/service/domain/watering_plan/watering_plan.go:195)")
 	})
 
 	t.Run("should return error if the evaluation is not empty but the status is not »finished«", func(t *testing.T) {
@@ -959,7 +959,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "400: Evaluation values can only be set if the watering plan has been finished")
+		assert.EqualError(t, err, "400: Evaluation values can only be set if the watering plan has been finished (at internal/service/domain/watering_plan/watering_plan.go:199)")
 	})
 
 	t.Run("should return validation error when TreeClusterIDs contains nil pointers", func(t *testing.T) {
@@ -1154,7 +1154,7 @@ func TestWateringPlanService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "404: watering plan not found (at internal/service/domain/watering_plan/watering_plan.go:189)")
+		assert.EqualError(t, err, "404: watering plan not found (at internal/service/domain/watering_plan/watering_plan.go:207)")
 	})
 
 	t.Run("should return error if deleting watering plan fails", func(t *testing.T) {
@@ -1169,7 +1169,7 @@ func TestWateringPlanService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to delete (at internal/service/domain/watering_plan/watering_plan.go:192)")
+		assert.EqualError(t, err, "500: failed to delete (at internal/service/domain/watering_plan/watering_plan.go:210)")
 	})
 }
 
