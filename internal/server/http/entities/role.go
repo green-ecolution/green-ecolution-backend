@@ -3,19 +3,15 @@ package entities
 type UserRole string // @Name UserRole
 
 const (
-	UserRoleAdmin      UserRole = "Admin"
-	UserRoleDriver     UserRole = "Driver"
-	UserRoleEngineer   UserRole = "Engineer"
-	UserRoleHelper     UserRole = "Helper"
-	UserRoleManagement UserRole = "Management"
-	UserRoleStudent    UserRole = "Student"
-	UserRoleUnknown    UserRole = "unknown"
+	UserRoleTbz               UserRole = "tbz"
+	UserRoleGreenEcolution    UserRole = "green-ecolution"
+	UserRoleSmarteGrenzregion UserRole = "smarte-grenzregion"
+	UserRoleUnknown           UserRole = "unknown"
 )
 
 type RoleResponse struct {
-	ID          int32  `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
 } // @Name Role
 
 type RoleListResponse struct {

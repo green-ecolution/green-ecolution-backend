@@ -704,7 +704,7 @@ func TestGetUsersByRole(t *testing.T) {
 				EmployeeID:  "1234",
 				PhoneNumber: "+123456789",
 				Roles: []domain.Role{
-					{Name: domain.UserRoleAdmin},
+					{Name: domain.UserRoleTbz},
 				},
 			},
 			{
@@ -717,15 +717,15 @@ func TestGetUsersByRole(t *testing.T) {
 				EmployeeID:  "5678",
 				PhoneNumber: "+987654321",
 				Roles: []domain.Role{
-					{Name: domain.UserRoleEngineer},
+					{Name: domain.UserRoleGreenEcolution},
 				},
 			},
 		}
 		expectedUsers := []*domain.User{users[1]}
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleEngineer}).Return(expectedUsers, nil)
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleGreenEcolution}).Return(expectedUsers, nil)
 
 		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/Engineer", nil)
+		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleGreenEcolution), nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -770,11 +770,11 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleAdmin}).
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleTbz}).
 			Return(nil, service.NewError(service.InternalError, "service error"))
 
 		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/Admin", nil)
+		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleTbz), nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -792,7 +792,7 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService.EXPECT().GetAll(mock.Anything).Return([]*domain.User{}, nil)
 
 		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user/role/Admin", nil)
+		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleTbz), nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 

@@ -3,35 +3,25 @@ package entities
 type UserRole string
 
 const (
-	UserRoleAdmin      UserRole = "Admin"
-	UserRoleDriver     UserRole = "Driver"
-	UserRoleEngineer   UserRole = "Engineer"
-	UserRoleHelper     UserRole = "Helper"
-	UserRoleManagement UserRole = "Management"
-	UserRoleStudent    UserRole = "Student"
-	UserRoleUnknown    UserRole = "unknown"
+	UserRoleTbz               UserRole = "tbz"
+	UserRoleGreenEcolution    UserRole = "green-ecolution"
+	UserRoleSmarteGrenzregion UserRole = "smarte-grenzregion"
+	UserRoleUnknown           UserRole = "unknown"
 )
 
 type Role struct {
-	ID          int32
-	Name        UserRole
-	Description string
+	ID   int32
+	Name UserRole
 }
 
 func ParseUserRole(role string) UserRole {
 	switch role {
-	case string(UserRoleAdmin):
-		return UserRoleAdmin
-	case string(UserRoleDriver):
-		return UserRoleDriver
-	case string(UserRoleEngineer):
-		return UserRoleEngineer
-	case string(UserRoleHelper):
-		return UserRoleHelper
-	case string(UserRoleManagement):
-		return UserRoleManagement
-	case string(UserRoleStudent):
-		return UserRoleStudent
+	case string(UserRoleTbz):
+		return UserRoleTbz
+	case string(UserRoleGreenEcolution):
+		return UserRoleGreenEcolution
+	case string(UserRoleSmarteGrenzregion):
+		return UserRoleSmarteGrenzregion
 	default:
 		return UserRoleUnknown
 	}
