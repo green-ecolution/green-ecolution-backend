@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -53,6 +54,12 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 				assert.Equal(t, allTestWateringPlans[i].TreeClusters[j].Name, tc.Name)
 			}
 
+			// assert user
+			assert.Len(t, allTestWateringPlans[i].UserIDs, len(wp.UserIDs))
+			for j, userID := range wp.UserIDs {
+				assert.Equal(t, allTestWateringPlans[i].UserIDs[j], userID)
+			}
+
 			// assert evaluation
 			if allTestWateringPlans[i].Evaluation == nil {
 				assert.Len(t, allTestWateringPlans[i].Evaluation, 0)
@@ -67,8 +74,6 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 					assert.Equal(t, *allTestWateringPlans[i].Evaluation[j].ConsumedWater, *value.ConsumedWater)
 				}
 			}
-
-			// TODO: assert user
 		}
 	})
 
@@ -136,10 +141,14 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[0].TreeClusters[i].Name, tc.Name)
 		}
 
+		// assert user
+		assert.Len(t, allTestWateringPlans[0].UserIDs, len(got.UserIDs))
+		for j, userID := range got.UserIDs {
+			assert.Equal(t, allTestWateringPlans[0].UserIDs[j], userID)
+		}
+
 		// assert evaluation
 		assert.Len(t, allTestWateringPlans[0].Evaluation, 0)
-
-		// TODO: assert user
 	})
 
 	t.Run("should return watering plan by id without trailer", func(t *testing.T) {
@@ -174,7 +183,11 @@ func TestWateringPlanRepository_GetByID(t *testing.T) {
 			assert.Equal(t, allTestWateringPlans[1].TreeClusters[i].Name, tc.Name)
 		}
 
-		// TODO: assert user
+		// assert user
+		assert.Len(t, allTestWateringPlans[1].UserIDs, len(got.UserIDs))
+		for j, userID := range got.UserIDs {
+			assert.Equal(t, allTestWateringPlans[1].UserIDs[j], userID)
+		}
 	})
 
 	t.Run("should return watering plan by id with evaluation", func(t *testing.T) {
@@ -442,6 +455,76 @@ func TestWateringPlanRepository_GetLinkedTreeClustersByID(t *testing.T) {
 	})
 }
 
+func TestWateringPlanRepository_GetLinkedUsersByID(t *testing.T) {
+	suite.ResetDB(t)
+	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+
+	t.Run("should return users by watering plan id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedUsersByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 3)
+		for _, userID := range got {
+			assert.NotNil(t, userID)
+		}
+	})
+
+	t.Run("should return empty list when watering plan is not found", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedUsersByID(context.Background(), 99)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return empty list when watering plan with negative id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedUsersByID(context.Background(), -1)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return empty list when watering plan with zero id", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		// when
+		got, err := r.GetLinkedUsersByID(context.Background(), 0)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.GetLinkedUsersByID(ctx, 1)
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+	})
+}
+
 func TestWateringPlanRepository_GetEvaluationValues(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
@@ -527,6 +610,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            allTestVehicles[0],
 		TreeClusters:       allTestClusters[0:2],
 		CancellationNote:   "",
+		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab", "05c028d9-62ef-4dcc-aa79-6b2fe9ce6f42", "e5ed176c-3aa8-4676-8e5b-0a0001a1bb88"}),
 	},
 	{
 		ID:                 2,
@@ -539,6 +623,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
 		CancellationNote:   "",
+		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab"}),
 	},
 	{
 		ID:                 3,
@@ -551,6 +636,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[0:3],
 		CancellationNote:   "",
+		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab"}),
 		Evaluation: []*entities.EvaluationValue{
 			{
 				WateringPlanID: 3,
@@ -580,6 +666,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Trailer:            nil,
 		TreeClusters:       allTestClusters[2:3],
 		CancellationNote:   "",
+		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab"}),
 	},
 	{
 		ID:                 5,
@@ -591,6 +678,7 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		Transporter:        allTestVehicles[1],
 		TreeClusters:       allTestClusters[2:3],
 		CancellationNote:   "The watering plan was cancelled due to various reasons.",
+		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab"}),
 	},
 }
 
@@ -670,4 +758,17 @@ var allTestClusters = []*entities.TreeCluster{
 		Longitude:     utils.P(9.446398),
 		Trees:         []*entities.Tree{},
 	},
+}
+
+func parseUUIDs(uuids []string) []*uuid.UUID {
+	var parsedUUIDs []*uuid.UUID
+	for _, u := range uuids {
+		parsedUUID, err := uuid.Parse(u)
+		if err != nil {
+			return []*uuid.UUID{}
+		}
+		parsedUUIDs = append(parsedUUIDs, &parsedUUID)
+	}
+
+	return parsedUUIDs
 }

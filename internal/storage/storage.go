@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
@@ -25,6 +26,7 @@ var (
 	ErrTreeNotFound         = errors.New("tree not found")
 	ErrVehicleNotFound      = errors.New("vehicle not found")
 	ErrWateringPlanNotFound = errors.New("watering plan not found")
+	ErrUserNotFound         = errors.New("user not found")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")
@@ -100,6 +102,8 @@ type WateringPlanRepository interface {
 	GetLinkedVehicleByIDAndType(ctx context.Context, id int32, vehicleType entities.VehicleType) (*entities.Vehicle, error)
 	// GetLinkedTreeClustersByID retruns all tree cluster linked to a watering plan by the watering plan id
 	GetLinkedTreeClustersByID(ctx context.Context, id int32) ([]*entities.TreeCluster, error)
+	// GetLinkedUsersByID returns all linked user ids from relationship by a watering plan id
+	GetLinkedUsersByID(ctx context.Context, id int32) ([]*uuid.UUID, error)
 	// GetEvaluationValues returns all tree cluster relationship entities by a watering plan id
 	GetEvaluationValues(ctx context.Context, id int32) ([]*entities.EvaluationValue, error)
 	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.

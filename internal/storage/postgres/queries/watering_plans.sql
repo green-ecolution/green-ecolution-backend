@@ -25,6 +25,19 @@ WHERE id = $1;
 -- name: DeleteWateringPlan :one
 DELETE FROM watering_plans WHERE id = $1 RETURNING id;
 
+-- name: SetUserToWateringPlan :exec
+INSERT INTO user_watering_plans (user_id, watering_plan_id)
+VALUES ($1, $2);
+
+-- name: GetUsersByWateringPlanID :many
+SELECT user_id
+FROM user_watering_plans
+WHERE watering_plan_id = $1;
+
+-- name: DeleteAllUsersFromWateringPlan :exec
+DELETE FROM user_watering_plans
+WHERE watering_plan_id = $1;
+
 -- name: GetVehicleByWateringPlanID :one
 SELECT v.* FROM vehicles v
 JOIN vehicle_watering_plans vwp ON v.id = vwp.vehicle_id

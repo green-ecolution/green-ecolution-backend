@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -22,7 +23,6 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 		}
 	}
 
-	// TODO: get mapped data like users
 	return data, nil
 }
 
@@ -37,7 +37,6 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 		return nil, err
 	}
 
-	// TODO: get mapped data like users
 	return wp, nil
 }
 
@@ -79,6 +78,24 @@ func (w *WateringPlanRepository) GetEvaluationValues(ctx context.Context, id int
 	return w.mapper.EvaluationFromSqlList(rows), nil
 }
 
+func (w *WateringPlanRepository) GetLinkedUsersByID(ctx context.Context, id int32) ([]*uuid.UUID, error) {
+	pgUUIDS, err := w.store.GetUsersByWateringPlanID(ctx, id)
+	if err != nil {
+		return nil, w.store.HandleError(err)
+	}
+
+	// Convert pgtype.UUID to uuid.UUID
+	var userUUIDs []*uuid.UUID
+	for _, pgUUID := range pgUUIDS {
+		if pgUUID.Valid {
+			uuidVal := uuid.UUID(pgUUID.Bytes)
+			userUUIDs = append(userUUIDs, &uuidVal)
+		}
+	}
+
+	return userUUIDs, nil
+}
+
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
 	var err error
 
@@ -100,6 +117,11 @@ func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.Wat
 		wp.Trailer = nil
 	}
 
+	wp.UserIDs, err = w.GetLinkedUsersByID(ctx, wp.ID)
+	if err != nil {
+		return w.store.HandleError(err)
+	}
+
 	// Only load evaluation values if the watering plan is set to »finished«
 	if wp.Status == entities.WateringPlanStatusFinished {
 		wp.Evaluation, err = w.GetEvaluationValues(ctx, wp.ID)
@@ -109,9 +131,6 @@ func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.Wat
 	} else {
 		wp.Evaluation = []*entities.EvaluationValue{}
 	}
-
-	// TODO: map correct users
-	wp.Users = []*entities.User{}
 
 	return nil
 }

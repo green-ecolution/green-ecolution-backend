@@ -2,6 +2,8 @@ package entities
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type WateringPlanStatus string
@@ -24,7 +26,7 @@ type WateringPlan struct {
 	Status             WateringPlanStatus
 	Distance           *float64
 	TotalWaterRequired *float64
-	Users              []*User
+	UserIDs            []*uuid.UUID
 	TreeClusters       []*TreeCluster
 	Transporter        *Vehicle
 	Trailer            *Vehicle
@@ -38,7 +40,7 @@ type WateringPlanCreate struct {
 	TreeClusterIDs []*int32 `validate:"required,min=1,dive,required"`
 	TransporterID  *int32   `validate:"required"`
 	TrailerID      *int32
-	// Users           []*int32
+	UserIDs        []*uuid.UUID `validate:"required,min=1,dive,required"`
 }
 
 type WateringPlanUpdate struct {
@@ -50,7 +52,7 @@ type WateringPlanUpdate struct {
 	CancellationNote string
 	Status           WateringPlanStatus `validate:"oneof=planned active canceled finished 'not competed' unknown"`
 	Evaluation       []*EvaluationValue
-	// Users           []*int32
+	UserIDs          []*uuid.UUID `validate:"required,min=1,dive,required"`
 }
 
 type EvaluationValue struct {

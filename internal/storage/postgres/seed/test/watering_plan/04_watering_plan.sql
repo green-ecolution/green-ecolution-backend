@@ -26,6 +26,15 @@ INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id, cons
 (3, 3, 10.0),
 (3, 4, 10.0),
 (3, 5, 10.0);
+
+INSERT INTO user_watering_plans (user_id, watering_plan_id) VALUES 
+('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 1),
+('05c028d9-62ef-4dcc-aa79-6b2fe9ce6f42', 1),
+('e5ed176c-3aa8-4676-8e5b-0a0001a1bb88', 1),
+('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 2),
+('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 3),
+('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 4),
+('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 5);
 -- +goose StatementEnd
 
 -- +goose Down

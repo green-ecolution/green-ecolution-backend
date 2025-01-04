@@ -25,16 +25,10 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	uuid, _ := uuid.NewRandom()
-	testUser := &entities.User{
-		ID:          uuid,
-		CreatedAt:   time.Unix(123456, 0),
-		Username:    "test",
-		FirstName:   "Toni",
-		LastName:    "Tester",
-		Email:       "dev@green-ecolution.de",
-		PhoneNumber: "+49 123456",
-		EmployeeID:  "123456",
+	// UUID from test user in keycloak
+	testUUID, err := uuid.Parse("6a1078e8-80fd-458f-b74e-e388fe2dd6ab")
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	input := entities.WateringPlan{
@@ -44,7 +38,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[0],
 		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[1],
 		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
-		Users:        []*entities.User{testUser},
+		UserIDs:      []*uuid.UUID{&testUUID},
 	}
 
 	expectedTotalWater := 720.0
@@ -60,7 +54,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -97,7 +91,11 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			assert.Equal(t, input.TreeClusters[i].Name, tc.Name)
 		}
 
-		// TODO: test linked users
+		// assert user
+		assert.Len(t, input.UserIDs, len(getWp.UserIDs))
+		for i, userID := range getWp.UserIDs {
+			assert.Equal(t, input.UserIDs[i], userID)
+		}
 	})
 
 	t.Run("should create watering plan with default values", func(t *testing.T) {
@@ -108,7 +106,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -144,7 +142,11 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			assert.Equal(t, input.TreeClusters[i].Name, tc.Name)
 		}
 
-		// TODO: test linked users
+		// assert user
+		assert.Len(t, input.UserIDs, len(getWp.UserIDs))
+		for i, userID := range getWp.UserIDs {
+			assert.Equal(t, input.UserIDs[i], userID)
+		}
 	})
 
 	t.Run("should return error when date is not in correct format", func(t *testing.T) {
@@ -155,7 +157,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = time.Time{}
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -177,7 +179,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -190,27 +192,27 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		assert.Equal(t, "trailer vehicle requires a vehicle of type trailer", err.Error())
 	})
 
-	// t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
-	// 	// given
-	// 	r := NewWateringPlanRepository(suite.Store, mappers)
+	t.Run("should return error when watering plan has no linked users", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
 
-	// 	createFn := func(wp *entities.WateringPlan) (bool, error) {
-	// 		wp.Date = input.Date
-	// 		wp.Transporter = input.Transporter
-	// 		wp.Trailer = input.Trailer
-	// 		wp.TreeClusters = input.TreeClusters
-	// 		wp.Users = []*entities.User{}
-	// 		return true, nil
-	// 	}
+		createFn := func(wp *entities.WateringPlan) (bool, error) {
+			wp.Date = input.Date
+			wp.Transporter = input.Transporter
+			wp.Trailer = input.Trailer
+			wp.TreeClusters = input.TreeClusters
+			wp.UserIDs = []*uuid.UUID{}
+			return true, nil
+		}
 
-	// 	// when
-	// 	got, err := r.Create(context.Background(), createFn)
+		// when
+		got, err := r.Create(context.Background(), createFn)
 
-	// 	// then
-	// 	assert.Error(t, err)
-	// 	assert.Nil(t, got)
-	// 	assert.Equal(t, "watering plan requires employees", err.Error())
-	// })
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+		assert.Equal(t, "watering plan requires employees", err.Error())
+	})
 
 	t.Run("should return error when transporter has not correct vehilce type", func(t *testing.T) {
 		// given
@@ -221,7 +223,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Trailer
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -243,7 +245,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = nil
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -265,7 +267,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = []*entities.TreeCluster{}
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -298,7 +300,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return true, nil
 		}
 
@@ -350,7 +352,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
-			wp.Users = input.Users
+			wp.UserIDs = input.UserIDs
 			return false, nil
 		}
 

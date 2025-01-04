@@ -221,6 +221,14 @@ VALUES
   (2, 4),
   (2, 5);
 
+INSERT INTO user_watering_plans (user_id, watering_plan_id) 
+VALUES 
+  ('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 1),
+  ('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 2),
+  ('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 3),
+  ('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 4),
+  ('6a1078e8-80fd-458f-b74e-e388fe2dd6ab', 5);
+
 INSERT INTO tree_cluster_watering_plans (tree_cluster_id, watering_plan_id, consumed_water)
 VALUES 
   (1, 1, 0.0),

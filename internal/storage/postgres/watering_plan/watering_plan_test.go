@@ -94,6 +94,25 @@ func TestWateringPlanRepository_Delete(t *testing.T) {
 		assert.Equal(t, []*entities.TreeCluster{}, treecluster)
 	})
 
+	t.Run("should delete watering plan and linked users in pivot table", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		gotBefore, errBefore := r.GetLinkedUsersByID(context.Background(), 1)
+		assert.NoError(t, errBefore)
+		assert.NotNil(t, gotBefore)
+
+		// when
+		err := r.Delete(context.Background(), 1)
+		users, _ := r.GetLinkedUsersByID(context.Background(), 1)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, users)
+	})
+
 	t.Run("should return error when watering plan not found", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)

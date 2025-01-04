@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
@@ -18,7 +19,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		Distance:           utils.P(0.0),
 		TotalWaterRequired: utils.P(0.0),
 		Status:             entities.WateringPlanStatusPlanned,
-		Users:              make([]*entities.User, 0),
+		UserIDs:            make([]*uuid.UUID, 0),
 		TreeClusters:       make([]*entities.TreeCluster, 0),
 		Transporter:        nil,
 		Trailer:            nil,
@@ -97,7 +98,9 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 		return nil, w.store.HandleError(err)
 	}
 
-	// TODO: Link users in pivot table
+	if err := w.setLinkedUsers(ctx, entity, id); err != nil {
+		return nil, w.store.HandleError(err)
+	}
 
 	if err := w.setLinkedVehicles(ctx, entity, id); err != nil {
 		return nil, w.store.HandleError(err)
@@ -119,10 +122,9 @@ func (w *WateringPlanRepository) validateWateringPlan(entity *entities.WateringP
 		return errors.New("trailer vehicle requires a vehicle of type trailer")
 	}
 
-	// TODO: please comment also the test cases back in as soon as the empoyees are ready
-	// if len(entity.Users) == 0 {
-	// 	return errors.New("watering plan requires employees")
-	// }
+	if len(entity.UserIDs) == 0 {
+		return errors.New("watering plan requires employees")
+	}
 
 	if len(entity.TreeClusters) == 0 {
 		return errors.New("watering plan requires tree cluster")
@@ -146,6 +148,20 @@ func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *
 		err = w.store.SetVehicleToWateringPlan(ctx, &sqlc.SetVehicleToWateringPlanParams{
 			WateringPlanID: id,
 			VehicleID:      entity.Trailer.ID,
+		})
+		if err != nil {
+			return w.store.HandleError(err)
+		}
+	}
+
+	return nil
+}
+
+func (w *WateringPlanRepository) setLinkedUsers(ctx context.Context, entity *entities.WateringPlan, id int32) error {
+	for _, userID := range entity.UserIDs {
+		err := w.store.SetUserToWateringPlan(ctx, &sqlc.SetUserToWateringPlanParams{
+			WateringPlanID: id,
+			UserID:         utils.UUIDToPGUUID(*userID),
 		})
 		if err != nil {
 			return w.store.HandleError(err)

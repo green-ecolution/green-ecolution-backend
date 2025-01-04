@@ -336,7 +336,7 @@ func TestVehicleService_Create(t *testing.T) {
 		assert.ErrorContains(t, err, "400: validation error")
 	})
 
-	t.Run("should return validation error on wrong driving licence format", func(t *testing.T) {
+	t.Run("should return validation error on wrong driving license format", func(t *testing.T) {
 		// given
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
@@ -545,7 +545,7 @@ func TestVehicleService_Update(t *testing.T) {
 		assert.EqualError(t, err, "400: validation error: Key: 'VehicleUpdate.Height' Error:Field validation for 'Height' failed on the 'gt' tag")
 	})
 
-	t.Run("should return validation error on wrong driving licence format", func(t *testing.T) {
+	t.Run("should return validation error on wrong driving license format", func(t *testing.T) {
 		// given
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
