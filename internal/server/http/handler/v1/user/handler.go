@@ -174,6 +174,7 @@ func parseURL(rawURL string) (*url.URL, error) {
 
 // @Summary		Get all users
 // @Description	Get all users
+// @Id				get-all-users
 // @Tags			User
 // @Produce		json
 // @Success		200			{object}	entities.UserListResponse

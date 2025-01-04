@@ -34,10 +34,11 @@ func TestKeycloakRepository_AuthClient(t *testing.T) {
 		assert.NotNil(t, backendClient.Secret)
 
 		// when
-		token, err := loginRestAPIClient(ctx, baseURL, *backendClient.ClientID, *backendClient.Secret, suite.RealmName)
+		client, token, err := loginRestAPIClient(ctx, baseURL, *backendClient.ClientID, *backendClient.Secret, suite.RealmName)
 
 		// then
 		assert.NoError(t, err)
+		assert.NotNil(t, client)
 		assert.NotNil(t, token)
 	})
 
@@ -51,10 +52,11 @@ func TestKeycloakRepository_AuthClient(t *testing.T) {
 		assert.NotNil(t, frontendClient.Secret)
 
 		// when
-		token, err := loginRestAPIClient(ctx, baseURL, *frontendClient.ClientID, *frontendClient.Secret, suite.RealmName)
+		client, token, err := loginRestAPIClient(ctx, baseURL, *frontendClient.ClientID, *frontendClient.Secret, suite.RealmName)
 
 		// then
 		assert.Error(t, err)
+		assert.Nil(t, client)
 		assert.Nil(t, token)
 	})
 
@@ -68,10 +70,11 @@ func TestKeycloakRepository_AuthClient(t *testing.T) {
 		assert.NotNil(t, backendClient.Secret)
 
 		// when
-		token, err := loginRestAPIClient(ctx, baseURL, *backendClient.ClientID, "invalid-secret", suite.RealmName)
+		client, token, err := loginRestAPIClient(ctx, baseURL, *backendClient.ClientID, "invalid-secret", suite.RealmName)
 
 		// then
 		assert.Error(t, err)
+		assert.Nil(t, client)
 		assert.Nil(t, token)
 	})
 }

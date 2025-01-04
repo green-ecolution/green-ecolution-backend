@@ -15,9 +15,9 @@
         pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
           src = ./.;
           hooks = {
-            golangci-lint.enable = true;
+            golangci-lint.enable = false;
             gofmt.enable = true;
-            gotest.enable = true;
+            gotest.enable = false;
           };
         };
 

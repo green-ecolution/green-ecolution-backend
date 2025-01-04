@@ -37,7 +37,7 @@ func NewCreateTreeSubscriber(tcs service.TreeClusterService) *CreateTreeSubscrib
 }
 
 func (s *CreateTreeSubscriber) EventType() entities.EventType {
-	return entities.EventTypeUpdateTree
+	return entities.EventTypeCreateTree
 }
 
 func (s *CreateTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
@@ -56,10 +56,35 @@ func NewDeleteTreeSubscriber(tcs service.TreeClusterService) *DeleteTreeSubscrib
 }
 
 func (s *DeleteTreeSubscriber) EventType() entities.EventType {
-	return entities.EventTypeUpdateTree
+	return entities.EventTypeDeleteTree
 }
 
 func (s *DeleteTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
 	event := e.(entities.EventUpdateTree)
 	return s.tcs.HandleUpdateTree(ctx, &event)
+}
+
+type CreateSensorDataSubscriber struct {
+	tcSvc   service.TreeClusterService
+	treeSvc service.TreeService
+}
+
+func NewSensorDataSubscriber(tcSvc service.TreeClusterService, treeSvc service.TreeService) *CreateSensorDataSubscriber {
+	return &CreateSensorDataSubscriber{
+		tcSvc:   tcSvc,
+		treeSvc: treeSvc,
+	}
+}
+
+func (s *CreateSensorDataSubscriber) EventType() entities.EventType {
+	return entities.EventTypeNewSensorData
+}
+
+func (s *CreateSensorDataSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
+	event := e.(entities.EventNewSensorData)
+	if err := s.treeSvc.HandleNewSensorData(ctx, &event); err != nil {
+		return err
+	}
+
+	return s.tcSvc.HandleNewSensorData(ctx, &event)
 }

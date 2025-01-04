@@ -40,8 +40,6 @@ import (
 
 var version = "develop"
 
-const waitGroupSize = 4
-
 //	@title			Green Space Management API
 //	@version		develop
 //	@description	This is the API for the Green Ecolution Management System.
@@ -134,29 +132,58 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 		WateringPlan: postgresRepo.WateringPlan,
 	}
 
-	em := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+	em := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster, entities.EventTypeCreateTree, entities.EventTypeDeleteTree, entities.EventTypeNewSensorData)
 	services := domain.NewService(cfg, repositories, em)
 	httpServer := http.NewServer(cfg, services)
 	mqttServer := mqtt.NewMqtt(cfg, services)
 
 	var wg sync.WaitGroup
-	wg.Add(waitGroupSize)
 
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		mqttServer.RunSubscriber(ctx)
 	}()
 
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		em.Run(ctx)
 	}()
 
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		_ = em.RunSubscription(ctx, subscriber.NewUpdateTreeSubscriber(services.TreeClusterService))
+		if err := em.RunSubscription(ctx, subscriber.NewUpdateTreeSubscriber(services.TreeClusterService)); err != nil {
+			slog.Error("stop subscription with err", "err", err)
+		}
 	}()
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := em.RunSubscription(ctx, subscriber.NewCreateTreeSubscriber(services.TreeClusterService)); err != nil {
+			slog.Error("stop subscription with err", "err", err)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := em.RunSubscription(ctx, subscriber.NewDeleteTreeSubscriber(services.TreeClusterService)); err != nil {
+			slog.Error("stop subscription with err", "err", err)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := em.RunSubscription(ctx, subscriber.NewSensorDataSubscriber(services.TreeClusterService, services.TreeService)); err != nil {
+			slog.Error("stop subscription with err", "err", err)
+		}
+	}()
+
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if err := httpServer.Run(ctx); err != nil {

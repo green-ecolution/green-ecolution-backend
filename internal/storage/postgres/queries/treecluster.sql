@@ -60,3 +60,18 @@ DELETE FROM tree_clusters WHERE id = $1 RETURNING id;
 
 -- name: CalculateTreesCentroid :one
 SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE trees.tree_cluster_id = $1;
+
+-- name: GetAllLatestSensorDataByTreeClusterID :many
+SELECT sd.*
+FROM sensor_data sd
+JOIN sensors s ON sd.sensor_id = s.id
+JOIN trees t ON t.sensor_id = s.id
+JOIN tree_clusters tc ON t.tree_cluster_id = tc.id
+WHERE tc.id = $1
+  AND sd.id = (
+    SELECT id
+    FROM sensor_data
+    WHERE sensor_id = s.id
+    ORDER BY created_at DESC
+    LIMIT 1
+  );

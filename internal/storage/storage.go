@@ -131,6 +131,7 @@ type TreeClusterRepository interface {
 	Archive(ctx context.Context, id int32) error
 	LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error
 	GetCenterPoint(ctx context.Context, id int32) (float64, float64, error)
+	GetAllLatestSensorDataByClusterID(ctx context.Context, tcID int32) ([]*entities.SensorData, error)
 }
 
 type TreeRepository interface {
@@ -141,6 +142,7 @@ type TreeRepository interface {
 	GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error)
 	GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 	GetBySensorID(ctx context.Context, id string) (*entities.Tree, error)
+	GetBySensorIDs(ctx context.Context, ids ...string) ([]*entities.Tree, error)
 
 	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error

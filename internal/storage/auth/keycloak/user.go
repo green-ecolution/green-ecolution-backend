@@ -2,7 +2,7 @@ package keycloak
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 	"strings"
 	"time"
@@ -12,7 +12,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/pkg/errors"
 )
 
 type UserRepository struct {
@@ -26,26 +25,25 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 }
 
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
-	slog.Debug("Creating user in keycloak", "user", user)
+	slog.Debug("Creating user in keycloak", "user", user, "roles", roles)
 	if user == nil {
-		return nil, errors.New("user is nil")
+		return nil, ErrEmptyUser
 	}
 
 	keyCloakUser := userToKeyCloakUser(user)
 
-	clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	client, clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, *keyCloakUser)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create user")
+		return nil, errors.Join(err, ErrCreateUser)
 	}
 
 	if err = client.SetPassword(ctx, clientToken.AccessToken, userID, r.cfg.OidcProvider.DomainName, password, false); err != nil {
-		return nil, errors.Wrap(err, "failed to set password")
+		return nil, errors.Join(err, ErrSetPassword)
 	}
 
 	if roles != nil || len(roles) > 0 {
@@ -55,7 +53,8 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 			roleNameLowerCase := strings.ToLower(roleName)
 			roleKeyCloak, err = client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, roleNameLowerCase)
 			if err != nil {
-				return nil, errors.Wrap(err, fmt.Sprintf("failed to get role by name: '%v'", roleNameLowerCase))
+				slog.Error("failed to get role by name", "role", roleNameLowerCase, "err", err)
+				return nil, errors.Join(err, ErrGetRole)
 			}
 
 			if roleKeyCloak != nil {
@@ -63,13 +62,15 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 			}
 		}
 		if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, userID, kcRoles); err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
+			slog.Error("failed to assign roles to user", "role", kcRoles, "err", err)
+			return nil, errors.Join(err, ErrSetRole)
 		}
 	}
 
 	userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, userID)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to get created user by id: '%v'", userID))
+		slog.Error("failed to get recently created user by id", "user_id", userID, "err", err)
+		return nil, errors.Join(err, ErrGetUser)
 	}
 
 	return keyCloakUserToUser(userKeyCloak)
@@ -78,72 +79,52 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string) error {
 	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 	if err := client.Logout(ctx, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName, refreshToken); err != nil {
-		return errors.Wrap(err, "failed to logout")
+		return errors.Join(err, ErrLogout)
 	}
 	return nil
 }
 
-func (r *UserRepository) getClientToken(ctx context.Context) (string, error) {
-	clientToken, err := loginRestAPIClient(
-		ctx,
-		r.cfg.OidcProvider.BaseURL,
-		r.cfg.OidcProvider.Backend.ClientID,
-		r.cfg.OidcProvider.Backend.ClientSecret,
-		r.cfg.OidcProvider.DomainName,
-	)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to log in to Keycloak")
-	}
-	return clientToken.AccessToken, nil
-}
-
 func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
-	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
-	token, err := r.getClientToken(ctx)
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	users, err := client.GetUsers(ctx, token, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
+	users, err := client.GetUsers(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get users from Keycloak")
+		return nil, errors.Join(err, ErrGetUser)
 	}
 
-	allUsers := make([]*entities.User, 0, len(users))
-	for _, kcUser := range users {
+	allUsers := make([]*entities.User, len(users))
+	for i, kcUser := range users {
 		user, err := keyCloakUserToUser(kcUser)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to convert Keycloak user")
+			return nil, err
 		}
-		allUsers = append(allUsers, user)
+		allUsers[i] = user
 	}
 
 	return allUsers, nil
 }
 
 func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
-	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
-	token, err := r.getClientToken(ctx)
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	kcUsers := make([]*gocloak.User, 0, len(ids))
-	for _, id := range ids {
-		user, err := client.GetUserByID(ctx, token, r.cfg.OidcProvider.DomainName, id)
+	users := make([]*entities.User, len(ids))
+	for i, id := range ids {
+		kcUser, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get user from Keycloak")
+			return nil, err
 		}
-		kcUsers = append(kcUsers, user)
-	}
 
-	users := make([]*entities.User, 0, len(kcUsers))
-	for _, kcUser := range kcUsers {
 		user, err := keyCloakUserToUser(kcUser)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to convert Keycloak user")
+			return nil, err
 		}
-		users = append(users, user)
+		users[i] = user
 	}
 
 	return users, nil
@@ -152,7 +133,8 @@ func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entitie
 func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	userID, err := uuid.Parse(*user.ID)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to parse user id: '%v'", *user.ID))
+		slog.Error("failed to parse user id", "user_id", *user.ID, "err", err)
+		return nil, ErrParseID
 	}
 	var phoneNumber, employeeID string
 	if user.Attributes != nil {
