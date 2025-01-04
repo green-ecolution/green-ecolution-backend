@@ -43,7 +43,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, sensors)
-		assert.EqualError(t, err, "500: sensor not found (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: sensor not found (at internal/service/domain/sensor/sensor.go:165)")
 	})
 }
 
@@ -83,7 +83,7 @@ func TestSensorService_GetByID(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, sensor)
-		assert.EqualError(t, err, "404: sensor not found (at internal/service/domain/sensor/sensor.go:148)")
+		assert.EqualError(t, err, "404: sensor not found (at internal/service/domain/sensor/sensor.go:162)")
 	})
 }
 
@@ -222,7 +222,7 @@ func TestSensorService_Create(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: Failed to create sensor (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: Failed to create sensor (at internal/service/domain/sensor/sensor.go:165)")
 	})
 }
 
@@ -275,7 +275,7 @@ func TestSensorService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to update cluster (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: failed to update cluster (at internal/service/domain/sensor/sensor.go:165)")
 	})
 
 	t.Run("should return an error when the update fails", func(t *testing.T) {
@@ -301,7 +301,7 @@ func TestSensorService_Update(t *testing.T) {
 
 		// then
 		assert.Nil(t, result)
-		assert.EqualError(t, err, "500: failed to update cluster (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: failed to update cluster (at internal/service/domain/sensor/sensor.go:165)")
 	})
 
 	t.Run("should return validation error on invalid latitude and longitude", func(t *testing.T) {
@@ -364,7 +364,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "404: sensor not found (at internal/service/domain/sensor/sensor.go:148)")
+		assert.EqualError(t, err, "404: sensor not found (at internal/service/domain/sensor/sensor.go:162)")
 	})
 
 	t.Run("should return error if unlinking sensor ID on tree fails", func(t *testing.T) {
@@ -385,7 +385,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to unlink (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: failed to unlink (at internal/service/domain/sensor/sensor.go:165)")
 	})
 
 	t.Run("should return error if unlinking sensor ID on flowerbed fails", func(t *testing.T) {
@@ -406,7 +406,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to unlink (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: failed to unlink (at internal/service/domain/sensor/sensor.go:165)")
 	})
 
 	t.Run("should return error if deleting sensor fails", func(t *testing.T) {
@@ -428,7 +428,7 @@ func TestSensorService_Delete(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "500: failed to delete (at internal/service/domain/sensor/sensor.go:151)")
+		assert.EqualError(t, err, "500: failed to delete (at internal/service/domain/sensor/sensor.go:165)")
 	})
 }
 
