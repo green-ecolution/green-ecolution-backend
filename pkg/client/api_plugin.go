@@ -20,11 +20,12 @@ import (
 	"strings"
 )
 
+
 // PluginAPIService PluginAPI service
 type PluginAPIService service
 
 type ApiGetPluginInfoRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *PluginAPIService
 	pluginSlug string
 }
@@ -38,27 +39,26 @@ GetPluginInfo Get a plugin info
 
 Get a plugin info
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pluginSlug Slug of the plugin
-	@return ApiGetPluginInfoRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param pluginSlug Slug of the plugin
+ @return ApiGetPluginInfoRequest
 */
 func (a *PluginAPIService) GetPluginInfo(ctx context.Context, pluginSlug string) ApiGetPluginInfoRequest {
 	return ApiGetPluginInfoRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 		pluginSlug: pluginSlug,
 	}
 }
 
 // Execute executes the request
-//
-//	@return	Plugin
+//  @return Plugin
 func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plugin, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *Plugin
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *Plugin
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PluginAPIService.GetPluginInfo")
@@ -119,8 +119,8 @@ func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plu
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -130,8 +130,8 @@ func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plu
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -141,8 +141,8 @@ func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plu
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -152,8 +152,8 @@ func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plu
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -163,8 +163,8 @@ func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plu
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -182,7 +182,7 @@ func (a *PluginAPIService) GetPluginInfoExecute(r ApiGetPluginInfoRequest) (*Plu
 }
 
 type ApiGetPluginsListRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *PluginAPIService
 }
 
@@ -195,25 +195,24 @@ GetPluginsList Get a list of all registered plugins
 
 Get a list of all registered plugins
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiGetPluginsListRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetPluginsListRequest
 */
 func (a *PluginAPIService) GetPluginsList(ctx context.Context) ApiGetPluginsListRequest {
 	return ApiGetPluginsListRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return	PluginListResponse
+//  @return PluginListResponse
 func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*PluginListResponse, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodGet
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *PluginListResponse
+		localVarHTTPMethod   = http.MethodGet
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *PluginListResponse
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PluginAPIService.GetPluginsList")
@@ -273,8 +272,8 @@ func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*P
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -284,8 +283,8 @@ func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*P
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -295,8 +294,8 @@ func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*P
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -306,8 +305,8 @@ func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*P
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -317,8 +316,8 @@ func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*P
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -336,7 +335,7 @@ func (a *PluginAPIService) GetPluginsListExecute(r ApiGetPluginsListRequest) (*P
 }
 
 type ApiPluginHeartbeatRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *PluginAPIService
 	pluginSlug string
 }
@@ -350,27 +349,26 @@ PluginHeartbeat Heartbeat for a plugin
 
 Heartbeat for a plugin
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@param pluginSlug Name of the plugin specified by slug during registration
-	@return ApiPluginHeartbeatRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @param pluginSlug Name of the plugin specified by slug during registration
+ @return ApiPluginHeartbeatRequest
 */
 func (a *PluginAPIService) PluginHeartbeat(ctx context.Context, pluginSlug string) ApiPluginHeartbeatRequest {
 	return ApiPluginHeartbeatRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 		pluginSlug: pluginSlug,
 	}
 }
 
 // Execute executes the request
-//
-//	@return	string
+//  @return string
 func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (string, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue string
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  string
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PluginAPIService.PluginHeartbeat")
@@ -431,8 +429,8 @@ func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -442,8 +440,8 @@ func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -453,8 +451,8 @@ func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -464,8 +462,8 @@ func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -475,8 +473,8 @@ func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -494,9 +492,9 @@ func (a *PluginAPIService) PluginHeartbeatExecute(r ApiPluginHeartbeatRequest) (
 }
 
 type ApiRegisterPluginRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *PluginAPIService
-	body       *PluginRegisterRequest
+	body *PluginRegisterRequest
 }
 
 // Plugin registration request
@@ -514,25 +512,24 @@ RegisterPlugin Register a plugin
 
 Register a plugin
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiRegisterPluginRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiRegisterPluginRequest
 */
 func (a *PluginAPIService) RegisterPlugin(ctx context.Context) ApiRegisterPluginRequest {
 	return ApiRegisterPluginRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//
-//	@return	ClientToken
+//  @return ClientToken
 func (a *PluginAPIService) RegisterPluginExecute(r ApiRegisterPluginRequest) (*ClientToken, *http.Response, error) {
 	var (
-		localVarHTTPMethod  = http.MethodPost
-		localVarPostBody    interface{}
-		formFiles           []formFile
-		localVarReturnValue *ClientToken
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *ClientToken
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "PluginAPIService.RegisterPlugin")
@@ -597,8 +594,8 @@ func (a *PluginAPIService) RegisterPluginExecute(r ApiRegisterPluginRequest) (*C
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -608,8 +605,8 @@ func (a *PluginAPIService) RegisterPluginExecute(r ApiRegisterPluginRequest) (*C
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -619,8 +616,8 @@ func (a *PluginAPIService) RegisterPluginExecute(r ApiRegisterPluginRequest) (*C
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -630,8 +627,8 @@ func (a *PluginAPIService) RegisterPluginExecute(r ApiRegisterPluginRequest) (*C
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -641,8 +638,8 @@ func (a *PluginAPIService) RegisterPluginExecute(r ApiRegisterPluginRequest) (*C
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

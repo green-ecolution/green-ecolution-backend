@@ -20,13 +20,14 @@ import (
 	"os"
 )
 
+
 // FileImportAPIService FileImportAPI service
 type FileImportAPIService service
 
 type ApiImportTreesFromCsvRequest struct {
-	ctx        context.Context
+	ctx context.Context
 	ApiService *FileImportAPIService
-	file       *os.File
+	file *os.File
 }
 
 // CSV file to import
@@ -44,22 +45,22 @@ ImportTreesFromCsv Import trees from a CSV file
 
 Import trees from a CSV file
 
-	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-	@return ApiImportTreesFromCsvRequest
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiImportTreesFromCsvRequest
 */
 func (a *FileImportAPIService) ImportTreesFromCsv(ctx context.Context) ApiImportTreesFromCsvRequest {
 	return ApiImportTreesFromCsvRequest{
 		ApiService: a,
-		ctx:        ctx,
+		ctx: ctx,
 	}
 }
 
 // Execute executes the request
 func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsvRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod = http.MethodPost
-		localVarPostBody   interface{}
-		formFiles          []formFile
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "FileImportAPIService.ImportTreesFromCsv")
@@ -94,8 +95,8 @@ func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsv
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	var fileLocalVarFormFileName string
-	var fileLocalVarFileName string
-	var fileLocalVarFileBytes []byte
+	var fileLocalVarFileName     string
+	var fileLocalVarFileBytes    []byte
 
 	fileLocalVarFormFileName = "file"
 	fileLocalVarFile := r.file
@@ -137,8 +138,8 @@ func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsv
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -148,8 +149,8 @@ func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsv
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -159,8 +160,8 @@ func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsv
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -170,8 +171,8 @@ func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsv
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -181,8 +182,8 @@ func (a *FileImportAPIService) ImportTreesFromCsvExecute(r ApiImportTreesFromCsv
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-			newErr.model = v
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}

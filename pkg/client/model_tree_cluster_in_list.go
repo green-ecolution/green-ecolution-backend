@@ -17,11 +17,11 @@ import (
 	"fmt"
 )
 
-// checks if the TreeCluster type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &TreeCluster{}
+// checks if the TreeClusterInList type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &TreeClusterInList{}
 
-// TreeCluster struct for TreeCluster
-type TreeCluster struct {
+// TreeClusterInList struct for TreeClusterInList
+type TreeClusterInList struct {
 	Address string `json:"address"`
 	Archived bool `json:"archived"`
 	CreatedAt string `json:"created_at"`
@@ -34,19 +34,19 @@ type TreeCluster struct {
 	Name string `json:"name"`
 	Region *Region `json:"region,omitempty"`
 	SoilCondition SoilCondition `json:"soil_condition"`
-	Trees []Tree `json:"trees,omitempty"`
+	TreeIds []int32 `json:"tree_ids,omitempty"`
 	UpdatedAt string `json:"updated_at"`
 	WateringStatus WateringStatus `json:"watering_status"`
 }
 
-type _TreeCluster TreeCluster
+type _TreeClusterInList TreeClusterInList
 
-// NewTreeCluster instantiates a new TreeCluster object
+// NewTreeClusterInList instantiates a new TreeClusterInList object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeCluster(address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
-	this := TreeCluster{}
+func NewTreeClusterInList(address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeClusterInList {
+	this := TreeClusterInList{}
 	this.Address = address
 	this.Archived = archived
 	this.CreatedAt = createdAt
@@ -62,16 +62,16 @@ func NewTreeCluster(address string, archived bool, createdAt string, description
 	return &this
 }
 
-// NewTreeClusterWithDefaults instantiates a new TreeCluster object
+// NewTreeClusterInListWithDefaults instantiates a new TreeClusterInList object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewTreeClusterWithDefaults() *TreeCluster {
-	this := TreeCluster{}
+func NewTreeClusterInListWithDefaults() *TreeClusterInList {
+	this := TreeClusterInList{}
 	return &this
 }
 
 // GetAddress returns the Address field value
-func (o *TreeCluster) GetAddress() string {
+func (o *TreeClusterInList) GetAddress() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -82,7 +82,7 @@ func (o *TreeCluster) GetAddress() string {
 
 // GetAddressOk returns a tuple with the Address field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetAddressOk() (*string, bool) {
+func (o *TreeClusterInList) GetAddressOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -90,12 +90,12 @@ func (o *TreeCluster) GetAddressOk() (*string, bool) {
 }
 
 // SetAddress sets field value
-func (o *TreeCluster) SetAddress(v string) {
+func (o *TreeClusterInList) SetAddress(v string) {
 	o.Address = v
 }
 
 // GetArchived returns the Archived field value
-func (o *TreeCluster) GetArchived() bool {
+func (o *TreeClusterInList) GetArchived() bool {
 	if o == nil {
 		var ret bool
 		return ret
@@ -106,7 +106,7 @@ func (o *TreeCluster) GetArchived() bool {
 
 // GetArchivedOk returns a tuple with the Archived field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetArchivedOk() (*bool, bool) {
+func (o *TreeClusterInList) GetArchivedOk() (*bool, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -114,12 +114,12 @@ func (o *TreeCluster) GetArchivedOk() (*bool, bool) {
 }
 
 // SetArchived sets field value
-func (o *TreeCluster) SetArchived(v bool) {
+func (o *TreeClusterInList) SetArchived(v bool) {
 	o.Archived = v
 }
 
 // GetCreatedAt returns the CreatedAt field value
-func (o *TreeCluster) GetCreatedAt() string {
+func (o *TreeClusterInList) GetCreatedAt() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -130,7 +130,7 @@ func (o *TreeCluster) GetCreatedAt() string {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetCreatedAtOk() (*string, bool) {
+func (o *TreeClusterInList) GetCreatedAtOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -138,12 +138,12 @@ func (o *TreeCluster) GetCreatedAtOk() (*string, bool) {
 }
 
 // SetCreatedAt sets field value
-func (o *TreeCluster) SetCreatedAt(v string) {
+func (o *TreeClusterInList) SetCreatedAt(v string) {
 	o.CreatedAt = v
 }
 
 // GetDescription returns the Description field value
-func (o *TreeCluster) GetDescription() string {
+func (o *TreeClusterInList) GetDescription() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -154,7 +154,7 @@ func (o *TreeCluster) GetDescription() string {
 
 // GetDescriptionOk returns a tuple with the Description field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetDescriptionOk() (*string, bool) {
+func (o *TreeClusterInList) GetDescriptionOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -162,12 +162,12 @@ func (o *TreeCluster) GetDescriptionOk() (*string, bool) {
 }
 
 // SetDescription sets field value
-func (o *TreeCluster) SetDescription(v string) {
+func (o *TreeClusterInList) SetDescription(v string) {
 	o.Description = v
 }
 
 // GetId returns the Id field value
-func (o *TreeCluster) GetId() int32 {
+func (o *TreeClusterInList) GetId() int32 {
 	if o == nil {
 		var ret int32
 		return ret
@@ -178,7 +178,7 @@ func (o *TreeCluster) GetId() int32 {
 
 // GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetIdOk() (*int32, bool) {
+func (o *TreeClusterInList) GetIdOk() (*int32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -186,12 +186,12 @@ func (o *TreeCluster) GetIdOk() (*int32, bool) {
 }
 
 // SetId sets field value
-func (o *TreeCluster) SetId(v int32) {
+func (o *TreeClusterInList) SetId(v int32) {
 	o.Id = v
 }
 
 // GetLastWatered returns the LastWatered field value if set, zero value otherwise.
-func (o *TreeCluster) GetLastWatered() string {
+func (o *TreeClusterInList) GetLastWatered() string {
 	if o == nil || IsNil(o.LastWatered) {
 		var ret string
 		return ret
@@ -201,7 +201,7 @@ func (o *TreeCluster) GetLastWatered() string {
 
 // GetLastWateredOk returns a tuple with the LastWatered field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetLastWateredOk() (*string, bool) {
+func (o *TreeClusterInList) GetLastWateredOk() (*string, bool) {
 	if o == nil || IsNil(o.LastWatered) {
 		return nil, false
 	}
@@ -209,7 +209,7 @@ func (o *TreeCluster) GetLastWateredOk() (*string, bool) {
 }
 
 // HasLastWatered returns a boolean if a field has been set.
-func (o *TreeCluster) HasLastWatered() bool {
+func (o *TreeClusterInList) HasLastWatered() bool {
 	if o != nil && !IsNil(o.LastWatered) {
 		return true
 	}
@@ -218,12 +218,12 @@ func (o *TreeCluster) HasLastWatered() bool {
 }
 
 // SetLastWatered gets a reference to the given string and assigns it to the LastWatered field.
-func (o *TreeCluster) SetLastWatered(v string) {
+func (o *TreeClusterInList) SetLastWatered(v string) {
 	o.LastWatered = &v
 }
 
 // GetLatitude returns the Latitude field value
-func (o *TreeCluster) GetLatitude() float32 {
+func (o *TreeClusterInList) GetLatitude() float32 {
 	if o == nil {
 		var ret float32
 		return ret
@@ -234,7 +234,7 @@ func (o *TreeCluster) GetLatitude() float32 {
 
 // GetLatitudeOk returns a tuple with the Latitude field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetLatitudeOk() (*float32, bool) {
+func (o *TreeClusterInList) GetLatitudeOk() (*float32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -242,12 +242,12 @@ func (o *TreeCluster) GetLatitudeOk() (*float32, bool) {
 }
 
 // SetLatitude sets field value
-func (o *TreeCluster) SetLatitude(v float32) {
+func (o *TreeClusterInList) SetLatitude(v float32) {
 	o.Latitude = v
 }
 
 // GetLongitude returns the Longitude field value
-func (o *TreeCluster) GetLongitude() float32 {
+func (o *TreeClusterInList) GetLongitude() float32 {
 	if o == nil {
 		var ret float32
 		return ret
@@ -258,7 +258,7 @@ func (o *TreeCluster) GetLongitude() float32 {
 
 // GetLongitudeOk returns a tuple with the Longitude field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetLongitudeOk() (*float32, bool) {
+func (o *TreeClusterInList) GetLongitudeOk() (*float32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -266,12 +266,12 @@ func (o *TreeCluster) GetLongitudeOk() (*float32, bool) {
 }
 
 // SetLongitude sets field value
-func (o *TreeCluster) SetLongitude(v float32) {
+func (o *TreeClusterInList) SetLongitude(v float32) {
 	o.Longitude = v
 }
 
 // GetMoistureLevel returns the MoistureLevel field value
-func (o *TreeCluster) GetMoistureLevel() float32 {
+func (o *TreeClusterInList) GetMoistureLevel() float32 {
 	if o == nil {
 		var ret float32
 		return ret
@@ -282,7 +282,7 @@ func (o *TreeCluster) GetMoistureLevel() float32 {
 
 // GetMoistureLevelOk returns a tuple with the MoistureLevel field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetMoistureLevelOk() (*float32, bool) {
+func (o *TreeClusterInList) GetMoistureLevelOk() (*float32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -290,12 +290,12 @@ func (o *TreeCluster) GetMoistureLevelOk() (*float32, bool) {
 }
 
 // SetMoistureLevel sets field value
-func (o *TreeCluster) SetMoistureLevel(v float32) {
+func (o *TreeClusterInList) SetMoistureLevel(v float32) {
 	o.MoistureLevel = v
 }
 
 // GetName returns the Name field value
-func (o *TreeCluster) GetName() string {
+func (o *TreeClusterInList) GetName() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -306,7 +306,7 @@ func (o *TreeCluster) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetNameOk() (*string, bool) {
+func (o *TreeClusterInList) GetNameOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -314,12 +314,12 @@ func (o *TreeCluster) GetNameOk() (*string, bool) {
 }
 
 // SetName sets field value
-func (o *TreeCluster) SetName(v string) {
+func (o *TreeClusterInList) SetName(v string) {
 	o.Name = v
 }
 
 // GetRegion returns the Region field value if set, zero value otherwise.
-func (o *TreeCluster) GetRegion() Region {
+func (o *TreeClusterInList) GetRegion() Region {
 	if o == nil || IsNil(o.Region) {
 		var ret Region
 		return ret
@@ -329,7 +329,7 @@ func (o *TreeCluster) GetRegion() Region {
 
 // GetRegionOk returns a tuple with the Region field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetRegionOk() (*Region, bool) {
+func (o *TreeClusterInList) GetRegionOk() (*Region, bool) {
 	if o == nil || IsNil(o.Region) {
 		return nil, false
 	}
@@ -337,7 +337,7 @@ func (o *TreeCluster) GetRegionOk() (*Region, bool) {
 }
 
 // HasRegion returns a boolean if a field has been set.
-func (o *TreeCluster) HasRegion() bool {
+func (o *TreeClusterInList) HasRegion() bool {
 	if o != nil && !IsNil(o.Region) {
 		return true
 	}
@@ -346,12 +346,12 @@ func (o *TreeCluster) HasRegion() bool {
 }
 
 // SetRegion gets a reference to the given Region and assigns it to the Region field.
-func (o *TreeCluster) SetRegion(v Region) {
+func (o *TreeClusterInList) SetRegion(v Region) {
 	o.Region = &v
 }
 
 // GetSoilCondition returns the SoilCondition field value
-func (o *TreeCluster) GetSoilCondition() SoilCondition {
+func (o *TreeClusterInList) GetSoilCondition() SoilCondition {
 	if o == nil {
 		var ret SoilCondition
 		return ret
@@ -362,7 +362,7 @@ func (o *TreeCluster) GetSoilCondition() SoilCondition {
 
 // GetSoilConditionOk returns a tuple with the SoilCondition field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetSoilConditionOk() (*SoilCondition, bool) {
+func (o *TreeClusterInList) GetSoilConditionOk() (*SoilCondition, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -370,44 +370,44 @@ func (o *TreeCluster) GetSoilConditionOk() (*SoilCondition, bool) {
 }
 
 // SetSoilCondition sets field value
-func (o *TreeCluster) SetSoilCondition(v SoilCondition) {
+func (o *TreeClusterInList) SetSoilCondition(v SoilCondition) {
 	o.SoilCondition = v
 }
 
-// GetTrees returns the Trees field value if set, zero value otherwise.
-func (o *TreeCluster) GetTrees() []Tree {
-	if o == nil || IsNil(o.Trees) {
-		var ret []Tree
+// GetTreeIds returns the TreeIds field value if set, zero value otherwise.
+func (o *TreeClusterInList) GetTreeIds() []int32 {
+	if o == nil || IsNil(o.TreeIds) {
+		var ret []int32
 		return ret
 	}
-	return o.Trees
+	return o.TreeIds
 }
 
-// GetTreesOk returns a tuple with the Trees field value if set, nil otherwise
+// GetTreeIdsOk returns a tuple with the TreeIds field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetTreesOk() ([]Tree, bool) {
-	if o == nil || IsNil(o.Trees) {
+func (o *TreeClusterInList) GetTreeIdsOk() ([]int32, bool) {
+	if o == nil || IsNil(o.TreeIds) {
 		return nil, false
 	}
-	return o.Trees, true
+	return o.TreeIds, true
 }
 
-// HasTrees returns a boolean if a field has been set.
-func (o *TreeCluster) HasTrees() bool {
-	if o != nil && !IsNil(o.Trees) {
+// HasTreeIds returns a boolean if a field has been set.
+func (o *TreeClusterInList) HasTreeIds() bool {
+	if o != nil && !IsNil(o.TreeIds) {
 		return true
 	}
 
 	return false
 }
 
-// SetTrees gets a reference to the given []Tree and assigns it to the Trees field.
-func (o *TreeCluster) SetTrees(v []Tree) {
-	o.Trees = v
+// SetTreeIds gets a reference to the given []int32 and assigns it to the TreeIds field.
+func (o *TreeClusterInList) SetTreeIds(v []int32) {
+	o.TreeIds = v
 }
 
 // GetUpdatedAt returns the UpdatedAt field value
-func (o *TreeCluster) GetUpdatedAt() string {
+func (o *TreeClusterInList) GetUpdatedAt() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -418,7 +418,7 @@ func (o *TreeCluster) GetUpdatedAt() string {
 
 // GetUpdatedAtOk returns a tuple with the UpdatedAt field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetUpdatedAtOk() (*string, bool) {
+func (o *TreeClusterInList) GetUpdatedAtOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -426,12 +426,12 @@ func (o *TreeCluster) GetUpdatedAtOk() (*string, bool) {
 }
 
 // SetUpdatedAt sets field value
-func (o *TreeCluster) SetUpdatedAt(v string) {
+func (o *TreeClusterInList) SetUpdatedAt(v string) {
 	o.UpdatedAt = v
 }
 
 // GetWateringStatus returns the WateringStatus field value
-func (o *TreeCluster) GetWateringStatus() WateringStatus {
+func (o *TreeClusterInList) GetWateringStatus() WateringStatus {
 	if o == nil {
 		var ret WateringStatus
 		return ret
@@ -442,7 +442,7 @@ func (o *TreeCluster) GetWateringStatus() WateringStatus {
 
 // GetWateringStatusOk returns a tuple with the WateringStatus field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetWateringStatusOk() (*WateringStatus, bool) {
+func (o *TreeClusterInList) GetWateringStatusOk() (*WateringStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -450,11 +450,11 @@ func (o *TreeCluster) GetWateringStatusOk() (*WateringStatus, bool) {
 }
 
 // SetWateringStatus sets field value
-func (o *TreeCluster) SetWateringStatus(v WateringStatus) {
+func (o *TreeClusterInList) SetWateringStatus(v WateringStatus) {
 	o.WateringStatus = v
 }
 
-func (o TreeCluster) MarshalJSON() ([]byte, error) {
+func (o TreeClusterInList) MarshalJSON() ([]byte, error) {
 	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -462,7 +462,7 @@ func (o TreeCluster) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o TreeCluster) ToMap() (map[string]interface{}, error) {
+func (o TreeClusterInList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["address"] = o.Address
 	toSerialize["archived"] = o.Archived
@@ -480,15 +480,15 @@ func (o TreeCluster) ToMap() (map[string]interface{}, error) {
 		toSerialize["region"] = o.Region
 	}
 	toSerialize["soil_condition"] = o.SoilCondition
-	if !IsNil(o.Trees) {
-		toSerialize["trees"] = o.Trees
+	if !IsNil(o.TreeIds) {
+		toSerialize["tree_ids"] = o.TreeIds
 	}
 	toSerialize["updated_at"] = o.UpdatedAt
 	toSerialize["watering_status"] = o.WateringStatus
 	return toSerialize, nil
 }
 
-func (o *TreeCluster) UnmarshalJSON(data []byte) (err error) {
+func (o *TreeClusterInList) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -521,53 +521,53 @@ func (o *TreeCluster) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varTreeCluster := _TreeCluster{}
+	varTreeClusterInList := _TreeClusterInList{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varTreeCluster)
+	err = decoder.Decode(&varTreeClusterInList)
 
 	if err != nil {
 		return err
 	}
 
-	*o = TreeCluster(varTreeCluster)
+	*o = TreeClusterInList(varTreeClusterInList)
 
 	return err
 }
 
-type NullableTreeCluster struct {
-	value *TreeCluster
+type NullableTreeClusterInList struct {
+	value *TreeClusterInList
 	isSet bool
 }
 
-func (v NullableTreeCluster) Get() *TreeCluster {
+func (v NullableTreeClusterInList) Get() *TreeClusterInList {
 	return v.value
 }
 
-func (v *NullableTreeCluster) Set(val *TreeCluster) {
+func (v *NullableTreeClusterInList) Set(val *TreeClusterInList) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableTreeCluster) IsSet() bool {
+func (v NullableTreeClusterInList) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableTreeCluster) Unset() {
+func (v *NullableTreeClusterInList) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableTreeCluster(val *TreeCluster) *NullableTreeCluster {
-	return &NullableTreeCluster{value: val, isSet: true}
+func NewNullableTreeClusterInList(val *TreeClusterInList) *NullableTreeClusterInList {
+	return &NullableTreeClusterInList{value: val, isSet: true}
 }
 
-func (v NullableTreeCluster) MarshalJSON() ([]byte, error) {
+func (v NullableTreeClusterInList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableTreeCluster) UnmarshalJSON(src []byte) error {
+func (v *NullableTreeClusterInList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

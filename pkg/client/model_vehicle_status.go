@@ -21,10 +21,10 @@ type VehicleStatus string
 
 // List of VehicleStatus
 const (
-	VehicleStatusActive       VehicleStatus = "active"
-	VehicleStatusAvailable    VehicleStatus = "available"
+	VehicleStatusActive VehicleStatus = "active"
+	VehicleStatusAvailable VehicleStatus = "available"
 	VehicleStatusNotAvailable VehicleStatus = "not available"
-	VehicleStatusUnknown      VehicleStatus = "unknown"
+	VehicleStatusUnknown VehicleStatus = "unknown"
 )
 
 // All allowed values of VehicleStatus enum
@@ -113,3 +113,4 @@ func (v *NullableVehicleStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+

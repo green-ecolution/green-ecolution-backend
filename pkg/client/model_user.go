@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,16 +22,17 @@ var _ MappedNullable = &User{}
 
 // User struct for User
 type User struct {
-	AvatarUrl     string `json:"avatar_url"`
-	CreatedAt     string `json:"created_at"`
-	Email         string `json:"email"`
-	EmailVerified bool   `json:"email_verified"`
-	EmployeeId    string `json:"employee_id"`
-	FirstName     string `json:"first_name"`
-	Id            string `json:"id"`
-	LastName      string `json:"last_name"`
-	PhoneNumber   string `json:"phone_number"`
-	Username      string `json:"username"`
+	AvatarUrl string `json:"avatar_url"`
+	CreatedAt string `json:"created_at"`
+	DrivingLicense DrivingLicense `json:"driving_license"`
+	Email string `json:"email"`
+	EmailVerified bool `json:"email_verified"`
+	EmployeeId string `json:"employee_id"`
+	FirstName string `json:"first_name"`
+	Id string `json:"id"`
+	LastName string `json:"last_name"`
+	PhoneNumber string `json:"phone_number"`
+	Username string `json:"username"`
 }
 
 type _User User
@@ -40,10 +41,11 @@ type _User User
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUser(avatarUrl string, createdAt string, email string, emailVerified bool, employeeId string, firstName string, id string, lastName string, phoneNumber string, username string) *User {
+func NewUser(avatarUrl string, createdAt string, drivingLicense DrivingLicense, email string, emailVerified bool, employeeId string, firstName string, id string, lastName string, phoneNumber string, username string) *User {
 	this := User{}
 	this.AvatarUrl = avatarUrl
 	this.CreatedAt = createdAt
+	this.DrivingLicense = drivingLicense
 	this.Email = email
 	this.EmailVerified = emailVerified
 	this.EmployeeId = employeeId
@@ -109,6 +111,30 @@ func (o *User) GetCreatedAtOk() (*string, bool) {
 // SetCreatedAt sets field value
 func (o *User) SetCreatedAt(v string) {
 	o.CreatedAt = v
+}
+
+// GetDrivingLicense returns the DrivingLicense field value
+func (o *User) GetDrivingLicense() DrivingLicense {
+	if o == nil {
+		var ret DrivingLicense
+		return ret
+	}
+
+	return o.DrivingLicense
+}
+
+// GetDrivingLicenseOk returns a tuple with the DrivingLicense field value
+// and a boolean to check if the value has been set.
+func (o *User) GetDrivingLicenseOk() (*DrivingLicense, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.DrivingLicense, true
+}
+
+// SetDrivingLicense sets field value
+func (o *User) SetDrivingLicense(v DrivingLicense) {
+	o.DrivingLicense = v
 }
 
 // GetEmail returns the Email field value
@@ -304,7 +330,7 @@ func (o *User) SetUsername(v string) {
 }
 
 func (o User) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -315,6 +341,7 @@ func (o User) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["avatar_url"] = o.AvatarUrl
 	toSerialize["created_at"] = o.CreatedAt
+	toSerialize["driving_license"] = o.DrivingLicense
 	toSerialize["email"] = o.Email
 	toSerialize["email_verified"] = o.EmailVerified
 	toSerialize["employee_id"] = o.EmployeeId
@@ -333,6 +360,7 @@ func (o *User) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"avatar_url",
 		"created_at",
+		"driving_license",
 		"email",
 		"email_verified",
 		"employee_id",
@@ -348,10 +376,10 @@ func (o *User) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -407,3 +435,5 @@ func (v *NullableUser) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

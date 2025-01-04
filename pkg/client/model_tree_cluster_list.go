@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,8 +22,8 @@ var _ MappedNullable = &TreeClusterList{}
 
 // TreeClusterList struct for TreeClusterList
 type TreeClusterList struct {
-	Data       []TreeCluster `json:"data"`
-	Pagination Pagination    `json:"pagination"`
+	Data []TreeClusterInList `json:"data"`
+	Pagination Pagination `json:"pagination"`
 }
 
 type _TreeClusterList TreeClusterList
@@ -32,7 +32,7 @@ type _TreeClusterList TreeClusterList
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeClusterList(data []TreeCluster, pagination Pagination) *TreeClusterList {
+func NewTreeClusterList(data []TreeClusterInList, pagination Pagination) *TreeClusterList {
 	this := TreeClusterList{}
 	this.Data = data
 	this.Pagination = pagination
@@ -48,9 +48,9 @@ func NewTreeClusterListWithDefaults() *TreeClusterList {
 }
 
 // GetData returns the Data field value
-func (o *TreeClusterList) GetData() []TreeCluster {
+func (o *TreeClusterList) GetData() []TreeClusterInList {
 	if o == nil {
-		var ret []TreeCluster
+		var ret []TreeClusterInList
 		return ret
 	}
 
@@ -59,7 +59,7 @@ func (o *TreeClusterList) GetData() []TreeCluster {
 
 // GetDataOk returns a tuple with the Data field value
 // and a boolean to check if the value has been set.
-func (o *TreeClusterList) GetDataOk() ([]TreeCluster, bool) {
+func (o *TreeClusterList) GetDataOk() ([]TreeClusterInList, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -67,7 +67,7 @@ func (o *TreeClusterList) GetDataOk() ([]TreeCluster, bool) {
 }
 
 // SetData sets field value
-func (o *TreeClusterList) SetData(v []TreeCluster) {
+func (o *TreeClusterList) SetData(v []TreeClusterInList) {
 	o.Data = v
 }
 
@@ -96,7 +96,7 @@ func (o *TreeClusterList) SetPagination(v Pagination) {
 }
 
 func (o TreeClusterList) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -124,10 +124,10 @@ func (o *TreeClusterList) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -183,3 +183,5 @@ func (v *NullableTreeClusterList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

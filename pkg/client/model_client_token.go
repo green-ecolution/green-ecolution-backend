@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,15 +22,15 @@ var _ MappedNullable = &ClientToken{}
 
 // ClientToken struct for ClientToken
 type ClientToken struct {
-	AccessToken      string `json:"access_token"`
-	ExpiresIn        int32  `json:"expires_in"`
-	IdToken          string `json:"id_token"`
-	NotBeforePolicy  int32  `json:"not_before_policy"`
-	RefreshExpiresIn int32  `json:"refresh_expires_in"`
-	RefreshToken     string `json:"refresh_token"`
-	Scope            string `json:"scope"`
-	SessionState     string `json:"session_state"`
-	TokenType        string `json:"token_type"`
+	AccessToken string `json:"access_token"`
+	ExpiresIn int32 `json:"expires_in"`
+	IdToken string `json:"id_token"`
+	NotBeforePolicy int32 `json:"not_before_policy"`
+	RefreshExpiresIn int32 `json:"refresh_expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	Scope string `json:"scope"`
+	SessionState string `json:"session_state"`
+	TokenType string `json:"token_type"`
 }
 
 type _ClientToken ClientToken
@@ -278,7 +278,7 @@ func (o *ClientToken) SetTokenType(v string) {
 }
 
 func (o ClientToken) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -320,10 +320,10 @@ func (o *ClientToken) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -379,3 +379,5 @@ func (v *NullableClientToken) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

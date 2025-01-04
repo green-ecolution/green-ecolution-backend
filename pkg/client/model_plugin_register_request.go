@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,12 +22,12 @@ var _ MappedNullable = &PluginRegisterRequest{}
 
 // PluginRegisterRequest struct for PluginRegisterRequest
 type PluginRegisterRequest struct {
-	Auth        PluginAuth `json:"auth"`
-	Description string     `json:"description"`
-	Name        string     `json:"name"`
-	Path        string     `json:"path"`
-	Slug        string     `json:"slug"`
-	Version     string     `json:"version"`
+	Auth PluginAuth `json:"auth"`
+	Description string `json:"description"`
+	Name string `json:"name"`
+	Path string `json:"path"`
+	Slug string `json:"slug"`
+	Version string `json:"version"`
 }
 
 type _PluginRegisterRequest PluginRegisterRequest
@@ -200,7 +200,7 @@ func (o *PluginRegisterRequest) SetVersion(v string) {
 }
 
 func (o PluginRegisterRequest) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -236,10 +236,10 @@ func (o *PluginRegisterRequest) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -295,3 +295,5 @@ func (v *NullablePluginRegisterRequest) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

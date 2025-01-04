@@ -1,7 +1,7 @@
 /*
 Green Space Management API
 
-Testing TreeAPIService
+Testing WateringPlanAPIService
 
 */
 
@@ -17,16 +17,16 @@ import (
 	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
-func Test_client_TreeAPIService(t *testing.T) {
+func Test_client_WateringPlanAPIService(t *testing.T) {
 
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
-	t.Run("Test TreeAPIService CreateTree", func(t *testing.T) {
+	t.Run("Test WateringPlanAPIService CreateWateringPlan", func(t *testing.T) {
 
 		t.Skip("skip test")  // remove to run test
 
-		resp, httpRes, err := apiClient.TreeAPI.CreateTree(context.Background()).Execute()
+		resp, httpRes, err := apiClient.WateringPlanAPI.CreateWateringPlan(context.Background()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -34,38 +34,24 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	})
 
-	t.Run("Test TreeAPIService DeleteTree", func(t *testing.T) {
+	t.Run("Test WateringPlanAPIService DeleteWateringPlan", func(t *testing.T) {
 
 		t.Skip("skip test")  // remove to run test
 
-		var treeId string
+		var id string
 
-		httpRes, err := apiClient.TreeAPI.DeleteTree(context.Background(), treeId).Execute()
+		httpRes, err := apiClient.WateringPlanAPI.DeleteWateringPlan(context.Background(), id).Execute()
 
 		require.Nil(t, err)
 		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})
 
-	t.Run("Test TreeAPIService GetAllTrees", func(t *testing.T) {
+	t.Run("Test WateringPlanAPIService GetAllWateringPlans", func(t *testing.T) {
 
 		t.Skip("skip test")  // remove to run test
 
-		resp, httpRes, err := apiClient.TreeAPI.GetAllTrees(context.Background()).Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test TreeAPIService GetTrees", func(t *testing.T) {
-
-		t.Skip("skip test")  // remove to run test
-
-		var treeId string
-
-		resp, httpRes, err := apiClient.TreeAPI.GetTrees(context.Background(), treeId).Execute()
+		resp, httpRes, err := apiClient.WateringPlanAPI.GetAllWateringPlans(context.Background()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
@@ -73,13 +59,27 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 	})
 
-	t.Run("Test TreeAPIService UpdateTree", func(t *testing.T) {
+	t.Run("Test WateringPlanAPIService GetWateringPlanById", func(t *testing.T) {
 
 		t.Skip("skip test")  // remove to run test
 
-		var treeId string
+		var id string
 
-		resp, httpRes, err := apiClient.TreeAPI.UpdateTree(context.Background(), treeId).Execute()
+		resp, httpRes, err := apiClient.WateringPlanAPI.GetWateringPlanById(context.Background(), id).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
+	t.Run("Test WateringPlanAPIService UpdateWateringPlan", func(t *testing.T) {
+
+		t.Skip("skip test")  // remove to run test
+
+		var id string
+
+		resp, httpRes, err := apiClient.WateringPlanAPI.UpdateWateringPlan(context.Background(), id).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

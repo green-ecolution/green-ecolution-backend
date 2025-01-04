@@ -21,56 +21,56 @@ import (
 )
 
 
-// VehicleAPIService VehicleAPI service
-type VehicleAPIService service
+// WateringPlanAPIService WateringPlanAPI service
+type WateringPlanAPIService service
 
-type ApiCreateVehicleRequest struct {
+type ApiCreateWateringPlanRequest struct {
 	ctx context.Context
-	ApiService *VehicleAPIService
-	body *VehicleCreate
+	ApiService *WateringPlanAPIService
+	body *WateringPlanCreate
 }
 
-// Vehicle Create Request
-func (r ApiCreateVehicleRequest) Body(body VehicleCreate) ApiCreateVehicleRequest {
+// Watering Plan Create Request
+func (r ApiCreateWateringPlanRequest) Body(body WateringPlanCreate) ApiCreateWateringPlanRequest {
 	r.body = &body
 	return r
 }
 
-func (r ApiCreateVehicleRequest) Execute() (*Vehicle, *http.Response, error) {
-	return r.ApiService.CreateVehicleExecute(r)
+func (r ApiCreateWateringPlanRequest) Execute() (*WateringPlan, *http.Response, error) {
+	return r.ApiService.CreateWateringPlanExecute(r)
 }
 
 /*
-CreateVehicle Create vehicle
+CreateWateringPlan Create watering plan
 
-Create vehicle
+Create watering plan
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateVehicleRequest
+ @return ApiCreateWateringPlanRequest
 */
-func (a *VehicleAPIService) CreateVehicle(ctx context.Context) ApiCreateVehicleRequest {
-	return ApiCreateVehicleRequest{
+func (a *WateringPlanAPIService) CreateWateringPlan(ctx context.Context) ApiCreateWateringPlanRequest {
+	return ApiCreateWateringPlanRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return Vehicle
-func (a *VehicleAPIService) CreateVehicleExecute(r ApiCreateVehicleRequest) (*Vehicle, *http.Response, error) {
+//  @return WateringPlan
+func (a *WateringPlanAPIService) CreateWateringPlanExecute(r ApiCreateWateringPlanRequest) (*WateringPlan, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *Vehicle
+		localVarReturnValue  *WateringPlan
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "VehicleAPIService.CreateVehicle")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WateringPlanAPIService.CreateWateringPlan")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/vehicle"
+	localVarPath := localBasePath + "/v1/watering-plan"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -189,27 +189,27 @@ func (a *VehicleAPIService) CreateVehicleExecute(r ApiCreateVehicleRequest) (*Ve
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiDeleteVehicleRequest struct {
+type ApiDeleteWateringPlanRequest struct {
 	ctx context.Context
-	ApiService *VehicleAPIService
+	ApiService *WateringPlanAPIService
 	id string
 }
 
-func (r ApiDeleteVehicleRequest) Execute() (*http.Response, error) {
-	return r.ApiService.DeleteVehicleExecute(r)
+func (r ApiDeleteWateringPlanRequest) Execute() (*http.Response, error) {
+	return r.ApiService.DeleteWateringPlanExecute(r)
 }
 
 /*
-DeleteVehicle Delete vehicle
+DeleteWateringPlan Delete watering plan
 
-Delete vehicle
+Delete watering plan
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id Vehicle ID
- @return ApiDeleteVehicleRequest
+ @param id Watering Plan ID
+ @return ApiDeleteWateringPlanRequest
 */
-func (a *VehicleAPIService) DeleteVehicle(ctx context.Context, id string) ApiDeleteVehicleRequest {
-	return ApiDeleteVehicleRequest{
+func (a *WateringPlanAPIService) DeleteWateringPlan(ctx context.Context, id string) ApiDeleteWateringPlanRequest {
+	return ApiDeleteWateringPlanRequest{
 		ApiService: a,
 		ctx: ctx,
 		id: id,
@@ -217,19 +217,19 @@ func (a *VehicleAPIService) DeleteVehicle(ctx context.Context, id string) ApiDel
 }
 
 // Execute executes the request
-func (a *VehicleAPIService) DeleteVehicleExecute(r ApiDeleteVehicleRequest) (*http.Response, error) {
+func (a *WateringPlanAPIService) DeleteWateringPlanExecute(r ApiDeleteWateringPlanRequest) (*http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete
 		localVarPostBody     interface{}
 		formFiles            []formFile
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "VehicleAPIService.DeleteVehicle")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WateringPlanAPIService.DeleteWateringPlan")
 	if err != nil {
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/vehicle/{id}"
+	localVarPath := localBasePath + "/v1/watering-plan/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -335,74 +335,67 @@ func (a *VehicleAPIService) DeleteVehicleExecute(r ApiDeleteVehicleRequest) (*ht
 	return localVarHTTPResponse, nil
 }
 
-type ApiGetAllVehiclesRequest struct {
+type ApiGetAllWateringPlansRequest struct {
 	ctx context.Context
-	ApiService *VehicleAPIService
+	ApiService *WateringPlanAPIService
 	page *string
 	limit *string
 	status *string
-	type_ *string
 }
 
 // Page
-func (r ApiGetAllVehiclesRequest) Page(page string) ApiGetAllVehiclesRequest {
+func (r ApiGetAllWateringPlansRequest) Page(page string) ApiGetAllWateringPlansRequest {
 	r.page = &page
 	return r
 }
 
 // Limit
-func (r ApiGetAllVehiclesRequest) Limit(limit string) ApiGetAllVehiclesRequest {
+func (r ApiGetAllWateringPlansRequest) Limit(limit string) ApiGetAllWateringPlansRequest {
 	r.limit = &limit
 	return r
 }
 
 // Status
-func (r ApiGetAllVehiclesRequest) Status(status string) ApiGetAllVehiclesRequest {
+func (r ApiGetAllWateringPlansRequest) Status(status string) ApiGetAllWateringPlansRequest {
 	r.status = &status
 	return r
 }
 
-// Vehicle Type
-func (r ApiGetAllVehiclesRequest) Type_(type_ string) ApiGetAllVehiclesRequest {
-	r.type_ = &type_
-	return r
-}
-
-func (r ApiGetAllVehiclesRequest) Execute() (*VehicleList, *http.Response, error) {
-	return r.ApiService.GetAllVehiclesExecute(r)
+func (r ApiGetAllWateringPlansRequest) Execute() (*WateringPlanList, *http.Response, error) {
+	return r.ApiService.GetAllWateringPlansExecute(r)
 }
 
 /*
-GetAllVehicles Get all vehicles
+GetAllWateringPlans Get all watering plans
 
-Get all vehicles
+Get all watering plans
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetAllVehiclesRequest
+ @return ApiGetAllWateringPlansRequest
 */
-func (a *VehicleAPIService) GetAllVehicles(ctx context.Context) ApiGetAllVehiclesRequest {
-	return ApiGetAllVehiclesRequest{
+func (a *WateringPlanAPIService) GetAllWateringPlans(ctx context.Context) ApiGetAllWateringPlansRequest {
+	return ApiGetAllWateringPlansRequest{
 		ApiService: a,
 		ctx: ctx,
 	}
 }
 
 // Execute executes the request
-//  @return VehicleList
-func (a *VehicleAPIService) GetAllVehiclesExecute(r ApiGetAllVehiclesRequest) (*VehicleList, *http.Response, error) {
+//  @return WateringPlanList
+func (a *WateringPlanAPIService) GetAllWateringPlansExecute(r ApiGetAllWateringPlansRequest) (*WateringPlanList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *VehicleList
+		localVarReturnValue  *WateringPlanList
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "VehicleAPIService.GetAllVehicles")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WateringPlanAPIService.GetAllWateringPlans")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/vehicle"
+	localVarPath := localBasePath + "/v1/watering-plan"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -416,9 +409,6 @@ func (a *VehicleAPIService) GetAllVehiclesExecute(r ApiGetAllVehiclesRequest) (*
 	}
 	if r.status != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "", "")
-	}
-	if r.type_ != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "type", r.type_, "", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -528,27 +518,27 @@ func (a *VehicleAPIService) GetAllVehiclesExecute(r ApiGetAllVehiclesRequest) (*
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetVehicleByIdRequest struct {
+type ApiGetWateringPlanByIdRequest struct {
 	ctx context.Context
-	ApiService *VehicleAPIService
+	ApiService *WateringPlanAPIService
 	id string
 }
 
-func (r ApiGetVehicleByIdRequest) Execute() (*Vehicle, *http.Response, error) {
-	return r.ApiService.GetVehicleByIdExecute(r)
+func (r ApiGetWateringPlanByIdRequest) Execute() (*WateringPlan, *http.Response, error) {
+	return r.ApiService.GetWateringPlanByIdExecute(r)
 }
 
 /*
-GetVehicleById Get vehicle by ID
+GetWateringPlanById Get watering plan by ID
 
-Get vehicle by ID
+Get watering plan by ID
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id Vehicle ID
- @return ApiGetVehicleByIdRequest
+ @param id Watering Plan ID
+ @return ApiGetWateringPlanByIdRequest
 */
-func (a *VehicleAPIService) GetVehicleById(ctx context.Context, id string) ApiGetVehicleByIdRequest {
-	return ApiGetVehicleByIdRequest{
+func (a *WateringPlanAPIService) GetWateringPlanById(ctx context.Context, id string) ApiGetWateringPlanByIdRequest {
+	return ApiGetWateringPlanByIdRequest{
 		ApiService: a,
 		ctx: ctx,
 		id: id,
@@ -556,21 +546,21 @@ func (a *VehicleAPIService) GetVehicleById(ctx context.Context, id string) ApiGe
 }
 
 // Execute executes the request
-//  @return Vehicle
-func (a *VehicleAPIService) GetVehicleByIdExecute(r ApiGetVehicleByIdRequest) (*Vehicle, *http.Response, error) {
+//  @return WateringPlan
+func (a *WateringPlanAPIService) GetWateringPlanByIdExecute(r ApiGetWateringPlanByIdRequest) (*WateringPlan, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *Vehicle
+		localVarReturnValue  *WateringPlan
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "VehicleAPIService.GetVehicleById")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WateringPlanAPIService.GetWateringPlanById")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/vehicle/{id}"
+	localVarPath := localBasePath + "/v1/watering-plan/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -685,191 +675,34 @@ func (a *VehicleAPIService) GetVehicleByIdExecute(r ApiGetVehicleByIdRequest) (*
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-type ApiGetVehicleByPlateRequest struct {
+type ApiUpdateWateringPlanRequest struct {
 	ctx context.Context
-	ApiService *VehicleAPIService
-	plate string
-}
-
-func (r ApiGetVehicleByPlateRequest) Execute() (*Vehicle, *http.Response, error) {
-	return r.ApiService.GetVehicleByPlateExecute(r)
-}
-
-/*
-GetVehicleByPlate Get vehicle by plate
-
-Get vehicle by plate
-
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param plate Vehicle plate number
- @return ApiGetVehicleByPlateRequest
-*/
-func (a *VehicleAPIService) GetVehicleByPlate(ctx context.Context, plate string) ApiGetVehicleByPlateRequest {
-	return ApiGetVehicleByPlateRequest{
-		ApiService: a,
-		ctx: ctx,
-		plate: plate,
-	}
-}
-
-// Execute executes the request
-//  @return Vehicle
-func (a *VehicleAPIService) GetVehicleByPlateExecute(r ApiGetVehicleByPlateRequest) (*Vehicle, *http.Response, error) {
-	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Vehicle
-	)
-
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "VehicleAPIService.GetVehicleByPlate")
-	if err != nil {
-		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
-	}
-
-	localVarPath := localBasePath + "/v1/vehicle/plate/{plate}"
-	localVarPath = strings.Replace(localVarPath, "{"+"plate"+"}", url.PathEscape(parameterValueToString(r.plate, "plate")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(req)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
-	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
-			var v HTTPError
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 401 {
-			var v HTTPError
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 403 {
-			var v HTTPError
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 404 {
-			var v HTTPError
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-			return localVarReturnValue, localVarHTTPResponse, newErr
-		}
-		if localVarHTTPResponse.StatusCode == 500 {
-			var v HTTPError
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarReturnValue, localVarHTTPResponse, newErr
-			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := &GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
-		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-type ApiUpdateVehicleRequest struct {
-	ctx context.Context
-	ApiService *VehicleAPIService
+	ApiService *WateringPlanAPIService
 	id string
-	body *VehicleUpdate
+	body *WateringPlanUpdate
 }
 
-// Vehicle Update Request
-func (r ApiUpdateVehicleRequest) Body(body VehicleUpdate) ApiUpdateVehicleRequest {
+// Watering Plan Update Request
+func (r ApiUpdateWateringPlanRequest) Body(body WateringPlanUpdate) ApiUpdateWateringPlanRequest {
 	r.body = &body
 	return r
 }
 
-func (r ApiUpdateVehicleRequest) Execute() (*Vehicle, *http.Response, error) {
-	return r.ApiService.UpdateVehicleExecute(r)
+func (r ApiUpdateWateringPlanRequest) Execute() (*WateringPlan, *http.Response, error) {
+	return r.ApiService.UpdateWateringPlanExecute(r)
 }
 
 /*
-UpdateVehicle Update vehicle
+UpdateWateringPlan Update watering plan
 
-Update vehicle
+Update watering plan
 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id Vehicle ID
- @return ApiUpdateVehicleRequest
+ @param id Watering Plan ID
+ @return ApiUpdateWateringPlanRequest
 */
-func (a *VehicleAPIService) UpdateVehicle(ctx context.Context, id string) ApiUpdateVehicleRequest {
-	return ApiUpdateVehicleRequest{
+func (a *WateringPlanAPIService) UpdateWateringPlan(ctx context.Context, id string) ApiUpdateWateringPlanRequest {
+	return ApiUpdateWateringPlanRequest{
 		ApiService: a,
 		ctx: ctx,
 		id: id,
@@ -877,21 +710,21 @@ func (a *VehicleAPIService) UpdateVehicle(ctx context.Context, id string) ApiUpd
 }
 
 // Execute executes the request
-//  @return Vehicle
-func (a *VehicleAPIService) UpdateVehicleExecute(r ApiUpdateVehicleRequest) (*Vehicle, *http.Response, error) {
+//  @return WateringPlan
+func (a *WateringPlanAPIService) UpdateWateringPlanExecute(r ApiUpdateWateringPlanRequest) (*WateringPlan, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPut
 		localVarPostBody     interface{}
 		formFiles            []formFile
-		localVarReturnValue  *Vehicle
+		localVarReturnValue  *WateringPlan
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "VehicleAPIService.UpdateVehicle")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WateringPlanAPIService.UpdateWateringPlan")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/v1/vehicle/{id}"
+	localVarPath := localBasePath + "/v1/watering-plan/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", url.PathEscape(parameterValueToString(r.id, "id")), -1)
 
 	localVarHeaderParams := make(map[string]string)

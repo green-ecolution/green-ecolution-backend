@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,13 +22,10 @@ var _ MappedNullable = &SensorData{}
 
 // SensorData struct for SensorData
 type SensorData struct {
-	BatteryLevel     float32 `json:"battery_level"`
-	Depth            float32 `json:"depth"`
-	Humidity         float32 `json:"humidity"`
-	Id               string  `json:"id"`
-	SoilWaterTension float32 `json:"soil_water_tension"`
-	Temperature      float32 `json:"temperature"`
-	TrunkMoisture    float32 `json:"trunk_moisture"`
+	Battery float32 `json:"battery"`
+	Humidity float32 `json:"humidity"`
+	Temperature float32 `json:"temperature"`
+	Watermarks []WatermarkResponse `json:"watermarks"`
 }
 
 type _SensorData SensorData
@@ -37,15 +34,12 @@ type _SensorData SensorData
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensorData(batteryLevel float32, depth float32, humidity float32, id string, soilWaterTension float32, temperature float32, trunkMoisture float32) *SensorData {
+func NewSensorData(battery float32, humidity float32, temperature float32, watermarks []WatermarkResponse) *SensorData {
 	this := SensorData{}
-	this.BatteryLevel = batteryLevel
-	this.Depth = depth
+	this.Battery = battery
 	this.Humidity = humidity
-	this.Id = id
-	this.SoilWaterTension = soilWaterTension
 	this.Temperature = temperature
-	this.TrunkMoisture = trunkMoisture
+	this.Watermarks = watermarks
 	return &this
 }
 
@@ -57,52 +51,28 @@ func NewSensorDataWithDefaults() *SensorData {
 	return &this
 }
 
-// GetBatteryLevel returns the BatteryLevel field value
-func (o *SensorData) GetBatteryLevel() float32 {
+// GetBattery returns the Battery field value
+func (o *SensorData) GetBattery() float32 {
 	if o == nil {
 		var ret float32
 		return ret
 	}
 
-	return o.BatteryLevel
+	return o.Battery
 }
 
-// GetBatteryLevelOk returns a tuple with the BatteryLevel field value
+// GetBatteryOk returns a tuple with the Battery field value
 // and a boolean to check if the value has been set.
-func (o *SensorData) GetBatteryLevelOk() (*float32, bool) {
+func (o *SensorData) GetBatteryOk() (*float32, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.BatteryLevel, true
+	return &o.Battery, true
 }
 
-// SetBatteryLevel sets field value
-func (o *SensorData) SetBatteryLevel(v float32) {
-	o.BatteryLevel = v
-}
-
-// GetDepth returns the Depth field value
-func (o *SensorData) GetDepth() float32 {
-	if o == nil {
-		var ret float32
-		return ret
-	}
-
-	return o.Depth
-}
-
-// GetDepthOk returns a tuple with the Depth field value
-// and a boolean to check if the value has been set.
-func (o *SensorData) GetDepthOk() (*float32, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Depth, true
-}
-
-// SetDepth sets field value
-func (o *SensorData) SetDepth(v float32) {
-	o.Depth = v
+// SetBattery sets field value
+func (o *SensorData) SetBattery(v float32) {
+	o.Battery = v
 }
 
 // GetHumidity returns the Humidity field value
@@ -129,54 +99,6 @@ func (o *SensorData) SetHumidity(v float32) {
 	o.Humidity = v
 }
 
-// GetId returns the Id field value
-func (o *SensorData) GetId() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Id
-}
-
-// GetIdOk returns a tuple with the Id field value
-// and a boolean to check if the value has been set.
-func (o *SensorData) GetIdOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Id, true
-}
-
-// SetId sets field value
-func (o *SensorData) SetId(v string) {
-	o.Id = v
-}
-
-// GetSoilWaterTension returns the SoilWaterTension field value
-func (o *SensorData) GetSoilWaterTension() float32 {
-	if o == nil {
-		var ret float32
-		return ret
-	}
-
-	return o.SoilWaterTension
-}
-
-// GetSoilWaterTensionOk returns a tuple with the SoilWaterTension field value
-// and a boolean to check if the value has been set.
-func (o *SensorData) GetSoilWaterTensionOk() (*float32, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.SoilWaterTension, true
-}
-
-// SetSoilWaterTension sets field value
-func (o *SensorData) SetSoilWaterTension(v float32) {
-	o.SoilWaterTension = v
-}
-
 // GetTemperature returns the Temperature field value
 func (o *SensorData) GetTemperature() float32 {
 	if o == nil {
@@ -201,32 +123,32 @@ func (o *SensorData) SetTemperature(v float32) {
 	o.Temperature = v
 }
 
-// GetTrunkMoisture returns the TrunkMoisture field value
-func (o *SensorData) GetTrunkMoisture() float32 {
+// GetWatermarks returns the Watermarks field value
+func (o *SensorData) GetWatermarks() []WatermarkResponse {
 	if o == nil {
-		var ret float32
+		var ret []WatermarkResponse
 		return ret
 	}
 
-	return o.TrunkMoisture
+	return o.Watermarks
 }
 
-// GetTrunkMoistureOk returns a tuple with the TrunkMoisture field value
+// GetWatermarksOk returns a tuple with the Watermarks field value
 // and a boolean to check if the value has been set.
-func (o *SensorData) GetTrunkMoistureOk() (*float32, bool) {
+func (o *SensorData) GetWatermarksOk() ([]WatermarkResponse, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.TrunkMoisture, true
+	return o.Watermarks, true
 }
 
-// SetTrunkMoisture sets field value
-func (o *SensorData) SetTrunkMoisture(v float32) {
-	o.TrunkMoisture = v
+// SetWatermarks sets field value
+func (o *SensorData) SetWatermarks(v []WatermarkResponse) {
+	o.Watermarks = v
 }
 
 func (o SensorData) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -235,13 +157,10 @@ func (o SensorData) MarshalJSON() ([]byte, error) {
 
 func (o SensorData) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["battery_level"] = o.BatteryLevel
-	toSerialize["depth"] = o.Depth
+	toSerialize["battery"] = o.Battery
 	toSerialize["humidity"] = o.Humidity
-	toSerialize["id"] = o.Id
-	toSerialize["soil_water_tension"] = o.SoilWaterTension
 	toSerialize["temperature"] = o.Temperature
-	toSerialize["trunk_moisture"] = o.TrunkMoisture
+	toSerialize["watermarks"] = o.Watermarks
 	return toSerialize, nil
 }
 
@@ -250,13 +169,10 @@ func (o *SensorData) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"battery_level",
-		"depth",
+		"battery",
 		"humidity",
-		"id",
-		"soil_water_tension",
 		"temperature",
-		"trunk_moisture",
+		"watermarks",
 	}
 
 	allProperties := make(map[string]interface{})
@@ -264,10 +180,10 @@ func (o *SensorData) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -323,3 +239,5 @@ func (v *NullableSensorData) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

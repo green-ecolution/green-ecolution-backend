@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,16 +22,16 @@ var _ MappedNullable = &VehicleCreate{}
 
 // VehicleCreate struct for VehicleCreate
 type VehicleCreate struct {
-	Description    string         `json:"description"`
+	Description string `json:"description"`
 	DrivingLicense DrivingLicense `json:"driving_license"`
-	Height         float32        `json:"height"`
-	Length         float32        `json:"length"`
-	Model          string         `json:"model"`
-	NumberPlate    string         `json:"number_plate"`
-	Status         VehicleStatus  `json:"status"`
-	Type           VehicleType    `json:"type"`
-	WaterCapacity  float32        `json:"water_capacity"`
-	Width          float32        `json:"width"`
+	Height float32 `json:"height"`
+	Length float32 `json:"length"`
+	Model string `json:"model"`
+	NumberPlate string `json:"number_plate"`
+	Status VehicleStatus `json:"status"`
+	Type VehicleType `json:"type"`
+	WaterCapacity float32 `json:"water_capacity"`
+	Width float32 `json:"width"`
 }
 
 type _VehicleCreate VehicleCreate
@@ -304,7 +304,7 @@ func (o *VehicleCreate) SetWidth(v float32) {
 }
 
 func (o VehicleCreate) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -348,10 +348,10 @@ func (o *VehicleCreate) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -407,3 +407,5 @@ func (v *NullableVehicleCreate) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

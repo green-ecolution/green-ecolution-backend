@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,11 +22,11 @@ var _ MappedNullable = &AppInfo{}
 
 // AppInfo struct for AppInfo
 type AppInfo struct {
-	BuildTime string     `json:"buildTime"`
-	Git       GitInfo    `json:"git"`
-	GoVersion string     `json:"goVersion"`
-	Server    ServerInfo `json:"server"`
-	Version   string     `json:"version"`
+	BuildTime string `json:"buildTime"`
+	Git GitInfo `json:"git"`
+	GoVersion string `json:"goVersion"`
+	Server ServerInfo `json:"server"`
+	Version string `json:"version"`
 }
 
 type _AppInfo AppInfo
@@ -174,7 +174,7 @@ func (o *AppInfo) SetVersion(v string) {
 }
 
 func (o AppInfo) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -208,10 +208,10 @@ func (o *AppInfo) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -267,3 +267,5 @@ func (v *NullableAppInfo) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

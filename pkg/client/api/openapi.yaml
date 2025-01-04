@@ -909,84 +909,6 @@ paths:
       summary: Get sensor by ID
       tags:
       - Sensor
-  /v1/sensor/{sensor_id}/data:
-    get:
-      description: Get sensor data by ID
-      operationId: get-sensor-data-by-id
-      parameters:
-      - description: Sensor ID
-        in: path
-        name: sensor_id
-        required: true
-        schema:
-          type: string
-      - description: Page
-        in: query
-        name: page
-        schema:
-          type: string
-      - description: Limit
-        in: query
-        name: limit
-        schema:
-          type: string
-      - description: Start time
-        in: query
-        name: start_time
-        schema:
-          type: string
-      - description: End time
-        in: query
-        name: end_time
-        schema:
-          type: string
-      - description: TreeCluster ID
-        in: query
-        name: treecluster_id
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SensorDataList'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get sensor data by ID
-      tags:
-      - Sensor
   /v1/tree:
     get:
       description: Get all trees
@@ -1005,11 +927,6 @@ paths:
       - description: Age
         in: query
         name: age
-        schema:
-          type: string
-      - description: Tree Cluster ID
-        in: query
-        name: treecluster_id
         schema:
           type: string
       responses:
@@ -1269,360 +1186,6 @@ paths:
       tags:
       - Tree
       x-codegen-request-body-name: body
-  /v1/tree/{tree_id}/images:
-    get:
-      description: Get images of a tree
-      operationId: get-tree-images
-      parameters:
-      - description: Tree ID
-        in: path
-        name: tree_id
-        required: true
-        schema:
-          type: string
-      - description: Page
-        in: query
-        name: page
-        schema:
-          type: string
-      - description: Limit
-        in: query
-        name: limit
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get images of a tree
-      tags:
-      - Tree Images
-    post:
-      description: Add images to a tree
-      operationId: add-images-to-tree
-      parameters:
-      - description: Tree ID
-        in: path
-        name: tree_id
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/TreeAddImages'
-        description: Images to add
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Add images to a tree
-      tags:
-      - Tree Images
-      x-codegen-request-body-name: body
-  /v1/tree/{tree_id}/images/{image_id}:
-    delete:
-      description: Remove image from a tree
-      operationId: remove-image-from-tree
-      parameters:
-      - description: Tree ID
-        in: path
-        name: tree_id
-        required: true
-        schema:
-          type: string
-      - description: Image ID
-        in: path
-        name: image_id
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Remove image from a tree
-      tags:
-      - Tree Images
-  /v1/tree/{tree_id}/sensor:
-    get:
-      description: Get sensor of a tree
-      operationId: get-tree-sensor
-      parameters:
-      - description: Tree ID
-        in: path
-        name: tree_id
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get sensor of a tree
-      tags:
-      - Tree Sensor
-    post:
-      description: Add sensor to a tree
-      operationId: add-sensor-to-tree
-      parameters:
-      - description: Tree ID
-        in: path
-        name: tree_id
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/TreeAddSensor'
-        description: Sensor to add
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Add sensor to a tree
-      tags:
-      - Tree Sensor
-      x-codegen-request-body-name: body
-  /v1/tree/{tree_id}/sensor/{sensor_id}:
-    delete:
-      description: Remove sensor from a tree
-      operationId: remove-sensor-from-tree
-      parameters:
-      - description: Tree ID
-        in: path
-        name: tree_id
-        required: true
-        schema:
-          type: string
-      - description: Sensor ID
-        in: path
-        name: sensor_id
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Tree'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Remove sensor from a tree
-      tags:
-      - Tree Sensor
   /v1/tree/sensor/{sensor_id}:
     get:
       description: Get tree by sensor ID
@@ -1679,6 +1242,7 @@ paths:
   /v1/user:
     get:
       description: Get all users
+      operationId: get-all-users
       parameters:
       - description: Page
         in: query
@@ -1688,6 +1252,16 @@ paths:
       - description: Limit
         in: query
         name: limit
+        schema:
+          type: string
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: string
+      - description: User IDs
+        in: query
+        name: user_ids
         schema:
           type: string
       responses:
@@ -1748,176 +1322,6 @@ paths:
       tags:
       - User
       x-codegen-request-body-name: user
-  /v1/user/{user_id}:
-    delete:
-      description: Delete a user by ID
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                type: string
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Delete a user by ID
-      tags:
-      - User
-    get:
-      description: Get a user by ID
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get a user by ID
-      tags:
-      - User
-    put:
-      description: Update a user by ID
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdate'
-        description: User information
-        required: true
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Update a user by ID
-      tags:
-      - User
-      x-codegen-request-body-name: user
-  /v1/user/{user_id}/roles:
-    get:
-      description: Get user roles
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        schema:
-          type: string
-      - description: Page
-        in: query
-        name: page
-        schema:
-          type: string
-      - description: Limit
-        in: query
-        name: limit
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleList'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get user roles
-      tags:
-      - User
   /v1/user/login:
     get:
       parameters:
@@ -2071,6 +1475,11 @@ paths:
       - description: Status
         in: query
         name: status
+        schema:
+          type: string
+      - description: Vehicle Type
+        in: query
+        name: type
         schema:
           type: string
       responses:
@@ -2383,6 +1792,283 @@ paths:
       summary: Get vehicle by plate
       tags:
       - Vehicle
+  /v1/watering-plan:
+    get:
+      description: Get all watering plans
+      operationId: get-all-watering-plans
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        schema:
+          type: string
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: string
+      - description: Status
+        in: query
+        name: status
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WateringPlanList'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Get all watering plans
+      tags:
+      - Watering Plan
+    post:
+      description: Create watering plan
+      operationId: create-watering-plan
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/WateringPlanCreate'
+        description: Watering Plan Create Request
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WateringPlan'
+          description: Created
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Create watering plan
+      tags:
+      - Watering Plan
+      x-codegen-request-body-name: body
+  /v1/watering-plan/{id}:
+    delete:
+      description: Delete watering plan
+      operationId: delete-watering-plan
+      parameters:
+      - description: Watering Plan ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Delete watering plan
+      tags:
+      - Watering Plan
+    get:
+      description: Get watering plan by ID
+      operationId: get-watering-plan-by-id
+      parameters:
+      - description: Watering Plan ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WateringPlan'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Get watering plan by ID
+      tags:
+      - Watering Plan
+    put:
+      description: Update watering plan
+      operationId: update-watering-plan
+      parameters:
+      - description: Watering Plan ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/WateringPlanUpdate'
+        description: Watering Plan Update Request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WateringPlan'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Update watering plan
+      tags:
+      - Watering Plan
+      x-codegen-request-body-name: body
 components:
   schemas:
     AppInfo:
@@ -2472,6 +2158,23 @@ components:
       - DrivingLicenseCar
       - DrivingLicenseTrailer
       - DrivingLicenseTransporter
+    EvaluationValue:
+      example:
+        consumed_water: 6.027456183070403
+        tree_cluster_id: 1
+        watering_plan_id: 5
+      properties:
+        consumed_water:
+          type: number
+        tree_cluster_id:
+          type: integer
+        watering_plan_id:
+          type: integer
+      required:
+      - consumed_water
+      - tree_cluster_id
+      - watering_plan_id
+      type: object
     GitInfo:
       example:
         commit: commit
@@ -2492,7 +2195,7 @@ components:
     HTTPError:
       example:
         path: path
-        code: 1
+        code: 7
         method: method
         error: error
       properties:
@@ -2539,11 +2242,11 @@ components:
       type: object
     Pagination:
       example:
-        next_page: 1
-        total_records: 7
-        total_pages: 6
-        prev_page: 1
-        current_page: 1
+        next_page: 9
+        total_records: 4
+        total_pages: 2
+        prev_page: 3
+        current_page: 7
       properties:
         current_page:
           type: integer
@@ -2677,11 +2380,11 @@ components:
     RegionList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         regions:
         - name: name
           id: 5
@@ -2718,11 +2421,11 @@ components:
     RoleList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         data:
         - name: name
           description: description
@@ -2743,17 +2446,30 @@ components:
       type: object
     Sensor:
       example:
+        latest_data:
+          temperature: 4.145608029883936
+          humidity: 2.027123023002322
+          watermarks:
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          battery: 3.616076749251911
         updated_at: updated_at
-        latitude: 2.027123023002322
+        latitude: 1.4894159098541704
         created_at: created_at
         id: id
-        longitude: 4.145608029883936
+        longitude: 6.84685269835264
         status: online
       properties:
         created_at:
           type: string
         id:
           type: string
+        latest_data:
+          $ref: '#/components/schemas/SensorData'
         latitude:
           type: number
         longitude:
@@ -2765,6 +2481,7 @@ components:
       required:
       - created_at
       - id
+      - latest_data
       - latitude
       - longitude
       - status
@@ -2772,91 +2489,75 @@ components:
       type: object
     SensorData:
       example:
-        depth: 6.027456183070403
-        battery_level: 0.8008281904610115
-        soil_water_tension: 5.962133916683182
-        temperature: 5.637376656633329
-        humidity: 1.4658129805029452
-        id: id
-        trunk_moisture: 2.3021358869347655
+        temperature: 4.145608029883936
+        humidity: 2.027123023002322
+        watermarks:
+        - centibar: 7
+          depth: 1
+          resistance: 1
+        - centibar: 7
+          depth: 1
+          resistance: 1
+        battery: 3.616076749251911
       properties:
-        battery_level:
-          type: number
-        depth:
+        battery:
           type: number
         humidity:
           type: number
-        id:
-          type: string
-        soil_water_tension:
-          type: number
         temperature:
           type: number
-        trunk_moisture:
-          type: number
-      required:
-      - battery_level
-      - depth
-      - humidity
-      - id
-      - soil_water_tension
-      - temperature
-      - trunk_moisture
-      type: object
-    SensorDataList:
-      example:
-        pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
-        data:
-        - depth: 6.027456183070403
-          battery_level: 0.8008281904610115
-          soil_water_tension: 5.962133916683182
-          temperature: 5.637376656633329
-          humidity: 1.4658129805029452
-          id: id
-          trunk_moisture: 2.3021358869347655
-        - depth: 6.027456183070403
-          battery_level: 0.8008281904610115
-          soil_water_tension: 5.962133916683182
-          temperature: 5.637376656633329
-          humidity: 1.4658129805029452
-          id: id
-          trunk_moisture: 2.3021358869347655
-      properties:
-        data:
+        watermarks:
           items:
-            $ref: '#/components/schemas/SensorData'
+            $ref: '#/components/schemas/WatermarkResponse'
           type: array
-        pagination:
-          $ref: '#/components/schemas/Pagination'
       required:
-      - data
-      - pagination
+      - battery
+      - humidity
+      - temperature
+      - watermarks
       type: object
     SensorList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         data:
-        - updated_at: updated_at
-          latitude: 2.027123023002322
+        - latest_data:
+            temperature: 4.145608029883936
+            humidity: 2.027123023002322
+            watermarks:
+            - centibar: 7
+              depth: 1
+              resistance: 1
+            - centibar: 7
+              depth: 1
+              resistance: 1
+            battery: 3.616076749251911
+          updated_at: updated_at
+          latitude: 1.4894159098541704
           created_at: created_at
           id: id
-          longitude: 4.145608029883936
+          longitude: 6.84685269835264
           status: online
-        - updated_at: updated_at
-          latitude: 2.027123023002322
+        - latest_data:
+            temperature: 4.145608029883936
+            humidity: 2.027123023002322
+            watermarks:
+            - centibar: 7
+              depth: 1
+              resistance: 1
+            - centibar: 7
+              depth: 1
+              resistance: 1
+            battery: 3.616076749251911
+          updated_at: updated_at
+          latitude: 1.4894159098541704
           created_at: created_at
           id: id
-          longitude: 4.145608029883936
+          longitude: 6.84685269835264
           status: online
       properties:
         data:
@@ -2932,25 +2633,36 @@ components:
       - TreeSoilConditionUnknown
     Tree:
       example:
-        latitude: 7.061401241503109
+        latitude: 2.3021358869347655
         created_at: created_at
         description: description
         tree_cluster_id: 7
+        number: number
         readonly: true
         updated_at: updated_at
         watering_status: good
         species: species
-        planting_year: 3
+        planting_year: 9
         sensor:
+          latest_data:
+            temperature: 4.145608029883936
+            humidity: 2.027123023002322
+            watermarks:
+            - centibar: 7
+              depth: 1
+              resistance: 1
+            - centibar: 7
+              depth: 1
+              resistance: 1
+            battery: 3.616076749251911
           updated_at: updated_at
-          latitude: 2.027123023002322
+          latitude: 1.4894159098541704
           created_at: created_at
           id: id
-          longitude: 4.145608029883936
+          longitude: 6.84685269835264
           status: online
-        id: 2
-        tree_number: tree_number
-        longitude: 9.301444243932576
+        id: 5
+        longitude: 7.061401241503109
       properties:
         created_at:
           type: string
@@ -2962,6 +2674,8 @@ components:
           type: number
         longitude:
           type: number
+        number:
+          type: string
         planting_year:
           type: integer
         readonly:
@@ -2973,8 +2687,6 @@ components:
           type: string
         tree_cluster_id:
           type: integer
-        tree_number:
-          type: string
         updated_at:
           type: string
         watering_status:
@@ -2985,34 +2697,12 @@ components:
       - id
       - latitude
       - longitude
+      - number
       - planting_year
       - readonly
       - species
-      - tree_number
       - updated_at
       - watering_status
-      type: object
-    TreeAddImages:
-      example:
-        image_ids:
-        - 0
-        - 0
-      properties:
-        image_ids:
-          items:
-            type: integer
-          type: array
-      required:
-      - image_ids
-      type: object
-    TreeAddSensor:
-      example:
-        sensor_id: sensor_id
-      properties:
-        sensor_id:
-          type: string
-      required:
-      - sensor_id
       type: object
     TreeCluster:
       example:
@@ -3022,44 +2712,66 @@ components:
         description: description
         last_watered: last_watered
         trees:
-        - latitude: 7.061401241503109
+        - latitude: 2.3021358869347655
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
           species: species
-          planting_year: 3
+          planting_year: 9
           sensor:
+            latest_data:
+              temperature: 4.145608029883936
+              humidity: 2.027123023002322
+              watermarks:
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              battery: 3.616076749251911
             updated_at: updated_at
-            latitude: 2.027123023002322
+            latitude: 1.4894159098541704
             created_at: created_at
             id: id
-            longitude: 4.145608029883936
+            longitude: 6.84685269835264
             status: online
-          id: 2
-          tree_number: tree_number
-          longitude: 9.301444243932576
-        - latitude: 7.061401241503109
+          id: 5
+          longitude: 7.061401241503109
+        - latitude: 2.3021358869347655
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
           species: species
-          planting_year: 3
+          planting_year: 9
           sensor:
+            latest_data:
+              temperature: 4.145608029883936
+              humidity: 2.027123023002322
+              watermarks:
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              battery: 3.616076749251911
             updated_at: updated_at
-            latitude: 2.027123023002322
+            latitude: 1.4894159098541704
             created_at: created_at
             id: id
-            longitude: 4.145608029883936
+            longitude: 6.84685269835264
             status: online
-          id: 2
-          tree_number: tree_number
-          longitude: 9.301444243932576
+          id: 5
+          longitude: 7.061401241503109
         soil_condition: schluffig
         archived: true
         updated_at: updated_at
@@ -3147,63 +2859,95 @@ components:
       - soil_condition
       - tree_ids
       type: object
+    TreeClusterInList:
+      example:
+        address: address
+        latitude: 6.027456183070403
+        created_at: created_at
+        description: description
+        last_watered: last_watered
+        soil_condition: schluffig
+        archived: true
+        tree_ids:
+        - 2
+        - 2
+        updated_at: updated_at
+        watering_status: good
+        name: name
+        moisture_level: 5.962133916683182
+        id: 0
+        region:
+          name: name
+          id: 5
+        longitude: 1.4658129805029452
+      properties:
+        address:
+          type: string
+        archived:
+          type: boolean
+        created_at:
+          type: string
+        description:
+          type: string
+        id:
+          type: integer
+        last_watered:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        moisture_level:
+          type: number
+        name:
+          type: string
+        region:
+          $ref: '#/components/schemas/Region'
+        soil_condition:
+          $ref: '#/components/schemas/SoilCondition'
+        tree_ids:
+          items:
+            type: integer
+          type: array
+        updated_at:
+          type: string
+        watering_status:
+          $ref: '#/components/schemas/WateringStatus'
+      required:
+      - address
+      - archived
+      - created_at
+      - description
+      - id
+      - latitude
+      - longitude
+      - moisture_level
+      - name
+      - soil_condition
+      - updated_at
+      - watering_status
+      type: object
     TreeClusterList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         data:
         - address: address
           latitude: 6.027456183070403
           created_at: created_at
           description: description
           last_watered: last_watered
-          trees:
-          - latitude: 7.061401241503109
-            created_at: created_at
-            description: description
-            tree_cluster_id: 7
-            readonly: true
-            updated_at: updated_at
-            watering_status: good
-            species: species
-            planting_year: 3
-            sensor:
-              updated_at: updated_at
-              latitude: 2.027123023002322
-              created_at: created_at
-              id: id
-              longitude: 4.145608029883936
-              status: online
-            id: 2
-            tree_number: tree_number
-            longitude: 9.301444243932576
-          - latitude: 7.061401241503109
-            created_at: created_at
-            description: description
-            tree_cluster_id: 7
-            readonly: true
-            updated_at: updated_at
-            watering_status: good
-            species: species
-            planting_year: 3
-            sensor:
-              updated_at: updated_at
-              latitude: 2.027123023002322
-              created_at: created_at
-              id: id
-              longitude: 4.145608029883936
-              status: online
-            id: 2
-            tree_number: tree_number
-            longitude: 9.301444243932576
           soil_condition: schluffig
           archived: true
+          tree_ids:
+          - 2
+          - 2
           updated_at: updated_at
-          watering_status: null
+          watering_status: good
           name: name
           moisture_level: 5.962133916683182
           id: 0
@@ -3216,49 +2960,13 @@ components:
           created_at: created_at
           description: description
           last_watered: last_watered
-          trees:
-          - latitude: 7.061401241503109
-            created_at: created_at
-            description: description
-            tree_cluster_id: 7
-            readonly: true
-            updated_at: updated_at
-            watering_status: good
-            species: species
-            planting_year: 3
-            sensor:
-              updated_at: updated_at
-              latitude: 2.027123023002322
-              created_at: created_at
-              id: id
-              longitude: 4.145608029883936
-              status: online
-            id: 2
-            tree_number: tree_number
-            longitude: 9.301444243932576
-          - latitude: 7.061401241503109
-            created_at: created_at
-            description: description
-            tree_cluster_id: 7
-            readonly: true
-            updated_at: updated_at
-            watering_status: good
-            species: species
-            planting_year: 3
-            sensor:
-              updated_at: updated_at
-              latitude: 2.027123023002322
-              created_at: created_at
-              id: id
-              longitude: 4.145608029883936
-              status: online
-            id: 2
-            tree_number: tree_number
-            longitude: 9.301444243932576
           soil_condition: schluffig
           archived: true
+          tree_ids:
+          - 2
+          - 2
           updated_at: updated_at
-          watering_status: null
+          watering_status: good
           name: name
           moisture_level: 5.962133916683182
           id: 0
@@ -3269,7 +2977,7 @@ components:
       properties:
         data:
           items:
-            $ref: '#/components/schemas/TreeCluster'
+            $ref: '#/components/schemas/TreeClusterInList'
           type: array
         pagination:
           $ref: '#/components/schemas/Pagination'
@@ -3309,13 +3017,13 @@ components:
     TreeCreate:
       example:
         sensor_id: sensor_id
+        number: number
         readonly: true
         species: species
         latitude: 0.8008281904610115
         description: description
         planting_year: 1
         tree_cluster_id: 5
-        tree_number: tree_number
         longitude: 6.027456183070403
       properties:
         description:
@@ -3324,6 +3032,8 @@ components:
           type: number
         longitude:
           type: number
+        number:
+          type: string
         planting_year:
           type: integer
         readonly:
@@ -3334,64 +3044,84 @@ components:
           type: string
         tree_cluster_id:
           type: integer
-        tree_number:
-          type: string
       required:
       - description
       - latitude
       - longitude
+      - number
       - planting_year
       - readonly
       - species
-      - tree_number
       type: object
     TreeList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         data:
-        - latitude: 7.061401241503109
+        - latitude: 2.3021358869347655
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
           species: species
-          planting_year: 3
+          planting_year: 9
           sensor:
+            latest_data:
+              temperature: 4.145608029883936
+              humidity: 2.027123023002322
+              watermarks:
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              battery: 3.616076749251911
             updated_at: updated_at
-            latitude: 2.027123023002322
+            latitude: 1.4894159098541704
             created_at: created_at
             id: id
-            longitude: 4.145608029883936
+            longitude: 6.84685269835264
             status: online
-          id: 2
-          tree_number: tree_number
-          longitude: 9.301444243932576
-        - latitude: 7.061401241503109
+          id: 5
+          longitude: 7.061401241503109
+        - latitude: 2.3021358869347655
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
           species: species
-          planting_year: 3
+          planting_year: 9
           sensor:
+            latest_data:
+              temperature: 4.145608029883936
+              humidity: 2.027123023002322
+              watermarks:
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              - centibar: 7
+                depth: 1
+                resistance: 1
+              battery: 3.616076749251911
             updated_at: updated_at
-            latitude: 2.027123023002322
+            latitude: 1.4894159098541704
             created_at: created_at
             id: id
-            longitude: 4.145608029883936
+            longitude: 6.84685269835264
             status: online
-          id: 2
-          tree_number: tree_number
-          longitude: 9.301444243932576
+          id: 5
+          longitude: 7.061401241503109
       properties:
         data:
           items:
@@ -3406,13 +3136,13 @@ components:
     TreeUpdate:
       example:
         sensor_id: sensor_id
+        number: number
         readonly: true
         species: species
         latitude: 0.8008281904610115
         description: description
         planting_year: 1
         tree_cluster_id: 5
-        tree_number: tree_number
         longitude: 6.027456183070403
       properties:
         description:
@@ -3421,6 +3151,8 @@ components:
           type: number
         longitude:
           type: number
+        number:
+          type: string
         planting_year:
           type: integer
         readonly:
@@ -3431,21 +3163,20 @@ components:
           type: string
         tree_cluster_id:
           type: integer
-        tree_number:
-          type: string
       required:
       - description
       - latitude
       - longitude
+      - number
       - planting_year
       - readonly
       - species
-      - tree_number
       type: object
     User:
       example:
         email_verified: true
         avatar_url: avatar_url
+        driving_license: B
         employee_id: employee_id
         created_at: created_at
         last_name: last_name
@@ -3459,6 +3190,8 @@ components:
           type: string
         created_at:
           type: string
+        driving_license:
+          $ref: '#/components/schemas/DrivingLicense'
         email:
           type: string
         email_verified:
@@ -3478,6 +3211,7 @@ components:
       required:
       - avatar_url
       - created_at
+      - driving_license
       - email
       - email_verified
       - employee_id
@@ -3490,14 +3224,15 @@ components:
     UserList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         data:
         - email_verified: true
           avatar_url: avatar_url
+          driving_license: B
           employee_id: employee_id
           created_at: created_at
           last_name: last_name
@@ -3508,6 +3243,7 @@ components:
           username: username
         - email_verified: true
           avatar_url: avatar_url
+          driving_license: B
           employee_id: employee_id
           created_at: created_at
           last_name: last_name
@@ -3570,39 +3306,6 @@ components:
       - password
       - phone_number
       - roles
-      - username
-      type: object
-    UserUpdate:
-      example:
-        avatar_url: avatar_url
-        employee_id: employee_id
-        last_name: last_name
-        phone_number: phone_number
-        first_name: first_name
-        email: email
-        username: username
-      properties:
-        avatar_url:
-          type: string
-        email:
-          type: string
-        employee_id:
-          type: string
-        first_name:
-          type: string
-        last_name:
-          type: string
-        phone_number:
-          type: string
-        username:
-          type: string
-      required:
-      - avatar_url
-      - email
-      - employee_id
-      - first_name
-      - last_name
-      - phone_number
       - username
       type: object
     Vehicle:
@@ -3710,11 +3413,11 @@ components:
     VehicleList:
       example:
         pagination:
-          next_page: 1
-          total_records: 7
-          total_pages: 6
-          prev_page: 1
-          current_page: 1
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
         data:
         - water_capacity: 5.962133916683182
           length: 1.4658129805029452
@@ -3820,6 +3523,555 @@ components:
       - water_capacity
       - width
       type: object
+    WateringPlan:
+      example:
+        date: date
+        treeclusters:
+        - address: address
+          latitude: 6.027456183070403
+          created_at: created_at
+          description: description
+          last_watered: last_watered
+          soil_condition: schluffig
+          archived: true
+          tree_ids:
+          - 2
+          - 2
+          updated_at: updated_at
+          watering_status: good
+          name: name
+          moisture_level: 5.962133916683182
+          id: 0
+          region:
+            name: name
+            id: 5
+          longitude: 1.4658129805029452
+        - address: address
+          latitude: 6.027456183070403
+          created_at: created_at
+          description: description
+          last_watered: last_watered
+          soil_condition: schluffig
+          archived: true
+          tree_ids:
+          - 2
+          - 2
+          updated_at: updated_at
+          watering_status: good
+          name: name
+          moisture_level: 5.962133916683182
+          id: 0
+          region:
+            name: name
+            id: 5
+          longitude: 1.4658129805029452
+        cancellation_note: cancellation_note
+        distance: 0.8008281904610115
+        user_ids:
+        - user_ids
+        - user_ids
+        total_water_required: 2.3021358869347655
+        created_at: created_at
+        description: description
+        evaluation:
+        - consumed_water: 6.027456183070403
+          tree_cluster_id: 1
+          watering_plan_id: 5
+        - consumed_water: 6.027456183070403
+          tree_cluster_id: 1
+          watering_plan_id: 5
+        trailer:
+          water_capacity: 5.962133916683182
+          length: 1.4658129805029452
+          number_plate: number_plate
+          created_at: created_at
+          description: description
+          type: transporter
+          driving_license: B
+          updated_at: updated_at
+          width: 5.637376656633329
+          model: model
+          id: 6
+          height: 0.8008281904610115
+          status: active
+        updated_at: updated_at
+        transporter:
+          water_capacity: 5.962133916683182
+          length: 1.4658129805029452
+          number_plate: number_plate
+          created_at: created_at
+          description: description
+          type: transporter
+          driving_license: B
+          updated_at: updated_at
+          width: 5.637376656633329
+          model: model
+          id: 6
+          height: 0.8008281904610115
+          status: active
+        id: 5
+        status: planned
+      properties:
+        cancellation_note:
+          type: string
+        created_at:
+          type: string
+        date:
+          type: string
+        description:
+          type: string
+        distance:
+          type: number
+        evaluation:
+          items:
+            $ref: '#/components/schemas/EvaluationValue'
+          type: array
+        id:
+          type: integer
+        status:
+          $ref: '#/components/schemas/WateringPlanStatus'
+        total_water_required:
+          type: number
+        trailer:
+          $ref: '#/components/schemas/Vehicle'
+        transporter:
+          $ref: '#/components/schemas/Vehicle'
+        treeclusters:
+          items:
+            $ref: '#/components/schemas/TreeClusterInList'
+          type: array
+        updated_at:
+          type: string
+        user_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - cancellation_note
+      - created_at
+      - date
+      - description
+      - distance
+      - evaluation
+      - id
+      - status
+      - total_water_required
+      - transporter
+      - treeclusters
+      - updated_at
+      - user_ids
+      type: object
+    WateringPlanCreate:
+      example:
+        date: date
+        tree_cluster_ids:
+        - 1
+        - 1
+        user_ids:
+        - user_ids
+        - user_ids
+        trailer_id: 0
+        description: description
+        transporter_id: 6
+      properties:
+        date:
+          type: string
+        description:
+          type: string
+        trailer_id:
+          type: integer
+        transporter_id:
+          type: integer
+        tree_cluster_ids:
+          items:
+            type: integer
+          type: array
+        user_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - date
+      - description
+      - transporter_id
+      - tree_cluster_ids
+      - user_ids
+      type: object
+    WateringPlanInList:
+      example:
+        date: date
+        treeclusters:
+        - address: address
+          latitude: 6.027456183070403
+          created_at: created_at
+          description: description
+          last_watered: last_watered
+          soil_condition: schluffig
+          archived: true
+          tree_ids:
+          - 2
+          - 2
+          updated_at: updated_at
+          watering_status: good
+          name: name
+          moisture_level: 5.962133916683182
+          id: 0
+          region:
+            name: name
+            id: 5
+          longitude: 1.4658129805029452
+        - address: address
+          latitude: 6.027456183070403
+          created_at: created_at
+          description: description
+          last_watered: last_watered
+          soil_condition: schluffig
+          archived: true
+          tree_ids:
+          - 2
+          - 2
+          updated_at: updated_at
+          watering_status: good
+          name: name
+          moisture_level: 5.962133916683182
+          id: 0
+          region:
+            name: name
+            id: 5
+          longitude: 1.4658129805029452
+        cancellation_note: cancellation_note
+        distance: 0.8008281904610115
+        user_ids:
+        - user_ids
+        - user_ids
+        total_water_required: 1.4658129805029452
+        created_at: created_at
+        description: description
+        trailer:
+          water_capacity: 5.962133916683182
+          length: 1.4658129805029452
+          number_plate: number_plate
+          created_at: created_at
+          description: description
+          type: transporter
+          driving_license: B
+          updated_at: updated_at
+          width: 5.637376656633329
+          model: model
+          id: 6
+          height: 0.8008281904610115
+          status: active
+        updated_at: updated_at
+        transporter:
+          water_capacity: 5.962133916683182
+          length: 1.4658129805029452
+          number_plate: number_plate
+          created_at: created_at
+          description: description
+          type: transporter
+          driving_license: B
+          updated_at: updated_at
+          width: 5.637376656633329
+          model: model
+          id: 6
+          height: 0.8008281904610115
+          status: active
+        id: 6
+        status: planned
+      properties:
+        cancellation_note:
+          type: string
+        created_at:
+          type: string
+        date:
+          type: string
+        description:
+          type: string
+        distance:
+          type: number
+        id:
+          type: integer
+        status:
+          $ref: '#/components/schemas/WateringPlanStatus'
+        total_water_required:
+          type: number
+        trailer:
+          $ref: '#/components/schemas/Vehicle'
+        transporter:
+          $ref: '#/components/schemas/Vehicle'
+        treeclusters:
+          items:
+            $ref: '#/components/schemas/TreeClusterInList'
+          type: array
+        updated_at:
+          type: string
+        user_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - cancellation_note
+      - created_at
+      - date
+      - description
+      - distance
+      - id
+      - status
+      - total_water_required
+      - transporter
+      - treeclusters
+      - updated_at
+      - user_ids
+      type: object
+    WateringPlanList:
+      example:
+        pagination:
+          next_page: 9
+          total_records: 4
+          total_pages: 2
+          prev_page: 3
+          current_page: 7
+        data:
+        - date: date
+          treeclusters:
+          - address: address
+            latitude: 6.027456183070403
+            created_at: created_at
+            description: description
+            last_watered: last_watered
+            soil_condition: schluffig
+            archived: true
+            tree_ids:
+            - 2
+            - 2
+            updated_at: updated_at
+            watering_status: good
+            name: name
+            moisture_level: 5.962133916683182
+            id: 0
+            region:
+              name: name
+              id: 5
+            longitude: 1.4658129805029452
+          - address: address
+            latitude: 6.027456183070403
+            created_at: created_at
+            description: description
+            last_watered: last_watered
+            soil_condition: schluffig
+            archived: true
+            tree_ids:
+            - 2
+            - 2
+            updated_at: updated_at
+            watering_status: good
+            name: name
+            moisture_level: 5.962133916683182
+            id: 0
+            region:
+              name: name
+              id: 5
+            longitude: 1.4658129805029452
+          cancellation_note: cancellation_note
+          distance: 0.8008281904610115
+          user_ids:
+          - user_ids
+          - user_ids
+          total_water_required: 1.4658129805029452
+          created_at: created_at
+          description: description
+          trailer:
+            water_capacity: 5.962133916683182
+            length: 1.4658129805029452
+            number_plate: number_plate
+            created_at: created_at
+            description: description
+            type: transporter
+            driving_license: B
+            updated_at: updated_at
+            width: 5.637376656633329
+            model: model
+            id: 6
+            height: 0.8008281904610115
+            status: active
+          updated_at: updated_at
+          transporter:
+            water_capacity: 5.962133916683182
+            length: 1.4658129805029452
+            number_plate: number_plate
+            created_at: created_at
+            description: description
+            type: transporter
+            driving_license: B
+            updated_at: updated_at
+            width: 5.637376656633329
+            model: model
+            id: 6
+            height: 0.8008281904610115
+            status: active
+          id: 6
+          status: planned
+        - date: date
+          treeclusters:
+          - address: address
+            latitude: 6.027456183070403
+            created_at: created_at
+            description: description
+            last_watered: last_watered
+            soil_condition: schluffig
+            archived: true
+            tree_ids:
+            - 2
+            - 2
+            updated_at: updated_at
+            watering_status: good
+            name: name
+            moisture_level: 5.962133916683182
+            id: 0
+            region:
+              name: name
+              id: 5
+            longitude: 1.4658129805029452
+          - address: address
+            latitude: 6.027456183070403
+            created_at: created_at
+            description: description
+            last_watered: last_watered
+            soil_condition: schluffig
+            archived: true
+            tree_ids:
+            - 2
+            - 2
+            updated_at: updated_at
+            watering_status: good
+            name: name
+            moisture_level: 5.962133916683182
+            id: 0
+            region:
+              name: name
+              id: 5
+            longitude: 1.4658129805029452
+          cancellation_note: cancellation_note
+          distance: 0.8008281904610115
+          user_ids:
+          - user_ids
+          - user_ids
+          total_water_required: 1.4658129805029452
+          created_at: created_at
+          description: description
+          trailer:
+            water_capacity: 5.962133916683182
+            length: 1.4658129805029452
+            number_plate: number_plate
+            created_at: created_at
+            description: description
+            type: transporter
+            driving_license: B
+            updated_at: updated_at
+            width: 5.637376656633329
+            model: model
+            id: 6
+            height: 0.8008281904610115
+            status: active
+          updated_at: updated_at
+          transporter:
+            water_capacity: 5.962133916683182
+            length: 1.4658129805029452
+            number_plate: number_plate
+            created_at: created_at
+            description: description
+            type: transporter
+            driving_license: B
+            updated_at: updated_at
+            width: 5.637376656633329
+            model: model
+            id: 6
+            height: 0.8008281904610115
+            status: active
+          id: 6
+          status: planned
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/WateringPlanInList'
+          type: array
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - data
+      - pagination
+      type: object
+    WateringPlanStatus:
+      enum:
+      - planned
+      - active
+      - canceled
+      - finished
+      - not competed
+      - unknown
+      type: string
+      x-enum-varnames:
+      - WateringPlanStatusPlanned
+      - WateringPlanStatusActive
+      - WateringPlanStatusCanceled
+      - WateringPlanStatusFinished
+      - WateringPlanStatusNotCompeted
+      - WateringPlanStatusUnknown
+    WateringPlanUpdate:
+      example:
+        date: date
+        evaluation:
+        - consumed_water: 6.027456183070403
+          tree_cluster_id: 1
+          watering_plan_id: 5
+        - consumed_water: 6.027456183070403
+          tree_cluster_id: 1
+          watering_plan_id: 5
+        cancellation_note: cancellation_note
+        tree_cluster_ids:
+        - 1
+        - 1
+        user_ids:
+        - user_ids
+        - user_ids
+        trailer_id: 0
+        description: description
+        transporter_id: 6
+        status: planned
+      properties:
+        cancellation_note:
+          type: string
+        date:
+          type: string
+        description:
+          type: string
+        evaluation:
+          items:
+            $ref: '#/components/schemas/EvaluationValue'
+          type: array
+        status:
+          $ref: '#/components/schemas/WateringPlanStatus'
+        trailer_id:
+          type: integer
+        transporter_id:
+          type: integer
+        tree_cluster_ids:
+          items:
+            type: integer
+          type: array
+        user_ids:
+          items:
+            type: string
+          type: array
+      required:
+      - cancellation_note
+      - date
+      - description
+      - status
+      - transporter_id
+      - tree_cluster_ids
+      - user_ids
+      type: object
     WateringStatus:
       enum:
       - good
@@ -3832,6 +4084,23 @@ components:
       - WateringStatusModerate
       - WateringStatusBad
       - WateringStatusUnknown
+    WatermarkResponse:
+      example:
+        centibar: 7
+        depth: 1
+        resistance: 1
+      properties:
+        centibar:
+          type: integer
+        depth:
+          type: integer
+        resistance:
+          type: integer
+      required:
+      - centibar
+      - depth
+      - resistance
+      type: object
     import_trees_from_csv_request:
       properties:
         file:
