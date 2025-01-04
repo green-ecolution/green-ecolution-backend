@@ -37,6 +37,7 @@ help:
 	@echo "  build                             Build"
 	@echo "  generate                          Generate"
 	@echo "  generate/client                   Generate client pkg"
+	@echo "  generate/ors_client		   Generate client pkg"
 	@echo "  setup                             Install dependencies"
 	@echo "  setup/macos                       Install dependencies for macOS"
 	@echo "  setup/ci                          Install dependencies for CI"
@@ -103,7 +104,12 @@ generate:
 .PHONY: generate/client
 generate/client: generate
 	@echo "Generating client..."
-	@./scripts/openapi-generator.sh
+	@./scripts/openapi-generator.sh client docs/swagger.yaml pkg/client
+
+.PHONY: generate/ors
+generate/ors: 
+	@echo "Generating ors api client..."
+	@./scripts/openapi-generator.sh ors pkg/ors_api/api-docs.json pkg/ors_api
 
 .PHONY: setup
 setup:
