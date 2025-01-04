@@ -205,7 +205,7 @@ infra/up:
 	mkdir -p .docker/infra/ors/{config,elevation_cache,files,graphs,logs}
 	chown -R $(USER_ID) .docker/infra/ors
 	yq e -i '.services."ors-app".user = env(USER_ID)' .docker/docker-compose.infra.yaml
-	wget https://download.geofabrik.de/europe/germany/schleswig-holstein-latest.osm.pbf -O .docker/infra/ors/files/sh.osm.pbf
+	test -f .docker/infra/ors/files/sh.osm.pbf || wget https://download.geofabrik.de/europe/germany/schleswig-holstein-latest.osm.pbf -O .docker/infra/ors/files/sh.osm.pbf
 
 	docker compose -f .docker/docker-compose.infra.yaml up -d
 
