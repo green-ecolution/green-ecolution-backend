@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,10 +22,10 @@ var _ MappedNullable = &Pagination{}
 
 // Pagination struct for Pagination
 type Pagination struct {
-	CurrentPage  int32 `json:"current_page"`
-	NextPage     int32 `json:"next_page"`
-	PrevPage     int32 `json:"prev_page"`
-	TotalPages   int32 `json:"total_pages"`
+	CurrentPage int32 `json:"current_page"`
+	NextPage int32 `json:"next_page"`
+	PrevPage int32 `json:"prev_page"`
+	TotalPages int32 `json:"total_pages"`
 	TotalRecords int32 `json:"total_records"`
 }
 
@@ -174,7 +174,7 @@ func (o *Pagination) SetTotalRecords(v int32) {
 }
 
 func (o Pagination) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -208,10 +208,10 @@ func (o *Pagination) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -267,3 +267,5 @@ func (v *NullablePagination) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

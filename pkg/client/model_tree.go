@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,19 +22,19 @@ var _ MappedNullable = &Tree{}
 
 // Tree struct for Tree
 type Tree struct {
-	CreatedAt    string  `json:"created_at"`
-	Description  string  `json:"description"`
-	Id           int32   `json:"id"`
-	Latitude     float32 `json:"latitude"`
-	Longitude    float32 `json:"longitude"`
-	PlantingYear int32   `json:"planting_year"`
+	CreatedAt string `json:"created_at"`
+	Description string `json:"description"`
+	Id int32 `json:"id"`
+	Latitude float32 `json:"latitude"`
+	Longitude float32 `json:"longitude"`
+	Number string `json:"number"`
+	PlantingYear int32 `json:"planting_year"`
 	// Images              []*ImageResponse `json:\"images\"`
-	Readonly       bool           `json:"readonly"`
-	Sensor         *Sensor        `json:"sensor,omitempty"`
-	Species        string         `json:"species"`
-	TreeClusterId  *int32         `json:"tree_cluster_id,omitempty"`
-	TreeNumber     string         `json:"tree_number"`
-	UpdatedAt      string         `json:"updated_at"`
+	Readonly bool `json:"readonly"`
+	Sensor *Sensor `json:"sensor,omitempty"`
+	Species string `json:"species"`
+	TreeClusterId *int32 `json:"tree_cluster_id,omitempty"`
+	UpdatedAt string `json:"updated_at"`
 	WateringStatus WateringStatus `json:"watering_status"`
 }
 
@@ -44,17 +44,17 @@ type _Tree Tree
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, plantingYear int32, readonly bool, species string, treeNumber string, updatedAt string, wateringStatus WateringStatus) *Tree {
+func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
 	this := Tree{}
 	this.CreatedAt = createdAt
 	this.Description = description
 	this.Id = id
 	this.Latitude = latitude
 	this.Longitude = longitude
+	this.Number = number
 	this.PlantingYear = plantingYear
 	this.Readonly = readonly
 	this.Species = species
-	this.TreeNumber = treeNumber
 	this.UpdatedAt = updatedAt
 	this.WateringStatus = wateringStatus
 	return &this
@@ -186,6 +186,30 @@ func (o *Tree) GetLongitudeOk() (*float32, bool) {
 // SetLongitude sets field value
 func (o *Tree) SetLongitude(v float32) {
 	o.Longitude = v
+}
+
+// GetNumber returns the Number field value
+func (o *Tree) GetNumber() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Number
+}
+
+// GetNumberOk returns a tuple with the Number field value
+// and a boolean to check if the value has been set.
+func (o *Tree) GetNumberOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Number, true
+}
+
+// SetNumber sets field value
+func (o *Tree) SetNumber(v string) {
+	o.Number = v
 }
 
 // GetPlantingYear returns the PlantingYear field value
@@ -324,30 +348,6 @@ func (o *Tree) SetTreeClusterId(v int32) {
 	o.TreeClusterId = &v
 }
 
-// GetTreeNumber returns the TreeNumber field value
-func (o *Tree) GetTreeNumber() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.TreeNumber
-}
-
-// GetTreeNumberOk returns a tuple with the TreeNumber field value
-// and a boolean to check if the value has been set.
-func (o *Tree) GetTreeNumberOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.TreeNumber, true
-}
-
-// SetTreeNumber sets field value
-func (o *Tree) SetTreeNumber(v string) {
-	o.TreeNumber = v
-}
-
 // GetUpdatedAt returns the UpdatedAt field value
 func (o *Tree) GetUpdatedAt() string {
 	if o == nil {
@@ -397,7 +397,7 @@ func (o *Tree) SetWateringStatus(v WateringStatus) {
 }
 
 func (o Tree) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -411,6 +411,7 @@ func (o Tree) ToMap() (map[string]interface{}, error) {
 	toSerialize["id"] = o.Id
 	toSerialize["latitude"] = o.Latitude
 	toSerialize["longitude"] = o.Longitude
+	toSerialize["number"] = o.Number
 	toSerialize["planting_year"] = o.PlantingYear
 	toSerialize["readonly"] = o.Readonly
 	if !IsNil(o.Sensor) {
@@ -420,7 +421,6 @@ func (o Tree) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.TreeClusterId) {
 		toSerialize["tree_cluster_id"] = o.TreeClusterId
 	}
-	toSerialize["tree_number"] = o.TreeNumber
 	toSerialize["updated_at"] = o.UpdatedAt
 	toSerialize["watering_status"] = o.WateringStatus
 	return toSerialize, nil
@@ -436,10 +436,10 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 		"id",
 		"latitude",
 		"longitude",
+		"number",
 		"planting_year",
 		"readonly",
 		"species",
-		"tree_number",
 		"updated_at",
 		"watering_status",
 	}
@@ -449,10 +449,10 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -508,3 +508,5 @@ func (v *NullableTree) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

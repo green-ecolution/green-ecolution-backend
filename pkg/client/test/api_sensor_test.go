@@ -11,11 +11,10 @@ package client
 
 import (
 	"context"
-	"testing"
-
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_SensorAPIService(t *testing.T) {
@@ -25,7 +24,7 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	t.Run("Test SensorAPIService DeleteSensor", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var sensorId string
 
@@ -38,7 +37,7 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	t.Run("Test SensorAPIService GetAllSensors", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		resp, httpRes, err := apiClient.SensorAPI.GetAllSensors(context.Background()).Execute()
 
@@ -50,25 +49,11 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	t.Run("Test SensorAPIService GetSensorById", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var sensorId string
 
 		resp, httpRes, err := apiClient.SensorAPI.GetSensorById(context.Background(), sensorId).Execute()
-
-		require.Nil(t, err)
-		require.NotNil(t, resp)
-		assert.Equal(t, 200, httpRes.StatusCode)
-
-	})
-
-	t.Run("Test SensorAPIService GetSensorDataById", func(t *testing.T) {
-
-		t.Skip("skip test") // remove to run test
-
-		var sensorId string
-
-		resp, httpRes, err := apiClient.SensorAPI.GetSensorDataById(context.Background(), sensorId).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

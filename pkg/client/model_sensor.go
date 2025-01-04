@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
@@ -22,12 +22,13 @@ var _ MappedNullable = &Sensor{}
 
 // Sensor struct for Sensor
 type Sensor struct {
-	CreatedAt string       `json:"created_at"`
-	Id        string       `json:"id"`
-	Latitude  float32      `json:"latitude"`
-	Longitude float32      `json:"longitude"`
-	Status    SensorStatus `json:"status"`
-	UpdatedAt string       `json:"updated_at"`
+	CreatedAt string `json:"created_at"`
+	Id string `json:"id"`
+	LatestData SensorData `json:"latest_data"`
+	Latitude float32 `json:"latitude"`
+	Longitude float32 `json:"longitude"`
+	Status SensorStatus `json:"status"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 type _Sensor Sensor
@@ -36,10 +37,11 @@ type _Sensor Sensor
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensor(createdAt string, id string, latitude float32, longitude float32, status SensorStatus, updatedAt string) *Sensor {
+func NewSensor(createdAt string, id string, latestData SensorData, latitude float32, longitude float32, status SensorStatus, updatedAt string) *Sensor {
 	this := Sensor{}
 	this.CreatedAt = createdAt
 	this.Id = id
+	this.LatestData = latestData
 	this.Latitude = latitude
 	this.Longitude = longitude
 	this.Status = status
@@ -101,6 +103,30 @@ func (o *Sensor) GetIdOk() (*string, bool) {
 // SetId sets field value
 func (o *Sensor) SetId(v string) {
 	o.Id = v
+}
+
+// GetLatestData returns the LatestData field value
+func (o *Sensor) GetLatestData() SensorData {
+	if o == nil {
+		var ret SensorData
+		return ret
+	}
+
+	return o.LatestData
+}
+
+// GetLatestDataOk returns a tuple with the LatestData field value
+// and a boolean to check if the value has been set.
+func (o *Sensor) GetLatestDataOk() (*SensorData, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.LatestData, true
+}
+
+// SetLatestData sets field value
+func (o *Sensor) SetLatestData(v SensorData) {
+	o.LatestData = v
 }
 
 // GetLatitude returns the Latitude field value
@@ -200,7 +226,7 @@ func (o *Sensor) SetUpdatedAt(v string) {
 }
 
 func (o Sensor) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -211,6 +237,7 @@ func (o Sensor) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["id"] = o.Id
+	toSerialize["latest_data"] = o.LatestData
 	toSerialize["latitude"] = o.Latitude
 	toSerialize["longitude"] = o.Longitude
 	toSerialize["status"] = o.Status
@@ -225,6 +252,7 @@ func (o *Sensor) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"created_at",
 		"id",
+		"latest_data",
 		"latitude",
 		"longitude",
 		"status",
@@ -236,10 +264,10 @@ func (o *Sensor) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -295,3 +323,5 @@ func (v *NullableSensor) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

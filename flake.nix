@@ -57,6 +57,7 @@
           geos
           proj
           gitflow
+          yq-go
         ];
 
       shellHook = ''

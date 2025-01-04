@@ -11,11 +11,10 @@ package client
 
 import (
 	"context"
-	"testing"
-
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_PluginAPIService(t *testing.T) {
@@ -25,7 +24,7 @@ func Test_client_PluginAPIService(t *testing.T) {
 
 	t.Run("Test PluginAPIService GetPluginInfo", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var pluginSlug string
 
@@ -39,7 +38,7 @@ func Test_client_PluginAPIService(t *testing.T) {
 
 	t.Run("Test PluginAPIService GetPluginsList", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		resp, httpRes, err := apiClient.PluginAPI.GetPluginsList(context.Background()).Execute()
 
@@ -51,7 +50,7 @@ func Test_client_PluginAPIService(t *testing.T) {
 
 	t.Run("Test PluginAPIService PluginHeartbeat", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var pluginSlug string
 
@@ -65,7 +64,7 @@ func Test_client_PluginAPIService(t *testing.T) {
 
 	t.Run("Test PluginAPIService RegisterPlugin", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		resp, httpRes, err := apiClient.PluginAPI.RegisterPlugin(context.Background()).Execute()
 

@@ -12,45 +12,45 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"bytes"
 	"encoding/json"
+	"bytes"
 	"fmt"
 )
 
-// checks if the SensorDataList type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &SensorDataList{}
+// checks if the WateringPlanList type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &WateringPlanList{}
 
-// SensorDataList struct for SensorDataList
-type SensorDataList struct {
-	Data       []SensorData `json:"data"`
-	Pagination Pagination   `json:"pagination"`
+// WateringPlanList struct for WateringPlanList
+type WateringPlanList struct {
+	Data []WateringPlanInList `json:"data"`
+	Pagination Pagination `json:"pagination"`
 }
 
-type _SensorDataList SensorDataList
+type _WateringPlanList WateringPlanList
 
-// NewSensorDataList instantiates a new SensorDataList object
+// NewWateringPlanList instantiates a new WateringPlanList object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensorDataList(data []SensorData, pagination Pagination) *SensorDataList {
-	this := SensorDataList{}
+func NewWateringPlanList(data []WateringPlanInList, pagination Pagination) *WateringPlanList {
+	this := WateringPlanList{}
 	this.Data = data
 	this.Pagination = pagination
 	return &this
 }
 
-// NewSensorDataListWithDefaults instantiates a new SensorDataList object
+// NewWateringPlanListWithDefaults instantiates a new WateringPlanList object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewSensorDataListWithDefaults() *SensorDataList {
-	this := SensorDataList{}
+func NewWateringPlanListWithDefaults() *WateringPlanList {
+	this := WateringPlanList{}
 	return &this
 }
 
 // GetData returns the Data field value
-func (o *SensorDataList) GetData() []SensorData {
+func (o *WateringPlanList) GetData() []WateringPlanInList {
 	if o == nil {
-		var ret []SensorData
+		var ret []WateringPlanInList
 		return ret
 	}
 
@@ -59,7 +59,7 @@ func (o *SensorDataList) GetData() []SensorData {
 
 // GetDataOk returns a tuple with the Data field value
 // and a boolean to check if the value has been set.
-func (o *SensorDataList) GetDataOk() ([]SensorData, bool) {
+func (o *WateringPlanList) GetDataOk() ([]WateringPlanInList, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -67,12 +67,12 @@ func (o *SensorDataList) GetDataOk() ([]SensorData, bool) {
 }
 
 // SetData sets field value
-func (o *SensorDataList) SetData(v []SensorData) {
+func (o *WateringPlanList) SetData(v []WateringPlanInList) {
 	o.Data = v
 }
 
 // GetPagination returns the Pagination field value
-func (o *SensorDataList) GetPagination() Pagination {
+func (o *WateringPlanList) GetPagination() Pagination {
 	if o == nil {
 		var ret Pagination
 		return ret
@@ -83,7 +83,7 @@ func (o *SensorDataList) GetPagination() Pagination {
 
 // GetPaginationOk returns a tuple with the Pagination field value
 // and a boolean to check if the value has been set.
-func (o *SensorDataList) GetPaginationOk() (*Pagination, bool) {
+func (o *WateringPlanList) GetPaginationOk() (*Pagination, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -91,26 +91,26 @@ func (o *SensorDataList) GetPaginationOk() (*Pagination, bool) {
 }
 
 // SetPagination sets field value
-func (o *SensorDataList) SetPagination(v Pagination) {
+func (o *WateringPlanList) SetPagination(v Pagination) {
 	o.Pagination = v
 }
 
-func (o SensorDataList) MarshalJSON() ([]byte, error) {
-	toSerialize, err := o.ToMap()
+func (o WateringPlanList) MarshalJSON() ([]byte, error) {
+	toSerialize,err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
 	return json.Marshal(toSerialize)
 }
 
-func (o SensorDataList) ToMap() (map[string]interface{}, error) {
+func (o WateringPlanList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["data"] = o.Data
 	toSerialize["pagination"] = o.Pagination
 	return toSerialize, nil
 }
 
-func (o *SensorDataList) UnmarshalJSON(data []byte) (err error) {
+func (o *WateringPlanList) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -124,62 +124,64 @@ func (o *SensorDataList) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err
+		return err;
 	}
 
-	for _, requiredProperty := range requiredProperties {
+	for _, requiredProperty := range(requiredProperties) {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
 	}
 
-	varSensorDataList := _SensorDataList{}
+	varWateringPlanList := _WateringPlanList{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varSensorDataList)
+	err = decoder.Decode(&varWateringPlanList)
 
 	if err != nil {
 		return err
 	}
 
-	*o = SensorDataList(varSensorDataList)
+	*o = WateringPlanList(varWateringPlanList)
 
 	return err
 }
 
-type NullableSensorDataList struct {
-	value *SensorDataList
+type NullableWateringPlanList struct {
+	value *WateringPlanList
 	isSet bool
 }
 
-func (v NullableSensorDataList) Get() *SensorDataList {
+func (v NullableWateringPlanList) Get() *WateringPlanList {
 	return v.value
 }
 
-func (v *NullableSensorDataList) Set(val *SensorDataList) {
+func (v *NullableWateringPlanList) Set(val *WateringPlanList) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableSensorDataList) IsSet() bool {
+func (v NullableWateringPlanList) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableSensorDataList) Unset() {
+func (v *NullableWateringPlanList) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableSensorDataList(val *SensorDataList) *NullableSensorDataList {
-	return &NullableSensorDataList{value: val, isSet: true}
+func NewNullableWateringPlanList(val *WateringPlanList) *NullableWateringPlanList {
+	return &NullableWateringPlanList{value: val, isSet: true}
 }
 
-func (v NullableSensorDataList) MarshalJSON() ([]byte, error) {
+func (v NullableWateringPlanList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableSensorDataList) UnmarshalJSON(src []byte) error {
+func (v *NullableWateringPlanList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+
+

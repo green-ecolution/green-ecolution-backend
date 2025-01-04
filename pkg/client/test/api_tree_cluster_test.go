@@ -11,11 +11,10 @@ package client
 
 import (
 	"context"
-	"testing"
-
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"testing"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_TreeClusterAPIService(t *testing.T) {
@@ -25,7 +24,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 	t.Run("Test TreeClusterAPIService CreateTreeCluster", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		resp, httpRes, err := apiClient.TreeClusterAPI.CreateTreeCluster(context.Background()).Execute()
 
@@ -37,7 +36,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 	t.Run("Test TreeClusterAPIService DeleteTreeCluster", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var clusterId string
 
@@ -50,7 +49,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 	t.Run("Test TreeClusterAPIService GetAllTreeClusters", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		resp, httpRes, err := apiClient.TreeClusterAPI.GetAllTreeClusters(context.Background()).Execute()
 
@@ -62,7 +61,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 	t.Run("Test TreeClusterAPIService GetTreeClusterById", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var clusterId string
 
@@ -76,7 +75,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 	t.Run("Test TreeClusterAPIService UpdateTreeCluster", func(t *testing.T) {
 
-		t.Skip("skip test") // remove to run test
+		t.Skip("skip test")  // remove to run test
 
 		var clusterId string
 

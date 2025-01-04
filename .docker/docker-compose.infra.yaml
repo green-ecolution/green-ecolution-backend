@@ -8,7 +8,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
-
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -21,4 +20,19 @@ services:
       PGADMIN_DEFAULT_PASSWORD: geheim
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-
+  ors-app:
+    container_name: ors-app
+    image: openrouteservice/openrouteservice:v9.0.0
+    ports:
+      - "8080:8082"
+      - "9001:9001"
+    user: "1000:1000" # Default is 1000:1000. make infra/up will override this to the actual user values
+    volumes:
+      - ./infra/ors:/home/ors
+    environment:
+      ors.engine.profile_default.build.source_file: /home/ors/files/sh.osm.pbf
+      REBUILD_GRAPHS: false
+      CONTAINER_LOG_LAVEL: INFO
+      XMS: 1g
+      XMX: 2g
+      ADDITIONAL_JAVA_OPTS: ""

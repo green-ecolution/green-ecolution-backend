@@ -21,7 +21,7 @@ type SensorStatus string
 
 // List of SensorStatus
 const (
-	SensorStatusOnline  SensorStatus = "online"
+	SensorStatusOnline SensorStatus = "online"
 	SensorStatusOffline SensorStatus = "offline"
 	SensorStatusUnknown SensorStatus = "unknown"
 )
@@ -111,3 +111,4 @@ func (v *NullableSensorStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
+

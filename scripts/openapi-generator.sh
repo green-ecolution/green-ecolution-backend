@@ -1,13 +1,15 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
-API_DOCS_DIR="./pkg/client"
+PACKAGE_NAME="$1"
+API_DOCS_FILE="$2"
+API_DOCS_OUT_DIR="$3"
 
 generate_client_docker() {
   docker run --rm -v "${PWD}":/local -u "$(id -u):$(id -g)" openapitools/openapi-generator-cli generate \
-    -i /local/docs/swagger.yaml \
-    -o /local/$API_DOCS_DIR \
+    -i /local/$API_DOCS_FILE \
+    -o /local/$API_DOCS_OUT_DIR \
     -g go \
-    --package-name client \
+    --package-name $PACKAGE_NAME \
     --git-host github.com \
     --git-user-id green-ecolution \
     --git-repo-id green-ecolution-backend \
