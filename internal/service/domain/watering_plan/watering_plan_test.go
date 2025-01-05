@@ -1190,7 +1190,6 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		testUUIDString := "6a1078e8-80fd-458f-b74e-e388fe2dd6ab"
 		testUUID, err := uuid.Parse(testUUIDString)
@@ -1203,6 +1202,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 			TreeClusters: []*entities.TreeCluster{{ID: 1}},
 			Status:       entities.WateringPlanStatusActive,
+			UserIDs:        []*uuid.UUID{&testUUID},
 		}
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
@@ -1220,7 +1220,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			Status:       entities.WateringPlanStatusActive,
 			UserIDs:      []*uuid.UUID{&testUUID},
 		}
-
+		
 		// Event
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateWateringPlan)
 		expectedEvent := entities.NewEventUpdateWateringPlan(&prevWp, &expectedWp)
@@ -1231,7 +1231,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
 			int32(1),
-		).Return(&prevWp, nil)
+		).Return(&expectedWp, nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -1256,6 +1256,8 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			expectedWp.ID,
 			mock.Anything,
 		).Return(nil)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, eventManager)
 
 		// when
 		subID, ch, err := eventManager.Subscribe(entities.EventTypeUpdateWateringPlan)
