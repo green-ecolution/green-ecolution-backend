@@ -259,35 +259,6 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 	}
 }
 
-// @Summary		Get a user by ID
-// @Description	Get a user by ID
-// @Tags			User
-// @Produce		json
-// @Success		200		{object}	entities.UserResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Router			/v1/user/{user_id} [get]
-// @Security		Keycloak
-func GetUserByID(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-		data := make([]*entities.UserResponse, len(domainData))
-		for i, domain := range domainData {
-			data[i] = userMapper.FromResponse(domain)
-		}
-
-		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
-		})
-	}
-}
-
 var group singleflight.Group
 
 // @Summary		Refresh token
