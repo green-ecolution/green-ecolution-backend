@@ -850,7 +850,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 			ctx,
 			int32(1),
 		).Return(allTestWateringPlans[0], nil)
-		
+
 		// check users
 		userRepo.EXPECT().GetByIDs(
 			ctx,
@@ -871,7 +871,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
-		
+
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
 			int32(1),
@@ -1149,7 +1149,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 			Description: "New watering plan for the east side of the city",
 			UserIDs:     []*uuid.UUID{&testUUID},
 		}
-		
+
 		// when
 		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
@@ -1199,26 +1199,26 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 		}
 
 		prevWp := entities.WateringPlan{
-			ID: 1,
-			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-			TreeClusters:   []*entities.TreeCluster{{ID: 1}},
-			Status:           entities.WateringPlanStatusActive,
+			ID:           1,
+			Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			TreeClusters: []*entities.TreeCluster{{ID: 1}},
+			Status:       entities.WateringPlanStatusActive,
 		}
-	
+
 		updatedWateringPlan := &entities.WateringPlanUpdate{
-			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-			TransporterID:    utils.P(int32(2)),
-			TreeClusterIDs:   []*int32{utils.P(int32(1)), utils.P(int32(2))},
-			UserIDs:          []*uuid.UUID{&testUUID},
-			Status:           entities.WateringPlanStatusActive,
+			Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			TransporterID:  utils.P(int32(2)),
+			TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			UserIDs:        []*uuid.UUID{&testUUID},
+			Status:         entities.WateringPlanStatusActive,
 		}
 
 		expectedWp := entities.WateringPlan{
-			ID: 1,
-			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
-			TreeClusters:   []*entities.TreeCluster{{ID: 1}},
-			Status:           entities.WateringPlanStatusActive,
-			UserIDs:          []*uuid.UUID{&testUUID},
+			ID:           1,
+			Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			TreeClusters: []*entities.TreeCluster{{ID: 1}},
+			Status:       entities.WateringPlanStatusActive,
+			UserIDs:      []*uuid.UUID{&testUUID},
 		}
 
 		// Event

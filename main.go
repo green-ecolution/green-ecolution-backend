@@ -132,7 +132,15 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 		WateringPlan: postgresRepo.WateringPlan,
 	}
 
-	em := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster, entities.EventTypeCreateTree, entities.EventTypeDeleteTree, entities.EventTypeNewSensorData, entities.EventTypeUpdateWateringPlan)
+	em := worker.NewEventManager(
+		entities.EventTypeUpdateTree,
+		entities.EventTypeUpdateTreeCluster,
+		entities.EventTypeCreateTree,
+		entities.EventTypeDeleteTree,
+		entities.EventTypeNewSensorData,
+		entities.EventTypeUpdateWateringPlan,
+	)
+
 	services := domain.NewService(cfg, repositories, em)
 	httpServer := http.NewServer(cfg, services)
 	mqttServer := mqtt.NewMqtt(cfg, services)

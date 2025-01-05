@@ -178,7 +178,10 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, handleError(err)
 	}
 
-	w.publishUpdateEvent(ctx, prevWp)
+	if err := w.publishUpdateEvent(ctx, prevWp); err != nil {
+		return nil, handleError(err)
+	}
+
 	return w.GetByID(ctx, id)
 }
 
