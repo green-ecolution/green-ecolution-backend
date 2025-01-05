@@ -76,7 +76,7 @@ func (a *UserAPIService) GetAllUsers(ctx context.Context) ApiGetAllUsersRequest 
 }
 
 // Execute executes the request
-//  @return UserList
+//	@return	UserList
 func (a *UserAPIService) GetAllUsersExecute(r ApiGetAllUsersRequest) (*UserList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -213,7 +213,7 @@ func (a *UserAPIService) V1UserLoginGet(ctx context.Context) ApiV1UserLoginGetRe
 }
 
 // Execute executes the request
-//  @return LoginResponse
+//	@return	LoginResponse
 func (a *UserAPIService) V1UserLoginGetExecute(r ApiV1UserLoginGetRequest) (*LoginResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -349,7 +349,7 @@ func (a *UserAPIService) V1UserLoginTokenPost(ctx context.Context) ApiV1UserLogi
 }
 
 // Execute executes the request
-//  @return ClientToken
+//	@return	ClientToken
 func (a *UserAPIService) V1UserLoginTokenPostExecute(r ApiV1UserLoginTokenPostRequest) (*ClientToken, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -483,7 +483,7 @@ func (a *UserAPIService) V1UserLogoutPost(ctx context.Context) ApiV1UserLogoutPo
 }
 
 // Execute executes the request
-//  @return string
+//	@return	string
 func (a *UserAPIService) V1UserLogoutPostExecute(r ApiV1UserLogoutPostRequest) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -615,7 +615,7 @@ func (a *UserAPIService) V1UserPost(ctx context.Context) ApiV1UserPostRequest {
 }
 
 // Execute executes the request
-//  @return User
+//	@return	User
 func (a *UserAPIService) V1UserPostExecute(r ApiV1UserPostRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -747,7 +747,7 @@ func (a *UserAPIService) V1UserTokenRefreshPost(ctx context.Context) ApiV1UserTo
 }
 
 // Execute executes the request
-//  @return ClientToken
+//	@return	ClientToken
 func (a *UserAPIService) V1UserTokenRefreshPostExecute(r ApiV1UserTokenRefreshPostRequest) (*ClientToken, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost

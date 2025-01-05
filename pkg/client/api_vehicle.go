@@ -56,7 +56,7 @@ func (a *VehicleAPIService) CreateVehicle(ctx context.Context) ApiCreateVehicleR
 }
 
 // Execute executes the request
-//  @return Vehicle
+//	@return	Vehicle
 func (a *VehicleAPIService) CreateVehicleExecute(r ApiCreateVehicleRequest) (*Vehicle, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -388,7 +388,7 @@ func (a *VehicleAPIService) GetAllVehicles(ctx context.Context) ApiGetAllVehicle
 }
 
 // Execute executes the request
-//  @return VehicleList
+//	@return	VehicleList
 func (a *VehicleAPIService) GetAllVehiclesExecute(r ApiGetAllVehiclesRequest) (*VehicleList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -556,7 +556,7 @@ func (a *VehicleAPIService) GetVehicleById(ctx context.Context, id string) ApiGe
 }
 
 // Execute executes the request
-//  @return Vehicle
+//	@return	Vehicle
 func (a *VehicleAPIService) GetVehicleByIdExecute(r ApiGetVehicleByIdRequest) (*Vehicle, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -713,7 +713,7 @@ func (a *VehicleAPIService) GetVehicleByPlate(ctx context.Context, plate string)
 }
 
 // Execute executes the request
-//  @return Vehicle
+//	@return	Vehicle
 func (a *VehicleAPIService) GetVehicleByPlateExecute(r ApiGetVehicleByPlateRequest) (*Vehicle, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -877,7 +877,7 @@ func (a *VehicleAPIService) UpdateVehicle(ctx context.Context, id string) ApiUpd
 }
 
 // Execute executes the request
-//  @return Vehicle
+//	@return	Vehicle
 func (a *VehicleAPIService) UpdateVehicleExecute(r ApiUpdateVehicleRequest) (*Vehicle, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPut
