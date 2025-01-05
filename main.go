@@ -186,6 +186,14 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		if err := em.RunSubscription(ctx, subscriber.NewUpdateWateringPlanSubscriber(services.TreeClusterService, services.WateringPlanService)); err != nil {
+			slog.Error("stop subscription with err", "err", err)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		if err := httpServer.Run(ctx); err != nil {
 			slog.Error("Error while running HTTP Server", "error", err)
 		}

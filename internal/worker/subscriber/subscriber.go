@@ -90,13 +90,13 @@ func (s *CreateSensorDataSubscriber) HandleEvent(ctx context.Context, e entities
 }
 
 type UpdateWateringPlanSubscriber struct {
-	tcSvc   service.TreeClusterService
+	tcSvc service.TreeClusterService
 	wpSvc service.WateringPlanService
 }
 
 func NewUpdateWateringPlanSubscriber(tcSvc service.TreeClusterService, wpSvc service.WateringPlanService) *UpdateWateringPlanSubscriber {
 	return &UpdateWateringPlanSubscriber{
-		tcSvc:   tcSvc,
+		tcSvc: tcSvc,
 		wpSvc: wpSvc,
 	}
 }

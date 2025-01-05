@@ -7,11 +7,11 @@ type Event interface {
 }
 
 const (
-	EventTypeUpdateTree        EventType = "update tree"
-	EventTypeCreateTree        EventType = "create tree"
-	EventTypeDeleteTree        EventType = "delete tree"
-	EventTypeUpdateTreeCluster EventType = "update tree cluster"
-	EventTypeNewSensorData     EventType = "receive sensor data"
+	EventTypeUpdateTree         EventType = "update tree"
+	EventTypeCreateTree         EventType = "create tree"
+	EventTypeDeleteTree         EventType = "delete tree"
+	EventTypeUpdateTreeCluster  EventType = "update tree cluster"
+	EventTypeNewSensorData      EventType = "receive sensor data"
 	EventTypeUpdateWateringPlan EventType = "update watering plan"
 )
 

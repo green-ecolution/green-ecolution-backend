@@ -21,7 +21,7 @@ type WateringPlanService struct {
 	vehicleRepo      storage.VehicleRepository
 	userRepo         storage.UserRepository
 	validator        *validator.Validate
-	eventManager    *worker.EventManager
+	eventManager     *worker.EventManager
 }
 
 func NewWateringPlanService(
@@ -37,7 +37,7 @@ func NewWateringPlanService(
 		vehicleRepo:      vehicleRepository,
 		userRepo:         userRepository,
 		validator:        validator.New(),
-		eventManager:    eventManager,
+		eventManager:     eventManager,
 	}
 }
 
