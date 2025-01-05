@@ -787,9 +787,9 @@ func TestGetUsersByRole(t *testing.T) {
 		// given
 		app := fiber.New()
 		mockAuthService := serviceMock.NewMockAuthService(t)
-		app.Get("/v1/user/role/:role", GetAllUsers(mockAuthService))
+		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockAuthService.EXPECT().GetAll(mock.Anything).Return([]*domain.User{}, nil)
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleTbz}).Return([]*domain.User{}, nil)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleTbz), nil)
