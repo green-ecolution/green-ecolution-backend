@@ -41,12 +41,18 @@ func NewWateringPlanService(
 	}
 }
 
-func (w *WateringPlanService) publishUpdateWateringPlanEvent(prevWp, updatedWp *entities.WateringPlan) {
+func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *entities.WateringPlan) error {
 	slog.Debug("publish new event", "event", entities.EventTypeUpdateWateringPlan, "service", "WateringPlanService")
+	updatedWp, err := w.GetByID(ctx, prevWp.ID)
+	if err != nil {
+		return err
+	}
 	event := entities.NewEventUpdateWateringPlan(prevWp, updatedWp)
 	if err := w.eventManager.Publish(event); err != nil {
 		slog.Error("error while sending event after updating watering plan", "err", err, "watering_plan_id", prevWp.ID)
 	}
+
+	return nil
 }
 
 func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {
@@ -120,6 +126,11 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
+	prevWp, err := w.GetByID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
 	// TODO: get distance from valhalla
 	// TODO: validate driver license
 
@@ -167,6 +178,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, handleError(err)
 	}
 
+	w.publishUpdateEvent(ctx, prevWp)
 	return w.GetByID(ctx, id)
 }
 

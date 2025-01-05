@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-var globalEventManager = worker.NewEventManager() //entities.EventTypeUpdateWateringPlanStatus
+var globalEventManager = worker.NewEventManager() //entities.EventTypeUpdateWateringPlan
 
 func TestWateringPlanService_GetAll(t *testing.T) {
 	ctx := context.Background()
