@@ -3,6 +3,7 @@ package store_test
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"os"
 	"testing"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/testutils"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -248,4 +250,65 @@ func poolConn(t testing.TB) *pgxpool.Pool {
 	}
 
 	return pool
+}
+
+func TestHandleErrorExpanded(t *testing.T) {
+	// Dummy Store für Tests
+	dummyStore := &store.Store{}
+
+	t.Run("HandleError with nil error", func(t *testing.T) {
+		// Simulate no error
+		err := dummyStore.HandleError(nil, "Testing nil error")
+
+		// Assertions
+		assert.NoError(t, err)
+	})
+
+	t.Run("HandleError with NotFoundError", func(t *testing.T) {
+		// Simulate a "no rows" error
+		err := dummyStore.HandleError(pgx.ErrNoRows, "Fetching entity by ID")
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "NotFoundError")
+		assert.Contains(t, err.Error(), "Fetching entity by ID")
+	})
+
+	t.Run("HandleError with DatabaseError", func(t *testing.T) {
+		// Simulate a PostgreSQL error
+		pgErr := &pgconn.PgError{
+			Code:    "23505",
+			Message: "Duplicate key value violates unique constraint",
+		}
+		err := dummyStore.HandleError(pgErr, "Creating new entry")
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "DatabaseError")
+		assert.Contains(t, err.Error(), "Creating new entry")
+		assert.Contains(t, err.Error(), "23505")
+	})
+
+	t.Run("HandleError with UnexpectedError", func(t *testing.T) {
+		// Simulate a generic unexpected error
+		unexpectedErr := errors.New("unexpected issue occurred")
+		err := dummyStore.HandleError(unexpectedErr, "Unexpected operation")
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "UnexpectedError")
+		assert.Contains(t, err.Error(), "Unexpected operation")
+	})
+
+	t.Run("HandleError with empty context", func(t *testing.T) {
+		// Simulate a generic unexpected error with empty context
+		unexpectedErr := errors.New("unexpected issue occurred")
+		err := dummyStore.HandleError(unexpectedErr)
+
+		// Assertions
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "UnexpectedError")
+		assert.Contains(t, err.Error(), "No context provided")
+	})
+
 }
