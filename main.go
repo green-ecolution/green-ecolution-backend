@@ -24,6 +24,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
@@ -107,15 +108,30 @@ func postgresRepo(ctx context.Context, cfg *config.Config) (repo *storage.Reposi
 }
 
 func startAppServices(ctx context.Context, cfg *config.Config) {
+	repositories, closeFn, err := initializeRepositories(ctx, cfg)
+	if err != nil {
+		slog.Error("Failed to initialize repositories", "error", err)
+		return
+	}
+	defer closeFn()
+
+	em := initializeEventManager()
+
+	services := domain.NewService(cfg, repositories, em)
+	httpServer := http.NewServer(cfg, services)
+	mqttServer := mqtt.NewMqtt(cfg, services)
+
+	runServices(ctx, httpServer, mqttServer, em, services)
+}
+
+func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.Repository, func(), error) {
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
-		slog.Error("Error while creating local repository", "error", err)
-		return
+		return nil, nil, fmt.Errorf("error creating local repository: %w", err)
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
 	postgresRepo, closeFn := postgresRepo(ctx, cfg)
-	defer closeFn()
 
 	repositories := &storage.Repository{
 		Auth: keycloakRepo.Auth,
@@ -132,7 +148,11 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 		WateringPlan: postgresRepo.WateringPlan,
 	}
 
-	em := worker.NewEventManager(
+	return repositories, closeFn, nil
+}
+
+func initializeEventManager() *worker.EventManager {
+	return worker.NewEventManager(
 		entities.EventTypeUpdateTree,
 		entities.EventTypeUpdateTreeCluster,
 		entities.EventTypeCreateTree,
@@ -140,11 +160,9 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 		entities.EventTypeNewSensorData,
 		entities.EventTypeUpdateWateringPlan,
 	)
+}
 
-	services := domain.NewService(cfg, repositories, em)
-	httpServer := http.NewServer(cfg, services)
-	mqttServer := mqtt.NewMqtt(cfg, services)
-
+func runServices(ctx context.Context, httpServer *http.Server, mqttServer *mqtt.Mqtt, em *worker.EventManager, services *service.Services) {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -159,45 +177,7 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 		em.Run(ctx)
 	}()
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := em.RunSubscription(ctx, subscriber.NewUpdateTreeSubscriber(services.TreeClusterService)); err != nil {
-			slog.Error("stop subscription with err", "err", err)
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := em.RunSubscription(ctx, subscriber.NewCreateTreeSubscriber(services.TreeClusterService)); err != nil {
-			slog.Error("stop subscription with err", "err", err)
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := em.RunSubscription(ctx, subscriber.NewDeleteTreeSubscriber(services.TreeClusterService)); err != nil {
-			slog.Error("stop subscription with err", "err", err)
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := em.RunSubscription(ctx, subscriber.NewSensorDataSubscriber(services.TreeClusterService, services.TreeService)); err != nil {
-			slog.Error("stop subscription with err", "err", err)
-		}
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		if err := em.RunSubscription(ctx, subscriber.NewUpdateWateringPlanSubscriber(services.TreeClusterService, services.WateringPlanService)); err != nil {
-			slog.Error("stop subscription with err", "err", err)
-		}
-	}()
+	runEventSubscriptions(ctx, &wg, em, services)
 
 	wg.Add(1)
 	go func() {
@@ -208,6 +188,26 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 	}()
 
 	wg.Wait()
+}
+
+func runEventSubscriptions(ctx context.Context, wg *sync.WaitGroup, em *worker.EventManager, services *service.Services) {
+	subscribers := []worker.Subscriber{
+		subscriber.NewUpdateTreeSubscriber(services.TreeClusterService),
+		subscriber.NewCreateTreeSubscriber(services.TreeClusterService),
+		subscriber.NewDeleteTreeSubscriber(services.TreeClusterService),
+		subscriber.NewSensorDataSubscriber(services.TreeClusterService, services.TreeService),
+		subscriber.NewUpdateWateringPlanSubscriber(services.TreeClusterService, services.WateringPlanService),
+	}
+
+	for _, sub := range subscribers {
+		wg.Add(1)
+		go func(sub worker.Subscriber) {
+			defer wg.Done()
+			if err := em.RunSubscription(ctx, sub); err != nil {
+				slog.Error("stop subscription with err", "eventType", sub.EventType(), "err", err)
+			}
+		}(sub)
+	}
 }
 
 func setSwaggerInfo(appURL string) {

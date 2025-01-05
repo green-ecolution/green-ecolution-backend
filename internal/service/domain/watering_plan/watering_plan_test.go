@@ -1202,7 +1202,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
 			TreeClusters: []*entities.TreeCluster{{ID: 1}},
 			Status:       entities.WateringPlanStatusActive,
-			UserIDs:        []*uuid.UUID{&testUUID},
+			UserIDs:      []*uuid.UUID{&testUUID},
 		}
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
@@ -1220,7 +1220,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			Status:       entities.WateringPlanStatusActive,
 			UserIDs:      []*uuid.UUID{&testUUID},
 		}
-		
+
 		// Event
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateWateringPlan)
 		expectedEvent := entities.NewEventUpdateWateringPlan(&prevWp, &expectedWp)
