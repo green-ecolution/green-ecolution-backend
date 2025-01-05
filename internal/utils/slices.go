@@ -22,6 +22,16 @@ func Map[T, K any](slice []T, fn func(T) K) []K {
 	return result
 }
 
+func MapIdx[T, K any](slice []T, fn func(T, int) K) []K {
+	result := make([]K, len(slice))
+
+	for i, item := range slice {
+		result[i] = fn(item, i)
+	}
+
+	return result
+}
+
 func MapKeysSlice[K comparable, V, T any](m map[K]V, fn func(K, V) T) []T {
 	result := make([]T, 0, len(m))
 
@@ -37,6 +47,16 @@ func Reduce[T, K any](slice []T, fn func(K, T) K, initial K) K {
 
 	for _, item := range slice {
 		result = fn(result, item)
+	}
+
+	return result
+}
+
+func ReduceIdx[T, K any](slice []T, fn func(K, T, int) K, initial K) K {
+	result := initial
+
+	for i, item := range slice {
+		result = fn(result, item, i)
 	}
 
 	return result

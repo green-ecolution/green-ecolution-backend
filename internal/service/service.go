@@ -102,6 +102,11 @@ type SensorService interface {
 	MapSensorToTree(ctx context.Context, sen *domain.Sensor) error
 }
 
+type RoutingService interface {
+	Service
+	PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*domain.GeoJSON, error)
+}
+
 type CrudService[T any, CreateType any, UpdateType any] interface {
 	Service
 	BasicCrudService[T, CreateType, UpdateType]
@@ -141,6 +146,7 @@ type Services struct {
 	VehicleService      VehicleService
 	PluginService       PluginService
 	WateringPlanService WateringPlanService
+	RoutingService      RoutingService
 }
 
 func (s *Services) AllServicesReady() bool {

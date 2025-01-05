@@ -30,6 +30,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
 	"github.com/jackc/pgx/v5"
@@ -131,6 +132,7 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
+	routingRepo := openrouteservice.NewRepository(cfg)
 	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 
 	repositories := &storage.Repository{
@@ -146,6 +148,7 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 		Image:        postgresRepo.Image,
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,
+		Routing:      routingRepo.Routing,
 	}
 
 	return repositories, closeFn, nil
