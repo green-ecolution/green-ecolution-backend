@@ -112,7 +112,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "water capacity is required and can not be 0")
+		assert.EqualError(t, err, "transaction failed: water capacity is required and can not be 0")
 		assert.Nil(t, got)
 	})
 
@@ -134,7 +134,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "number plate is required")
+		assert.EqualError(t, err, "transaction failed: number plate is required")
 		assert.Nil(t, got)
 	})
 
@@ -158,7 +158,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "size measurements are required and can not be 0")
+		assert.EqualError(t, err, "transaction failed: size measurements are required and can not be 0")
 		assert.Nil(t, got)
 	})
 
@@ -181,7 +181,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
-		assert.EqualError(t, err, "number plate is required")
+		assert.EqualError(t, err, "transaction failed: number plate is required")
 		assert.Nil(t, got)
 	})
 
