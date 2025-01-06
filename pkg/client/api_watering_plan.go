@@ -56,7 +56,7 @@ func (a *WateringPlanAPIService) CreateWateringPlan(ctx context.Context) ApiCrea
 }
 
 // Execute executes the request
-//  @return WateringPlan
+//	@return	WateringPlan
 func (a *WateringPlanAPIService) CreateWateringPlanExecute(r ApiCreateWateringPlanRequest) (*WateringPlan, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
@@ -381,7 +381,7 @@ func (a *WateringPlanAPIService) GetAllWateringPlans(ctx context.Context) ApiGet
 }
 
 // Execute executes the request
-//  @return WateringPlanList
+//	@return	WateringPlanList
 func (a *WateringPlanAPIService) GetAllWateringPlansExecute(r ApiGetAllWateringPlansRequest) (*WateringPlanList, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -546,7 +546,7 @@ func (a *WateringPlanAPIService) GetWateringPlanById(ctx context.Context, id str
 }
 
 // Execute executes the request
-//  @return WateringPlan
+//	@return	WateringPlan
 func (a *WateringPlanAPIService) GetWateringPlanByIdExecute(r ApiGetWateringPlanByIdRequest) (*WateringPlan, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
@@ -710,7 +710,7 @@ func (a *WateringPlanAPIService) UpdateWateringPlan(ctx context.Context, id stri
 }
 
 // Execute executes the request
-//  @return WateringPlan
+//	@return	WateringPlan
 func (a *WateringPlanAPIService) UpdateWateringPlanExecute(r ApiUpdateWateringPlanRequest) (*WateringPlan, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPut
