@@ -12,5 +12,5 @@ func RegisterRoutes(r fiber.Router, svc service.WateringPlanService) {
 	r.Put("/:id", UpdateWateringPlan(svc))
 	r.Delete("/:id", DeleteWateringPlan(svc))
 	r.Post("/route/preview", CreatePreviewRoute(svc))
-	r.Post("/route/:gpx_name", CreateRoute(svc))
+	r.Get("/route/gpx/:gpx_name", GetGpxFile(svc))
 }

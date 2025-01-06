@@ -181,7 +181,7 @@ func (w *WateringPlanService) getGpxRouteURL(ctx context.Context, waterPlanID in
 		return "", err
 	}
 
-	return fmt.Sprintf("/v1/watering-plan/routing/gpx/%s", objName), nil
+	return fmt.Sprintf("/v1/watering-plan/route/gpx/%s", objName), nil
 }
 
 func (w *WateringPlanService) GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error) {
