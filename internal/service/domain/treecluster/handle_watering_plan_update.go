@@ -38,8 +38,8 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 			return true, nil
 		}
 
-		if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err != nil {
-			slog.Error("Failed to update tree cluster in response to event", "tree_cluster_id", tc.ID, "service", "TreeClusterService", "error", err)
+		if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err == nil {
+			return s.publishUpdateEvent(ctx, tc)
 		}
 	}
 
