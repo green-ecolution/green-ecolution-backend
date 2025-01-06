@@ -28,8 +28,8 @@ type SensorListResponse struct {
 } // @Name SensorList
 
 type SensorDataResponse struct {
-	CreatedAt  time.Time           `json:"created_at"`
-	UpdatedAt  time.Time           `json:"updated_at"`
+	CreatedAt   time.Time            `json:"created_at"`
+	UpdatedAt   time.Time            `json:"updated_at"`
 	Battery     float64              `json:"battery"`
 	Humidity    float64              `json:"humidity"`
 	Temperature float64              `json:"temperature"`
