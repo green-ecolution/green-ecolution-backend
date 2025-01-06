@@ -53,6 +53,7 @@ type S3Config struct {
 	Endpoint string          `mapstructure:"endpoint"`
 	Region   string          `mapstructure:"region"`
 	RouteGpx S3ServiceConfig `mapstructure:"route-gpx"`
+	UseSSL   bool            `mapstructure:"use_ssl"`
 }
 
 type S3ServiceConfig struct {

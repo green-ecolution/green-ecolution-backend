@@ -31,6 +31,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
 	"github.com/jackc/pgx/v5"
@@ -137,6 +138,11 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 		panic(err)
 	}
 
+	s3Repos, err := s3.NewRepository(cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 
 	repositories := &storage.Repository{
@@ -153,6 +159,7 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,
 		Routing:      routingRepo.Routing,
+		GpxBucket:    s3Repos.GpxBucket,
 	}
 
 	return repositories, closeFn, nil

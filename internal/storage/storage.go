@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"io"
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -38,6 +39,7 @@ var (
 	ErrInvalidLongitude = errors.New("longitude must be between 180,-180")
 
 	ErrUnknownVehicleType = errors.New("unknown vehicle type")
+	ErrBucketNotExists    = errors.New("bucket dont exists")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
@@ -170,6 +172,14 @@ type SensorRepository interface {
 
 type RoutingRepository interface {
 	GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error)
+	GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error)
+}
+
+type S3Repository interface {
+	BucketExists(ctx context.Context) (bool, error)
+	// contentLength -1 => uploads to EOF
+	PutObject(ctx context.Context, objName, contentType string, contentLength int64, r io.Reader) error
+	GetObject(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }
 
 type FlowerbedRepository interface {
@@ -208,4 +218,6 @@ type Repository struct {
 	Region       RegionRepository
 	WateringPlan WateringPlanRepository
 	Routing      RoutingRepository
+	GpxBucket    S3Repository
+	// ImageBucket  S3Repository
 }
