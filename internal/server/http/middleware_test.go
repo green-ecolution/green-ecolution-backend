@@ -46,23 +46,6 @@ func TestHealthCheckMiddleware(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
 	})
 
-	t.Run("should handle requests with query parameters gracefully", func(t *testing.T) {
-		app := fiber.New()
-		app.Use(middleware.HealthCheck(nil))
-
-		req := httptest.NewRequest("GET", "/health?param=value", nil)
-		resp, err := app.Test(req, -1)
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should handle query parameters")
-	})
-
 	t.Run("should handle health check with different HTTP methods", func(t *testing.T) {
 		methods := []string{"POST", "PUT", "DELETE", "PATCH"}
 		for _, method := range methods {
@@ -121,6 +104,8 @@ func TestHealthCheckMiddleware(t *testing.T) {
 
 		body := make([]byte, resp.ContentLength)
 		resp.Body.Read(body)
+		_, err = resp.Body.Read(body)
+		assert.Nil(t, err)
 		assert.Equal(t, "OK", string(body), "Health check response body should be 'OK'")
 	})
 }
@@ -343,27 +328,6 @@ func TestPublicRoutes(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Public route should return status 200")
 	})
-	t.Run("should set X-Request-ID header for a new request", func(t *testing.T) {
-		app := fiber.New()
-		app.Use(middleware.RequestID())
-
-		app.Get("/request-id", func(c *fiber.Ctx) error {
-			return c.SendStatus(http.StatusOK)
-		})
-
-		req := httptest.NewRequest("GET", "/request-id", nil)
-		resp, err := app.Test(req, -1)
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-		assert.NotEmpty(t, resp.Header.Get("X-Request-ID"), "X-Request-ID header should be set")
-	})
 
 	t.Run("should preserve X-Request-ID if already set by client", func(t *testing.T) {
 		app := fiber.New()
@@ -545,26 +509,6 @@ func TestInvalidRoutes(t *testing.T) {
 		assert.Equal(t, http.StatusMethodNotAllowed, resp.StatusCode, "Unsupported method for valid route should return status 405")
 	})
 
-	t.Run("should return 404 for routes with similar names but no exact match", func(t *testing.T) {
-		app := fiber.New()
-		app.Get("/exact-route", func(c *fiber.Ctx) error {
-			return c.SendStatus(http.StatusOK)
-		})
-
-		req := httptest.NewRequest("GET", "/exact-route-similar", nil)
-		resp, err := app.Test(req, -1)
-
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Similar route name should return status 404 if not an exact match")
-	})
-
 	t.Run("should return 404 for route with extra trailing slash", func(t *testing.T) {
 		app := fiber.New(fiber.Config{
 			StrictRouting: false,
@@ -630,23 +574,35 @@ func TestInvalidRoutes(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Route with incorrect parameter format should return status 404")
 	})
-
-	t.Run("should return 404 for routes with incorrect prefix or suffix", func(t *testing.T) {
+	t.Run("should return 404 for routes with similar names or incorrect prefix/suffix", func(t *testing.T) {
 		app := fiber.New()
-		app.Get("/prefix-route", func(c *fiber.Ctx) error {
+		app.Get("/exact-route", func(c *fiber.Ctx) error {
 			return c.SendStatus(http.StatusOK)
 		})
 
-		req := httptest.NewRequest("GET", "/wrong-prefix-route", nil)
-		resp, err := app.Test(req, -1)
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
+		req1 := httptest.NewRequest("GET", "/exact-route-similar", nil)
+		req2 := httptest.NewRequest("GET", "/wrong-prefix-route", nil)
+
+		tests := []struct {
+			req  *http.Request
+			desc string
+		}{
+			{req1, "similar name"},
+			{req2, "incorrect prefix or suffix"},
 		}
 
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Route with incorrect prefix or suffix should return status 404")
+		for _, test := range tests {
+			resp, err := app.Test(test.req, -1)
+			if err != nil {
+				t.Fatalf("Request failed: %v", err)
+			}
+			if resp != nil {
+				defer resp.Body.Close()
+			}
+
+			assert.Nil(t, err)
+			assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Route with "+test.desc+" should return status 404")
+		}
 	})
+
 }

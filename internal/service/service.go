@@ -149,7 +149,7 @@ type Services struct {
 }
 
 type ServicesInterface interface {
-  AllServicesReady() bool
+	AllServicesReady() bool
 }
 
 func (s *Services) AllServicesReady() bool {

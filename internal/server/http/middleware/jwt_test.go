@@ -94,6 +94,8 @@ func Test_NewJWTMiddleware(t *testing.T) {
 		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
 		resp, _ := app.Test(req)
 		body := new(bytes.Buffer)
+		_, err := body.ReadFrom(resp.Body)
+		assert.Nil(t, err, "Reading response body should not fail")
 		body.ReadFrom(resp.Body)
 
 		// then
