@@ -57,6 +57,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 	optimizedRoutes, err := r.optimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
 		slog.Error("failed to optimize route", "error", err)
+		return nil, err
 	}
 
 	// currently handle only the first route
@@ -106,7 +107,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 	}
 
 	return &entities.GeoJSON{
-		Type:     geoJson.Type,
+		Type:     entities.GeoJSONType(geoJson.Type),
 		Bbox:     geoJson.Bbox,
 		Features: geoJson.Features,
 	}, nil

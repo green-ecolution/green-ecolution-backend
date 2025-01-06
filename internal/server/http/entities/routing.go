@@ -1,7 +1,13 @@
 package entities
 
+type GeoJSONType string // @Name GeoJsonType
+
+const (
+	FeatureCollection GeoJSONType = "FeatureCollection"
+)
+
 type GeoJSON struct {
-	Type     *string                  `json:"type,omitempty"`
+	Type     GeoJSONType              `json:"type,omitempty"`
 	Bbox     []float64                `json:"bbox,omitempty"`
 	Features []map[string]interface{} `json:"features,omitempty"`
 } // @Name GeoJson

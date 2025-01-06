@@ -7,7 +7,7 @@ type OrsDirectionRequest struct {
 }
 
 type OrsGeoJsonResponse struct {
-	Type     *string
+	Type     string
 	Bbox     []float64
 	Features []map[string]interface{}
 }

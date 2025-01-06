@@ -32,7 +32,7 @@ func CreatePreviewRoute(svc service.RoutingService) fiber.Handler {
 		}
 
 		return c.JSON(entities.GeoJSON{
-			Type:     domainGeo.Type,
+			Type:     entities.GeoJSONType(domainGeo.Type),
 			Bbox:     domainGeo.Bbox,
 			Features: domainGeo.Features,
 		})
