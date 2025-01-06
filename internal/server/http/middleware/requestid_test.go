@@ -18,6 +18,7 @@ func TestRequestID(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.NotEmpty(t, resp.Header.Get("X-Request-ID"))
 	})
 
@@ -28,12 +29,16 @@ func TestRequestID(t *testing.T) {
 		req1 := httptest.NewRequest(http.MethodGet, "/", nil)
 		resp1, err1 := app.Test(req1, -1)
 		assert.NoError(t, err1)
+
+		defer resp1.Body.Close()
 		id1 := resp1.Header.Get("X-Request-ID")
 		assert.NotEmpty(t, id1)
 
 		req2 := httptest.NewRequest(http.MethodGet, "/", nil)
 		resp2, err2 := app.Test(req2, -1)
 		assert.NoError(t, err2)
+
+		defer resp2.Body.Close()
 		id2 := resp2.Header.Get("X-Request-ID")
 		assert.NotEmpty(t, id2)
 
@@ -48,6 +53,7 @@ func TestRequestID(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.NotEmpty(t, resp.Header.Get("X-Request-ID"))
 	})
 
@@ -58,12 +64,15 @@ func TestRequestID(t *testing.T) {
 		req1 := httptest.NewRequest(http.MethodGet, "/", nil)
 		resp1, err1 := app.Test(req1, -1)
 		assert.NoError(t, err1)
+		defer resp1.Body.Close()
 		id1 := resp1.Header.Get("X-Request-ID")
 		assert.NotEmpty(t, id1)
 
 		req2 := httptest.NewRequest(http.MethodGet, "/", nil)
 		resp2, err2 := app.Test(req2, -1)
 		assert.NoError(t, err2)
+
+		defer resp2.Body.Close()
 		id2 := resp2.Header.Get("X-Request-ID")
 		assert.NotEmpty(t, id2)
 

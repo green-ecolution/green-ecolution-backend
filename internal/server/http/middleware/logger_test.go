@@ -34,6 +34,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.Equal(t, http.StatusRequestTimeout, resp.StatusCode)
 	})
 
@@ -49,6 +50,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 
@@ -65,12 +67,14 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 				req := httptest.NewRequest(http.MethodGet, "/test", nil)
 				resp, err := app.Test(req, -1)
 				results <- err == nil && resp.StatusCode == http.StatusOK
+				defer resp.Body.Close()
 			}()
 		}
 
 		for i := 0; i < concurrency; i++ {
 			assert.True(t, <-results)
 		}
+
 	})
 
 	t.Run("should handle request with unusual headers", func(t *testing.T) {
@@ -86,6 +90,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 
@@ -98,6 +103,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 	})
 
@@ -113,6 +119,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 		resp, err := app.Test(req, -1)
 
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 }

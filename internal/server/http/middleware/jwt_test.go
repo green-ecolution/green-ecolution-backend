@@ -93,10 +93,13 @@ func Test_NewJWTMiddleware(t *testing.T) {
 
 		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
 		resp, _ := app.Test(req)
+		defer resp.Body.Close()
+
 		body := new(bytes.Buffer)
 		_, err := body.ReadFrom(resp.Body)
-		assert.Nil(t, err, "Reading response body should not fail")
-		body.ReadFrom(resp.Body)
+		if err != nil {
+			t.Fatalf("Failed to read response body: %v", err)
+		}
 
 		// then
 		assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
@@ -156,6 +159,7 @@ func Test_successHandler(t *testing.T) {
 		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
 		req.Header.Set("Authorization", "Bearer "+signJWT(t, validKey))
 		resp, _ := app.Test(req)
+		defer resp.Body.Close()
 
 		// then
 		assert.NotNil(t, got)
@@ -175,6 +179,7 @@ func Test_successHandler(t *testing.T) {
 		// when
 		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
 		resp, _ := app.Test(req)
+		defer resp.Body.Close()
 
 		// then
 		assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
@@ -205,6 +210,7 @@ func Test_successHandler(t *testing.T) {
 		req := httptest.NewRequest(fiber.MethodGet, "/", nil)
 		req.Header.Set("Authorization", "Bearer "+signJWT(t, validKey))
 		resp, _ := app.Test(req)
+		defer resp.Body.Close()
 
 		// then
 		assert.NotNil(t, got)

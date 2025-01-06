@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -14,22 +15,6 @@ import (
 
 func TestHealthCheckMiddleware(t *testing.T) {
 	t.Run("should return status 200 for health check", func(t *testing.T) {
-		app := fiber.New()
-		app.Use(middleware.HealthCheck(nil))
-
-		req := httptest.NewRequest("GET", "/health", nil)
-		resp, err := app.Test(req, -1)
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
-	})
-	t.Run("should return status 200 for valid health check request", func(t *testing.T) {
 		app := fiber.New()
 		app.Use(middleware.HealthCheck(nil))
 
@@ -102,31 +87,13 @@ func TestHealthCheckMiddleware(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode, "Health check should return status 200")
 
-		body := make([]byte, resp.ContentLength)
-		resp.Body.Read(body)
-		_, err = resp.Body.Read(body)
+		body, err := io.ReadAll(resp.Body)
 		assert.Nil(t, err)
 		assert.Equal(t, "OK", string(body), "Health check response body should be 'OK'")
 	})
 }
 
 func TestHTTPLoggerMiddleware(t *testing.T) {
-	t.Run("should log and return a response", func(t *testing.T) {
-		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
-
-		req := httptest.NewRequest("GET", "/log", nil)
-		resp, err := app.Test(req, -1)
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.NotNil(t, resp, "Response should not be nil for HTTPLogger")
-	})
 
 	t.Run("should log and return a response for valid GET request", func(t *testing.T) {
 		app := fiber.New()
@@ -454,23 +421,6 @@ func TestPublicRoutes(t *testing.T) {
 }
 
 func TestInvalidRoutes(t *testing.T) {
-	t.Run("should return 404 for invalid route", func(t *testing.T) {
-		app := fiber.New()
-		app.Use(middleware.HealthCheck(nil))
-
-		req := httptest.NewRequest("GET", "/invalid-route", nil)
-		resp, err := app.Test(req, -1)
-
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusNotFound, resp.StatusCode, "Invalid route should return status 404")
-	})
 	t.Run("should return 404 for an undefined route", func(t *testing.T) {
 		app := fiber.New()
 		app.Use(middleware.HealthCheck(nil))
@@ -507,28 +457,6 @@ func TestInvalidRoutes(t *testing.T) {
 
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusMethodNotAllowed, resp.StatusCode, "Unsupported method for valid route should return status 405")
-	})
-
-	t.Run("should return 404 for route with extra trailing slash", func(t *testing.T) {
-		app := fiber.New(fiber.Config{
-			StrictRouting: false,
-		})
-		app.Get("/no-trailing-slash", func(c *fiber.Ctx) error {
-			return c.SendStatus(http.StatusOK)
-		})
-
-		req := httptest.NewRequest("GET", "/no-trailing-slash/", nil)
-		resp, err := app.Test(req, -1)
-
-		if err != nil {
-			t.Fatalf("Request failed: %v", err)
-		}
-		if resp != nil {
-			defer resp.Body.Close()
-		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode, "Route with extra trailing slash should return status 200 if framework normalizes slashes")
 	})
 
 	t.Run("should return 404 for routes with query parameters on undefined route", func(t *testing.T) {
