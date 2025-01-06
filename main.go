@@ -196,7 +196,7 @@ func runEventSubscriptions(ctx context.Context, wg *sync.WaitGroup, em *worker.E
 		subscriber.NewCreateTreeSubscriber(services.TreeClusterService),
 		subscriber.NewDeleteTreeSubscriber(services.TreeClusterService),
 		subscriber.NewSensorDataSubscriber(services.TreeClusterService, services.TreeService),
-		subscriber.NewUpdateWateringPlanSubscriber(services.TreeClusterService, services.WateringPlanService),
+		subscriber.NewUpdateWateringPlanSubscriber(services.TreeClusterService),
 	}
 
 	for _, sub := range subscribers {

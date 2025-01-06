@@ -3,7 +3,6 @@ package treecluster
 import (
 	"context"
 	"log/slog"
-	"reflect"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -17,7 +16,7 @@ func (s *TreeClusterService) HandleUpdateWateringPlan(ctx context.Context, event
 	if event.Prev.Status == event.New.Status ||
 		event.Prev.Date != event.New.Date ||
 		event.New.Status != entities.WateringPlanStatusFinished ||
-		!reflect.DeepEqual(event.Prev.TreeClusters, event.New.TreeClusters) {
+		len(event.Prev.TreeClusters) != len(event.New.TreeClusters) {
 		return nil
 	}
 
