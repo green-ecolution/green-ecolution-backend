@@ -7,6 +7,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type UserStatus string
+
+const (
+	UserStatusAvailable SensorStatus = "available"
+	UserStatusAbsent    SensorStatus = "absent"
+)
+
 type User struct {
 	ID             uuid.UUID
 	CreatedAt      time.Time
@@ -20,6 +27,7 @@ type User struct {
 	Roles          []Role
 	Avatar         *url.URL
 	DrivingLicense DrivingLicense
+	Status         UserStatus
 }
 
 type RegisterUser struct {

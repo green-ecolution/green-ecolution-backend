@@ -136,7 +136,7 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		slog.Error("failed to parse user id", "user_id", *user.ID, "err", err)
 		return nil, ErrParseID
 	}
-	var phoneNumber, employeeID, drivingLicenseClass string
+	var phoneNumber, employeeID, drivingLicenseClass, status string
 	var userRoles []string
 	if user.Attributes != nil {
 		if val, ok := (*user.Attributes)["phone_number"]; ok && len(val) > 0 {
@@ -153,6 +153,10 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 
 		if val, ok := (*user.Attributes)["user_roles"]; ok && len(val) > 0 {
 			userRoles = val
+		}
+
+		if val, ok := (*user.Attributes)["status"]; ok && len(val) > 0 {
+			status = val[0]
 		}
 	}
 	var roles []entities.Role
@@ -172,6 +176,7 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		EmployeeID:     employeeID,
 		Roles:          roles,
 		DrivingLicense: entities.DrivingLicense(drivingLicenseClass),
+		Status:         entities.UserStatus(status),
 	}, nil
 }
 
