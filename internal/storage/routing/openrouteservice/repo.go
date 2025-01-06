@@ -10,6 +10,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/ors"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/vroom"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -32,15 +33,15 @@ const (
 )
 
 type RouteRepo struct {
-	vroom VroomClient
+	vroom vroom.VroomClient
 	ors   ors.OrsClient
 }
 
 func NewRouteRepo() *RouteRepo {
 	vroomURL, _ := url.Parse(vroomURL)
 	orsURL, _ := url.Parse(orsURL)
-	vroom := NewVroomClient(
-		WithHostURL(vroomURL),
+	vroom := vroom.NewVroomClient(
+		vroom.WithHostURL(vroomURL),
 	)
 	ors := ors.NewOrsClient(
 		ors.WithHostURL(orsURL),
@@ -63,7 +64,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 
 	// Reduce muliple pickups to one
 	// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
-	reducedSteps := utils.Reduce(oRoute.Steps, func(acc []*VroomRouteStep, current VroomRouteStep) []*VroomRouteStep {
+	reducedSteps := utils.Reduce(oRoute.Steps, func(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
 		if len(acc) == 0 {
 			return append(acc, &current)
 		}
@@ -79,7 +80,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 
 		prev.Load = current.Load
 		return acc
-	}, make([]*VroomRouteStep, 0, len(oRoute.Steps)))
+	}, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 
 	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
 	if err != nil {
@@ -89,7 +90,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 
 	fmt.Printf("%+v\n", reducedSteps)
 
-	orsLocation := utils.Reduce(reducedSteps, func(acc [][]float64, current *VroomRouteStep) [][]float64 {
+	orsLocation := utils.Reduce(reducedSteps, func(acc [][]float64, current *vroom.VroomRouteStep) [][]float64 {
 		return append(acc, current.Location)
 	}, make([][]float64, 0, len(reducedSteps)))
 
@@ -111,7 +112,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 	}, nil
 }
 
-func (r *RouteRepo) optimizeRoute(ctx context.Context, vehicle *entities.Vehicle, cluster []*entities.TreeCluster) (*VroomResponse, error) {
+func (r *RouteRepo) optimizeRoute(ctx context.Context, vehicle *entities.Vehicle, cluster []*entities.TreeCluster) (*vroom.VroomResponse, error) {
 	vroomVehicle, err := r.toVroomVehicle(vehicle)
 	if err != nil {
 		if errors.Is(err, storage.ErrUnknownVehicleType) {
@@ -122,8 +123,8 @@ func (r *RouteRepo) optimizeRoute(ctx context.Context, vehicle *entities.Vehicle
 	}
 
 	shipments := r.toVroomShipments(cluster)
-	req := &VroomReq{
-		Vehicles:  []VroomVehicle{*vroomVehicle},
+	req := &vroom.VroomReq{
+		Vehicles:  []vroom.VroomVehicle{*vroomVehicle},
 		Shipments: shipments,
 	}
 
@@ -135,7 +136,7 @@ func (r *RouteRepo) optimizeRoute(ctx context.Context, vehicle *entities.Vehicle
 	return resp, nil
 }
 
-func (r RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []VroomShipments {
+func (r RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []vroom.VroomShipments {
 
 	// ignore tree cluster with empty coordinates
 	filteredClusters := utils.Filter(cluster, func(c *entities.TreeCluster) bool {
@@ -143,15 +144,15 @@ func (r RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []VroomShip
 	})
 
 	nextID := int32(0)
-	return utils.MapIdx(filteredClusters, func(c *entities.TreeCluster, i int) VroomShipments {
-		shipment := VroomShipments{
+	return utils.MapIdx(filteredClusters, func(c *entities.TreeCluster, i int) vroom.VroomShipments {
+		shipment := vroom.VroomShipments{
 			Amount: []int32{treeAmount},
-			Pickup: VroomShipmentStep{
+			Pickup: vroom.VroomShipmentStep{
 				Description: defaultPickupDesc,
 				Id:          nextID,
 				Location:    wateringPoint,
 			},
-			Delivery: VroomShipmentStep{
+			Delivery: vroom.VroomShipmentStep{
 				Description: c.Name,
 				Id:          nextID + 1,
 				Location:    []float64{*c.Longitude, *c.Latitude},
@@ -163,13 +164,13 @@ func (r RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []VroomShip
 	})
 }
 
-func (r *RouteRepo) toVroomVehicle(vehicle *entities.Vehicle) (*VroomVehicle, error) {
+func (r *RouteRepo) toVroomVehicle(vehicle *entities.Vehicle) (*vroom.VroomVehicle, error) {
 	vehicleType, err := r.toOrsVehicleType(vehicle.Type)
 	if err != nil {
 		return nil, err
 	}
 
-	return &VroomVehicle{
+	return &vroom.VroomVehicle{
 		Id:          vehicle.ID,
 		Description: vehicle.Description,
 		Profile:     vehicleType,

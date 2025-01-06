@@ -1,9 +1,11 @@
-package openrouteservice
+package vroom
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -47,13 +49,13 @@ func NewVroomClient(opts ...VroomClientOption) VroomClient {
 }
 
 func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomResponse, error) {
-	buf, err := json.Marshal(reqBody)
-	if err != nil {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
 		slog.Error("failed to marshal vroom req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, v.cfg.url.String(), bytes.NewReader(buf))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, v.cfg.url.String(), &buf)
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +65,17 @@ func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomRespon
 	if err != nil {
 		slog.Error("failed to send request to vroom service", "error", err)
 		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		body, err := io.ReadAll(resp.Body)
+		if err == nil {
+			slog.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode, "body", body)
+		} else {
+			slog.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode)
+		}
+		return nil, errors.New("response not successful")
 	}
 
 	var vroomResp VroomResponse
