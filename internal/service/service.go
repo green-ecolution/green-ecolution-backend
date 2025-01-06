@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"reflect"
 	"time"
@@ -102,11 +103,6 @@ type SensorService interface {
 	MapSensorToTree(ctx context.Context, sen *domain.Sensor) error
 }
 
-type RoutingService interface {
-	Service
-	PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*domain.GeoJSON, error)
-}
-
 type CrudService[T any, CreateType any, UpdateType any] interface {
 	Service
 	BasicCrudService[T, CreateType, UpdateType]
@@ -120,6 +116,8 @@ type VehicleService interface {
 
 type WateringPlanService interface {
 	CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
+	PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*domain.GeoJSON, error)
+	GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }
 
 type PluginService interface {
@@ -146,7 +144,6 @@ type Services struct {
 	VehicleService      VehicleService
 	PluginService       PluginService
 	WateringPlanService WateringPlanService
-	RoutingService      RoutingService
 }
 
 func (s *Services) AllServicesReady() bool {

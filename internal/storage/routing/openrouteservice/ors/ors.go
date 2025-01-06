@@ -49,7 +49,7 @@ func NewOrsClient(opts ...OrsClientOption) OrsClient {
 	}
 }
 
-func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBody OrsDirectionRequest) (*OrsGeoJsonResponse, error) {
+func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*OrsGeoJsonResponse, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
 		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
@@ -86,4 +86,38 @@ func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBo
 	}
 
 	return &orsGeoJson, nil
+}
+
+func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (io.ReadCloser, error) {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
+		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
+		return nil, err
+	}
+
+	path := fmt.Sprintf("%s/v2/directions/%s/gpx", o.cfg.url.String(), profile)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, &buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := o.cfg.client.Do(req)
+	if err != nil {
+		slog.Error("failed to send request to ors service", "error", err)
+		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err == nil {
+			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode, "body", body)
+		} else {
+			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode)
+		}
+		return nil, errors.New("response not successful")
+	}
+
+	return resp.Body, nil
 }

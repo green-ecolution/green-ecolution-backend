@@ -64,3 +64,10 @@ func NetURLToString(u *url.URL) string {
 func TimeDurationToString(t time.Duration) string {
 	return t.String()
 }
+
+func StringPtrToString(source *string) string {
+	if source == nil {
+		return ""
+	}
+	return *source
+}

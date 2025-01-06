@@ -19,7 +19,8 @@ UPDATE watering_plans SET
   status = $4,
   distance = $5,
   total_water_required = $6,
-  cancellation_note = $7
+  cancellation_note = $7,
+  gpx_url = $8
 WHERE id = $1;
 
 -- name: DeleteWateringPlan :one

@@ -3,7 +3,7 @@ package openrouteservice
 import (
 	"context"
 	"errors"
-	"fmt"
+	"io"
 	"log/slog"
 	"net/url"
 
@@ -58,6 +58,43 @@ func NewRouteRepo(cfg RouteRepoConfig) (*RouteRepo, error) {
 }
 
 func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
+	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
+	if err != nil {
+		return nil, err
+	}
+
+	geoJson, err := r.ors.DirectionsGeoJson(ctx, orsProfile, orsRoute)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entities.GeoJSON{
+		Type:     entities.GeoJSONType(geoJson.Type),
+		Bbox:     geoJson.Bbox,
+		Features: geoJson.Features,
+	}, nil
+}
+
+func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {
+	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.ors.DirectionsRawGpx(ctx, orsProfile, orsRoute)
+}
+
+func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*ors.OrsDirectionRequest, error) {
 	optimizedRoutes, err := r.optimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
 		slog.Error("failed to optimize route", "error", err)
@@ -65,6 +102,10 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 	}
 
 	// currently handle only the first route
+	if len(optimizedRoutes.Routes) <= 0 {
+		slog.Error("there are no routes in vroom response", "routes", optimizedRoutes)
+		return nil, errors.New("empty routes")
+	}
 	oRoute := optimizedRoutes.Routes[0]
 
 	// Reduce muliple pickups to one
@@ -87,33 +128,19 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 		return acc
 	}, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 
-	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
 	if err != nil {
 		slog.Error("unknown vehicle type. please specify vehicle type", "error", err, "vehicle_type", vehicle.Type)
 		return nil, err
 	}
 
-	fmt.Printf("%+v\n", reducedSteps)
-
 	orsLocation := utils.Reduce(reducedSteps, func(acc [][]float64, current *vroom.VroomRouteStep) [][]float64 {
 		return append(acc, current.Location)
 	}, make([][]float64, 0, len(reducedSteps)))
 
-	orsRoute := ors.OrsDirectionRequest{
+	return &ors.OrsDirectionRequest{
 		Coordinates: orsLocation,
 		Units:       "m",
 		Language:    "de-de",
-	}
-
-	geoJson, err := r.ors.DirectionsGeoJson(ctx, orsProfile, orsRoute)
-	if err != nil {
-		return nil, err
-	}
-
-	return &entities.GeoJSON{
-		Type:     entities.GeoJSONType(geoJson.Type),
-		Bbox:     geoJson.Bbox,
-		Features: geoJson.Features,
 	}, nil
 }
 
@@ -185,14 +212,15 @@ func (r *RouteRepo) toVroomVehicle(vehicle *entities.Vehicle) (*vroom.VroomVehic
 }
 
 func (r *RouteRepo) toOrsVehicleType(vecType entities.VehicleType) (string, error) {
-	switch vecType {
-	case entities.VehicleTypeTrailer:
-		return "driving-car", nil
+	return "driving-car", nil
+	// switch vecType {
+	// case entities.VehicleTypeTrailer:
+	// 	return "driving-car", nil
 
-	case entities.VehicleTypeTransporter:
-		return "driving-hgv", nil
+	// case entities.VehicleTypeTransporter:
+	// 	return "driving-hgv", nil
 
-	default:
-		return "", storage.ErrUnknownVehicleType
-	}
+	// default:
+	// 	return "", storage.ErrUnknownVehicleType
+	// }
 }

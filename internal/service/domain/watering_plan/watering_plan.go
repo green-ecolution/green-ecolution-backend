@@ -2,6 +2,8 @@ package wateringplan
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"log/slog"
 
 	"github.com/google/uuid"
@@ -20,6 +22,8 @@ type WateringPlanService struct {
 	clusterRepo      storage.TreeClusterRepository
 	vehicleRepo      storage.VehicleRepository
 	userRepo         storage.UserRepository
+	routingRepo      storage.RoutingRepository
+	gpxBucket        storage.S3Repository
 	validator        *validator.Validate
 	eventManager     *worker.EventManager
 }
@@ -30,12 +34,16 @@ func NewWateringPlanService(
 	vehicleRepository storage.VehicleRepository,
 	userRepository storage.UserRepository,
 	eventManager *worker.EventManager,
+	routingRepo storage.RoutingRepository,
+	gpxRepo storage.S3Repository,
 ) service.WateringPlanService {
 	return &WateringPlanService{
 		wateringPlanRepo: wateringPlanRepository,
 		clusterRepo:      clusterRepository,
 		vehicleRepo:      vehicleRepository,
 		userRepo:         userRepository,
+		routingRepo:      routingRepo,
+		gpxBucket:        gpxRepo,
 		validator:        validator.New(),
 		eventManager:     eventManager,
 	}
@@ -53,6 +61,31 @@ func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *en
 	}
 
 	return nil
+}
+
+func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*entities.GeoJSON, error) {
+	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
+	if err != nil {
+		slog.Error("can't find vehicle to preview route", "error", err, "vehicle_id", vehicleID)
+		return nil, service.NewError(service.NotFound, fmt.Sprintf("vehicle with id %d not found", vehicleID))
+	}
+
+	clusters, err := w.clusterRepo.GetByIDs(ctx, clusterIDs)
+	if err != nil {
+		// when error, something is wrong with the db, else clusters should be an empty array
+		return nil, err
+	}
+
+	geoJson, err := w.routingRepo.GenerateRoute(ctx, vehicle, clusters)
+	if err != nil {
+		if errors.Is(err, storage.ErrUnknownVehicleType) {
+			slog.Error("the vehicle type is not supported", "error", err, "vehicle_type", vehicle.Type)
+			return nil, service.NewError(service.NotFound, "vehicle type is not supported")
+		}
+		return nil, err
+	}
+
+	return geoJson, nil
 }
 
 func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {
@@ -113,12 +146,46 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 
 		return true, nil
 	})
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
+		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, transporter, treeClusters)
+		if err != nil {
+			return false, handleError(err)
+		}
+
+		wp.GpxURL = gpxURL
+
+		return true, nil
+	})
 
 	if err != nil {
 		return nil, handleError(err)
 	}
 
 	return created, nil
+}
+
+func (w *WateringPlanService) getGpxRouteURL(ctx context.Context, waterPlanID int32, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (string, error) {
+	r, err := w.routingRepo.GenerateRawGpxRoute(ctx, vehicle, clusters)
+	if err != nil {
+		return "", err
+	}
+	defer r.Close()
+
+	objName := fmt.Sprintf("waterplan-%d.gpx", waterPlanID)
+
+	if err := w.gpxBucket.PutObject(ctx, objName, "application/gpx+xml;charset=UTF-8 ", -1, r); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("/v1/watering-plan/routing/gpx/%s", objName), nil
+}
+
+func (w *WateringPlanService) GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error) {
+	return w.gpxBucket.GetObject(ctx, objName)
 }
 
 func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *entities.WateringPlanUpdate) (*entities.WateringPlan, error) {
