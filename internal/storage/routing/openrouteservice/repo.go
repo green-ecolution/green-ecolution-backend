@@ -9,8 +9,8 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/ors"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-	"github.com/green-ecolution/green-ecolution-backend/pkg/ors"
 )
 
 // validate is RouteRepo implements storage.RoutingRepository
@@ -25,23 +25,26 @@ var (
 )
 
 const (
-	treeAmount        int32 = 100 // how much water does a cluster need
+	treeAmount        int32 = 40 // how much water does a cluster need
 	defaultPickupDesc       = "TBZ Schleswiger Str."
-	vroomURL                = "http://localhost:2525" // TODO: move to config
-	orsURL                  = "http://localhost:8080" // TODO: move to config
+	vroomURL                = "http://localhost:2525"     // TODO: move to config
+	orsURL                  = "http://localhost:8080/ors" // TODO: move to config
 )
 
 type RouteRepo struct {
 	vroom VroomClient
-	ors   *ors.APIClient
+	ors   ors.OrsClient
 }
 
-func NewRouteRepo(cfg *ors.Configuration) *RouteRepo {
-	url, _ := url.Parse(vroomURL)
+func NewRouteRepo() *RouteRepo {
+	vroomURL, _ := url.Parse(vroomURL)
+	orsURL, _ := url.Parse(orsURL)
 	vroom := NewVroomClient(
-		WithHostURL(url),
+		WithHostURL(vroomURL),
 	)
-	ors := ors.NewAPIClient(cfg)
+	ors := ors.NewOrsClient(
+		ors.WithHostURL(orsURL),
+	)
 
 	return &RouteRepo{
 		vroom: vroom,
@@ -90,13 +93,13 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 		return append(acc, current.Location)
 	}, make([][]float64, 0, len(reducedSteps)))
 
-	orsRoute := ors.DirectionsService{
+	orsRoute := ors.OrsDirectionRequest{
 		Coordinates: orsLocation,
-		Units:       utils.P("m"),
-		Language:    utils.P("de-de"),
+		Units:       "m",
+		Language:    "de-de",
 	}
 
-	geoJson, err := r.generateGeoJSON(ctx, orsProfile, orsRoute)
+	geoJson, err := r.ors.DirectionsGeoJson(ctx, orsProfile, orsRoute)
 	if err != nil {
 		return nil, err
 	}
@@ -106,18 +109,6 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 		Bbox:     geoJson.Bbox,
 		Features: geoJson.Features,
 	}, nil
-}
-
-func (r *RouteRepo) generateGeoJSON(ctx context.Context, driveProfile string, route ors.DirectionsService) (*ors.GeoJSONRouteResponse, error) {
-	req := r.ors.DirectionsServiceAPI.GetGeoJsonRoute(ctx, driveProfile)
-	fmt.Printf("%+v\n", req)
-	geoJson, httpResp, err := req.DirectionsService(route).Execute()
-	if err != nil {
-		slog.Error("failed to request route from ors", "error", err, "http_response", httpResp)
-		return nil, err
-	}
-
-	return geoJson, nil
 }
 
 func (r *RouteRepo) optimizeRoute(ctx context.Context, vehicle *entities.Vehicle, cluster []*entities.TreeCluster) (*VroomResponse, error) {

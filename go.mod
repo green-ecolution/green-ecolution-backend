@@ -12,7 +12,6 @@ require (
 	github.com/gofiber/swagger v1.1.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
-	github.com/green-ecolution/green-ecolution-backend/pkg/ors v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/omniscale/go-proj/v2 v2.0.0-20221006090944-6c8a5f5a510d
 	github.com/pkg/errors v0.9.1
@@ -121,5 +120,3 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/green-ecolution/green-ecolution-backend/pkg/ors => ./pkg/ors_api
