@@ -690,12 +690,9 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockUUID1 := uuid.New()
-		mockUUID2 := uuid.New()
-
 		users := []*domain.User{
 			{
-				ID:          mockUUID1,
+				ID:          uuid.New(),
 				CreatedAt:   time.Now(),
 				Email:       "user1@example.com",
 				FirstName:   "John",
@@ -708,7 +705,7 @@ func TestGetUsersByRole(t *testing.T) {
 				},
 			},
 			{
-				ID:          mockUUID2,
+				ID:          uuid.New(),
 				CreatedAt:   time.Now(),
 				Email:       "user2@example.com",
 				FirstName:   "Jane",
@@ -733,18 +730,18 @@ func TestGetUsersByRole(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var response []entities.UserResponse
+		var response entities.UserListResponse
 		err = json.NewDecoder(resp.Body).Decode(&response)
 		assert.Nil(t, err)
-		assert.Equal(t, len(expectedUsers), len(response))
+		assert.Equal(t, len(expectedUsers), len(response.Data))
 		for i, user := range expectedUsers {
-			assert.Equal(t, user.ID.String(), response[i].ID)
-			assert.Equal(t, user.Email, response[i].Email)
-			assert.Equal(t, user.FirstName, response[i].FirstName)
-			assert.Equal(t, user.LastName, response[i].LastName)
-			assert.Equal(t, user.Username, response[i].Username)
-			assert.Equal(t, user.EmployeeID, response[i].EmployeeID)
-			assert.Equal(t, user.PhoneNumber, response[i].PhoneNumber)
+			assert.Equal(t, user.ID.String(), response.Data[i].ID)
+			assert.Equal(t, user.Email, response.Data[i].Email)
+			assert.Equal(t, user.FirstName, response.Data[i].FirstName)
+			assert.Equal(t, user.LastName, response.Data[i].LastName)
+			assert.Equal(t, user.Username, response.Data[i].Username)
+			assert.Equal(t, user.EmployeeID, response.Data[i].EmployeeID)
+			assert.Equal(t, user.PhoneNumber, response.Data[i].PhoneNumber)
 		}
 	})
 
@@ -800,10 +797,10 @@ func TestGetUsersByRole(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		var response []entities.UserResponse
+		var response entities.UserListResponse
 		err = json.NewDecoder(resp.Body).Decode(&response)
 		assert.Nil(t, err)
-		assert.Empty(t, response)
+		assert.Empty(t, response.Data)
 	})
 }
 

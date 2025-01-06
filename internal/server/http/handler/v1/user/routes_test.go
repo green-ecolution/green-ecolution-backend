@@ -106,6 +106,50 @@ func TestRegisterRoutes(t *testing.T) {
 			assert.Equal(t, expected.EmployeeID, got.EmployeeID)
 			assert.Equal(t, expected.PhoneNumber, got.PhoneNumber)
 		})
+
+		t.Run("role/:role should call GET", func(t *testing.T) {
+			mockUserService := serviceMock.NewMockAuthService(t)
+			app := fiber.New()
+			RegisterRoutes(app, mockUserService)
+			expected := []*domain.User{
+				{
+					ID:            uuid.MustParse("6be4c752-94df-4719-99b1-ce58253eaf75"),
+					CreatedAt:     time.Now(),
+					Username:      "toni_tester",
+					FirstName:     "Toni",
+					LastName:      "Tester",
+					Email:         "dev@green-ecolution.de",
+					EmployeeID:    "123456",
+					PhoneNumber:   "+49 123456",
+					EmailVerified: false,
+					Avatar:        nil,
+					Roles: []domain.Role{
+						{Name: domain.UserRoleGreenEcolution},
+					},
+				},
+			}
+			mockUserService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleGreenEcolution}).Return(expected, nil)
+
+			// when
+			req := httptest.NewRequest(http.MethodGet, string("/role/"+domain.UserRoleGreenEcolution), nil)
+			resp, err := app.Test(req, -1)
+			defer resp.Body.Close()
+
+			// then
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+			var got entities.UserListResponse
+			err = json.NewDecoder(resp.Body).Decode(&got)
+			assert.NoError(t, err)
+			assert.Equal(t, len(expected), len(got.Data))
+			assert.Equal(t, expected[0].ID.String(), got.Data[0].ID)
+			assert.Equal(t, expected[0].Username, got.Data[0].Username)
+			assert.Equal(t, expected[0].FirstName, got.Data[0].FirstName)
+			assert.Equal(t, expected[0].LastName, got.Data[0].LastName)
+			assert.Equal(t, expected[0].Email, got.Data[0].Email)
+			assert.Equal(t, expected[0].PhoneNumber, got.Data[0].PhoneNumber)
+		})
 	})
 }
 

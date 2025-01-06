@@ -220,6 +220,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 
 // @Summary		Get users by role
 // @Description	Get users by role
+// @Id				get-users-by-role
 // @Tags			User
 // @Produce		json
 // @Success		200	{object}	entities.UserListResponse
@@ -248,14 +249,16 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 		if err != nil {
 			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by role").Error()))
 		}
-		response := make([]entities.UserResponse, len(users))
 
+		data := make([]*entities.UserResponse, len(users))
 		for i, user := range users {
-			userResponse := userMapper.FromResponse(user)
-			response[i] = *userResponse
+			data[i] = userMapper.FromResponse(user)
 		}
 
-		return c.Status(fiber.StatusOK).JSON(response)
+		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
