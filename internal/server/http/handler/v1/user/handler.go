@@ -222,13 +222,13 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 // @Description	Get users by role
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	entities.UserListResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
-// @Param			limit	query		string	false	"Role"
-// @Router			/v1/user [get]
+// @Success		200	{object}	entities.UserListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/user/role/{role} [get]
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			role	path	string	true	"Role"
 // @Security		Keycloak
 func GetUsersByRole(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
