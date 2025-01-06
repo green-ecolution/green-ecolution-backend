@@ -29,6 +29,38 @@ type LogConfig struct {
 	Format logger.LogFormat `mapstructure:"format"`
 }
 
+type RoutingConfig struct {
+	StartPoint    []float64        `mapstructure:"start_point"`
+	EndPoint      []float64        `mapstructure:"end_point"`
+	WateringPoint []float64        `mapstructure:"watering_point"`
+	Ors           RoutingOrsConfig `mapstructure:"ors"`
+}
+
+type RoutingOrsConfig struct {
+	Host         string                       `mapstructure:"host"`
+	Optimization RoutingOrsOptimizationConfig `mapstructure:"optimization"`
+}
+
+type RoutingOrsOptimizationConfig struct {
+	Vroom RoutingVroomConfig `mapstructure:"vroom"`
+}
+
+type RoutingVroomConfig struct {
+	Host string `mapstructure:"host"`
+}
+
+type S3Config struct {
+	Endpoint string          `mapstructure:"endpoint"`
+	Region   string          `mapstructure:"region"`
+	RouteGpx S3ServiceConfig `mapstructure:"route-gpx"`
+}
+
+type S3ServiceConfig struct {
+	Bucket          string `mapstructure:"bucket"`
+	AccessKey       string `mapstructure:"accessKey"`
+	SecretAccessKey string `mapstructure:"secretAccessKey"`
+}
+
 type ServerConfig struct {
 	Logs        LogConfig      `mapstructure:"logs"`
 	Database    DatabaseConfig `mapstructure:"database"`
@@ -48,6 +80,8 @@ type IdentityAuthConfig struct {
 type Config struct {
 	Server       ServerConfig       `mapstructure:"server"`
 	Dashboard    DashboardConfig    `mapstructure:"dashboard"`
+	Routing      RoutingConfig      `mapstructure:"routing"`
+	S3           S3Config           `mapstructure:"s3"`
 	MQTT         MQTTConfig         `mapstructure:"mqtt"`
 	IdentityAuth IdentityAuthConfig `mapstructure:"auth"`
 }

@@ -132,7 +132,11 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
-	routingRepo := openrouteservice.NewRepository(cfg)
+	routingRepo, err := openrouteservice.NewRepository(cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 
 	repositories := &storage.Repository{

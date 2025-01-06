@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/url"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/ors"
@@ -17,29 +18,31 @@ import (
 // validate is RouteRepo implements storage.RoutingRepository
 var _ storage.RoutingRepository = (*RouteRepo)(nil)
 
-// start and end point tbz flensburg schleswiger str.
-// TODO: save points in db or config
-var (
-	startPoint    = []float64{9.434764259345679, 54.768731253913806}
-	endPoint      = []float64{9.434764259345679, 54.768731253913806}
-	wateringPoint = []float64{9.434764259345679, 54.768731253913806}
+const (
+	treeAmount int32 = 40 // how much water does a cluster need
 )
 
-const (
-	treeAmount        int32 = 40 // how much water does a cluster need
-	defaultPickupDesc       = "TBZ Schleswiger Str."
-	vroomURL                = "http://localhost:2525"     // TODO: move to config
-	orsURL                  = "http://localhost:8080/ors" // TODO: move to config
-)
+type RouteRepoConfig struct {
+	routing config.RoutingConfig
+	s3      config.S3Config
+}
 
 type RouteRepo struct {
 	vroom vroom.VroomClient
 	ors   ors.OrsClient
+	cfg   RouteRepoConfig
 }
 
-func NewRouteRepo() *RouteRepo {
-	vroomURL, _ := url.Parse(vroomURL)
-	orsURL, _ := url.Parse(orsURL)
+func NewRouteRepo(cfg RouteRepoConfig) (*RouteRepo, error) {
+	vroomURL, err := url.Parse(cfg.routing.Ors.Optimization.Vroom.Host)
+	if err != nil {
+		return nil, err
+	}
+	orsURL, err := url.Parse(cfg.routing.Ors.Host)
+	if err != nil {
+		return nil, err
+	}
+
 	vroom := vroom.NewVroomClient(
 		vroom.WithHostURL(vroomURL),
 	)
@@ -50,7 +53,8 @@ func NewRouteRepo() *RouteRepo {
 	return &RouteRepo{
 		vroom: vroom,
 		ors:   ors,
-	}
+		cfg:   cfg,
+	}, nil
 }
 
 func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
@@ -149,9 +153,8 @@ func (r RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []vroom.Vro
 		shipment := vroom.VroomShipments{
 			Amount: []int32{treeAmount},
 			Pickup: vroom.VroomShipmentStep{
-				Description: defaultPickupDesc,
-				Id:          nextID,
-				Location:    wateringPoint,
+				Id:       nextID,
+				Location: r.cfg.routing.WateringPoint,
 			},
 			Delivery: vroom.VroomShipmentStep{
 				Description: c.Name,
@@ -175,8 +178,8 @@ func (r *RouteRepo) toVroomVehicle(vehicle *entities.Vehicle) (*vroom.VroomVehic
 		Id:          vehicle.ID,
 		Description: vehicle.Description,
 		Profile:     vehicleType,
-		Start:       startPoint,
-		End:         endPoint,
+		Start:       r.cfg.routing.StartPoint,
+		End:         r.cfg.routing.EndPoint,
 		Capacity:    []int32{int32(vehicle.WaterCapacity)}, // vroom don't accept floats
 	}, nil
 }
