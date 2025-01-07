@@ -19,6 +19,8 @@ func MapLatestDataToResponse(sensorData *domain.SensorData) *entities.SensorData
 	}
 
 	return &entities.SensorDataResponse{
+		CreatedAt:   sensorData.CreatedAt,
+		UpdatedAt:   sensorData.UpdatedAt,
 		Battery:     sensorData.Data.Battery,
 		Humidity:    sensorData.Data.Humidity,
 		Temperature: sensorData.Data.Temperature,
