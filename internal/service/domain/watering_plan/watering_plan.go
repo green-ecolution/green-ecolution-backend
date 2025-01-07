@@ -2,12 +2,12 @@ package wateringplan
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 
 	"github.com/google/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -70,6 +70,8 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32,
 		return nil, service.NewError(service.NotFound, fmt.Sprintf("vehicle with id %d not found", vehicleID))
 	}
 
+	// TODO: add trailer
+
 	clusters, err := w.clusterRepo.GetByIDs(ctx, clusterIDs)
 	if err != nil {
 		// when error, something is wrong with the db, else clusters should be an empty array
@@ -108,7 +110,7 @@ func (w *WateringPlanService) GetByID(ctx context.Context, id int32) (*entities.
 
 func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.WateringPlanCreate) (*entities.WateringPlan, error) {
 	if err := w.validator.Struct(createWp); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.NewError(service.BadRequest, errors.Join(err, errors.New("validation error")).Error())
 	}
 
 	// TODO: get distance from valhalla
@@ -136,6 +138,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		}
 	}
 
+	neededWater := w.calculateRequiredWater(treeClusters)
 	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
 		wp.Date = createWp.Date
 		wp.Description = createWp.Description
@@ -143,6 +146,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.Trailer = trailer
 		wp.TreeClusters = treeClusters
 		wp.UserIDs = createWp.UserIDs
+		wp.TotalWaterRequired = utils.P(float64(neededWater))
 
 		return true, nil
 	})
@@ -151,7 +155,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
-		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, transporter, treeClusters)
+		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, w.mergeVehicle(transporter, trailer), treeClusters)
 		if err != nil {
 			return false, handleError(err)
 		}
@@ -190,7 +194,7 @@ func (w *WateringPlanService) GetGPXFileStream(ctx context.Context, objName stri
 
 func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *entities.WateringPlanUpdate) (*entities.WateringPlan, error) {
 	if err := w.validator.Struct(updateWp); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.NewError(service.BadRequest, errors.Join(err, errors.New("validation error")).Error())
 	}
 
 	prevWp, err := w.GetByID(ctx, id)
@@ -331,6 +335,33 @@ func (w *WateringPlanService) validateStatusDependentValues(entity *entities.Wat
 	}
 
 	return nil
+}
+
+// This function calculates approximately how much water the irrigation schedule needs
+// Each tree in a linked tree cluster requires approximately 120 liters of water
+func (w *WateringPlanService) calculateRequiredWater(clusters []*entities.TreeCluster) float64 {
+	return utils.Reduce(clusters, func(acc float64, tc *entities.TreeCluster) float64 {
+		return acc + (float64(len(tc.Trees)) * 120.0)
+	}, 0)
+}
+
+func (w *WateringPlanService) mergeVehicle(transporter *entities.Vehicle, trailer *entities.Vehicle) *entities.Vehicle {
+	if transporter == nil {
+		return nil // this should not happen because of before validation
+	}
+
+	if trailer == nil {
+		return transporter
+	}
+
+	return &entities.Vehicle{
+		Width:         transporter.Width + trailer.Width,
+		Height:        transporter.Height + trailer.Height,
+		Length:        transporter.Length + trailer.Length,
+		WaterCapacity: transporter.WaterCapacity + trailer.WaterCapacity,
+		Type:          entities.VehicleTypeTransporter,
+		NumberPlate:   fmt.Sprintf("%s - %s", transporter.NumberPlate, trailer.NumberPlate),
+	}
 }
 
 func handleError(err error) error {

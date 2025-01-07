@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
@@ -104,12 +105,18 @@ func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomRespon
 		} else {
 			slog.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode)
 		}
-		return nil, errors.New("response not successful")
+		return nil, errors.New("failed to optimize route")
 	}
 
 	var vroomResp VroomResponse
 	if err := json.NewDecoder(resp.Body).Decode(&vroomResp); err != nil {
 		slog.Error("failed to decode vroom response")
+		return nil, errors.New("failed to optimize route")
+	}
+
+	if vroomResp.Code != 0 {
+		slog.Error("vroom returned error", "vroom_error", vroomResp.Error)
+		return nil, errors.New("failed to optimize route")
 	}
 
 	return &vroomResp, nil
@@ -148,7 +155,7 @@ func (v *VroomClient) toVroomShipments(cluster []*entities.TreeCluster) []VroomS
 	nextID := int32(0)
 	return utils.Map(filteredClusters, func(c *entities.TreeCluster) VroomShipments {
 		shipment := VroomShipments{
-			Amount: []int32{treeAmount},
+			Amount: []int32{int32(len(c.Trees) * 120)},
 			Pickup: VroomShipmentStep{
 				ID:       nextID,
 				Location: v.cfg.wateringPoint,
@@ -171,6 +178,7 @@ func (v *VroomClient) toVroomVehicle(vehicle *entities.Vehicle) (*VroomVehicle, 
 		return nil, err
 	}
 
+	fmt.Println("vehicle capacity", int32(vehicle.WaterCapacity))
 	return &VroomVehicle{
 		ID:          vehicle.ID,
 		Description: vehicle.Description,

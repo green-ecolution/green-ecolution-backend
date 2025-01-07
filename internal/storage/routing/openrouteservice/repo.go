@@ -20,7 +20,6 @@ var _ storage.RoutingRepository = (*RouteRepo)(nil)
 
 type RouteRepoConfig struct {
 	routing config.RoutingConfig
-	s3      config.S3Config
 }
 
 type RouteRepo struct {

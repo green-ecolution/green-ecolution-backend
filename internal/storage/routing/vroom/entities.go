@@ -75,6 +75,7 @@ type VroomRoutes struct {
 
 type VroomResponse struct {
 	Code    int32         `json:"code"`
+	Error   *string       `json:"error,omitempty"`
 	Summary VroomSummary  `json:"summary"`
 	Routes  []VroomRoutes `json:"routes"`
 }
