@@ -28,9 +28,9 @@ func WithClient(client *http.Client) VroomClientOption {
 	}
 }
 
-func WithHostURL(url *url.URL) VroomClientOption {
+func WithHostURL(hostURL *url.URL) VroomClientOption {
 	return func(cfg *VroomClientConfig) {
-		cfg.url = url
+		cfg.url = hostURL
 	}
 }
 

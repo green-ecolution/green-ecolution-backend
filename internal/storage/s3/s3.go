@@ -19,11 +19,11 @@ type S3RepoCfg struct {
 }
 
 type S3Repository struct {
-	cfg    S3RepoCfg
+	cfg    *S3RepoCfg
 	client *minio.Client
 }
 
-func NewS3Repository(cfg S3RepoCfg) (*S3Repository, error) {
+func NewS3Repository(cfg *S3RepoCfg) (*S3Repository, error) {
 	client, err := minio.New(cfg.endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.accessKeyID, cfg.secretAccessKey, ""),
 		Secure: cfg.useSSL,

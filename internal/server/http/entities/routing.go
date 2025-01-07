@@ -1,26 +1,26 @@
 package entities
 
-type GeoJsonType string // @Name GeoJsonType
+type GeoJSONType string // @Name GeoJsonType
 
 const (
-	FeatureCollection GeoJsonType = "FeatureCollection"
+	FeatureCollection GeoJSONType = "FeatureCollection"
 )
 
-type GeoJson struct {
-	Type     GeoJsonType      `json:"type"`
+type GeoJSON struct {
+	Type     GeoJSONType      `json:"type"`
 	Bbox     []float64        `json:"bbox"`
-	Features []GeoJsonFeature `json:"features"`
+	Features []GeoJSONFeature `json:"features"`
 } // @Name GeoJson
 
-type GeoJsonFeature struct {
-	Type       GeoJsonType            `json:"type"`
-	Bbox       []float64              `json:"bbox"`
-	Properties map[string]interface{} `json:"properties"`
-	Geometry   GeoJsonGeometry        `json:"geometry"`
+type GeoJSONFeature struct {
+	Type       GeoJSONType     `json:"type"`
+	Bbox       []float64       `json:"bbox"`
+	Properties map[string]any  `json:"properties"`
+	Geometry   GeoJSONGeometry `json:"geometry"`
 } // @Name GeoJsonFeature
 
-type GeoJsonGeometry struct {
-	Type        GeoJsonType `json:"type"`
+type GeoJSONGeometry struct {
+	Type        GeoJSONType `json:"type"`
 	Coordinates [][]float64 `json:"coordinates"`
 } // @Name GeoJsonGeometry
 

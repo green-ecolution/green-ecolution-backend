@@ -31,9 +31,9 @@ func WithClient(client *http.Client) OrsClientOption {
 	}
 }
 
-func WithHostURL(url *url.URL) OrsClientOption {
+func WithHostURL(hostURL *url.URL) OrsClientOption {
 	return func(cfg *OrsClientConfig) {
-		cfg.url = url
+		cfg.url = hostURL
 	}
 }
 
@@ -51,7 +51,7 @@ func NewOrsClient(opts ...OrsClientOption) OrsClient {
 	}
 }
 
-func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*entities.GeoJson, error) {
+func (o *OrsClient) DirectionsGeoJSON(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*entities.GeoJSON, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
 		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
@@ -82,12 +82,12 @@ func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBo
 		return nil, errors.New("response not successful")
 	}
 
-	var geoJson entities.GeoJson
-	if err := json.NewDecoder(resp.Body).Decode(&geoJson); err != nil {
+	var geoJSON entities.GeoJSON
+	if err := json.NewDecoder(resp.Body).Decode(&geoJSON); err != nil {
 		slog.Error("failed to decode ors response")
 	}
 
-	return &geoJson, nil
+	return &geoJSON, nil
 }
 
 func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (io.ReadCloser, error) {

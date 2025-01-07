@@ -8,7 +8,7 @@ import (
 )
 
 func NewRepository(cfg *config.Config) (*storage.Repository, error) {
-	repoCfg := RouteRepoConfig{
+	repoCfg := &RouteRepoConfig{
 		routing: cfg.Routing,
 	}
 

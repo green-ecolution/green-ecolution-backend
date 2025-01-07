@@ -198,7 +198,7 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 // @Tags			Watering Plan
 // @Produce		json
 // @Accept			json
-// @Success		200		{object}	entities.GeoJson
+// @Success		200		{object}	entities.GeoJSON
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Param			body	body		entities.RouteRequest	true	"Route Request"
@@ -217,16 +217,16 @@ func CreatePreviewRoute(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		return c.JSON(entities.GeoJson{
-			Type: entities.GeoJsonType(domainGeo.Type),
+		return c.JSON(entities.GeoJSON{
+			Type: entities.GeoJSONType(domainGeo.Type),
 			Bbox: domainGeo.Bbox,
-			Features: utils.Map(domainGeo.Features, func(f domain.GeoJsonFeature) entities.GeoJsonFeature {
-				return entities.GeoJsonFeature{
-					Type:       entities.GeoJsonType(f.Type),
+			Features: utils.Map(domainGeo.Features, func(f domain.GeoJSONFeature) entities.GeoJSONFeature {
+				return entities.GeoJSONFeature{
+					Type:       entities.GeoJSONType(f.Type),
 					Bbox:       f.Bbox,
 					Properties: f.Properties,
-					Geometry: entities.GeoJsonGeometry{
-						Type:        entities.GeoJsonType(f.Geometry.Type),
+					Geometry: entities.GeoJSONGeometry{
+						Type:        entities.GeoJSONType(f.Geometry.Type),
 						Coordinates: f.Geometry.Coordinates,
 					},
 				}

@@ -3,7 +3,7 @@ package vroom
 type VroomLocation []float64
 
 type VroomVehicle struct {
-	Id          int32         `json:"id"`
+	ID          int32         `json:"id"`
 	Description string        `json:"description"`
 	Profile     string        `json:"profile"`
 	Start       VroomLocation `json:"start"`
@@ -18,7 +18,7 @@ type VroomShipments struct {
 }
 
 type VroomShipmentStep struct {
-	Id          int32     `json:"id"`
+	ID          int32     `json:"id"`
 	Description string    `json:"description"`
 	Location    []float64 `json:"location"`
 }

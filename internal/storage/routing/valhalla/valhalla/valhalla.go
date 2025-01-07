@@ -33,9 +33,9 @@ func WithClient(client *http.Client) ValhallaClientOption {
 	}
 }
 
-func WithHostURL(url *url.URL) ValhallaClientOption {
+func WithHostURL(hostURL *url.URL) ValhallaClientOption {
 	return func(cfg *ValhallaClientConfig) {
-		cfg.url = url
+		cfg.url = hostURL
 	}
 }
 
@@ -53,7 +53,7 @@ func NewValhallaClient(opts ...ValhallaClientOption) ValhallaClient {
 	}
 }
 
-func (o *ValhallaClient) DirectionsGeoJson(ctx context.Context, reqBody *DirectionRequest) (*entities.GeoJson, error) {
+func (o *ValhallaClient) DirectionsGeoJSON(ctx context.Context, reqBody *DirectionRequest) (*entities.GeoJSON, error) {
 	reqBody.Format = "json"
 	var buf strings.Builder
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
@@ -62,7 +62,7 @@ func (o *ValhallaClient) DirectionsGeoJson(ctx context.Context, reqBody *Directi
 	}
 
 	path := fmt.Sprintf("%s/route", o.cfg.url.String())
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (o *ValhallaClient) DirectionsGeoJson(ctx context.Context, reqBody *Directi
 		slog.Error("failed to decode ors response")
 	}
 
-	return o.toGeoJson(&response), nil
+	return o.toGeoJSON(&response), nil
 }
 
 func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *DirectionRequest) (io.ReadCloser, error) {
@@ -105,7 +105,7 @@ func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *Directio
 	}
 
 	path := fmt.Sprintf("%s/route", o.cfg.url.String())
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
@@ -134,24 +134,24 @@ func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *Directio
 	return resp.Body, nil
 }
 
-func (o *ValhallaClient) toGeoJson(resp *DirectionResponse) *entities.GeoJson {
+func (o *ValhallaClient) toGeoJSON(resp *DirectionResponse) *entities.GeoJSON {
 	bboxRoot := []float64{resp.Trip.Summary.MinLat, resp.Trip.Summary.MinLon, resp.Trip.Summary.MaxLat, resp.Trip.Summary.MinLon}
-	features := utils.Map(resp.Trip.Legs, func(leg LegResponse) entities.GeoJsonFeature {
+	features := utils.Map(resp.Trip.Legs, func(leg LegResponse) entities.GeoJSONFeature {
 		coords := o.decodePolyline(&leg.Shape)
 		bbox := []float64{leg.Summary.MinLat, leg.Summary.MinLon, leg.Summary.MaxLat, leg.Summary.MaxLon}
 
-		return entities.GeoJsonFeature{
+		return entities.GeoJSONFeature{
 			Type:       entities.Feature,
 			Bbox:       bbox,
-			Properties: make(map[string]interface{}),
-			Geometry: entities.GeoJsonGeometry{
+			Properties: make(map[string]any),
+			Geometry: entities.GeoJSONGeometry{
 				Type:        entities.LineString,
 				Coordinates: coords,
 			},
 		}
 	})
 
-	return &entities.GeoJson{
+	return &entities.GeoJSON{
 		Type:     entities.FeatureCollection,
 		Bbox:     bboxRoot,
 		Features: features,
@@ -171,11 +171,11 @@ func (o *ValhallaClient) decodePolyline(encoded *string, precisionOptional ...in
 	index := 0
 	for index < len(*encoded) {
 		// Consume varint bits for lat until we run out
-		var byte int = 0x20
+		var b = 0x20
 		shift, result := 0, 0
-		for byte >= 0x20 {
-			byte = int((*encoded)[index]) - 63
-			result |= (byte & 0x1f) << shift
+		for b >= 0x20 {
+			b = int((*encoded)[index]) - 63
+			result |= (b & 0x1f) << shift
 			shift += 5
 			index++
 		}
@@ -188,11 +188,11 @@ func (o *ValhallaClient) decodePolyline(encoded *string, precisionOptional ...in
 		}
 
 		// Consume varint bits for lng until we run out
-		byte = 0x20
+		b = 0x20
 		shift, result = 0, 0
-		for byte >= 0x20 {
-			byte = int((*encoded)[index]) - 63
-			result |= (byte & 0x1f) << shift
+		for b >= 0x20 {
+			b = int((*encoded)[index]) - 63
+			result |= (b & 0x1f) << shift
 			shift += 5
 			index++
 		}

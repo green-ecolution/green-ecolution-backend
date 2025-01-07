@@ -30,10 +30,10 @@ type RouteRepoConfig struct {
 type RouteRepo struct {
 	vroom vroom.VroomClient
 	ors   ors.OrsClient
-	cfg   RouteRepoConfig
+	cfg   *RouteRepoConfig
 }
 
-func NewRouteRepo(cfg RouteRepoConfig) (*RouteRepo, error) {
+func NewRouteRepo(cfg *RouteRepoConfig) (*RouteRepo, error) {
 	vroomURL, err := url.Parse(cfg.routing.Ors.Optimization.Vroom.Host)
 	if err != nil {
 		return nil, err
@@ -43,21 +43,21 @@ func NewRouteRepo(cfg RouteRepoConfig) (*RouteRepo, error) {
 		return nil, err
 	}
 
-	vroom := vroom.NewVroomClient(
+	vroomClient := vroom.NewVroomClient(
 		vroom.WithHostURL(vroomURL),
 	)
-	ors := ors.NewOrsClient(
+	orsClient := ors.NewOrsClient(
 		ors.WithHostURL(orsURL),
 	)
 
 	return &RouteRepo{
-		vroom: vroom,
-		ors:   ors,
+		vroom: vroomClient,
+		ors:   orsClient,
 		cfg:   cfg,
 	}, nil
 }
 
-func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJson, error) {
+func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
 	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
 	if err != nil {
 		return nil, err
@@ -68,16 +68,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 		return nil, err
 	}
 
-	geoJson, err := r.ors.DirectionsGeoJson(ctx, orsProfile, orsRoute)
-	if err != nil {
-		return nil, err
-	}
-
-	return &entities.GeoJson{
-		Type:     entities.GeoJsonType(geoJson.Type),
-		Bbox:     geoJson.Bbox,
-		Features: geoJson.Features,
-	}, nil
+	return r.ors.DirectionsGeoJSON(ctx, orsProfile, orsRoute)
 }
 
 func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {
@@ -102,13 +93,13 @@ func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehic
 	}
 
 	// currently handle only the first route
-	if len(optimizedRoutes.Routes) <= 0 {
+	if len(optimizedRoutes.Routes) == 0 {
 		slog.Error("there are no routes in vroom response", "routes", optimizedRoutes)
 		return nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]
 
-	// Reduce muliple pickups to one
+	// Reduce multiple pickups to one
 	// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
 	reducedSteps := utils.Reduce(oRoute.Steps, func(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
 		if len(acc) == 0 {
@@ -163,24 +154,23 @@ func (r *RouteRepo) optimizeRoute(ctx context.Context, vehicle *entities.Vehicle
 	return resp, nil
 }
 
-func (r RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []vroom.VroomShipments {
-
+func (r *RouteRepo) toVroomShipments(cluster []*entities.TreeCluster) []vroom.VroomShipments {
 	// ignore tree cluster with empty coordinates
 	filteredClusters := utils.Filter(cluster, func(c *entities.TreeCluster) bool {
 		return c.Longitude != nil && c.Latitude != nil
 	})
 
 	nextID := int32(0)
-	return utils.MapIdx(filteredClusters, func(c *entities.TreeCluster, i int) vroom.VroomShipments {
+	return utils.Map(filteredClusters, func(c *entities.TreeCluster) vroom.VroomShipments {
 		shipment := vroom.VroomShipments{
 			Amount: []int32{treeAmount},
 			Pickup: vroom.VroomShipmentStep{
-				Id:       nextID,
+				ID:       nextID,
 				Location: r.cfg.routing.WateringPoint,
 			},
 			Delivery: vroom.VroomShipmentStep{
 				Description: c.Name,
-				Id:          nextID + 1,
+				ID:          nextID + 1,
 				Location:    []float64{*c.Longitude, *c.Latitude},
 			},
 		}
@@ -197,7 +187,7 @@ func (r *RouteRepo) toVroomVehicle(vehicle *entities.Vehicle) (*vroom.VroomVehic
 	}
 
 	return &vroom.VroomVehicle{
-		Id:          vehicle.ID,
+		ID:          vehicle.ID,
 		Description: vehicle.Description,
 		Profile:     vehicleType,
 		Start:       r.cfg.routing.StartPoint,

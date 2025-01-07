@@ -116,7 +116,7 @@ type VehicleService interface {
 
 type WateringPlanService interface {
 	CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
-	PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*domain.GeoJson, error)
+	PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*domain.GeoJSON, error)
 	GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }
 

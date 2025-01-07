@@ -63,7 +63,7 @@ func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *en
 	return nil
 }
 
-func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*entities.GeoJson, error) {
+func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*entities.GeoJSON, error) {
 	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
 	if err != nil {
 		slog.Error("can't find vehicle to preview route", "error", err, "vehicle_id", vehicleID)
@@ -76,7 +76,7 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32,
 		return nil, err
 	}
 
-	geoJson, err := w.routingRepo.GenerateRoute(ctx, vehicle, clusters)
+	geoJSON, err := w.routingRepo.GenerateRoute(ctx, vehicle, clusters)
 	if err != nil {
 		if errors.Is(err, storage.ErrUnknownVehicleType) {
 			slog.Error("the vehicle type is not supported", "error", err, "vehicle_type", vehicle.Type)
@@ -85,7 +85,7 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32,
 		return nil, err
 	}
 
-	return geoJson, nil
+	return geoJSON, nil
 }
 
 func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {

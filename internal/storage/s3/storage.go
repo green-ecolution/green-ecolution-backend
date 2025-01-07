@@ -9,7 +9,7 @@ import (
 )
 
 func NewRepository(cfg *config.Config) (*storage.Repository, error) {
-	gpxBucket, err := NewS3Repository(S3RepoCfg{
+	gpxBucket, err := NewS3Repository(&S3RepoCfg{
 		bucketName:      cfg.S3.RouteGpx.Bucket,
 		endpoint:        cfg.S3.Endpoint,
 		region:          cfg.S3.Region,
