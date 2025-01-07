@@ -5,4 +5,3 @@ type OrsDirectionRequest struct {
 	Units       string      `json:"units"`
 	Language    string      `json:"language"`
 }
-
