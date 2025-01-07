@@ -212,7 +212,7 @@ func CreatePreviewRoute(svc service.WateringPlanService) fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, err.Error())
 		}
 
-		domainGeo, err := svc.PreviewRoute(ctx, req.VehicleID, req.ClusterIDs)
+		domainGeo, err := svc.PreviewRoute(ctx, req.TransporterID, req.TrailerID, req.ClusterIDs)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}

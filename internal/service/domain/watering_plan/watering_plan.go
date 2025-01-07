@@ -63,14 +63,20 @@ func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *en
 	return nil
 }
 
-func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*entities.GeoJSON, error) {
-	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
+func (w *WateringPlanService) PreviewRoute(ctx context.Context, transporterID int32, trailerID *int32, clusterIDs []int32) (*entities.GeoJSON, error) {
+	transporter, err := w.vehicleRepo.GetByID(ctx, transporterID)
 	if err != nil {
-		slog.Error("can't find vehicle to preview route", "error", err, "vehicle_id", vehicleID)
-		return nil, service.NewError(service.NotFound, fmt.Sprintf("vehicle with id %d not found", vehicleID))
+		slog.Error("can't find selected transporter to preview route", "error", err, "vehicle_id", transporterID)
+		return nil, service.NewError(service.NotFound, fmt.Sprintf("vehicle with id %d not found", transporterID))
 	}
 
-	// TODO: add trailer
+	var trailer *entities.Vehicle
+	if trailerID != nil {
+		trailer, err = w.vehicleRepo.GetByID(ctx, *trailerID)
+		if err != nil {
+			slog.Error("can't find selected trailer to preview route. route will be calculated without trailer", "error", err, "trailer_id", trailerID)
+		}
+	}
 
 	clusters, err := w.clusterRepo.GetByIDs(ctx, clusterIDs)
 	if err != nil {
@@ -78,10 +84,10 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32,
 		return nil, err
 	}
 
-	geoJSON, err := w.routingRepo.GenerateRoute(ctx, vehicle, clusters)
+	geoJSON, err := w.routingRepo.GenerateRoute(ctx, w.mergeVehicle(transporter, trailer), clusters)
 	if err != nil {
 		if errors.Is(err, storage.ErrUnknownVehicleType) {
-			slog.Error("the vehicle type is not supported", "error", err, "vehicle_type", vehicle.Type)
+			slog.Error("the vehicle type is not supported", "error", err, "vehicle_type", transporter.Type)
 			return nil, service.NewError(service.NotFound, "vehicle type is not supported")
 		}
 		return nil, err
@@ -134,7 +140,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	if createWp.TrailerID != nil {
 		trailer, err = w.fetchVehicle(ctx, *createWp.TrailerID)
 		if err != nil {
-			return nil, err
+			return nil, err // Maybe ignore?
 		}
 	}
 
