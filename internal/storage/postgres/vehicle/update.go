@@ -56,6 +56,7 @@ func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.
 		Height:         vehicle.Height,
 		Length:         vehicle.Length,
 		Width:          vehicle.Width,
+		Weight:         vehicle.Weight,
 	}
 
 	return r.store.UpdateVehicle(ctx, &params)

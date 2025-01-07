@@ -33,6 +33,7 @@ type VehicleResponse struct {
 	Height         float64        `json:"height"`
 	Width          float64        `json:"width"`
 	Length         float64        `json:"length"`
+	Weight         float64        `json:"weight"`
 } // @Name Vehicle
 
 type VehicleListResponse struct {
@@ -51,6 +52,7 @@ type VehicleCreateRequest struct {
 	Height         float64        `json:"height"`
 	Width          float64        `json:"width"`
 	Length         float64        `json:"length"`
+	Weight         float64        `json:"weight"`
 } // @Name VehicleCreate
 
 type VehicleUpdateRequest struct {
@@ -64,4 +66,5 @@ type VehicleUpdateRequest struct {
 	Height         float64        `json:"height"`
 	Width          float64        `json:"width"`
 	Length         float64        `json:"length"`
+	Weight         float64        `json:"weight"`
 } // @Name VehicleUpdate

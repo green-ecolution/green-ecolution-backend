@@ -20,6 +20,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		Height:         1.5,
 		Length:         2.0,
 		Width:          2.0,
+		Weight:         3.0,
 		Model:          "1615/17 - Conrad - MAN TGE 3.180",
 	}
 
@@ -39,6 +40,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -58,6 +60,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Height, got.Height)
 		assert.Equal(t, input.Length, got.Length)
 		assert.Equal(t, input.Width, got.Width)
+		assert.Equal(t, input.Weight, got.Weight)
 		assert.Equal(t, input.Model, got.Model)
 	})
 
@@ -72,6 +75,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -92,6 +96,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		assert.Equal(t, input.Height, got.Height)
 		assert.Equal(t, input.Length, got.Length)
 		assert.Equal(t, input.Width, got.Width)
+		assert.Equal(t, input.Weight, got.Weight)
 	})
 
 	t.Run("should return error when create vehicle with zero water capacity", func(t *testing.T) {
@@ -103,6 +108,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = 0
 			return true, nil
 		}
@@ -125,6 +131,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -149,6 +156,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = 0
 			vh.Length = 0
 			vh.Width = 0
+			vh.Weight = 0
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -171,6 +179,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = "ABC"
 			return true, nil
@@ -196,6 +205,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = input.DrivingLicense
 			return true, nil
@@ -225,6 +235,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = input.DrivingLicense
 			return true, nil
@@ -274,6 +285,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = input.DrivingLicense
 			return false, nil

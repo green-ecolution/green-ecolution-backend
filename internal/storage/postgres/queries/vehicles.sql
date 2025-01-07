@@ -21,9 +21,10 @@ INSERT INTO vehicles (
   driving_license, 
   height, 
   length, 
-  width
+  width,
+  weight
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11
 ) RETURNING id;
 
 -- name: UpdateVehicle :exec
@@ -37,7 +38,8 @@ UPDATE vehicles SET
   driving_license = $8,
   height = $9,
   length = $10,
-  width = $11
+  width = $11,
+  weight = $12
 WHERE id = $1;
 
 -- name: DeleteVehicle :one

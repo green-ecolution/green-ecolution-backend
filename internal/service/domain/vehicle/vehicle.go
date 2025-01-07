@@ -80,6 +80,7 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		vh.Length = createData.Length
 		vh.Width = createData.Width
 		vh.Model = createData.Model
+		vh.Weight = createData.Weight
 		vh.DrivingLicense = createData.DrivingLicense
 
 		return true, nil
@@ -120,6 +121,7 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 		vh.Length = updateData.Length
 		vh.Width = updateData.Width
 		vh.Model = updateData.Model
+		vh.Weight = updateData.Weight
 		vh.DrivingLicense = updateData.DrivingLicense
 
 		return true, nil

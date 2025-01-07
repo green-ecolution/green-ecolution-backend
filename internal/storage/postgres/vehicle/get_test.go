@@ -32,6 +32,7 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 			assert.Equal(t, allTestVehicles[i].Height, vehicle.Height)
 			assert.Equal(t, allTestVehicles[i].Width, vehicle.Width)
 			assert.Equal(t, allTestVehicles[i].Length, vehicle.Length)
+			assert.Equal(t, allTestVehicles[i].Weight, vehicle.Weight)
 			assert.Equal(t, allTestVehicles[i].Model, vehicle.Model)
 			assert.NotZero(t, vehicle.CreatedAt)
 			assert.NotZero(t, vehicle.UpdatedAt)
@@ -153,6 +154,7 @@ func TestVehicleRepository_GetByID(t *testing.T) {
 		assert.Equal(t, shouldReturn.Height, got.Height)
 		assert.Equal(t, shouldReturn.Length, got.Length)
 		assert.Equal(t, shouldReturn.Width, got.Width)
+		assert.Equal(t, shouldReturn.Weight, got.Weight)
 		assert.Equal(t, shouldReturn.Model, got.Model)
 		assert.NotZero(t, got.CreatedAt)
 		assert.NotZero(t, got.UpdatedAt)
@@ -256,6 +258,7 @@ func TestVehicleRepository_GetByPlate(t *testing.T) {
 			assert.Equal(t, tt.want.Height, got.Height)
 			assert.Equal(t, tt.want.Length, got.Length)
 			assert.Equal(t, tt.want.Width, got.Width)
+			assert.Equal(t, tt.want.Weight, got.Weight)
 			assert.Equal(t, tt.want.Model, got.Model)
 			assert.NotZero(t, got.CreatedAt)
 			assert.NotZero(t, got.UpdatedAt)
@@ -316,6 +319,7 @@ var allTestVehicles = []*entities.Vehicle{
 		Height:         1.5,
 		Length:         2.0,
 		Width:          2.0,
+		Weight:         3.3,
 	},
 	{
 		ID:             2,
@@ -329,5 +333,6 @@ var allTestVehicles = []*entities.Vehicle{
 		Height:         2.1,
 		Length:         5.0,
 		Width:          2.4,
+		Weight:         3.7,
 	},
 }

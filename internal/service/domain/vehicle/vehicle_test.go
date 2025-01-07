@@ -198,6 +198,7 @@ func TestVehicleService_Create(t *testing.T) {
 		Height:         2.1,
 		Length:         5.0,
 		Width:          2.4,
+		Weight:         3.2,
 	}
 
 	t.Run("should successfully create a new vehicle", func(t *testing.T) {
@@ -369,6 +370,7 @@ func TestVehicleService_Update(t *testing.T) {
 		Height:         2.1,
 		Length:         5.0,
 		Width:          2.4,
+		Weight:         3.2,
 	}
 
 	t.Run("should successfully update a vehicle", func(t *testing.T) {
@@ -660,6 +662,7 @@ func getTestVehicles() []*entities.Vehicle {
 			Height:         1.5,
 			Length:         2.0,
 			Width:          2.0,
+			Weight:         3.2,
 		},
 		{
 			ID:             2,
@@ -675,6 +678,7 @@ func getTestVehicles() []*entities.Vehicle {
 			Height:         2.1,
 			Length:         5.0,
 			Width:          2.4,
+			Weight:         3.5,
 		},
 	}
 }
