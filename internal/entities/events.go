@@ -7,11 +7,12 @@ type Event interface {
 }
 
 const (
-	EventTypeUpdateTree        EventType = "update tree"
-	EventTypeCreateTree        EventType = "create tree"
-	EventTypeDeleteTree        EventType = "delete tree"
-	EventTypeUpdateTreeCluster EventType = "update tree cluster"
-	EventTypeNewSensorData     EventType = "receive sensor data"
+	EventTypeUpdateTree         EventType = "update tree"
+	EventTypeCreateTree         EventType = "create tree"
+	EventTypeDeleteTree         EventType = "delete tree"
+	EventTypeUpdateTreeCluster  EventType = "update tree cluster"
+	EventTypeNewSensorData      EventType = "receive sensor data"
+	EventTypeUpdateWateringPlan EventType = "update watering plan"
 )
 
 type BasicEvent struct {
@@ -83,5 +84,19 @@ func NewEventSensorData(newData *SensorData) EventNewSensorData {
 	return EventNewSensorData{
 		BasicEvent: BasicEvent{eventType: EventTypeNewSensorData},
 		New:        newData,
+	}
+}
+
+type EventUpdateWateringPlan struct {
+	BasicEvent
+	Prev *WateringPlan
+	New  *WateringPlan
+}
+
+func NewEventUpdateWateringPlan(prev, newWp *WateringPlan) EventUpdateWateringPlan {
+	return EventUpdateWateringPlan{
+		BasicEvent: BasicEvent{eventType: EventTypeUpdateWateringPlan},
+		Prev:       prev,
+		New:        newWp,
 	}
 }

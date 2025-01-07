@@ -11,9 +11,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+var globalEventManager = worker.NewEventManager() //entities.EventTypeUpdateWateringPlan
 
 func TestWateringPlanService_GetAll(t *testing.T) {
 	ctx := context.Background()
@@ -23,7 +26,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, nil)
 
@@ -40,7 +43,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, nil)
 
@@ -57,7 +60,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		expectedErr := errors.New("GetAll failed")
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
@@ -80,7 +83,7 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		id := int32(1)
 		expectedPlan := allTestWateringPlans[0]
@@ -99,7 +102,7 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		id := int32(1)
 		expectedErr := storage.ErrEntityNotFound
@@ -137,7 +140,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -181,7 +184,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -227,7 +230,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		// check treecluster
 		userRepo.EXPECT().GetByIDs(
@@ -248,7 +251,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -275,7 +278,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -296,7 +299,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -323,7 +326,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -356,7 +359,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		expectedErr := errors.New("Failed to create watering plan")
 
@@ -403,7 +406,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -428,7 +431,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		newWateringPlan.Date = time.Time{}
 
@@ -446,7 +449,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -468,7 +471,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -491,7 +494,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -511,7 +514,6 @@ func TestWateringPlanService_Create(t *testing.T) {
 
 func TestWateringPlanService_Update(t *testing.T) {
 	ctx := context.Background()
-	wateringPlanID := int32(1)
 	testUUIDString := "6a1078e8-80fd-458f-b74e-e388fe2dd6ab"
 	testUUID, err := uuid.Parse(testUUIDString)
 	if err != nil {
@@ -534,7 +536,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -562,21 +569,21 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		wateringPlanRepo.EXPECT().Update(
 			ctx,
-			wateringPlanID,
+			int32(1),
 			mock.Anything,
 		).Return(nil)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
-			wateringPlanID,
-		).Return(allTestWateringPlans[1], nil)
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, allTestWateringPlans[1], result)
+		assert.Equal(t, allTestWateringPlans[0], result)
 	})
 
 	t.Run("should successfully update a watering plan with evaluation", func(t *testing.T) {
@@ -584,7 +591,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -596,12 +603,17 @@ func TestWateringPlanService_Update(t *testing.T) {
 			UserIDs:          []*uuid.UUID{&testUUID},
 			Evaluation: []*entities.EvaluationValue{
 				{
-					WateringPlanID: wateringPlanID,
+					WateringPlanID: int32(3),
 					TreeClusterID:  1,
 					ConsumedWater:  utils.P(100.00),
 				},
 			},
 		}
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(3),
+		).Return(allTestWateringPlans[2], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -623,17 +635,17 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		wateringPlanRepo.EXPECT().Update(
 			ctx,
-			wateringPlanID,
+			int32(3),
 			mock.Anything,
 		).Return(nil)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
-			wateringPlanID,
+			int32(3),
 		).Return(allTestWateringPlans[2], nil)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(3), updatedWateringPlan)
 
 		// then
 		assert.NoError(t, err)
@@ -645,7 +657,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -656,6 +668,11 @@ func TestWateringPlanService_Update(t *testing.T) {
 			TreeClusterIDs:   []*int32{utils.P(int32(1)), utils.P(int32(2))},
 			UserIDs:          []*uuid.UUID{&testUUID},
 		}
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -677,21 +694,21 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		wateringPlanRepo.EXPECT().Update(
 			ctx,
-			wateringPlanID,
+			int32(1),
 			mock.Anything,
 		).Return(nil)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
-			wateringPlanID,
-		).Return(allTestWateringPlans[1], nil)
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, allTestWateringPlans[1], result)
+		assert.Equal(t, allTestWateringPlans[0], result)
 	})
 
 	t.Run("should return an error when users is not found", func(t *testing.T) {
@@ -699,7 +716,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -708,7 +730,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		).Return(nil, storage.ErrUserNotFound)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -720,7 +742,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -741,7 +768,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		).Return(nil, storage.ErrVehicleNotFound)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -753,7 +780,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -768,7 +800,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		).Return(nil, storage.ErrConnectionClosed)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -780,7 +812,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -795,7 +832,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		).Return([]*entities.TreeCluster{}, nil)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -807,7 +844,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -816,7 +858,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		).Return([]*entities.User{}, nil)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -828,7 +870,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -856,12 +903,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		wateringPlanRepo.EXPECT().Update(
 			ctx,
-			wateringPlanID,
+			int32(1),
 			mock.Anything,
 		).Return(storage.ErrEntityNotFound)
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -873,9 +920,14 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		expectedErr := errors.New("failed to update watering plan")
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -903,12 +955,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 
 		wateringPlanRepo.EXPECT().Update(
 			ctx,
-			wateringPlanID,
+			int32(1),
 			mock.Anything,
 		).Return(expectedErr)
 
 		// when
-		result, err := svc.Update(context.Background(), wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(context.Background(), int32(1), updatedWateringPlan)
 
 		// then
 		assert.Nil(t, result)
@@ -921,13 +973,18 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan.Status = entities.WateringPlanStatusActive
 		updatedWateringPlan.CancellationNote = "This is a note"
 
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
+
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -941,20 +998,25 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan.Status = entities.WateringPlanStatusPlanned
 		updatedWateringPlan.CancellationNote = ""
 		updatedWateringPlan.Evaluation = []*entities.EvaluationValue{
 			{
-				WateringPlanID: wateringPlanID,
+				WateringPlanID: int32(1),
 				TreeClusterID:  1,
 				ConsumedWater:  utils.P(100.00),
 			},
 		}
 
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
+
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -968,7 +1030,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -979,7 +1041,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		}
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -993,7 +1055,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -1003,7 +1065,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		}
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -1017,12 +1079,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan.Date = time.Time{}
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -1036,12 +1098,12 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan.Status = "test"
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -1055,7 +1117,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -1065,7 +1127,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		}
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -1079,7 +1141,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -1089,7 +1151,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		}
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
@@ -1102,7 +1164,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -1113,12 +1175,107 @@ func TestWateringPlanService_Update(t *testing.T) {
 		}
 
 		// when
-		result, err := svc.Update(ctx, wateringPlanID, updatedWateringPlan)
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "validation error")
+	})
+}
+
+func TestWateringPlanService_EventSystem(t *testing.T) {
+	t.Run("should send update watering plan event on update watering plan", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+
+		testUUIDString := "6a1078e8-80fd-458f-b74e-e388fe2dd6ab"
+		testUUID, err := uuid.Parse(testUUIDString)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		prevWp := entities.WateringPlan{
+			ID:           1,
+			Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			TreeClusters: []*entities.TreeCluster{{ID: 1}},
+			Status:       entities.WateringPlanStatusActive,
+			UserIDs:      []*uuid.UUID{&testUUID},
+		}
+
+		updatedWateringPlan := &entities.WateringPlanUpdate{
+			Date:           time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			TransporterID:  utils.P(int32(2)),
+			TreeClusterIDs: []*int32{utils.P(int32(1)), utils.P(int32(2))},
+			UserIDs:        []*uuid.UUID{&testUUID},
+			Status:         entities.WateringPlanStatusActive,
+		}
+
+		expectedWp := entities.WateringPlan{
+			ID:           1,
+			Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+			TreeClusters: []*entities.TreeCluster{{ID: 1}},
+			Status:       entities.WateringPlanStatusActive,
+			UserIDs:      []*uuid.UUID{&testUUID},
+		}
+
+		// Event
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateWateringPlan)
+		expectedEvent := entities.NewEventUpdateWateringPlan(&prevWp, &expectedWp)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(&expectedWp, nil)
+
+		// check users
+		userRepo.EXPECT().GetByIDs(
+			ctx,
+			[]string{testUUIDString},
+		).Return([]*entities.User{testUser}, nil)
+
+		// check treecluster
+		clusterRepo.EXPECT().GetByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(allTestClusters[0:2], nil)
+
+		// check transporter
+		vehicleRepo.EXPECT().GetByID(
+			ctx,
+			int32(2),
+		).Return(allTestVehicles[1], nil)
+
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			expectedWp.ID,
+			mock.Anything,
+		).Return(nil)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, eventManager)
+
+		// when
+		subID, ch, err := eventManager.Subscribe(entities.EventTypeUpdateWateringPlan)
+		if err != nil {
+			t.Fatal("failed to subscribe to event manager")
+		}
+		_, err = svc.Update(ctx, expectedWp.ID, updatedWateringPlan)
+
+		// then
+		assert.NoError(t, err)
+		select {
+		case recievedEvent := <-ch:
+			assert.Equal(t, recievedEvent, expectedEvent)
+		case <-time.After(1 * time.Second):
+			t.Fatal("event was not received")
+		}
+
+		_ = eventManager.Unsubscribe(entities.EventTypeUpdateWateringPlan, subID)
 	})
 }
 
@@ -1129,7 +1286,7 @@ func TestWateringPlanService_Delete(t *testing.T) {
 	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 	vehicleRepo := storageMock.NewMockVehicleRepository(t)
 	userRepo := storageMock.NewMockUserRepository(t)
-	svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo)
+	svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
 
 	t.Run("should successfully delete a watering plan", func(t *testing.T) {
 		id := int32(1)

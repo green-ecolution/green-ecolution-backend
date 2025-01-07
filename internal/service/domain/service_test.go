@@ -37,7 +37,7 @@ func TestNewService(t *testing.T) {
 			Vehicle:     mockVehicleRepo,
 		}
 
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster)
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree, entities.EventTypeUpdateTreeCluster, entities.EventTypeUpdateWateringPlan)
 		svc := NewService(mockConfig, mockRepos, eventManager)
 
 		assert.NotNil(t, svc)

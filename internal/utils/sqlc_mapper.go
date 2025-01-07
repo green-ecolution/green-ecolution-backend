@@ -27,7 +27,8 @@ func TimeToPgTimestamp(t *time.Time) pgtype.Timestamp {
 	}
 
 	return pgtype.Timestamp{
-		Time: *t,
+		Time:  *t,
+		Valid: true,
 	}
 }
 

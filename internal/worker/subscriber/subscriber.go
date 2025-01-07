@@ -88,3 +88,26 @@ func (s *CreateSensorDataSubscriber) HandleEvent(ctx context.Context, e entities
 
 	return s.tcSvc.HandleNewSensorData(ctx, &event)
 }
+
+type UpdateWateringPlanSubscriber struct {
+	tcSvc service.TreeClusterService
+}
+
+func NewUpdateWateringPlanSubscriber(tcSvc service.TreeClusterService) *UpdateWateringPlanSubscriber {
+	return &UpdateWateringPlanSubscriber{
+		tcSvc: tcSvc,
+	}
+}
+
+func (s *UpdateWateringPlanSubscriber) EventType() entities.EventType {
+	return entities.EventTypeUpdateWateringPlan
+}
+
+func (s *UpdateWateringPlanSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
+	event := e.(entities.EventUpdateWateringPlan)
+	if err := s.tcSvc.HandleUpdateWateringPlan(ctx, &event); err != nil {
+		return err
+	}
+
+	return s.tcSvc.HandleUpdateWateringPlan(ctx, &event)
+}

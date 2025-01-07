@@ -2,6 +2,7 @@ package wateringplan
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -11,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
 type WateringPlanService struct {
@@ -19,6 +21,7 @@ type WateringPlanService struct {
 	vehicleRepo      storage.VehicleRepository
 	userRepo         storage.UserRepository
 	validator        *validator.Validate
+	eventManager     *worker.EventManager
 }
 
 func NewWateringPlanService(
@@ -26,6 +29,7 @@ func NewWateringPlanService(
 	clusterRepository storage.TreeClusterRepository,
 	vehicleRepository storage.VehicleRepository,
 	userRepository storage.UserRepository,
+	eventManager *worker.EventManager,
 ) service.WateringPlanService {
 	return &WateringPlanService{
 		wateringPlanRepo: wateringPlanRepository,
@@ -33,7 +37,22 @@ func NewWateringPlanService(
 		vehicleRepo:      vehicleRepository,
 		userRepo:         userRepository,
 		validator:        validator.New(),
+		eventManager:     eventManager,
 	}
+}
+
+func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *entities.WateringPlan) error {
+	slog.Debug("publish new event", "event", entities.EventTypeUpdateWateringPlan, "service", "WateringPlanService")
+	updatedWp, err := w.GetByID(ctx, prevWp.ID)
+	if err != nil {
+		return err
+	}
+	event := entities.NewEventUpdateWateringPlan(prevWp, updatedWp)
+	if err := w.eventManager.Publish(event); err != nil {
+		slog.Error("error while sending event after updating watering plan", "err", err, "watering_plan_id", prevWp.ID)
+	}
+
+	return nil
 }
 
 func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {
@@ -107,6 +126,11 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
+	prevWp, err := w.GetByID(ctx, id)
+	if err != nil {
+		return nil, handleError(err)
+	}
+
 	// TODO: get distance from valhalla
 	// TODO: validate driver license
 
@@ -151,6 +175,10 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	})
 
 	if err != nil {
+		return nil, handleError(err)
+	}
+
+	if err := w.publishUpdateEvent(ctx, prevWp); err != nil {
 		return nil, handleError(err)
 	}
 
