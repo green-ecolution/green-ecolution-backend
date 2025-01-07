@@ -1,4 +1,4 @@
-package openrouteservice
+package valhalla
 
 import (
 	"context"
@@ -10,8 +10,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/ors"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/vroom"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla/valhalla"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -24,21 +24,20 @@ const (
 
 type RouteRepoConfig struct {
 	routing config.RoutingConfig
-	s3      config.S3Config
 }
 
 type RouteRepo struct {
-	vroom vroom.VroomClient
-	ors   ors.OrsClient
-	cfg   RouteRepoConfig
+	vroom    vroom.VroomClient
+	valhalla valhalla.ValhallaClient
+	cfg      RouteRepoConfig
 }
 
 func NewRouteRepo(cfg RouteRepoConfig) (*RouteRepo, error) {
-	vroomURL, err := url.Parse(cfg.routing.Ors.Optimization.Vroom.Host)
+	vroomURL, err := url.Parse(cfg.routing.Valhalla.Optimization.Vroom.Host)
 	if err != nil {
 		return nil, err
 	}
-	orsURL, err := url.Parse(cfg.routing.Ors.Host)
+	valhallaURL, err := url.Parse(cfg.routing.Valhalla.Host)
 	if err != nil {
 		return nil, err
 	}
@@ -46,55 +45,36 @@ func NewRouteRepo(cfg RouteRepoConfig) (*RouteRepo, error) {
 	vroom := vroom.NewVroomClient(
 		vroom.WithHostURL(vroomURL),
 	)
-	ors := ors.NewOrsClient(
-		ors.WithHostURL(orsURL),
+	valhallla := valhalla.NewValhallaClient(
+		valhalla.WithHostURL(valhallaURL),
 	)
 
 	return &RouteRepo{
-		vroom: vroom,
-		ors:   ors,
-		cfg:   cfg,
+		vroom:    vroom,
+		valhalla: valhallla,
+		cfg:      cfg,
 	}, nil
 }
 
 func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJson, error) {
-	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
+	orsRoute, err := r.prepareRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
 
-	orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
-	if err != nil {
-		return nil, err
-	}
-
-	geoJson, err := r.ors.DirectionsGeoJson(ctx, orsProfile, orsRoute)
-	if err != nil {
-		return nil, err
-	}
-
-	return &entities.GeoJson{
-		Type:     entities.GeoJsonType(geoJson.Type),
-		Bbox:     geoJson.Bbox,
-		Features: geoJson.Features,
-	}, nil
+	return r.valhalla.DirectionsGeoJson(ctx, orsRoute)
 }
 
 func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {
-	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
+	route, err := r.prepareRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
 
-	orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.ors.DirectionsRawGpx(ctx, orsProfile, orsRoute)
+	return r.valhalla.DirectionsRawGpx(ctx, route)
 }
 
-func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*ors.OrsDirectionRequest, error) {
+func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*valhalla.DirectionRequest, error) {
 	optimizedRoutes, err := r.optimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
 		slog.Error("failed to optimize route", "error", err)
@@ -128,14 +108,28 @@ func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehic
 		return acc
 	}, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 
-	orsLocation := utils.Reduce(reducedSteps, func(acc [][]float64, current *vroom.VroomRouteStep) [][]float64 {
-		return append(acc, current.Location)
-	}, make([][]float64, 0, len(reducedSteps)))
+	locations := utils.Map(reducedSteps, func(step *vroom.VroomRouteStep) valhalla.Location {
+		return valhalla.Location{
+			Lat:  step.Location[1],
+			Lon:  step.Location[0],
+			Type: "break",
+		}
+	})
 
-	return &ors.OrsDirectionRequest{
-		Coordinates: orsLocation,
-		Units:       "m",
-		Language:    "de-de",
+	costingOpts := make(map[string]valhalla.CostingOptions)
+	costingOpts["truck"] = valhalla.CostingOptions{
+		Width:     vehicle.Width,
+		Height:    vehicle.Height,
+		Length:    vehicle.Length,
+		Weight:    3.5, // TODO: use real value
+		AxleLoad:  0.0,
+		AxleCount: 2,
+	}
+
+	return &valhalla.DirectionRequest{
+		Locations:      locations,
+		Costing:        "truck",
+		CostingOptions: costingOpts,
 	}, nil
 }
 

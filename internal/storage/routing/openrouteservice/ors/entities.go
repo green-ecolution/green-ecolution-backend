@@ -6,8 +6,3 @@ type OrsDirectionRequest struct {
 	Language    string      `json:"language"`
 }
 
-type OrsGeoJsonResponse struct {
-	Type     string
-	Bbox     []float64
-	Features []map[string]interface{}
-}

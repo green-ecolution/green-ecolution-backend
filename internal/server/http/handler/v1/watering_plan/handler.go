@@ -7,10 +7,12 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 var (
@@ -196,7 +198,7 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 // @Tags			Watering Plan
 // @Produce		json
 // @Accept			json
-// @Success		200		{object}	entities.GeoJSON
+// @Success		200		{object}	entities.GeoJson
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
 // @Param			body	body		entities.RouteRequest	true	"Route Request"
@@ -215,10 +217,20 @@ func CreatePreviewRoute(svc service.WateringPlanService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		return c.JSON(entities.GeoJSON{
-			Type:     entities.GeoJSONType(domainGeo.Type),
-			Bbox:     domainGeo.Bbox,
-			Features: domainGeo.Features,
+		return c.JSON(entities.GeoJson{
+			Type: entities.GeoJsonType(domainGeo.Type),
+			Bbox: domainGeo.Bbox,
+			Features: utils.Map(domainGeo.Features, func(f domain.GeoJsonFeature) entities.GeoJsonFeature {
+				return entities.GeoJsonFeature{
+					Type:       entities.GeoJsonType(f.Type),
+					Bbox:       f.Bbox,
+					Properties: f.Properties,
+					Geometry: entities.GeoJsonGeometry{
+						Type:        entities.GeoJsonType(f.Geometry.Type),
+						Coordinates: f.Geometry.Coordinates,
+					},
+				}
+			}),
 		})
 	}
 }

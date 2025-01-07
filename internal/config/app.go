@@ -30,10 +30,20 @@ type LogConfig struct {
 }
 
 type RoutingConfig struct {
-	StartPoint    []float64        `mapstructure:"start_point"`
-	EndPoint      []float64        `mapstructure:"end_point"`
-	WateringPoint []float64        `mapstructure:"watering_point"`
-	Ors           RoutingOrsConfig `mapstructure:"ors"`
+	StartPoint    []float64             `mapstructure:"start_point"`
+	EndPoint      []float64             `mapstructure:"end_point"`
+	WateringPoint []float64             `mapstructure:"watering_point"`
+	Ors           RoutingOrsConfig      `mapstructure:"ors"`
+	Valhalla      RoutingValhallaConfig `mapstructure:"valhalla"`
+}
+
+type RoutingValhallaConfig struct {
+	Host         string                            `mapstructure:"host"`
+	Optimization RoutingValhallaOptimizationConfig `mapstructure:"optimization"`
+}
+
+type RoutingValhallaOptimizationConfig struct {
+	Vroom RoutingVroomConfig `mapstructure:"vroom"`
 }
 
 type RoutingOrsConfig struct {

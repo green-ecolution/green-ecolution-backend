@@ -197,9 +197,11 @@ run/docker: run/docker/prepare
 infra/up:
 	@echo "Running infra..."
 	mkdir -p .docker/infra/ors/{config,elevation_cache,files,graphs,logs}
+	mkdir -p .docker/infra/valhalla/custom_files
 	chown -R $(USER_ID) .docker/infra/ors
 	yq e -i '.services."ors-app".user = env(USER_ID)' .docker/docker-compose.infra.yaml
 	test -f .docker/infra/ors/files/sh.osm.pbf || wget https://download.geofabrik.de/europe/germany/schleswig-holstein-latest.osm.pbf -O .docker/infra/ors/files/sh.osm.pbf
+	test -f .docker/infra/valhalla/custom_files/sh.osm.pbf || wget https://download.geofabrik.de/europe/germany/schleswig-holstein-latest.osm.pbf -O .docker/infra/valhalla/custom_files/sh.osm.pbf
 
 	docker compose -f .docker/docker-compose.infra.yaml up -d
 

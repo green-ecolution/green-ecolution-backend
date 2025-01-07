@@ -52,6 +52,12 @@ services:
       VROOM_ROUTER: ors
     networks:
       - app-network
+  valhalla:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./infra/valhalla/custom_files:/custom_files
 networks:
   app-network:
     driver: bridge

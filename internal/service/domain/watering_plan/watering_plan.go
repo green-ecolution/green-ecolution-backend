@@ -63,7 +63,7 @@ func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *en
 	return nil
 }
 
-func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*entities.GeoJSON, error) {
+func (w *WateringPlanService) PreviewRoute(ctx context.Context, vehicleID int32, clusterIDs []int32) (*entities.GeoJson, error) {
 	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
 	if err != nil {
 		slog.Error("can't find vehicle to preview route", "error", err, "vehicle_id", vehicleID)

@@ -10,6 +10,8 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
 type OrsClientConfig struct {
@@ -49,7 +51,7 @@ func NewOrsClient(opts ...OrsClientOption) OrsClient {
 	}
 }
 
-func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*OrsGeoJsonResponse, error) {
+func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*entities.GeoJson, error) {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
 		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
@@ -80,12 +82,12 @@ func (o *OrsClient) DirectionsGeoJson(ctx context.Context, profile string, reqBo
 		return nil, errors.New("response not successful")
 	}
 
-	var orsGeoJson OrsGeoJsonResponse
-	if err := json.NewDecoder(resp.Body).Decode(&orsGeoJson); err != nil {
+	var geoJson entities.GeoJson
+	if err := json.NewDecoder(resp.Body).Decode(&geoJson); err != nil {
 		slog.Error("failed to decode ors response")
 	}
 
-	return &orsGeoJson, nil
+	return &geoJson, nil
 }
 
 func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (io.ReadCloser, error) {

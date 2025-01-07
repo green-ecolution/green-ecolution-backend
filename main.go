@@ -30,7 +30,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
@@ -133,7 +133,7 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
-	routingRepo, err := openrouteservice.NewRepository(cfg)
+	routingRepo, err := valhalla.NewRepository(cfg)
 	if err != nil {
 		panic(err)
 	}
