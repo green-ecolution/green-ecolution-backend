@@ -72,7 +72,7 @@ func (o *OrsClient) DirectionsGeoJSON(ctx context.Context, profile string, reqBo
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
 			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode, "body", body)
@@ -110,7 +110,7 @@ func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBod
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {

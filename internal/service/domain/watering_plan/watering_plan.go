@@ -351,7 +351,7 @@ func (w *WateringPlanService) calculateRequiredWater(clusters []*entities.TreeCl
 	}, 0)
 }
 
-func (w *WateringPlanService) mergeVehicle(transporter *entities.Vehicle, trailer *entities.Vehicle) *entities.Vehicle {
+func (w *WateringPlanService) mergeVehicle(transporter, trailer *entities.Vehicle) *entities.Vehicle {
 	if transporter == nil {
 		return nil // this should not happen because of before validation
 	}

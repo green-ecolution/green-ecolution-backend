@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	treeAmount int32 = 40 // how much water does a cluster need
+	treeScale = 120 // how much water does a tree need
 )
 
 type VroomClientConfig struct {
@@ -98,7 +98,7 @@ func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomRespon
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
 			slog.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode, "body", body)
@@ -155,7 +155,7 @@ func (v *VroomClient) toVroomShipments(cluster []*entities.TreeCluster) []VroomS
 	nextID := int32(0)
 	return utils.Map(filteredClusters, func(c *entities.TreeCluster) VroomShipments {
 		shipment := VroomShipments{
-			Amount: []int32{int32(len(c.Trees) * 120)},
+			Amount: []int32{int32(len(c.Trees) * treeScale)},
 			Pickup: VroomShipmentStep{
 				ID:       nextID,
 				Location: v.cfg.wateringPoint,

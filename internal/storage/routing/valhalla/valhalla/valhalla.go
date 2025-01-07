@@ -78,7 +78,7 @@ func (o *ValhallaClient) DirectionsGeoJSON(ctx context.Context, reqBody *Directi
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
 			slog.Error("response from the Valhalla service with a not successful code", "status_code", resp.StatusCode, "body", body)
@@ -120,7 +120,7 @@ func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *Directio
 		return nil, err
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
