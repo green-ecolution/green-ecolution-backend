@@ -250,6 +250,15 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.UserIDs = updateWp.UserIDs
 		wp.TotalWaterRequired = &neededWater
 
+		if w.shouldUpdateGpx(prevWp, wp) {
+			gpxURL, err := w.getGpxRouteURL(ctx, id, w.mergeVehicle(transporter, trailer), treeClusters)
+			if err != nil {
+				return false, handleError(err)
+			}
+
+			wp.GpxURL = gpxURL
+		}
+
 		return true, nil
 	})
 
@@ -279,6 +288,32 @@ func (w *WateringPlanService) Delete(ctx context.Context, id int32) error {
 
 func (w *WateringPlanService) Ready() bool {
 	return w.wateringPlanRepo != nil
+}
+
+func (w *WateringPlanService) shouldUpdateGpx(prevWp, newWp *entities.WateringPlan) bool {
+	if len(prevWp.TreeClusters) != len(newWp.TreeClusters) {
+		return true
+	}
+
+	if prevWp.Transporter.ID != newWp.Transporter.ID {
+		return true
+	}
+
+	if (prevWp.Trailer == nil && newWp.Trailer != nil) || (prevWp.Trailer != nil && newWp.Trailer == nil) {
+		return true
+	}
+
+	if prevWp.Trailer != nil && newWp.Trailer != nil && prevWp.Trailer.ID != newWp.Trailer.ID {
+		return true
+	}
+
+	for i, prevWpTc := range prevWp.TreeClusters {
+		if prevWpTc.ID != newWp.TreeClusters[i].ID {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (w *WateringPlanService) fetchVehicle(ctx context.Context, vehicleID int32) (*entities.Vehicle, error) {
