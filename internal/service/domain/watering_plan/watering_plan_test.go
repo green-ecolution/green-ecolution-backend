@@ -189,6 +189,12 @@ func TestWateringPlanService_Create(t *testing.T) {
 			mock.Anything,
 		).Return(allTestWateringPlans[0], nil)
 
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			allTestWateringPlans[0].ID,
+			mock.Anything,
+		).Return(nil)
+
 		// when
 		result, err := svc.Create(ctx, newWateringPlan)
 
@@ -237,6 +243,12 @@ func TestWateringPlanService_Create(t *testing.T) {
 			ctx,
 			mock.Anything,
 		).Return(allTestWateringPlans[0], nil)
+
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			allTestWateringPlans[0].ID,
+			mock.Anything,
+		).Return(nil)
 
 		// when
 		result, err := svc.Create(ctx, newWateringPlan)
@@ -1370,7 +1382,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			mock.Anything,
 		).Return(nil)
 
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, eventManager, routingRepo, s3Repo)
 
 		// when
 		subID, ch, err := eventManager.Subscribe(entities.EventTypeUpdateWateringPlan)

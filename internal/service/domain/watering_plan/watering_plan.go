@@ -237,6 +237,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		}
 	}
 
+	neededWater := w.calculateRequiredWater(treeClusters)
 	err = w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
 		wp.Date = updateWp.Date
 		wp.Description = updateWp.Description
@@ -247,6 +248,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.CancellationNote = updateWp.CancellationNote
 		wp.Evaluation = updateWp.Evaluation
 		wp.UserIDs = updateWp.UserIDs
+		wp.TotalWaterRequired = &neededWater
 
 		return true, nil
 	})
