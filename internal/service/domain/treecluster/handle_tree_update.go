@@ -42,7 +42,7 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 		return err
 	}
 
-	if event.Prev.TreeCluster.ID != event.New.TreeCluster.ID {
+	if event.Prev.TreeCluster != nil && event.New.TreeCluster != nil && event.Prev.TreeCluster.ID != event.New.TreeCluster.ID {
 		if err := s.handleTreeClusterUpdate(ctx, event.New.TreeCluster); err != nil {
 			return err
 		}
