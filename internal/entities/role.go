@@ -14,15 +14,15 @@ type Role struct {
 	Name UserRole
 }
 
-func ParseUserRole(role string) UserRole {
-	switch role {
+func (r *Role) SetName(roleName string) {
+	switch roleName {
 	case string(UserRoleTbz):
-		return UserRoleTbz
+		r.Name = UserRoleTbz
 	case string(UserRoleGreenEcolution):
-		return UserRoleGreenEcolution
+		r.Name = UserRoleGreenEcolution
 	case string(UserRoleSmarteGrenzregion):
-		return UserRoleSmarteGrenzregion
+		r.Name = UserRoleSmarteGrenzregion
 	default:
-		return UserRoleUnknown
+		r.Name = UserRoleUnknown
 	}
 }

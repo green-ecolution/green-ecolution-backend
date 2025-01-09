@@ -161,7 +161,13 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	}
 	var roles []entities.Role
 	for _, roleName := range userRoles {
-		roles = append(roles, entities.Role{Name: entities.ParseUserRole(roleName)})
+		var userRole entities.Role
+		userRole.SetName(roleName)
+		roles = append(roles, userRole)
+	}
+
+	if roles == nil {
+		roles = []entities.Role{}
 	}
 
 	const millisecondsInSecond = 1000
@@ -176,7 +182,7 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		EmployeeID:     employeeID,
 		Roles:          roles,
 		DrivingLicense: entities.DrivingLicense(drivingLicenseClass),
-		Status:         entities.UserStatus(status),
+		Status:         entities.ParseUserStatus(status),
 	}, nil
 }
 

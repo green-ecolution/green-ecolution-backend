@@ -12,6 +12,7 @@ type UserStatus string
 const (
 	UserStatusAvailable SensorStatus = "available"
 	UserStatusAbsent    SensorStatus = "absent"
+	UserStatusUnknown   SensorStatus = "unknown"
 )
 
 type User struct {
@@ -34,4 +35,15 @@ type RegisterUser struct {
 	User     User
 	Password string `validate:"required"`
 	Roles    []string
+}
+
+func ParseUserStatus(status string) UserStatus {
+	switch status {
+	case string(UserStatusAvailable):
+		return UserStatus(UserStatusAvailable)
+	case string(UserStatusAbsent):
+		return UserStatus(UserStatusAbsent)
+	default:
+		return UserStatus(UserStatusUnknown)
+	}
 }
