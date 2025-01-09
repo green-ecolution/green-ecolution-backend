@@ -25,7 +25,7 @@ type GeoJSONGeometry struct {
 } // @Name GeoJsonGeometry
 
 type RouteRequest struct {
-	TransporterID int32   `json:"transporter_id"`
-	TrailerID     *int32  `json:"trailer_id,omitempty" validate:"optional"`
-	ClusterIDs    []int32 `json:"cluster_ids"`
+	TransporterID  int32   `json:"transporter_id"`
+	TrailerID      *int32  `json:"trailer_id,omitempty" validate:"optional"`
+	TreeClusterIDs []int32 `json:"cluster_ids"`
 } // @Name RouteRequest
