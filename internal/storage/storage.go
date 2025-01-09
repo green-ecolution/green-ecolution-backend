@@ -39,7 +39,7 @@ var (
 	ErrInvalidLongitude = errors.New("longitude must be between 180,-180")
 
 	ErrUnknownVehicleType = errors.New("unknown vehicle type")
-	ErrBucketNotExists    = errors.New("bucket dont exists")
+	ErrBucketNotExists    = errors.New("bucket don't exists")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
