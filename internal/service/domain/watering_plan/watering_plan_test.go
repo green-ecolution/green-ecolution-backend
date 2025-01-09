@@ -26,7 +26,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, nil)
 
@@ -43,7 +46,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, nil)
 
@@ -60,7 +66,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		expectedErr := errors.New("GetAll failed")
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
@@ -83,7 +92,10 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		id := int32(1)
 		expectedPlan := allTestWateringPlans[0]
@@ -102,7 +114,10 @@ func TestWateringPlanService_GetByID(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		id := int32(1)
 		expectedErr := storage.ErrEntityNotFound
@@ -140,7 +155,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -171,6 +189,12 @@ func TestWateringPlanService_Create(t *testing.T) {
 			mock.Anything,
 		).Return(allTestWateringPlans[0], nil)
 
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			allTestWateringPlans[0].ID,
+			mock.Anything,
+		).Return(nil)
+
 		// when
 		result, err := svc.Create(ctx, newWateringPlan)
 
@@ -184,7 +208,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -217,6 +244,12 @@ func TestWateringPlanService_Create(t *testing.T) {
 			mock.Anything,
 		).Return(allTestWateringPlans[0], nil)
 
+		wateringPlanRepo.EXPECT().Update(
+			ctx,
+			allTestWateringPlans[0].ID,
+			mock.Anything,
+		).Return(nil)
+
 		// when
 		result, err := svc.Create(ctx, newWateringPlan)
 
@@ -230,7 +263,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		// check treecluster
 		userRepo.EXPECT().GetByIDs(
@@ -251,7 +287,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -278,7 +317,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -299,7 +341,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -326,7 +371,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		// check users
 		userRepo.EXPECT().GetByIDs(
@@ -359,7 +407,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		expectedErr := errors.New("Failed to create watering plan")
 
@@ -406,7 +457,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -431,7 +485,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		newWateringPlan.Date = time.Time{}
 
@@ -449,7 +506,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:        time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -471,7 +531,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -494,7 +557,10 @@ func TestWateringPlanService_Create(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		newWateringPlan := &entities.WateringPlanCreate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -536,7 +602,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -591,7 +660,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -657,7 +729,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:             time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -716,7 +791,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -742,7 +820,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -780,7 +861,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -812,7 +896,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -844,7 +931,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -870,7 +960,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		wateringPlanRepo.EXPECT().GetByID(
 			ctx,
@@ -920,7 +1013,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		expectedErr := errors.New("failed to update watering plan")
 
@@ -973,7 +1069,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan.Status = entities.WateringPlanStatusActive
 		updatedWateringPlan.CancellationNote = "This is a note"
@@ -998,7 +1097,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan.Status = entities.WateringPlanStatusPlanned
 		updatedWateringPlan.CancellationNote = ""
@@ -1030,7 +1132,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:           time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -1055,7 +1160,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -1079,7 +1187,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan.Date = time.Time{}
 
@@ -1098,7 +1209,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan.Status = "test"
 
@@ -1117,7 +1231,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -1141,7 +1258,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
@@ -1164,7 +1284,10 @@ func TestWateringPlanService_Update(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		updatedWateringPlan := &entities.WateringPlanUpdate{
 			Date:          time.Date(2024, 9, 26, 0, 0, 0, 0, time.UTC),
@@ -1190,6 +1313,8 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
 
 		testUUIDString := "6a1078e8-80fd-458f-b74e-e388fe2dd6ab"
 		testUUID, err := uuid.Parse(testUUIDString)
@@ -1257,7 +1382,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 			mock.Anything,
 		).Return(nil)
 
-		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, eventManager)
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, eventManager, routingRepo, s3Repo)
 
 		// when
 		subID, ch, err := eventManager.Subscribe(entities.EventTypeUpdateWateringPlan)
@@ -1286,7 +1411,10 @@ func TestWateringPlanService_Delete(t *testing.T) {
 	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 	vehicleRepo := storageMock.NewMockVehicleRepository(t)
 	userRepo := storageMock.NewMockUserRepository(t)
-	svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager)
+	routingRepo := storageMock.NewMockRoutingRepository(t)
+	s3Repo := storageMock.NewMockS3Repository(t)
+
+	svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 	t.Run("should successfully delete a watering plan", func(t *testing.T) {
 		id := int32(1)

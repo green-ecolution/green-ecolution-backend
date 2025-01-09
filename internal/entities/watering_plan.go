@@ -32,6 +32,7 @@ type WateringPlan struct {
 	Trailer            *Vehicle
 	CancellationNote   string
 	Evaluation         []*EvaluationValue
+	GpxURL             string
 }
 
 type WateringPlanCreate struct {

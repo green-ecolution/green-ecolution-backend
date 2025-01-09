@@ -8,6 +8,8 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - 5432:5432
+    networks:
+      - app-network
   pgadmin:
     image: dpage/pgadmin4
     restart: always
@@ -20,6 +22,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: geheim
       PGADMIN_CONFIG_SERVER_MODE: "False"
       PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    networks:
+      - app-network
   ors-app:
     container_name: ors-app
     image: openrouteservice/openrouteservice:v9.0.0
@@ -36,3 +40,24 @@ services:
       XMS: 1g
       XMX: 2g
       ADDITIONAL_JAVA_OPTS: ""
+    networks:
+      - app-network
+  vroom:
+    image: ghcr.io/vroom-project/vroom-docker:v1.14.0
+    ports:
+      - 2525:3000
+    volumes:
+      - ./infra/vroom:/conf
+    environment:
+      VROOM_ROUTER: ors
+    networks:
+      - app-network
+  valhalla:
+    image: ghcr.io/gis-ops/docker-valhalla/valhalla:latest
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./infra/valhalla/custom_files:/custom_files
+networks:
+  app-network:
+    driver: bridge

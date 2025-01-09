@@ -279,3 +279,5 @@ config/config.dev.yaml
 .direnv
 .pre-commit-config.yaml
 .docker/infra/ors
+.docker/infra/vroom/access.log
+.docker/infra/valhalla/custom_files

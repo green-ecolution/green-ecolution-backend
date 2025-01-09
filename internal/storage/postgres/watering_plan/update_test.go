@@ -128,6 +128,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 			wp.TreeClusters = input.TreeClusters
 			wp.UserIDs = input.UserIDs
 			wp.Status = input.Status
+			wp.TotalWaterRequired = &expectedTotalWater
 			return true, nil
 		}
 

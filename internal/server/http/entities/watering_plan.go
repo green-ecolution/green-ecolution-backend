@@ -32,6 +32,7 @@ type WateringPlanResponse struct {
 	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
 	CancellationNote   string                       `json:"cancellation_note"`
 	Evaluation         []*EvaluationValue           `json:"evaluation"`
+	GpxURL             string                       `json:"gpx_url"`
 } // @Name WateringPlan
 
 type WateringPlanInListResponse struct {

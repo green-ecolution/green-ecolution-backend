@@ -22,7 +22,11 @@ var notFoundErrors = []error{
 	storage.ErrWateringPlanNotFound,
 }
 
-func HandleError(err error) *fiber.Error {
+func HandleError(err error) error {
+	if err == nil {
+		return nil
+	}
+
 	code := fiber.StatusInternalServerError
 
 	// Check if the error is of type service.Error

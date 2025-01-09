@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"errors"
+	"io"
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -36,6 +37,9 @@ var (
 
 	ErrInvalidLatitude  = errors.New("latitude must be between 90,-90")
 	ErrInvalidLongitude = errors.New("longitude must be between 180,-180")
+
+	ErrUnknownVehicleType = errors.New("unknown vehicle type")
+	ErrBucketNotExists    = errors.New("bucket don't exists")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
@@ -120,6 +124,7 @@ type TreeClusterRepository interface {
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids
+	// TODO: Add ability to optional preload
 	GetByIDs(ctx context.Context, ids []int32) ([]*entities.TreeCluster, error)
 	// Create creates a new tree cluster. It accepts a function that takes a tree cluster that can be modified. Any changes made to the tree cluster will be saved in the storage. If the function returns true, the tree cluster will be created, otherwise it will not be created.
 	Create(ctx context.Context, fn func(tc *entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error)
@@ -165,6 +170,18 @@ type SensorRepository interface {
 	InsertSensorData(ctx context.Context, data *entities.SensorData, id string) error
 }
 
+type RoutingRepository interface {
+	GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error)
+	GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error)
+}
+
+type S3Repository interface {
+	BucketExists(ctx context.Context) (bool, error)
+	// contentLength -1 => uploads to EOF
+	PutObject(ctx context.Context, objName, contentType string, contentLength int64, r io.Reader) error
+	GetObject(ctx context.Context, objName string) (io.ReadSeekCloser, error)
+}
+
 type FlowerbedRepository interface {
 	BasicCrudRepository[entities.Flowerbed]
 	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
@@ -200,4 +217,7 @@ type Repository struct {
 	Flowerbed    FlowerbedRepository
 	Region       RegionRepository
 	WateringPlan WateringPlanRepository
+	Routing      RoutingRepository
+	GpxBucket    S3Repository
+	// ImageBucket  S3Repository
 }

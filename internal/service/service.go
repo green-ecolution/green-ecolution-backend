@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"reflect"
 	"time"
@@ -115,6 +116,8 @@ type VehicleService interface {
 
 type WateringPlanService interface {
 	CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
+	PreviewRoute(ctx context.Context, transporterID int32, trailerID *int32, clusterIDs []int32) (*domain.GeoJSON, error)
+	GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }
 
 type PluginService interface {

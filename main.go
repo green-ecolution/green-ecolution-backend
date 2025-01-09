@@ -30,6 +30,9 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
 	"github.com/jackc/pgx/v5"
@@ -130,7 +133,20 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 		return nil, nil, fmt.Errorf("error creating local repository: %w", err)
 	}
 
+	// can be switched between ors and valhalla
+	// routingRepo, err := openrouteservice.NewRepository(cfg)
+	routingRepo, err := valhalla.NewRepository(cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
+
+	s3Repos, err := s3.NewRepository(cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 
 	repositories := &storage.Repository{
@@ -146,6 +162,8 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 		Image:        postgresRepo.Image,
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,
+		Routing:      routingRepo.Routing,
+		GpxBucket:    s3Repos.GpxBucket,
 	}
 
 	return repositories, closeFn, nil

@@ -1,13 +1,18 @@
 package wateringplan
 
 import (
+	"fmt"
+	"io"
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 var (
@@ -185,5 +190,76 @@ func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 		}
 
 		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
+
+// @Summary		Generate preview route
+// @Description	Generate preview route
+// @Tags			Watering Plan
+// @Produce		json
+// @Accept			json
+// @Success		200		{object}	entities.GeoJSON
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Param			body	body		entities.RouteRequest	true	"Route Request"
+// @Router			/v1/watering-plan/route/preview [post]
+// @Security		Keycloak
+func CreatePreviewRoute(svc service.WateringPlanService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		var req entities.RouteRequest
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, err.Error())
+		}
+
+		domainGeo, err := svc.PreviewRoute(ctx, req.TransporterID, req.TrailerID, req.TreeClusterIDs)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.JSON(entities.GeoJSON{
+			Type: entities.GeoJSONType(domainGeo.Type),
+			Bbox: domainGeo.Bbox,
+			Features: utils.Map(domainGeo.Features, func(f domain.GeoJSONFeature) entities.GeoJSONFeature {
+				return entities.GeoJSONFeature{
+					Type:       entities.GeoJSONType(f.Type),
+					Bbox:       f.Bbox,
+					Properties: f.Properties,
+					Geometry: entities.GeoJSONGeometry{
+						Type:        entities.GeoJSONType(f.Geometry.Type),
+						Coordinates: f.Geometry.Coordinates,
+					},
+				}
+			}),
+		})
+	}
+}
+
+// @Summary		Generate route
+// @Description	Generate route
+// @Tags			Watering Plan
+// @Produce		application/gpx+xml
+// @Produce		json
+// @Accept			json
+// @Success		200	{file}		application/gpx+xml
+// @Failure		400	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/watering-plan/route/gpx/{gpx_name} [get]
+// @Param			gpx_name	path	string	true	"gpx file name"
+// @Security		Keycloak
+func GetGpxFile(svc service.WateringPlanService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		objName := strings.Clone(c.Params("gpx_name"))
+
+		fileStream, err := svc.GetGPXFileStream(ctx, objName)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		c.Set(fiber.HeaderContentType, "application/gpx+xml;charset=UTF-8")
+		c.Set(fiber.HeaderContentDisposition, fmt.Sprintf("attachment; filename=%s", objName))
+		_, err = io.Copy(c.Response().BodyWriter(), fileStream)
+		return errorhandler.HandleError(err)
 	}
 }

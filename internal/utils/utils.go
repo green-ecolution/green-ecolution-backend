@@ -31,13 +31,6 @@ func ParseJSONResponse(body *http.Response, target any) error {
 	return json.NewDecoder(body.Body).Decode(target)
 }
 
-func StringPtrToString(source *string) string {
-	if source == nil {
-		return ""
-	}
-	return *source
-}
-
 // Helper function to parse a UUID to a string
 func UUIDToString(u uuid.UUID) string {
 	if u == uuid.Nil {

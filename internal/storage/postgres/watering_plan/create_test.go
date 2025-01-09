@@ -55,6 +55,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Trailer = input.Trailer
 			wp.TreeClusters = input.TreeClusters
 			wp.UserIDs = input.UserIDs
+			wp.TotalWaterRequired = &expectedTotalWater
 			return true, nil
 		}
 
@@ -107,6 +108,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
 			wp.UserIDs = input.UserIDs
+			wp.TotalWaterRequired = &expectedTotalWater
 			return true, nil
 		}
 
