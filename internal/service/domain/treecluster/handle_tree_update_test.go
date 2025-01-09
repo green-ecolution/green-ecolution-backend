@@ -258,4 +258,97 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 			t.Fatal("event was not received")
 		}
 	})
+
+	t.Run("should listen on create new tree event", func(t *testing.T) {
+		// given
+		eventManager := worker.NewEventManager(entities.EventTypeCreateTree)
+		newTree := entities.Tree{
+			ID:        1,
+			Number:    "T001",
+			Latitude:  54.776366336440255,
+			Longitude: 9.451084144617182,
+		}
+		event := entities.NewEventCreateTree(&newTree)
+
+		_, ch, _ := eventManager.Subscribe(entities.EventTypeCreateTree)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		// when
+		err := eventManager.Publish(event)
+
+		// then
+		assert.NoError(t, err)
+		select {
+		case _, ok := <-ch:
+			assert.True(t, ok)
+		case <-time.After(100 * time.Millisecond):
+			t.Fatal("event was not received")
+		}
+	})
+
+	t.Run("should listen on update tree event", func(t *testing.T) {
+		// given
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
+		prevTree := entities.Tree{
+			ID:        1,
+			Number:    "T001",
+			Latitude:  54.776366336440255,
+			Longitude: 9.4510841446171324,
+		}
+		newTree := entities.Tree{
+			ID:        1,
+			Number:    "T001",
+			Latitude:  54.776366336440255,
+			Longitude: 9.451084144617182,
+		}
+		event := entities.NewEventUpdateTree(&prevTree, &newTree)
+
+		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTree)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		// when
+		err := eventManager.Publish(event)
+
+		// then
+		assert.NoError(t, err)
+		select {
+		case _, ok := <-ch:
+			assert.True(t, ok)
+		case <-time.After(100 * time.Millisecond):
+			t.Fatal("event was not received")
+		}
+	})
+
+	t.Run("should listen on delete tree event", func(t *testing.T) {
+		// given
+		eventManager := worker.NewEventManager(entities.EventTypeDeleteTree)
+		newTree := entities.Tree{
+			ID:        1,
+			Number:    "T001",
+			Latitude:  54.776366336440255,
+			Longitude: 9.451084144617182,
+		}
+		event := entities.NewEventDeleteTree(&newTree)
+
+		_, ch, _ := eventManager.Subscribe(entities.EventTypeDeleteTree)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		// when
+		err := eventManager.Publish(event)
+
+		// then
+		assert.NoError(t, err)
+		select {
+		case _, ok := <-ch:
+			assert.True(t, ok)
+		case <-time.After(100 * time.Millisecond):
+			t.Fatal("event was not received")
+		}
+	})
 }

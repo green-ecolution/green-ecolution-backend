@@ -85,6 +85,8 @@ type TreeClusterService interface {
 	Service
 	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
 	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
+	HandleCreateTree(context.Context, *domain.EventCreateTree) error
+	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error
 	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 	HandleUpdateWateringPlan(context.Context, *domain.EventUpdateWateringPlan) error
 }

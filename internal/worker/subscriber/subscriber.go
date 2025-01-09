@@ -41,8 +41,8 @@ func (s *CreateTreeSubscriber) EventType() entities.EventType {
 }
 
 func (s *CreateTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
-	event := e.(entities.EventUpdateTree)
-	return s.tcs.HandleUpdateTree(ctx, &event)
+	event := e.(entities.EventCreateTree)
+	return s.tcs.HandleCreateTree(ctx, &event)
 }
 
 type DeleteTreeSubscriber struct {
@@ -60,8 +60,8 @@ func (s *DeleteTreeSubscriber) EventType() entities.EventType {
 }
 
 func (s *DeleteTreeSubscriber) HandleEvent(ctx context.Context, e entities.Event) error {
-	event := e.(entities.EventUpdateTree)
-	return s.tcs.HandleUpdateTree(ctx, &event)
+	event := e.(entities.EventDeleteTree)
+	return s.tcs.HandleDeleteTree(ctx, &event)
 }
 
 type CreateSensorDataSubscriber struct {
