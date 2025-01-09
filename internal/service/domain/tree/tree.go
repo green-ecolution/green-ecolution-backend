@@ -101,7 +101,7 @@ func (s *TreeService) publishUpdateTreeEvent(prevTree, updatedTree *entities.Tre
 }
 
 func (s *TreeService) publishCreateTreeEvent(newTree *entities.Tree) {
-	slog.Debug("publish new event", "event", entities.EventTypeUpdateTree, "service", "TreeService")
+	slog.Debug("publish new event", "event", entities.EventTypeCreateTree, "service", "TreeService")
 	event := entities.NewEventCreateTree(newTree)
 	if err := s.eventManager.Publish(event); err != nil {
 		slog.Error("error while sending event after creating tree", "err", err, "tree_id", newTree.ID)
@@ -109,7 +109,7 @@ func (s *TreeService) publishCreateTreeEvent(newTree *entities.Tree) {
 }
 
 func (s *TreeService) publishDeleteTreeEvent(prevTree *entities.Tree) {
-	slog.Debug("publish new event", "event", entities.EventTypeUpdateTree, "service", "TreeService")
+	slog.Debug("publish new event", "event", entities.EventTypeDeleteTree, "service", "TreeService")
 	event := entities.NewEventDeleteTree(prevTree)
 	if err := s.eventManager.Publish(event); err != nil {
 		slog.Error("error while sending event after deleting tree", "err", err, "tree_id", prevTree.ID)
