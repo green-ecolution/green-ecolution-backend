@@ -397,11 +397,22 @@ func (w *WateringPlanService) mergeVehicle(transporter, trailer *entities.Vehicl
 		return transporter
 	}
 
+	var biggerWidth = transporter.Width
+	if trailer.Width > transporter.Width {
+		biggerWidth = trailer.Width
+	}
+
+	var biggerHeight = transporter.Height
+	if trailer.Height > transporter.Height {
+		biggerHeight = trailer.Height
+	}
+
 	return &entities.Vehicle{
-		Width:         transporter.Width + trailer.Width,
-		Height:        transporter.Height + trailer.Height,
+		Width:         biggerWidth,
+		Height:        biggerHeight,
 		Length:        transporter.Length + trailer.Length,
-		WaterCapacity: transporter.WaterCapacity + trailer.WaterCapacity,
+		Weight:        transporter.Weight + trailer.Weight,
+		WaterCapacity: transporter.WaterCapacity + trailer.WaterCapacity, // TODO: There may be a choice of transporter and trailer, but only the trailer will have water capacity should it be in use.
 		Type:          entities.VehicleTypeTransporter,
 		NumberPlate:   fmt.Sprintf("%s - %s", transporter.NumberPlate, trailer.NumberPlate),
 	}

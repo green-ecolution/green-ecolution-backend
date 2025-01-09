@@ -120,7 +120,7 @@ func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle,
 		Width:     vehicle.Width,
 		Height:    vehicle.Height,
 		Length:    vehicle.Length,
-		Weight:    3.5, // TODO: use real value
+		Weight:    vehicle.Weight,
 		AxleLoad:  0.0,
 		AxleCount: 2,
 	}
