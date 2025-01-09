@@ -21,6 +21,7 @@ func defaultVehicle() *entities.Vehicle {
 		Height:         0,
 		Length:         0,
 		Width:          0,
+		Weight:         0,
 	}
 }
 
@@ -82,6 +83,7 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 		Width:          entity.Width,
 		Height:         entity.Height,
 		Length:         entity.Length,
+		Weight:         entity.Weight,
 	}
 
 	id, err := r.store.CreateVehicle(ctx, &args)
@@ -97,7 +99,7 @@ func (r *VehicleRepository) validateVehicle(entity *entities.Vehicle) error {
 		return errors.New("water capacity is required and can not be 0")
 	}
 
-	if entity.Length == 0 || entity.Width == 0 || entity.Height == 0 {
+	if entity.Length == 0 || entity.Width == 0 || entity.Height == 0 || entity.Weight == 0 {
 		return errors.New("size measurements are required and can not be 0")
 	}
 

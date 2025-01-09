@@ -22,6 +22,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		Height:         2.75,
 		Length:         6.0,
 		Width:          5.0,
+		Weight:         1.3,
 		Model:          "New model 1615/17",
 	}
 
@@ -39,6 +40,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -63,6 +65,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		assert.Equal(t, input.Height, got.Height)
 		assert.Equal(t, input.Length, got.Length)
 		assert.Equal(t, input.Width, got.Width)
+		assert.Equal(t, input.Weight, got.Weight)
 	})
 
 	t.Run("should return error when update vehicle with duplicate plate", func(t *testing.T) {
@@ -77,6 +80,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -102,6 +106,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = 0
 			return true, nil
 		}
@@ -123,6 +128,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -144,6 +150,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = 0
 			vh.Length = 0
 			vh.Width = 0
+			vh.Weight = 0
 			vh.WaterCapacity = input.WaterCapacity
 			return true, nil
 		}
@@ -165,6 +172,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = ""
 			return true, nil
@@ -187,6 +195,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = "B"
 			return true, nil
@@ -208,6 +217,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = "B"
 			return true, nil
@@ -228,6 +238,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = "B"
 			return true, nil
@@ -252,6 +263,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = "B"
 			return true, nil
@@ -314,6 +326,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 			vh.Height = input.Height
 			vh.Length = input.Length
 			vh.Width = input.Width
+			vh.Weight = input.Weight
 			vh.WaterCapacity = input.WaterCapacity
 			vh.DrivingLicense = "B"
 			return false, nil

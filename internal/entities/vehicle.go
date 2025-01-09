@@ -35,6 +35,7 @@ type Vehicle struct {
 	Height         float64
 	Width          float64
 	Length         float64
+	Weight         float64
 }
 
 type VehicleCreate struct {
@@ -48,6 +49,7 @@ type VehicleCreate struct {
 	Height         float64        `validate:"gt=0"`
 	Width          float64        `validate:"gt=0"`
 	Length         float64        `validate:"gt=0"`
+	Weight         float64        `validate:"gt=0"`
 }
 
 type VehicleUpdate struct {
@@ -61,4 +63,5 @@ type VehicleUpdate struct {
 	Height         float64        `validate:"gt=0"`
 	Width          float64        `validate:"gt=0"`
 	Length         float64        `validate:"gt=0"`
+	Weight         float64        `validate:"gt=0"`
 }
