@@ -7,6 +7,26 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
+func (s *TreeClusterService) HandleCreateTree(ctx context.Context, event *entities.EventCreateTree) error {
+	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+
+	if event.New.TreeCluster == nil {
+		return nil
+	}
+
+	return s.handleTreeClusterUpdate(ctx, event.New.TreeCluster)
+}
+
+func (s *TreeClusterService) HandleDeleteTree(ctx context.Context, event *entities.EventDeleteTree) error {
+	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+
+	if event.Prev.TreeCluster == nil {
+		return nil
+	}
+
+	return s.handleTreeClusterUpdate(ctx, event.Prev.TreeCluster)
+}
+
 func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entities.EventUpdateTree) error {
 	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 
