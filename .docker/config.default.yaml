@@ -29,6 +29,28 @@ auth:
     backend:
       client_id: green-ecolution-backend
       client_secret: secret_secret_secret
+routing:
+    start_point: [9.434764259345679, 54.768731253913806]
+    end_point: [9.434764259345679, 54.768731253913806]
+    watering_point: [9.434764259345679, 54.768731253913806]
+    valhalla:
+        host: http://localhost:8002
+        optimization:
+            vroom:
+                host: http://localhost:2525
+    ors:
+        host: http://localhost:8080/ors
+        optimization:
+            vroom:
+                host: http://localhost:2525
+s3:
+    endpoint: s3.green-ecolution.de
+    region: us-east-1
+    use_ssl: true
+    route-gpx:
+        bucket: routes-gpx
+        accessKey: routes-gpx
+        secretAccessKey: secret_secret_secret
 mqtt:
   broker: eu1.cloud.thethings.industries:1883
   client_id: tree-sensor
