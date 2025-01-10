@@ -25,9 +25,9 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 		return nil
 	}
 
-	sensorData, err := s.treeClusterRepo.GetAllLatestSensorDataByClusterID(ctx, tree.TreeCluster.ID)
+	sensorData, err := s.treeRepo.GetAllLatestSensorDataByTreeID(ctx, tree.ID)
 	if err != nil {
-		slog.Error("failed to get latest sensor data", "cluster_id", tree.TreeCluster.ID, "err", err)
+		slog.Error("failed to get latest sensor data", "tree_id", tree.ID, "err", err)
 		return nil
 	}
 
@@ -83,6 +83,10 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 		}
 
 		wateringStatus = svcUtils.CalculateWateringStatus(youngestTree.PlantingYear, watermarks)
+	}
+
+	if (tree.TreeCluster == nil) {
+		return nil
 	}
 
 	if wateringStatus == tree.TreeCluster.WateringStatus {

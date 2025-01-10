@@ -92,3 +92,17 @@ SELECT * FROM trees
 WHERE ST_Distance(geometry::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) <= 3
 ORDER BY ST_Distance(geometry::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) ASC
     LIMIT 1;
+
+-- name: GetAllLatestSensorDataByTreeID :many
+SELECT sd.*
+FROM sensor_data sd
+JOIN sensors s ON sd.sensor_id = s.id
+JOIN trees t ON t.sensor_id = s.id
+WHERE t.id = $1
+  AND sd.id = (
+    SELECT id
+    FROM sensor_data
+    WHERE sensor_id = s.id
+    ORDER BY created_at DESC
+    LIMIT 1
+  );

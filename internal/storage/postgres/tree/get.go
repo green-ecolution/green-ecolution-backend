@@ -160,6 +160,19 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*
 	return data, nil
 }
 
+func (r *TreeRepository) GetAllLatestSensorDataByTreeID(ctx context.Context, treeID int32) ([]*entities.SensorData, error) {
+	rows, err := r.store.GetAllLatestSensorDataByTreeID(ctx, treeID)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	domainData, err := r.sMapper.FromSqlSensorDataList(rows)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to map sensor data")
+	}
+
+	return domainData, nil
+}
+
 func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
 	row, err := r.store.GetTreeClusterByTreeID(ctx, treeID)
 	if err != nil {
