@@ -21,7 +21,12 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 			slog.Error("failed to get sensor by id", "sensor_id", event.New.SensorID, "err", err)
 			return nil
 		}
-		slog.Info("the sensor has no selected tree. this event will be ignored", "sensor_id", event.New.SensorID, "err", err)
+		slog.Info("the sensor has no selected tree. This event will be ignored", "sensor_id", event.New.SensorID, "err", err)
+		return nil
+	}
+
+	if(tree.TreeCluster == nil) {
+		slog.Info("this tree will has no linked tree cluster. This event will be ignored", "tree_id", tree.ID, "err", err)
 		return nil
 	}
 
