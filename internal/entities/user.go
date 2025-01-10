@@ -40,10 +40,10 @@ type RegisterUser struct {
 func ParseUserStatus(status string) UserStatus {
 	switch status {
 	case string(UserStatusAvailable):
-		return UserStatus(UserStatusAvailable)
+		return UserStatusAvailable
 	case string(UserStatusAbsent):
-		return UserStatus(UserStatusAbsent)
+		return UserStatusAbsent
 	default:
-		return UserStatus(UserStatusUnknown)
+		return UserStatusUnknown
 	}
 }
