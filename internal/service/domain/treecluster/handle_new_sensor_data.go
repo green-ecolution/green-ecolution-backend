@@ -2,11 +2,13 @@ package treecluster
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"slices"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	svcUtils "github.com/green-ecolution/green-ecolution-backend/internal/service/domain/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -14,7 +16,12 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 	tree, err := s.treeRepo.GetBySensorID(ctx, event.New.SensorID)
 	if err != nil {
-		slog.Error("failed to get tree by sensor id", "sensor_id", event.New.SensorID, "err", err)
+		// when error, it can be because the sensor has not linked tree or the tree does not exists
+		if errors.Is(err, storage.ErrSensorNotFound) {
+			slog.Error("failed to get sensor by id", "sensor_id", event.New.SensorID, "err", err)
+			return nil
+		}
+		slog.Info("the sensor has no selected tree. this event will be ignored", "sensor_id", event.New.SensorID, "err", err)
 		return nil
 	}
 
