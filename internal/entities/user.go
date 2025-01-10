@@ -10,9 +10,9 @@ import (
 type UserStatus string
 
 const (
-	UserStatusAvailable SensorStatus = "available"
-	UserStatusAbsent    SensorStatus = "absent"
-	UserStatusUnknown   SensorStatus = "unknown"
+	UserStatusAvailable UserStatus = "available"
+	UserStatusAbsent    UserStatus = "absent"
+	UserStatusUnknown   UserStatus = "unknown"
 )
 
 type User struct {
