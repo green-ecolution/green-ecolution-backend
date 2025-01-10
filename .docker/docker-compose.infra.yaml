@@ -30,7 +30,7 @@ services:
     ports:
       - "8080:8082"
       - "9001:9001"
-    user: "1000:1000" # Default is 1000:1000. make infra/up will override this to the actual user values
+    user: "501:20" # Default is 1000:1000. make infra/up will override this to the actual user values
     volumes:
       - ./infra/ors:/home/ors
     environment:
