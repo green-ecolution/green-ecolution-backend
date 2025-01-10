@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
@@ -42,6 +43,10 @@ func (s *Server) Run(ctx context.Context) error {
 	go func() {
 		err := s.services.PluginService.StartCleanup(ctx)
 		slog.Error("Error while running plugin cleanup", "error", err)
+	}()
+
+	go func() {
+		s.services.SensorService.RunStatusUpdater(ctx, 1*time.Hour)
 	}()
 
 	go func() {
