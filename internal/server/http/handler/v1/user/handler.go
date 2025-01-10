@@ -218,6 +218,51 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 	}
 }
 
+// @Summary		Get users by role
+// @Description	Get users by role
+// @Id				get-users-by-role
+// @Tags			User
+// @Produce		json
+// @Success		200	{object}	entities.UserListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/user/role/{role} [get]
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			role	path	string	true	"Role"
+// @Security		Keycloak
+func GetUsersByRole(svc service.AuthService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+
+		role := strings.Clone(c.Params("Role"))
+		if role == "" {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role format"))
+		}
+
+		var userRole domain.Role
+		userRole.SetName(role)
+		if userRole.Name == domain.UserRoleUnknown {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role name"))
+		}
+
+		users, err := svc.GetAllByRole(ctx, userRole)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by role").Error()))
+		}
+
+		data := make([]*entities.UserResponse, len(users))
+		for i, user := range users {
+			data[i] = userMapper.FromResponse(user)
+		}
+
+		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
+	}
+}
+
 var group singleflight.Group
 
 // @Summary		Refresh token

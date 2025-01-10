@@ -136,7 +136,8 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		slog.Error("failed to parse user id", "user_id", *user.ID, "err", err)
 		return nil, ErrParseID
 	}
-	var phoneNumber, employeeID string
+	var phoneNumber, employeeID, drivingLicenseClass, status string
+	var userRoles []string
 	if user.Attributes != nil {
 		if val, ok := (*user.Attributes)["phone_number"]; ok && len(val) > 0 {
 			phoneNumber = val[0]
@@ -145,17 +146,43 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		if val, ok := (*user.Attributes)["employee_id"]; ok && len(val) > 0 {
 			employeeID = val[0]
 		}
+
+		if val, ok := (*user.Attributes)["driving_license_class"]; ok && len(val) > 0 {
+			drivingLicenseClass = val[0]
+		}
+
+		if val, ok := (*user.Attributes)["user_roles"]; ok && len(val) > 0 {
+			userRoles = val
+		}
+
+		if val, ok := (*user.Attributes)["status"]; ok && len(val) > 0 {
+			status = val[0]
+		}
 	}
+	var roles []entities.Role
+	for _, roleName := range userRoles {
+		var userRole entities.Role
+		userRole.SetName(roleName)
+		roles = append(roles, userRole)
+	}
+
+	if roles == nil {
+		roles = []entities.Role{}
+	}
+
 	const millisecondsInSecond = 1000
 	return &entities.User{
-		ID:          userID,
-		CreatedAt:   time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
-		Username:    *user.Username,
-		FirstName:   *user.FirstName,
-		LastName:    *user.LastName,
-		Email:       *user.Email,
-		PhoneNumber: phoneNumber,
-		EmployeeID:  employeeID,
+		ID:             userID,
+		CreatedAt:      time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
+		Username:       *user.Username,
+		FirstName:      *user.FirstName,
+		LastName:       *user.LastName,
+		Email:          *user.Email,
+		PhoneNumber:    phoneNumber,
+		EmployeeID:     employeeID,
+		Roles:          roles,
+		DrivingLicense: entities.DrivingLicense(drivingLicenseClass),
+		Status:         entities.ParseUserStatus(status),
 	}, nil
 }
 

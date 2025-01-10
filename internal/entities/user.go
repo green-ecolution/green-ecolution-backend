@@ -7,6 +7,14 @@ import (
 	"github.com/google/uuid"
 )
 
+type UserStatus string
+
+const (
+	UserStatusAvailable UserStatus = "available"
+	UserStatusAbsent    UserStatus = "absent"
+	UserStatusUnknown   UserStatus = "unknown"
+)
+
 type User struct {
 	ID             uuid.UUID
 	CreatedAt      time.Time
@@ -17,12 +25,25 @@ type User struct {
 	EmployeeID     string
 	PhoneNumber    string
 	EmailVerified  bool
+	Roles          []Role
 	Avatar         *url.URL
 	DrivingLicense DrivingLicense
+	Status         UserStatus
 }
 
 type RegisterUser struct {
 	User     User
 	Password string `validate:"required"`
 	Roles    []string
+}
+
+func ParseUserStatus(status string) UserStatus {
+	switch status {
+	case string(UserStatusAvailable):
+		return UserStatusAvailable
+	case string(UserStatusAbsent):
+		return UserStatusAbsent
+	default:
+		return UserStatusUnknown
+	}
 }

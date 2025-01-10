@@ -8,6 +8,7 @@ import (
 func RegisterRoutes(r fiber.Router, svc service.AuthService) {
 	r.Post("/", Register(svc))
 	r.Get("/", GetAllUsers(svc))
+	r.Get("/role/:role", GetUsersByRole(svc))
 }
 
 func RegisterPublicRoutes(r fiber.Router, svc service.AuthService) {

@@ -452,3 +452,114 @@ func TestGetByIDs(t *testing.T) {
 		assert.Empty(t, users)
 	})
 }
+
+func TestGetAllByRole(t *testing.T) {
+	t.Run("should return users matching the role", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		uuid01, _ := uuid.NewRandom()
+		uuid02, _ := uuid.NewRandom()
+
+		expectedRole := entities.Role{Name: entities.UserRoleTbz}
+		expectedUsers := []*entities.User{
+			{
+				ID:          uuid01,
+				Username:    "admin1",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Email:       "admin1@example.com",
+				PhoneNumber: "+123456789",
+				Roles:       []entities.Role{{Name: entities.UserRoleTbz}},
+			},
+			{
+				ID:          uuid02,
+				Username:    "admin2",
+				FirstName:   "Jane",
+				LastName:    "Smith",
+				Email:       "admin2@example.com",
+				PhoneNumber: "+987654321",
+				Roles:       []entities.Role{{Name: entities.UserRoleTbz}},
+			},
+		}
+
+		allUsers := append(expectedUsers, &entities.User{
+			ID:          uuid.New(),
+			Username:    "user3",
+			FirstName:   "Bob",
+			LastName:    "Johnson",
+			Email:       "user3@example.com",
+			PhoneNumber: "+555555555",
+			Roles:       []entities.Role{{Name: entities.UserRoleGreenEcolution}},
+		})
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(allUsers, nil)
+
+		// when
+		users, err := svc.GetAllByRole(context.Background(), expectedRole)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+	})
+
+	t.Run("should return empty slice when no users match the role", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		expectedRole := entities.Role{Name: entities.UserRoleTbz}
+		allUsers := []*entities.User{
+			{
+				ID:          uuid.New(),
+				Username:    "user1",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Email:       "user1@example.com",
+				PhoneNumber: "+123456789",
+				Roles:       []entities.Role{{Name: entities.UserRoleGreenEcolution}},
+			},
+			{
+				ID:          uuid.New(),
+				Username:    "user2",
+				FirstName:   "Jane",
+				LastName:    "Smith",
+				Email:       "user2@example.com",
+				PhoneNumber: "+987654321",
+				Roles:       []entities.Role{{Name: entities.UserRoleSmarteGrenzregion}},
+			},
+		}
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(allUsers, nil)
+
+		// when
+		users, err := svc.GetAllByRole(context.Background(), expectedRole)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, users)
+	})
+
+	t.Run("should return error when underlying repository fails", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(nil, errors.New("repository error"))
+
+		// when
+		users, err := svc.GetAllByRole(context.Background(), entities.Role{Name: entities.UserRoleTbz})
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "repository error")
+	})
+}

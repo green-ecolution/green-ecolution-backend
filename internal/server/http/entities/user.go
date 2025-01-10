@@ -4,6 +4,13 @@ import (
 	"time"
 )
 
+type UserStatus string // @Name UserStatus
+
+const (
+	UserStatusAvailable SensorStatus = "available"
+	UserStatusAbsent    SensorStatus = "absent"
+)
+
 type UserResponse struct {
 	ID             string         `json:"id"`
 	CreatedAt      time.Time      `json:"created_at"`
@@ -15,7 +22,9 @@ type UserResponse struct {
 	PhoneNumber    string         `json:"phone_number"`
 	EmailVerified  bool           `json:"email_verified"`
 	Avatar         string         `json:"avatar_url"`
+	Roles          []RoleResponse `json:"roles"`
 	DrivingLicense DrivingLicense `json:"driving_license"`
+	Status         UserStatus     `json:"status"`
 } // @Name User
 
 type UserListResponse struct {
