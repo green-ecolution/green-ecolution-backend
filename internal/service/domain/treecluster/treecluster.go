@@ -135,7 +135,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 	if err != nil {
 		return nil, handleError(err)
 	}
-
+	
 	prevTc, err := s.GetByID(ctx, id)
 	if err != nil {
 		return nil, handleError(err)
@@ -148,6 +148,16 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
 
+		return true, nil
+	})
+
+	if err != nil {
+		return nil, handleError(err)
+	}
+
+	// Update the tree cluster only after the trees have been updated to the database,
+	// otherwise the centre point of the tree cluster cannot be set 
+	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 		if err != nil {
 			return false, nil
@@ -265,6 +275,6 @@ func (s *TreeClusterService) getTrees(ctx context.Context, ids []*int32) ([]*dom
 	for i, id := range ids {
 		treeIDs[i] = *id
 	}
-
+	
 	return s.treeRepo.GetTreesByIDs(ctx, treeIDs)
 }
