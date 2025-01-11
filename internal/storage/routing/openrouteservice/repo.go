@@ -10,6 +10,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/ors"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/vroom"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -66,7 +67,19 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 		return nil, err
 	}
 
-	return r.ors.DirectionsGeoJSON(ctx, orsProfile, orsRoute)
+	entity, err := r.ors.DirectionsGeoJSON(ctx, orsProfile, orsRoute)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := routing.ConvertLocations(&r.cfg.routing)
+	if err != nil {
+		return nil, err
+	}
+
+	entity.Metadata = *metadata
+
+	return entity, nil
 }
 
 func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {

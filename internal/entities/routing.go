@@ -12,6 +12,7 @@ type GeoJSON struct {
 	Type     GeoJSONType      `json:"type"`
 	Bbox     []float64        `json:"bbox"`
 	Features []GeoJSONFeature `json:"features"`
+	Metadata GeoJSONMetadata  `json:"metadata"`
 }
 
 type GeoJSONFeature struct {
@@ -25,3 +26,14 @@ type GeoJSONGeometry struct {
 	Type        GeoJSONType `json:"type"`
 	Coordinates [][]float64 `json:"coordinates"`
 }
+
+type GeoJSONMetadata struct {
+	StartPoint    GeoJSONLocation `json:"start_point"`
+	EndPoint      GeoJSONLocation `json:"end_point"`
+	WateringPoint GeoJSONLocation `json:"watering_point"`
+} // @Name GeoJSONMetadata
+
+type GeoJSONLocation struct {
+	Latitude    float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
+} // @Name GeoJSONLocation
