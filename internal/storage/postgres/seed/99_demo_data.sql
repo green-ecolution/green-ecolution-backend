@@ -16,12 +16,12 @@ VALUES
   (2, 'Sankt-Jürgen-Platz', 'moderate', 0.5, 1, 'Ulmenstraße', 'Bäume beim Sankt-Jürgen-Platz', 'schluffig', 54.78805731048199, 9.44400186680097, ST_SetSRID(ST_MakePoint(54.78805731048199, 9.44400186680097), 4326)),
   (3, 'Flensburger Stadion', 'unknown', 0.7, 1, 'Flensburger Stadion', 'Alle Bäume in der Gegend des Stadions in Mürwik', 'schluffig', 54.802163, 9.446398, ST_SetSRID(ST_MakePoint(54.802163, 9.446398), 4326)),
   (4, 'Campus Hochschule', 'bad', 0.1, 4, 'Thomas-Finke Straße', 'Gruppe ist besonders anfällig', 'schluffig', 54.77576059694547, 9.450720736264868, ST_SetSRID(ST_MakePoint(54.77576059694547, 9.450720736264868), 4326)),
-  (5, 'Mathildenstraße', 'bad', 0.4, 10, 'Mathildenstraße', 'Sehr enge Straße und dadurch schlecht zu bewässern.', 'schluffig', 54.782402, 9.424270, ST_SetSRID(ST_MakePoint(54.782402, 9.424270), 4326)),
+  (5, 'Mathildenstraße', 'bad', 0.4, 10, 'Mathildenstraße', 'Sehr enge Straße und dadurch schlecht zu bewässern.', 'schluffig', 54.78219253876479, 9.423978982828825, ST_SetSRID(ST_MakePoint(54.78219253876479, 9.423978982828825), 4326)),
   (6, 'Nordstadt', 'unknown', 0.6, 13, 'Apenrader Straße', 'Guter Baumbestand mit großen Kronen.', 'sandig', 54.807162, 9.423138, ST_SetSRID(ST_MakePoint(54.807162, 9.423138), 4326)),
   (7, 'TSB Neustadt', 'good', 0.75, 13, 'Ecknerstraße', 'Kleiner Baumbestand.', 'sandig', 54.797162, 9.419620, ST_SetSRID(ST_MakePoint(54.797162, 9.419620), 4326)),
-  (8, 'Gewerbegebiet Süd', 'moderate', 0.1, 13, 'Schleswiger Straße', 'Sehr viel versiegelter Boden.', 'sandig', 54.768115, 9.435285, ST_SetSRID(ST_MakePoint(54.768115, 9.435285), 4326)),
-  (9, 'Seniorenanlage Valentinerhof', 'bad', 0.1, 13, 'Auf dem Geländer der Seniorenanlage', 'Sehr viel versiegelter Boden.', 'sandig', 54.76994251235151, 9.441111747447234, ST_SetSRID(ST_MakePoint(54.76994251235151, 9.441111747447234), 4326)),
-  (10, 'Peelwatt', 'unknown', 0.1, 13, 'Peelwatt halt', 'Sehr viel versiegelter Boden.', 'sandig', 54.76671656688957, 9.456136954289867, ST_SetSRID(ST_MakePoint(54.76671656688957, 9.456136954289867), 4326));
+  (8, 'Seniorenanlage Valentinerhof', 'bad', 0.1, 13, 'Auf dem Geländer der Seniorenanlage', 'Sehr viel versiegelter Boden.', 'sandig', 54.76994251235151, 9.441111747447234, ST_SetSRID(ST_MakePoint(54.76994251235151, 9.441111747447234), 4326)),
+  (9, 'Peelwatt', 'unknown', 0.1, 13, 'Peelwatt halt', 'Sehr viel versiegelter Boden.', 'sandig', 54.76671656688957, 9.456136954289867, ST_SetSRID(ST_MakePoint(54.76671656688957, 9.456136954289867), 4326)),
+  (10, 'Lautrupsbach', 'moderate', 0.1, 13, 'An der Nordstraße', 'Sehr viel versiegelter Boden.', 'sandig', 54.79265065021804, 9.454269041383837, ST_SetSRID(ST_MakePoint(54.76671656688957, 9.454269041383837), 4326));
 
 INSERT INTO sensors (id, status, latitude, longitude, geometry)
 VALUES
@@ -31,8 +31,8 @@ VALUES
     ('sensor-4', 'offline', 54.775679885633636, 9.451171073968197, ST_SetSRID(ST_MakePoint(54.775679885633636, 9.451171073968197), 4326)),
     ('sensor-5', 'offline', 54.782630, 9.423792, ST_SetSRID(ST_MakePoint(54.782630, 9.423792), 4326)),
     ('sensor-6', 'offline', 54.796916, 9.421332, ST_SetSRID(ST_MakePoint(54.796916, 9.421332), 4326)),
-    ('sensor-7', 'offline', 54.767936, 9.435316, ST_SetSRID(ST_MakePoint(54.767936, 9.435316), 4326)),
-    ('sensor-8', 'offline', 54.7697451282801, 9.439562555553788, ST_SetSRID(ST_MakePoint(54.7697451282801, 9.439562555553788), 4326)),
+    ('sensor-7', 'offline', 54.7697451282801, 9.439562555553788, ST_SetSRID(ST_MakePoint(54.7697451282801, 9.439562555553788), 4326)),
+    ('sensor-8', 'offline', 54.792472, 9.450000, ST_SetSRID(ST_MakePoint(54.792472, 9.450000), 4326)),
     ('tree-sensor', 'online', 54.774932, 9.450000, ST_SetSRID(ST_MakePoint(54.774932, 9.450000), 4326));
 
 INSERT INTO trees (tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, readonly, watering_status, description)
@@ -59,7 +59,7 @@ VALUES
   (3, NULL, 2023, 'Betula pendula', 1037, 54.799796, 9.443927, ST_SetSRID(ST_MakePoint(54.799796, 9.443927), 4326), true, 'unknown', ''),
   (3, NULL, 2023, 'Betula pendula', 1038, 54.804052, 9.447900, ST_SetSRID(ST_MakePoint(54.804052, 9.447900), 4326), true, 'unknown', ''),
 
-  (4, 'sensor-4', 2022, 'Tilia intermedia', 1029, 54.775679885633636, 9.451171073968197, ST_SetSRID(ST_MakePoint(54.775679885633636, 9.451171073968197), 4326), true, 'unknown', ''),
+  (4, 'sensor-4', 2022, 'Tilia intermedia', 1029, 54.775679885633636, 9.451171073968197, ST_SetSRID(ST_MakePoint(54.775679885633636, 9.451171073968197), 4326), true, 'bad', ''),
   (4, NULL, 2022, 'Tilia intermedia', 1027, 54.776120, 9.450891, ST_SetSRID(ST_MakePoint(54.776120, 9.450891), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
   (4, NULL, 2022, 'Tilia intermedia', 1028, 54.776058, 9.450311, ST_SetSRID(ST_MakePoint(54.776058, 9.450311), 4326), true, 'unknown', ''),
   (4, NULL, 2022, 'Tilia intermedia', 1029, 54.775709, 9.447762, ST_SetSRID(ST_MakePoint(54.775709, 9.447762), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
@@ -81,32 +81,27 @@ VALUES
   (7, NULL, 2022, 'Acer platanoides Schwedleri', 1044, 54.797330, 9.419002, ST_SetSRID(ST_MakePoint(54.797330, 9.419002), 4326), true, 'unknown', ''),
   (7, NULL, 2022, 'Acer platanoides Schwedleri', 1045, 54.797114, 9.417843, ST_SetSRID(ST_MakePoint(54.797114, 9.417843), 4326), true, 'unknown', ''),
 
-  (8, 'sensor-7', 2024, 'Sorbus x thuringiaca', 1046, 54.767936, 9.435316, ST_SetSRID(ST_MakePoint(54.767936, 9.435316), 4326), true, 'moderate', ''),
-  (8, NULL, 2024, 'Sorbus x thuringiaca', 1047, 54.767275, 9.435024, ST_SetSRID(ST_MakePoint(54.767275, 9.435024), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
-  (8, NULL, 2024, 'Sorbus x thuringiaca', 1048, 54.766991, 9.435672, ST_SetSRID(ST_MakePoint(54.766991, 9.435672), 4326), true, 'unknown', ''),
-  (8, NULL, 2024, 'Sorbus x thuringiaca', 1049, 54.767972, 9.435373, ST_SetSRID(ST_MakePoint(54.767972, 9.435373), 4326), true, 'unknown', ''),
-  (8, NULL, 2024, 'Sorbus x thuringiaca', 1050, 54.767019, 9.435321, ST_SetSRID(ST_MakePoint(54.767019, 9.435321), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
+  (8, 'sensor-7', 2023, 'Populus cf. suaveolens', 1052, 54.7697451282801, 9.439562555553788, ST_SetSRID(ST_MakePoint(54.7697451282801, 9.439562555553788), 4326), true, 'bad', ''),
+  (8, NULL, 2023, 'Populus cf. suaveolens', 5555, 54.76932352301634, 9.441299419876234, ST_SetSRID(ST_MakePoint(54.76932352301634, 9.441299419876234), 4326), true, 'unknown', ''),
+  (8, NULL, 2023, 'Populus cf. suaveolens', 4444, 54.76915329290317, 9.441851862902759, ST_SetSRID(ST_MakePoint(54.76915329290317, 9.441851862902759), 4326), true, 'unknown', ''),
+  (8, NULL, 2023, 'Populus cf. suaveolens', 3333, 54.770304653528044, 9.44233994363491, ST_SetSRID(ST_MakePoint(54.770304653528044, 9.44233994363491), 4326), true, 'unknown', ''),
+  (8, NULL, 2023, 'Populus cf. suaveolens', 2222, 54.771043653535294, 9.440740347234932, ST_SetSRID(ST_MakePoint(54.771043653535294, 9.440740347234932), 4326), true, 'unknown', ''),
 
-  (9, 'sensor-8', 2023, 'Populus cf. suaveolens', 1052, 54.7697451282801, 9.439562555553788, ST_SetSRID(ST_MakePoint(54.7697451282801, 9.439562555553788), 4326), true, 'bad', ''),
-  (9, NULL, 2023, 'Populus cf. suaveolens', 5555, 54.76932352301634, 9.441299419876234, ST_SetSRID(ST_MakePoint(54.76932352301634, 9.441299419876234), 4326), true, 'unknown', ''),
-  (9, NULL, 2023, 'Populus cf. suaveolens', 4444, 54.76915329290317, 9.441851862902759, ST_SetSRID(ST_MakePoint(54.76915329290317, 9.441851862902759), 4326), true, 'unknown', ''),
-  (9, NULL, 2023, 'Populus cf. suaveolens', 3333, 54.770304653528044, 9.44233994363491, ST_SetSRID(ST_MakePoint(54.770304653528044, 9.44233994363491), 4326), true, 'unknown', ''),
-  (9, NULL, 2023, 'Populus cf. suaveolens', 2222, 54.771043653535294, 9.440740347234932, ST_SetSRID(ST_MakePoint(54.771043653535294, 9.440740347234932), 4326), true, 'unknown', ''),
+  (9, NULL, 2024, 'Tilia x vulgaris', 1015, 54.76752937879732, 9.457372632491829, ST_SetSRID(ST_MakePoint(54.76752937879732, 9.457372632491829), 4326), true, 'unknown', ''),
+  (9, NULL, 2024, 'Tilia x vulgaris', 1015, 54.767564688002714, 9.453443844886783, ST_SetSRID(ST_MakePoint(54.767564688002714, 9.453443844886783), 4326), true, 'unknown', ''),
+  (9, NULL, 2024, 'Tilia x vulgaris', 1015, 54.765620842535895, 9.4575523046762, ST_SetSRID(ST_MakePoint(54.765620842535895, 9.4575523046762), 4326), true, 'unknown', ''),
+  (9, NULL, 2024, 'Tilia x vulgaris', 1015, 54.76725516472003, 9.456833592389275, ST_SetSRID(ST_MakePoint(54.76725516472003, 9.456833592389275), 4326), true, 'unknown', ''),
 
-  (10, NULL, 2024, 'Tilia x vulgaris', 1015, 54.76752937879732, 9.457372632491829, ST_SetSRID(ST_MakePoint(54.76752937879732, 9.457372632491829), 4326), true, 'unknown', ''),
-  (10, NULL, 2024, 'Tilia x vulgaris', 1015, 54.767564688002714, 9.453443844886783, ST_SetSRID(ST_MakePoint(54.767564688002714, 9.453443844886783), 4326), true, 'unknown', ''),
-  (10, NULL, 2024, 'Tilia x vulgaris', 1015, 54.765620842535895, 9.4575523046762, ST_SetSRID(ST_MakePoint(54.765620842535895, 9.4575523046762), 4326), true, 'unknown', ''),
-  (10, NULL, 2024, 'Tilia x vulgaris', 1015, 54.76725516472003, 9.456833592389275, ST_SetSRID(ST_MakePoint(54.76725516472003, 9.456833592389275), 4326), true, 'unknown', ''),
+  (10, 'sensor-8', 2023, 'Alnus glutinosa', 1030, 54.792472, 9.452773, ST_SetSRID(ST_MakePoint(54.792472, 9.452773), 4326), true, 'moderate', ''),
+  (10, NULL, 2023, 'Alnus glutinosa', 1031, 54.792782, 9.453795, ST_SetSRID(ST_MakePoint(54.792782, 9.453795), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
+  (10, NULL, 2023, 'Alnus glutinosa', 1032, 54.792837, 9.454880, ST_SetSRID(ST_MakePoint(54.792837, 9.454880), 4326), true, 'unknown', ''),
+  (10, NULL, 2023, 'Alnus glutinosa', 1033, 54.792435, 9.455545, ST_SetSRID(ST_MakePoint(54.792435, 9.455545), 4326), true, 'unknown', ''),
 
   (NULL, NULL, 2024, 'Carpinus betulus', 1015, 54.783739, 9.426823, ST_SetSRID(ST_MakePoint(54.783739, 9.426823), 4326), true, 'unknown', ''),
   (NULL, NULL, 2022, 'Carpinus betulus', 1017, 54.785981, 9.430668, ST_SetSRID(ST_MakePoint(54.785981, 9.430668), 4326), true, 'unknown', ''),
   (NULL, NULL, 2022, 'Carpinus betulus', 1018, 54.786269, 9.431758, ST_SetSRID(ST_MakePoint(54.786269, 9.431758), 4326), true, 'unknown', ''),
   (NULL, NULL, 2022, 'Carpinus betulus', 1019, 54.787339, 9.431701, ST_SetSRID(ST_MakePoint(54.787339, 9.431701), 4326), true, 'unknown', ''),
   (NULL, NULL, 2021, 'Carpinus betulus', 1020, 54.786656, 9.432243, ST_SetSRID(ST_MakePoint(54.786656, 9.432243), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
-  (NULL, NULL, 2023, 'Alnus glutinosa', 1030, 54.792472, 9.452773, ST_SetSRID(ST_MakePoint(54.792472, 9.452773), 4326), true, 'unknown', ''),
-  (NULL, NULL, 2023, 'Alnus glutinosa', 1031, 54.792782, 9.453795, ST_SetSRID(ST_MakePoint(54.792782, 9.453795), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
-  (NULL, NULL, 2023, 'Alnus glutinosa', 1032, 54.792837, 9.454880, ST_SetSRID(ST_MakePoint(54.792837, 9.454880), 4326), true, 'unknown', ''),
-  (NULL, NULL, 2023, 'Alnus glutinosa', 1033, 54.792435, 9.455545, ST_SetSRID(ST_MakePoint(54.792435, 9.455545), 4326), true, 'unknown', ''),
   (NULL, NULL, 2022, 'Populus cf. suaveolens', 1051, 54.769030, 9.429936, ST_SetSRID(ST_MakePoint(54.769030, 9.429936), 4326), true, 'unknown', ''),
   (NULL, NULL, 2021, 'Populus cf. suaveolens', 1053, 54.775237, 9.441981, ST_SetSRID(ST_MakePoint(54.775237, 9.441981), 4326), true, 'unknown', ''),
   (NULL, NULL, 2022, 'Populus cf. suaveolens', 1054, 54.780192, 9.459607, ST_SetSRID(ST_MakePoint(54.780192, 9.459607), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
@@ -188,17 +183,6 @@ VALUES
         ]
     }'),
     ('sensor-7', '{
-        "device": "sensor-6",
-        "temperature": 2.0,
-        "humidity": 0.5,
-        "battery": 3.7,
-        "watermarks": [
-            {"resistance": 800, "centibar": 50, "depth": 30},
-            {"resistance": 900, "centibar": 52, "depth": 60},
-            {"resistance": 1000, "centibar": 55, "depth": 90}
-        ]
-    }'),
-    ('sensor-8', '{
         "device": "sensor-8",
         "temperature": 2.23,
         "humidity": 1.5,
@@ -207,6 +191,17 @@ VALUES
             {"resistance": 2230, "centibar": 80, "depth": 30},
             {"resistance": 2240, "centibar": 85, "depth": 60},
             {"resistance": 2500, "centibar": 90, "depth": 90}
+        ]
+    }'),
+    ('sensor-8', '{
+        "device": "sensor-9",
+        "temperature": 2.0,
+        "humidity": 0.5,
+        "battery": 3.7,
+        "watermarks": [
+            {"resistance": 800, "centibar": 50, "depth": 30},
+            {"resistance": 900, "centibar": 52, "depth": 60},
+            {"resistance": 1000, "centibar": 55, "depth": 90}
         ]
     }');
 

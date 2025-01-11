@@ -1,11 +1,11 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters;
+SELECT * FROM tree_clusters ORDER BY name ASC;
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
 
 -- name: GetTreesClustersByIDs :many
-SELECT * FROM tree_clusters WHERE id = ANY($1::int[]);
+SELECT * FROM tree_clusters WHERE id = ANY($1::int[]) ORDER BY name ASC;
 
 -- name: GetRegionByTreeClusterID :one
 SELECT regions.* FROM regions JOIN tree_clusters ON regions.id = tree_clusters.region_id WHERE tree_clusters.id = $1;

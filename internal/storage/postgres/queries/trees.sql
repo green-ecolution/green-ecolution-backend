@@ -1,5 +1,5 @@
 -- name: GetAllTrees :many
-SELECT * FROM trees;
+SELECT * FROM trees ORDER BY number ASC;
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
@@ -8,13 +8,13 @@ SELECT * FROM trees WHERE id = $1;
 SELECT * FROM trees WHERE sensor_id = $1;
 
 -- name: GetTreesBySensorIDs :many
-SELECT * FROM trees WHERE sensor_id = ANY($1::text[]);
+SELECT * FROM trees WHERE sensor_id = ANY($1::text[]) ORDER BY number ASC;
 
 -- name: GetTreesByIDs :many
-SELECT * FROM trees WHERE id = ANY($1::int[]);
+SELECT * FROM trees WHERE id = ANY($1::int[]) ORDER BY number ASC;
 
 -- name: GetTreesByTreeClusterID :many
-SELECT * FROM trees WHERE tree_cluster_id = $1;
+SELECT * FROM trees WHERE tree_cluster_id = $1 ORDER BY number ASC;
 
 -- name: GetTreeByCoordinates :one
 SELECT * FROM trees WHERE latitude = $1 AND longitude = $2 LIMIT 1;
