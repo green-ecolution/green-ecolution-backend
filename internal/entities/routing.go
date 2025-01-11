@@ -28,12 +28,18 @@ type GeoJSONGeometry struct {
 }
 
 type GeoJSONMetadata struct {
-	StartPoint    GeoJSONLocation `json:"start_point"`
-	EndPoint      GeoJSONLocation `json:"end_point"`
-	WateringPoint GeoJSONLocation `json:"watering_point"`
-} // @Name GeoJSONMetadata
+	StartPoint    GeoJSONLocation
+	EndPoint      GeoJSONLocation
+	WateringPoint GeoJSONLocation
+}
 
 type GeoJSONLocation struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-} // @Name GeoJSONLocation
+	Latitude  float64
+	Longitude float64
+}
+
+type RouteMetadata struct {
+	Distance float64
+	Refills  int
+	Time     float64
+}

@@ -161,12 +161,18 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
-		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, w.mergeVehicle(transporter, trailer), treeClusters)
-		if err != nil {
-			return false, handleError(err)
+		mergedVehicle := w.mergeVehicle(transporter, trailer)
+		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, mergedVehicle, treeClusters)
+		if err == nil {
+			wp.GpxURL = gpxURL
 		}
 
-		wp.GpxURL = gpxURL
+		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
+		if err == nil {
+			wp.Distance = utils.P(metadata.Distance)
+			// wp.Duration = utils.P(metadata.Time)
+			// wp.RefillCount = utils.P(metadata.Refills)
+		}
 
 		return true, nil
 	})
