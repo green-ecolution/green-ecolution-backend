@@ -138,6 +138,12 @@ func TestTreeClusterService_Create(t *testing.T) {
 			mock.Anything,
 		).Return(expectedCluster, nil)
 
+		clusterRepo.EXPECT().Update(
+			ctx,
+			expectedCluster.ID,
+			mock.Anything,
+		).Return(nil)
+
 		// when
 		result, err := svc.Create(ctx, newCluster)
 
@@ -171,6 +177,12 @@ func TestTreeClusterService_Create(t *testing.T) {
 			ctx,
 			mock.Anything,
 		).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().Update(
+			ctx,
+			expectedCluster.ID,
+			mock.Anything,
+		).Return(nil)
 
 		// when
 		result, err := svc.Create(ctx, newCluster)
@@ -219,6 +231,40 @@ func TestTreeClusterService_Create(t *testing.T) {
 			ctx,
 			mock.Anything,
 		).Return(nil, expectedErr)
+
+		// when
+		result, err := svc.Create(ctx, newCluster)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "500: Failed to create cluster")
+	})
+
+	t.Run("should return an error when creating cluster fails due to error in position update", func(t *testing.T) {
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
+
+		expectedCluster := getTestTreeClusters()[0]
+		expectedErr := errors.New("Failed to create cluster")
+		expectedTrees := getTestTrees()
+
+		treeRepo.EXPECT().GetTreesByIDs(
+			ctx,
+			[]int32{1, 2},
+		).Return(expectedTrees, nil)
+
+		clusterRepo.EXPECT().Create(
+			ctx,
+			mock.Anything,
+		).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().Update(
+			ctx,
+			expectedCluster.ID,
+			mock.Anything,
+		).Return(expectedErr)
 
 		// when
 		result, err := svc.Create(ctx, newCluster)
