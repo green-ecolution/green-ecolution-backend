@@ -250,4 +250,52 @@ func TestTreeClusterService_HandleNewSensorData(t *testing.T) {
 			assert.True(t, true)
 		}
 	})
+
+	t.Run("should not update and not send event if the tree of the sensor has no tree cluster", func(t *testing.T) {
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+
+		// event
+		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		sensorDataEvent := entities.SensorData{
+			SensorID: "sensor-1",
+			Data: &entities.MqttPayload{
+				Watermarks: []entities.Watermark{
+					{Centibar: 61, Depth: 30},
+					{Centibar: 24, Depth: 60},
+					{Centibar: 24, Depth: 90},
+				},
+			},
+		}
+
+		tree := entities.Tree{
+			ID:             1,
+			TreeCluster:    nil,
+			WateringStatus: entities.WateringStatusBad,
+			PlantingYear:   int32(time.Now().Year() - 2),
+		}
+
+		event := entities.NewEventSensorData(&sensorDataEvent)
+
+		treeRepo.EXPECT().GetBySensorID(mock.Anything, "sensor-1").Return(&tree, nil)
+
+		// when
+		err := svc.HandleNewSensorData(context.Background(), &event)
+
+		// then
+		assert.NoError(t, err)
+		select {
+		case <-ch:
+			t.Fatal("event was received. It should not have been sent")
+		case <-time.After(100 * time.Millisecond):
+			assert.True(t, true)
+		}
+	})
 }
