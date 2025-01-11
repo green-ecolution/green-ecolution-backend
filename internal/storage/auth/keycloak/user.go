@@ -98,10 +98,12 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	allUsers := make([]*entities.User, len(users))
 	for i, kcUser := range users {
 		user, err := keyCloakUserToUser(kcUser)
-		if err != nil {
+		if err != nil && !errors.Is(err, ErrUserWithNilAttributes) { // skip users without required attributes
 			return nil, err
 		}
-		allUsers[i] = user
+		if user != nil {
+			allUsers[i] = user
+		}
 	}
 
 	return allUsers, nil
@@ -136,6 +138,11 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		slog.Error("failed to parse user id", "user_id", *user.ID, "err", err)
 		return nil, ErrParseID
 	}
+
+	if err := validateRequiredAttributes(user); err != nil {
+		return nil, err
+	}
+
 	var phoneNumber, employeeID, drivingLicenseClass, status string
 	var userRoles []string
 	if user.Attributes != nil {
@@ -159,16 +166,8 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 			status = val[0]
 		}
 	}
-	var roles []entities.Role
-	for _, roleName := range userRoles {
-		var userRole entities.Role
-		userRole.SetName(roleName)
-		roles = append(roles, userRole)
-	}
 
-	if roles == nil {
-		roles = []entities.Role{}
-	}
+	roles := convertRoles(userRoles)
 
 	const millisecondsInSecond = 1000
 	return &entities.User{
@@ -184,6 +183,26 @@ func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 		DrivingLicense: entities.DrivingLicense(drivingLicenseClass),
 		Status:         entities.ParseUserStatus(status),
 	}, nil
+}
+
+func convertRoles(userRoles []string) []entities.Role {
+	var roles []entities.Role
+	for _, roleName := range userRoles {
+		var userRole entities.Role
+		userRole.SetName(roleName)
+		roles = append(roles, userRole)
+	}
+	if roles == nil {
+		roles = []entities.Role{}
+	}
+	return roles
+}
+
+func validateRequiredAttributes(user *gocloak.User) error {
+	if user.FirstName == nil || user.Email == nil || user.LastName == nil || user.Username == nil {
+		return ErrUserWithNilAttributes
+	}
+	return nil
 }
 
 func userToKeyCloakUser(user *entities.User) *gocloak.User {
