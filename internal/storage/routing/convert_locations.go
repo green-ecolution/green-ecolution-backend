@@ -34,7 +34,7 @@ func ConvertLocations(cfg *config.RoutingConfig) (*entities.GeoJSONMetadata, err
 
 func validateLocation(location []float64) (entities.GeoJSONLocation, error) {
 	if len(location) != 2 {
-		return entities.GeoJSONLocation{}, fmt.Errorf("Must have exactly two elements: latitude and longitude")
+		return entities.GeoJSONLocation{}, fmt.Errorf("must have exactly two elements: latitude and longitude")
 	}
 	return entities.GeoJSONLocation{
 		Longitude: location[0],
