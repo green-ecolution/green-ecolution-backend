@@ -25,7 +25,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 		return nil
 	}
 
-	if(tree.TreeCluster == nil) {
+	if tree.TreeCluster == nil {
 		slog.Info("this tree will has no linked tree cluster. This event will be ignored", "tree_id", tree.ID, "err", err)
 		return nil
 	}
