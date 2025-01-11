@@ -7,8 +7,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-
-func ConvertLocations(cfg *config.RoutingConfig) (*entities.GeoJSONMetadata, error){
+func ConvertLocations(cfg *config.RoutingConfig) (*entities.GeoJSONMetadata, error) {
 	endPoint, err := validateLocation(cfg.EndPoint)
 	if err != nil {
 		return nil, fmt.Errorf("invalid EndPoint configuration: %w", err)
@@ -34,11 +33,11 @@ func ConvertLocations(cfg *config.RoutingConfig) (*entities.GeoJSONMetadata, err
 }
 
 func validateLocation(location []float64) (entities.GeoJSONLocation, error) {
-    if len(location) != 2 {
-        return entities.GeoJSONLocation{}, fmt.Errorf("Must have exactly two elements: latitude and longitude")
-    }
-    return entities.GeoJSONLocation{
-        Longitude:  location[0],
-        Latitude: location[1],
-    }, nil
+	if len(location) != 2 {
+		return entities.GeoJSONLocation{}, fmt.Errorf("Must have exactly two elements: latitude and longitude")
+	}
+	return entities.GeoJSONLocation{
+		Longitude: location[0],
+		Latitude:  location[1],
+	}, nil
 }
