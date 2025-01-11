@@ -218,8 +218,9 @@ func CreatePreviewRoute(svc service.WateringPlanService) fiber.Handler {
 		}
 
 		return c.JSON(entities.GeoJSON{
-			Type: entities.GeoJSONType(domainGeo.Type),
-			Bbox: domainGeo.Bbox,
+			Type:     entities.GeoJSONType(domainGeo.Type),
+			Bbox:     domainGeo.Bbox,
+			Metadata: convertMetaData(domainGeo.Metadata),
 			Features: utils.Map(domainGeo.Features, func(f domain.GeoJSONFeature) entities.GeoJSONFeature {
 				return entities.GeoJSONFeature{
 					Type:       entities.GeoJSONType(f.Type),
@@ -261,5 +262,22 @@ func GetGpxFile(svc service.WateringPlanService) fiber.Handler {
 		c.Set(fiber.HeaderContentDisposition, fmt.Sprintf("attachment; filename=%s", objName))
 		_, err = io.Copy(c.Response().BodyWriter(), fileStream)
 		return errorhandler.HandleError(err)
+	}
+}
+
+func convertMetaData(domainMetadata domain.GeoJSONMetadata) entities.GeoJSONMetadata {
+	return entities.GeoJSONMetadata{
+		StartPoint: entities.GeoJSONLocation{
+			Latitude:  domainMetadata.StartPoint.Latitude,
+			Longitude: domainMetadata.StartPoint.Longitude,
+		},
+		EndPoint: entities.GeoJSONLocation{
+			Latitude:  domainMetadata.EndPoint.Latitude,
+			Longitude: domainMetadata.EndPoint.Longitude,
+		},
+		WateringPoint: entities.GeoJSONLocation{
+			Latitude:  domainMetadata.WateringPoint.Latitude,
+			Longitude: domainMetadata.WateringPoint.Longitude,
+		},
 	}
 }
