@@ -61,12 +61,14 @@ func (s *TreeClusterService) getUpdatedLatLong(ctx context.Context, tc *domain.T
 
 	latitude, longitude, err := s.treeClusterRepo.GetCenterPoint(ctx, tc.ID)
 	if err != nil {
+		slog.Error("failed to get center point of tree cluster", "error", err, "tree_cluster", tc)
 		return nil, nil, nil, err
 	}
 
 	region, err = s.regionRepo.GetByPoint(ctx, latitude, longitude)
 	if err != nil {
-		return nil, nil, nil, err
+		slog.Error("can't find region by lat and long", "error", err, "latitude", latitude, "longitude", longitude, "tree_cluster", tc)
+		return &latitude, &longitude, nil, nil
 	}
 
 	return &latitude, &longitude, region, nil
@@ -99,6 +101,7 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 
 	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster) (bool, error) {
 		if err = s.handlePrevTreeLocation(ctx, trees); err != nil {
+			slog.Error("failed to update prev tree location", "error", err, "trees", trees, "tree_cluster", tc)
 			return false, handleError(err)
 		}
 
@@ -116,6 +119,7 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 	}
 
 	if err := s.updateTreeClusterPosition(ctx, c.ID); err != nil {
+		slog.Error("error while update the cluster locations", "error", err, "cluster_id", c.ID)
 		return nil, handleError(err)
 	}
 
@@ -152,6 +156,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 	}
 
 	if err := s.updateTreeClusterPosition(ctx, id); err != nil {
+		slog.Error("error while update the cluster locations", "error", err, "cluster_id", id)
 		return nil, handleError(err)
 	}
 
