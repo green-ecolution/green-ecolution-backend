@@ -143,6 +143,7 @@ func (o *OrsClient) DirectionsJSON(ctx context.Context, profile string, reqBody 
 		slog.Error("failed to send request to ors service", "error", err)
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	var response OrsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {

@@ -111,10 +111,8 @@ func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entit
 	var refillCount int
 	if len(optimizedRoutes.Routes) > 0 {
 		oRoute := optimizedRoutes.Routes[0]
-		reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
-		refillCount = len(utils.Filter(reducedSteps, func(step *vroom.VroomRouteStep) bool {
-			return step.Type == "pickup"
-		}))
+		reducedSteps := utils.Reduce(oRoute.Steps, vroom.ReduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
+		refillCount = vroom.RefillCount(reducedSteps)
 	}
 
 	rawDirections, err := r.ors.DirectionsJSON(ctx, orsProfile, route)
@@ -133,7 +131,6 @@ func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entit
 		Distance: distance,
 		Time:     time.Duration(duration),
 	}, nil
-
 }
 
 func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (optimized *vroom.VroomResponse, routes *ors.OrsDirectionRequest, err error) {
@@ -149,7 +146,7 @@ func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehic
 		return nil, nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]
-	reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
+	reducedSteps := utils.Reduce(oRoute.Steps, vroom.ReduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 	orsLocation := utils.Reduce(reducedSteps, func(acc [][]float64, current *vroom.VroomRouteStep) [][]float64 {
 		return append(acc, current.Location)
 	}, make([][]float64, 0, len(reducedSteps)))
@@ -167,24 +164,4 @@ func (r *RouteRepo) toOrsVehicleType(vehicle entities.VehicleType) (string, erro
 	}
 
 	return "driving-car", nil // ORS doesn't support dynamic routing over api call
-}
-
-// Reduce multiple pickups to one
-// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
-func (r *RouteRepo) reduceSteps(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
-	if len(acc) == 0 {
-		return append(acc, &current)
-	}
-
-	prev := acc[len(acc)-1]
-	if prev.Type != "pickup" {
-		return append(acc, &current)
-	}
-
-	if current.Type != "pickup" {
-		return append(acc, &current)
-	}
-
-	prev.Load = current.Load
-	return acc
 }

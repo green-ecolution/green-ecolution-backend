@@ -97,10 +97,8 @@ func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entit
 	var refillCount int
 	if len(optimizedRoutes.Routes) > 0 {
 		oRoute := optimizedRoutes.Routes[0]
-		reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
-		refillCount = len(utils.Filter(reducedSteps, func(step *vroom.VroomRouteStep) bool {
-			return step.Type == "pickup"
-		}))
+		reducedSteps := utils.Reduce(oRoute.Steps, vroom.ReduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
+		refillCount = vroom.RefillCount(reducedSteps)
 	}
 
 	rawDirections, err := r.valhalla.DirectionsJSON(ctx, route)
@@ -128,7 +126,7 @@ func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle,
 		return nil, nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]
-	reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
+	reducedSteps := utils.Reduce(oRoute.Steps, vroom.ReduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 	locations := utils.Map(reducedSteps, func(step *vroom.VroomRouteStep) valhalla.Location {
 		return valhalla.Location{
 			Lat:  step.Location[1],
@@ -152,24 +150,4 @@ func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle,
 		Costing:        "truck",
 		CostingOptions: costingOpts,
 	}, nil
-}
-
-// Reduce multiple pickups to one
-// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
-func (r *RouteRepo) reduceSteps(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
-	if len(acc) == 0 {
-		return append(acc, &current)
-	}
-
-	prev := acc[len(acc)-1]
-	if prev.Type != "pickup" {
-		return append(acc, &current)
-	}
-
-	if current.Type != "pickup" {
-		return append(acc, &current)
-	}
-
-	prev.Load = current.Load
-	return acc
 }
