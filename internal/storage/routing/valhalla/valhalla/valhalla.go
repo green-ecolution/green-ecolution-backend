@@ -53,7 +53,7 @@ func NewValhallaClient(opts ...ValhallaClientOption) ValhallaClient {
 	}
 }
 
-func (o *ValhallaClient) DirectionsGeoJSON(ctx context.Context, reqBody *DirectionRequest) (*entities.GeoJSON, error) {
+func (o *ValhallaClient) DirectionsJSON(ctx context.Context, reqBody *DirectionRequest) (*DirectionResponse, error) {
 	reqBody.Format = "json"
 	var buf strings.Builder
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
@@ -93,7 +93,15 @@ func (o *ValhallaClient) DirectionsGeoJSON(ctx context.Context, reqBody *Directi
 		slog.Error("failed to decode ors response")
 	}
 
-	return o.toGeoJSON(&response), nil
+	return &response, nil
+}
+
+func (o *ValhallaClient) DirectionsGeoJSON(ctx context.Context, reqBody *DirectionRequest) (*entities.GeoJSON, error) {
+	response, err := o.DirectionsJSON(ctx, reqBody)
+	if err != nil {
+		return nil, err
+	}
+	return o.toGeoJSON(response), nil
 }
 
 func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *DirectionRequest) (io.ReadCloser, error) {

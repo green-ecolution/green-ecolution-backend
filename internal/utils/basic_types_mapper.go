@@ -71,3 +71,11 @@ func StringPtrToString(source *string) string {
 	}
 	return *source
 }
+
+func Float64ToDuration(source float64) time.Duration {
+	return time.Duration(source)
+}
+
+func DurationToPtrFloat64(source time.Duration) *float64 {
+	return P(float64(source))
+}

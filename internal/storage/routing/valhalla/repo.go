@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -57,12 +58,12 @@ func NewRouteRepo(cfg *RouteRepoConfig) (*RouteRepo, error) {
 }
 
 func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
-	orsRoute, err := r.prepareRoute(ctx, vehicle, clusters)
+	_, route, err := r.prepareRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
 
-	entity, err := r.valhalla.DirectionsGeoJSON(ctx, orsRoute)
+	entity, err := r.valhalla.DirectionsGeoJSON(ctx, route)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +79,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 }
 
 func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {
-	route, err := r.prepareRoute(ctx, vehicle, clusters)
+	_, route, err := r.prepareRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
@@ -86,40 +87,46 @@ func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.V
 	return r.valhalla.DirectionsRawGpx(ctx, route)
 }
 
-func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*valhalla.DirectionRequest, error) {
+func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.RouteMetadata, error) {
+	optimizedRoutes, route, err := r.prepareRoute(ctx, vehicle, clusters)
+	if err != nil {
+		return nil, err
+	}
+
+	// currently handle only the first route
+	var refillCount int
+	if len(optimizedRoutes.Routes) > 0 {
+		oRoute := optimizedRoutes.Routes[0]
+		reducedSteps := utils.Reduce(oRoute.Steps, vroom.ReduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
+		refillCount = vroom.RefillCount(reducedSteps)
+	}
+
+	rawDirections, err := r.valhalla.DirectionsJSON(ctx, route)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entities.RouteMetadata{
+		Refills:  int32(refillCount),
+		Distance: rawDirections.Trip.Summary.Length,
+		Time:     time.Duration(rawDirections.Trip.Summary.Time * float64(time.Second)),
+	}, nil
+}
+
+func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (optimized *vroom.VroomResponse, routes *valhalla.DirectionRequest, err error) {
 	optimizedRoutes, err := r.vroom.OptimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
 		slog.Error("failed to optimize route", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
 
 	// currently handle only the first route
 	if len(optimizedRoutes.Routes) == 0 {
 		slog.Error("there are no routes in vroom response", "routes", optimizedRoutes)
-		return nil, errors.New("empty routes")
+		return nil, nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]
-
-	// Reduce multiple pickups to one
-	// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
-	reducedSteps := utils.Reduce(oRoute.Steps, func(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
-		if len(acc) == 0 {
-			return append(acc, &current)
-		}
-
-		prev := acc[len(acc)-1]
-		if prev.Type != "pickup" {
-			return append(acc, &current)
-		}
-
-		if current.Type != "pickup" {
-			return append(acc, &current)
-		}
-
-		prev.Load = current.Load
-		return acc
-	}, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
-
+	reducedSteps := utils.Reduce(oRoute.Steps, vroom.ReduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 	locations := utils.Map(reducedSteps, func(step *vroom.VroomRouteStep) valhalla.Location {
 		return valhalla.Location{
 			Lat:  step.Location[1],
@@ -138,7 +145,7 @@ func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle,
 		AxleCount: 2,
 	}
 
-	return &valhalla.DirectionRequest{
+	return optimizedRoutes, &valhalla.DirectionRequest{
 		Locations:      locations,
 		Costing:        "truck",
 		CostingOptions: costingOpts,

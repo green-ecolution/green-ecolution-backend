@@ -10,6 +10,7 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgDateToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:StringPtrToString
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:Float64ToDuration
 // goverter:extend MapWateringPlanStatus
 type InternalWateringPlanRepoMapper interface {
 	// goverter:ignore TreeClusters UserIDs Transporter Trailer Evaluation

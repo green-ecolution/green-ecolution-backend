@@ -161,12 +161,18 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
-		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, w.mergeVehicle(transporter, trailer), treeClusters)
-		if err != nil {
-			return false, handleError(err)
+		mergedVehicle := w.mergeVehicle(transporter, trailer)
+		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, mergedVehicle, treeClusters)
+		if err == nil {
+			wp.GpxURL = gpxURL
 		}
 
-		wp.GpxURL = gpxURL
+		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
+		if err == nil {
+			wp.Distance = utils.P(metadata.Distance)
+			wp.Duration = metadata.Time
+			wp.RefillCount = metadata.Refills
+		}
 
 		return true, nil
 	})
@@ -250,13 +256,21 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.UserIDs = updateWp.UserIDs
 		wp.TotalWaterRequired = &neededWater
 
+		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		if w.shouldUpdateGpx(prevWp, wp) {
-			gpxURL, err := w.getGpxRouteURL(ctx, id, w.mergeVehicle(transporter, trailer), treeClusters)
+			gpxURL, err := w.getGpxRouteURL(ctx, id, mergedVehicle, treeClusters)
 			if err != nil {
 				return false, handleError(err)
 			}
 
 			wp.GpxURL = gpxURL
+		}
+
+		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
+		if err == nil {
+			wp.Distance = utils.P(metadata.Distance)
+			wp.Duration = metadata.Time
+			wp.RefillCount = metadata.Refills
 		}
 
 		return true, nil
