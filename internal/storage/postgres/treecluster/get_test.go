@@ -2,13 +2,14 @@ package treecluster
 
 import (
 	"context"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestTreeClusterRepository_GetAll(t *testing.T) {
-	t.Run("should return all tree clusters", func(t *testing.T) {
+	t.Run("should return all tree clusters ordered by name", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
@@ -22,28 +23,31 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
 		assert.Len(t, got, len(allTestCluster))
+
+		sortedTestCluster := sortClusterByName(allTestCluster)
+
 		for i, tc := range got {
-			assert.Equal(t, allTestCluster[i].ID, tc.ID)
-			assert.Equal(t, allTestCluster[i].Name, tc.Name)
+			assert.Equal(t, sortedTestCluster[i].ID, tc.ID)
+			assert.Equal(t, sortedTestCluster[i].Name, tc.Name)
 
 			// assert region
-			if allTestCluster[i].RegionID == -1 {
+			if sortedTestCluster[i].RegionID == -1 {
 				assert.Nil(t, tc.Region)
 				assert.NoError(t, err)
 			} else {
 				assert.NotNil(t, tc.Region)
-				assert.Equal(t, allTestCluster[i].RegionID, tc.Region.ID)
+				assert.Equal(t, sortedTestCluster[i].RegionID, tc.Region.ID)
 			}
 
 			// assert trees
-			assert.Len(t, tc.Trees, len(allTestCluster[i].TreeIDs))
-			if len(allTestCluster[i].TreeIDs) == 0 {
+			assert.Len(t, tc.Trees, len(sortedTestCluster[i].TreeIDs))
+			if len(sortedTestCluster[i].TreeIDs) == 0 {
 				assert.Empty(t, tc.Trees)
 			}
 
 			for j, tree := range tc.Trees {
 				assert.NotZero(t, tree)
-				assert.Equal(t, allTestCluster[i].TreeIDs[j], tree.ID)
+				assert.Equal(t, sortedTestCluster[i].TreeIDs[j], tree.ID)
 			}
 		}
 	})
@@ -330,4 +334,15 @@ var allTestCluster = []*testTreeCluster{
 		RegionID: -1, // no region
 		TreeIDs:  []int32{25, 26, 27, 28},
 	},
+}
+
+func sortClusterByName(data []*testTreeCluster) []*testTreeCluster {
+	sorted := make([]*testTreeCluster, len(data))
+	copy(sorted, data)
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].Name < sorted[j].Name
+	})
+
+	return sorted
 }

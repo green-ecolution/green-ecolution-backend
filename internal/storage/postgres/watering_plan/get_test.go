@@ -704,15 +704,15 @@ var allTestVehicles = []*entities.Vehicle{
 var allTestClusters = []*entities.TreeCluster{
 	{
 		ID:             1,
-		Name:           "Solitüde Strand",
+		Name:           "Flensburger Stadion",
 		WateringStatus: entities.WateringStatusGood,
 		MoistureLevel:  0.75,
 		Region: &entities.Region{
 			ID:   1,
 			Name: "Mürwik",
 		},
-		Address:       "Solitüde Strand",
-		Description:   "Alle Bäume am Strand",
+		Address:       "Am Stadion",
+		Description:   "Alle Bäume am Stadion",
 		SoilCondition: entities.TreeSoilConditionSandig,
 		Latitude:      utils.P(54.820940),
 		Longitude:     utils.P(9.489022),
@@ -744,15 +744,15 @@ var allTestClusters = []*entities.TreeCluster{
 	},
 	{
 		ID:             3,
-		Name:           "Flensburger Stadion",
+		Name:           "Solitüde Strand",
 		WateringStatus: "unknown",
 		MoistureLevel:  0.7,
 		Region: &entities.Region{
 			ID:   1,
 			Name: "Mürwik",
 		},
-		Address:       "Flensburger Stadion",
-		Description:   "Alle Bäume in der Gegend des Stadions in Mürwik",
+		Address:       "Solitüde Strand",
+		Description:   "Alle Bäume am Strand",
 		SoilCondition: "schluffig",
 		Latitude:      utils.P(54.802163),
 		Longitude:     utils.P(9.446398),

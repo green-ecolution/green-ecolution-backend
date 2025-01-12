@@ -35,8 +35,8 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		Date:         time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
 		Description:  "New watering plan",
 		Distance:     utils.P(50.0),
-		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[0],
-		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[1],
+		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[2],
+		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[0],
 		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
 		UserIDs:      []*uuid.UUID{&testUUID},
 	}
