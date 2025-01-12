@@ -123,3 +123,31 @@ func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBod
 
 	return resp.Body, nil
 }
+
+func (o *OrsClient) DirectionsJSON(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*OrsResponse, error) {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
+		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
+		return nil, err
+	}
+
+	path := fmt.Sprintf("%s/v2/directions/%s/json", o.cfg.url.String(), profile)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, path, &buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := o.cfg.client.Do(req)
+	if err != nil {
+		slog.Error("failed to send request to ors service", "error", err)
+		return nil, err
+	}
+
+	var response OrsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		slog.Error("failed to decode ors response")
+	}
+
+	return &response, nil
+}

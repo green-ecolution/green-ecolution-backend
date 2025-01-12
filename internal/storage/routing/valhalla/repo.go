@@ -128,7 +128,6 @@ func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle,
 	}
 	oRoute := optimizedRoutes.Routes[0]
 	reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
-
 	locations := utils.Map(reducedSteps, func(step *vroom.VroomRouteStep) valhalla.Location {
 		return valhalla.Location{
 			Lat:  step.Location[1],

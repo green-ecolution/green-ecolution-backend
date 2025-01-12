@@ -62,7 +62,7 @@ func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle
 		return nil, err
 	}
 
-	orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
+	_, orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +88,7 @@ func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.V
 		return nil, err
 	}
 
-	orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
+	_, orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
@@ -96,45 +96,64 @@ func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.V
 	return r.ors.DirectionsRawGpx(ctx, orsProfile, orsRoute)
 }
 
-func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*ors.OrsDirectionRequest, error) {
+func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.RouteMetadata, error) {
+	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	optimizedRoutes, route, err := r.prepareOrsRoute(ctx, vehicle, clusters)
+	if err != nil {
+		return nil, err
+	}
+
+	var refillCount int
+	if len(optimizedRoutes.Routes) > 0 {
+		oRoute := optimizedRoutes.Routes[0]
+		reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
+		refillCount = len(utils.Filter(reducedSteps, func(step *vroom.VroomRouteStep) bool {
+			return step.Type == "pickup"
+		}))
+	}
+
+	rawDirections, err := r.ors.DirectionsJSON(ctx, orsProfile, route)
+	if err != nil {
+		return nil, err
+	}
+
+	var distance, duration float64
+	if len(rawDirections.Routes) > 0 {
+		distance = rawDirections.Routes[0].Summary.Distance
+		duration = rawDirections.Routes[0].Summary.Duration
+	}
+
+	return &entities.RouteMetadata{
+		Refills:  refillCount,
+		Distance: distance,
+		Time:     duration,
+	}, nil
+
+}
+
+func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (optimized *vroom.VroomResponse, routes *ors.OrsDirectionRequest, err error) {
 	optimizedRoutes, err := r.vroom.OptimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
 		slog.Error("failed to optimize route", "error", err)
-		return nil, err
+		return nil, nil, err
 	}
 
 	// currently handle only the first route
 	if len(optimizedRoutes.Routes) == 0 {
 		slog.Error("there are no routes in vroom response", "routes", optimizedRoutes)
-		return nil, errors.New("empty routes")
+		return nil, nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]
-
-	// Reduce multiple pickups to one
-	// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
-	reducedSteps := utils.Reduce(oRoute.Steps, func(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
-		if len(acc) == 0 {
-			return append(acc, &current)
-		}
-
-		prev := acc[len(acc)-1]
-		if prev.Type != "pickup" {
-			return append(acc, &current)
-		}
-
-		if current.Type != "pickup" {
-			return append(acc, &current)
-		}
-
-		prev.Load = current.Load
-		return acc
-	}, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
-
+	reducedSteps := utils.Reduce(oRoute.Steps, r.reduceSteps, make([]*vroom.VroomRouteStep, 0, len(oRoute.Steps)))
 	orsLocation := utils.Reduce(reducedSteps, func(acc [][]float64, current *vroom.VroomRouteStep) [][]float64 {
 		return append(acc, current.Location)
 	}, make([][]float64, 0, len(reducedSteps)))
 
-	return &ors.OrsDirectionRequest{
+	return optimizedRoutes, &ors.OrsDirectionRequest{
 		Coordinates: orsLocation,
 		Units:       "m",
 		Language:    "de-de",
@@ -147,4 +166,24 @@ func (r *RouteRepo) toOrsVehicleType(vehicle entities.VehicleType) (string, erro
 	}
 
 	return "driving-car", nil // ORS doesn't support dynamic routing over api call
+}
+
+// Reduce multiple pickups to one
+// "start" -> "pickup" -> "pickup" -> "delivery" => "start" -> "pickup" -> "delivery"
+func (r *RouteRepo) reduceSteps(acc []*vroom.VroomRouteStep, current vroom.VroomRouteStep) []*vroom.VroomRouteStep {
+	if len(acc) == 0 {
+		return append(acc, &current)
+	}
+
+	prev := acc[len(acc)-1]
+	if prev.Type != "pickup" {
+		return append(acc, &current)
+	}
+
+	if current.Type != "pickup" {
+		return append(acc, &current)
+	}
+
+	prev.Load = current.Load
+	return acc
 }
