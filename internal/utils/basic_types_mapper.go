@@ -77,5 +77,5 @@ func Float64ToDuration(source float64) time.Duration {
 }
 
 func DurationToPtrFloat64(source time.Duration) *float64 {
-	return P(float64(source) / float64(time.Minute))
+	return P(float64(source))
 }

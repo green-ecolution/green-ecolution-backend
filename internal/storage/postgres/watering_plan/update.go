@@ -3,6 +3,7 @@ package wateringplan
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -63,7 +64,7 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		Status:             sqlc.WateringPlanStatus(entity.Status),
 		CancellationNote:   entity.CancellationNote,
 		GpxUrl:             &entity.GpxURL,
-		Duration:           float64(entity.Duration),
+		Duration:           float64(entity.Duration) / float64(time.Second),
 		RefillCount:        entity.Refills,
 	}
 
