@@ -25,7 +25,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 		Trailer:            nil,
 		CancellationNote:   "",
 		Duration:           time.Duration(0),
-		Refills:            0,
+		RefillCount:        0,
 	}
 }
 

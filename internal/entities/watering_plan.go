@@ -33,7 +33,7 @@ type WateringPlan struct {
 	CancellationNote   string
 	Evaluation         []*EvaluationValue
 	GpxURL             string
-	Refills            int32
+	RefillCount        int32
 	Duration           time.Duration
 }
 

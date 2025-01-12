@@ -15,7 +15,6 @@ import (
 type InternalWateringPlanRepoMapper interface {
 	// goverter:ignore TreeClusters UserIDs Transporter Trailer Evaluation
 	// goverter:map GpxUrl GpxURL
-	// goverter:map RefillCount Refills
 	FromSql(src *sqlc.WateringPlan) *entities.WateringPlan
 	FromSqlList(src []*sqlc.WateringPlan) []*entities.WateringPlan
 

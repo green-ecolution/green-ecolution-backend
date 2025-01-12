@@ -171,7 +171,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		if err == nil {
 			wp.Distance = utils.P(metadata.Distance)
 			wp.Duration = metadata.Time
-			wp.Refills = metadata.Refills
+			wp.RefillCount = metadata.Refills
 		}
 
 		return true, nil
@@ -270,7 +270,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		if err == nil {
 			wp.Distance = utils.P(metadata.Distance)
 			wp.Duration = metadata.Time
-			wp.Refills = metadata.Refills
+			wp.RefillCount = metadata.Refills
 		}
 
 		return true, nil

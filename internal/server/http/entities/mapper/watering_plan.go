@@ -13,7 +13,6 @@ import (
 // goverter:extend MapWateringPlanStatus MapVehicleStatus MapVehicleType MapDrivingLicense MapWateringPlanStatusReq
 // goverter:extend MapWateringStatus MapSensorStatus MapSoilCondition MapTreesToIDs MapUUIDs MapUUIDReq
 type WateringPlanHTTPMapper interface {
-	// goverter:map Refills RefillCount
 	FromResponse(*domain.WateringPlan) *entities.WateringPlanResponse
 	FromResponseList([]*domain.WateringPlan) []*entities.WateringPlanResponse
 	FromCreateRequest(*entities.WateringPlanCreateRequest) *domain.WateringPlanCreate

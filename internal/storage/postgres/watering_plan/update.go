@@ -65,7 +65,7 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 		CancellationNote:   entity.CancellationNote,
 		GpxUrl:             &entity.GpxURL,
 		Duration:           float64(entity.Duration) / float64(time.Second),
-		RefillCount:        entity.Refills,
+		RefillCount:        entity.RefillCount,
 	}
 
 	if err := w.store.DeleteAllVehiclesFromWateringPlan(ctx, entity.ID); err != nil {
