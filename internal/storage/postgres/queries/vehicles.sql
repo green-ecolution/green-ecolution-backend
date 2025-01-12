@@ -1,8 +1,8 @@
 -- name: GetAllVehicles :many
-SELECT * FROM vehicles;
+SELECT * FROM vehicles ORDER BY water_capacity DESC;
 
 -- name: GetAllVehiclesByType :many
-SELECT * FROM vehicles WHERE type = $1;
+SELECT * FROM vehicles WHERE type = $1 ORDER BY water_capacity DESC;
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;

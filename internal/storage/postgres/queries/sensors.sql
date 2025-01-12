@@ -1,5 +1,5 @@
 -- name: GetAllSensors :many
-SELECT * FROM sensors;
+SELECT * FROM sensors ORDER BY id;
 
 -- name: GetSensorByID :one
 SELECT * FROM sensors WHERE id = $1;

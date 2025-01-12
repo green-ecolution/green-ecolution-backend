@@ -2,6 +2,7 @@ package vehicle
 
 import (
 	"context"
+	"sort"
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -9,7 +10,7 @@ import (
 )
 
 func TestVehicleRepository_GetAll(t *testing.T) {
-	t.Run("should return all verhicles", func(t *testing.T) {
+	t.Run("should return all verhicles ordered by water capacity", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
@@ -21,19 +22,22 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, len(allTestVehicles), len(got))
+
+		sortedVehicles := sortVehicleByWaterCapacity(allTestVehicles)
+
 		for i, vehicle := range got {
-			assert.Equal(t, allTestVehicles[i].ID, vehicle.ID)
-			assert.Equal(t, allTestVehicles[i].Description, vehicle.Description)
-			assert.Equal(t, allTestVehicles[i].NumberPlate, vehicle.NumberPlate)
-			assert.Equal(t, allTestVehicles[i].WaterCapacity, vehicle.WaterCapacity)
-			assert.Equal(t, allTestVehicles[i].Type, vehicle.Type)
-			assert.Equal(t, allTestVehicles[i].Status, vehicle.Status)
-			assert.Equal(t, allTestVehicles[i].DrivingLicense, vehicle.DrivingLicense)
-			assert.Equal(t, allTestVehicles[i].Height, vehicle.Height)
-			assert.Equal(t, allTestVehicles[i].Width, vehicle.Width)
-			assert.Equal(t, allTestVehicles[i].Length, vehicle.Length)
-			assert.Equal(t, allTestVehicles[i].Weight, vehicle.Weight)
-			assert.Equal(t, allTestVehicles[i].Model, vehicle.Model)
+			assert.Equal(t, sortedVehicles[i].ID, vehicle.ID)
+			assert.Equal(t, sortedVehicles[i].Description, vehicle.Description)
+			assert.Equal(t, sortedVehicles[i].NumberPlate, vehicle.NumberPlate)
+			assert.Equal(t, sortedVehicles[i].WaterCapacity, vehicle.WaterCapacity)
+			assert.Equal(t, sortedVehicles[i].Type, vehicle.Type)
+			assert.Equal(t, sortedVehicles[i].Status, vehicle.Status)
+			assert.Equal(t, sortedVehicles[i].DrivingLicense, vehicle.DrivingLicense)
+			assert.Equal(t, sortedVehicles[i].Height, vehicle.Height)
+			assert.Equal(t, sortedVehicles[i].Width, vehicle.Width)
+			assert.Equal(t, sortedVehicles[i].Length, vehicle.Length)
+			assert.Equal(t, sortedVehicles[i].Weight, vehicle.Weight)
+			assert.Equal(t, sortedVehicles[i].Model, vehicle.Model)
 			assert.NotZero(t, vehicle.CreatedAt)
 			assert.NotZero(t, vehicle.UpdatedAt)
 		}
@@ -335,4 +339,15 @@ var allTestVehicles = []*entities.Vehicle{
 		Width:          2.4,
 		Weight:         3.7,
 	},
+}
+
+func sortVehicleByWaterCapacity(data []*entities.Vehicle) []*entities.Vehicle {
+	sorted := make([]*entities.Vehicle, len(data))
+	copy(sorted, data)
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].WaterCapacity > sorted[j].WaterCapacity
+	})
+
+	return sorted
 }

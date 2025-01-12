@@ -1,5 +1,5 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters;
+SELECT * FROM tree_clusters ORDER BY name ASC;
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
