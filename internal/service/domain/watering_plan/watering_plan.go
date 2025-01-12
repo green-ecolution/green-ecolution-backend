@@ -170,8 +170,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
 		if err == nil {
 			wp.Distance = utils.P(metadata.Distance)
-			// wp.Duration = utils.P(metadata.Time)
-			// wp.RefillCount = utils.P(metadata.Refills)
+			wp.Duration = metadata.Time
+			wp.Refills = metadata.Refills
 		}
 
 		return true, nil
@@ -256,13 +256,21 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.UserIDs = updateWp.UserIDs
 		wp.TotalWaterRequired = &neededWater
 
+		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		if w.shouldUpdateGpx(prevWp, wp) {
-			gpxURL, err := w.getGpxRouteURL(ctx, id, w.mergeVehicle(transporter, trailer), treeClusters)
+			gpxURL, err := w.getGpxRouteURL(ctx, id, mergedVehicle, treeClusters)
 			if err != nil {
 				return false, handleError(err)
 			}
 
 			wp.GpxURL = gpxURL
+		}
+
+		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
+		if err == nil {
+			wp.Distance = utils.P(metadata.Distance)
+			wp.Duration = metadata.Time
+			wp.Refills = metadata.Refills
 		}
 
 		return true, nil

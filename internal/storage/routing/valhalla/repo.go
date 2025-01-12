@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/url"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -108,9 +109,9 @@ func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entit
 	}
 
 	return &entities.RouteMetadata{
-		Refills:  refillCount,
+		Refills:  int32(refillCount),
 		Distance: rawDirections.Trip.Summary.Length,
-		Time:     rawDirections.Trip.Summary.Time,
+		Time:     time.Duration(rawDirections.Trip.Summary.Time),
 	}, nil
 }
 

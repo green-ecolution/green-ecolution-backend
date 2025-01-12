@@ -1,5 +1,7 @@
 package entities
 
+import "time"
+
 type GeoJSONType string
 
 const (
@@ -40,6 +42,6 @@ type GeoJSONLocation struct {
 
 type RouteMetadata struct {
 	Distance float64
-	Refills  int
-	Time     float64
+	Refills  int32
+	Time     time.Duration
 }

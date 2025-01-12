@@ -33,6 +33,8 @@ type WateringPlanResponse struct {
 	CancellationNote   string                       `json:"cancellation_note"`
 	Evaluation         []*EvaluationValue           `json:"evaluation"`
 	GpxURL             string                       `json:"gpx_url"`
+	Duration           *float64                     `json:"duration"`
+	RefillCount        int32                        `json:"refill_count"`
 } // @Name WateringPlan
 
 type WateringPlanInListResponse struct {
