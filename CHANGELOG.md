@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced vehicle management with new fields and filtering capabilities (#243, #288).
 - Sensor data mapping logic and scheduler integration (#259, #297, #322).
 - User management enhancements, including roles, statuses, and external authentication integration (#297).
+- Transaction in database operations (#235)
+- Event system to respond to specific events (#295)
+- Plugin system to integrate external plugins into the backend (#196)
+- Packages to share code, register plugin and communicate to the backend REST API (#271, #250)
+- Routing system to generate routes based on selected truck + trailer and selected tree clusters (#328, #321)
 
 ### Changed
 - Refactored sensor entities for better structure (#231).
