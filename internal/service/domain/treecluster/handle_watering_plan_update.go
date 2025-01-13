@@ -39,7 +39,7 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 		}
 
 		if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err == nil {
-			return s.publishUpdateEvent(ctx, tc)
+			s.publishUpdateEvent(ctx, tc)
 		}
 	}
 
