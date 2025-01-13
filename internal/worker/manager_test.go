@@ -3,6 +3,7 @@ package worker
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -157,5 +158,65 @@ func TestEventManager_RunSubscription(t *testing.T) {
 
 		// Simulate some processing time
 		time.Sleep(100 * time.Millisecond)
+	})
+}
+
+func TestEventManager_PublishEventsInLoop(t *testing.T) {
+	t.Run("should publish events in loop", func(t *testing.T) {
+		// given
+		em := NewEventManager(EventTypeTest)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		go em.Run(ctx)
+
+		id, ch, _ := em.Subscribe(EventTypeTest)
+		receivedCount := 0
+		go func() {
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ch:
+					fmt.Println("received event. eventcount: ", receivedCount)
+					receivedCount++
+				}
+
+			}
+		}()
+
+		// when
+		for i := 0; i < 100; i++ {
+			fmt.Println("Publish event", i)
+			event := TestEvent{eventType: EventTypeTest}
+			err := em.Publish(event)
+			assert.NoError(t, err)
+		}
+
+		// then
+		<-ctx.Done()
+		_ = em.Unsubscribe(EventTypeTest, id)
+		assert.Equal(t, 100, receivedCount)
+	})
+
+	t.Run("should buffer 100 if not consumed in channel", func(t *testing.T) {
+		// given
+		em := NewEventManager(EventTypeTest)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		go em.Run(ctx)
+
+		_, _, _ = em.Subscribe(EventTypeTest)
+
+		// when
+		for i := 0; i < 101; i++ {
+			fmt.Println("Publish event", i)
+			event := TestEvent{eventType: EventTypeTest}
+			err := em.Publish(event)
+			assert.NoError(t, err)
+		}
+
+		// then
+		<-ctx.Done()
+		assert.Equal(t, 100, len(em.eventCh))
 	})
 }
