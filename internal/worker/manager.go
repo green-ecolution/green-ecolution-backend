@@ -15,6 +15,8 @@ var (
 	ErrNotSubscribedErr    = errors.New("not subscribed")
 )
 
+const eventChSize = 100
+
 // Subscriber defines the interface for handling events of a specific type.
 type Subscriber interface {
 	// HandleEvent processes the received event.
@@ -63,7 +65,7 @@ func NewEventManager(eventTypes ...entities.EventType) *EventManager {
 	}
 
 	return &EventManager{
-		eventCh:    make(chan entities.Event, 100),
+		eventCh:    make(chan entities.Event, eventChSize),
 		subscriber: subscriber,
 		nextID:     0,
 		eventTypes: eventTypeMap,
