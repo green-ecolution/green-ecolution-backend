@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [v2.0.0] - 2025-01-12
-
 ### Added
 - Support for watering plans: storage, server layer, and additional properties (#278, #251).
 - Tracking water usage per tree cluster (#290).
@@ -30,8 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 - Removed unused entity types and cleaned up legacy code (#284).
-
-
 
 ## [v1.0.0] - 2024-10-22
 
