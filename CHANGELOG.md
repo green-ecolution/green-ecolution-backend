@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v1.1.0] - 2024-01-13
+
 ### Added
 - Support for watering plans: storage, server layer, and additional properties (#278, #251).
 - Tracking water usage per tree cluster (#290).
@@ -62,4 +64,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/green-ecolution/green-ecolution-backend/compare/v1.0.0...HEAD
 [v1.0.0]: https://github.com/green-ecolution/green-ecolution-backend/compare/dfdebe...v1.0.0
+[v1.1.0]: https://github.com/green-ecolution/green-ecolution-backend/compare/v1.0.0...v1.1.0
 

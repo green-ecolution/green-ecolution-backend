@@ -229,7 +229,7 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees []*domain.Tree) error {
 	visitedClusters := make(map[int32]bool)
 	for _, tree := range trees {
-		if tree.TreeCluster != nil && tree.TreeCluster.ID != 0 {
+		if tree.TreeCluster == nil || tree.TreeCluster.ID == 0 {
 			continue
 		}
 
