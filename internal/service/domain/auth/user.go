@@ -23,13 +23,13 @@ func (s *AuthService) Register(ctx context.Context, user *domain.RegisterUser) (
 }
 
 func (s *AuthService) LoginRequest(_ context.Context, loginRequest *domain.LoginRequest) (*domain.LoginResp, error) {
-	loginURL, err := url.ParseRequestURI(s.cfg.KeyCloak.Frontend.AuthURL)
+	loginURL, err := url.ParseRequestURI(s.cfg.OidcProvider.AuthURL)
 	if err != nil {
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url in config").Error())
 	}
 
 	query := loginURL.Query()
-	query.Add("client_id", s.cfg.KeyCloak.Frontend.ClientID)
+	query.Add("client_id", s.cfg.OidcProvider.Frontend.ClientID)
 	query.Add("response_type", "code")
 	query.Add("redirect_uri", loginRequest.RedirectURL.String())
 
@@ -65,4 +65,41 @@ func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.L
 	}
 
 	return nil
+}
+
+func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
+	users, err := s.userRepo.GetAll(ctx)
+	if err != nil {
+		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error())
+	}
+
+	return users, nil
+}
+
+func (s *AuthService) GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error) {
+	users, err := s.userRepo.GetByIDs(ctx, ids)
+	if err != nil {
+		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by ids").Error())
+	}
+
+	return users, nil
+}
+
+func (s *AuthService) GetAllByRole(ctx context.Context, role domain.Role) ([]*domain.User, error) {
+	users, err := s.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var filteredUsers []*domain.User
+	for _, user := range users {
+		for _, userRole := range user.Roles {
+			if userRole.Name == role.Name {
+				filteredUsers = append(filteredUsers, user)
+				break
+			}
+		}
+	}
+
+	return filteredUsers, nil
 }

@@ -2,6 +2,7 @@ package tree
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -28,10 +29,9 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [get]
-// @Param			page			query	string	false	"Page"
-// @Param			limit			query	string	false	"Limit"
-// @Param			age				query	string	false	"Age"
-// @Param			treecluster_id	query	string	false	"Tree Cluster ID"
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			age		query	string	false	"Age"
 // @Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -70,9 +70,12 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		id, err := strconv.Atoi(c.Params("id"))
+		idStr := c.Params("id")
+
+		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			return err
+			err = service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		domainData, err := svc.GetByID(ctx, int32(id))
@@ -80,6 +83,35 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
+		data := mapTreeToDto(domainData)
+
+		return c.JSON(data)
+	}
+}
+
+// @Summary		Get tree by sensor ID
+// @Description	Get tree by sensor ID
+// @Id				get-tree-by-sensor-id
+// @Tags			Tree Sensor
+// @Produce		json
+// @Success		200	{object}	entities.TreeResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/tree/sensor/{sensor_id} [get]
+// @Param			sensor_id	path	string	false	"Sensor ID"
+// @Security		Keycloak
+func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		id := strings.Clone(c.Params("sensor_id"))
+
+		domainData, err := svc.GetBySensorID(ctx, id)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 		data := mapTreeToDto(domainData)
 
 		return c.JSON(data)
@@ -139,6 +171,7 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
+			err = service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 		var req entities.TreeUpdateRequest
@@ -174,6 +207,7 @@ func DeleteTree(svc service.TreeService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("id"))
 		if err != nil {
+			err = service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 		err = svc.Delete(ctx, int32(id))
@@ -181,140 +215,6 @@ func DeleteTree(svc service.TreeService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 		return c.SendStatus(fiber.StatusNoContent)
-	}
-}
-
-// @Summary		Get sensor of a tree
-// @Description	Get sensor of a tree
-// @Id				get-tree-sensor
-// @Tags			Tree Sensor
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/sensor [get]
-// @Param			tree_id	path	string	false	"Tree ID"
-// @Security		Keycloak
-func GetTreeSensor(_ service.TreeService) fiber.Handler {
-	// TODO: Change @Success to return sensor.SensorResponse
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Add sensor to a tree
-// @Description	Add sensor to a tree
-// @Id				add-sensor-to-tree
-// @Tags			Tree Sensor
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/sensor [post]
-// @Param			tree_id	path	string							false	"Tree ID"
-// @Param			body	body	entities.TreeAddSensorRequest	true	"Sensor to add"
-// @Security		Keycloak
-func AddTreeSensor(_ service.TreeService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Remove sensor from a tree
-// @Description	Remove sensor from a tree
-// @Id				remove-sensor-from-tree
-// @Tags			Tree Sensor
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/sensor/{sensor_id} [delete]
-// @Param			tree_id		path	string	false	"Tree ID"
-// @Param			sensor_id	path	string	false	"Sensor ID"
-// @Security		Keycloak
-func RemoveTreeSensor(_ service.TreeService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Get images of a tree
-// @Description	Get images of a tree
-// @Id				get-tree-images
-// @Tags			Tree Images
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/images [get]
-// @Param			tree_id	path	string	false	"Tree ID"
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Security		Keycloak
-func GetTreeImages(_ service.TreeService) fiber.Handler {
-	// TODO: Change @Success to return image.ImageResponse
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Add images to a tree
-// @Description	Add images to a tree
-// @Id				add-images-to-tree
-// @Tags			Tree Images
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/images [post]
-// @Param			tree_id	path	string							false	"Tree ID"
-// @Param			body	body	entities.TreeAddImagesRequest	true	"Images to add"
-// @Security		Keycloak
-func AddTreeImage(_ service.TreeService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Remove image from a tree
-// @Description	Remove image from a tree
-// @Id				remove-image-from-tree
-// @Tags			Tree Images
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id}/images/{image_id} [delete]
-// @Param			tree_id		path	string	false	"Tree ID"
-// @Param			image_id	path	string	false	"Image ID"
-// @Security		Keycloak
-func RemoveTreeImage(_ service.TreeService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
 	}
 }
 

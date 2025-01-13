@@ -38,7 +38,6 @@ func NewFlowerbedMappers(
 }
 
 func NewFlowerbedRepository(s *store.Store, mappers FlowerbedMappers) storage.FlowerbedRepository {
-	s.SetEntityType(store.Flowerbed)
 	return &FlowerbedRepository{
 		store:            s,
 		FlowerbedMappers: mappers,
@@ -81,13 +80,13 @@ func WithAddress(address string) entities.EntityFunc[entities.Flowerbed] {
 	}
 }
 
-func WithLatitude(latitude float64) entities.EntityFunc[entities.Flowerbed] {
+func WithLatitude(latitude *float64) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Latitude = latitude
 	}
 }
 
-func WithLongitude(longitude float64) entities.EntityFunc[entities.Flowerbed] {
+func WithLongitude(longitude *float64) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Longitude = longitude
 	}
@@ -119,14 +118,25 @@ func WithImagesIDs(imagesIDs []int32) entities.EntityFunc[entities.Flowerbed] {
 	}
 }
 
-func WithSensorID(id int32) entities.EntityFunc[entities.Flowerbed] {
+func WithSensorID(id string) entities.EntityFunc[entities.Flowerbed] {
 	return func(f *entities.Flowerbed) {
 		f.Sensor = &entities.Sensor{ID: id}
 	}
 }
 
+func WithRegionID(id int32) entities.EntityFunc[entities.Flowerbed] {
+	return func(f *entities.Flowerbed) {
+		f.Region = &entities.Region{ID: id}
+	}
+}
+
 func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
-	return r.store.DeleteFlowerbed(ctx, id)
+	_, err := r.store.DeleteFlowerbed(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
@@ -149,13 +159,36 @@ func (r *FlowerbedRepository) UnlinkImage(ctx context.Context, id, imageID int32
 		FlowerbedID: id,
 		ImageID:     imageID,
 	}
-	return r.store.UnlinkFlowerbedImage(ctx, &args)
+
+	_, err := r.store.UnlinkFlowerbedImage(ctx, &args)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *FlowerbedRepository) UnlinkAllImages(ctx context.Context, id int32) error {
-	return r.store.UnlinkAllFlowerbedImages(ctx, id)
+	_, err := r.store.UnlinkAllFlowerbedImages(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *FlowerbedRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {
+	if sensorID == "" {
+		return errors.New("sensorID cannot be empty")
+	}
+	return r.store.UnlinkSensorIDFromFlowerbeds(ctx, &sensorID)
 }
 
 func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
-	return r.store.ArchiveFlowerbed(ctx, id)
+	_, err := r.store.ArchiveFlowerbed(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

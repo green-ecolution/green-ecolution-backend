@@ -12,7 +12,7 @@ import (
 func (r *RegionRepository) GetAll(ctx context.Context) ([]*entities.Region, error) {
 	rows, err := r.store.GetAllRegions(ctx)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSqlList(rows), nil
@@ -21,7 +21,7 @@ func (r *RegionRepository) GetAll(ctx context.Context) ([]*entities.Region, erro
 func (r *RegionRepository) GetByID(ctx context.Context, id int32) (*entities.Region, error) {
 	row, err := r.store.GetRegionById(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -30,7 +30,7 @@ func (r *RegionRepository) GetByID(ctx context.Context, id int32) (*entities.Reg
 func (r *RegionRepository) GetByName(ctx context.Context, plate string) (*entities.Region, error) {
 	row, err := r.store.GetRegionByName(ctx, plate)
 	if err != nil {
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -43,7 +43,7 @@ func (r *RegionRepository) GetByPoint(ctx context.Context, latitude, longitude f
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
-		return nil, err
+		return nil, r.store.HandleError(err)
 	}
 
 	return r.mapper.FromSql(region), nil

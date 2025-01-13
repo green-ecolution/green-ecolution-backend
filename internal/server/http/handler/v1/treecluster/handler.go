@@ -4,7 +4,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
@@ -13,7 +12,6 @@ import (
 
 var (
 	treeClusterMapper = generated.TreeClusterHTTPMapperImpl{}
-	treeMapper        = generated.TreeHTTPMapperImpl{}
 )
 
 // @Summary		Get all tree clusters
@@ -40,9 +38,9 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := make([]*entities.TreeClusterResponse, len(domainData))
+		data := make([]*entities.TreeClusterInListResponse, len(domainData))
 		for i, domain := range domainData {
-			data[i] = mapTreeClusterToDto(domain)
+			data[i] = treeClusterMapper.FromInListResponse(domain)
 		}
 
 		return c.JSON(entities.TreeClusterListResponse{
@@ -71,7 +69,8 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
-			return err
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		domainData, err := svc.GetByID(ctx, int32(id))
@@ -80,9 +79,7 @@ func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
-
-		return c.JSON(data)
+		return c.JSON(treeClusterMapper.FromResponse(domainData))
 	}
 }
 
@@ -115,7 +112,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
+		data := treeClusterMapper.FromResponse(domainData)
 		return c.Status(fiber.StatusCreated).JSON(data)
 	}
 }
@@ -140,6 +137,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
 			return errorhandler.HandleError(err)
 		}
 
@@ -154,8 +152,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapTreeClusterToDto(domainData)
-		return c.JSON(data)
+		return c.JSON(treeClusterMapper.FromResponse(domainData))
 	}
 }
 
@@ -178,7 +175,8 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		ctx := c.Context()
 		id, err := strconv.Atoi(c.Params("treecluster_id"))
 		if err != nil {
-			return err
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
 		}
 
 		err = svc.Delete(ctx, int32(id))
@@ -188,87 +186,4 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
-}
-
-// @Summary		Get all trees in tree cluster
-// @Description	Get all trees in tree cluster
-// @Id				get-all-trees-in-tree-cluster
-// @Tags			Tree Cluster
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/cluster/{cluster_id}/trees [get]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
-// @Param			age			query	string	false	"Age"
-// @Security		Keycloak
-func GetTreesInTreeCluster(_ service.TreeClusterService) fiber.Handler {
-	// TODO: Change response @Success to entities.TreeListResponse
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Add trees to tree cluster
-// @Description	Add trees to tree cluster
-// @Id				add-trees-to-tree-cluster
-// @Tags			Tree Cluster
-// @Produce		json
-// @Success		200	{object}	entities.TreeClusterResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/cluster/{cluster_id}/trees [post]
-// @Param			cluster_id	path	string								true	"Tree Cluster ID"
-// @Param			body		body	entities.TreeClusterAddTreesRequest	true	"Tree Cluster Add Trees Request"
-// @Security		Keycloak
-func AddTreesToTreeCluster(_ service.TreeClusterService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-// @Summary		Remove trees from tree cluster
-// @Description	Remove trees from tree cluster
-// @Id				remove-trees-from-tree-cluster
-// @Tags			Tree Cluster
-// @Produce		json
-// @Success		200	{object}	entities.TreeClusterResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/cluster/{cluster_id}/trees/{tree_id} [delete]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
-// @Param			tree_id		path	string	true	"Tree ID"
-// @Security		Keycloak
-func RemoveTreesFromTreeCluster(_ service.TreeClusterService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// TODO: Implement
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
-
-func mapTreeClusterToDto(t *domain.TreeCluster) *entities.TreeClusterResponse {
-	dto := treeClusterMapper.FormResponse(t)
-
-	if t.Region != nil {
-		dto.Region = &entities.RegionResponse{
-			ID:   t.Region.ID,
-			Name: t.Region.Name,
-		}
-	}
-
-	dto.Trees = treeMapper.FromResponseList(t.Trees)
-
-	return dto
 }

@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Support for watering plans: storage, server layer, and additional properties (#278, #251).
+- Tracking water usage per tree cluster (#290).
+- Enhanced vehicle management with new fields and filtering capabilities (#243, #288).
+- Sensor data mapping logic and scheduler integration (#297, #322).
+- Map sensor to tree based on it's gps location (#259)
+- User management enhancements, including roles, statuses, and external authentication integration (#297).
+- Transaction in database operations (#235)
+- Event system to respond to specific events (#295)
+- Plugin system to integrate external plugins into the backend (#196)
+- Packages to share code, register plugin and communicate to the backend REST API (#271, #250)
+- Routing system to generate routes based on selected truck + trailer and selected tree clusters (#328, #321)
+- Save routing gpx file in s3 storage (#328)
+
+### Changed
+- Refactored sensor entities for better structure (#231).
+- Renamed `wateringPlanStatus` to `status` in watering plan entities (#281).
+
+### Fixed
+- Resolved errors when linking sensors to trees or creating tree clusters (#345, #340, #339).
+- Fixed authentication errors in MQTT handling and API responses (#316, #330).
+
+### Testing
+- Comprehensive test coverage improvements across repositories, services and server layers (#275, #247, #186).
+- Cleanup of test utilities for improved maintainability (#274).
+
+### Removed
+- Removed unused entity types and cleaned up legacy code (#284).
+
 ## [v1.0.0] - 2024-10-22
 
 ### Added

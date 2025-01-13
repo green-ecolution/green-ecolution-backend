@@ -9,14 +9,15 @@ import (
 	contribJwt "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	golangJwt "github.com/golang-jwt/jwt/v5"
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/enums"
 	"github.com/pkg/errors"
 )
 
 func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) fiber.Handler {
-	base64Str := cfg.KeyCloak.RealmPublicKey
+	base64Str := cfg.OidcProvider.PublicKey.StaticKey
 	publicKey, err := parsePublicKey(base64Str)
 	if err != nil {
 		return func(c *fiber.Ctx) error {
@@ -32,8 +33,9 @@ func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) f
 		SuccessHandler: func(c *fiber.Ctx) error {
 			return successHandler(c, svc)
 		},
-		ErrorHandler: func(c *fiber.Ctx, err error) error {
-			return c.Status(fiber.StatusUnauthorized).SendString(err.Error())
+		ErrorHandler: func(_ *fiber.Ctx, err error) error {
+			err = service.NewError(service.Unauthorized, err.Error())
+			return errorhandler.HandleError(err)
 		},
 	})
 }

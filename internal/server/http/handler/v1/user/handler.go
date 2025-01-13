@@ -2,14 +2,21 @@ package user
 
 import (
 	"net/url"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/singleflight"
+)
+
+var (
+	userMapper = generated.UserHTTPMapperImpl{}
 )
 
 // @Summary	Request to login
@@ -26,7 +33,7 @@ func Login(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		redirectURL, err := url.ParseRequestURI(c.Query("redirect_url"))
 		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		req := domain.LoginRequest{
@@ -35,7 +42,7 @@ func Login(svc service.AuthService) fiber.Handler {
 
 		resp, err := svc.LoginRequest(ctx, &req)
 		if err != nil {
-			return err
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
 		}
 
 		response := entities.LoginResponse{
@@ -59,7 +66,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.LogoutRequest{}
 		if err := c.BodyParser(&req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		domainReq := domain.Logout{
@@ -68,7 +75,7 @@ func Logout(svc service.AuthService) fiber.Handler {
 
 		err := svc.LogoutRequest(ctx, &domainReq)
 		if err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to logout").Error()))
 		}
 
 		return c.SendStatus(fiber.StatusOK)
@@ -91,12 +98,12 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.LoginTokenRequest{}
 		if err := c.BodyParser(&req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		redirectURL, err := parseURL(c.Query("redirect_url"))
 		if err != nil {
-			return err
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
 		}
 
 		domainReq := domain.LoginCallback{
@@ -106,7 +113,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		token, err := svc.ClientTokenCallback(ctx, &domainReq)
 		if err != nil {
-			return err
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get token").Error()))
 		}
 
 		response := entities.ClientTokenResponse{
@@ -136,9 +143,7 @@ func Register(svc service.AuthService) fiber.Handler {
 		ctx := c.Context()
 		req := entities.UserRegisterRequest{}
 		if err := c.BodyParser(&req); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": errors.Wrap(err, "failed to parse request").Error(),
-			})
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
 		}
 
 		domainUser := domain.RegisterUser{
@@ -154,20 +159,10 @@ func Register(svc service.AuthService) fiber.Handler {
 
 		u, err := svc.Register(ctx, &domainUser)
 		if err != nil {
-			return err
+			return errorhandler.HandleError(err)
 		}
 
-		response := entities.UserResponse{
-			ID:            u.ID.String(),
-			CreatedAt:     u.CreatedAt,
-			Email:         u.Email,
-			FirstName:     u.FirstName,
-			LastName:      u.LastName,
-			Username:      u.Username,
-			EmployeeID:    u.EmployeeID,
-			PhoneNumber:   u.PhoneNumber,
-			EmailVerified: u.EmailVerified,
-		}
+		response := userMapper.FromResponse(u)
 
 		return c.Status(fiber.StatusCreated).JSON(response)
 	}
@@ -179,89 +174,92 @@ func parseURL(rawURL string) (*url.URL, error) {
 
 // @Summary		Get all users
 // @Description	Get all users
+// @Id				get-all-users
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	entities.UserListResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
+// @Success		200			{object}	entities.UserListResponse
+// @Failure		400			{object}	HTTPError
+// @Failure		500			{object}	HTTPError
+// @Param			page		query		string	false	"Page"
+// @Param			limit		query		string	false	"Limit"
+// @Param			limit		query		string	false	"Limit"
+// @Param			user_ids	query		string	false	"User IDs"
 // @Router			/v1/user [get]
 // @Security		Keycloak
-func GetAllUsers(_ service.AuthService) fiber.Handler {
+func GetAllUsers(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		ctx := c.Context()
+		var domainData []*domain.User
+		var err error
+
+		userIDsParam := c.Query("user_ids")
+		if userIDsParam == "" {
+			domainData, err = svc.GetAll(ctx)
+			if err != nil {
+				return errorhandler.HandleError(err)
+			}
+		} else {
+			userIDs := strings.Split(userIDsParam, ",")
+			domainData, err = svc.GetByIDs(ctx, userIDs)
+			if err != nil {
+				return errorhandler.HandleError(err)
+			}
+		}
+
+		data := make([]*entities.UserResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = userMapper.FromResponse(domain)
+		}
+
+		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
-// @Summary		Get a user by ID
-// @Description	Get a user by ID
+// @Summary		Get users by role
+// @Description	Get users by role
+// @Id				get-users-by-role
 // @Tags			User
 // @Produce		json
-// @Success		200		{object}	entities.UserResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Router			/v1/user/{user_id} [get]
+// @Success		200	{object}	entities.UserListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/user/role/{role} [get]
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			role	path	string	true	"Role"
 // @Security		Keycloak
-func GetUserByID(_ service.AuthService) fiber.Handler {
+func GetUsersByRole(svc service.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
+		ctx := c.Context()
 
-// @Summary		Update a user by ID
-// @Description	Update a user by ID
-// @Tags			User
-// @Accept			json
-// @Produce		json
-// @Success		200		{object}	entities.UserResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string						true	"User ID"
-// @Param			user	body		entities.UserUpdateRequest	true	"User information"
-// @Router			/v1/user/{user_id} [put]
-// @Security		Keycloak
-func UpdateUserByID(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
+		role := strings.Clone(c.Params("Role"))
+		if role == "" {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role format"))
+		}
 
-// @Summary		Delete a user by ID
-// @Description	Delete a user by ID
-// @Tags			User
-// @Produce		json
-// @Success		200		{string}	string
-// @Failure		400		{object}	HTTPError
-// @Failure		404		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Router			/v1/user/{user_id} [delete]
-// @Security		Keycloak
-func DeleteUserByID(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
-	}
-}
+		var userRole domain.Role
+		userRole.SetName(role)
+		if userRole.Name == domain.UserRoleUnknown {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role name"))
+		}
 
-// @Summary		Get user roles
-// @Description	Get user roles
-// @Tags			User
-// @Produce		json
-// @Success		200		{object}	entities.RoleListResponse
-// @Failure		400		{object}	HTTPError
-// @Failure		500		{object}	HTTPError
-// @Param			user_id	path		string	true	"User ID"
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
-// @Router			/v1/user/{user_id}/roles [get]
-// @Security		Keycloak
-func GetUserRoles(_ service.AuthService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		return c.SendStatus(fiber.StatusNotImplemented)
+		users, err := svc.GetAllByRole(ctx, userRole)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by role").Error()))
+		}
+
+		data := make([]*entities.UserResponse, len(users))
+		for i, user := range users {
+			data[i] = userMapper.FromResponse(user)
+		}
+
+		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
+			Data:       data,
+			Pagination: entities.Pagination{}, // TODO: Handle pagination
+		})
 	}
 }
 
@@ -289,16 +287,15 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
 		}
 
-		jwtToken, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (any, error) {
+		jwtClaims := jwt.MapClaims{}
+		_, err := jwt.ParseWithClaims(req.RefreshToken, jwtClaims, func(token *jwt.Token) (any, error) {
 			return token, nil
 		})
 
 		var sub string
-		if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok {
-			if e, ok := claims["sub"]; ok {
-				if e, ok := e.(string); ok {
-					sub = e
-				}
+		if claims, ok := jwtClaims["sub"]; ok {
+			if e, ok := claims.(string); ok {
+				sub = e
 			}
 		}
 

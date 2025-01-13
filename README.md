@@ -1,11 +1,15 @@
 <p>
   <a href=""><img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white"/></a>
+  <a href=""><img src="https://raw.githubusercontent.com/green-ecolution/green-ecolution-backend/badges/.badges/develop/coverage.svg"/></a>
+  <a href="https://pkg.go.dev/github.com/green-ecolution/green-ecolution-backend"><img src="https://pkg.go.dev/badge/github.com/green-ecolution/green-ecolution-backend.svg" alt="Go Reference"></a>
 </p>
 
 # Green Ecolution Backend
+
 ![image](https://github.com/user-attachments/assets/c69e28cd-44ec-44e7-8d64-447bad7f4fd9)
 
 Smart irrigation is needed to save water, staff and costs. This project is the server-side for Green Ecolution. For Frontend please refer to [Green Ecolution Frontend](https://github.com/green-ecolution/green-ecolution-frontend). The backend provides an interface to interact between the website and the database. The backend retains data about
+
 - trees
 - tree clusters
 - flowerbeds
@@ -68,19 +72,23 @@ Inside the `internal` folder, there is a `server` package that contains the serv
 ### Setup
 
 To download all needed tools use
+
 ```bash
 make setup
 ```
 
 Then to generate code use
+
 ```bash
 make generate
 ```
 
-To run a local database you can use a preconfigured .yaml file. 
+To run a local database you can use a preconfigured .yaml file.
+
 ```bash
 docker compose up -d
 ```
+
 ### Run
 
 To run the project, you need to execute the following command:

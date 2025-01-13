@@ -38,6 +38,7 @@ RUN make build \
 FROM alpine:3.20 AS runner
 
 ENV PORT=3000
+ENV ENV=stage
 EXPOSE 3000
 
 RUN adduser -D gorunner
@@ -46,7 +47,7 @@ RUN apk add --no-cache geos proj
 USER gorunner
 WORKDIR /app
 
-COPY --chown=gorunner:gorunner --from=builder /app/build/.docker/config.default.yaml /app/config.yaml
+COPY --chown=gorunner:gorunner --from=builder /app/build/.docker/config.default.yaml /app/config/config.stage.yaml
 COPY --chown=gorunner:gorunner --from=builder /app/build/bin/green-ecolution-backend /app/backend
 
 ENTRYPOINT [ "/app/backend" ]

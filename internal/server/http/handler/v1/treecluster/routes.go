@@ -5,17 +5,10 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.TreeClusterService) *fiber.App {
-	app := fiber.New()
-
-	app.Get("/", GetAllTreeClusters(svc))
-	app.Get("/:treecluster_id", GetTreeClusterByID(svc))
-	app.Post("/", CreateTreeCluster(svc))
-	app.Put("/:treecluster_id", UpdateTreeCluster(svc))
-	app.Delete("/:treecluster_id", DeleteTreeCluster(svc))
-	app.Get("/:treecluster_id/trees", GetTreesInTreeCluster(svc))
-	app.Post("/:treecluster_id/trees", AddTreesToTreeCluster(svc))
-	app.Delete("/:treecluster_id/trees/:tree_id", RemoveTreesFromTreeCluster(svc))
-
-	return app
+func RegisterRoutes(r fiber.Router, svc service.TreeClusterService) {
+	r.Get("/", GetAllTreeClusters(svc))
+	r.Get("/:treecluster_id", GetTreeClusterByID(svc))
+	r.Post("/", CreateTreeCluster(svc))
+	r.Put("/:treecluster_id", UpdateTreeCluster(svc))
+	r.Delete("/:treecluster_id", DeleteTreeCluster(svc))
 }

@@ -5,15 +5,15 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.AuthService) *fiber.App {
-	app := fiber.New()
+func RegisterRoutes(r fiber.Router, svc service.AuthService) {
+	r.Post("/", Register(svc))
+	r.Get("/", GetAllUsers(svc))
+	r.Get("/role/:role", GetUsersByRole(svc))
+}
 
-	app.Post("/", Register(svc))
-	app.Get("/", GetAllUsers(svc))
-	app.Get("/:id", GetUserByID(svc))
-	app.Put("/:id", UpdateUserByID(svc))
-	app.Delete("/:id", DeleteUserByID(svc))
-	app.Get("/:id/roles", GetUserRoles(svc))
-
-	return app
+func RegisterPublicRoutes(r fiber.Router, svc service.AuthService) {
+	r.Post("/logout", Logout(svc))
+	r.Get("/login", Login(svc))
+	r.Post("/login/token", RequestToken(svc))
+	r.Post("/token/refresh", RefreshToken(svc))
 }

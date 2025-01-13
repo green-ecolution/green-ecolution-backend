@@ -26,7 +26,6 @@ func NewRegionMappers(rMapper mapper.InternalRegionRepoMapper) RegionMappers {
 }
 
 func NewRegionRepository(s *store.Store, mappers RegionMappers) storage.RegionRepository {
-	s.SetEntityType(store.Vehicle)
 	return &RegionRepository{
 		store:         s,
 		RegionMappers: mappers,

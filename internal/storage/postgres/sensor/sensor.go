@@ -25,7 +25,6 @@ func NewSensorRepositoryMappers(sMapper mapper.InternalSensorRepoMapper) SensorR
 }
 
 func NewSensorRepository(s *store.Store, mappers SensorRepositoryMappers) storage.SensorRepository {
-	s.SetEntityType(store.Sensor)
 	return &SensorRepository{
 		store:                   s,
 		SensorRepositoryMappers: mappers,
@@ -38,12 +37,30 @@ func WithStatus(status entities.SensorStatus) entities.EntityFunc[entities.Senso
 	}
 }
 
-func WithData(data []*entities.SensorData) entities.EntityFunc[entities.Sensor] {
+func WithLatestData(data *entities.SensorData) entities.EntityFunc[entities.Sensor] {
 	return func(s *entities.Sensor) {
-		s.Data = data
+		s.LatestData = data
 	}
 }
 
-func (r *SensorRepository) Delete(ctx context.Context, id int32) error {
+func WithSensorID(sensorID string) entities.EntityFunc[entities.Sensor] {
+	return func(s *entities.Sensor) {
+		s.ID = sensorID
+	}
+}
+
+func WithLatitude(lat float64) entities.EntityFunc[entities.Sensor] {
+	return func(t *entities.Sensor) {
+		t.Latitude = lat
+	}
+}
+
+func WithLongitude(long float64) entities.EntityFunc[entities.Sensor] {
+	return func(t *entities.Sensor) {
+		t.Longitude = long
+	}
+}
+
+func (r *SensorRepository) Delete(ctx context.Context, id string) error {
 	return r.store.DeleteSensor(ctx, id)
 }

@@ -2,15 +2,17 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"net/url"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestRegisterUser(t *testing.T) {
@@ -28,7 +30,7 @@ func TestRegisterUser(t *testing.T) {
 		input := &entities.RegisterUser{
 			User:     *inputUser,
 			Password: "password",
-			Roles:    &[]string{"viewer"},
+			Roles:    []string{"viewer"},
 		}
 
 		expected := &entities.User{
@@ -70,6 +72,8 @@ func TestRegisterUser(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, resp)
+		assert.ErrorContains(t, err, "400: validation error")
+
 	})
 
 	t.Run("should return error when validation error", func(t *testing.T) {
@@ -85,6 +89,8 @@ func TestRegisterUser(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, resp)
+		assert.ErrorContains(t, err, "400: validation error")
+
 	})
 }
 
@@ -92,14 +98,16 @@ func TestLoginRequest(t *testing.T) {
 	t.Run("should return login url", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{
-			KeyCloak: config.KeyCloakConfig{
-				BaseURL:      "http://localhost:8080/auth",
-				Realm:        "realm",
-				ClientID:     "backend_client",
-				ClientSecret: "backend_secret",
-				Frontend: config.KeyCloakFrontendConfig{
-					AuthURL:      "http://localhost:8080/auth/realms/realm/protocol/openid-connect/auth",
-					TokenURL:     "http://localhost:8080/auth/realms/realm/protocol/openid-connect/token",
+			OidcProvider: config.OidcProvider{
+				BaseURL:    "http://localhost:8080/auth",
+				DomainName: "realm",
+				AuthURL:    "http://localhost:8080/auth/realms/realm/protocol/openid-connect/auth",
+				TokenURL:   "http://localhost:8080/auth/realms/realm/protocol/openid-connect/token",
+				Backend: config.OidcClient{
+					ClientID:     "backend_client",
+					ClientSecret: "backend_secret",
+				},
+				Frontend: config.OidcClient{
 					ClientID:     "frontend_client",
 					ClientSecret: "frontend_secret",
 				},
@@ -113,7 +121,7 @@ func TestLoginRequest(t *testing.T) {
 
 		respURL, _ := url.Parse("http://localhost:8080/auth/realms/realm/protocol/openid-connect/auth")
 		query := respURL.Query()
-		query.Add("client_id", identityConfig.KeyCloak.Frontend.ClientID)
+		query.Add("client_id", identityConfig.OidcProvider.Frontend.ClientID)
 		query.Add("response_type", "code")
 		query.Add("redirect_uri", loginRequest.RedirectURL.String())
 		respURL.RawQuery = query.Encode()
@@ -137,10 +145,8 @@ func TestLoginRequest(t *testing.T) {
 	t.Run("should return error when failed to parse auth url in config", func(t *testing.T) {
 		// given
 		identityConfig := &config.IdentityAuthConfig{
-			KeyCloak: config.KeyCloakConfig{
-				Frontend: config.KeyCloakFrontendConfig{
-					AuthURL: "not_a_valid_url",
-				},
+			OidcProvider: config.OidcProvider{
+				AuthURL: "not_a_valid_url",
 			},
 		}
 
@@ -161,6 +167,7 @@ func TestLoginRequest(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to parse auth url in config: parse \"not_a_valid_url\": invalid URI for request")
 	})
 }
 
@@ -208,6 +215,7 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "400: validation error: Key: 'LoginCallback.Code' Error:Field validation for 'Code' failed on the 'required' tag")
 	})
 
 	t.Run("should return error when failed to get access token", func(t *testing.T) {
@@ -232,5 +240,326 @@ func TestClientTokenCallback(t *testing.T) {
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to get access token: assert.AnError general error for testing")
+	})
+}
+
+func TestLogoutRequest(t *testing.T) {
+	t.Run("should succeed when logout request is valid", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		logoutRequest := &entities.Logout{RefreshToken: "valid-refresh-token"}
+		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(nil)
+
+		// then
+		err := svc.LogoutRequest(context.Background(), logoutRequest)
+
+		// when
+		assert.NoError(t, err)
+	})
+
+	t.Run("should return error when validation fails", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		invalidLogoutRequest := &entities.Logout{RefreshToken: ""}
+
+		// when
+		err := svc.LogoutRequest(context.Background(), invalidLogoutRequest)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "400: validation error: Key: 'Logout.RefreshToken' Error:Field validation for 'RefreshToken' failed on the 'required' tag")
+	})
+
+	t.Run("should return error when session removal fails", func(t *testing.T) {
+		// given
+		identityConfig := &config.IdentityAuthConfig{}
+
+		authRepo := storageMock.NewMockAuthRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		logoutRequest := &entities.Logout{RefreshToken: "valid-refresh-token"}
+		userRepo.EXPECT().RemoveSession(mock.Anything, logoutRequest.RefreshToken).Return(errors.New(""))
+
+		// when
+		err := svc.LogoutRequest(context.Background(), logoutRequest)
+
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to remove user session: ")
+	})
+}
+
+func TestGetAllUsers(t *testing.T) {
+	t.Run("should return all users successfully", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+		uuid01, _ := uuid.NewRandom()
+		uuid02, _ := uuid.NewRandom()
+
+		expectedUsers := []*entities.User{
+			{
+				ID:          uuid01,
+				Username:    "user1",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Email:       "john.doe@example.com",
+				PhoneNumber: "+123456789",
+			},
+			{
+				ID:          uuid02,
+				Username:    "user2",
+				FirstName:   "Jane",
+				LastName:    "Smith",
+				Email:       "jane.smith@example.com",
+				PhoneNumber: "+987654321",
+			},
+		}
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(expectedUsers, nil)
+
+		// when
+		users, err := svc.GetAll(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+	})
+
+	t.Run("should return error when user repository fails", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(nil, errors.New("repository error"))
+
+		// when
+		users, err := svc.GetAll(context.Background())
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to get all users")
+	})
+
+	t.Run("should return empty slice when no users are found", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetAll(context.Background()).Return([]*entities.User{}, nil)
+
+		// when
+		users, err := svc.GetAll(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.Empty(t, users)
+	})
+}
+
+func TestGetByIDs(t *testing.T) {
+	uuid01, _ := uuid.NewRandom()
+	uuid02, _ := uuid.NewRandom()
+	input := []string{uuid01.String(), uuid02.String()}
+
+	expectedUsers := []*entities.User{
+		{
+			ID:          uuid01,
+			Username:    "user1",
+			FirstName:   "John",
+			LastName:    "Doe",
+			Email:       "john.doe@example.com",
+			PhoneNumber: "+123456789",
+		},
+		{
+			ID:          uuid02,
+			Username:    "user2",
+			FirstName:   "Jane",
+			LastName:    "Smith",
+			Email:       "jane.smith@example.com",
+			PhoneNumber: "+987654321",
+		},
+	}
+	t.Run("should return all users by ids successfully", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+		userRepo.EXPECT().GetByIDs(context.Background(), input).Return(expectedUsers, nil)
+
+		// when
+		users, err := svc.GetByIDs(context.Background(), input)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+	})
+
+	t.Run("should return error when user repository fails", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetByIDs(context.Background(), input).Return(nil, errors.New("repository error"))
+
+		// when
+		users, err := svc.GetByIDs(context.Background(), input)
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "failed to get users by ids")
+	})
+
+	t.Run("should return empty slice when no users are found", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetByIDs(context.Background(), input).Return([]*entities.User{}, nil)
+
+		// when
+		users, err := svc.GetByIDs(context.Background(), input)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.Empty(t, users)
+	})
+}
+
+func TestGetAllByRole(t *testing.T) {
+	t.Run("should return users matching the role", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		uuid01, _ := uuid.NewRandom()
+		uuid02, _ := uuid.NewRandom()
+
+		expectedRole := entities.Role{Name: entities.UserRoleTbz}
+		expectedUsers := []*entities.User{
+			{
+				ID:          uuid01,
+				Username:    "admin1",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Email:       "admin1@example.com",
+				PhoneNumber: "+123456789",
+				Roles:       []entities.Role{{Name: entities.UserRoleTbz}},
+			},
+			{
+				ID:          uuid02,
+				Username:    "admin2",
+				FirstName:   "Jane",
+				LastName:    "Smith",
+				Email:       "admin2@example.com",
+				PhoneNumber: "+987654321",
+				Roles:       []entities.Role{{Name: entities.UserRoleTbz}},
+			},
+		}
+
+		allUsers := append(expectedUsers, &entities.User{
+			ID:          uuid.New(),
+			Username:    "user3",
+			FirstName:   "Bob",
+			LastName:    "Johnson",
+			Email:       "user3@example.com",
+			PhoneNumber: "+555555555",
+			Roles:       []entities.Role{{Name: entities.UserRoleGreenEcolution}},
+		})
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(allUsers, nil)
+
+		// when
+		users, err := svc.GetAllByRole(context.Background(), expectedRole)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedUsers, users)
+	})
+
+	t.Run("should return empty slice when no users match the role", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		expectedRole := entities.Role{Name: entities.UserRoleTbz}
+		allUsers := []*entities.User{
+			{
+				ID:          uuid.New(),
+				Username:    "user1",
+				FirstName:   "John",
+				LastName:    "Doe",
+				Email:       "user1@example.com",
+				PhoneNumber: "+123456789",
+				Roles:       []entities.Role{{Name: entities.UserRoleGreenEcolution}},
+			},
+			{
+				ID:          uuid.New(),
+				Username:    "user2",
+				FirstName:   "Jane",
+				LastName:    "Smith",
+				Email:       "user2@example.com",
+				PhoneNumber: "+987654321",
+				Roles:       []entities.Role{{Name: entities.UserRoleSmarteGrenzregion}},
+			},
+		}
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(allUsers, nil)
+
+		// when
+		users, err := svc.GetAllByRole(context.Background(), expectedRole)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, users)
+	})
+
+	t.Run("should return error when underlying repository fails", func(t *testing.T) {
+		// given
+		userRepo := storageMock.NewMockUserRepository(t)
+		authRepo := storageMock.NewMockAuthRepository(t)
+		identityConfig := &config.IdentityAuthConfig{}
+		svc := NewAuthService(authRepo, userRepo, identityConfig)
+
+		userRepo.EXPECT().GetAll(context.Background()).Return(nil, errors.New("repository error"))
+
+		// when
+		users, err := svc.GetAllByRole(context.Background(), entities.Role{Name: entities.UserRoleTbz})
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, users)
+		assert.Contains(t, err.Error(), "repository error")
 	})
 }

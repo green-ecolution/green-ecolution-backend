@@ -2,16 +2,16 @@ package keycloak
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/pkg/errors"
 )
 
 type UserRepository struct {
@@ -24,88 +24,185 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 	}
 }
 
-func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles *[]string) (*entities.User, error) {
-	slog.Debug("Creating user in keycloak", "user", user)
+func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
+	slog.Debug("Creating user in keycloak", "user", user, "roles", roles)
+	if user == nil {
+		return nil, ErrEmptyUser
+	}
+
 	keyCloakUser := userToKeyCloakUser(user)
 
-	clientToken, err := loginRestAPIClient(ctx, r.cfg.KeyCloak.BaseURL, r.cfg.KeyCloak.ClientID, r.cfg.KeyCloak.ClientSecret, r.cfg.KeyCloak.Realm)
+	client, clientToken, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
 
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, *keyCloakUser)
+	userID, err := client.CreateUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, *keyCloakUser)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create user")
+		return nil, errors.Join(err, ErrCreateUser)
 	}
 
-	if err = client.SetPassword(ctx, clientToken.AccessToken, userID, r.cfg.KeyCloak.Realm, password, false); err != nil {
-		return nil, errors.Wrap(err, "failed to set password")
+	if err = client.SetPassword(ctx, clientToken.AccessToken, userID, r.cfg.OidcProvider.DomainName, password, false); err != nil {
+		return nil, errors.Join(err, ErrSetPassword)
 	}
 
-	kcRoles := make([]gocloak.Role, len(*roles))
-	for _, roleName := range *roles {
-		roleNameLowerCase := strings.ToLower(roleName)
-		roleKeyCloak, err := client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, roleNameLowerCase)
-		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("failed to get role by name: '%v'", roleNameLowerCase))
+	if roles != nil || len(roles) > 0 {
+		kcRoles := make([]gocloak.Role, len(roles))
+		for i, roleName := range roles {
+			var roleKeyCloak *gocloak.Role
+			roleNameLowerCase := strings.ToLower(roleName)
+			roleKeyCloak, err = client.GetRealmRole(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, roleNameLowerCase)
+			if err != nil {
+				slog.Error("failed to get role by name", "role", roleNameLowerCase, "err", err)
+				return nil, errors.Join(err, ErrGetRole)
+			}
+
+			if roleKeyCloak != nil {
+				kcRoles[i] = *roleKeyCloak
+			}
 		}
-		kcRoles = append(kcRoles, *roleKeyCloak)
+		if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, userID, kcRoles); err != nil {
+			slog.Error("failed to assign roles to user", "role", kcRoles, "err", err)
+			return nil, errors.Join(err, ErrSetRole)
+		}
 	}
 
-	if err = client.AddRealmRoleToUser(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID, kcRoles); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to roles to user. roles '%v'", kcRoles))
-	}
-
-	userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.KeyCloak.Realm, userID)
+	userKeyCloak, err := client.GetUserByID(ctx, clientToken.AccessToken, r.cfg.OidcProvider.DomainName, userID)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to get created user by id: '%v'", userID))
+		slog.Error("failed to get recently created user by id", "user_id", userID, "err", err)
+		return nil, errors.Join(err, ErrGetUser)
 	}
 
 	return keyCloakUserToUser(userKeyCloak)
 }
 
-func (r *UserRepository) GetByAccessToken(ctx context.Context, token string) (*entities.User, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	kUser, err := client.GetUserInfo(ctx, token, r.cfg.KeyCloak.Realm)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get user info from token")
-	}
-
-	user := &entities.User{
-		Username:      *kUser.PreferredUsername,
-		FirstName:     *kUser.GivenName,
-		LastName:      *kUser.FamilyName,
-		Email:         *kUser.Email,
-		EmailVerified: *kUser.EmailVerified,
-		// TODO: Handle Additional Fields
-		// PhoneNumber: ...,
-		// EmployeeID: ...,
-	}
-
-	return user, nil
-}
-
 func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string) error {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	if err := client.Logout(ctx, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm, refreshToken); err != nil {
-		return errors.Wrap(err, "failed to logout")
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+	if err := client.Logout(ctx, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName, refreshToken); err != nil {
+		return errors.Join(err, ErrLogout)
 	}
 	return nil
+}
+
+func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := client.GetUsers(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, gocloak.GetUsersParams{})
+	if err != nil {
+		return nil, errors.Join(err, ErrGetUser)
+	}
+
+	allUsers := make([]*entities.User, len(users))
+	for i, kcUser := range users {
+		user, err := keyCloakUserToUser(kcUser)
+		if err != nil && !errors.Is(err, ErrUserWithNilAttributes) { // skip users without required attributes
+			return nil, err
+		}
+		if user != nil {
+			allUsers[i] = user
+		}
+	}
+
+	return allUsers, nil
+}
+
+func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]*entities.User, len(ids))
+	for i, id := range ids {
+		kcUser, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
+		if err != nil {
+			return nil, err
+		}
+
+		user, err := keyCloakUserToUser(kcUser)
+		if err != nil {
+			return nil, err
+		}
+		users[i] = user
+	}
+
+	return users, nil
 }
 
 func keyCloakUserToUser(user *gocloak.User) (*entities.User, error) {
 	userID, err := uuid.Parse(*user.ID)
 	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to parse user id: '%v'", *user.ID))
+		slog.Error("failed to parse user id", "user_id", *user.ID, "err", err)
+		return nil, ErrParseID
 	}
+
+	if err := validateRequiredAttributes(user); err != nil {
+		return nil, err
+	}
+
+	var phoneNumber, employeeID, drivingLicenseClass, status string
+	var userRoles []string
+	if user.Attributes != nil {
+		if val, ok := (*user.Attributes)["phone_number"]; ok && len(val) > 0 {
+			phoneNumber = val[0]
+		}
+
+		if val, ok := (*user.Attributes)["employee_id"]; ok && len(val) > 0 {
+			employeeID = val[0]
+		}
+
+		if val, ok := (*user.Attributes)["driving_license_class"]; ok && len(val) > 0 {
+			drivingLicenseClass = val[0]
+		}
+
+		if val, ok := (*user.Attributes)["user_roles"]; ok && len(val) > 0 {
+			userRoles = val
+		}
+
+		if val, ok := (*user.Attributes)["status"]; ok && len(val) > 0 {
+			status = val[0]
+		}
+	}
+
+	roles := convertRoles(userRoles)
+
+	const millisecondsInSecond = 1000
 	return &entities.User{
-		ID:        userID,
-		Username:  *user.Username,
-		FirstName: *user.FirstName,
-		LastName:  *user.LastName,
-		Email:     *user.Email,
+		ID:             userID,
+		CreatedAt:      time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
+		Username:       *user.Username,
+		FirstName:      *user.FirstName,
+		LastName:       *user.LastName,
+		Email:          *user.Email,
+		PhoneNumber:    phoneNumber,
+		EmployeeID:     employeeID,
+		Roles:          roles,
+		DrivingLicense: entities.DrivingLicense(drivingLicenseClass),
+		Status:         entities.ParseUserStatus(status),
 	}, nil
+}
+
+func convertRoles(userRoles []string) []entities.Role {
+	var roles []entities.Role
+	for _, roleName := range userRoles {
+		var userRole entities.Role
+		userRole.SetName(roleName)
+		roles = append(roles, userRole)
+	}
+	if roles == nil {
+		roles = []entities.Role{}
+	}
+	return roles
+}
+
+func validateRequiredAttributes(user *gocloak.User) error {
+	if user.FirstName == nil || user.Email == nil || user.LastName == nil || user.Username == nil {
+		return ErrUserWithNilAttributes
+	}
+	return nil
 }
 
 func userToKeyCloakUser(user *entities.User) *gocloak.User {
@@ -114,6 +211,7 @@ func userToKeyCloakUser(user *entities.User) *gocloak.User {
 	attribute["employee_id"] = []string{user.EmployeeID}
 
 	return &gocloak.User{
+		ID:         gocloak.StringP(user.ID.String()),
 		Username:   gocloak.StringP(user.Username),
 		FirstName:  gocloak.StringP(user.FirstName),
 		LastName:   gocloak.StringP(user.LastName),

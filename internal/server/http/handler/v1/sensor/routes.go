@@ -5,16 +5,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func RegisterRoutes(svc service.SensorService) *fiber.App {
-	app := fiber.New()
-
-	app.Get("/", GetAllSensors(svc))
-	app.Get("/:id", GetSensorByID(svc))
-	app.Get("/:id/data", GetSensorDataByID(svc))
-
-	app.Post("/", CreateSensor(svc))
-	app.Put("/:id", UpdateSensor(svc))
-	app.Delete("/:id", DeleteSensor(svc))
-
-	return app
+func RegisterRoutes(r fiber.Router, svc service.SensorService) {
+	r.Get("/", GetAllSensors(svc))
+	r.Get("/:id", GetSensorByID(svc))
+	r.Delete("/:id", DeleteSensor(svc))
 }

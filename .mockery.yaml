@@ -8,10 +8,15 @@ packages:
       MqttService:
       TreeService:
       TreeClusterService:
+      GeoClusterLocator:
       AuthService:
       RegionService:
       SensorService:
+      VehicleService:
+      PluginService:
+      WateringPlanService:
       Service:
+      ServicesInterface:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
     config: 
       dir: ./internal/storage/_mock
@@ -19,6 +24,19 @@ packages:
       InfoRepository:
       SensorRepository:
       TreeRepository:
-      AuthRepository: 
+      TreeClusterRepository:
+      AuthRepository:
       UserRepository:
       RegionRepository:
+      ImageRepository:
+      VehicleRepository:
+      FlowerbedRepository:
+      WateringPlanRepository:
+      RoutingRepository:
+      S3Repository:
+  github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc:
+    config: 
+      dir: ./internal/storage/_mock
+      outpkg: storage
+    interfaces:
+      Querier:

@@ -1,14 +1,20 @@
 -- name: GetAllTrees :many
-SELECT * FROM trees;
+SELECT * FROM trees ORDER BY number ASC;
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
 
+-- name: GetTreeBySensorID :one
+SELECT * FROM trees WHERE sensor_id = $1;
+
+-- name: GetTreesBySensorIDs :many
+SELECT * FROM trees WHERE sensor_id = ANY($1::text[]) ORDER BY number ASC;
+
 -- name: GetTreesByIDs :many
-SELECT * FROM trees WHERE id = ANY($1::int[]);
+SELECT * FROM trees WHERE id = ANY($1::int[]) ORDER BY number ASC;
 
 -- name: GetTreesByTreeClusterID :many
-SELECT * FROM trees WHERE tree_cluster_id = $1;
+SELECT * FROM trees WHERE tree_cluster_id = $1 ORDER BY number ASC;
 
 -- name: GetTreeByCoordinates :one
 SELECT * FROM trees WHERE latitude = $1 AND longitude = $2 LIMIT 1;
@@ -24,7 +30,7 @@ SELECT tree_clusters.* FROM tree_clusters JOIN trees ON tree_clusters.id = trees
 
 -- name: CreateTree :one
 INSERT INTO trees (
-  tree_cluster_id, sensor_id, planting_year, species, tree_number, readonly, description, watering_status, latitude, longitude
+  tree_cluster_id, sensor_id, planting_year, species, number, readonly, description, watering_status, latitude, longitude
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 ) RETURNING id;
@@ -35,7 +41,7 @@ UPDATE trees SET
   sensor_id = $3,
   planting_year = $4,
   species = $5,
-  tree_number = $6,
+  number = $6,
   readonly = $7,
   watering_status = $8,
   description = $9
@@ -58,8 +64,8 @@ INSERT INTO tree_images (
   $1, $2
 );
 
--- name: UnlinkTreeImage :exec
-DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2;
+-- name: UnlinkTreeImage :one
+DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2 RETURNING image_id;
 
 -- name: UnlinkAllTreeImages :exec
 DELETE FROM tree_images WHERE tree_id = $1;
@@ -69,11 +75,20 @@ UPDATE trees SET
   geometry = ST_GeomFromText($2, 4326)
 WHERE id = $1;
 
--- name: DeleteTree :exec
-DELETE FROM trees WHERE id = $1;
+-- name: DeleteTree :one
+DELETE FROM trees WHERE id = $1 RETURNING id;
 
 -- name: UnlinkTreeClusterID :exec
 UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
 
+-- name: UnlinkSensorIDFromTrees :exec
+UPDATE trees SET sensor_id = NULL WHERE sensor_id = $1;
+
 -- name: CalculateGroupedCentroids :one
 SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE id = ANY($1::int[]);
+
+-- name: FindNearestTree :one
+SELECT * FROM trees
+WHERE ST_Distance(geometry::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) <= 3
+ORDER BY ST_Distance(geometry::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) ASC
+    LIMIT 1;

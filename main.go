@@ -18,16 +18,23 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/green-ecolution/green-ecolution-backend/config"
 	"github.com/green-ecolution/green-ecolution-backend/docs"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	_ "github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/spf13/viper"
@@ -46,11 +53,12 @@ var version = "develop"
 //	@contact.url	https://green-ecolution.de
 //	@contact.email	info@green-ecolution.de
 
-// @license.name							GPL-3.0
-// @license.url							https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
-// @securitydefinitions.oauth2.password	Keycloak
+//	@license.name	AGPL
+//	@license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
+
+// @securitydefinitions.oauth2.accessCode	Keycloak
 // @tokenUrl								https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/token
-// @authUrl								https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
+// @authorizationUrl						https://auth.green-ecolution.de/realms/green-ecolution-dev/protocol/openid-connect/auth
 // @in										header
 // @name									Authorization
 func main() {
@@ -60,7 +68,6 @@ func main() {
 	}
 
 	fmt.Printf("Version: %s\n", version)
-
 	fmt.Println("Server Port: ", viper.GetInt("server.port"))
 
 	if cfg.Server.Development {
@@ -78,12 +85,16 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
+	startAppServices(ctx, cfg)
+}
+
+func postgresRepo(ctx context.Context, cfg *config.Config) (repo *storage.Repository, closeFn func()) {
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Server.Database.Host, cfg.Server.Database.Port, cfg.Server.Database.Username, cfg.Server.Database.Password, cfg.Server.Database.Name)
 
 	pgxConfig, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
 		slog.Error("Error while parsing PostgreSQL connection string", "error", err)
-		return
+		return nil, nil
 	}
 
 	pgxConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
@@ -93,45 +104,100 @@ func main() {
 	pool, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		slog.Error("Error while connecting to PostgreSQL", "error", err)
+		return nil, nil
+	}
+
+	return postgres.NewRepository(pool), pool.Close
+}
+
+func startAppServices(ctx context.Context, cfg *config.Config) {
+	repositories, closeFn, err := initializeRepositories(ctx, cfg)
+	if err != nil {
+		slog.Error("Failed to initialize repositories", "error", err)
 		return
 	}
-	defer pool.Close()
+	defer closeFn()
 
-	postgresRepo := postgres.NewRepository(pool)
+	em := initializeEventManager()
 
+	services := domain.NewService(cfg, repositories, em)
+	httpServer := http.NewServer(cfg, services)
+	mqttServer := mqtt.NewMqtt(cfg, services)
+
+	runServices(ctx, httpServer, mqttServer, em, services)
+}
+
+func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.Repository, func(), error) {
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
-		slog.Error("Error while creating local repository", "error", err)
-		return
+		return nil, nil, fmt.Errorf("error creating local repository: %w", err)
+	}
+
+	// can be switched between ors and valhalla
+	// routingRepo, err := openrouteservice.NewRepository(cfg)
+	routingRepo, err := valhalla.NewRepository(cfg)
+	if err != nil {
+		panic(err)
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
+
+	s3Repos, err := s3.NewRepository(cfg)
+	if err != nil {
+		panic(err)
+	}
+
+	postgresRepo, closeFn := postgresRepo(ctx, cfg)
+
 	repositories := &storage.Repository{
 		Auth: keycloakRepo.Auth,
 		User: keycloakRepo.User,
 
-		Info:        localRepo.Info,
-		Sensor:      postgresRepo.Sensor,
-		Tree:        postgresRepo.Tree,
-		TreeCluster: postgresRepo.TreeCluster,
-		Vehicle:     postgresRepo.Vehicle,
-		Flowerbed:   postgresRepo.Flowerbed,
-		Image:       postgresRepo.Image,
-		Region:      postgresRepo.Region,
+		Info:         localRepo.Info,
+		Sensor:       postgresRepo.Sensor,
+		Tree:         postgresRepo.Tree,
+		TreeCluster:  postgresRepo.TreeCluster,
+		Vehicle:      postgresRepo.Vehicle,
+		Flowerbed:    postgresRepo.Flowerbed,
+		Image:        postgresRepo.Image,
+		Region:       postgresRepo.Region,
+		WateringPlan: postgresRepo.WateringPlan,
+		Routing:      routingRepo.Routing,
+		GpxBucket:    s3Repos.GpxBucket,
 	}
 
-	services := domain.NewService(cfg, repositories)
-	httpServer := http.NewServer(cfg, services)
-	mqttServer := mqtt.NewMqtt(cfg, services)
+	return repositories, closeFn, nil
+}
 
+func initializeEventManager() *worker.EventManager {
+	return worker.NewEventManager(
+		entities.EventTypeUpdateTree,
+		entities.EventTypeUpdateTreeCluster,
+		entities.EventTypeCreateTree,
+		entities.EventTypeDeleteTree,
+		entities.EventTypeNewSensorData,
+		entities.EventTypeUpdateWateringPlan,
+	)
+}
+
+func runServices(ctx context.Context, httpServer *http.Server, mqttServer *mqtt.Mqtt, em *worker.EventManager, services *service.Services) {
 	var wg sync.WaitGroup
-	wg.Add(2)
 
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		mqttServer.RunSubscriber(ctx)
 	}()
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		em.Run(ctx)
+	}()
+
+	runEventSubscriptions(ctx, &wg, em, services)
+
+	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if err := httpServer.Run(ctx); err != nil {
@@ -140,6 +206,26 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+func runEventSubscriptions(ctx context.Context, wg *sync.WaitGroup, em *worker.EventManager, services *service.Services) {
+	subscribers := []worker.Subscriber{
+		subscriber.NewUpdateTreeSubscriber(services.TreeClusterService),
+		subscriber.NewCreateTreeSubscriber(services.TreeClusterService),
+		subscriber.NewDeleteTreeSubscriber(services.TreeClusterService),
+		subscriber.NewSensorDataSubscriber(services.TreeClusterService, services.TreeService),
+		subscriber.NewUpdateWateringPlanSubscriber(services.TreeClusterService),
+	}
+
+	for _, sub := range subscribers {
+		wg.Add(1)
+		go func(sub worker.Subscriber) {
+			defer wg.Done()
+			if err := em.RunSubscription(ctx, sub); err != nil {
+				slog.Error("stop subscription with err", "eventType", sub.EventType(), "err", err)
+			}
+		}(sub)
+	}
 }
 
 func setSwaggerInfo(appURL string) {

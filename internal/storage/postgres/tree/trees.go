@@ -38,7 +38,6 @@ func NewTreeRepositoryMappers(
 }
 
 func NewTreeRepository(s *store.Store, mappers TreeMappers) storage.TreeRepository {
-	s.SetEntityType(store.Tree)
 	return &TreeRepository{
 		store:       s,
 		TreeMappers: mappers,
@@ -87,7 +86,7 @@ func WithLongitude(long float64) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithTreeNumber(number string) entities.EntityFunc[entities.Tree] {
+func WithNumber(number string) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.Number = number
 	}
@@ -122,7 +121,8 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 			TreeID:  id,
 			ImageID: img.ID,
 		}
-		if err = r.store.UnlinkTreeImage(ctx, &args); err != nil {
+		_, err = r.store.UnlinkTreeImage(ctx, &args)
+		if err != nil {
 			return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
 		}
 
@@ -130,7 +130,13 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 			return r.store.HandleError(errors.Wrap(err, "failed to delete image"))
 		}
 	}
-	return r.store.DeleteTree(ctx, id)
+
+	_, err = r.store.DeleteTree(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (r *TreeRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
@@ -146,7 +152,8 @@ func (r *TreeRepository) UnlinkImage(ctx context.Context, treeID, imageID int32)
 		TreeID:  treeID,
 		ImageID: imageID,
 	}
-	return r.store.UnlinkTreeImage(ctx, &args)
+	_, err := r.store.UnlinkTreeImage(ctx, &args)
+	return err
 }
 
 func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) error {
@@ -154,5 +161,16 @@ func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) erro
 }
 
 func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error {
+	_, err := r.store.GetTreeClusterByID(ctx, treeClusterID)
+	if err != nil {
+		return err
+	}
 	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
+}
+
+func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {
+	if sensorID == "" {
+		return errors.New("sensorID cannot be empty")
+	}
+	return r.store.UnlinkSensorIDFromTrees(ctx, &sensorID)
 }

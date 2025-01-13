@@ -38,6 +38,10 @@ func StringToNetIP(s string) net.IP {
 }
 
 func NetIPToString(ip net.IP) string {
+	if ip == nil {
+		return ""
+	}
+
 	return ip.String()
 }
 
@@ -51,9 +55,27 @@ func TimeToString(t time.Time) string {
 }
 
 func NetURLToString(u *url.URL) string {
+	if u == nil {
+		return ""
+	}
 	return u.String()
 }
 
 func TimeDurationToString(t time.Duration) string {
 	return t.String()
+}
+
+func StringPtrToString(source *string) string {
+	if source == nil {
+		return ""
+	}
+	return *source
+}
+
+func Float64ToDuration(source float64) time.Duration {
+	return time.Duration(source)
+}
+
+func DurationToPtrFloat64(source time.Duration) *float64 {
+	return P(float64(source))
 }

@@ -1,9 +1,15 @@
 package utils
 
 import (
+	"encoding/json"
+	"net/http"
+	"net/url"
 	"path"
 	"path/filepath"
 	"runtime"
+
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 // P returns a pointer to the value passed as an argument.
@@ -19,13 +25,31 @@ func RootDir() string {
 	return filepath.Dir(d)
 }
 
-// CompareAndUpdate compares two values and updates the new value if it is different from the old value. If the new value is nil, the old value is returned. If the old value is different from the new value, the new value is returned. Otherwise, the old value is returned.
-func CompareAndUpdate[T comparable](o T, n *T) T {
-	if n == nil {
-		return o
+// Helper function to decode JSON response
+func ParseJSONResponse(body *http.Response, target any) error {
+	defer body.Body.Close()
+	return json.NewDecoder(body.Body).Decode(target)
+}
+
+// Helper function to parse a UUID to a string
+func UUIDToString(u uuid.UUID) string {
+	if u == uuid.Nil {
+		return ""
 	}
-	if o != *n {
-		return *n
+	return u.String()
+}
+
+// Helper function to parse an url to a string
+func URLToString(u *url.URL) string {
+	if u == nil {
+		return ""
 	}
-	return o
+	return u.String()
+}
+
+func UUIDToPGUUID(userID uuid.UUID) pgtype.UUID {
+	return pgtype.UUID{
+		Bytes: userID,
+		Valid: true,
+	}
 }

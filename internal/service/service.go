@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"reflect"
+	"time"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
@@ -41,27 +43,25 @@ const (
 	InternalError ErrorCode = 500
 )
 
+type BasicCrudService[T any, CreateType any, UpdateType any] interface {
+	GetAll(ctx context.Context) ([]*T, error)
+	GetByID(ctx context.Context, id int32) (*T, error)
+	Create(ctx context.Context, createData *CreateType) (*T, error)
+	Update(ctx context.Context, id int32, updateData *UpdateType) (*T, error)
+	Delete(ctx context.Context, id int32) error
+}
+
 type InfoService interface {
 	Service
 	GetAppInfo(context.Context) (*domain.App, error)
 	GetAppInfoResponse(context.Context) (*domain.App, error)
 }
 
-type MqttService interface {
-	Service
-	HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.MqttPayload, error)
-	SetConnected(bool)
-}
-
 type TreeService interface {
-	Service
+	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
-
-	GetAll(ctx context.Context) ([]*domain.Tree, error)
-	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
-	Update(ctx context.Context, id int32, tc *domain.TreeUpdate) (*domain.Tree, error)
-	Create(ctx context.Context, treeCreate *domain.TreeCreate) (*domain.Tree, error)
-	Delete(ctx context.Context, id int32) error
+	GetBySensorID(ctx context.Context, id string) (*domain.Tree, error)
+	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 }
 
 type AuthService interface {
@@ -72,6 +72,9 @@ type AuthService interface {
 	Register(ctx context.Context, user *domain.RegisterUser) (*domain.User, error)
 	RetrospectToken(ctx context.Context, token string) (*domain.IntroSpectTokenResult, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*domain.ClientToken, error)
+	GetAll(ctx context.Context) ([]*domain.User, error)
+	GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error)
+	GetAllByRole(ctx context.Context, role domain.Role) ([]*domain.User, error)
 }
 
 type RegionService interface {
@@ -82,16 +85,51 @@ type RegionService interface {
 
 type TreeClusterService interface {
 	Service
-	GetAll(ctx context.Context) ([]*domain.TreeCluster, error)
-	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
-	Create(ctx context.Context, tc *domain.TreeClusterCreate) (*domain.TreeCluster, error)
-	Update(ctx context.Context, id int32, tc *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
-	Delete(ctx context.Context, id int32) error
+	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
+	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
+	HandleCreateTree(context.Context, *domain.EventCreateTree) error
+	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error
+	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
+	HandleUpdateWateringPlan(context.Context, *domain.EventUpdateWateringPlan) error
 }
 
 type SensorService interface {
 	Service
 	GetAll(ctx context.Context) ([]*domain.Sensor, error)
+	GetByID(ctx context.Context, id string) (*domain.Sensor, error)
+	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
+	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
+	Delete(ctx context.Context, id string) error
+	HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.SensorData, error)
+	MapSensorToTree(ctx context.Context, sen *domain.Sensor) error
+	RunStatusUpdater(ctx context.Context, interval time.Duration)
+}
+
+type CrudService[T any, CreateType any, UpdateType any] interface {
+	Service
+	BasicCrudService[T, CreateType, UpdateType]
+}
+
+type VehicleService interface {
+	CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
+	GetAllByType(ctx context.Context, vehicleType domain.VehicleType) ([]*domain.Vehicle, error)
+	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
+}
+
+type WateringPlanService interface {
+	CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
+	PreviewRoute(ctx context.Context, transporterID int32, trailerID *int32, clusterIDs []int32) (*domain.GeoJSON, error)
+	GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error)
+}
+
+type PluginService interface {
+	Service
+	Register(ctx context.Context, plugin *domain.Plugin) (*domain.ClientToken, error)
+	Get(slug string) (domain.Plugin, error)
+	GetAll() ([]domain.Plugin, []time.Time)
+	HeartBeat(slug string) error
+	Unregister(slug string)
+	StartCleanup(ctx context.Context) error
 }
 
 type Service interface {
@@ -99,13 +137,19 @@ type Service interface {
 }
 
 type Services struct {
-	InfoService        InfoService
-	MqttService        MqttService
-	TreeService        TreeService
-	AuthService        AuthService
-	RegionService      RegionService
-	TreeClusterService TreeClusterService
-	SensorService      SensorService
+	InfoService         InfoService
+	TreeService         TreeService
+	AuthService         AuthService
+	RegionService       RegionService
+	TreeClusterService  TreeClusterService
+	SensorService       SensorService
+	VehicleService      VehicleService
+	PluginService       PluginService
+	WateringPlanService WateringPlanService
+}
+
+type ServicesInterface interface {
+	AllServicesReady() bool
 }
 
 func (s *Services) AllServicesReady() bool {

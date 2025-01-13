@@ -1,11 +1,11 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters;
+SELECT * FROM tree_clusters ORDER BY name ASC;
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
 
--- name: GetSensorByTreeClusterID :one
-SELECT sensors.* FROM sensors JOIN tree_clusters ON sensors.id = tree_clusters.sensor_id WHERE tree_clusters.id = $1;
+-- name: GetTreesClustersByIDs :many
+SELECT * FROM tree_clusters WHERE id = ANY($1::int[]);
 
 -- name: GetRegionByTreeClusterID :one
 SELECT regions.* FROM regions JOIN tree_clusters ON regions.id = tree_clusters.region_id WHERE tree_clusters.id = $1;
@@ -19,9 +19,6 @@ INSERT INTO tree_clusters (
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7
 ) RETURNING id;
-
--- name: GetTreeClusterByAddress :one
-SELECT * FROM tree_clusters WHERE address = $1 LIMIT 1;
 
 -- name: LinkTreesToTreeCluster :exec
 UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
@@ -53,11 +50,28 @@ UPDATE tree_clusters SET
   archived = $10
 WHERE id = $1;
 
--- name: ArchiveTreeCluster :exec
+-- name: ArchiveTreeCluster :one
 UPDATE tree_clusters SET
   archived = TRUE
-WHERE id = $1;
+WHERE id = $1 RETURNING id;
 
--- name: DeleteTreeCluster :exec
-DELETE FROM tree_clusters WHERE id = $1;
+-- name: DeleteTreeCluster :one
+DELETE FROM tree_clusters WHERE id = $1 RETURNING id;
 
+-- name: CalculateTreesCentroid :one
+SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE trees.tree_cluster_id = $1;
+
+-- name: GetAllLatestSensorDataByTreeClusterID :many
+SELECT sd.*
+FROM sensor_data sd
+JOIN sensors s ON sd.sensor_id = s.id
+JOIN trees t ON t.sensor_id = s.id
+JOIN tree_clusters tc ON t.tree_cluster_id = tc.id
+WHERE tc.id = $1
+  AND sd.id = (
+    SELECT id
+    FROM sensor_data
+    WHERE sensor_id = s.id
+    ORDER BY created_at DESC
+    LIMIT 1
+  );

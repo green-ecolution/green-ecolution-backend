@@ -9,7 +9,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
-	"github.com/twpayne/go-geos"
 )
 
 func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
@@ -42,6 +41,45 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	return t, nil
 }
 
+func (r *TreeRepository) GetBySensorID(ctx context.Context, id string) (*entities.Tree, error) {
+	_, err := r.store.GetSensorByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, storage.ErrSensorNotFound
+		} else {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
+	row, err := r.store.GetTreeBySensorID(ctx, &id)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	t := r.mapper.FromSql(row)
+	if err := r.mapFields(ctx, t); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	return t, nil
+}
+
+func (r *TreeRepository) GetBySensorIDs(ctx context.Context, ids ...string) ([]*entities.Tree, error) {
+	rows, err := r.store.GetTreesBySensorIDs(ctx, ids)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
+	t := r.mapper.FromSqlList(rows)
+	for _, tree := range t {
+		if err := r.mapFields(ctx, tree); err != nil {
+			return nil, r.store.HandleError(err)
+		}
+	}
+
+	return t, nil
+}
+
 func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error) {
 	rows, err := r.store.GetTreesByIDs(ctx, ids)
 	if err != nil {
@@ -58,26 +96,12 @@ func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*ent
 	return t, nil
 }
 
-func (r *TreeRepository) GetCenterPoint(ctx context.Context, ids []int32) (lat, long float64, err error) {
-	geoStr, err := r.store.CalculateGroupedCentroids(ctx, ids)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	// Parse geoStr to get latitude and longitude
-	g, err := geos.NewGeomFromWKT(geoStr)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	if g.IsEmpty() {
-		return 0, 0, errors.New("empty geometry")
-	}
-
-	return g.X(), g.Y(), nil
-}
-
 func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	_, err := r.store.GetTreeClusterByID(ctx, id)
+	if err != nil {
+		return nil, r.store.HandleError(err)
+	}
+
 	rows, err := r.store.GetTreesByTreeClusterID(ctx, &id)
 	if err != nil {
 		return nil, r.store.HandleError(err)
@@ -118,8 +142,8 @@ func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*ent
 	return r.iMapper.FromSqlList(rows), nil
 }
 
-func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
-	row, err := r.store.GetSensorByTreeID(ctx, flowerbedID)
+func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*entities.Sensor, error) {
+	row, err := r.store.GetSensorByTreeID(ctx, treeID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrSensorNotFound
@@ -128,10 +152,15 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, flowerbedID int3
 		}
 	}
 
-	return r.sMapper.FromSql(row), nil
+	data := r.sMapper.FromSql(row)
+	if err := r.store.MapSensorFields(ctx, data); err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
-func (r *TreeRepository) GetTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
+func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
 	row, err := r.store.GetTreeClusterByTreeID(ctx, treeID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -183,10 +212,28 @@ func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 }
 
 func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
-	treeCluster, err := r.GetTreeClusterByTreeID(ctx, t.ID)
+	treeCluster, err := r.getTreeClusterByTreeID(ctx, t.ID)
 	if err != nil {
 		return r.store.HandleError(err)
 	}
 	t.TreeCluster = treeCluster
 	return nil
+}
+
+func (r *TreeRepository) FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error) {
+	params := &sqlc.FindNearestTreeParams{
+		StMakepoint:   latitude,
+		StMakepoint_2: longitude,
+	}
+
+	nearestTree, err := r.store.FindNearestTree(ctx, params)
+	if err != nil {
+		return nil, err
+	}
+
+	tree := r.mapper.FromSql(nearestTree)
+	if err := r.mapFields(ctx, tree); err != nil {
+		return nil, r.store.HandleError(err)
+	}
+	return tree, nil
 }

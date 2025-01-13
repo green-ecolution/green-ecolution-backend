@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/green-ecolution/green-ecolution-backend/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -47,10 +47,11 @@ func TestRestrospectToken(t *testing.T) {
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		// when
-		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New("failed to retrospect token"))
+		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New(""))
 		_, err := svc.RetrospectToken(context.Background(), token)
 
 		// then
 		assert.Error(t, err)
+		assert.EqualError(t, err, "500: failed to retrospect token: ")
 	})
 }

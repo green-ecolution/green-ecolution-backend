@@ -2,23 +2,15 @@ package keycloak
 
 import (
 	"context"
-	"errors"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
 
-var (
-	ErrInvalidToken     = errors.New("invalid token")
-	ErrTokenExpired     = errors.New("token expired")
-	ErrTokenNotActive   = errors.New("token not active")
-	ErrTokenInvalidType = errors.New("token invalid type")
-)
-
 func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 
-	rptResult, err := client.RetrospectToken(ctx, token, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm)
+	rptResult, err := client.RetrospectToken(ctx, token, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName)
 	if err != nil {
 		return nil, err
 	}
@@ -32,17 +24,17 @@ func (r *KeycloakRepository) RetrospectToken(ctx context.Context, token string) 
 }
 
 func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
 
 	tokenOptions := gocloak.TokenOptions{
-		ClientID:     &r.cfg.KeyCloak.Frontend.ClientID,
-		ClientSecret: &r.cfg.KeyCloak.Frontend.ClientSecret,
+		ClientID:     &r.cfg.OidcProvider.Frontend.ClientID,
+		ClientSecret: &r.cfg.OidcProvider.Frontend.ClientSecret,
 		Code:         &code,
 		GrantType:    gocloak.StringP("authorization_code"),
 		RedirectURI:  &redirectURL,
 	}
 
-	token, err := client.GetToken(ctx, r.cfg.KeyCloak.Realm, tokenOptions)
+	token, err := client.GetToken(ctx, r.cfg.OidcProvider.DomainName, tokenOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +52,34 @@ func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, c
 }
 
 func (r *KeycloakRepository) RefreshToken(ctx context.Context, refreshToken string) (*entities.ClientToken, error) {
-	client := gocloak.NewClient(r.cfg.KeyCloak.BaseURL)
-	token, err := client.RefreshToken(ctx, refreshToken, r.cfg.KeyCloak.Frontend.ClientID, r.cfg.KeyCloak.Frontend.ClientSecret, r.cfg.KeyCloak.Realm)
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+	token, err := client.RefreshToken(ctx, refreshToken, r.cfg.OidcProvider.Frontend.ClientID, r.cfg.OidcProvider.Frontend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &entities.ClientToken{
+		AccessToken:      token.AccessToken,
+		RefreshToken:     token.RefreshToken,
+		ExpiresIn:        token.ExpiresIn,
+		RefreshExpiresIn: token.RefreshExpiresIn,
+		TokenType:        token.TokenType,
+		NotBeforePolicy:  token.NotBeforePolicy,
+		SessionState:     token.SessionState,
+		Scope:            token.Scope,
+	}, nil
+}
+
+func (r *KeycloakRepository) GetAccessTokenFromClientCredentials(ctx context.Context, clientID, clientSecret string) (*entities.ClientToken, error) {
+	client := gocloak.NewClient(r.cfg.OidcProvider.BaseURL)
+
+	tokenOptions := gocloak.TokenOptions{
+		ClientID:     &clientID,
+		ClientSecret: &clientSecret,
+		GrantType:    gocloak.StringP("client_credentials"),
+	}
+
+	token, err := client.GetToken(ctx, r.cfg.OidcProvider.DomainName, tokenOptions)
 	if err != nil {
 		return nil, err
 	}

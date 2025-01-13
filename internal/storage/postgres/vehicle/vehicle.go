@@ -2,9 +2,7 @@ package vehicle
 
 import (
 	"context"
-	"log/slog"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -27,34 +25,17 @@ func NewVehicleRepositoryMappers(vMapper mapper.InternalVehicleRepoMapper) Vehic
 }
 
 func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
-	s.SetEntityType(store.Vehicle)
 	return &VehicleRepository{
 		store:                    s,
 		VehicleRepositoryMappers: mappers,
 	}
 }
 
-func WithNumberPlate(numberPlate string) entities.EntityFunc[entities.Vehicle] {
-	return func(v *entities.Vehicle) {
-		slog.Debug("updating number", "number", numberPlate)
-		v.NumberPlate = numberPlate
-	}
-}
-
-func WithDescription(description string) entities.EntityFunc[entities.Vehicle] {
-	return func(v *entities.Vehicle) {
-		slog.Debug("updating description", "description", description)
-		v.Description = description
-	}
-}
-
-func WithWaterCapacity(waterCapacity float64) entities.EntityFunc[entities.Vehicle] {
-	return func(v *entities.Vehicle) {
-		slog.Debug("updating water capacity", "water capacity", waterCapacity)
-		v.WaterCapacity = waterCapacity
-	}
-}
-
 func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
-	return r.store.DeleteVehicle(ctx, id)
+	_, err := r.store.DeleteVehicle(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

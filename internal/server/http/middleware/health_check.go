@@ -6,7 +6,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 )
 
-func HealthCheck(svc *service.Services) fiber.Handler {
+func HealthCheck(svc service.ServicesInterface) fiber.Handler {
 	return healthcheck.New(healthcheck.Config{
 		LivenessProbe: func(_ *fiber.Ctx) bool {
 			return true
