@@ -53,7 +53,7 @@ var version = "develop"
 //	@contact.url	https://green-ecolution.de
 //	@contact.email	info@green-ecolution.de
 
-//	@license.name	GPL-3.0
+//	@license.name	AGPL
 //	@license.url	https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
 
 // @securitydefinitions.oauth2.accessCode	Keycloak
