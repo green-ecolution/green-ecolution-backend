@@ -63,7 +63,7 @@ func NewEventManager(eventTypes ...entities.EventType) *EventManager {
 	}
 
 	return &EventManager{
-		eventCh:    make(chan entities.Event, 1),
+		eventCh:    make(chan entities.Event, 100),
 		subscriber: subscriber,
 		nextID:     0,
 		eventTypes: eventTypeMap,
