@@ -81,7 +81,7 @@ func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, prevTc *dom
 		return err
 	}
 	event := domain.NewEventUpdateTreeCluster(prevTc, updatedTc)
-	err = s.eventManager.Publish(event)
+	err = s.eventManager.Publish(ctx, event)
 	if err != nil {
 		slog.Error("error while sending event after updating tree cluster", "err", err)
 	}

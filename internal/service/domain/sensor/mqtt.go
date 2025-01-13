@@ -36,7 +36,7 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		return nil, err
 	}
 
-	s.publishNewSensorDataEvent(sensorData)
+	s.publishNewSensorDataEvent(ctx, sensorData)
 
 	return sensorData, nil
 }
