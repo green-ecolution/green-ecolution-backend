@@ -2,6 +2,7 @@
 -- +goose StatementBegin
 INSERT INTO images (url) VALUES ('https://avatars.githubusercontent.com/u/165842746?s=96&v=4');
 INSERT INTO images (url, filename, mime_type) VALUES ('https://app.dev.green-ecolution.de/api/v1/images/avatar.png', 'avatar.png', 'image/png');
+ALTER SEQUENCE images_id_seq RESTART WITH 3;
 
 INSERT INTO vehicles (id, number_plate, description, water_capacity, type, status, driving_license, model, width, height, length, weight) 
 VALUES 
@@ -9,6 +10,7 @@ VALUES
   (2, 'B-2222', 'Test vehicle 2', 1000.0, 'transporter', 'unknown', 'C', 'Actros L Mercedes Benz', 2.4, 2.1, 5.0, 2.5),
   (3, 'B-3333', 'Test vehicle 3', 2800.0, 'transporter', 'available', 'C', 'Ford Ranger XL', 2.55, 4.0, 9.09, 26),
   (4, 'B-4444', 'Test vehicle 4', 1000.0, 'trailer', 'available', 'BE', 'VW Crafter Pritsche', 2.4, 2.1, 5.0, 5.5);
+ALTER SEQUENCE vehicles_id_seq RESTART WITH 5;
 
 INSERT INTO tree_clusters (id, name, watering_status, moisture_level, region_id, address, description, soil_condition, latitude, longitude, geometry)
 VALUES 
@@ -22,6 +24,7 @@ VALUES
   (8, 'Seniorenanlage Valentinerhof', 'bad', 0.1, 13, 'Auf dem Geländer der Seniorenanlage', 'Sehr viel versiegelter Boden.', 'sandig', 54.76994251235151, 9.441111747447234, ST_SetSRID(ST_MakePoint(54.76994251235151, 9.441111747447234), 4326)),
   (9, 'Peelwatt', 'unknown', 0.1, 13, 'Peelwatt halt', 'Sehr viel versiegelter Boden.', 'sandig', 54.76671656688957, 9.456136954289867, ST_SetSRID(ST_MakePoint(54.76671656688957, 9.456136954289867), 4326)),
   (10, 'Lautrupsbach', 'moderate', 0.1, 13, 'An der Nordstraße', 'Sehr viel versiegelter Boden.', 'sandig', 54.79265065021804, 9.454269041383837, ST_SetSRID(ST_MakePoint(54.76671656688957, 9.454269041383837), 4326));
+ALTER SEQUENCE tree_clusters_id_seq RESTART WITH 11;
 
 INSERT INTO sensors (id, status, latitude, longitude, geometry)
 VALUES
@@ -113,6 +116,7 @@ VALUES
   (NULL, NULL, 2024, 'Acer pseudoplatanus', 1060, 54.813655, 9.477633, ST_SetSRID(ST_MakePoint(54.813655, 9.477633), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
   (NULL, NULL, 2024, 'Acer pseudoplatanus', 1061, 54.811001, 9.484132, ST_SetSRID(ST_MakePoint(54.811001, 9.484132), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
   (NULL, NULL, 2024, 'Acer pseudoplatanus', 1062, 54.790366, 9.472744, ST_SetSRID(ST_MakePoint(54.790366, 9.472744), 4326), true, 'unknown', '');
+ALTER SEQUENCE trees_id_seq RESTART WITH 67;
 
 INSERT INTO sensor_data (sensor_id, data)
 VALUES
@@ -213,6 +217,7 @@ VALUES
   (3, '2025-06-12', 'Very important watering plan due to no rainfall', 'finished', 63.0, 1320.0, ''),
   (4, '2025-06-10', 'New watering plan for the south side of the city', 'not competed', 63.0, 600.0, ''),
   (5, '2025-06-04', 'Canceled due to flood', 'canceled', 63.0, 600.0, 'The watering plan was cancelled due to various reasons.');
+ALTER SEQUENCE watering_plans_id_seq RESTART WITH 6;
 
 INSERT INTO vehicle_watering_plans (vehicle_id, watering_plan_id) 
 VALUES 
