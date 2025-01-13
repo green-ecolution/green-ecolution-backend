@@ -38,6 +38,7 @@ RUN make build \
 FROM alpine:3.20 AS runner
 
 ENV PORT=3000
+ENV ENV=stage
 EXPOSE 3000
 
 RUN adduser -D gorunner
