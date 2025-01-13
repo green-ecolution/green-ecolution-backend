@@ -276,7 +276,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		go eventManager.Run(ctx)
 
 		// when
-		err := eventManager.Publish(event)
+		err := eventManager.Publish(context.Background(), event)
 
 		// then
 		assert.NoError(t, err)
@@ -311,7 +311,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		go eventManager.Run(ctx)
 
 		// when
-		err := eventManager.Publish(event)
+		err := eventManager.Publish(context.Background(), event)
 
 		// then
 		assert.NoError(t, err)
@@ -340,7 +340,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		go eventManager.Run(ctx)
 
 		// when
-		err := eventManager.Publish(event)
+		err := eventManager.Publish(context.Background(), event)
 
 		// then
 		assert.NoError(t, err)

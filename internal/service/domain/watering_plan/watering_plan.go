@@ -56,7 +56,7 @@ func (w *WateringPlanService) publishUpdateEvent(ctx context.Context, prevWp *en
 		return err
 	}
 	event := entities.NewEventUpdateWateringPlan(prevWp, updatedWp)
-	if err := w.eventManager.Publish(event); err != nil {
+	if err := w.eventManager.Publish(ctx, event); err != nil {
 		slog.Error("error while sending event after updating watering plan", "err", err, "watering_plan_id", prevWp.ID)
 	}
 

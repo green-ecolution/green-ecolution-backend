@@ -41,10 +41,10 @@ func NewSensorService(
 	}
 }
 
-func (s *SensorService) publishNewSensorDataEvent(data *entities.SensorData) {
+func (s *SensorService) publishNewSensorDataEvent(ctx context.Context, data *entities.SensorData) {
 	slog.Debug("publish new event", "event", entities.EventTypeNewSensorData, "service", "SensorService")
 	event := entities.NewEventSensorData(data)
-	if err := s.eventManager.Publish(event); err != nil {
+	if err := s.eventManager.Publish(ctx, event); err != nil {
 		slog.Error("error while sending event after new sensor data received", "err", err)
 	}
 }

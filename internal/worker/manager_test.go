@@ -42,7 +42,7 @@ func TestEventManager_Publish(t *testing.T) {
 		event := TestEvent{eventType: EventTypeTest}
 
 		// when
-		err := em.Publish(event)
+		err := em.Publish(context.Background(), event)
 
 		// then
 		assert.NoError(t, err)
@@ -54,7 +54,7 @@ func TestEventManager_Publish(t *testing.T) {
 		event := TestEvent{eventType: EventTypeTest}
 
 		// when
-		err := em.Publish(event)
+		err := em.Publish(context.Background(), event)
 
 		// then
 		assert.ErrorIs(t, err, ErrUnknownEventTypeErr)
@@ -126,7 +126,7 @@ func TestEventManager_Run(t *testing.T) {
 		event := TestEvent{eventType: EventTypeTest}
 
 		// when
-		_ = em.Publish(event)
+		_ = em.Publish(context.Background(), event)
 
 		// then
 		select {
@@ -154,7 +154,7 @@ func TestEventManager_RunSubscription(t *testing.T) {
 		}()
 
 		event := TestEvent{eventType: EventTypeTest}
-		_ = em.Publish(event)
+		_ = em.Publish(context.Background(), event)
 
 		// Simulate some processing time
 		time.Sleep(100 * time.Millisecond)
@@ -188,7 +188,7 @@ func TestEventManager_PublishEventsInLoop(t *testing.T) {
 		for i := 0; i < 100; i++ {
 			fmt.Println("Publish event", i)
 			event := TestEvent{eventType: EventTypeTest}
-			err := em.Publish(event)
+			err := em.Publish(context.Background(), event)
 			assert.NoError(t, err)
 		}
 
@@ -211,12 +211,38 @@ func TestEventManager_PublishEventsInLoop(t *testing.T) {
 		for i := 0; i < 101; i++ {
 			fmt.Println("Publish event", i)
 			event := TestEvent{eventType: EventTypeTest}
-			err := em.Publish(event)
+			err := em.Publish(context.Background(), event)
 			assert.NoError(t, err)
 		}
 
 		// then
 		<-ctx.Done()
 		assert.Equal(t, 100, len(em.eventCh))
+	})
+
+	t.Run("should error on buffered 101 if not consumed in channel and context timeout", func(t *testing.T) {
+		// given
+		em := NewEventManager(EventTypeTest)
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		defer cancel()
+		go em.Run(ctx)
+
+		_, _, _ = em.Subscribe(EventTypeTest)
+
+		// when
+		for i := 0; i < 102; i++ {
+			fmt.Println("Publish event", i)
+			event := TestEvent{eventType: EventTypeTest}
+			err := em.Publish(ctx, event)
+			if i == 101 {
+				assert.Error(t, err)
+				assert.ErrorIs(t, err, context.DeadlineExceeded)
+			} else {
+				assert.NoError(t, err)
+			}
+		}
+
+		// then
+		<-ctx.Done()
 	})
 }

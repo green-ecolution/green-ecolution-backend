@@ -87,14 +87,17 @@ func NewEventManager(eventTypes ...entities.EventType) *EventManager {
 //	if err != nil {
 //		log.Fatalf("Failed to publish event: %v", err)
 //	}
-func (e *EventManager) Publish(event entities.Event) error {
+func (e *EventManager) Publish(ctx context.Context, event entities.Event) error {
 	if _, ok := e.eventTypes[event.Type()]; !ok {
 		return ErrUnknownEventTypeErr
 	}
 
-	e.eventCh <- event
-
-	return nil
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case e.eventCh <- event:
+		return nil
+	}
 }
 
 // Subscribe registers a new subscription for the specified event type.
