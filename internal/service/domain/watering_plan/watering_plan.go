@@ -1,6 +1,7 @@
 package wateringplan
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -193,7 +194,14 @@ func (w *WateringPlanService) getGpxRouteURL(ctx context.Context, waterPlanID in
 
 	objName := fmt.Sprintf("waterplan-%d.gpx", waterPlanID)
 
-	if err := w.gpxBucket.PutObject(ctx, objName, "application/gpx+xml;charset=UTF-8 ", -1, r); err != nil {
+	var buf bytes.Buffer
+	length, err := io.Copy(&buf, r)
+	if err != nil {
+		slog.Error("error while reading gpx response", "error", err)
+		return "", err
+	}
+
+	if err := w.gpxBucket.PutObject(ctx, objName, "application/gpx+xml;charset=UTF-8 ", length, &buf); err != nil {
 		return "", err
 	}
 
