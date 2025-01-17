@@ -43,7 +43,7 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		if vehicleTypeStr != "" {
 			vehicleType := domain.ParseVehicleType(vehicleTypeStr)
 			if vehicleType == domain.VehicleTypeUnknown {
-				return service.NewError(service.BadRequest, "invalid vehicle type")
+				return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid vehicle type"))
 			}
 			domainData, err = svc.GetAllByType(ctx, vehicleType)
 		} else {
