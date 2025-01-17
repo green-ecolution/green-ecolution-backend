@@ -9,6 +9,7 @@ type UserStatus string // @Name UserStatus
 const (
 	UserStatusAvailable UserStatus = "available"
 	UserStatusAbsent    UserStatus = "absent"
+	UserStatusUnknown   UserStatus = "unknown"
 )
 
 type UserRole string // @Name UserRole
