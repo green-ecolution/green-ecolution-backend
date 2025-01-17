@@ -164,7 +164,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -225,7 +225,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -268,7 +268,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
-		// check treecluster
+		// check user
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
@@ -281,6 +281,54 @@ func TestWateringPlanService_Create(t *testing.T) {
 		assert.Nil(t, result)
 		assert.Error(t, err)
 		// assert.EqualError(t, err, "404: user not found")
+	})
+
+	t.Run("should return an error when one user has not correct user role", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		// check users
+		userRepo.EXPECT().GetByIDs(
+			ctx,
+			[]string{testUUIDString},
+		).Return([]*entities.User{testUserGreenEcolution}, nil)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "400: user has an incorrect role")
+	})
+
+	t.Run("should return an error when user has no role", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		// check users
+		userRepo.EXPECT().GetByIDs(
+			ctx,
+			[]string{testUUIDString},
+		).Return([]*entities.User{{Roles: []entities.Role{}}}, nil)
+
+		// when
+		result, err := svc.Create(ctx, newWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "400: user has an incorrect role")
 	})
 
 	t.Run("should return an error when finding treeclusters fails", func(t *testing.T) {
@@ -297,7 +345,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -353,7 +401,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -384,7 +432,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -423,7 +471,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -622,7 +670,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -697,7 +745,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -759,7 +807,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -790,6 +838,64 @@ func TestWateringPlanService_Update(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, allTestWateringPlans[0], result)
+	})
+
+	t.Run("should return an error when one user has not correct user role", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
+
+		// check users
+		userRepo.EXPECT().GetByIDs(
+			ctx,
+			[]string{testUUIDString},
+		).Return([]*entities.User{testUserGreenEcolution}, nil)
+
+		// when
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "400: user has an incorrect role")
+	})
+
+	t.Run("should return an error when user has no roles", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		wateringPlanRepo.EXPECT().GetByID(
+			ctx,
+			int32(1),
+		).Return(allTestWateringPlans[0], nil)
+
+		// check users
+		userRepo.EXPECT().GetByIDs(
+			ctx,
+			[]string{testUUIDString},
+		).Return([]*entities.User{{Roles: []entities.Role{}}}, nil)
+
+		// when
+		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
+
+		// then
+		assert.Nil(t, result)
+		assert.EqualError(t, err, "400: user has an incorrect role")
 	})
 
 	t.Run("should return an error when users is not found", func(t *testing.T) {
@@ -841,7 +947,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -883,7 +989,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -919,7 +1025,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -985,7 +1091,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -1041,7 +1147,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -1377,7 +1483,7 @@ func TestWateringPlanService_EventSystem(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{testUser}, nil)
+		).Return([]*entities.User{testUserTbz}, nil)
 
 		// check treecluster
 		clusterRepo.EXPECT().GetByIDs(
@@ -1631,11 +1737,20 @@ var allTestClusters = []*entities.TreeCluster{
 	},
 }
 
-var testUser = &entities.User{
-	Username:    "user1",
-	FirstName:   "John",
-	LastName:    "Doe",
-	Email:       "john.doe@green-ecolution.de",
-	EmployeeID:  "EMP001",
-	PhoneNumber: "+49 123456789",
+var testUserTbz = &entities.User{
+	Roles: []entities.Role{
+		{
+			ID:   1,
+			Name: entities.UserRoleTbz,
+		},
+	},
+}
+
+var testUserGreenEcolution = &entities.User{
+	Roles: []entities.Role{
+		{
+			ID:   1,
+			Name: entities.UserRoleGreenEcolution,
+		},
+	},
 }

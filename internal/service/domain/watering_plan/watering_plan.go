@@ -132,7 +132,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	// TODO: validate driver license
-	if err := w.validateUserIDs(ctx, createWp.UserIDs); err != nil {
+	if err := w.validateUsers(ctx, createWp.UserIDs); err != nil {
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
@@ -151,6 +151,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		trailer, err = w.fetchVehicle(ctx, *createWp.TrailerID)
 		if err != nil {
 			log.Warn("failed to get trailer by id. will continue without trailer", "error", err)
+			return nil, err
 		}
 	}
 
@@ -253,7 +254,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, err
 	}
 
-	if err := w.validateUserIDs(ctx, updateWp.UserIDs); err != nil {
+	if err := w.validateUsers(ctx, updateWp.UserIDs); err != nil {
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
@@ -402,13 +403,13 @@ func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32)
 	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
 }
 
-// Checks if the incoming user ids are belonging to valid users
-func (w *WateringPlanService) validateUserIDs(ctx context.Context, userIDs []*uuid.UUID) error {
+func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid.UUID) error {
 	log := logger.GetLogger(ctx)
 	userIDStr := utils.Map(userIDs, func(id *uuid.UUID) string {
 		return utils.UUIDToString(*id)
 	})
 
+	// Checks if the incoming user ids are belonging to valid users
 	users, err := w.userRepo.GetByIDs(ctx, userIDStr)
 	if err != nil {
 		log.Debug("failed to fetch users by id", "error", err, "user_ids", userIDStr)
@@ -418,6 +419,22 @@ func (w *WateringPlanService) validateUserIDs(ctx context.Context, userIDs []*uu
 	if len(users) == 0 {
 		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStr)
 		return storage.ErrEntityNotFound("user not found")
+	}
+
+	// Checks if the users have correct user roles
+	// Only users with the user role »UserRoleTbz« should be linked to a watering plan
+	if err := w.validateUserRoles(users); err != nil {
+		return service.NewError(service.BadRequest, storage.ErrUserNotCorrectRole.Error())
+	}
+
+	return nil
+}
+
+func (w *WateringPlanService) validateUserRoles(users []*entities.User) error {
+	for _, user := range users {
+		if !containsRole(user.Roles, entities.UserRoleTbz) {
+			return storage.ErrUserNotCorrectRole
+		}
 	}
 
 	return nil
@@ -476,4 +493,17 @@ func (w *WateringPlanService) mergeVehicle(transporter, trailer *entities.Vehicl
 		Type:          entities.VehicleTypeTransporter,
 		NumberPlate:   fmt.Sprintf("%s - %s", transporter.NumberPlate, trailer.NumberPlate),
 	}
+}
+
+func containsRole(roles []entities.Role, targetRole entities.UserRole) bool {
+	if len(roles) == 0 {
+		return false
+	}
+
+	for _, role := range roles {
+		if role.Name == targetRole {
+			return true
+		}
+	}
+	return false
 }
