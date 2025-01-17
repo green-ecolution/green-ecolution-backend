@@ -495,13 +495,13 @@ func (w *WateringPlanService) mergeVehicle(transporter, trailer *entities.Vehicl
 	}
 }
 
-func containsRole(roles []entities.Role, targetRole entities.UserRole) bool {
+func containsRole(roles []entities.UserRole, targetRole entities.UserRole) bool {
 	if len(roles) == 0 {
 		return false
 	}
 
 	for _, role := range roles {
-		if role.Name == targetRole {
+		if role == targetRole {
 			return true
 		}
 	}

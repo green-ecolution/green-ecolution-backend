@@ -9,8 +9,12 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:UUIDToString
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:URLToString
-// goverter:extend MapDrivingLicense
+// goverter:extend MapDrivingLicense MapUserRoles
 type UserHTTPMapper interface {
 	FromResponse(*domain.User) *entities.UserResponse
 	FromResponseList([]*domain.User) []*entities.UserResponse
+}
+
+func MapUserRoles(userRole domain.UserRole) entities.UserRole {
+	return entities.UserRole(userRole)
 }
