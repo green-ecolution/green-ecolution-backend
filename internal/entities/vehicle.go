@@ -65,3 +65,14 @@ type VehicleUpdate struct {
 	Length         float64        `validate:"gt=0"`
 	Weight         float64        `validate:"gt=0"`
 }
+
+func ParseVehicleType(vehicleTypeStr string) VehicleType {
+	switch vehicleTypeStr {
+	case string(VehicleTypeTrailer):
+		return VehicleTypeTrailer
+	case string(VehicleTypeTransporter):
+		return VehicleTypeTransporter
+	default:
+		return VehicleTypeUnknown
+	}
+}

@@ -18,7 +18,7 @@ func defaultVehicle() *entities.Vehicle {
 		Type:           entities.VehicleTypeUnknown,
 		Status:         entities.VehicleStatusUnknown,
 		Model:          "",
-		DrivingLicense: entities.DrivingLicenseCar,
+		DrivingLicense: entities.DrivingLicenseB,
 		Height:         0,
 		Length:         0,
 		Width:          0,

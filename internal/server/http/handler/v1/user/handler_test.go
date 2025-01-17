@@ -676,8 +676,8 @@ func TestGetUsersByRole(t *testing.T) {
 				Username:    "johndoe",
 				EmployeeID:  "1234",
 				PhoneNumber: "+123456789",
-				Roles: []domain.Role{
-					{Name: domain.UserRoleTbz},
+				Roles: []domain.UserRole{
+					domain.UserRoleTbz,
 				},
 			},
 			{
@@ -689,13 +689,13 @@ func TestGetUsersByRole(t *testing.T) {
 				Username:    "janedoe",
 				EmployeeID:  "5678",
 				PhoneNumber: "+987654321",
-				Roles: []domain.Role{
-					{Name: domain.UserRoleGreenEcolution},
+				Roles: []domain.UserRole{
+					domain.UserRoleSmarteGrenzregion,
 				},
 			},
 		}
 		expectedUsers := []*domain.User{users[1]}
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleGreenEcolution}).Return(expectedUsers, nil)
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleGreenEcolution).Return(expectedUsers, nil)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleGreenEcolution), nil)
@@ -743,7 +743,7 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleTbz}).
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleTbz).
 			Return(nil, service.NewError(service.InternalError, "service error"))
 
 		// when
@@ -762,7 +762,7 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleTbz}).Return([]*domain.User{}, nil)
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleTbz).Return([]*domain.User{}, nil)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleTbz), nil)

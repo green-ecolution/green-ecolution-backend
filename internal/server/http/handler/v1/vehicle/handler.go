@@ -42,9 +42,9 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		vehicleTypeStr := c.Query("type")
 		if vehicleTypeStr != "" {
 			var vehicleType domain.VehicleType
-			vehicleType, err = parseVehicleType(vehicleTypeStr)
-			if err != nil {
-				return errorhandler.HandleError(err)
+			vehicleType = domain.ParseVehicleType(vehicleTypeStr)
+			if vehicleType == domain.VehicleTypeUnknown {
+				return service.NewError(service.BadRequest, "invalid vehicle type")
 			}
 			domainData, err = svc.GetAllByType(ctx, vehicleType)
 		} else {
@@ -245,15 +245,4 @@ func mapVehicleToDto(v *domain.Vehicle) *entities.VehicleResponse {
 	dto := vehicleMapper.FromResponse(v)
 
 	return dto
-}
-
-func parseVehicleType(vehicleTypeStr string) (domain.VehicleType, error) {
-	switch vehicleTypeStr {
-	case string(domain.VehicleTypeTrailer):
-		return domain.VehicleTypeTrailer, nil
-	case string(domain.VehicleTypeTransporter):
-		return domain.VehicleTypeTransporter, nil
-	default:
-		return domain.VehicleTypeUnknown, service.NewError(service.BadRequest, "invalid vehicle type")
-	}
 }

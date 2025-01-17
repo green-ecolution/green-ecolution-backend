@@ -123,12 +123,12 @@ func TestRegisterRoutes(t *testing.T) {
 					PhoneNumber:   "+49 123456",
 					EmailVerified: false,
 					Avatar:        nil,
-					Roles: []domain.Role{
-						{Name: domain.UserRoleGreenEcolution},
+					Roles: []domain.UserRole{
+						domain.UserRoleGreenEcolution,
 					},
 				},
 			}
-			mockUserService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleGreenEcolution}).Return(expected, nil)
+			mockUserService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleGreenEcolution).Return(expected, nil)
 
 			// when
 			req := httptest.NewRequest(http.MethodGet, string("/role/"+domain.UserRoleGreenEcolution), nil)

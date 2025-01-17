@@ -111,7 +111,7 @@ type AuthService interface {
 	RefreshToken(ctx context.Context, refreshToken string) (*domain.ClientToken, error)
 	GetAll(ctx context.Context) ([]*domain.User, error)
 	GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error)
-	GetAllByRole(ctx context.Context, role domain.Role) ([]*domain.User, error)
+	GetAllByRole(ctx context.Context, role domain.UserRole) ([]*domain.User, error)
 }
 
 type RegionService interface {

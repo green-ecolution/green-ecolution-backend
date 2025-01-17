@@ -80,10 +80,6 @@ type UserRepository interface {
 	GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error)
 }
 
-type RoleRepository interface {
-	GetByName(ctx context.Context, name string) (*entities.Role, error)
-}
-
 type ImageRepository interface {
 	BasicCrudRepository[entities.Image]
 }
@@ -219,7 +215,6 @@ type Repository struct {
 	Sensor       SensorRepository
 	Tree         TreeRepository
 	User         UserRepository
-	Role         RoleRepository
 	Image        ImageRepository
 	Vehicle      VehicleRepository
 	TreeCluster  TreeClusterRepository

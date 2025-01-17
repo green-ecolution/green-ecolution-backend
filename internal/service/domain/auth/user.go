@@ -102,7 +102,7 @@ func (s *AuthService) GetByIDs(ctx context.Context, ids []string) ([]*domain.Use
 	return users, nil
 }
 
-func (s *AuthService) GetAllByRole(ctx context.Context, role domain.Role) ([]*domain.User, error) {
+func (s *AuthService) GetAllByRole(ctx context.Context, role domain.UserRole) ([]*domain.User, error) {
 	users, err := s.GetAll(ctx)
 	if err != nil {
 		return nil, err
@@ -111,7 +111,7 @@ func (s *AuthService) GetAllByRole(ctx context.Context, role domain.Role) ([]*do
 	var filteredUsers []*domain.User
 	for _, user := range users {
 		for _, userRole := range user.Roles {
-			if userRole.Name == role.Name {
+			if userRole == role {
 				filteredUsers = append(filteredUsers, user)
 				break
 			}
