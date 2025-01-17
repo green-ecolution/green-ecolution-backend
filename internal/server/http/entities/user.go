@@ -11,20 +11,29 @@ const (
 	UserStatusAbsent    SensorStatus = "absent"
 )
 
+type UserRole string // @Name UserRole
+
+const (
+	UserRoleTbz               UserRole = "tbz"
+	UserRoleGreenEcolution    UserRole = "green-ecolution"
+	UserRoleSmarteGrenzregion UserRole = "smarte-grenzregion"
+	UserRoleUnknown           UserRole = "unknown"
+)
+
 type UserResponse struct {
-	ID             string         `json:"id"`
-	CreatedAt      time.Time      `json:"created_at"`
-	Username       string         `json:"username"`
-	FirstName      string         `json:"first_name"`
-	LastName       string         `json:"last_name"`
-	Email          string         `json:"email"`
-	EmployeeID     string         `json:"employee_id"`
-	PhoneNumber    string         `json:"phone_number"`
-	EmailVerified  bool           `json:"email_verified"`
-	Avatar         string         `json:"avatar_url"`
-	Roles          []RoleResponse `json:"roles"`
-	DrivingLicense DrivingLicense `json:"driving_license"`
-	Status         UserStatus     `json:"status"`
+	ID              string           `json:"id"`
+	CreatedAt       time.Time        `json:"created_at"`
+	Username        string           `json:"username"`
+	FirstName       string           `json:"first_name"`
+	LastName        string           `json:"last_name"`
+	Email           string           `json:"email"`
+	EmployeeID      string           `json:"employee_id"`
+	PhoneNumber     string           `json:"phone_number"`
+	EmailVerified   bool             `json:"email_verified"`
+	Avatar          string           `json:"avatar_url"`
+	Roles           []UserRole       `json:"roles"`
+	DrivingLicenses []DrivingLicense `json:"driving_licenses"`
+	Status          UserStatus       `json:"status"`
 } // @Name User
 
 type UserListResponse struct {

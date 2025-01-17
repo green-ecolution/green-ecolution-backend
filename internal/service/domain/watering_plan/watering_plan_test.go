@@ -321,7 +321,7 @@ func TestWateringPlanService_Create(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{{Roles: []entities.Role{}}}, nil)
+		).Return([]*entities.User{{Roles: []entities.UserRole{}}}, nil)
 
 		// when
 		result, err := svc.Create(ctx, newWateringPlan)
@@ -888,7 +888,7 @@ func TestWateringPlanService_Update(t *testing.T) {
 		userRepo.EXPECT().GetByIDs(
 			ctx,
 			[]string{testUUIDString},
-		).Return([]*entities.User{{Roles: []entities.Role{}}}, nil)
+		).Return([]*entities.User{{Roles: []entities.UserRole{}}}, nil)
 
 		// when
 		result, err := svc.Update(ctx, int32(1), updatedWateringPlan)
@@ -1738,19 +1738,9 @@ var allTestClusters = []*entities.TreeCluster{
 }
 
 var testUserTbz = &entities.User{
-	Roles: []entities.Role{
-		{
-			ID:   1,
-			Name: entities.UserRoleTbz,
-		},
-	},
+	Roles: []entities.UserRole{entities.UserRoleTbz},
 }
 
 var testUserGreenEcolution = &entities.User{
-	Roles: []entities.Role{
-		{
-			ID:   1,
-			Name: entities.UserRoleGreenEcolution,
-		},
-	},
+	Roles: []entities.UserRole{entities.UserRoleGreenEcolution},
 }
