@@ -402,7 +402,7 @@ func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32)
 	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
 }
 
-func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid.UUID, transporter *entities.Vehicle, trailer *entities.Vehicle) error {
+func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid.UUID, transporter, trailer *entities.Vehicle) error {
 	log := logger.GetLogger(ctx)
 	var userIDStrings []string
 	for _, id := range userIDs {
@@ -449,7 +449,7 @@ func (w *WateringPlanService) validateUserRoles(users []*entities.User) error {
 	return nil
 }
 
-func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User, transporter *entities.Vehicle, trailer *entities.Vehicle) error {
+func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User, transporter, trailer *entities.Vehicle) error {
 	var requiredLicenses []entities.DrivingLicense
 
 	if transporter != nil && transporter.DrivingLicense != entities.DrivingLicenseUnknown {
