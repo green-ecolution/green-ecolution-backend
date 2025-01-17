@@ -236,10 +236,9 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role format"))
 		}
 
-		var userRole domain.UserRole
-		userRole = domain.ParseUserRole(role)
+		userRole := domain.ParseUserRole(role)
 		if userRole == domain.UserRoleUnknown {
-			return service.NewError(service.BadRequest, "invalid role type")
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role type"))
 		}
 
 		users, err := svc.GetAllByRole(ctx, userRole)
