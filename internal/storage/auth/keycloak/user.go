@@ -202,6 +202,10 @@ func keyCloakUserToUser(ctx context.Context, user *gocloak.User) (*entities.User
 }
 
 func convertRoles(userRoles []string) []entities.UserRole {
+	if userRoles == nil {
+		return []entities.UserRole{}
+	}
+
 	var roles []entities.UserRole
 	for _, roleName := range userRoles {
 		userRole := entities.ParseUserRole(roleName)
@@ -211,11 +215,16 @@ func convertRoles(userRoles []string) []entities.UserRole {
 }
 
 func convertDrivingLicenses(drivingLicenses []string) []entities.DrivingLicense {
+	if drivingLicenses == nil {
+		return []entities.DrivingLicense{}
+	}
+
 	var licenses []entities.DrivingLicense
 	for _, drivingLicense := range drivingLicenses {
 		license := entities.ParseDrivingLicense(drivingLicense)
 		licenses = append(licenses, license)
 	}
+
 	return licenses
 }
 
