@@ -18,6 +18,8 @@ func ParseDrivingLicense(drivingLicense string) DrivingLicense {
 		return DrivingLicenseBE
 	case string(DrivingLicenseC):
 		return DrivingLicenseC
+	case string(DrivingLicenseCE):
+		return DrivingLicenseCE
 	default:
 		return DrivingLicenseUnknown
 	}
