@@ -7,8 +7,8 @@ import (
 type UserStatus string // @Name UserStatus
 
 const (
-	UserStatusAvailable SensorStatus = "available"
-	UserStatusAbsent    SensorStatus = "absent"
+	UserStatusAvailable UserStatus = "available"
+	UserStatusAbsent    UserStatus = "absent"
 )
 
 type UserRole string // @Name UserRole
