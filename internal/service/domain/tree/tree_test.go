@@ -251,6 +251,7 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(expectedTree, nil)
 
 		// when
@@ -352,6 +353,7 @@ func TestTreeService_Create(t *testing.T) {
 		treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeCreate.TreeClusterID).Return(expectedCluster, nil)
 		sensorRepo.EXPECT().GetByID(ctx, *TestTreeCreate.SensorID).Return(expectedSensor, nil)
 		treeRepo.EXPECT().Create(ctx,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
@@ -509,6 +511,7 @@ func TestTreeService_Update(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(updatedTree, nil)
 
 		// when
@@ -648,6 +651,7 @@ func TestTreeService_Update(t *testing.T) {
 		treeClusterRepo.EXPECT().GetByID(ctx, currentTree.TreeCluster.ID).Return(treeCluster, nil)
 		sensorRepo.EXPECT().GetByID(ctx, currentTree.Sensor.ID).Return(sensor, nil)
 		treeRepo.EXPECT().Update(ctx, id,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,

@@ -146,12 +146,17 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 
 	if treeCreate.SensorID != nil {
-		sensorID, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
+		sensor, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
 		if err != nil {
 			log.Debug("failed to fetch sensor by id specified in the tree create request", "sensor_id", treeCreate.SensorID)
 			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
-		fn = append(fn, tree.WithSensor(sensorID))
+		fn = append(fn, tree.WithSensor(sensor))
+
+		if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
+			status := utils.CalculateWateringStatus(treeCreate.PlantingYear, sensor.LatestData.Data.Watermarks)
+			fn = append(fn, tree.WithWateringStatus(status))
+		}
 	}
 
 	fn = append(fn,
@@ -202,6 +207,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
+	// TODO: Why is this still commented out?
 	// Check if the tree is readonly (imported from csv)
 	// if currentTree.Readonly {
 	// 	return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))

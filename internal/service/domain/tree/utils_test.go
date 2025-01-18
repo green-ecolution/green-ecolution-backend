@@ -51,6 +51,7 @@ var (
 			Description:  "A mature oak tree",
 			PlantingYear: 2023,
 			Readonly:     true,
+			WateringStatus: entities.WateringStatusBad,
 		},
 		{
 			ID:           2,
@@ -63,6 +64,7 @@ var (
 			Description:  "A young pine tree",
 			PlantingYear: 2023,
 			Readonly:     true,
+			WateringStatus: entities.WateringStatusUnknown,
 		},
 	}
 
@@ -74,7 +76,7 @@ var (
 			Status:     entities.SensorStatusUnknown,
 			Latitude:   54.82124518093376,
 			Longitude:  9.485702120628517,
-			LatestData: &entities.SensorData{},
+			LatestData: TestSensorDataBad,
 		},
 		{
 			ID:         "sensor-2",
@@ -114,5 +116,35 @@ var (
 		Latitude:      testLatitude,
 		Longitude:     testLongitude,
 		Description:   "Updated description",
+	}
+
+	TestSensorDataBad = &entities.SensorData{
+		ID: 1,
+		SensorID:         "sensor-1",
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+		Data: &entities.MqttPayload{
+			Device: "sensor-1",
+			Temperature: 2.0,
+			Humidity: 0.5,
+			Battery: 3.3,
+			Watermarks: []entities.Watermark{
+				{
+					Resistance: 2000,
+					Centibar: 80,
+					Depth: 30,
+				},
+				{
+					Resistance: 2200,
+					Centibar: 85,
+					Depth: 60,
+				},
+				{
+					Resistance: 2500,
+					Centibar: 90,
+					Depth: 90,
+				},
+			},
+		},
 	}
 )
