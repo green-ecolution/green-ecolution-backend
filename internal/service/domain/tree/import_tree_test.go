@@ -65,6 +65,7 @@ func TestTreeService_ImportTree(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(updatedTree, nil)
 
 		// When

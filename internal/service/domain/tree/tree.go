@@ -208,8 +208,15 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			return nil, service.MapError(ctx, fmt.Errorf("failed to find Sensor with ID %v: %w", *tu.SensorID, err), service.ErrorLogEntityNotFound)
 		}
 		fn = append(fn, tree.WithSensor(sensor))
+
+		if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
+			status := utils.CalculateWateringStatus(tu.PlantingYear, sensor.LatestData.Data.Watermarks)
+			fn = append(fn, tree.WithWateringStatus(status))
+		}
 	} else {
-		fn = append(fn, tree.WithSensor(nil))
+		fn = append(fn, 
+			tree.WithSensor(nil), 
+			tree.WithWateringStatus(entities.WateringStatusUnknown))
 	}
 
 	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),
