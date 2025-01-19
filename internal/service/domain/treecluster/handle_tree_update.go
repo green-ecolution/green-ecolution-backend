@@ -57,7 +57,8 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 func (s *TreeClusterService) isNoUpdateNeeded(event *entities.EventUpdateTree) bool {
 	treePosSame := event.Prev.Latitude == event.New.Latitude && event.Prev.Longitude == event.New.Longitude
 	tcSame := event.Prev.TreeCluster != nil && event.New.TreeCluster != nil && event.Prev.TreeCluster.ID == event.New.TreeCluster.ID
-	return treePosSame && tcSame
+	sensorSame := event.Prev.Sensor == event.New.Sensor
+	return treePosSame && tcSame && sensorSame
 }
 
 func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *entities.TreeCluster, tree *entities.Tree) error {

@@ -66,10 +66,6 @@ func (s *TreeClusterService) getWateringStatusOfTreeCluster(ctx context.Context,
 		return entities.WateringStatusUnknown, errors.New("sensor data is empty")
 	}
 
-	if len(sensorData) == 1 {
-		return tree.WateringStatus, nil
-	}
-
 	sensorIDs := utils.Map(sensorData, func(data *entities.SensorData) string {
 		return data.SensorID
 	})
