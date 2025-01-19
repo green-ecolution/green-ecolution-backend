@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -16,11 +17,7 @@ import (
 
 func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	t.Run("should update tree cluster lat, long, region, watering status and send treecluster update event", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+		clusterRepo, treeRepo, _, eventManager, svc := setupTest(t)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
@@ -58,11 +55,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	})
 
 	t.Run("should update tree cluster watering status to unkown and send treecluster update event", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+		clusterRepo, _, _, eventManager, svc := setupTest(t)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
@@ -99,11 +92,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	})
 
 	t.Run("should not update tree cluster if treeclusters in event are nil", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+		clusterRepo, _, regionRepo, eventManager, svc := setupTest(t)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
@@ -137,11 +126,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	})
 
 	t.Run("should not update tree cluster if tree has not changed location", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+		clusterRepo, _, regionRepo, eventManager, svc := setupTest(t)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
@@ -181,11 +166,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	})
 
 	t.Run("should update if tree location is equal but tree has changed treecluster", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+		clusterRepo, _, regionRepo, eventManager, svc := setupTest(t)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
@@ -297,6 +278,15 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 			t.Fatal("event was not received")
 		}
 	})
+}
+
+func setupTest(t *testing.T) (*storageMock.MockTreeClusterRepository, *storageMock.MockTreeRepository, *storageMock.MockRegionRepository, *worker.EventManager, service.TreeClusterService) {
+	clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+	treeRepo := storageMock.NewMockTreeRepository(t)
+	regionRepo := storageMock.NewMockRegionRepository(t)
+	eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
+	svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+	return clusterRepo, treeRepo, regionRepo, eventManager, svc
 }
 
 var prevTc = entities.TreeCluster{
