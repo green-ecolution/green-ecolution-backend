@@ -15,6 +15,7 @@ import (
 	mock "github.com/stretchr/testify/mock"
 )
 
+//nolint:gocyclo // function handles multiple test cases and complex event logic, which requires higher complexity to cover all scenarios.
 func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	t.Run("should update tree cluster lat, long, region, watering status and send treecluster update event", func(t *testing.T) {
 		clusterRepo, treeRepo, _, eventManager, svc := setupTest(t)
