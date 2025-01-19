@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
@@ -64,7 +65,110 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 
 		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
 
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).Return(nil)
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(nil, storage.ErrSensorNotFound)
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+			cluster := entities.TreeCluster{}
+			_, err := f(&cluster)
+			assert.NoError(t, err)
+			// Watering status should be unknown due to no sensor data
+			assert.Equal(t, entities.WateringStatusUnknown, cluster.WateringStatus)
+			return nil
+		})
+		clusterRepo.EXPECT().GetByID(mock.Anything, int32(1)).Return(&updatedTc, nil)
+
+		// when
+		err := svc.HandleUpdateTree(context.Background(), &event)
+
+		// then
+		assert.NoError(t, err)
+		select {
+		case recievedEvent, ok := <-ch:
+			assert.True(t, ok)
+			e := recievedEvent.(entities.EventUpdateTreeCluster)
+			assert.Equal(t, e.Prev, &prevTc)
+			assert.Equal(t, e.New, &updatedTc)
+		case <-time.After(1 * time.Second):
+			t.Fatal("event was not received")
+		}
+	})
+
+	t.Run("should update tree cluster watering status and send treecluster update event", func(t *testing.T) {
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateTreeCluster)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, eventManager)
+
+		// event
+		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTreeCluster)
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		go eventManager.Run(ctx)
+
+		prevTc := entities.TreeCluster{
+			ID: 1,
+			Region: &entities.Region{
+				ID:   1,
+				Name: "Sandberg",
+			},
+			Latitude:  utils.P(54.776366336440255),
+			Longitude: utils.P(9.451084144617182),
+		}
+		prevTree := entities.Tree{
+			ID:           1,
+			TreeCluster:  &prevTc,
+			Number:       "T001",
+			Latitude:     54.776366336440255,
+			Longitude:    9.451084144617182,
+			PlantingYear: int32(time.Now().Year() - 2),
+		}
+
+		updatedTree := entities.Tree{
+			ID:           1,
+			TreeCluster:  &prevTc,
+			Number:       "T001",
+			Latitude:     54.811733806341856,
+			Longitude:    9.482958846410169,
+			PlantingYear: int32(time.Now().Year() - 2),
+			Sensor: &entities.Sensor{
+				ID: "sensor-1",
+			},
+		}
+
+		updatedTc := entities.TreeCluster{
+			ID: 1,
+			Region: &entities.Region{
+				ID:   2,
+				Name: "Mürwik",
+			},
+			Latitude:  utils.P(54.811733806341856),
+			Longitude: utils.P(9.482958846410169),
+		}
+
+		allLatestSensorData := []*entities.SensorData{
+			{
+				SensorID: "sensor-1",
+				Data: &entities.MqttPayload{
+					Watermarks: []entities.Watermark{
+						{Centibar: 61, Depth: 30},
+						{Centibar: 24, Depth: 60},
+						{Centibar: 23, Depth: 90},
+					},
+				},
+			},
+		}
+
+		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(allLatestSensorData, nil)
+		treeRepo.EXPECT().GetBySensorIDs(mock.Anything, "sensor-1").Return([]*entities.Tree{&updatedTree}, nil)
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+			cluster := entities.TreeCluster{}
+			_, err := f(&cluster)
+			assert.NoError(t, err)
+			assert.Equal(t, entities.WateringStatusGood, cluster.WateringStatus)
+			return nil
+		})
 		clusterRepo.EXPECT().GetByID(mock.Anything, int32(1)).Return(&updatedTc, nil)
 
 		// when
@@ -237,6 +341,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 
 		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
 
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(2)).Return(nil, storage.ErrSensorNotFound)
 		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).Return(nil)
 		clusterRepo.EXPECT().Update(mock.Anything, int32(2), mock.Anything).Return(nil)
 		clusterRepo.EXPECT().GetByID(mock.Anything, int32(1)).Return(&prevTc, nil)
