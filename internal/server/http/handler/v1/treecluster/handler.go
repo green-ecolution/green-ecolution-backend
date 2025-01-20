@@ -55,7 +55,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 
         var pagination *entities.Pagination
         if limit != -1 {
-			totalPages, prevPage, nextPage := entities.CalculatePagination(int32(totalCount), int32(limit), int32(page))
+			totalPages, nextPage, prevPage := entities.CalculatePagination(int32(totalCount), int32(limit), int32(page))
 
             pagination = &entities.Pagination{
                 Total:       totalCount,
