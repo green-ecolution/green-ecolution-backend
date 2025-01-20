@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,7 +21,11 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	testCluster, err := suite.Store.GetAllTreeClusters(context.Background())
+	testCluster, err := suite.Store.GetAllTreeClusters(context.Background(), &sqlc.GetAllTreeClustersParams{
+		Offset: 0,
+		Limit:  5,
+	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
