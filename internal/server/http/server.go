@@ -41,8 +41,11 @@ func (s *Server) Run(ctx context.Context) error {
 	app.Mount("/", s.middleware())
 
 	go func() {
+		slog.Info("starting plugin cleanup service: cleaning up unhealthy plugins")
 		err := s.services.PluginService.StartCleanup(ctx)
-		slog.Error("error while running plugin cleanup", "error", err, "service", "fiber")
+		if err != nil {
+			slog.Error("error while running plugin cleanup", "error", err)
+		}
 	}()
 
 	go func() {

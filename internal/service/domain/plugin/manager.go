@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"maps"
 	"slices"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/pkg/errors"
@@ -28,12 +30,14 @@ var defaultPluginManagerConfig = PluginManagerConfig{
 }
 
 func WithTimeout(timeout time.Duration) PluginManagerOption {
+	slog.Debug("use plugin manager with timeout", "timeout", timeout)
 	return func(cfg *PluginManagerConfig) {
 		cfg.timeout = timeout
 	}
 }
 
 func WithInterval(interval time.Duration) PluginManagerOption {
+	slog.Debug("use plugin manager with interval", "interval", interval)
 	return func(cfg *PluginManagerConfig) {
 		cfg.interval = interval
 	}
@@ -66,14 +70,17 @@ func NewPluginManager(authRepo storage.AuthRepository, opts ...PluginManagerOpti
 }
 
 func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (*entities.ClientToken, error) {
+	log := logger.GetLogger(ctx)
 	if err := p.validator.Struct(plugin); err != nil {
+		log.Debug("failed to validate plugin struct", "error", err, "raw_plugin", fmt.Sprintf("%+v", plugin))
 		return nil, errors.Wrap(err, "validation failed")
 	}
 
-	slog.Info("Register Plugin", "plugin", plugin.Slug)
+	slog.Info("register new plugin", "plugin", plugin.Slug)
 
 	token, err := p.authRepository.GetAccessTokenFromClientCredentials(ctx, plugin.Auth.ClientID, plugin.Auth.ClientSecret)
 	if err != nil {
+		slog.Error("failed to login plugin with credantials", "error", err, "plugin_client_id", plugin.Auth.ClientID, "plugin_client_secret", "*******")
 		return nil, errors.Wrap(err, "failed to login plugin with credantials")
 	}
 
@@ -81,6 +88,7 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 	defer p.mutex.Unlock()
 
 	if _, ok := p.plugins[plugin.Slug]; ok {
+		slog.Warn("the plugin you are trying to register is already registered in the system.", "plugin_slug", plugin.Slug)
 		return nil, errors.New("plugin already registered")
 	}
 
@@ -95,6 +103,7 @@ func (p *PluginManager) Get(slug string) (entities.Plugin, error) {
 	defer p.mutex.RUnlock()
 	plugin, ok := p.plugins[slug]
 	if !ok {
+		slog.Error("the plugin is not registered in the system", "plugin_slug", slug)
 		return plugin, errors.New("plugin not registered")
 	}
 
@@ -109,12 +118,14 @@ func (p *PluginManager) GetAll() ([]entities.Plugin, []time.Time) {
 
 func (p *PluginManager) HeartBeat(slug string) error {
 	if slug == "" {
+		slog.Debug("the provided plugin slug is empty")
 		return errors.New("slug is empty")
 	}
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	if _, ok := p.heartbeats[slug]; !ok {
+		slog.Error("the plugin is not registered in the system", "plugin_slug", slug)
 		return errors.New("plugin not registered")
 	}
 
@@ -123,7 +134,7 @@ func (p *PluginManager) HeartBeat(slug string) error {
 }
 
 func (p *PluginManager) Unregister(slug string) {
-	slog.Info("Unregister Plugin", "plugin", slug)
+	slog.Info("unregister plugin", "plugin_slug", slug)
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	delete(p.plugins, slug)
@@ -153,7 +164,7 @@ func (p *PluginManager) batchUnregister(slugs []string) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	for _, slug := range slugs {
-		slog.Info("Unregister Plugin due to timeout", "plugin", slug)
+		slog.Info("unregister plugin due to timeout", "plugin", slug)
 		delete(p.plugins, slug)
 		delete(p.heartbeats, slug)
 	}
