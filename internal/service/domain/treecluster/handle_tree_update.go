@@ -2,13 +2,14 @@ package treecluster
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 func (s *TreeClusterService) HandleCreateTree(ctx context.Context, event *entities.EventCreateTree) error {
-	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+	log := logger.GetLogger(ctx)
+	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 
 	if event.New.TreeCluster == nil {
 		return nil
@@ -18,7 +19,8 @@ func (s *TreeClusterService) HandleCreateTree(ctx context.Context, event *entiti
 }
 
 func (s *TreeClusterService) HandleDeleteTree(ctx context.Context, event *entities.EventDeleteTree) error {
-	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+	log := logger.GetLogger(ctx)
+	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 
 	if event.Prev.TreeCluster == nil {
 		return nil
@@ -28,7 +30,8 @@ func (s *TreeClusterService) HandleDeleteTree(ctx context.Context, event *entiti
 }
 
 func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entities.EventUpdateTree) error {
-	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+	log := logger.GetLogger(ctx)
+	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 
 	if event.Prev.TreeCluster == nil && event.New.TreeCluster == nil {
 		return nil
@@ -58,6 +61,7 @@ func (s *TreeClusterService) isNoUpdateNeeded(event *entities.EventUpdateTree) b
 }
 
 func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *entities.TreeCluster) error {
+	log := logger.GetLogger(ctx)
 	if tc == nil {
 		return nil
 	}
@@ -65,6 +69,7 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 	updateFn := func(tc *entities.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 		if err != nil {
+			log.Error("failed to calculate latitude, longitude and region based on tree cluster", "error", err, "cluster_id", tc.ID)
 			return false, err
 		}
 		tc.Latitude = lat
@@ -74,6 +79,7 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 	}
 
 	if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err == nil {
+		log.Info("successfully updated new tree cluster position", "cluster_id", tc.ID)
 		return s.publishUpdateEvent(ctx, tc)
 	}
 	return nil

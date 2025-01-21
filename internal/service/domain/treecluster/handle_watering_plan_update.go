@@ -2,14 +2,15 @@ package treecluster
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 func (s *TreeClusterService) HandleUpdateWateringPlan(ctx context.Context, event *entities.EventUpdateWateringPlan) error {
-	slog.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+	log := logger.GetLogger(ctx)
+	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 
 	// Tree clusters should only be updated if the status has been changed to ‘finished’
 	// and the linked tree clusters and the date have not changed
@@ -28,6 +29,7 @@ func (s *TreeClusterService) HandleUpdateWateringPlan(ctx context.Context, event
 }
 
 func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs []*entities.TreeCluster, date time.Time) error {
+	log := logger.GetLogger(ctx)
 	if len(tcs) == 0 || tcs == nil {
 		return nil
 	}
@@ -39,6 +41,7 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 		}
 
 		if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err == nil {
+			log.Info("successfully updated last watered date in tree cluster", "cluster_id", tc.ID, "last_watered", date)
 			err := s.publishUpdateEvent(ctx, tc)
 			if err != nil {
 				return err
