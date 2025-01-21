@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
+
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
@@ -162,7 +162,10 @@ func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Senso
 	}
 
 	if nearestTree != nil {
-		_, err = s.treeRepo.Update(ctx, nearestTree.ID, tree.WithSensor(sen))
+		_, err = s.treeRepo.Update(ctx, nearestTree.ID, func(tree *entities.Tree) (bool, error) {
+			tree.Sensor = sen
+			return true, nil
+		})
 		if err != nil {
 			log.Error("failed to link sensor to nearest calculated tree", "tree_id", nearestTree.ID, "sensor_id", sen.ID, "error", err)
 			return err

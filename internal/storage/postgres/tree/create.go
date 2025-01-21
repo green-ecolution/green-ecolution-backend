@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -29,51 +31,87 @@ func defaultTree() entities.Tree {
 	}
 }
 
-func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	log := logger.GetLogger(ctx)
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
-	}
-
-	if err := r.validateTreeEntity(&entity); err != nil {
-		return nil, err
-	}
-
-	id, err := r.createEntity(ctx, &entity)
-	if err != nil {
-		log.Error("failed to create tree entity in db", "error", err)
-		return nil, err
-	}
-	entity.ID = id
-
-	log.Debug("tree entity created successfully in db", "tree_id", id)
-	return r.GetByID(ctx, id)
+func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+	return r.createWithTx(ctx, createFn, nil)
 }
 
-func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	createdEntity, err := r.Create(ctx, tFn...)
+func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+	return r.createWithTx(ctx, createFn, func(ctx context.Context, tree *entities.Tree) error {
+		if tree.Images != nil {
+			if err := r.handleImages(ctx, tree.ID, tree.Images); err != nil {
+				return err
+			}
+
+			linkedImages, err := r.GetAllImagesByID(ctx, tree.ID)
+			if err != nil {
+				return err
+			}
+			tree.Images = linkedImages
+		}
+		return nil
+	})
+}
+
+func (r *TreeRepository) createWithTx(
+	ctx context.Context,
+	createFn func(*entities.Tree) (bool, error),
+	afterCreateFn func(ctx context.Context, tree *entities.Tree) error) (*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
+	}
+
+	var createdTree *entities.Tree
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
+
+		entity := defaultTree()
+
+		created, err := createFn(&entity)
+		if err != nil {
+			return err
+		}
+
+		if !created {
+			return nil
+		}
+
+		if err := r.validateTreeEntity(&entity); err != nil {
+			return err
+		}
+
+		id, err := r.createEntity(ctx, &entity)
+		if err != nil {
+
+			log.Error("failed to create tree entity in db", "error", err)
+			return err
+		}
+		entity.ID = id
+
+		if afterCreateFn != nil {
+			if err := afterCreateFn(ctx, &entity); err != nil {
+				return err
+			}
+		}
+
+		createdTree, err = r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, err
 	}
 
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
-	}
-
-	if entity.Images != nil {
-		if err := r.handleImages(ctx, createdEntity.ID, entity.Images); err != nil {
-			return nil, err
-		}
-		linkedImages, err := r.GetAllImagesByID(ctx, createdEntity.ID)
-		if err != nil {
-			return nil, err
-		}
-		createdEntity.Images = linkedImages
-	}
-
-	return createdEntity, nil
+	log.Debug("tree entity created successfully in db", "tree_id", createdTree.ID)
+	return createdTree, nil
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
