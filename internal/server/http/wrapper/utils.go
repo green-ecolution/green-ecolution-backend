@@ -15,7 +15,12 @@ func NewFiberCtx(ctx *fiber.Ctx) *FiberCtx {
 }
 
 func (f *FiberCtx) GetLogger() *slog.Logger {
-	return f.Locals("logger").(*slog.Logger)
+	log, ok := f.Locals("logger").(*slog.Logger)
+	if !ok {
+		log = slog.Default()
+	}
+
+	return log
 }
 
 func (f *FiberCtx) SetLogger(logger *slog.Logger) {
