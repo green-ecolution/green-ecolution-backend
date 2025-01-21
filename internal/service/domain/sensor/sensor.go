@@ -2,13 +2,14 @@ package sensor
 
 import (
 	"context"
-	"log/slog"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
@@ -42,16 +43,19 @@ func NewSensorService(
 }
 
 func (s *SensorService) publishNewSensorDataEvent(ctx context.Context, data *entities.SensorData) {
-	slog.Debug("publish new event", "event", entities.EventTypeNewSensorData, "service", "SensorService")
+	log := logger.GetLogger(ctx)
+	log.Debug("publish new event", "event", entities.EventTypeNewSensorData, "service", "SensorService")
 	event := entities.NewEventSensorData(data)
 	if err := s.eventManager.Publish(ctx, event); err != nil {
-		slog.Error("error while sending event after new sensor data received", "err", err)
+		log.Error("error while sending event after new sensor data received", "err", err)
 	}
 }
 
 func (s *SensorService) GetAll(ctx context.Context) ([]*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	sensors, err := s.sensorRepo.GetAll(ctx)
 	if err != nil {
+		log.Error("failed to fetch sensors", "error", err)
 		return nil, handleError(err)
 	}
 
@@ -59,8 +63,10 @@ func (s *SensorService) GetAll(ctx context.Context) ([]*entities.Sensor, error) 
 }
 
 func (s *SensorService) GetByID(ctx context.Context, id string) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	get, err := s.sensorRepo.GetByID(ctx, id)
 	if err != nil {
+		log.Error("failed to fetch sensor by id", "sensor_id", id, "error", err)
 		return nil, handleError(err)
 	}
 
@@ -68,7 +74,9 @@ func (s *SensorService) GetByID(ctx context.Context, id string) (*entities.Senso
 }
 
 func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(sc); err != nil {
+		log.Debug("failed to validate sensor struct to create", "error", err, "raw_sensor", fmt.Sprintf("%+v", sc))
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
@@ -76,8 +84,8 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		sensor.WithLatestData(sc.LatestData),
 		sensor.WithStatus(sc.Status),
 	)
-
 	if err != nil {
+		log.Error("failed to create sensor", "error", err, "sensor_id", sc.ID)
 		return nil, handleError(err)
 	}
 
@@ -85,7 +93,9 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 }
 
 func (s *SensorService) Update(ctx context.Context, id string, su *entities.SensorUpdate) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(su); err != nil {
+		log.Debug("failed to validate sensor struct to update", "error", err, "raw_sensor", fmt.Sprintf("%+v", su))
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
@@ -99,6 +109,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 		sensor.WithStatus(su.Status),
 	)
 	if err != nil {
+		log.Error("failed to update sensor", "sensor_id", id, "error", err)
 		return nil, handleError(err)
 	}
 
@@ -106,6 +117,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 }
 
 func (s *SensorService) Delete(ctx context.Context, id string) error {
+	log := logger.GetLogger(ctx)
 	_, err := s.sensorRepo.GetByID(ctx, id)
 	if err != nil {
 		return handleError(err)
@@ -113,16 +125,19 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 
 	err = s.treeRepo.UnlinkSensorID(ctx, id)
 	if err != nil {
+		log.Error("failed to unlink sensor from tree", "error", err, "sensor_id", id)
 		return handleError(err)
 	}
 
 	err = s.flowerbedRepo.UnlinkSensorID(ctx, id)
 	if err != nil {
+		log.Error("failed to unlink sensor from flowerbed", "error", err, "sensor_id", id)
 		return handleError(err)
 	}
 
 	err = s.sensorRepo.Delete(ctx, id)
 	if err != nil {
+		log.Error("failed to delete sensor", "error", err, "sensor_id", id)
 		return handleError(err)
 	}
 
@@ -134,18 +149,21 @@ func (s *SensorService) RunStatusUpdater(ctx context.Context, interval time.Dura
 }
 
 func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Sensor) error {
+	log := logger.GetLogger(ctx)
 	if sen == nil {
 		return errors.New("sensor cannot be nil")
 	}
 
 	nearestTree, err := s.treeRepo.FindNearestTree(ctx, sen.Latitude, sen.Longitude)
 	if err != nil {
+		log.Error("failed to calculate nearest tree", "sensor_id", sen.ID, "sensor_latitude", sen.Latitude, "sensor_longitude", sen.Longitude)
 		return handleError(err)
 	}
 
 	if nearestTree != nil {
 		_, err = s.treeRepo.Update(ctx, nearestTree.ID, tree.WithSensor(sen))
 		if err != nil {
+			log.Error("failed to link sensor to nearest calculated tree", "tree_id", nearestTree.ID, "sensor_id", sen.ID, "error", err)
 			return handleError(err)
 		}
 	}

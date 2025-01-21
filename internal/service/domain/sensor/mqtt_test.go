@@ -8,7 +8,6 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/sensor"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/stretchr/testify/mock"
 
@@ -104,7 +103,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 			Data: testPayLoad,
 		}
 
-		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.Device).Return(nil, storage.ErrSensorNotFound).Once()
+		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.Device).Return(nil, nil).Once()
 		sensorRepo.EXPECT().Create(context.Background(),
 			mock.Anything,
 			mock.Anything,
@@ -140,7 +139,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 
 		testPayload := TestListMQTTPayload[0]
 
-		sensorRepo.EXPECT().GetByID(context.Background(), testPayload.Device).Return(nil, storage.ErrSensorNotFound)
+		sensorRepo.EXPECT().GetByID(context.Background(), testPayload.Device).Return(nil, nil)
 		sensorRepo.EXPECT().Create(context.Background(),
 			mock.Anything,
 			mock.Anything,
