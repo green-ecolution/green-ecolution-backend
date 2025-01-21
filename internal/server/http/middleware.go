@@ -11,7 +11,6 @@ import (
 )
 
 func (s *Server) middleware() *fiber.App {
-	slog.Info("Setting up fiber middlewares")
 	logFormat := viper.GetString("server.logs.format")
 	logLevel := viper.GetString("server.logs.level")
 
@@ -19,14 +18,24 @@ func (s *Server) middleware() *fiber.App {
 
 	app := fiber.New()
 
-	app.Use(middleware.HealthCheck(s.services))
-	app.Use(middleware.HTTPLogger())
-	app.Use(middleware.RequestID())
-	app.Use(middleware.AppLogger(logFn))
+	middlewares := map[string]fiber.Handler{
+		"health_check": middleware.HealthCheck(s.services),
+		"http_logger":  middleware.HTTPLogger(),
+		"request_id":   middleware.RequestID(),
+		"app_logger":   middleware.AppLogger(logFn),
+		"auth":         middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService),
+	}
 
-	authMiddlware := middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService)
-	s.root(app, authMiddlware)
-	slog.Info("Fiber middlewares setup complete")
+	slog.Info("setting up fiber middlewares", "size", len(middlewares), "service", "fiber")
+	for name, middleware := range middlewares {
+		slog.Info("enable middleware", "name", name, "service", "fiber")
+		if name == "auth" {
+			s.root(app, middleware)
+		} else {
+			app.Use(middleware)
+		}
+	}
 
+	slog.Info("successfully initialized middlewares", "service", "fiber")
 	return app
 }

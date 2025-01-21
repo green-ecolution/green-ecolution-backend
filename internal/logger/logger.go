@@ -160,7 +160,7 @@ func (h *PrettyHandler) Handle(ctx context.Context, r slog.Record) error {
 		source = fmt.Sprintf("\033[38;5;98;1;4m%s:%d\033[0m", filepath.Join(relativeDir, file), frame.Line)
 	}
 
-	timeStr := r.Time.Format(time.Stamp)
+	timeStr := fmt.Sprintf("[%s]", r.Time.Format(time.Stamp))
 	msg := fmt.Sprintf("\033[36m%s\033[0m", r.Message) // Cyan
 
 	h.l.Println(timeStr, level, source, msg, strings.Join(logFields, " "))
