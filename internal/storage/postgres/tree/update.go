@@ -3,6 +3,8 @@ package tree
 import (
 	"context"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
@@ -10,49 +12,87 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) Update(ctx context.Context, id int32, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
+func (r *TreeRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+	return r.updateWithTx(ctx, id, updateFn, nil)
+}
+
+func (r *TreeRepository) UpdateWithImages(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+	return r.updateWithTx(ctx, id, updateFn, func(ctx context.Context, tree *entities.Tree, updatedEntity *entities.Tree) error {
+		if len(tree.Images) > 0 {
+			if updatedEntity.Images == nil {
+				updatedEntity.Images = tree.Images
+			} else {
+				updatedEntity.Images = append(updatedEntity.Images, tree.Images...)
+			}
+			if err := r.updateImages(ctx, updatedEntity); err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}
+
+func (r *TreeRepository) updateWithTx(
+	ctx context.Context,
+	id int32,
+	updateFn func(*entities.Tree) (bool, error),
+	afterUpdateFn func(ctx context.Context, tree *entities.Tree, updatedEntity *entities.Tree) error) (*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
-	entity, err := r.GetByID(ctx, id)
-	if err != nil {
-		return nil, err
-	}
+	var updatedTree *entities.Tree
 
-	for _, fn := range tFn {
-		fn(entity)
-	}
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
 
-	err = r.updateEntity(ctx, entity)
+		tree, err := r.GetByID(ctx, id)
+		if err != nil {
+			log.Error("failed to get tree entity from db", "error", err, "tree_id", id)
+			return err
+		}
+
+		if updateFn == nil {
+			return errors.New("updateFn is nil")
+		}
+
+		updated, err := updateFn(tree)
+		if err != nil {
+			return err
+		}
+
+		if !updated {
+			updatedTree = tree
+			return nil
+		}
+
+		if err := r.updateEntity(ctx, tree); err != nil {
+			log.Error("failed to update tree entity in db", "error", err, "tree_id", id)
+			return err
+		}
+
+		updatedTree, err = r.GetByID(ctx, id)
+		if err != nil {
+			log.Error("failed to get updated tree entity from db", "error", err, "tree_id", id)
+			return err
+		}
+
+		if afterUpdateFn != nil {
+			if err := afterUpdateFn(ctx, tree, updatedTree); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
 	if err != nil {
-		log.Error("failed to update tree entity in db", "error", err, "tree_id", id)
 		return nil, err
 	}
 
 	log.Debug("tree entity updated successfully in db", "tree_id", id)
-	return r.GetByID(ctx, id)
-}
-
-func (r *TreeRepository) UpdateWithImages(ctx context.Context, id int32, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	t, err := r.Update(ctx, id, tFn...)
-	if err != nil {
-		return nil, err
-	}
-
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
-	}
-
-	if len(entity.Images) > 0 {
-		if t.Images == nil {
-			t.Images = entity.Images
-		} else {
-			t.Images = append(t.Images, entity.Images...)
-		}
-		if err := r.updateImages(ctx, t); err != nil {
-			return nil, err
-		}
-	}
-	return r.GetByID(ctx, id)
+	return updatedTree, nil
 }
 
 func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) error {

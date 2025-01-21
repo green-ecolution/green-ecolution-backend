@@ -24,18 +24,17 @@ func TestTreeRepository_Update(t *testing.T) {
 		newWateringStatus := entities.WateringStatusGood
 
 		// when
-		updatedTree, err := r.Update(
-			context.Background(),
-			treeID,
-			WithSpecies(newSpecies),
-			WithNumber(newNumber),
-			WithLatitude(newLatitude),
-			WithLongitude(newLongitude),
-			WithPlantingYear(newPlantingYear),
-			WithReadonly(false),
-			WithDescription(newDescription),
-			WithWateringStatus(newWateringStatus),
-		)
+		updatedTree, err := r.Update(context.Background(), treeID, func(tree *entities.Tree) (bool, error) {
+			tree.Species = newSpecies
+			tree.Number = newNumber
+			tree.Latitude = newLatitude
+			tree.Longitude = newLongitude
+			tree.PlantingYear = newPlantingYear
+			tree.Readonly = false
+			tree.Description = newDescription
+			tree.WateringStatus = newWateringStatus
+			return true, nil
+		})
 
 		// then
 		assert.NoError(t, err)
@@ -50,13 +49,16 @@ func TestTreeRepository_Update(t *testing.T) {
 		assert.Equal(t, newWateringStatus, updatedTree.WateringStatus, "Watering Status should match")
 	})
 
-	t.Run("should return error when is not found", func(t *testing.T) {
+	t.Run("should return error when tree is not found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		updatedTree, err := r.Update(context.Background(), int32(99), WithSpecies("Non-existent species"))
+		updatedTree, err := r.Update(context.Background(), int32(99), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "Non-existent species"
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -69,7 +71,10 @@ func TestTreeRepository_Update(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		updatedTree, err := r.Update(context.Background(), int32(-1), WithSpecies("species"))
+		updatedTree, err := r.Update(context.Background(), int32(-1), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "species"
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -82,7 +87,10 @@ func TestTreeRepository_Update(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		updatedTree, err := r.Update(context.Background(), int32(0), WithSpecies("species"))
+		updatedTree, err := r.Update(context.Background(), int32(0), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "species"
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -96,7 +104,10 @@ func TestTreeRepository_Update(t *testing.T) {
 		cancel()
 
 		// when
-		updatedTree, err := r.Update(ctx, int32(1), WithSpecies("Canceled context species"))
+		updatedTree, err := r.Update(ctx, int32(1), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "Canceled context species"
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -136,9 +147,12 @@ func TestTreeRepository_UpdateWithImages(t *testing.T) {
 		updatedTree, updateErr := r.UpdateWithImages(
 			context.Background(),
 			treeID,
-			WithSpecies(newSpecies),
-			WithDescription(newDescription),
-			WithImages(updateImages),
+			func(tree *entities.Tree) (bool, error) {
+				tree.Species = newSpecies
+				tree.Description = newDescription
+				tree.Images = updateImages
+				return true, nil
+			},
 		)
 
 		sqlImages, err = suite.Store.GetAllImagesByTreeID(context.Background(), treeID)
@@ -186,9 +200,12 @@ func TestTreeRepository_UpdateWithImages(t *testing.T) {
 		updatedTree, err := r.UpdateWithImages(
 			context.Background(),
 			treeID,
-			WithSpecies(newSpecies),
-			WithDescription(newDescription),
-			WithImages(images),
+			func(tree *entities.Tree) (bool, error) {
+				tree.Species = newSpecies
+				tree.Description = newDescription
+				tree.Images = images
+				return true, nil
+			},
 		)
 
 		// then
@@ -219,7 +236,11 @@ func TestTreeRepository_UpdateWithImages(t *testing.T) {
 		images := mappers.iMapper.FromSqlList(sqlImages)
 
 		// when
-		updatedTree, err := r.UpdateWithImages(ctx, int32(1), WithSpecies("Canceled context species"), WithImages(images))
+		updatedTree, err := r.UpdateWithImages(ctx, int32(1), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "Canceled context species"
+			tree.Images = images
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
