@@ -122,7 +122,7 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 	runServices(ctx, httpServer, mqttServer, em, services)
 }
 
-func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.Repository, func()) {
+func initializeRepositories(ctx context.Context, cfg *config.Config) (repos *storage.Repository, closeFn func()) {
 	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {

@@ -74,9 +74,10 @@ func NewPrettyHandler(out io.Writer, opts PrettyHandlerOptions) *PrettyHandler {
 }
 
 func (h *PrettyHandler) WithGroup(group string) slog.Handler {
+	lCopy := log.New(h.l.Writer(), h.l.Prefix(), h.l.Flags())
 	return &PrettyHandler{
 		Handler: h.Handler.WithGroup(group),
-		l:       &*h.l,
+		l:       lCopy,
 		opts:    h.opts,
 		goa:     append(h.goa, GroupOrAttrs{group: group}),
 	}
@@ -89,15 +90,17 @@ func (h *PrettyHandler) WithAttrs(attrs []slog.Attr) slog.Handler {
 		newAttrs[i] = GroupOrAttrs{attr: attr}
 	}
 
+	lCopy := log.New(h.l.Writer(), h.l.Prefix(), h.l.Flags())
 	return &PrettyHandler{
 		Handler: h.Handler.WithAttrs(attrs),
-		l:       &*h.l,
+		l:       lCopy,
 		opts:    h.opts,
 		goa:     append(h.goa, newAttrs...),
 	}
 }
 
-func (h *PrettyHandler) Handle(ctx context.Context, r slog.Record) error {
+//nolint:gocritic // ignored because this has to implement slog handler
+func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 	level := r.Level.String()
 	switch r.Level {
 	case slog.LevelDebug:
@@ -110,7 +113,7 @@ func (h *PrettyHandler) Handle(ctx context.Context, r slog.Record) error {
 		level = fmt.Sprintf("\033[31;1m%s\033[0m", level) // Red
 	}
 
-	fields := make(map[string]interface{})
+	fields := make(map[string]any)
 	lastGroup := ""
 	for _, goa := range h.goa {
 		if goa.group != "" {
@@ -187,7 +190,6 @@ func CreateLogger(out io.Writer, format LogFormat, level LogLevel) func() *slog.
 			handler = slog.NewTextHandler(out, options)
 		}
 
-		log := slog.New(handler)
-		return log
+		return slog.New(handler)
 	}
 }

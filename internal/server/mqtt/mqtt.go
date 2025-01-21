@@ -67,7 +67,7 @@ func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 		return
 	}
 
-	slog.Info("recieved sensor data", "sensor_id", sensorData.Device)
+	slog.Info("received sensor data", "sensor_id", sensorData.Device)
 	slog.Debug("detailed sensor data", "sensor_raw_data", fmt.Sprintf("%+v", sensorData))
 
 	domainPayload := m.mapper.FromResponse(sensorData)
