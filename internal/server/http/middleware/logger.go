@@ -1,10 +1,24 @@
 package middleware
 
 import (
+	"log/slog"
+
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
+	http_logger "github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func HTTPLogger() fiber.Handler {
-	return logger.New()
+	return http_logger.New()
+}
+
+func AppLogger(createLoggerFn func() *slog.Logger) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		logger := createLoggerFn()
+		requestid := c.Locals("requestid").(string)
+
+		logger = logger.With("request_id", requestid)
+		c.Locals("logger", logger)
+
+		return c.Next()
+	}
 }

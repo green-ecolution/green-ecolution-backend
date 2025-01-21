@@ -75,8 +75,8 @@ func main() {
 		cfg.Server.Logs.Level = "debug"
 	}
 
-	logg := logger.CreateLogger(os.Stdout, cfg.Server.Logs.Format, cfg.Server.Logs.Level)
-	slog.SetDefault(logg)
+	logg := logger.CreateLogger(os.Stdout, "text", cfg.Server.Logs.Level)
+	slog.SetDefault(logg())
 
 	setSwaggerInfo(cfg.Server.AppURL)
 
