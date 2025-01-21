@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/sensor"
@@ -502,5 +503,110 @@ func TestReady(t *testing.T) {
 
 		// then
 		assert.False(t, ready)
+	})
+}
+
+func TestSensorService_UpdateStatuses(t *testing.T) {
+	t.Run("should update stale sensors successfully", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		repo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+
+		staleSensor := &entities.Sensor{
+			ID:        "sensor-1",
+			UpdatedAt: time.Now().Add(-73 * time.Hour), // 73 hours ago
+		}
+		recentSensor := &entities.Sensor{
+			ID:        "sensor-2",
+			UpdatedAt: time.Now().Add(-1 * time.Hour), // 1 hour ago
+		}
+
+		// when
+		repo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{staleSensor, recentSensor}, nil)
+		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.NoError(t, err)
+		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
+		repo.AssertExpectations(t) // Verifies all expectations are met
+	})
+
+	t.Run("should do nothing when there are no stale sensors", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		repo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+
+		freshSensor := &entities.Sensor{
+			ID:        "sensor-1",
+			UpdatedAt: time.Now(),
+		}
+
+		// when
+		repo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{freshSensor}, nil)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.NoError(t, err)
+		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertNotCalled(t, "Update")
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("should return an error when fetching sensors fails", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		repo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+
+		// when
+		expectedErr := errors.New("database error")
+		repo.EXPECT().GetAll(mock.Anything).Return(nil, expectedErr)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, expectedErr, err)
+		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertNotCalled(t, "Update")
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("should log an error when updating a sensor fails", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		repo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+
+		staleSensor := &entities.Sensor{
+			ID:        "sensor-1",
+			UpdatedAt: time.Now().Add(-100 * time.Hour),
+		}
+
+		// when
+		repo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{staleSensor}, nil)
+		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
+		repo.AssertExpectations(t)
+		assert.NoError(t, err)
 	})
 }
