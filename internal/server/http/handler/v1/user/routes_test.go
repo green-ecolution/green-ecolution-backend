@@ -191,7 +191,7 @@ func TestRegisterPublicRoutes(t *testing.T) {
 		mockUserService.EXPECT().LoginRequest(
 			mock.Anything,
 			mock.AnythingOfType("*entities.LoginRequest"),
-		).Return(expected, nil)
+		).Return(expected)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, "/login?redirect_url=http%3A%2F%2Flocalhost%3A3000%2Flogin", nil)

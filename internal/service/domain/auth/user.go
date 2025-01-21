@@ -2,30 +2,37 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/pkg/errors"
 )
 
 func (s *AuthService) Register(ctx context.Context, user *domain.RegisterUser) (*domain.User, error) {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(user); err != nil {
+		log.Debug("failed to validate registerd user", "raw_user", fmt.Sprintf("%+v", user), "error", err)
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
 	createdUser, err := s.userRepo.Create(ctx, &user.User, user.Password, user.Roles)
 	if err != nil {
+		log.Error("failed to create user", "error", err, "user_name", user.User.Username)
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to create user").Error())
 	}
 
 	return createdUser, nil
 }
 
-func (s *AuthService) LoginRequest(_ context.Context, loginRequest *domain.LoginRequest) (*domain.LoginResp, error) {
+func (s *AuthService) LoginRequest(ctx context.Context, loginRequest *domain.LoginRequest) *domain.LoginResp {
+	log := logger.GetLogger(ctx)
 	loginURL, err := url.ParseRequestURI(s.cfg.OidcProvider.AuthURL)
 	if err != nil {
-		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to parse auth url in config").Error())
+		log.Error("failed to parse auth url in config", "error", err, "auth_url", s.cfg.OidcProvider.AuthURL)
+		panic("failed to parse auth url in config. Pleas check your configuration")
 	}
 
 	query := loginURL.Query()
@@ -38,16 +45,19 @@ func (s *AuthService) LoginRequest(_ context.Context, loginRequest *domain.Login
 		LoginURL: loginURL,
 	}
 
-	return resp, nil
+	return resp
 }
 
 func (s *AuthService) ClientTokenCallback(ctx context.Context, loginCallback *domain.LoginCallback) (*domain.ClientToken, error) {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(loginCallback); err != nil {
+		log.Debug("failed to validate client token callback", "raw_callback", fmt.Sprintf("%+v", loginCallback), "error", err)
 		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
 	token, err := s.authRepository.GetAccessTokenFromClientCode(ctx, loginCallback.Code, loginCallback.RedirectURL.String())
 	if err != nil {
+		log.Error("failed to get access token from auth flow", "error", err, "code", loginCallback.Code, "redirect_uri", loginCallback.RedirectURL.String())
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get access token").Error())
 	}
 
@@ -55,12 +65,15 @@ func (s *AuthService) ClientTokenCallback(ctx context.Context, loginCallback *do
 }
 
 func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.Logout) error {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(logoutRequest); err != nil {
+		log.Debug("failed to validate logout request", "raw_request", fmt.Sprintf("%+v", logoutRequest), "error", err)
 		return service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
 	}
 
 	err := s.userRepo.RemoveSession(ctx, logoutRequest.RefreshToken)
 	if err != nil {
+		log.Error("failed to remove user session", "error", err)
 		return service.NewError(service.InternalError, errors.Wrap(err, "failed to remove user session").Error())
 	}
 
@@ -68,8 +81,10 @@ func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.L
 }
 
 func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
-	users, err := s.userRepo.GetAll(ctx)
+	log := logger.GetLogger(ctx)
+	users, err := s.userRepo.GetAll(ctx) // TODO: Pagination
 	if err != nil {
+		log.Error("failed to fetch all user lists", "error", err)
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get all users").Error())
 	}
 
@@ -77,8 +92,10 @@ func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
 }
 
 func (s *AuthService) GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error) {
-	users, err := s.userRepo.GetByIDs(ctx, ids)
+	log := logger.GetLogger(ctx)
+	users, err := s.userRepo.GetByIDs(ctx, ids) // TODO: Pagination
 	if err != nil {
+		log.Error("failed to fetch users by ids", "error", err, "user_ids", ids)
 		return nil, service.NewError(service.InternalError, errors.Wrap(err, "failed to get users by ids").Error())
 	}
 
@@ -99,7 +116,7 @@ func (s *AuthService) GetAllByRole(ctx context.Context, role domain.Role) ([]*do
 				break
 			}
 		}
-	}
+	} // TODO: Move to repository
 
 	return filteredUsers, nil
 }

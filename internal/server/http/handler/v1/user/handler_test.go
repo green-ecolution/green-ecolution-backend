@@ -38,7 +38,7 @@ func TestLogin(t *testing.T) {
 		loginResponse := &domain.LoginResp{
 			LoginURL: parsedURLResponse,
 		}
-		mockAuthService.EXPECT().LoginRequest(mock.Anything, loginRequest).Return(loginResponse, nil)
+		mockAuthService.EXPECT().LoginRequest(mock.Anything, loginRequest).Return(loginResponse)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, "/v1/user/login?redirect_url="+parsedURLRedirect.String(), nil)
@@ -65,30 +65,6 @@ func TestLogin(t *testing.T) {
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-		mockAuthService.AssertExpectations(t)
-	})
-
-	t.Run("Should return 500 for invalid login.", func(t *testing.T) {
-		// given
-		app := fiber.New()
-		mockAuthService := serviceMock.NewMockAuthService(t)
-		app.Get("/v1/user/login", Login(mockAuthService))
-
-		parsedURLRedirect, _ := url.Parse("http://example.com/redirect")
-
-		loginRequest := &domain.LoginRequest{
-			RedirectURL: parsedURLRedirect,
-		}
-		mockAuthService.EXPECT().LoginRequest(mock.Anything, loginRequest).Return(nil, errors.New("service error"))
-
-		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user/login?redirect_url="+parsedURLRedirect.String(), nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 		mockAuthService.AssertExpectations(t)
 	})
 

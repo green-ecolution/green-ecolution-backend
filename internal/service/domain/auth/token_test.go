@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"context"
 	"errors"
 	"testing"
 
@@ -29,8 +28,8 @@ func TestRestrospectToken(t *testing.T) {
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		// when
-		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(expected, nil)
-		resp, err := svc.RetrospectToken(context.Background(), token)
+		authRepo.EXPECT().RetrospectToken(rootCtx, token).Return(expected, nil)
+		resp, err := svc.RetrospectToken(rootCtx, token)
 
 		// then
 		assert.NoError(t, err)
@@ -47,8 +46,8 @@ func TestRestrospectToken(t *testing.T) {
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
 		// when
-		authRepo.EXPECT().RetrospectToken(context.Background(), token).Return(nil, errors.New(""))
-		_, err := svc.RetrospectToken(context.Background(), token)
+		authRepo.EXPECT().RetrospectToken(rootCtx, token).Return(nil, errors.New(""))
+		_, err := svc.RetrospectToken(rootCtx, token)
 
 		// then
 		assert.Error(t, err)
