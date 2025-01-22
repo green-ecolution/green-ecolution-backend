@@ -22,18 +22,18 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 			log.Error("failed to get sensor by id", "sensor_id", event.New.SensorID, "err", err)
 			return nil
 		}
-		log.Info("the sensor has no selected tree. This event will be ignored", "sensor_id", event.New.SensorID, "err", err)
+		log.Info("the sensor has no selected tree. This event will be ignored", "sensor_id", event.New.SensorID, "error", err)
 		return nil
 	}
 
 	if tree.TreeCluster == nil {
-		log.Info("this tree will has no linked tree cluster. This event will be ignored", "tree_id", tree.ID, "err", err)
+		log.Info("this tree will has no linked tree cluster. This event will be ignored", "tree_id", tree.ID, "error", err)
 		return nil
 	}
 
 	sensorData, err := s.treeClusterRepo.GetAllLatestSensorDataByClusterID(ctx, tree.TreeCluster.ID)
 	if err != nil {
-		log.Error("failed to get latest sensor data", "cluster_id", tree.TreeCluster.ID, "err", err)
+		log.Error("failed to get latest sensor data", "cluster_id", tree.TreeCluster.ID, "error", err)
 		return nil
 	}
 
@@ -50,7 +50,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 
 		trees, err := s.treeRepo.GetBySensorIDs(ctx, sensorIDs...)
 		if err != nil {
-			log.Error("failed to get trees by sensor id", "sensor_ids", sensorIDs, "err", err)
+			log.Error("failed to get trees by sensor id", "sensor_ids", sensorIDs, "error", err)
 			return nil
 		}
 

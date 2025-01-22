@@ -76,11 +76,11 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 		return nil, errors.Wrap(err, "validation failed")
 	}
 
-	slog.Info("register new plugin", "plugin", plugin.Slug)
+	log.Info("register new plugin", "plugin", plugin.Slug)
 
 	token, err := p.authRepository.GetAccessTokenFromClientCredentials(ctx, plugin.Auth.ClientID, plugin.Auth.ClientSecret)
 	if err != nil {
-		slog.Error("failed to login plugin with credantials", "error", err, "plugin_client_id", plugin.Auth.ClientID, "plugin_client_secret", "*******")
+		log.Error("failed to login plugin with credantials", "error", err, "plugin_client_id", plugin.Auth.ClientID, "plugin_client_secret", "*******")
 		return nil, errors.Wrap(err, "failed to login plugin with credantials")
 	}
 
@@ -88,7 +88,7 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 	defer p.mutex.Unlock()
 
 	if _, ok := p.plugins[plugin.Slug]; ok {
-		slog.Warn("the plugin you are trying to register is already registered in the system.", "plugin_slug", plugin.Slug)
+		log.Warn("the plugin you are trying to register is already registered in the system.", "plugin_slug", plugin.Slug)
 		return nil, errors.New("plugin already registered")
 	}
 
