@@ -28,7 +28,7 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
 	log := logger.GetLogger(ctx)
 	log.Debug("creating user in keycloak", "user_name", user.Username)
-	log.Error("creating user in keycloak with detailed information", "roles", roles, "raw_user", fmt.Sprintf("%+v", user))
+	log.Debug("creating user in keycloak with detailed information", "roles", roles, "raw_user", fmt.Sprintf("%+v", user))
 
 	if user == nil {
 		return nil, ErrEmptyUser
@@ -79,7 +79,7 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 		return nil, errors.Join(err, ErrGetUser)
 	}
 
-	log.Info("user created successfully", "user_id", *userKeyCloak.ID)
+	log.Debug("user created successfully", "user_id", *userKeyCloak.ID)
 
 	return keyCloakUserToUser(ctx, userKeyCloak)
 }

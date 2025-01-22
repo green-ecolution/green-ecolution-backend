@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
@@ -62,5 +63,12 @@ func WithLongitude(long float64) entities.EntityFunc[entities.Sensor] {
 }
 
 func (r *SensorRepository) Delete(ctx context.Context, id string) error {
-	return r.store.DeleteSensor(ctx, id)
+	log := logger.GetLogger(ctx)
+	if err := r.store.DeleteSensor(ctx, id); err != nil {
+		log.Error("failed to delete sensor entity in db", "error", err, "sensor_id", id)
+		return err
+	}
+
+	log.Debug("sensor entity deleted successfully in db", "sensor_id", id)
+	return nil
 }

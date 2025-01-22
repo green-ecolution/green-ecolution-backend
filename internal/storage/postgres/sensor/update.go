@@ -2,7 +2,9 @@ package sensor
 
 import (
 	"context"
+	"log/slog"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -10,6 +12,7 @@ import (
 )
 
 func (r *SensorRepository) Update(ctx context.Context, id string, sFn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	entity, err := r.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -20,7 +23,8 @@ func (r *SensorRepository) Update(ctx context.Context, id string, sFn ...entitie
 	}
 
 	if err := r.updateEntity(ctx, entity); err != nil {
-		return nil, r.store.HandleError(err)
+		log.Error("failed to update sensor entity in db", "error", err, "sensor_id", id)
+		return nil, err
 	}
 
 	if entity.LatestData != nil && entity.LatestData.Data != nil {
@@ -30,6 +34,7 @@ func (r *SensorRepository) Update(ctx context.Context, id string, sFn ...entitie
 		}
 	}
 
+	slog.Debug("sensor entity updated successfully in db", "sensor_id", id)
 	return r.GetByID(ctx, entity.ID)
 }
 

@@ -5,14 +5,16 @@ import (
 	"reflect"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/pkg/errors"
 )
 
 func (r *FlowerbedRepository) Update(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {
+	log := logger.GetLogger(ctx)
 	prev, err := r.GetByID(ctx, id)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	original := *prev
@@ -27,9 +29,11 @@ func (r *FlowerbedRepository) Update(ctx context.Context, id int32, fFn ...entit
 
 	err = r.updateEntity(ctx, prev)
 	if err != nil {
+		log.Error("failed to update flowerbed entity in db", "error", err, "flowerbed_id", id)
 		return nil, err
 	}
 
+	log.Debug("flowerbed entity updated successfully in db", "flowerbed_id", id)
 	return r.GetByID(ctx, id)
 }
 

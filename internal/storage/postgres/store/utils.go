@@ -38,7 +38,7 @@ func (s *Store) MapSensorFields(ctx context.Context, sn *entities.Sensor) error 
 
 	sn.LatestData, err = s.GetLatestSensorDataBySensorID(ctx, sn.ID)
 	if err != nil && !errors.Is(err, storage.ErrEntityNotFound) {
-		return s.HandleError(err)
+		return err
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func (s *Store) getRegionByTreeClusterID(ctx context.Context, id int32) (*entiti
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrRegionNotFound
 		}
-		return nil, s.HandleError(err)
+		return nil, err
 	}
 
 	return regionMapper.FromSql(row), nil
@@ -100,7 +100,7 @@ func (s *Store) getLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]
 		if errors.Is(err, pgx.ErrNoRows) {
 			return []*entities.Tree{}, nil
 		}
-		return nil, s.HandleError(err)
+		return nil, err
 	}
 
 	return treeMapper.FromSqlList(rows), nil

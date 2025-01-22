@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -21,6 +22,7 @@ func defaultSensor() *entities.Sensor {
 }
 
 func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	entity := defaultSensor()
 	for _, fn := range sFn {
 		fn(entity)
@@ -37,10 +39,13 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 
 	id, err := r.createEntity(ctx, entity)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		log.Error("failed to create sensor entity in db", "error", err)
+		return nil, err
 	}
 
 	entity.ID = id
+	log.Debug("sensor entity created successfully in db", "sensor_id", id)
+
 	if entity.LatestData != nil && entity.LatestData.Data != nil {
 		err = r.InsertSensorData(ctx, entity.LatestData, id)
 		if err != nil {
@@ -52,6 +57,7 @@ func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFun
 }
 
 func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *entities.SensorData, id string) error {
+	log := logger.GetLogger(ctx)
 	if latestData == nil || latestData.Data == nil {
 		return errors.New("latest data cannot be empty")
 	}
@@ -73,6 +79,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *ent
 
 	err = r.store.InsertSensorData(ctx, params)
 	if err != nil {
+		log.Error("failed to insert sensor data in db", "error", err, "sensor_id", id)
 		return err
 	}
 

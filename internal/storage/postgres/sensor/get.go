@@ -4,11 +4,14 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	rows, err := r.store.GetAllSensors(ctx)
 	if err != nil {
+		log.Debug("failed to get sensors in db", "error", err)
 		return nil, r.store.HandleError(err)
 	}
 
@@ -23,8 +26,10 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, erro
 }
 
 func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	row, err := r.store.GetSensorByID(ctx, id)
 	if err != nil {
+		log.Debug("failed to get sensor by id in db", "error", err, "sensor_id", id)
 		return nil, r.store.HandleError(err)
 	}
 
@@ -37,8 +42,10 @@ func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Se
 }
 
 func (r *SensorRepository) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error) {
+	log := logger.GetLogger(ctx)
 	data, err := r.store.GetLatestSensorDataBySensorID(ctx, id)
 	if err != nil {
+		log.Debug("failed to get latest sensor data by sensor id in db", "error", err, "sensor_id", id)
 		return nil, r.store.HandleError(err)
 	}
 

@@ -12,7 +12,7 @@ import (
 func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed, error) {
 	row, err := r.store.GetAllFlowerbeds(ctx)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	data := r.mapper.FromSqlList(row)
@@ -39,7 +39,7 @@ func (r *FlowerbedRepository) GetAll(ctx context.Context) ([]*entities.Flowerbed
 func (r *FlowerbedRepository) GetByID(ctx context.Context, id int32) (*entities.Flowerbed, error) {
 	row, err := r.store.GetFlowerbedByID(ctx, id)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	data := r.mapper.FromSql(row)
@@ -69,7 +69,7 @@ func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID 
 
 	row, err := r.store.GetAllImagesByFlowerbedID(ctx, flowerbedID)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	return r.imgMapper.FromSqlList(row), nil
@@ -85,7 +85,7 @@ func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flower
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrSensorNotFound
 		}
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	return r.sensorMapper.FromSql(row), nil
@@ -101,7 +101,7 @@ func (r *FlowerbedRepository) GetRegionByFlowerbedID(ctx context.Context, flower
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrRegionNotFound
 		}
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	return r.regionMapper.FromSql(row), nil

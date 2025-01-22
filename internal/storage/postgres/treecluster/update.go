@@ -12,6 +12,7 @@ import (
 )
 
 func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func(*entities.TreeCluster) (bool, error)) error {
+	log := logger.GetLogger(ctx)
 	return r.store.WithTx(ctx, func(s *store.Store) error {
 		oldStore := r.store
 		defer func() {
@@ -37,7 +38,12 @@ func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn f
 			return nil
 		}
 
-		return r.updateEntity(ctx, tc)
+		if err := r.updateEntity(ctx, tc); err != nil {
+			log.Error("failed to update tree cluster entity in db", "error", err, "cluster_id", id)
+		}
+
+		log.Debug("tree cluster updated successfully in db", "cluster_id", id)
+		return nil
 	})
 }
 

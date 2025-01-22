@@ -112,6 +112,7 @@ func WithWateringStatus(wateringStatus entities.WateringStatus) entities.EntityF
 }
 
 func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
 		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
@@ -134,9 +135,11 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 
 	_, err = r.store.DeleteTree(ctx, id)
 	if err != nil {
+		log.Debug("failed to delete tree in db", "error", err, "tree_id", id)
 		return err
 	}
 
+	log.Debug("tree entity deleted successfully in db", "tree_id", id)
 	return nil
 }
 

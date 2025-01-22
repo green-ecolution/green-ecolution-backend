@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5"
@@ -47,11 +48,11 @@ func (s *Store) HandleError(err error) error {
 		return storage.ErrEntityNotFound
 	}
 
-	slog.Error("An Error occurred in database operation", "error", err)
 	return err
 }
 
 func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
+	log := logger.GetLogger(ctx)
 	if fn == nil {
 		return errors.New("txFn is nil")
 	}
@@ -64,14 +65,14 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 	qtx := sqlc.New(tx)
 	err = fn(NewStore(s.db, qtx))
 	if err == nil {
-		slog.Debug("Committing transaction")
+		log.Debug("committing transaction")
 		return tx.Commit(ctx)
 	}
 
-	slog.Debug("Rolling back transaction")
+	log.Debug("rolling back transaction")
 	rollbackErr := tx.Rollback(ctx)
 	if rollbackErr != nil {
-		slog.Error("Error rolling back transaction", "error", rollbackErr)
+		log.Error("error rolling back transaction", "error", rollbackErr)
 		return errors.Join(err, rollbackErr)
 	}
 

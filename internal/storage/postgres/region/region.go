@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -39,5 +40,12 @@ func WithName(name string) entities.EntityFunc[entities.Region] {
 }
 
 func (r *RegionRepository) Delete(ctx context.Context, id int32) error {
-	return r.store.DeleteRegion(ctx, id)
+	log := logger.GetLogger(ctx)
+	if err := r.store.DeleteRegion(ctx, id); err != nil {
+		log.Error("failed to delete region entity in db", "error", err, "region_id", id)
+		return err
+	}
+
+	log.Debug("region entity deleted successfully in db", "region_id", id)
+	return nil
 }
