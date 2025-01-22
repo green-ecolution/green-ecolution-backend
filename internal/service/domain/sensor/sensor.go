@@ -89,6 +89,8 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		return nil, handleError(err)
 	}
 
+	log.Info("sensor created successfully", "sensor_id", created.ID)
+
 	return created, nil
 }
 
@@ -113,6 +115,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 		return nil, handleError(err)
 	}
 
+	log.Info("sensor updated successfully", "sensor_id", id)
 	return updated, nil
 }
 
