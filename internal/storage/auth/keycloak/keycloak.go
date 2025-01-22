@@ -6,6 +6,7 @@ import (
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -68,10 +69,12 @@ func NewKeycloakRepository(cfg *config.IdentityAuthConfig) storage.AuthRepositor
 //
 //	fmt.Printf("Access Token: %s\n", token.AccessToken)
 func loginRestAPIClient(ctx context.Context, baseURL, clientID, clientSecret, realm string) (client *gocloak.GoCloak, token *gocloak.JWT, err error) {
+	log := logger.GetLogger(ctx)
 	client = gocloak.NewClient(baseURL)
 
 	token, err = client.LoginClient(ctx, clientID, clientSecret, realm)
 	if err != nil {
+		log.Error("failed to generate keycloak client", "error", err, "client_id", clientID, "client_secret", "*******", "realm", realm)
 		return nil, nil, errors.Join(err, ErrLogin)
 	}
 
