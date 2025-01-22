@@ -31,6 +31,20 @@ const (
 	Error LogLevel = "error"
 )
 
+var _ slog.LogValuer = (*TimeSince)(nil)
+
+type TimeSince struct {
+	startTime time.Time
+}
+
+func NewTimeSince() *TimeSince {
+	return &TimeSince{startTime: time.Now()}
+}
+
+func (t *TimeSince) LogValue() slog.Value {
+	return slog.StringValue(time.Since(t.startTime).String())
+}
+
 func (l LogLevel) ToSLog() slog.Level {
 	switch l {
 	case Debug:
@@ -120,6 +134,7 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 			lastGroup += goa.group + "."
 		} else {
 			attr := goa.attr
+			attr.Value = attr.Value.Resolve()
 			if lastGroup != "" {
 				attr.Key = lastGroup + attr.Key
 			}
