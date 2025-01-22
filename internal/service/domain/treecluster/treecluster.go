@@ -3,6 +3,7 @@ package treecluster
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/pkg/errors"
 
@@ -123,6 +124,14 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		tc.Description = createTc.Description
 		tc.SoilCondition = createTc.SoilCondition
 
+		log.Debug("creating tree cluster with following attributes",
+			"tree_ids", createTc.TreeIDs,
+			"name", createTc.Name,
+			"address", createTc.Address,
+			"description", createTc.Description,
+			"soil_condition", createTc.SoilCondition,
+		)
+
 		return true, nil
 	})
 
@@ -136,7 +145,7 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		return nil, handleError(err)
 	}
 
-	log.Info("successfully created tree cluster", "cluster_id", c.ID)
+	log.Info("tree cluster created successfully", "cluster_id", c.ID)
 
 	return c, nil
 }
@@ -166,6 +175,14 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
 
+		log.Debug("updating tree cluster with following attributes",
+			"cluster_id", id,
+			"name", tcUpdate.Name,
+			"address", tcUpdate.Address,
+			"description", tcUpdate.Description,
+			"soil_condition", tcUpdate.SoilCondition,
+		)
+
 		return true, nil
 	})
 
@@ -179,7 +196,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		return nil, handleError(err)
 	}
 
-	log.Info("successfully updated tree cluster", "cluster_id", id)
+	log.Info("tree cluster updated successfully", "cluster_id", id)
 	if err := s.publishUpdateEvent(ctx, prevTc); err != nil {
 		return nil, handleError(err)
 	}
@@ -207,7 +224,7 @@ func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 
-	log.Info("successfully deleted tree cluster", "cluster_id", id)
+	log.Info("tree cluster deleted successfully", "cluster_id", id)
 	return nil
 }
 
@@ -218,15 +235,24 @@ func (s *TreeClusterService) Ready() bool {
 // Update the tree cluster only after the trees have been updated to the database,
 // otherwise the center point of the tree cluster cannot be set
 func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	err := s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 		if err != nil {
 			return false, nil
 		}
 
-		tc.Latitude = lat
-		tc.Longitude = long
-		tc.Region = region
+		if tc.Latitude != lat || tc.Longitude != long || tc.Region.ID != region.ID {
+			tc.Latitude = lat
+			tc.Longitude = long
+			tc.Region = region
+
+			log.Info("update tree cluster position due to changed trees inside the tree cluster", "cluster_id", id)
+			log.Debug("detailed updated tree cluster position informations", "cluster_id", id,
+				slog.Group("new_position", "latitude", *lat, "longitude", *long),
+				slog.Group("region", "id", region.ID, "name", region.Name),
+			)
+		}
 
 		return true, nil
 	})
