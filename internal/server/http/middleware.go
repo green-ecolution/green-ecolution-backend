@@ -20,7 +20,6 @@ func (s *Server) middleware() *fiber.App {
 
 	middlewares := map[string]fiber.Handler{
 		"health_check": middleware.HealthCheck(s.services),
-		"http_logger":  middleware.HTTPLogger(),
 		"request_id":   middleware.RequestID(),
 		"app_logger":   middleware.AppLogger(logFn),
 		"auth":         middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService),

@@ -5,22 +5,27 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	http_logger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
-
-func HTTPLogger() fiber.Handler {
-	return http_logger.New()
-}
 
 func AppLogger(createLoggerFn func() *slog.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		log := createLoggerFn()
-		requestid := c.Locals("requestid").(string)
+		requestid, ok := c.Locals("requestid").(string)
+		if !ok {
+			requestid = ""
+		}
 
 		log = log.With("request_id", requestid, "request_duration", logger.NewTimeSince(), "request_start_time", time.Now())
 		c.Locals("logger", log)
 
-		return c.Next()
+		err := c.Next()
+		if err != nil {
+			log.Info("fiber request", "method", c.Method(), "path", c.Path(), "error", err)
+		} else {
+			log.Info("fiber request", "method", c.Method(), "path", c.Path())
+		}
+
+		return err
 	}
 }
