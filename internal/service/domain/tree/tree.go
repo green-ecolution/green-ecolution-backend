@@ -169,7 +169,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		return nil, handleError(err)
 	}
 
-	slog.Info("successfully created tree", "tree_id", newTree.ID)
+	slog.Info("tree created successfully", "tree_id", newTree.ID)
 	s.publishCreateTreeEvent(ctx, newTree)
 	return newTree, nil
 }
@@ -185,7 +185,7 @@ func (s *TreeService) Delete(ctx context.Context, id int32) error {
 		return handleError(err)
 	}
 
-	slog.Info("successfully deleting tree", "tree_id", id)
+	slog.Info("tree deleted successfully", "tree_id", id)
 	s.publishDeleteTreeEvent(ctx, treeEntity)
 	return nil
 }
@@ -245,7 +245,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, handleError(err)
 	}
 
-	slog.Info("successfully updated tree", "tree_id", id)
+	slog.Info("tree updated successfully", "tree_id", id)
 	s.publishUpdateTreeEvent(ctx, prevTree, updatedTree)
 	return updatedTree, nil
 }
