@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log/slog"
 	"net/url"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice/ors"
@@ -58,28 +58,49 @@ func NewRouteRepo(cfg *RouteRepoConfig) (*RouteRepo, error) {
 }
 
 func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
+	log := logger.GetLogger(ctx)
 	orsProfile, err := r.toOrsVehicleType(vehicle.Type)
 	if err != nil {
+		log.Debug("failed to convert vehicle type to ors vehicle profile", "error", err, "vehicle_type", vehicle.Type)
 		return nil, err
 	}
 
 	_, orsRoute, err := r.prepareOrsRoute(ctx, vehicle, clusters)
 	if err != nil {
+		log.Error("failed to prepare route to call ors",
+			"error", err,
+			"vehicle_id", vehicle.ID,
+			"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+		)
 		return nil, err
 	}
 
 	entity, err := r.ors.DirectionsGeoJSON(ctx, orsProfile, orsRoute)
 	if err != nil {
+		log.Error("failed to calculate route",
+			"error", err,
+			"vehicle_id", vehicle.ID,
+			"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+		)
 		return nil, err
 	}
 
 	metadata, err := routing.ConvertLocations(&r.cfg.routing)
 	if err != nil {
+		log.Error("failed to convert location to route metadata",
+			"error", err,
+			"vehicle_id", vehicle.ID,
+			"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+		)
 		return nil, err
 	}
 
 	entity.Metadata = *metadata
 
+	log.Debug("route generated successfully",
+		"vehicle_id", vehicle.ID,
+		"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+	)
 	return entity, nil
 }
 
@@ -134,15 +155,16 @@ func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entit
 }
 
 func (r *RouteRepo) prepareOrsRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (optimized *vroom.VroomResponse, routes *ors.OrsDirectionRequest, err error) {
+	log := logger.GetLogger(ctx)
 	optimizedRoutes, err := r.vroom.OptimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
-		slog.Error("failed to optimize route", "error", err)
+		log.Error("failed to optimize route", "error", err)
 		return nil, nil, err
 	}
 
 	// currently handle only the first route
 	if len(optimizedRoutes.Routes) == 0 {
-		slog.Error("there are no routes in vroom response", "routes", optimizedRoutes)
+		log.Error("there are no routes in vroom response", "routes", optimizedRoutes)
 		return nil, nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]

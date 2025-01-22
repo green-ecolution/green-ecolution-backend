@@ -6,13 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
 	"math"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
@@ -54,10 +54,11 @@ func NewValhallaClient(opts ...ValhallaClientOption) ValhallaClient {
 }
 
 func (o *ValhallaClient) DirectionsJSON(ctx context.Context, reqBody *DirectionRequest) (*DirectionResponse, error) {
+	log := logger.GetLogger(ctx)
 	reqBody.Format = "json"
 	var buf strings.Builder
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
-		slog.Error("failed to marshal valhalla req body", "error", err, "req_body", reqBody)
+		log.Error("failed to marshal valhalla req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
@@ -73,7 +74,7 @@ func (o *ValhallaClient) DirectionsJSON(ctx context.Context, reqBody *DirectionR
 
 	resp, err := o.cfg.client.Do(req)
 	if err != nil {
-		slog.Error("failed to send request to ors service", "error", err)
+		log.Error("failed to send request to ors service", "error", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -81,16 +82,16 @@ func (o *ValhallaClient) DirectionsJSON(ctx context.Context, reqBody *DirectionR
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
-			slog.Error("response from the Valhalla service with a not successful code", "status_code", resp.StatusCode, "body", body)
+			log.Error("response from the Valhalla service with a not successful code", "status_code", resp.StatusCode, "body", body)
 		} else {
-			slog.Error("response from the Valhalla service with a not successful code", "status_code", resp.StatusCode)
+			log.Error("response from the Valhalla service with a not successful code", "status_code", resp.StatusCode)
 		}
 		return nil, errors.New("response not successful")
 	}
 
 	var response DirectionResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		slog.Error("failed to decode ors response")
+		log.Error("failed to decode ors response")
 	}
 
 	return &response, nil
@@ -105,10 +106,11 @@ func (o *ValhallaClient) DirectionsGeoJSON(ctx context.Context, reqBody *Directi
 }
 
 func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *DirectionRequest) (io.ReadCloser, error) {
+	log := logger.GetLogger(ctx)
 	reqBody.Format = "gpx"
 	var buf strings.Builder
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
-		slog.Error("failed to marshal valhalla req body", "error", err, "req_body", reqBody)
+		log.Error("failed to marshal valhalla req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
@@ -124,7 +126,7 @@ func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *Directio
 
 	resp, err := o.cfg.client.Do(req)
 	if err != nil {
-		slog.Error("failed to send request to valhalla service", "error", err)
+		log.Error("failed to send request to valhalla service", "error", err)
 		return nil, err
 	}
 
@@ -132,9 +134,9 @@ func (o *ValhallaClient) DirectionsRawGpx(ctx context.Context, reqBody *Directio
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
-			slog.Error("response from the valhalla service with a not successful code", "status_code", resp.StatusCode, "body", body)
+			log.Error("response from the valhalla service with a not successful code", "status_code", resp.StatusCode, "body", body)
 		} else {
-			slog.Error("response from the valhalla service with a not successful code", "status_code", resp.StatusCode)
+			log.Error("response from the valhalla service with a not successful code", "status_code", resp.StatusCode)
 		}
 		return nil, errors.New("response not successful")
 	}
