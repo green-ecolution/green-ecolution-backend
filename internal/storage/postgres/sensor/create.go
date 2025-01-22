@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -21,39 +23,68 @@ func defaultSensor() *entities.Sensor {
 	}
 }
 
-func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error) {
+func (r *SensorRepository) Create(ctx context.Context, createFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
-	entity := defaultSensor()
-	for _, fn := range sFn {
-		fn(entity)
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
 	}
 
-	sensor, _ := r.GetByID(ctx, entity.ID)
-	if sensor != nil {
-		return nil, errors.New("sensor with same ID already exists")
-	}
+	var createdSensor *entities.Sensor
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		oldStore := r.store
+		defer func() {
+			r.store = oldStore
+		}()
+		r.store = s
 
-	if err := r.validateSensorEntity(entity); err != nil {
-		return nil, err
-	}
+		entity := defaultSensor()
 
-	id, err := r.createEntity(ctx, entity)
-	if err != nil {
-		log.Error("failed to create sensor entity in db", "error", err)
-		return nil, err
-	}
-
-	entity.ID = id
-	log.Debug("sensor entity created successfully in db", "sensor_id", id)
-
-	if entity.LatestData != nil && entity.LatestData.Data != nil {
-		err = r.InsertSensorData(ctx, entity.LatestData, id)
+		created, err := createFn(entity)
 		if err != nil {
-			return nil, err
+			return err
 		}
+
+		if !created {
+			return nil
+		}
+
+		existingSensor, _ := r.GetByID(ctx, entity.ID)
+		if existingSensor != nil {
+			return errors.New("sensor with same ID already exists")
+		}
+
+		if err := r.validateSensorEntity(entity); err != nil {
+			return err
+		}
+
+		id, err := r.createEntity(ctx, entity)
+		if err != nil {
+			log.Error("failed to create sensor entity in db", "error", err)
+			return err
+		}
+		entity.ID = id
+		log.Debug("sensor entity created successfully in db", "sensor_id", id)
+
+		if entity.LatestData != nil && entity.LatestData.Data != nil {
+			err = r.InsertSensorData(ctx, entity.LatestData, id)
+			if err != nil {
+				return err
+			}
+		}
+
+		createdSensor, err = r.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return r.GetByID(ctx, id)
+	return createdSensor, nil
 }
 
 func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *entities.SensorData, id string) error {

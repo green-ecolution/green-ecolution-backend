@@ -11,7 +11,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
@@ -79,10 +78,12 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
-	created, err := s.sensorRepo.Create(ctx,
-		sensor.WithLatestData(sc.LatestData),
-		sensor.WithStatus(sc.Status),
-	)
+	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor) (bool, error) {
+		s.LatestData = sc.LatestData
+		s.Status = sc.Status
+		return true, nil
+	})
+
 	if err != nil {
 		log.Debug("failed to create sensor", "error", err, "sensor_id", sc.ID)
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
@@ -104,10 +105,12 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	updated, err := s.sensorRepo.Update(ctx, id,
-		sensor.WithLatestData(su.LatestData),
-		sensor.WithStatus(su.Status),
-	)
+	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor) (bool, error) {
+		s.LatestData = su.LatestData
+		s.Status = su.Status
+		return true, nil
+	})
+
 	if err != nil {
 		log.Debug("failed to update sensor", "sensor_id", id, "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
