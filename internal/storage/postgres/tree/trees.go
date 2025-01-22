@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
@@ -161,11 +162,20 @@ func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) erro
 }
 
 func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error {
+	log := logger.GetLogger(ctx)
+
 	_, err := r.store.GetTreeClusterByID(ctx, treeClusterID)
 	if err != nil {
 		return err
 	}
-	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
+	unlinkTreeIDs, err := r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
+	if err != nil {
+		log.Error("failed to unlink tree cluster from trees", "error", err, "cluster_id", treeClusterID)
+	}
+
+	log.Info("unlink trees from following tree cluster", "cluster_id", treeClusterID, "unlinked_trees", unlinkTreeIDs)
+
+	return nil
 }
 
 func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {

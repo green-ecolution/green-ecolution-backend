@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -41,6 +42,7 @@ func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn f
 }
 
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {
+	log := logger.GetLogger(ctx)
 	var regionID *int32
 	if tc.Region != nil {
 		regionID = &tc.Region.ID
@@ -58,7 +60,9 @@ func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.T
 		Name:           tc.Name,
 	}
 
-	if err := r.store.UnlinkTreeClusterID(ctx, &tc.ID); err != nil {
+	_, err := r.store.UnlinkTreeClusterID(ctx, &tc.ID)
+	if err != nil {
+		log.Error("failed to unlink tree cluster from trees", "error", err, "cluster_id", tc.ID)
 		return err
 	}
 
