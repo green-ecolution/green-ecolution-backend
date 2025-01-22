@@ -321,12 +321,11 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 }
 
 func (w *WateringPlanService) Delete(ctx context.Context, id int32) error {
-	// _, err := w.wateringPlanRepo.GetByID(ctx, id)
-	// if err != nil {
-	// 	return handleError(err)
-	// }
-
 	log := logger.GetLogger(ctx)
+	if _, err := w.wateringPlanRepo.GetByID(ctx, id); err != nil {
+		return handleError(err)
+	}
+
 	if err := w.wateringPlanRepo.Delete(ctx, id); err != nil {
 		log.Error("failed to delete watering plan", "error", err, "watering_plan_id", id)
 		return handleError(err)

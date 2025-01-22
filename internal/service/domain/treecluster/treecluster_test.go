@@ -546,7 +546,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
 	t.Run("should successfully delete a tree cluster", func(t *testing.T) {
 		id := int32(1)
 
-		// clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
 		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
 		clusterRepo.EXPECT().Delete(ctx, id).Return(nil)
 
@@ -558,25 +558,25 @@ func TestTreeClusterService_Delete(t *testing.T) {
 		assert.Equal(t, nil, err)
 	})
 
-	// t.Run("should return error if tree cluster not found", func(t *testing.T) {
-	// 	id := int32(2)
+	t.Run("should return error if tree cluster not found", func(t *testing.T) {
+		id := int32(2)
 
-	// 	expectedErr := storage.ErrEntityNotFound
-	// 	clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
+		expectedErr := storage.ErrEntityNotFound
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(nil, expectedErr)
 
-	// 	// when
-	// 	err := svc.Delete(ctx, id)
+		// when
+		err := svc.Delete(ctx, id)
 
-	// 	// then
-	// 	assert.Error(t, err)
-	// 	assert.EqualError(t, err, "404: treecluster not found")
-	// })
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "404: treecluster not found")
+	})
 
 	t.Run("should return error if unlinking tree cluster ID fails", func(t *testing.T) {
 		id := int32(3)
 		expectedErr := errors.New("failed to unlink treecluster ID")
 
-		// clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
 		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedErr)
 
 		// when
@@ -591,7 +591,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
 		id := int32(4)
 		expectedErr := errors.New("failed to delete")
 
-		// clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
 		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
 		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
 

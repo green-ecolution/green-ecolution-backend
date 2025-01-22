@@ -1419,7 +1419,7 @@ func TestWateringPlanService_Delete(t *testing.T) {
 	t.Run("should successfully delete a watering plan", func(t *testing.T) {
 		id := int32(1)
 
-		// wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(allTestWateringPlans[1], nil)
+		wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(allTestWateringPlans[1], nil)
 		wateringPlanRepo.EXPECT().Delete(ctx, id).Return(nil)
 
 		// when
@@ -1429,23 +1429,23 @@ func TestWateringPlanService_Delete(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	// t.Run("should return error if watering plan not found", func(t *testing.T) {
-	// 	id := int32(2)
+	t.Run("should return error if watering plan not found", func(t *testing.T) {
+		id := int32(2)
 
-	// 	wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(nil, storage.ErrEntityNotFound)
+		wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(nil, storage.ErrEntityNotFound)
 
-	// 	// when
-	// 	err := svc.Delete(ctx, id)
+		// when
+		err := svc.Delete(ctx, id)
 
-	// 	// then
-	// 	assert.Error(t, err)
-	// 	assert.EqualError(t, err, "404: watering plan not found")
-	// })
+		// then
+		assert.Error(t, err)
+		assert.EqualError(t, err, "404: watering plan not found")
+	})
 
 	t.Run("should return error if deleting watering plan fails", func(t *testing.T) {
 		id := int32(4)
 
-		// wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(allTestWateringPlans[1], nil)
+		wateringPlanRepo.EXPECT().GetByID(ctx, id).Return(allTestWateringPlans[1], nil)
 		expectedErr := errors.New("failed to delete")
 		wateringPlanRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
 

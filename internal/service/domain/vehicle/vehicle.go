@@ -160,14 +160,12 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 }
 
 func (v *VehicleService) Delete(ctx context.Context, id int32) error {
-	// _, err := v.vehicleRepo.GetByID(ctx, id)
-	// if err != nil {
-	// 	return handleError(err)
-	// }
-
 	log := logger.GetLogger(ctx)
-	err := v.vehicleRepo.Delete(ctx, id)
-	if err != nil {
+	if _, err := v.vehicleRepo.GetByID(ctx, id); err != nil {
+		return handleError(err)
+	}
+
+	if err := v.vehicleRepo.Delete(ctx, id); err != nil {
 		log.Error("failed to delete vehicle", "error", err, "vehicle_id", id)
 		return handleError(err)
 	}

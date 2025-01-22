@@ -206,20 +206,17 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 
 func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
-	// TODO: don't return error on empty entity
-	// _, err := s.treeClusterRepo.GetByID(ctx, id)
-	// if err != nil {
-	// 	return handleError(err)
-	// }
-
-	err := s.treeRepo.UnlinkTreeClusterID(ctx, id)
+	_, err := s.treeClusterRepo.GetByID(ctx, id)
 	if err != nil {
+		return handleError(err)
+	}
+
+	if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
 		log.Error("failed to unlink tree from tree cluster", "cluster_id", id, "error", err)
 		return handleError(err)
 	}
 
-	err = s.treeClusterRepo.Delete(ctx, id)
-	if err != nil {
+	if err := s.treeClusterRepo.Delete(ctx, id); err != nil {
 		log.Error("failed to delete tree cluster", "error", err, "cluster_id", id)
 		return handleError(err)
 	}
