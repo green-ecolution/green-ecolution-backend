@@ -127,7 +127,7 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 		level = fmt.Sprintf("\033[31;1m%s\033[0m", level) // Red
 	}
 
-	fields := make(map[string]any)
+	fields := make([]slog.Attr, 0)
 	lastGroup := ""
 	for _, goa := range h.goa {
 		if goa.group != "" {
@@ -139,7 +139,7 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 				attr.Key = lastGroup + attr.Key
 			}
 
-			fields[attr.Key] = attr.Value.Any()
+			fields = append(fields, attr)
 		}
 	}
 
@@ -148,21 +148,21 @@ func (h *PrettyHandler) Handle(_ context.Context, r slog.Record) error {
 		if lastGroup != "" {
 			a.Key = lastGroup + a.Key
 		}
-		fields[a.Key] = a.Value.Any()
+		fields = append(fields, a)
 		return true
 	})
 
 	logFields := make([]string, 0, len(fields))
-	for k, v := range fields {
+	for _, attr := range fields {
 		keyColorSeq := "\033[38;5;249;1m" // gray bold
 		valueColorSeq := "\033[38;5;249m" // gray
 
-		if k == "err" || k == "error" {
+		if attr.Key == "err" || attr.Key == "error" {
 			keyColorSeq = "\033[31;1m" // red bold
 			valueColorSeq = "\033[31m" // red
 		}
 
-		logFields = append(logFields, fmt.Sprintf("%s%s=\033[0m%s\"%v\"\033[0m", keyColorSeq, k, valueColorSeq, v))
+		logFields = append(logFields, fmt.Sprintf("%s%s=\033[0m%s\"%v\"\033[0m", keyColorSeq, attr.Key, valueColorSeq, attr.Value.Any()))
 	}
 
 	var source string
