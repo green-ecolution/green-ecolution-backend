@@ -49,7 +49,7 @@ func (s *Store) MapSensorFields(ctx context.Context, sn *entities.Sensor) error 
 func (s *Store) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error) {
 	row, err := s.GetLatestSensorDataByID(ctx, id)
 	if err != nil {
-		return nil, s.HandleError(err, sqlc.SensorDatum{})
+		return nil, s.MapError(err, sqlc.SensorDatum{})
 	}
 
 	domainData, err := sensorMapper.FromSqlSensorData(row)

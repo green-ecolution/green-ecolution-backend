@@ -39,8 +39,7 @@ func (s *Store) DB() *pgxpool.Pool {
 	return s.db
 }
 
-// TODO: Improve error handling
-func (s *Store) HandleError(err error, dbType interface{}) error {
+func (s *Store) MapError(err error, dbType interface{}) error {
 	if err == nil {
 		return nil
 	}

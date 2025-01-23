@@ -17,7 +17,7 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 	rows, err := r.store.GetAllTrees(ctx)
 	if err != nil {
 		log.Debug("failed to get trees in db", "error", err)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t := r.mapper.FromSqlList(rows)
@@ -36,7 +36,7 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 	row, err := r.store.GetTreeByID(ctx, id)
 	if err != nil {
 		log.Debug("failed to get tree by id in db", "error", err, "tree_id", id)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t := r.mapper.FromSql(row)
@@ -52,7 +52,7 @@ func (r *TreeRepository) GetBySensorID(ctx context.Context, id string) (*entitie
 	row, err := r.store.GetTreeBySensorID(ctx, &id)
 	if err != nil {
 		log.Debug("failed to get tree by sensor id in db", "error", err, "sensor_id", id)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t := r.mapper.FromSql(row)
@@ -68,7 +68,7 @@ func (r *TreeRepository) GetBySensorIDs(ctx context.Context, ids ...string) ([]*
 	rows, err := r.store.GetTreesBySensorIDs(ctx, ids)
 	if err != nil {
 		log.Debug("failed to get trees by multiple sensor ids in db", "error", err, "sensor_ids", ids)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t := r.mapper.FromSqlList(rows)
@@ -86,7 +86,7 @@ func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*ent
 	rows, err := r.store.GetTreesByIDs(ctx, ids)
 	if err != nil {
 		log.Debug("failed to get trees by ids in db", "error", err, "tree_ids", ids)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t := r.mapper.FromSqlList(rows)
@@ -104,7 +104,7 @@ func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*e
 	rows, err := r.store.GetTreesByTreeClusterID(ctx, &id)
 	if err != nil {
 		log.Debug("failed to get tree by cluster id in db", "error", err, "cluster_id", id)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t := r.mapper.FromSqlList(rows)
@@ -126,7 +126,7 @@ func (r *TreeRepository) GetByCoordinates(ctx context.Context, latitude, longitu
 	row, err := r.store.GetTreeByCoordinates(ctx, &params)
 	if err != nil {
 		log.Debug("failed to get tree by coordinates in db", "error", err, "latitude", latitude, "longitude", longitude)
-		return nil, r.store.HandleError(err, sqlc.Tree{})
+		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 	tree := r.mapper.FromSql(row)
 	if err := r.mapFields(ctx, tree); err != nil {
@@ -140,7 +140,7 @@ func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*ent
 	rows, err := r.store.GetAllImagesByTreeID(ctx, id)
 	if err != nil {
 		log.Debug("failed to get images from tree id in db", "error", err, "tree_id", id)
-		return nil, r.store.HandleError(err, sqlc.Image{})
+		return nil, r.store.MapError(err, sqlc.Image{})
 	}
 
 	return r.iMapper.FromSqlList(rows), nil
@@ -151,7 +151,7 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*
 	row, err := r.store.GetSensorByTreeID(ctx, treeID)
 	if err != nil {
 		log.Debug("failed to get sensor by tree id", "error", err, "tree_id", treeID)
-		return nil, r.store.HandleError(err, sqlc.Sensor{})
+		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
 	data := r.sMapper.FromSql(row)

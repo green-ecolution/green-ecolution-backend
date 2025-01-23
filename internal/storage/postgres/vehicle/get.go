@@ -13,7 +13,7 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, er
 	rows, err := r.store.GetAllVehicles(ctx)
 	if err != nil {
 		log.Debug("failed to get vehicle entities in db", "error", err)
-		return nil, r.store.HandleError(err, sqlc.Vehicle{})
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
 	return r.mapper.FromSqlList(rows), nil
@@ -24,7 +24,7 @@ func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entiti
 	rows, err := r.store.GetAllVehiclesByType(ctx, sqlc.VehicleType(vehicleType))
 	if err != nil {
 		log.Debug("failed to get vehicle entities by provides type in db", "error", err, "vehicle_type", vehicleType)
-		return nil, r.store.HandleError(err, sqlc.Vehicle{})
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
 	return r.mapper.FromSqlList(rows), nil
@@ -35,7 +35,7 @@ func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Ve
 	row, err := r.store.GetVehicleByID(ctx, id)
 	if err != nil {
 		log.Debug("failed to get vehicle entity by provided id", "error", err, "vehicle_id", id)
-		return nil, r.store.HandleError(err, sqlc.Vehicle{})
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -46,7 +46,7 @@ func (r *VehicleRepository) GetByPlate(ctx context.Context, plate string) (*enti
 	row, err := r.store.GetVehicleByPlate(ctx, plate)
 	if err != nil {
 		log.Debug("failed to get vehicle entity by given plate", "error", err, "vehicle_plate", plate)
-		return nil, r.store.HandleError(err, sqlc.Vehicle{})
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
 	return r.mapper.FromSql(row), nil
