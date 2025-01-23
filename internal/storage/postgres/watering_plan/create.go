@@ -3,6 +3,7 @@ package wateringplan
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -65,6 +66,7 @@ func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*enti
 
 		createdWp, err = w.GetByID(ctx, *id)
 		if err != nil {
+			fmt.Println("failed to get vy id")
 			return err
 		}
 
@@ -76,11 +78,16 @@ func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*enti
 		return nil, err
 	}
 
-	log.Debug("watering plan entity successfully created in db", "watering_plan_id", createdWp.ID)
+	if createdWp != nil {
+		log.Debug("tree cluster entity created successfully", "cluster_id", createdWp.ID)
+	} else {
+		log.Debug("tree cluster should not be created. cancel transaction")
+	}
 	return createdWp, nil
 }
 
 func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entities.WateringPlan) (*int32, error) {
+	log := logger.GetLogger(ctx)
 	date, err := utils.TimeToPgDate(entity.Date)
 	if err != nil {
 		return nil, errors.New("failed to convert date")
@@ -96,19 +103,29 @@ func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entit
 
 	id, err := w.store.CreateWateringPlan(ctx, &args)
 	if err != nil {
-		return nil, w.store.HandleError(err)
+		log.Debug("failed to create watering plan in createEntity func", "error", err)
+		return nil, err
 	}
 
 	if err := w.setLinkedUsers(ctx, entity, id); err != nil {
-		return nil, w.store.HandleError(err)
+		log.Debug("failed to link users to currently created watering plan", "error", err, "user_ids", entity.UserIDs, "watering_plan_id", id)
+		return nil, err
 	}
 
 	if err := w.setLinkedVehicles(ctx, entity, id); err != nil {
-		return nil, w.store.HandleError(err)
+		if entity.Trailer != nil {
+			log.Debug("failed to link vehicles to currently created watering plan", "error", err, "transporter_id", entity.Transporter.ID, "trailer_id", entity.Trailer.ID, "watering_plan_id", id)
+		} else {
+			log.Debug("failed to link vehicles to currently created watering plan", "error", err, "transporter_id", entity.Transporter.ID, "watering_plan_id", id)
+		}
+		return nil, err
 	}
 
 	if err := w.setLinkedTreeClusters(ctx, entity, id); err != nil {
-		return nil, w.store.HandleError(err)
+		if entity.TreeClusters != nil {
+			log.Debug("failed to link tree cluster to currently created watering plan", "error", err, "cluster_ids", utils.Map(entity.TreeClusters, func(c *entities.TreeCluster) int32 { return c.ID }), "watering_plan_id", id)
+		}
+		return nil, err
 	}
 
 	return &id, nil
@@ -143,7 +160,7 @@ func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *
 	})
 	if err != nil {
 		log.Error("failed to link transporter vehicle to watering plan", "error", err, "watering_plan_id", id, "vehicle_id", entity.Transporter.ID)
-		return w.store.HandleError(err)
+		return err
 	}
 
 	// link trailer to pivot table
@@ -154,7 +171,7 @@ func (w *WateringPlanRepository) setLinkedVehicles(ctx context.Context, entity *
 		})
 		if err != nil {
 			log.Error("failed to link trailer vehicle to watering plan", "error", err, "watering_plan_id", id, "vehicle_id", entity.Trailer.ID)
-			return w.store.HandleError(err)
+			return err
 		}
 	}
 
@@ -170,7 +187,7 @@ func (w *WateringPlanRepository) setLinkedUsers(ctx context.Context, entity *ent
 		})
 		if err != nil {
 			log.Error("failed to link users to watering plan", "error", err, "watering_plan_id", id, "user_ids", entity.UserIDs)
-			return w.store.HandleError(err)
+			return err
 		}
 	}
 
@@ -186,7 +203,7 @@ func (w *WateringPlanRepository) setLinkedTreeClusters(ctx context.Context, enti
 		})
 		if err != nil {
 			log.Error("failed to link tree clusters to watering plan", "error", err, "watering_plan_id", id, "cluster_ids", utils.Map(entity.TreeClusters, func(c *entities.TreeCluster) int32 { return c.ID }))
-			return w.store.HandleError(err)
+			return err
 		}
 	}
 

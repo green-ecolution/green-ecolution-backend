@@ -2,12 +2,11 @@ package tree
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/pkg/errors"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -52,7 +51,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 		return nil
 	}
 
-	status := utils.CalculateWateringStatus(t.PlantingYear, event.New.Data.Watermarks)
+	status := utils.CalculateWateringStatus(ctx, t.PlantingYear, event.New.Data.Watermarks)
 
 	if status == t.WateringStatus {
 		return nil
@@ -73,8 +72,8 @@ func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
 	trees, err := s.treeRepo.GetAll(ctx)
 	if err != nil {
-		log.Error("failed to fetch trees", "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to fetch trees", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return trees, nil
@@ -84,8 +83,8 @@ func (s *TreeService) GetByID(ctx context.Context, id int32) (*entities.Tree, er
 	log := logger.GetLogger(ctx)
 	tr, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
-		log.Error("failed to fetch tree by id", "error", err, "tree_id", id)
-		return nil, handleError(err)
+		log.Debug("failed to fetch tree by id", "error", err, "tree_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return tr, nil
@@ -95,8 +94,8 @@ func (s *TreeService) GetBySensorID(ctx context.Context, id string) (*entities.T
 	log := logger.GetLogger(ctx)
 	tr, err := s.treeRepo.GetBySensorID(ctx, id)
 	if err != nil {
-		log.Error("failed to get tree by sensor id", "sensor_id", id, "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to get tree by sensor id", "sensor_id", id, "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return tr, nil
@@ -133,15 +132,15 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(treeCreate); err != nil {
 		log.Debug("failed to validate tree struct to create", "error", err, "raw_tree", fmt.Sprintf("%+v", treeCreate))
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	fn := make([]entities.EntityFunc[entities.Tree], 0)
 	if treeCreate.TreeClusterID != nil {
 		treeClusterID, err := s.treeClusterRepo.GetByID(ctx, *treeCreate.TreeClusterID)
 		if err != nil {
-			log.Error("failed to fetch tree cluster by id specified in the tree create request", "tree_cluster_id", treeCreate.TreeClusterID)
-			return nil, handleError(err)
+			log.Debug("failed to fetch tree cluster by id specified in the tree create request", "tree_cluster_id", treeCreate.TreeClusterID)
+			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
 		fn = append(fn, tree.WithTreeCluster(treeClusterID))
 	}
@@ -149,8 +148,8 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	if treeCreate.SensorID != nil {
 		sensorID, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
 		if err != nil {
-			log.Error("failed to fetch sensor by id specified in the tree create request", "sensor_id", treeCreate.SensorID)
-			return nil, handleError(err)
+			log.Debug("failed to fetch sensor by id specified in the tree create request", "sensor_id", treeCreate.SensorID)
+			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
 		fn = append(fn, tree.WithSensor(sensorID))
 	}
@@ -165,8 +164,8 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	)
 	newTree, err := s.treeRepo.Create(ctx, fn...)
 	if err != nil {
-		log.Error("failed to create tree", "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to create tree", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	slog.Info("tree created successfully", "tree_id", newTree.ID)
@@ -176,13 +175,13 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 
 func (s *TreeService) Delete(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
-	treeEntity, err := s.GetByID(ctx, id)
+	treeEntity, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
-		return handleError(err)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 	if err := s.treeRepo.Delete(ctx, id); err != nil {
-		log.Error("failed to delete tree", "error", err, "tree_id", id)
-		return handleError(err)
+		log.Debug("failed to delete tree", "error", err, "tree_id", id)
+		return service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	slog.Info("tree deleted successfully", "tree_id", id)
@@ -194,12 +193,13 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(tu); err != nil {
 		log.Debug("failed to validate struct from tree update", "error", err, "raw_tree", fmt.Sprintf("%+v", tu))
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
-	prevTree, err := s.GetByID(ctx, id)
+	prevTree, err := s.treeRepo.GetByID(ctx, id)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get previouse existing tree", "tree_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	// Check if the tree is readonly (imported from csv)
@@ -212,8 +212,8 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		var treeCluster *entities.TreeCluster
 		treeCluster, err = s.treeClusterRepo.GetByID(ctx, *tu.TreeClusterID)
 		if err != nil {
-			log.Error("failed to find tree cluster by id specified from update request", "tree_cluster_id", tu.TreeClusterID)
-			return nil, handleError(fmt.Errorf("failed to find TreeCluster with ID %d: %w", *tu.TreeClusterID, err))
+			log.Debug("failed to find tree cluster by id specified from update request", "tree_cluster_id", tu.TreeClusterID)
+			return nil, service.MapError(ctx, fmt.Errorf("failed to find TreeCluster with ID %d: %w", *tu.TreeClusterID, err), service.ErrorLogEntityNotFound)
 		}
 		fn = append(fn, tree.WithTreeCluster(treeCluster))
 	} else {
@@ -224,8 +224,8 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		var sensor *entities.Sensor
 		sensor, err = s.sensorRepo.GetByID(ctx, *tu.SensorID)
 		if err != nil {
-			log.Error("failed to find sensor by id specified from update request", "sensor_id", tu.SensorID)
-			return nil, handleError(fmt.Errorf("failed to find Sensor with ID %v: %w", *tu.SensorID, err))
+			log.Debug("failed to find sensor by id specified from update request", "sensor_id", tu.SensorID)
+			return nil, service.MapError(ctx, fmt.Errorf("failed to find Sensor with ID %v: %w", *tu.SensorID, err), service.ErrorLogEntityNotFound)
 		}
 		fn = append(fn, tree.WithSensor(sensor))
 	} else {
@@ -241,25 +241,13 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 	updatedTree, err := s.treeRepo.Update(ctx, id, fn...)
 	if err != nil {
-		log.Error("failed to update tree", "error", err, "tree_id", id)
-		return nil, handleError(err)
+		log.Debug("failed to update tree", "error", err, "tree_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	slog.Info("tree updated successfully", "tree_id", id)
 	s.publishUpdateTreeEvent(ctx, prevTree, updatedTree)
 	return updatedTree, nil
-}
-
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, storage.ErrTreeNotFound.Error())
-	}
-
-	if errors.Is(err, storage.ErrSensorNotFound) {
-		return service.NewError(service.NotFound, err.Error())
-	}
-
-	return service.NewError(service.InternalError, err.Error())
 }
 
 func (s *TreeService) Ready() bool {

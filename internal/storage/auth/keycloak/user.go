@@ -27,12 +27,12 @@ func NewUserRepository(cfg *config.IdentityAuthConfig) storage.UserRepository {
 
 func (r *UserRepository) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
 	log := logger.GetLogger(ctx)
-	log.Debug("creating user in keycloak", "user_name", user.Username)
-	log.Debug("creating user in keycloak with detailed information", "roles", roles, "raw_user", fmt.Sprintf("%+v", user))
-
 	if user == nil {
 		return nil, ErrEmptyUser
 	}
+
+	log.Debug("creating user in keycloak", "user_name", user.Username)
+	log.Debug("creating user in keycloak with detailed information", "roles", roles, "raw_user", fmt.Sprintf("%+v", user))
 
 	keyCloakUser := userToKeyCloakUser(user)
 

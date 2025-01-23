@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"maps"
@@ -14,7 +15,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	"github.com/pkg/errors"
 )
 
 type PluginManagerConfig struct {
@@ -73,15 +73,15 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 	log := logger.GetLogger(ctx)
 	if err := p.validator.Struct(plugin); err != nil {
 		log.Debug("failed to validate plugin struct", "error", err, "raw_plugin", fmt.Sprintf("%+v", plugin))
-		return nil, errors.Wrap(err, "validation failed")
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	log.Info("register new plugin", "plugin", plugin.Slug)
 
 	token, err := p.authRepository.GetAccessTokenFromClientCredentials(ctx, plugin.Auth.ClientID, plugin.Auth.ClientSecret)
 	if err != nil {
-		log.Error("failed to login plugin with credantials", "error", err, "plugin_client_id", plugin.Auth.ClientID, "plugin_client_secret", "*******")
-		return nil, errors.Wrap(err, "failed to login plugin with credantials")
+		log.Debug("failed to login plugin with credantials", "error", err, "plugin_client_id", plugin.Auth.ClientID, "plugin_client_secret", "*******")
+		return nil, service.MapError(ctx, errors.Join(err, errors.New("failed to login plugin with credantials")), service.ErrorLogAll)
 	}
 
 	p.mutex.Lock()
@@ -89,7 +89,7 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 
 	if _, ok := p.plugins[plugin.Slug]; ok {
 		log.Warn("the plugin you are trying to register is already registered in the system.", "plugin_slug", plugin.Slug)
-		return nil, errors.New("plugin already registered")
+		return nil, service.ErrPluginRegistered
 	}
 
 	p.plugins[plugin.Slug] = *plugin
@@ -98,43 +98,46 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 	return token, nil
 }
 
-func (p *PluginManager) Get(slug string) (entities.Plugin, error) {
+func (p *PluginManager) Get(ctx context.Context, slug string) (entities.Plugin, error) {
+	log := logger.GetLogger(ctx)
 	p.mutex.RLock()
 	defer p.mutex.RUnlock()
 	plugin, ok := p.plugins[slug]
 	if !ok {
-		slog.Error("the plugin is not registered in the system", "plugin_slug", slug)
-		return plugin, errors.New("plugin not registered")
+		log.Error("the plugin is not registered in the system", "plugin_slug", slug)
+		return plugin, service.ErrPluginNotRegistered
 	}
 
 	return plugin, nil
 }
 
-func (p *PluginManager) GetAll() ([]entities.Plugin, []time.Time) {
+func (p *PluginManager) GetAll(_ context.Context) ([]entities.Plugin, []time.Time) {
 	p.mutex.RLock()
 	defer p.mutex.RUnlock()
 	return slices.Collect(maps.Values(p.plugins)), slices.Collect(maps.Values(p.heartbeats))
 }
 
-func (p *PluginManager) HeartBeat(slug string) error {
+func (p *PluginManager) HeartBeat(ctx context.Context, slug string) error {
+	log := logger.GetLogger(ctx)
 	if slug == "" {
-		slog.Debug("the provided plugin slug is empty")
-		return errors.New("slug is empty")
+		log.Debug("the provided plugin slug is empty")
+		return service.NewError(service.BadRequest, "slug is empty")
 	}
 
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	if _, ok := p.heartbeats[slug]; !ok {
-		slog.Error("the plugin is not registered in the system", "plugin_slug", slug)
-		return errors.New("plugin not registered")
+		log.Error("the plugin is not registered in the system", "plugin_slug", slug)
+		return service.ErrPluginNotRegistered
 	}
 
 	p.heartbeats[slug] = time.Now()
 	return nil
 }
 
-func (p *PluginManager) Unregister(slug string) {
-	slog.Info("unregister plugin", "plugin_slug", slug)
+func (p *PluginManager) Unregister(ctx context.Context, slug string) {
+	log := logger.GetLogger(ctx)
+	log.Info("unregister plugin", "plugin_slug", slug)
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	delete(p.plugins, slug)
@@ -156,7 +159,8 @@ func (p *PluginManager) checkHeartbeats() []string {
 	return slugsToDelete
 }
 
-func (p *PluginManager) batchUnregister(slugs []string) {
+func (p *PluginManager) batchUnregister(ctx context.Context, slugs []string) {
+	log := logger.GetLogger(ctx)
 	if len(slugs) == 0 {
 		return
 	}
@@ -164,7 +168,7 @@ func (p *PluginManager) batchUnregister(slugs []string) {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 	for _, slug := range slugs {
-		slog.Info("unregister plugin due to timeout", "plugin", slug)
+		log.Info("unregister plugin due to timeout", "plugin", slug)
 		delete(p.plugins, slug)
 		delete(p.heartbeats, slug)
 	}
@@ -178,7 +182,7 @@ func (p *PluginManager) StartCleanup(ctx context.Context) error {
 			return ctx.Err()
 		case <-ticker.C:
 			slugsToDelete := p.checkHeartbeats()
-			p.batchUnregister(slugsToDelete)
+			p.batchUnregister(ctx, slugsToDelete)
 		}
 	}
 }

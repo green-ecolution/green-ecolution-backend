@@ -84,7 +84,7 @@ func (r *FlowerbedRepository) createEntity(ctx context.Context, entity *entities
 
 	id, err := r.store.CreateFlowerbed(ctx, &args)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, r.store.HandleError(err, sqlc.Flowerbed{})
 	}
 
 	return &id, nil

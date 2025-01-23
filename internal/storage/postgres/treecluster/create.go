@@ -73,7 +73,12 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 		return nil, err
 	}
 
-	log.Debug("tree cluster entity created successfully", "cluster_id", createdTc.ID)
+	if createdTc != nil {
+		log.Debug("tree cluster entity created successfully", "cluster_id", createdTc.ID)
+	} else {
+		log.Debug("tree cluster should not be created. cancel transaction")
+	}
+
 	return createdTc, nil
 }
 

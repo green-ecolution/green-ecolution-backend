@@ -2,6 +2,7 @@ package tree
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
@@ -9,7 +10,6 @@ import (
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
-	"github.com/pkg/errors"
 )
 
 type TreeRepository struct {
@@ -115,7 +115,7 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
-		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
+		return err
 	}
 
 	for _, img := range images {
@@ -125,11 +125,11 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 		}
 		_, err = r.store.UnlinkTreeImage(ctx, &args)
 		if err != nil {
-			return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
+			return err
 		}
 
 		if err = r.store.DeleteImage(ctx, img.ID); err != nil {
-			return r.store.HandleError(errors.Wrap(err, "failed to delete image"))
+			return err
 		}
 	}
 
@@ -145,7 +145,7 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 
 func (r *TreeRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
 	if err := r.UnlinkAllImages(ctx, id); err != nil {
-		return r.store.HandleError(errors.Wrap(err, "failed to unlink images"))
+		return err
 	}
 
 	return r.Delete(ctx, id)

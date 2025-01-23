@@ -23,14 +23,13 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn 
 
 		entity, err := w.GetByID(ctx, id)
 		if err != nil {
-			return w.store.HandleError(err)
+			return err
 		}
 
 		if updateFn == nil {
 			return errors.New("updateFn is nil")
 		}
-		{
-		}
+
 		updated, err := updateFn(entity)
 		if err != nil {
 			return err
@@ -46,6 +45,7 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn 
 
 		if err := w.updateEntity(ctx, entity); err != nil {
 			log.Error("failed to updated watering plan entity in db", "error", err, "watering_plan_id", id)
+			return err
 		}
 
 		log.Debug("watering plan entity updated successfully", "watering_plan_id", id)
@@ -120,7 +120,7 @@ func (w *WateringPlanRepository) updateConsumedWaterValues(ctx context.Context, 
 			TreeClusterID:  value.TreeClusterID,
 			ConsumedWater:  *value.ConsumedWater,
 		}); err != nil {
-			return w.store.HandleError(err)
+			return err
 		}
 	}
 

@@ -14,7 +14,7 @@ func (r *RegionRepository) Update(ctx context.Context, id int32, vFn ...entities
 	log := logger.GetLogger(ctx)
 	entity, err := r.GetByID(ctx, id)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	for _, fn := range vFn {

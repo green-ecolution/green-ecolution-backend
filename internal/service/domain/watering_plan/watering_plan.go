@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
@@ -79,25 +78,25 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, transporterID in
 	if trailerID != nil {
 		trailer, err = w.vehicleRepo.GetByID(ctx, *trailerID)
 		if err != nil {
-			slog.Error("can't get selected trailer to preview route. route will be calculated without trailer", "error", err, "trailer_id", trailerID)
+			log.Warn("can't get selected trailer to preview route. route will be calculated without trailer", "error", err, "trailer_id", trailerID)
 		}
 	}
 
 	clusters, err := w.clusterRepo.GetByIDs(ctx, clusterIDs)
 	if err != nil {
 		// when error, something is wrong with the db, else clusters should be an empty array
-		log.Error("failed to get cluster by provided ids", "cluster_ids", clusterIDs)
-		return nil, err
+		log.Debug("failed to get cluster by provided ids", "cluster_ids", clusterIDs)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	geoJSON, err := w.routingRepo.GenerateRoute(ctx, w.mergeVehicle(transporter, trailer), clusters)
 	if err != nil {
 		if errors.Is(err, storage.ErrUnknownVehicleType) {
 			log.Debug("the vehicle type is not supported", "error", err, "vehicle_type", transporter.Type)
-			return nil, service.NewError(service.NotFound, "vehicle type is not supported")
+			return nil, service.ErrVehicleUnsupportedType
 		}
 		log.Debug("failed to generate route", "error", err)
-		return nil, err
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	return geoJSON, nil
@@ -107,8 +106,8 @@ func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringP
 	log := logger.GetLogger(ctx)
 	plans, err := w.wateringPlanRepo.GetAll(ctx)
 	if err != nil {
-		log.Error("failed to fetch watering plans", "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to fetch watering plans", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return plans, nil
@@ -118,8 +117,8 @@ func (w *WateringPlanService) GetByID(ctx context.Context, id int32) (*entities.
 	log := logger.GetLogger(ctx)
 	got, err := w.wateringPlanRepo.GetByID(ctx, id)
 	if err != nil {
-		log.Error("failed to fetch watering plan by id", "error", err, "watering_plan_id", id)
-		return nil, handleError(err)
+		log.Debug("failed to fetch watering plan by id", "error", err, "watering_plan_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return got, nil
@@ -129,23 +128,22 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	log := logger.GetLogger(ctx)
 	if err := w.validator.Struct(createWp); err != nil {
 		log.Debug("failed to validate struct from create watering plan", "error", err, "raw_watering_plan", fmt.Sprintf("%+v", createWp))
-		return nil, service.NewError(service.BadRequest, errors.Join(err, errors.New("validation error")).Error())
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	// TODO: validate driver license
-
 	if err := w.validateUserIDs(ctx, createWp.UserIDs); err != nil {
-		return nil, service.NewError(service.NotFound, storage.ErrUserNotFound.Error())
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	treeClusters, err := w.fetchTreeClusters(ctx, createWp.TreeClusterIDs)
 	if err != nil {
-		return nil, err
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	transporter, err := w.fetchVehicle(ctx, *createWp.TransporterID)
 	if err != nil {
-		return nil, err
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	var trailer *entities.Vehicle
@@ -169,19 +167,23 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return true, nil
 	})
 	if err != nil {
-		log.Error("failed to create watering plan", "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to create watering plan", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
 		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, mergedVehicle, treeClusters)
-		if err == nil {
+		if err != nil {
+			log.Warn("generating route in gpx fomat failed. will not save gpx route", "error", err, "watering_plan_id", created.ID)
+		} else {
 			wp.GpxURL = gpxURL
 		}
 
 		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
-		if err == nil {
+		if err != nil {
+			log.Warn("generating route information failed. will not route metadata", "error", err, "watering_plan_id", created.ID)
+		} else {
 			wp.Distance = utils.P(metadata.Distance)
 			wp.Duration = metadata.Time
 			wp.RefillCount = metadata.Refills
@@ -191,8 +193,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	})
 
 	if err != nil {
-		log.Error("failed to apply generate gpx url to recently created watering plan", "error", err, "watering_plan_id", created.ID)
-		return nil, handleError(err)
+		log.Debug("failed to apply generate gpx url and route metadata to recently created watering plan", "error", err, "watering_plan_id", created.ID)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	log.Info("watering plan created successfully", "watering_plan_id", created.ID)
@@ -236,12 +238,13 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	log := logger.GetLogger(ctx)
 	if err := w.validator.Struct(updateWp); err != nil {
 		log.Debug("failed to validate struct from update watering plan", "error", err, "raw_watering_plan", fmt.Sprintf("%+v", updateWp))
-		return nil, service.NewError(service.BadRequest, errors.Join(err, errors.New("validation error")).Error())
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	prevWp, err := w.GetByID(ctx, id)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get exitsting watering plan by id", "error", err, "watering_plan_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	// TODO: validate driver license
@@ -251,24 +254,24 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	}
 
 	if err := w.validateUserIDs(ctx, updateWp.UserIDs); err != nil {
-		return nil, service.NewError(service.NotFound, storage.ErrUserNotFound.Error())
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
 	if err != nil {
-		return nil, err
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	transporter, err := w.fetchVehicle(ctx, *updateWp.TransporterID)
 	if err != nil {
-		return nil, err
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	var trailer *entities.Vehicle
 	if updateWp.TrailerID != nil {
 		trailer, err = w.fetchVehicle(ctx, *updateWp.TrailerID)
 		if err != nil {
-			return nil, err
+			log.Warn("failed to get trailer by id. will continue without trailer", "error", err)
 		}
 	}
 
@@ -289,15 +292,15 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		if w.shouldUpdateGpx(prevWp, wp) {
 			gpxURL, err := w.getGpxRouteURL(ctx, id, mergedVehicle, treeClusters)
 			if err != nil {
-				return false, handleError(err)
+				log.Warn("generating route in gpx fomat failed. will not save gpx route", "error", err, "watering_plan_id", id)
+			} else {
+				wp.GpxURL = gpxURL
 			}
-
-			wp.GpxURL = gpxURL
 		}
 
 		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
 		if err != nil {
-			log.Error("failed to generate routing metadata", "error", err)
+			log.Warn("generating route information failed. will not route metadata", "error", err, "watering_plan_id", id)
 		} else {
 			wp.Distance = utils.P(metadata.Distance)
 			wp.Duration = metadata.Time
@@ -308,27 +311,26 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	})
 
 	if err != nil {
-		log.Error("failed to update watering plan")
-		return nil, handleError(err)
+		log.Debug("failed to update watering plan", "error", err, "watering_plan_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	log.Info("watering plan updated successfully", "watering_plan_id", id)
 	if err := w.publishUpdateEvent(ctx, prevWp); err != nil {
-		return nil, handleError(err)
+		log.Warn("failed to publish update event", "error", err)
 	}
-
 	return w.GetByID(ctx, id)
 }
 
 func (w *WateringPlanService) Delete(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
 	if _, err := w.wateringPlanRepo.GetByID(ctx, id); err != nil {
-		return handleError(err)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	if err := w.wateringPlanRepo.Delete(ctx, id); err != nil {
-		log.Error("failed to delete watering plan", "error", err, "watering_plan_id", id)
-		return handleError(err)
+		log.Debug("failed to delete watering plan", "error", err, "watering_plan_id", id)
+		return service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	log.Info("watering plan deleted successfully", "watering_plan_id", id)
@@ -369,11 +371,8 @@ func (w *WateringPlanService) fetchVehicle(ctx context.Context, vehicleID int32)
 	log := logger.GetLogger(ctx)
 	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
 	if err != nil {
-		log.Error("failed to fetch vehicle by provided id", "error", err, "vehicle_id", vehicleID)
-	}
-
-	if vehicle == nil {
-		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
+		log.Debug("failed to fetch vehicle by provided id", "error", err, "vehicle_id", vehicleID)
+		return nil, storage.ErrEntityNotFound("vehicle not found")
 	}
 
 	return vehicle, nil
@@ -383,12 +382,12 @@ func (w *WateringPlanService) fetchTreeClusters(ctx context.Context, treeCluster
 	log := logger.GetLogger(ctx)
 	clusters, err := w.getTreeClusters(ctx, treeClusterIDs)
 	if err != nil {
-		log.Error("failed to fetch tree cluster specified by requested ids", "cluster_ids", treeClusterIDs, "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to fetch tree cluster specified by requested ids", "cluster_ids", treeClusterIDs, "error", err)
+		return nil, err
 	}
 	if len(clusters) == 0 {
 		log.Debug("requested tree cluster ids in watering plan are not found", "cluster_ids", treeClusterIDs, "error", err)
-		return nil, service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
+		return nil, storage.ErrEntityNotFound("treecluster not found")
 	}
 
 	return clusters, nil
@@ -412,13 +411,13 @@ func (w *WateringPlanService) validateUserIDs(ctx context.Context, userIDs []*uu
 
 	users, err := w.userRepo.GetByIDs(ctx, userIDStr)
 	if err != nil {
-		log.Error("failed to fetch users by id", "error", err, "user_ids", userIDStr)
-		return handleError(err)
+		log.Debug("failed to fetch users by id", "error", err, "user_ids", userIDStr)
+		return err
 	}
 
 	if len(users) == 0 {
 		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStr)
-		return storage.ErrUserNotFound
+		return storage.ErrEntityNotFound("user not found")
 	}
 
 	return nil
@@ -477,12 +476,4 @@ func (w *WateringPlanService) mergeVehicle(transporter, trailer *entities.Vehicl
 		Type:          entities.VehicleTypeTransporter,
 		NumberPlate:   fmt.Sprintf("%s - %s", transporter.NumberPlate, trailer.NumberPlate),
 	}
-}
-
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, storage.ErrWateringPlanNotFound.Error())
-	}
-
-	return service.NewError(service.InternalError, err.Error())
 }

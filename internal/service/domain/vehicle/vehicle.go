@@ -2,9 +2,8 @@ package vehicle
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -29,8 +28,8 @@ func (v *VehicleService) GetAll(ctx context.Context) ([]*entities.Vehicle, error
 	log := logger.GetLogger(ctx)
 	vehicles, err := v.vehicleRepo.GetAll(ctx)
 	if err != nil {
-		log.Error("failed to fetch vehicles", "error", err)
-		return nil, handleError(err)
+		log.Debug("failed to fetch vehicles", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return vehicles, nil
@@ -40,8 +39,8 @@ func (v *VehicleService) GetAllByType(ctx context.Context, vehicleType entities.
 	log := logger.GetLogger(ctx)
 	vehicles, err := v.vehicleRepo.GetAllByType(ctx, vehicleType)
 	if err != nil {
-		log.Error("failed to fetch vehicles by a type", "error", err, "vehicle_type", vehicleType)
-		return nil, handleError(err)
+		log.Debug("failed to fetch vehicles by a type", "error", err, "vehicle_type", vehicleType)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return vehicles, nil
@@ -51,12 +50,8 @@ func (v *VehicleService) GetByID(ctx context.Context, id int32) (*entities.Vehic
 	log := logger.GetLogger(ctx)
 	got, err := v.vehicleRepo.GetByID(ctx, id)
 	if err != nil {
-		log.Error("failed to fetch vehicle by id", "error", err, "vehicle_id", id)
-		return nil, handleError(err)
-	}
-
-	if got == nil {
-		return nil, service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error()) // TODO: change to service error
+		log.Debug("failed to fetch vehicle by id", "error", err, "vehicle_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return got, nil
@@ -66,8 +61,8 @@ func (v *VehicleService) GetByPlate(ctx context.Context, plate string) (*entitie
 	log := logger.GetLogger(ctx)
 	got, err := v.vehicleRepo.GetByPlate(ctx, plate)
 	if err != nil {
-		log.Error("failed to fetch vehicle by plate", "error", err, "vehicle_plate", plate)
-		return nil, handleError(err)
+		log.Debug("failed to fetch vehicle by plate", "error", err, "vehicle_plate", plate)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return got, nil
@@ -77,15 +72,15 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 	log := logger.GetLogger(ctx)
 	if err := v.validator.Struct(createData); err != nil {
 		log.Debug("failed to validate struct from create vehicle", "error", err, "raw_vehicle", fmt.Sprintf("%+v", createData))
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	if isTaken, err := v.isVehicleNumberPlateTaken(ctx, createData.NumberPlate); err != nil {
-		log.Error("failed to request if vehicle plate is already taken", "error", err, "vehicle_plate", createData.NumberPlate)
-		return nil, err
+		log.Debug("failed to request if vehicle plate is already taken", "error", err, "vehicle_plate", createData.NumberPlate)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	} else if isTaken {
 		log.Debug("requested number plate is already taken", "vehicle_plate", createData.NumberPlate)
-		return nil, service.NewError(service.BadRequest, errors.New("number plate is already taken").Error())
+		return nil, service.ErrVehiclePlateTaken
 	}
 
 	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
@@ -105,7 +100,7 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 	})
 	if err != nil {
 		log.Error("failed to create vehicle", "error", err)
-		return nil, handleError(err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	log.Info("vehicle created successfully", "vehicle_id", created.ID)
@@ -116,21 +111,22 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 	log := logger.GetLogger(ctx)
 	if err := v.validator.Struct(updateData); err != nil {
 		log.Debug("failed to validate struct from update vehicle", "error", err, "raw_vehicle", fmt.Sprintf("%+v", updateData))
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	oldValue, err := v.GetByID(ctx, id)
 	if err != nil {
-		return nil, err
+		log.Debug("failed to get already existing vehicle from store", "error", err, "vehicle_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	if oldValue.NumberPlate != updateData.NumberPlate {
 		if isTaken, err := v.isVehicleNumberPlateTaken(ctx, updateData.NumberPlate); err != nil {
-			log.Error("failed to request if vehicle plate is already taken", "error", err, "vehicle_plate", updateData.NumberPlate)
-			return nil, err
+			log.Debug("failed to request if vehicle plate is already taken", "error", err, "vehicle_plate", updateData.NumberPlate)
+			return nil, service.MapError(ctx, err, service.ErrorLogAll)
 		} else if isTaken {
 			log.Debug("requested number plate is already taken", "vehicle_plate", updateData.NumberPlate)
-			return nil, service.NewError(service.BadRequest, errors.New("number plate is already taken").Error()) // TODO: move to svc error
+			return nil, service.ErrVehiclePlateTaken
 		}
 	}
 
@@ -151,8 +147,8 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 	})
 
 	if err != nil {
-		log.Error("failed to update vehicle", "error", err, "vehicle_id", id)
-		return nil, handleError(err)
+		log.Debug("failed to update vehicle", "error", err, "vehicle_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	log.Info("vehicle updated successfully", "vehicle_id", id)
@@ -162,12 +158,13 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 func (v *VehicleService) Delete(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
 	if _, err := v.vehicleRepo.GetByID(ctx, id); err != nil {
-		return handleError(err)
+		log.Debug("failed to get vehicle by id in delete request", "error", err, "vehicle_id", id)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	if err := v.vehicleRepo.Delete(ctx, id); err != nil {
-		log.Error("failed to delete vehicle", "error", err, "vehicle_id", id)
-		return handleError(err)
+		log.Debug("failed to delete vehicle", "error", err, "vehicle_id", id)
+		return service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	log.Info("vehicle deleted successfully", "vehicle_id", id)
@@ -178,18 +175,11 @@ func (v *VehicleService) Ready() bool {
 	return v.vehicleRepo != nil
 }
 
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, storage.ErrVehicleNotFound.Error())
-	}
-
-	return service.NewError(service.InternalError, err.Error())
-}
-
 func (v *VehicleService) isVehicleNumberPlateTaken(ctx context.Context, plate string) (bool, error) {
 	existingVehicle, err := v.vehicleRepo.GetByPlate(ctx, plate)
-	if err != nil && !errors.Is(err, storage.ErrEntityNotFound) {
-		return false, handleError(err)
+	var entityNotFoundErr storage.ErrEntityNotFound
+	if err != nil && !errors.As(err, &entityNotFoundErr) {
+		return false, err
 	}
 	return existingVehicle != nil, nil
 }

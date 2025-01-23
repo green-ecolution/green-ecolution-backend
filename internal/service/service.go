@@ -10,6 +10,8 @@ import (
 	"time"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
 var (
@@ -18,6 +20,11 @@ var (
 	ErrIFacesAddressNotFound = errors.New("cant get interfaces address")
 	ErrHostnameNotFound      = errors.New("cant get hostname")
 	ErrValidation            = errors.New("validation error")
+
+	ErrPluginRegistered       = NewError(BadRequest, "plugin already registered")
+	ErrPluginNotRegistered    = NewError(BadRequest, "plugin not registered")
+	ErrVehiclePlateTaken      = NewError(BadRequest, "number plate is already taken")
+	ErrVehicleUnsupportedType = NewError(BadRequest, "vehicle type is not supported")
 )
 
 type Error struct {
@@ -25,12 +32,43 @@ type Error struct {
 	Code    ErrorCode
 }
 
+type ErrorLogMask int
+
+// Bitmask
+const (
+	ErrorLogNothing        ErrorLogMask = -1
+	ErrorLogAll            ErrorLogMask = 0
+	ErrorLogEntityNotFound ErrorLogMask = (1 << iota)
+	ErrorLogValidation
+)
+
 func NewError(code ErrorCode, msg string) Error {
 	return Error{Code: code, Message: msg}
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("%d: %s", e.Code, e.Message)
+	return fmt.Sprintf("%s", e.Message)
+}
+
+func MapError(ctx context.Context, err error, errorMask ErrorLogMask) error {
+	log := logger.GetLogger(ctx)
+	var entityNotFoundErr storage.ErrEntityNotFound
+	if errors.As(err, &entityNotFoundErr) {
+		if errorMask&ErrorLogEntityNotFound == 0 {
+			log.Error("can't find entity", "error", err)
+		}
+		return NewError(NotFound, entityNotFoundErr.Error())
+	}
+
+	if errors.Is(err, ErrValidation) {
+		if errorMask&ErrorLogValidation == 0 {
+			log.Error("failed to validate struct", "error", err)
+		}
+		return NewError(BadRequest, err.Error())
+	}
+
+	log.Error("an error has occurred", "error", err)
+	return NewError(InternalError, err.Error())
 }
 
 type ErrorCode int
@@ -125,10 +163,10 @@ type WateringPlanService interface {
 type PluginService interface {
 	Service
 	Register(ctx context.Context, plugin *domain.Plugin) (*domain.ClientToken, error)
-	Get(slug string) (domain.Plugin, error)
-	GetAll() ([]domain.Plugin, []time.Time)
-	HeartBeat(slug string) error
-	Unregister(slug string)
+	Get(ctx context.Context, slug string) (domain.Plugin, error)
+	GetAll(ctx context.Context) ([]domain.Plugin, []time.Time)
+	HeartBeat(ctx context.Context, slug string) error
+	Unregister(ctx context.Context, slug string)
 	StartCleanup(ctx context.Context) error
 }
 

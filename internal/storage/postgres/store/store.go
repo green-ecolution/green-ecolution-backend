@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"reflect"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -39,13 +40,27 @@ func (s *Store) DB() *pgxpool.Pool {
 }
 
 // TODO: Improve error handling
-func (s *Store) HandleError(err error) error {
+func (s *Store) HandleError(err error, dbType interface{}) error {
 	if err == nil {
 		return nil
 	}
+	rType := reflect.TypeOf(dbType)
+	if rType.Kind() == reflect.Pointer {
+		rType = rType.Elem()
+	}
+
+	var rName string
+	switch rType.Kind() {
+	case reflect.Struct:
+		rName = rType.Name()
+	case reflect.String:
+		rName = dbType.(string)
+	default:
+		panic("unrechable")
+	}
 
 	if errors.Is(err, pgx.ErrNoRows) {
-		return storage.ErrEntityNotFound
+		return storage.ErrEntityNotFound(rName)
 	}
 
 	return err

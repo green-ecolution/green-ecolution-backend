@@ -7,6 +7,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -15,7 +16,7 @@ func (r *RegionRepository) GetAll(ctx context.Context) ([]*entities.Region, erro
 	rows, err := r.store.GetAllRegions(ctx)
 	if err != nil {
 		log.Debug("failed to get regions in db", "error", err)
-		return nil, r.store.HandleError(err)
+		return nil, r.store.HandleError(err, sqlc.Region{})
 	}
 
 	return r.mapper.FromSqlList(rows), nil
@@ -26,7 +27,7 @@ func (r *RegionRepository) GetByID(ctx context.Context, id int32) (*entities.Reg
 	row, err := r.store.GetRegionById(ctx, id)
 	if err != nil {
 		log.Debug("failed to get region by id", "error", err, "region_id", id)
-		return nil, r.store.HandleError(err)
+		return nil, r.store.HandleError(err, sqlc.Region{})
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -37,7 +38,7 @@ func (r *RegionRepository) GetByName(ctx context.Context, name string) (*entitie
 	row, err := r.store.GetRegionByName(ctx, name)
 	if err != nil {
 		log.Debug("failed to get region by name", "region_name", name, "error", err)
-		return nil, r.store.HandleError(err)
+		return nil, r.store.HandleError(err, sqlc.Region{})
 	}
 
 	return r.mapper.FromSql(row), nil
@@ -53,7 +54,7 @@ func (r *RegionRepository) GetByPoint(ctx context.Context, latitude, longitude f
 			return nil, nil
 		}
 		log.Debug("failed to translate point to region", "error", err, "latitude", latitude, "longitude", longitude)
-		return nil, r.store.HandleError(err)
+		return nil, r.store.HandleError(err, sqlc.Region{})
 	}
 
 	return r.mapper.FromSql(region), nil

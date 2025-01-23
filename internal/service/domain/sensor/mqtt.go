@@ -2,29 +2,29 @@ package sensor
 
 import (
 	"context"
+	"errors"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
-	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageSensor "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
-	"github.com/pkg/errors"
 )
 
 func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.SensorData, error) {
 	log := logger.GetLogger(ctx)
 	if payload == nil {
 		log.Debug("mqtt payload is nil")
-		return nil, handleError(errors.New("mqtt payload is nil"))
+		return nil, errors.New("mqtt payload is nil")
 	}
 
 	if err := s.validator.Struct(payload); err != nil {
 		log.Debug("failed to validate mqtt payload struct", "error", err)
-		return nil, handleError(service.ErrValidation)
+		return nil, err
 	}
 
 	sensor, err := s.getSensor(ctx, payload)
 	if err != nil {
-		return nil, handleError(err)
+		return nil, err
 	}
 
 	data := domain.SensorData{
@@ -33,7 +33,7 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 	err = s.sensorRepo.InsertSensorData(ctx, &data, sensor.ID)
 	if err != nil {
 		log.Error("failed to insert sensor data", "sensor_id", sensor.ID, "error", err)
-		return nil, handleError(err)
+		return nil, err
 	}
 
 	sensorData, err := s.sensorRepo.GetLatestSensorDataBySensorID(ctx, sensor.ID)
@@ -50,9 +50,12 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 func (s *SensorService) getSensor(ctx context.Context, payload *domain.MqttPayload) (*domain.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	sensor, err := s.sensorRepo.GetByID(ctx, payload.Device)
-	if err != nil { // something bad happend
-		log.Error("failed to get sensor by id", "error", err)
-		return nil, err
+	if err != nil {
+		var entityNotFoundErr storage.ErrEntityNotFound
+		if !errors.As(err, &entityNotFoundErr) {
+			log.Error("failed to get sensor by id", "error", err)
+			return nil, err
+		}
 	}
 
 	if sensor != nil {

@@ -88,7 +88,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 			},
 		}
 
-		wateringStatus = svcUtils.CalculateWateringStatus(youngestTree.PlantingYear, watermarks)
+		wateringStatus = svcUtils.CalculateWateringStatus(ctx, youngestTree.PlantingYear, watermarks)
 	}
 
 	if wateringStatus == tree.TreeCluster.WateringStatus {

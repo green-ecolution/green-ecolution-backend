@@ -12,7 +12,6 @@ import (
 var notFoundErrors = []error{
 	storage.ErrRegionNotFound,
 	storage.ErrIDNotFound,
-	storage.ErrEntityNotFound,
 	storage.ErrSensorNotFound,
 	storage.ErrImageNotFound,
 	storage.ErrFlowerbedNotFound,
@@ -49,12 +48,12 @@ func HandleError(err error) error {
 	}
 
 	// Check for specific "not found" errors
-	for _, notFoundErr := range notFoundErrors {
-		if errors.Is(err, notFoundErr) {
-			code = fiber.StatusNotFound
-			break
-		}
-	}
+	// for _, notFoundErr := range notFoundErrors {
+	// 	if errors.Is(err, notFoundErr) {
+	// 		code = fiber.StatusNotFound
+	// 		break
+	// 	}
+	// }
 
 	return fiber.NewError(code, err.Error())
 }

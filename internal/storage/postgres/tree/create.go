@@ -40,7 +40,7 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 	id, err := r.createEntity(ctx, &entity)
 	if err != nil {
 		log.Error("failed to create tree entity in db", "error", err)
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 	entity.ID = id
 

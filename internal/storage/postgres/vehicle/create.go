@@ -71,7 +71,10 @@ func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.
 		return nil, err
 	}
 
-	log.Debug("vehicle entity created successfully in db", "vehicle_id", createdVh.ID)
+	if createdVh != nil {
+		log.Debug("vehicle entity created successfully in db", "vehicle_id", createdVh.ID)
+	}
+
 	return createdVh, nil
 }
 
@@ -92,7 +95,7 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 
 	id, err := r.store.CreateVehicle(ctx, &args)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	return &id, nil

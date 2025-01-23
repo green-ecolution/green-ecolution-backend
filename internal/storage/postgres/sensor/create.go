@@ -63,7 +63,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *ent
 	}
 
 	if id == "" {
-		return r.store.HandleError(errors.New("sensor id cannot be empty"))
+		return errors.New("sensor id cannot be empty")
 	}
 
 	mqttData := r.mapper.FromDomainSensorData(latestData.Data)
