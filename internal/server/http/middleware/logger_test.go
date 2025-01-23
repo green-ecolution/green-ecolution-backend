@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -15,7 +16,7 @@ import (
 func TestHTTPLogger_EdgeCases(t *testing.T) {
 	t.Run("should handle long processing time", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(HTTPLogger())
+		app.Use(AppLogger(slog.Default))
 
 		app.Get("/timeout", func(c *fiber.Ctx) error {
 
@@ -40,7 +41,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 
 	t.Run("should handle TRACE method request", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(HTTPLogger())
+		app.Use(AppLogger(slog.Default))
 
 		app.Trace("/trace", func(c *fiber.Ctx) error {
 			return c.SendStatus(http.StatusOK)
@@ -56,7 +57,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 
 	t.Run("should handle large number of simultaneous requests", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(HTTPLogger())
+		app.Use(AppLogger(slog.Default))
 		app.Get("/test", func(c *fiber.Ctx) error { return c.SendStatus(http.StatusOK) })
 
 		concurrency := 100
@@ -79,7 +80,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 
 	t.Run("should handle request with unusual headers", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(HTTPLogger())
+		app.Use(AppLogger(slog.Default))
 
 		app.Get("/test", func(c *fiber.Ctx) error {
 			return c.SendStatus(http.StatusOK)
@@ -96,7 +97,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 
 	t.Run("should handle large URL path and query", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(HTTPLogger())
+		app.Use(AppLogger(slog.Default))
 
 		longPath := "/" + strings.Repeat("pathsegment/", 50)
 		req := httptest.NewRequest(http.MethodGet, longPath, nil)
@@ -109,7 +110,7 @@ func TestHTTPLogger_EdgeCases(t *testing.T) {
 
 	t.Run("should handle multilingual characters in path", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(HTTPLogger())
+		app.Use(AppLogger(slog.Default))
 
 		app.Get("/multilingual/こんにちは", func(c *fiber.Ctx) error {
 			return c.SendStatus(http.StatusOK)

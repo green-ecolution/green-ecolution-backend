@@ -11,8 +11,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -146,7 +146,7 @@ func TestGetSensorById(t *testing.T) {
 		mockSensorService.EXPECT().GetByID(
 			mock.Anything,
 			"sensor-999",
-		).Return(nil, storage.ErrSensorNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		app.Get("/v1/sensor/:id", handler)
 
@@ -220,7 +220,7 @@ func TestDeleteSensor(t *testing.T) {
 		mockSensorService.EXPECT().Delete(
 			mock.Anything,
 			"sensor-999",
-		).Return(storage.ErrSensorNotFound)
+		).Return(service.NewError(service.NotFound, "not found"))
 
 		app.Delete("/v1/sensor/:id", handler)
 

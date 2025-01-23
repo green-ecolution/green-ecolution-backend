@@ -12,8 +12,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	wateringplan "github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/watering_plan"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -152,7 +152,7 @@ func TestGetWateringPlanByID(t *testing.T) {
 		mockWateringPlanService.EXPECT().GetByID(
 			mock.Anything,
 			int32(999),
-		).Return(nil, storage.ErrWateringPlanNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/watering-plan/999", nil)
@@ -346,7 +346,7 @@ func TestUpdateWateringPlan(t *testing.T) {
 			mock.Anything,
 			int32(1),
 			mock.Anything,
-		).Return(nil, storage.ErrWateringPlanNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		body, _ := json.Marshal(TestWateringPlanRequest)
@@ -432,7 +432,7 @@ func TestDeleteWateringPlan(t *testing.T) {
 		mockWateringPlanService.EXPECT().Delete(
 			mock.Anything,
 			int32(wateringPlanID),
-		).Return(storage.ErrWateringPlanNotFound)
+		).Return(service.NewError(service.NotFound, "not found"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/watering-plan/"+strconv.Itoa(wateringPlanID), nil)
