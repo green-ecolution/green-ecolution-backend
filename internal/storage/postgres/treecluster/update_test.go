@@ -3,6 +3,7 @@ package treecluster
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -15,20 +16,41 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
-			tc.Name = "updated"
-			return true, nil
-		}
-
+		clusterID := int32(1)
+		newName := "Updated Name"
+		newAddress := "Updated Address"
+		newDescription := "Updated Description"
+		newMoistureLevel := 4.2
+		newWateringStatus := entities.WateringStatusGood
+		newSoilCondition := entities.TreeSoilConditionSchluffig
+		newArchived := false
+		newLastWatered := time.Now()
+	
 		// when
-		updateErr := r.Update(context.Background(), 1, updateFn)
-		got, getErr := r.GetByID(context.Background(), 1)
+		updatedCluster, err := r.Update(
+			context.Background(),
+			clusterID,
+			WithName(newName),
+			WithAddress(newAddress),
+			WithDescription(newDescription),
+			WithMoistureLevel(newMoistureLevel),
+			WithWateringStatus(newWateringStatus),
+			WithSoilCondition(newSoilCondition),
+			WithArchived(newArchived),
+			WithLastWatered(newLastWatered),
+		)
 
 		// then
-		assert.NoError(t, updateErr)
-		assert.NoError(t, getErr)
-		assert.NotNil(t, got)
-		assert.Equal(t, "updated", got.Name)
+		assert.NoError(t, err)
+		assert.NotNil(t, updatedCluster)
+		assert.Equal(t, newName, updatedCluster.Name, "Name should match")
+		assert.Equal(t, newAddress, updatedCluster.Address, "Address should match")
+		assert.Equal(t, newDescription, updatedCluster.Description, "Description should match")
+		assert.Equal(t, newMoistureLevel, updatedCluster.MoistureLevel, "Moisture Level should match")
+		assert.Equal(t, newWateringStatus, updatedCluster.WateringStatus, "Watering Status should match")
+		assert.Equal(t, newSoilCondition, updatedCluster.SoilCondition, "Soil Condition should match")
+		assert.Equal(t, newArchived, updatedCluster.Archived, "Archived status should match")
+		assert.True(t, updatedCluster.LastWatered.Equal(newLastWatered), "Last Watered should match")
 	})
 
 	t.Run("should return error when update tree cluster with non-existing id", func(t *testing.T) {

@@ -36,6 +36,56 @@ func NewTreeClusterService(
 	}
 }
 
+type TreeClusterOption func(*entities.TreeCluster)
+
+func WithName(name string) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.Name = name
+    }
+}
+
+func WithAddress(address string) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.Address = address
+    }
+}
+
+func WithDescription(description string) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.Description = description
+    }
+}
+
+func WithMoistureLevel(moistureLevel float64) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.MoistureLevel = moistureLevel
+    }
+}
+
+func WithWateringStatus(wateringStatus entities.WateringStatus) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.WateringStatus = wateringStatus
+    }
+}
+
+func WithSoilCondition(soilCondition entities.TreeSoilCondition) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.SoilCondition = soilCondition
+    }
+}
+
+func WithArchived(archived bool) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.Archived = archived
+    }
+}
+
+func WithLastWatered(lastWatered time.Time) TreeClusterOption {
+    return func(tc *entities.TreeCluster) {
+        tc.LastWatered = lastWatered
+    }
+}
+
 func (s *TreeClusterService) GetAll(ctx context.Context) ([]*domain.TreeCluster, error) {
 	treeClusters, err := s.treeClusterRepo.GetAll(ctx)
 	if err != nil {
