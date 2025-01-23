@@ -48,7 +48,7 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 	}
 
 	if err = client.SetPassword(ctx, clientToken.AccessToken, userID, r.cfg.OidcProvider.DomainName, password, false); err != nil {
-		log.Error("failed to set password of currenty created user", "error", err, "user_id", userID)
+		log.Error("failed to set password of currently created user", "error", err, "user_id", userID)
 		return nil, errors.Join(err, ErrSetPassword)
 	}
 

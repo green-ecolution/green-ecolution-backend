@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
 	"reflect"
@@ -47,7 +46,7 @@ func NewError(code ErrorCode, msg string) Error {
 }
 
 func (e Error) Error() string {
-	return fmt.Sprintf("%s", e.Message)
+	return e.Message
 }
 
 func MapError(ctx context.Context, err error, errorMask ErrorLogMask) error {

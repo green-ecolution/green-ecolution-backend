@@ -39,7 +39,7 @@ func (s *Store) DB() *pgxpool.Pool {
 	return s.db
 }
 
-func (s *Store) MapError(err error, dbType interface{}) error {
+func (s *Store) MapError(err error, dbType any) error {
 	if err == nil {
 		return nil
 	}

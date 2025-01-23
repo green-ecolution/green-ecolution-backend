@@ -125,10 +125,12 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 		}
 		_, err = r.store.UnlinkTreeImage(ctx, &args)
 		if err != nil {
+			log.Debug("failed to unlink image of tree in db", "error", err, "tree_id", id, "image_id", img.ID)
 			return err
 		}
 
-		if err = r.store.DeleteImage(ctx, img.ID); err != nil {
+		if err := r.store.DeleteImage(ctx, img.ID); err != nil {
+			log.Debug("failed to delete image of tree in db", "error", err, "tree_id", id, "image_id", img.ID)
 			return err
 		}
 	}

@@ -14,7 +14,7 @@ import (
 func (s *AuthService) Register(ctx context.Context, user *domain.RegisterUser) (*domain.User, error) {
 	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(user); err != nil {
-		log.Debug("failed to validate registerd user", "raw_user", fmt.Sprintf("%+v", user), "error", err)
+		log.Debug("failed to validate registered user", "raw_user", fmt.Sprintf("%+v", user), "error", err)
 		return nil, service.MapError(ctx, service.ErrValidation, service.ErrorLogValidation)
 	}
 

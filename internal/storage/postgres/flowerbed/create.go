@@ -40,7 +40,6 @@ func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.Entity
 	id, err := r.createEntity(ctx, entity)
 	if err != nil {
 		log.Error("failed to create flowerbed in postgres", "error", err)
-		//return nil, r.store.HandleError(err)
 		return nil, err
 	}
 
