@@ -16,41 +16,97 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		clusterID := int32(1)
-		newName := "Updated Name"
-		newAddress := "Updated Address"
-		newDescription := "Updated Description"
-		newMoistureLevel := 4.2
-		newWateringStatus := entities.WateringStatusGood
-		newSoilCondition := entities.TreeSoilConditionSchluffig
-		newArchived := false
-		newLastWatered := time.Now()
-	
+
+		newRegion := &entities.Region{
+			ID:        1,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "New Region",
+		}
+		now := time.Now()
+		lat := 54.3
+		long := 9.5
+
+		tree1 := &entities.Tree{
+			ID:             1,
+			CreatedAt:      time.Now(),
+			UpdatedAt:      time.Now(),
+			TreeCluster:    nil,
+			Sensor:         nil,
+			Images:         nil,
+			Readonly:       false,
+			PlantingYear:   2020,
+			Species:        "Eiche",
+			Number:         "1",
+			Latitude:       54.31,
+			Longitude:      9.51,
+			WateringStatus: entities.WateringStatusGood,
+			Description:    "Ein gesunder Baum",
+		}
+
+		tree2 := &entities.Tree{
+			ID:             2,
+			CreatedAt:      time.Now(),
+			UpdatedAt:      time.Now(),
+			TreeCluster:    nil,
+			Sensor:         nil,
+			Images:         nil,
+			Readonly:       false,
+			PlantingYear:   2018,
+			Species:        "Kiefer",
+			Number:         "2",
+			Latitude:       54.32,
+			Longitude:      9.52,
+			WateringStatus: entities.WateringStatusBad,
+			Description:    "Braucht viel Wasser",
+		}
+
+		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.Name = "updated"
+			tc.Address = "updated"
+			tc.Description = "updated"
+			tc.MoistureLevel = 4.2
+			tc.WateringStatus = entities.WateringStatusBad
+			tc.Archived = true
+			tc.Region = newRegion
+			tc.LastWatered = &now
+			tc.Latitude = &lat
+			tc.Longitude = &long
+			tc.SoilCondition = entities.TreeSoilConditionLehmig
+			tc.Trees = []*entities.Tree{tree1, tree2}
+			return true, nil
+		}
+
 		// when
-		updatedCluster, err := r.Update(
-			context.Background(),
-			clusterID,
-			WithName(newName),
-			WithAddress(newAddress),
-			WithDescription(newDescription),
-			WithMoistureLevel(newMoistureLevel),
-			WithWateringStatus(newWateringStatus),
-			WithSoilCondition(newSoilCondition),
-			WithArchived(newArchived),
-			WithLastWatered(newLastWatered),
-		)
+		updateErr := r.Update(context.Background(), 1, updateFn)
+		got, getErr := r.GetByID(context.Background(), 1)
 
 		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, updatedCluster)
-		assert.Equal(t, newName, updatedCluster.Name, "Name should match")
-		assert.Equal(t, newAddress, updatedCluster.Address, "Address should match")
-		assert.Equal(t, newDescription, updatedCluster.Description, "Description should match")
-		assert.Equal(t, newMoistureLevel, updatedCluster.MoistureLevel, "Moisture Level should match")
-		assert.Equal(t, newWateringStatus, updatedCluster.WateringStatus, "Watering Status should match")
-		assert.Equal(t, newSoilCondition, updatedCluster.SoilCondition, "Soil Condition should match")
-		assert.Equal(t, newArchived, updatedCluster.Archived, "Archived status should match")
-		assert.True(t, updatedCluster.LastWatered.Equal(newLastWatered), "Last Watered should match")
+		assert.NoError(t, updateErr)
+		assert.NoError(t, getErr)
+		assert.NotNil(t, got)
+		assert.Equal(t, "updated", got.Name)
+		assert.Equal(t, "updated", got.Address)
+		assert.Equal(t, "updated", got.Description)
+		assert.Equal(t, 4.2, got.MoistureLevel)
+		assert.Equal(t, entities.WateringStatusBad, got.WateringStatus)
+		assert.Equal(t, true, got.Archived)
+		assert.NotNil(t, got.Region)
+		assert.Equal(t, newRegion.ID, got.Region.ID)
+		assert.Equal(t, newRegion.Name, got.Region.Name)
+		assert.NotNil(t, got.LastWatered)
+		assert.WithinDuration(t, now, *got.LastWatered, time.Second)
+		assert.NotNil(t, got.Latitude)
+		assert.NotNil(t, got.Longitude)
+		assert.Equal(t, lat, *got.Latitude)
+		assert.Equal(t, long, *got.Longitude)
+		assert.Equal(t, entities.TreeSoilConditionLehmig, got.SoilCondition)
+		assert.NotNil(t, got.Trees)
+		assert.Len(t, got.Trees, 2)
+		assert.Equal(t, tree1.ID, got.Trees[0].ID)
+		assert.Equal(t, tree2.ID, got.Trees[1].ID)
+		assert.Equal(t, tree1.Species, got.Trees[0].Species)
+		assert.Equal(t, tree2.Species, got.Trees[1].Species)
 	})
 
 	t.Run("should return error when update tree cluster with non-existing id", func(t *testing.T) {
