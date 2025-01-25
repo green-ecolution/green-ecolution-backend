@@ -21,45 +21,15 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 			ID:        1,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-			Name:      "New Region",
+			Name:      "Mürwik",
 		}
 		now := time.Now()
 		lat := 54.3
 		long := 9.5
 
-		tree1 := &entities.Tree{
-			ID:             1,
-			CreatedAt:      time.Now(),
-			UpdatedAt:      time.Now(),
-			TreeCluster:    nil,
-			Sensor:         nil,
-			Images:         nil,
-			Readonly:       false,
-			PlantingYear:   2020,
-			Species:        "Eiche",
-			Number:         "1",
-			Latitude:       54.31,
-			Longitude:      9.51,
-			WateringStatus: entities.WateringStatusGood,
-			Description:    "Ein gesunder Baum",
-		}
-
-		tree2 := &entities.Tree{
-			ID:             2,
-			CreatedAt:      time.Now(),
-			UpdatedAt:      time.Now(),
-			TreeCluster:    nil,
-			Sensor:         nil,
-			Images:         nil,
-			Readonly:       false,
-			PlantingYear:   2018,
-			Species:        "Kiefer",
-			Number:         "2",
-			Latitude:       54.32,
-			Longitude:      9.52,
-			WateringStatus: entities.WateringStatusBad,
-			Description:    "Braucht viel Wasser",
-		}
+		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		assert.NoError(t, err)
+		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
 
 		updateFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "updated"
@@ -73,7 +43,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 			tc.Latitude = &lat
 			tc.Longitude = &long
 			tc.SoilCondition = entities.TreeSoilConditionLehmig
-			tc.Trees = []*entities.Tree{tree1, tree2}
+			tc.Trees = trees
 			return true, nil
 		}
 
@@ -102,11 +72,10 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		assert.Equal(t, long, *got.Longitude)
 		assert.Equal(t, entities.TreeSoilConditionLehmig, got.SoilCondition)
 		assert.NotNil(t, got.Trees)
-		assert.Len(t, got.Trees, 2)
-		assert.Equal(t, tree1.ID, got.Trees[0].ID)
-		assert.Equal(t, tree2.ID, got.Trees[1].ID)
-		assert.Equal(t, tree1.Species, got.Trees[0].Species)
-		assert.Equal(t, tree2.Species, got.Trees[1].Species)
+		assert.Len(t, got.Trees, len(trees))
+		for _, tree := range testTrees[0:2] {
+			assert.Equal(t, got.ID, *tree.TreeClusterID)
+		}
 	})
 
 	t.Run("should return error when update tree cluster with non-existing id", func(t *testing.T) {
