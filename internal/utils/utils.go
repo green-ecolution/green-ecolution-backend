@@ -60,6 +60,9 @@ func UUIDToPGUUID(userID uuid.UUID) pgtype.UUID {
 func Scheduler[T any](ctx context.Context, interval time.Duration, process func(ctx context.Context) T) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
+
+	_ = process(ctx)
+
 	for {
 		select {
 		case <-ticker.C:
