@@ -61,7 +61,12 @@ func Scheduler[T any](ctx context.Context, interval time.Duration, process func(
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
-	_ = process(ctx)
+	if ctx.Err() == nil {
+		_ = process(ctx)
+	} else {
+		slog.Info("Stopping scheduler before first execution due to canceled context")
+		return
+	}
 
 	for {
 		select {
