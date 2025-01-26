@@ -1,15 +1,12 @@
 package utils
 
 import (
-	"context"
 	"encoding/json"
-	"log/slog"
 	"net/http"
 	"net/url"
 	"path"
 	"path/filepath"
 	"runtime"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -54,27 +51,5 @@ func UUIDToPGUUID(userID uuid.UUID) pgtype.UUID {
 	return pgtype.UUID{
 		Bytes: userID,
 		Valid: true,
-	}
-}
-
-func Scheduler[T any](ctx context.Context, interval time.Duration, process func(ctx context.Context) T) {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	if ctx.Err() == nil {
-		_ = process(ctx)
-	} else {
-		slog.Info("Stopping scheduler before first execution due to canceled context")
-		return
-	}
-
-	for {
-		select {
-		case <-ticker.C:
-			_ = process(ctx)
-		case <-ctx.Done():
-			slog.Info("Stopping scheduler")
-			return
-		}
 	}
 }
