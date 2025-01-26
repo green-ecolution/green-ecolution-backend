@@ -20,13 +20,13 @@ func PaginationMiddleware() fiber.Handler {
 		pageParam := c.Query(Page, strconv.Itoa(defaultPage))
 		page, err := strconv.Atoi(pageParam)
 		if err != nil || page < 1 {
-			return service.NewError(service.BadRequest, "Invalid page format")
+			return service.NewError(service.BadRequest, "invalid page format")
 		}
 
 		limitParam := c.Query(Limit, strconv.Itoa(defaultLimit))
 		limit, err := strconv.Atoi(limitParam)
 		if err != nil || (limit != -1 && limit <= 0) {
-			return service.NewError(service.BadRequest, "Invalid limit format")
+			return service.NewError(service.BadRequest, "invalid limit format")
 		}
 
 		c.Locals(Page, int32(page))

@@ -7,7 +7,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
@@ -35,10 +34,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		page := c.Locals(middleware.Page).(int32)
-        limit := c.Locals(middleware.Limit).(int32)
-
-		domainData, totalCount, err := svc.GetAll(ctx, page, limit)
+		domainData, totalCount, err := svc.GetAll(ctx)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -50,7 +46,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 
 		return c.JSON(entities.TreeClusterListResponse{
 			Data:       data,
-			Pagination: utils.CreatePagination(page, limit, totalCount),
+			Pagination: utils.CreatePagination(c, totalCount),
 		})
 	}
 }

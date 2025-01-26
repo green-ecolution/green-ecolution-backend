@@ -1,11 +1,16 @@
 package utils
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 )
 
 
-func CreatePagination(page, limit int32, totalCount int64) *entities.Pagination{
+func CreatePagination(c *fiber.Ctx, totalCount int64) *entities.Pagination{
+	page := c.Locals(middleware.Page).(int32)
+	limit := c.Locals(middleware.Limit).(int32)
+	
 	if limit == -1 {
 		return nil
 	}

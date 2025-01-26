@@ -7,6 +7,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/twpayne/go-geos"
@@ -14,12 +15,26 @@ import (
 
 func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
+    page, ok := ctx.Value(middleware.Page).(int32)
+    if !ok {
+		log.Debug("page not found in context")
+		return nil, 0, r.store.MapError(storage.ErrPaginationValueInvalid, sqlc.TreeCluster{})
+    }
+
+    limit, ok := ctx.Value(middleware.Limit).(int32)
+    if !ok {
+		log.Debug("limit not found in context")
+		return nil, 0, r.store.MapError(storage.ErrPaginationValueInvalid, sqlc.TreeCluster{})
+    }
+	
 	if page <= 0 || (limit != -1 && limit <= 0) {
-		return []*entities.TreeCluster{}, 0, storage.ErrPaginationValueInvalid
+		log.Debug("invalid pagination values")
+		return nil, 0, r.store.MapError(storage.ErrPaginationValueInvalid, sqlc.TreeCluster{})
 	}
 
 	totalCount, err := r.store.GetAllTreeClustersCount(ctx)
 	if err != nil {
+		log.Debug("failed to get total tree cluster count in db")
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
