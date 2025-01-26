@@ -25,6 +25,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		var result map[string]interface{}
 		assert.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
@@ -37,6 +38,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test?page=2&limit=10", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		var result map[string]interface{}
 		assert.NoError(t, json.NewDecoder(resp.Body).Decode(&result))
@@ -49,6 +51,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test?page=abc&limit=10", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		assert.Equal(t, 400, resp.StatusCode)
 	})
@@ -57,6 +60,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test?page=0&limit=10", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		assert.Equal(t, 400, resp.StatusCode)
 	})
@@ -65,6 +69,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test?page=2&limit=xyz", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		assert.Equal(t, 400, resp.StatusCode)
 	})
@@ -73,6 +78,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test?page=2&limit=-10", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		assert.Equal(t, 400, resp.StatusCode)
 	})
@@ -81,6 +87,7 @@ func TestPaginationMiddleware(t *testing.T) {
 		req := httptest.NewRequest("GET", "/pagination-test?page=2&limit=0", nil)
 		resp, err := app.Test(req)
 		assert.NoError(t, err)
+		defer resp.Body.Close()
 
 		assert.Equal(t, 400, resp.StatusCode)
 	})
