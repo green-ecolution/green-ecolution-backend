@@ -46,7 +46,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 
 		return c.JSON(entities.TreeClusterListResponse{
 			Data:       data,
-			Pagination: utils.CreatePagination(c, totalCount),
+			Pagination: utils.CreatePagination(ctx, totalCount),
 		})
 	}
 }
