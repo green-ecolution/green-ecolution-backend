@@ -24,6 +24,7 @@ var (
 	ErrPluginNotRegistered    = NewError(BadRequest, "plugin not registered")
 	ErrVehiclePlateTaken      = NewError(BadRequest, "number plate is already taken")
 	ErrVehicleUnsupportedType = NewError(BadRequest, "vehicle type is not supported")
+	ErrUserNotCorrectRole     = NewError(BadRequest, "user has an incorrect role")
 )
 
 type Error struct {

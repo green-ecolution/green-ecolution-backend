@@ -136,22 +136,24 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	transporter, err := w.fetchVehicle(ctx, *createWp.TransporterID)
+	transporter, err := w.vehicleRepo.GetByID(ctx, *createWp.TransporterID)
 	if err != nil {
+		log.Debug("failed to get transporter by id", "error", err, "transporter_id", *createWp.TransporterID)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	var trailer *entities.Vehicle
 	if createWp.TrailerID != nil {
-		trailer, err = w.fetchVehicle(ctx, *createWp.TrailerID)
+		trailer, err = w.vehicleRepo.GetByID(ctx, *createWp.TrailerID)
 		if err != nil {
-			log.Warn("failed to get trailer by id. will continue without trailer", "error", err)
-			return nil, err
+			log.Debug("failed to get trailer by id", "error", err, "trailer_id", *createWp.TrailerID)
+			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
 	}
 
 	if err := w.validateUsers(ctx, createWp.UserIDs, transporter, trailer); err != nil {
-		return nil, err
+		log.Warn("selected user are not allowed to use this transporter and/or trailer", "error", err, "user_ids", createWp.UserIDs, "transporter_id", createWp.TransporterID, "trailer_id", createWp.TrailerID)
+		return nil, err // err is already a service error
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
@@ -182,7 +184,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 
 		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
 		if err != nil {
-			log.Warn("generating route information failed. will not route metadata", "error", err, "watering_plan_id", created.ID)
+			log.Warn("generating route information failed. will not save route metadata", "error", err, "watering_plan_id", created.ID)
 		} else {
 			wp.Distance = utils.P(metadata.Distance)
 			wp.Duration = metadata.Time
@@ -258,16 +260,18 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	transporter, err := w.fetchVehicle(ctx, *updateWp.TransporterID)
+	transporter, err := w.vehicleRepo.GetByID(ctx, *updateWp.TransporterID)
 	if err != nil {
+		log.Debug("failed to get transporter by provided id", "error", err, "transporter_id", updateWp.TransporterID)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	var trailer *entities.Vehicle
 	if updateWp.TrailerID != nil {
-		trailer, err = w.fetchVehicle(ctx, *updateWp.TrailerID)
+		trailer, err = w.vehicleRepo.GetByID(ctx, *updateWp.TrailerID)
 		if err != nil {
-			log.Warn("failed to get trailer by id. will continue without trailer", "error", err)
+			log.Warn("failed to get trailer by provided id", "error", err, "trailer_id", updateWp.TrailerID)
+			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
 	}
 
@@ -367,41 +371,26 @@ func (w *WateringPlanService) shouldUpdateGpx(prevWp, newWp *entities.WateringPl
 	return false
 }
 
-func (w *WateringPlanService) fetchVehicle(ctx context.Context, vehicleID int32) (*entities.Vehicle, error) {
-	log := logger.GetLogger(ctx)
-	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
-	if err != nil {
-		log.Debug("failed to fetch vehicle by provided id", "error", err, "vehicle_id", vehicleID)
-		return nil, storage.ErrEntityNotFound("vehicle not found")
-	}
-
-	return vehicle, nil
-}
-
+// returns service error
 func (w *WateringPlanService) fetchTreeClusters(ctx context.Context, treeClusterIDs []*int32) ([]*entities.TreeCluster, error) {
 	log := logger.GetLogger(ctx)
-	clusters, err := w.getTreeClusters(ctx, treeClusterIDs)
+	clusters, err := w.clusterRepo.GetByIDs(ctx, utils.Map(treeClusterIDs, func(cID *int32) int32 {
+		return *cID
+	}))
 	if err != nil {
 		log.Debug("failed to fetch tree cluster specified by requested ids", "cluster_ids", treeClusterIDs, "error", err)
 		return nil, err
 	}
+
 	if len(clusters) == 0 {
 		log.Debug("requested tree cluster ids in watering plan are not found", "cluster_ids", treeClusterIDs, "error", err)
-		return nil, storage.ErrEntityNotFound("treecluster not found")
+		return nil, storage.ErrEntityNotFound("treecluster")
 	}
 
 	return clusters, nil
 }
 
-func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32) ([]*entities.TreeCluster, error) {
-	clusterIDs := make([]int32, len(ids))
-	for i, id := range ids {
-		clusterIDs[i] = *id
-	}
-
-	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
-}
-
+// returns service error
 func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid.UUID, transporter, trailer *entities.Vehicle) error {
 	log := logger.GetLogger(ctx)
 	var userIDStrings []string
@@ -415,40 +404,39 @@ func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid
 	users, err := w.userRepo.GetByIDs(ctx, userIDStrings)
 	if err != nil {
 		log.Debug("failed to fetch users by id", "error", err, "user_ids", userIDStrings)
-		return err
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
-
-	fmt.Println(users)
 
 	if len(users) == 0 {
 		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStrings)
-		return storage.ErrEntityNotFound("user not found")
+		return service.MapError(ctx, storage.ErrEntityNotFound("users"), service.ErrorLogEntityNotFound)
 	}
 
 	// Checks if the users have correct user roles
 	// Only users with the user role »UserRoleTbz« should be linked to a watering plan
-	if err := w.validateUserRoles(users); err != nil {
-		return service.NewError(service.BadRequest, storage.ErrUserNotCorrectRole.Error())
+	if !w.validateUserRoles(users) {
+		return service.ErrUserNotCorrectRole
 	}
 
 	// Checks if at least on of the users has a matching driving license
 	if err := w.validateUserDrivingLicenses(users, transporter, trailer); err != nil {
-		return err
+		return err // err is already a service error
 	}
 
 	return nil
 }
 
-func (w *WateringPlanService) validateUserRoles(users []*entities.User) error {
+func (w *WateringPlanService) validateUserRoles(users []*entities.User) bool {
 	for _, user := range users {
 		if !containsUserRoleTbz(user.Roles) {
-			return storage.ErrUserNotCorrectRole
+			return false
 		}
 	}
 
-	return nil
+	return true
 }
 
+// returns service error
 func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User, transporter, trailer *entities.Vehicle) error {
 	var requiredLicenses []entities.DrivingLicense
 
@@ -463,7 +451,7 @@ func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User
 	for _, user := range users {
 		for _, requiredLicense := range requiredLicenses {
 			if !hasValidLicense(user, requiredLicense) {
-				return service.NewError(service.BadRequest, fmt.Sprintf("User %s does not have the required license %s", user.ID, requiredLicense))
+				return service.NewError(service.BadRequest, fmt.Sprintf("user %s does not have the required license %s", user.ID, requiredLicense))
 			}
 		}
 	}
