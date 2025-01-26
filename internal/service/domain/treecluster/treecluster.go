@@ -167,12 +167,18 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
+	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, id)
+	if err != nil {
+		slog.Error("could not update watering status", "error", err)
+	}
+
 	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		tc.Trees = trees
 		tc.Name = tcUpdate.Name
 		tc.Address = tcUpdate.Address
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
+		tc.WateringStatus = wateringStatus
 
 		log.Debug("updating tree cluster with following attributes",
 			"cluster_id", id,
@@ -180,6 +186,7 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 			"address", tcUpdate.Address,
 			"description", tcUpdate.Description,
 			"soil_condition", tcUpdate.SoilCondition,
+			"watering_status", wateringStatus,
 		)
 
 		return true, nil
@@ -232,12 +239,7 @@ func (s *TreeClusterService) Ready() bool {
 // otherwise the center point of the tree cluster cannot be set
 func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
-	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, id)
-	if err != nil {
-		slog.Error("could not update watering status", "error", err)
-	}
-
-	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
+	err := s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 		if err != nil {
 			log.Debug("cancel transaction on updateting tree cluster position due to error", "error", err, "cluster_id", id)

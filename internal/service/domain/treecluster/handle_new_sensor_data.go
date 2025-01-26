@@ -31,7 +31,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 		return nil
 	}
 
-	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, tree)
+	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, tree.TreeCluster.ID)
 	if err != nil {
 		return nil
 	}
@@ -52,11 +52,11 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 	return nil
 }
 
-func (s *TreeClusterService) getWateringStatusOfTreeCluster(ctx context.Context, tree *entities.Tree) (entities.WateringStatus, error) {
+func (s *TreeClusterService) getWateringStatusOfTreeCluster(ctx context.Context, clusterID int32) (entities.WateringStatus, error) {
 	log := logger.GetLogger(ctx)
-	sensorData, err := s.treeClusterRepo.GetAllLatestSensorDataByClusterID(ctx, tree.TreeCluster.ID)
+	sensorData, err := s.treeClusterRepo.GetAllLatestSensorDataByClusterID(ctx, clusterID)
 	if err != nil {
-		log.Error("failed to get latest sensor data", "cluster_id", tree.TreeCluster.ID, "err", err)
+		log.Error("failed to get latest sensor data", "cluster_id", clusterID, "err", err)
 		return entities.WateringStatusUnknown, errors.New("failed to get latest sensor data")
 	}
 
