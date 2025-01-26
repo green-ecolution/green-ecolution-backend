@@ -214,8 +214,8 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			fn = append(fn, tree.WithWateringStatus(status))
 		}
 	} else {
-		fn = append(fn, 
-			tree.WithSensor(nil), 
+		fn = append(fn,
+			tree.WithSensor(nil),
 			tree.WithWateringStatus(entities.WateringStatusUnknown))
 	}
 
