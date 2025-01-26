@@ -7,7 +7,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
@@ -51,7 +51,7 @@ func (s *Server) Run(ctx context.Context) error {
 	}()
 
 	go func() {
-		utils.Scheduler(ctx, 1*time.Hour, s.services.SensorService.UpdateStatuses)
+		worker.Scheduler(ctx, 1*time.Hour, s.services.SensorService.UpdateStatuses)
 	}()
 
 	go func() {
