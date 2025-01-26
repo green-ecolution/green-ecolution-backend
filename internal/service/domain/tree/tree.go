@@ -128,7 +128,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		fn = append(fn, tree.WithSensor(sensor))
 
 		if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
-			status := utils.CalculateWateringStatus(treeCreate.PlantingYear, sensor.LatestData.Data.Watermarks)
+			status := utils.CalculateWateringStatus(ctx, treeCreate.PlantingYear, sensor.LatestData.Data.Watermarks)
 			fn = append(fn, tree.WithWateringStatus(status))
 		}
 	}
@@ -210,7 +210,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		fn = append(fn, tree.WithSensor(sensor))
 
 		if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
-			status := utils.CalculateWateringStatus(tu.PlantingYear, sensor.LatestData.Data.Watermarks)
+			status := utils.CalculateWateringStatus(ctx, tu.PlantingYear, sensor.LatestData.Data.Watermarks)
 			fn = append(fn, tree.WithWateringStatus(status))
 		}
 	} else {
