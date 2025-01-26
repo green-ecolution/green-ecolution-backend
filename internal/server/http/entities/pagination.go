@@ -7,3 +7,31 @@ type Pagination struct {
 	NextPage    *int32 `json:"next_page"`
 	PrevPage    *int32 `json:"prev_page"`
 } // @Name Pagination
+
+func CalculatePagination(totalCount, limit, page int32) (totalPages int32, nextPage, prevPage *int32) {
+	if limit <= 0 {
+		limit = 1
+	}
+
+	totalPages = (totalCount + limit - 1) / limit
+
+	if page < totalPages {
+		next := page + 1
+		nextPage = &next
+	}
+
+	if page > 1 {
+		prev := page - 1
+		prevPage = &prev
+	}
+
+	if page == totalPages {
+		nextPage = nil
+	}
+
+	if page == 1 {
+		prevPage = nil
+	}
+
+	return totalPages, nextPage, prevPage
+}
