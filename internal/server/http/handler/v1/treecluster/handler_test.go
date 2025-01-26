@@ -100,7 +100,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		defer resp.Body.Close()
 
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 		mockClusterService.AssertExpectations(t)
 	})
@@ -117,7 +117,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		defer resp.Body.Close()
 
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 		mockClusterService.AssertExpectations(t)
 	})
