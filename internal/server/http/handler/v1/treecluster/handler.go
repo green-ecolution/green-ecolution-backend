@@ -7,7 +7,9 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 var (
@@ -33,23 +35,8 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		pageParam, err := strconv.Atoi(c.Query("page", "1"))
-		if err != nil || pageParam < 1 {
-			err := service.NewError(service.BadRequest, "invalid page format")
-			return errorhandler.HandleError(err)
-		}
-		page := int32(pageParam)
-
-		limit := int32(-1)
-		limitParam := c.Query("limit", "-1")
-		if limitParam != "" {
-			limitParam, err := strconv.Atoi(limitParam)
-			if err != nil || (limitParam != -1 && limitParam <= 0) {
-				err := service.NewError(service.BadRequest, "invalid limit format")
-				return errorhandler.HandleError(err)
-			}
-			limit = int32(limitParam)
-		}
+		page := c.Locals(middleware.Page).(int32)
+        limit := c.Locals(middleware.Limit).(int32)
 
 		domainData, totalCount, err := svc.GetAll(ctx, page, limit)
 		if err != nil {
@@ -61,22 +48,9 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			data[i] = treeClusterMapper.FromInListResponse(domain)
 		}
 
-		var pagination *entities.Pagination
-		if limit != -1 {
-			totalPages, nextPage, prevPage := entities.CalculatePagination(int32(totalCount), limit, page)
-
-			pagination = &entities.Pagination{
-				Total:       totalCount,
-				CurrentPage: page,
-				TotalPages:  totalPages,
-				NextPage:    nextPage,
-				PrevPage:    prevPage,
-			}
-		}
-
 		return c.JSON(entities.TreeClusterListResponse{
 			Data:       data,
-			Pagination: pagination,
+			Pagination: utils.CreatePagination(page, limit, totalCount),
 		})
 	}
 }

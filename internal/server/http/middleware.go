@@ -22,6 +22,7 @@ func (s *Server) middleware() *fiber.App {
 		"health_check": middleware.HealthCheck(s.services),
 		"request_id":   middleware.RequestID(),
 		"app_logger":   middleware.AppLogger(logFn),
+		"pagination":   middleware.PaginationMiddleware(),
 		"auth":         middleware.NewJWTMiddleware(&s.cfg.IdentityAuth, s.services.AuthService),
 	}
 
