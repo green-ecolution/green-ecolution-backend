@@ -8,7 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
-func GetValues(ctx context.Context) (int32, int32, error) {
+func GetValues(ctx context.Context) (page, limit int32, err error) {
 	log := logger.GetLogger(ctx)
 	page, pageOk := ctx.Value("page").(int32)
 	limit, limitOK := ctx.Value("limit").(int32)
