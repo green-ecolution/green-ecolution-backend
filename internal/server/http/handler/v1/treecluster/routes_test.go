@@ -23,8 +23,8 @@ func TestRegisterRoutes(t *testing.T) {
 			app.Use(middleware.PaginationMiddleware())
 			treecluster.RegisterRoutes(app, mockClusterService)
 
-			ctx := context.WithValue(context.Background(), middleware.Page, int32(1))
-			ctx = context.WithValue(ctx, middleware.Limit, int32(-1))
+			ctx := context.WithValue(context.Background(), "page", int32(1))
+			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockClusterService.EXPECT().GetAll(
 				mock.Anything,
