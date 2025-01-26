@@ -1,12 +1,32 @@
-package utils
+package pagination
 
 import (
 	"context"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
-func CreatePagination(ctx context.Context, totalCount int64) *entities.Pagination {
+func GetValues(ctx context.Context) (int32, int32, error) {
+	log := logger.GetLogger(ctx)
+	page, pageOk := ctx.Value("page").(int32)
+	limit, limitOK := ctx.Value("limit").(int32)
+
+	if !pageOk || !limitOK {
+		log.Debug("pagination values not found in context", "page", ctx.Value("page"), "limit", ctx.Value("limit"))
+		return 0, 0, storage.ErrPaginationValueInvalid
+	}
+
+	if page <= 0 || (limit != -1 && limit <= 0) {
+		log.Debug("pagination values are invalid", "page", ctx.Value("page"), "limit", ctx.Value("limit"))
+		return page, limit, storage.ErrPaginationValueInvalid
+	}
+
+	return page, limit, nil
+}
+
+func Create(ctx context.Context, totalCount int64) *entities.Pagination {
 	page, pageOk := ctx.Value("page").(int32)
 	limit, limitOK := ctx.Value("limit").(int32)
 
