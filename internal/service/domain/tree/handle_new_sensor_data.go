@@ -28,6 +28,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 	newTree, err := s.treeRepo.Update(ctx, t.ID, tree.WithWateringStatus(status))
 	if err != nil {
 		log.Error("failed to update tree with new watering status", "tree_id", t.ID, "watering_status", status, "err", err)
+		return err
 	}
 
 	slog.Info("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)

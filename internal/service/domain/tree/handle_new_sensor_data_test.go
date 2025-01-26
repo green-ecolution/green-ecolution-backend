@@ -151,7 +151,7 @@ func TestTreeService_HandleNewSensorData(t *testing.T) {
 		err := svc.HandleNewSensorData(context.Background(), &event)
 
 		// then
-		assert.NoError(t, err)
+		assert.ErrorIs(t, err, storage.ErrTreeNotFound)
 		select {
 		case <-ch:
 			t.Fatal("event was received. It should not have been sent")
