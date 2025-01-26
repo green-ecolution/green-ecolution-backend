@@ -19,18 +19,22 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 
 	if !pageOk || !limitOK {
 		log.Debug("pagination values not found in context")
-		return nil, 0, r.store.MapError(storage.ErrPaginationValueInvalid, sqlc.TreeCluster{})
+		return nil, 0, storage.ErrPaginationValueInvalid
 	}
 
 	if page <= 0 || (limit != -1 && limit <= 0) {
-		log.Debug("invalid pagination values")
-		return nil, 0, r.store.MapError(storage.ErrPaginationValueInvalid, sqlc.TreeCluster{})
+		log.Debug("pagination values are invalid", "page", ctx.Value("page"), "limit", ctx.Value("limit"))
+		return nil, 0, storage.ErrPaginationValueInvalid
 	}
 
 	totalCount, err := r.store.GetAllTreeClustersCount(ctx)
 	if err != nil {
-		log.Debug("failed to get total tree cluster count in db")
+		log.Debug("failed to get total tree cluster count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
+	if (totalCount == 0) {
+		return []*entities.TreeCluster{}, 0, nil
 	}
 
 	if limit == -1 {
