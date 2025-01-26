@@ -232,7 +232,12 @@ func (s *TreeClusterService) Ready() bool {
 // otherwise the center point of the tree cluster cannot be set
 func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id int32) error {
 	log := logger.GetLogger(ctx)
-	err := s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
+	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, id)
+	if err != nil {
+		slog.Error("could not update watering status", "error", err)
+	}
+
+	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 		if err != nil {
 			log.Debug("cancel transaction on updateting tree cluster position due to error", "error", err, "cluster_id", id)

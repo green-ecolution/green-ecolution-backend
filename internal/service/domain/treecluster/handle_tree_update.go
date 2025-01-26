@@ -67,7 +67,7 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 		return nil
 	}
 
-	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, tree)
+	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, tree.TreeCluster.ID)
 	if err != nil {
 		slog.Error("could not update watering status", "error", err)
 	}
