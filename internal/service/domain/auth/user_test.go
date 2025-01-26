@@ -554,7 +554,7 @@ func TestGetAllByRole(t *testing.T) {
 		userRepo.EXPECT().GetAll(rootCtx).Return(nil, errors.New("repository error"))
 
 		// when
-		users, err := svc.GetAllByRole(context.Background(), entities.UserRoleTbz)
+		users, err := svc.GetAllByRole(rootCtx, entities.UserRoleTbz)
 
 		// then
 		assert.Error(t, err)
