@@ -223,7 +223,7 @@ func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
 		}
 
 		// when
-		got, err := keyCloakUserToUser(user)
+		got, err := keyCloakUserToUser(context.Background(), user)
 
 		// then
 		assert.NoError(t, err)
@@ -253,7 +253,7 @@ func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
 		}
 
 		// when
-		got, err := keyCloakUserToUser(user)
+		got, err := keyCloakUserToUser(context.Background(), user)
 
 		// then
 		assert.Error(t, err)

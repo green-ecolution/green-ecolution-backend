@@ -40,11 +40,7 @@ func Login(svc service.AuthService) fiber.Handler {
 			RedirectURL: redirectURL,
 		}
 
-		resp, err := svc.LoginRequest(ctx, &req)
-		if err != nil {
-			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
-		}
-
+		resp := svc.LoginRequest(ctx, &req)
 		response := entities.LoginResponse{
 			LoginURL: resp.LoginURL.String(),
 		}

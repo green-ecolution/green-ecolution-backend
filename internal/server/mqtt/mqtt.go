@@ -36,15 +36,15 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	opts.SetPassword(m.cfg.MQTT.Password)
 
 	opts.OnConnect = func(_ MQTT.Client) {
-		slog.Info("Connected to MQTT Broker")
+		slog.Info("connected to mqtt broker")
 	}
 	opts.OnConnectionLost = func(_ MQTT.Client, err error) {
-		slog.Error("Connection to MQTT Broker lost", "error", err)
+		slog.Error("lost connection to mqtt broker", "error", err)
 	}
 
 	client := MQTT.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		slog.Error("Error connecting to MQTT Broker", "error", token.Error())
+		slog.Error("error connecting to mqtt broker", "error", token.Error())
 		return
 	}
 
@@ -52,26 +52,27 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	go func(token MQTT.Token) {
 		_ = token.Wait()
 		if token.Error() != nil {
-			slog.Error("Error while subscribing to MQTT Broker", "error", token.Error())
+			slog.Error("error while subscribing to mqtt broker", "error", token.Error())
 		}
 	}(token)
 
 	<-ctx.Done()
-	slog.Info("Shutting down MQTT Subscriber")
+	slog.Info("shutting down mqtt subscriber")
 }
 
 func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 	sensorData, err := m.convertToMqttPayloadResponse(msg)
 	if err != nil {
-		slog.Error("Error while converting MQTT payload to sensor data", "error", err)
+		slog.Error("error while converting mqtt payload to sensor data", "error", err)
+		return
 	}
 
-	slog.Info("Logging sensor data", "sensorData", sensorData)
+	slog.Info("received sensor data", "sensor_id", sensorData.Device)
+	slog.Debug("detailed sensor data", "sensor_raw_data", fmt.Sprintf("%+v", sensorData))
 
 	domainPayload := m.mapper.FromResponse(sensorData)
 	_, err = m.svc.SensorService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
-		slog.Error("Error handling message", "error", err)
 		return
 	}
 }
@@ -79,7 +80,7 @@ func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPayloadResponse, error) {
 	var raw map[string]any
 	if err := json.Unmarshal(msg.Payload(), &raw); err != nil {
-		return nil, fmt.Errorf("error unmarshalling JSON: %w", err)
+		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
 	endDevices := raw["end_device_ids"].(map[string]any)

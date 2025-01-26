@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
@@ -26,6 +27,7 @@ func defaultTree() entities.Tree {
 }
 
 func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
 	entity := defaultTree()
 	for _, fn := range tFn {
 		fn(&entity)
@@ -37,10 +39,12 @@ func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[
 
 	id, err := r.createEntity(ctx, &entity)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		log.Error("failed to create tree entity in db", "error", err)
+		return nil, err
 	}
 	entity.ID = id
 
+	log.Debug("tree entity created successfully in db", "tree_id", id)
 	return r.GetByID(ctx, id)
 }
 

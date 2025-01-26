@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/pkg/errors"
 )
@@ -25,21 +26,26 @@ func defaultFlowerbed() *entities.Flowerbed {
 }
 
 func (r *FlowerbedRepository) Create(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error) {
+	log := logger.GetLogger(ctx)
 	entity := defaultFlowerbed()
 	for _, fn := range fFn {
 		fn(entity)
 	}
 
 	if err := r.validateFlowerbedEntity(entity); err != nil {
+		log.Error("flowerbed entity is malformed", "error", err)
 		return nil, err
 	}
 
 	id, err := r.createEntity(ctx, entity)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		log.Error("failed to create flowerbed in postgres", "error", err)
+		return nil, err
 	}
 
 	entity.ID = *id
+
+	log.Debug("flowerbed entity created successfully in db")
 
 	return r.GetByID(ctx, *id)
 }
@@ -77,7 +83,7 @@ func (r *FlowerbedRepository) createEntity(ctx context.Context, entity *entities
 
 	id, err := r.store.CreateFlowerbed(ctx, &args)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, r.store.MapError(err, sqlc.Flowerbed{})
 	}
 
 	return &id, nil

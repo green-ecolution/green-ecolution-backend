@@ -11,6 +11,7 @@ import (
 	golangJwt "github.com/golang-jwt/jwt/v5"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/wrapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/enums"
 	"github.com/pkg/errors"
@@ -75,6 +76,14 @@ func successHandler(c *fiber.Ctx, svc service.AuthService) error {
 	if !*rptResult.Active {
 		return c.Status(fiber.StatusUnauthorized).SendString("token is not active")
 	}
+
+	fiberCtx := wrapper.NewFiberCtx(c)
+	userID, err := claims.GetSubject()
+	if err != nil {
+		panic(err)
+	}
+
+	_ = fiberCtx.WithLogger("user_id", userID)
 
 	return c.Next()
 }

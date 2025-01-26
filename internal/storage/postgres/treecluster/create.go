@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -28,6 +29,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 }
 
 func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
 	}
@@ -67,7 +69,14 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 	})
 
 	if err != nil {
+		log.Error("failed to update tree cluster entity in db", "error", err)
 		return nil, err
+	}
+
+	if createdTc != nil {
+		log.Debug("tree cluster entity created successfully", "cluster_id", createdTc.ID)
+	} else {
+		log.Debug("tree cluster should not be created. cancel transaction")
 	}
 
 	return createdTc, nil

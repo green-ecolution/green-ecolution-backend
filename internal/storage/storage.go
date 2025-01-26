@@ -3,11 +3,18 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
+
+type ErrEntityNotFound string
+
+func (e ErrEntityNotFound) Error() string {
+	return fmt.Sprintf("entity not found: %s", string(e))
+}
 
 var (
 	ErrIPNotFound            = errors.New("local ip not found")
@@ -18,7 +25,6 @@ var (
 
 	ErrIDNotFound           = errors.New("entity id not found")
 	ErrIDAlreadyExists      = errors.New("entity id already exists")
-	ErrEntityNotFound       = errors.New("entity not found")
 	ErrSensorNotFound       = errors.New("sensor not found")
 	ErrImageNotFound        = errors.New("image not found")
 	ErrFlowerbedNotFound    = errors.New("flowerbed not found")

@@ -15,7 +15,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -112,7 +111,7 @@ func TestGetTreeBySensorID(t *testing.T) {
 		mockTreeService.EXPECT().GetBySensorID(
 			mock.Anything,
 			sensorID,
-		).Return(nil, storage.ErrTreeNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		req, _ := http.NewRequestWithContext(context.Background(), "GET", "/v1/tree/sensor/"+sensorID, nil)
 		resp, err := app.Test(req, -1)
@@ -293,7 +292,7 @@ func TestUpdateTree(t *testing.T) {
 			mock.Anything,
 			treeID,
 			mock.AnythingOfType("*entities.TreeUpdate"),
-		).Return(nil, storage.ErrTreeNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		reqBody := TestTreeUpdateRequest

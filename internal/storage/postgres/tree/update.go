@@ -4,14 +4,16 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/pkg/errors"
 )
 
 func (r *TreeRepository) Update(ctx context.Context, id int32, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
 	entity, err := r.GetByID(ctx, id)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	for _, fn := range tFn {
@@ -20,9 +22,11 @@ func (r *TreeRepository) Update(ctx context.Context, id int32, tFn ...entities.E
 
 	err = r.updateEntity(ctx, entity)
 	if err != nil {
+		log.Error("failed to update tree entity in db", "error", err, "tree_id", id)
 		return nil, err
 	}
 
+	log.Debug("tree entity updated successfully in db", "tree_id", id)
 	return r.GetByID(ctx, id)
 }
 

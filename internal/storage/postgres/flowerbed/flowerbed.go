@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
@@ -131,23 +132,26 @@ func WithRegionID(id int32) entities.EntityFunc[entities.Flowerbed] {
 }
 
 func (r *FlowerbedRepository) Delete(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	_, err := r.store.DeleteFlowerbed(ctx, id)
 	if err != nil {
+		log.Error("failed to delete flowerbed entity in db", "error", err, "flowerbed_id", id)
 		return err
 	}
 
+	log.Debug("flowerbed entity deleted successfully in db", "flowerbed_id", id)
 	return nil
 }
 
 func (r *FlowerbedRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
-		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
+		return errors.Wrap(err, "failed to get images")
 	}
 
 	for _, img := range images {
 		if err := r.UnlinkImage(ctx, id, img.ID); err != nil {
-			return r.store.HandleError(errors.Wrap(err, "failed to unlink images"))
+			return errors.Wrap(err, "failed to unlink images")
 		}
 	}
 
@@ -185,10 +189,13 @@ func (r *FlowerbedRepository) UnlinkSensorID(ctx context.Context, sensorID strin
 }
 
 func (r *FlowerbedRepository) Archive(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	_, err := r.store.ArchiveFlowerbed(ctx, id)
 	if err != nil {
+		log.Error("failed to archive flowerbed entity in db", "error", err, "flowerbed_id", id)
 		return err
 	}
 
+	log.Debug("flowerbed entity archived successfully in db", "flowerbed_id", id)
 	return nil
 }

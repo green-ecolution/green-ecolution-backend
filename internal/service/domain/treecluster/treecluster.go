@@ -2,14 +2,16 @@ package treecluster
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
-
-	"github.com/pkg/errors"
 
 	"github.com/go-playground/validator/v10"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
@@ -37,37 +39,42 @@ func NewTreeClusterService(
 }
 
 func (s *TreeClusterService) GetAll(ctx context.Context) ([]*domain.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
 	treeClusters, err := s.treeClusterRepo.GetAll(ctx)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to fetch tree clsuters", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return treeClusters, nil
 }
 
 func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
 	treeCluster, err := s.treeClusterRepo.GetByID(ctx, id)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to fetch tree cluster by id", "error", err, "cluster_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return treeCluster, nil
 }
 
 func (s *TreeClusterService) getUpdatedLatLong(ctx context.Context, tc *domain.TreeCluster) (lat, long *float64, region *domain.Region, err error) {
+	log := logger.GetLogger(ctx)
 	if len(tc.Trees) == 0 {
 		return nil, nil, nil, nil
 	}
 
 	latitude, longitude, err := s.treeClusterRepo.GetCenterPoint(ctx, tc.ID)
 	if err != nil {
-		slog.Error("failed to get center point of tree cluster", "error", err, "tree_cluster", tc)
+		log.Error("failed to get center point of tree cluster", "error", err, "tree_cluster", tc)
 		return nil, nil, nil, err
 	}
 
 	region, err = s.regionRepo.GetByPoint(ctx, latitude, longitude)
 	if err != nil {
-		slog.Error("can't find region by lat and long", "error", err, "latitude", latitude, "longitude", longitude, "tree_cluster", tc)
+		log.Error("can't find region by lat and long", "error", err, "latitude", latitude, "longitude", longitude, "tree_cluster", tc)
 		return &latitude, &longitude, nil, nil
 	}
 
@@ -75,34 +82,39 @@ func (s *TreeClusterService) getUpdatedLatLong(ctx context.Context, tc *domain.T
 }
 
 func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, prevTc *domain.TreeCluster) error {
-	slog.Debug("publish new event", "event", domain.EventTypeUpdateTreeCluster, "service", "TreeClusterService")
+	log := logger.GetLogger(ctx)
+	log.Debug("publish new event", "event", domain.EventTypeUpdateTreeCluster, "service", "TreeClusterService")
 	updatedTc, err := s.GetByID(ctx, prevTc.ID)
 	if err != nil {
 		return err
 	}
+
 	event := domain.NewEventUpdateTreeCluster(prevTc, updatedTc)
 	err = s.eventManager.Publish(ctx, event)
 	if err != nil {
-		slog.Error("error while sending event after updating tree cluster", "err", err)
+		log.Error("error while sending event after updating tree cluster", "err", err)
 	}
 
 	return nil
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(createTc); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		log.Debug("failed to validate struct in create tree cluster", "error", err, "raw_cluster", fmt.Sprintf("%+v", createTc))
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	trees, err := s.getTrees(ctx, createTc.TreeIDs)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get trees inside the tree cluster", "error", err, "tree_ids", createTc.TreeIDs)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster) (bool, error) {
 		if err = s.handlePrevTreeLocation(ctx, trees); err != nil {
-			slog.Error("failed to update prev tree location", "error", err, "trees", trees, "tree_cluster", tc)
-			return false, handleError(err)
+			log.Debug("failed to update prev tree location", "error", err, "trees", trees, "tree_cluster", tc)
+			return false, service.MapError(ctx, err, service.ErrorLogAll)
 		}
 
 		tc.Trees = trees
@@ -111,34 +123,48 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		tc.Description = createTc.Description
 		tc.SoilCondition = createTc.SoilCondition
 
+		log.Debug("creating tree cluster with following attributes",
+			"tree_ids", createTc.TreeIDs,
+			"name", createTc.Name,
+			"address", createTc.Address,
+			"description", createTc.Description,
+			"soil_condition", createTc.SoilCondition,
+		)
+
 		return true, nil
 	})
 
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to create tree cluster", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	if err := s.updateTreeClusterPosition(ctx, c.ID); err != nil {
-		slog.Error("error while update the cluster locations", "error", err, "cluster_id", c.ID)
-		return nil, handleError(err)
+		log.Debug("error while update the cluster locations", "error", err, "cluster_id", c.ID)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
+	log.Info("tree cluster created successfully", "cluster_id", c.ID)
 	return c, nil
 }
 
 func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *domain.TreeClusterUpdate) (*domain.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
 	if err := s.validator.Struct(tcUpdate); err != nil {
-		return nil, service.NewError(service.BadRequest, errors.Wrap(err, "validation error").Error())
+		log.Debug("failed to validate struct from update tree cluster request", "error", err, "raw_cluster", fmt.Sprintf("%+v", tcUpdate))
+		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
 	trees, err := s.getTrees(ctx, tcUpdate.TreeIDs)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get trees inside the tree cluster", "error", err, "tree_ids", tcUpdate.TreeIDs)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	prevTc, err := s.GetByID(ctx, id)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get exiting tree cluster", "error", err, "cluster_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
@@ -148,41 +174,53 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
 
+		log.Debug("updating tree cluster with following attributes",
+			"cluster_id", id,
+			"name", tcUpdate.Name,
+			"address", tcUpdate.Address,
+			"description", tcUpdate.Description,
+			"soil_condition", tcUpdate.SoilCondition,
+		)
+
 		return true, nil
 	})
 
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to update tree cluster", "error", err, "cluster_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	if err := s.updateTreeClusterPosition(ctx, id); err != nil {
-		slog.Error("error while update the cluster locations", "error", err, "cluster_id", id)
-		return nil, handleError(err)
+		log.Error("error while update the cluster locations", "error", err, "cluster_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
+	log.Info("tree cluster updated successfully", "cluster_id", id)
 	if err := s.publishUpdateEvent(ctx, prevTc); err != nil {
-		return nil, handleError(err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	return s.GetByID(ctx, id)
 }
 
 func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	_, err := s.treeClusterRepo.GetByID(ctx, id)
 	if err != nil {
-		return handleError(err)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	err = s.treeRepo.UnlinkTreeClusterID(ctx, id)
-	if err != nil {
-		return handleError(err)
+	if err := s.treeRepo.UnlinkTreeClusterID(ctx, id); err != nil {
+		log.Debug("failed to unlink tree from tree cluster", "cluster_id", id, "error", err)
+		return service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
-	err = s.treeClusterRepo.Delete(ctx, id)
-	if err != nil {
-		return handleError(err)
+	if err := s.treeClusterRepo.Delete(ctx, id); err != nil {
+		log.Debug("failed to delete tree cluster", "error", err, "cluster_id", id)
+		return service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
+	log.Info("tree cluster deleted successfully", "cluster_id", id)
 	return nil
 }
 
@@ -193,15 +231,25 @@ func (s *TreeClusterService) Ready() bool {
 // Update the tree cluster only after the trees have been updated to the database,
 // otherwise the center point of the tree cluster cannot be set
 func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	err := s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 		if err != nil {
-			return false, nil
+			log.Debug("cancel transaction on updateting tree cluster position due to error", "error", err, "cluster_id", id)
+			return false, err
 		}
 
-		tc.Latitude = lat
-		tc.Longitude = long
-		tc.Region = region
+		if tc.Latitude != lat || tc.Longitude != long || tc.Region.ID != region.ID {
+			tc.Latitude = lat
+			tc.Longitude = long
+			tc.Region = region
+
+			log.Info("update tree cluster position due to changed trees inside the tree cluster", "cluster_id", id)
+			log.Debug("detailed updated tree cluster position informations", "cluster_id", id,
+				slog.Group("new_position", "latitude", *lat, "longitude", *long),
+				slog.Group("region", "id", region.ID, "name", region.Name),
+			)
+		}
 
 		return true, nil
 	})
@@ -227,6 +275,7 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 //   - Clusters with an ID of 0 are ignored.
 //   - Updates are performed via a callback mechanism in the `treeClusterRepo` to ensure thread safety or transactional consistency.
 func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees []*domain.Tree) error {
+	log := logger.GetLogger(ctx)
 	visitedClusters := make(map[int32]bool)
 	for _, tree := range trees {
 		if tree.TreeCluster == nil || tree.TreeCluster.ID == 0 {
@@ -234,11 +283,8 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 		}
 
 		if _, ok := visitedClusters[tree.TreeCluster.ID]; ok {
-			slog.Debug("Tree already visited", "treeID", tree.ID)
 			continue
 		}
-
-		slog.Debug("Updating cluster", "clusterID", tree.TreeCluster.ID)
 
 		updateFn := func(tc *domain.TreeCluster) (bool, error) {
 			lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
@@ -254,6 +300,7 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 		}
 
 		if err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, updateFn); err != nil {
+			log.Error("failed to update tree cluster after handling prev tree locations", "error", err, "cluster_id", tree.TreeCluster.ID, "tree_id", tree.ID)
 			return err
 		}
 
@@ -264,15 +311,11 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 		visitedClusters[tree.TreeCluster.ID] = true
 	}
 
+	log.Info("successfully updated tree cluster locations from prev trees",
+		"tree_ids", utils.Map(trees, func(t *domain.Tree) int32 { return t.ID }),
+		"updated_clusters", utils.MapKeysSlice(visitedClusters, func(k int32, _ bool) int32 { return k }),
+	)
 	return nil
-}
-
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, storage.ErrTreeClusterNotFound.Error())
-	}
-
-	return service.NewError(service.InternalError, err.Error())
 }
 
 func (s *TreeClusterService) getTrees(ctx context.Context, ids []*int32) ([]*domain.Tree, error) {

@@ -10,6 +10,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -64,14 +65,17 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 	}, nil
 }
 
-func (r *InfoRepository) GetAppInfo(_ context.Context) (*entities.App, error) {
+func (r *InfoRepository) GetAppInfo(ctx context.Context) (*entities.App, error) {
+	log := logger.GetLogger(ctx)
 	hostname, err := r.getHostname()
 	if err != nil {
+		log.Error("failed to get hostname from host", "error", err)
 		return nil, storage.ErrHostnameNotFound
 	}
 
 	appURL, err := r.getAppURL()
 	if err != nil {
+		log.Error("failed to parse configured app url", "error", err, "app_url", r.cfg.Server.AppURL)
 		return nil, storage.ErrCannotGetAppURL
 	}
 

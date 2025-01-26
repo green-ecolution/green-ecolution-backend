@@ -5,11 +5,13 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
 func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Vehicle) (bool, error)) error {
+	log := logger.GetLogger(ctx)
 	return r.store.WithTx(ctx, func(s *store.Store) error {
 		oldStore := r.store
 		defer func() {
@@ -39,7 +41,13 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(
 			return err
 		}
 
-		return r.updateEntity(ctx, vh)
+		if err := r.updateEntity(ctx, vh); err != nil {
+			log.Error("failed to update vehicle entity in db", "error", err, "vehicle_id", id)
+			return err
+		}
+
+		log.Debug("vehicle entity updated successfully in db", "vehicle_id", id)
+		return nil
 	})
 }
 

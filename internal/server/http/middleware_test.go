@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -97,7 +98,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 	t.Run("should log and return a response for valid GET request", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		app.Get("/log", func(c *fiber.Ctx) error {
 			return c.SendString("Log endpoint")
@@ -118,7 +119,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 	t.Run("should return 404 for non-existent route with logging", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		req := httptest.NewRequest("GET", "/non-existent", nil)
 		resp, err := app.Test(req, -1)
@@ -135,7 +136,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 	t.Run("should handle logging for POST requests", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		app.Post("/log", func(c *fiber.Ctx) error {
 			return c.SendString("Logged POST request")
@@ -156,7 +157,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 	t.Run("should handle requests with headers and log them", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		app.Get("/log", func(c *fiber.Ctx) error {
 			return c.SendString("Log endpoint with headers")
@@ -181,7 +182,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 		app := fiber.New(fiber.Config{
 			BodyLimit: 20 * 1024 * 1024,
 		})
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		app.Post("/log", func(c *fiber.Ctx) error {
 			return c.SendString("Handled large payload")
@@ -204,7 +205,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 	t.Run("should handle 500 Internal Server Error response and log it", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		app.Get("/error", func(c *fiber.Ctx) error {
 			return fiber.NewError(http.StatusInternalServerError, "Internal error")
@@ -225,7 +226,7 @@ func TestHTTPLoggerMiddleware(t *testing.T) {
 
 	t.Run("should log requests with query parameters", func(t *testing.T) {
 		app := fiber.New()
-		app.Use(middleware.HTTPLogger())
+		app.Use(middleware.AppLogger(slog.Default))
 
 		app.Get("/log", func(c *fiber.Ctx) error {
 			return c.SendString("Logged request with query parameters")

@@ -5,12 +5,14 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn func(*entities.TreeCluster) (bool, error)) error {
+	log := logger.GetLogger(ctx)
 	return r.store.WithTx(ctx, func(s *store.Store) error {
 		oldStore := r.store
 		defer func() {
@@ -36,11 +38,17 @@ func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn f
 			return nil
 		}
 
-		return r.updateEntity(ctx, tc)
+		if err := r.updateEntity(ctx, tc); err != nil {
+			log.Error("failed to update tree cluster entity in db", "error", err, "cluster_id", id)
+		}
+
+		log.Debug("tree cluster updated successfully in db", "cluster_id", id)
+		return nil
 	})
 }
 
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {
+	log := logger.GetLogger(ctx)
 	var regionID *int32
 	if tc.Region != nil {
 		regionID = &tc.Region.ID
@@ -58,7 +66,9 @@ func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.T
 		Name:           tc.Name,
 	}
 
-	if err := r.store.UnlinkTreeClusterID(ctx, &tc.ID); err != nil {
+	_, err := r.store.UnlinkTreeClusterID(ctx, &tc.ID)
+	if err != nil {
+		log.Error("failed to unlink tree cluster from trees", "error", err, "cluster_id", tc.ID)
 		return err
 	}
 

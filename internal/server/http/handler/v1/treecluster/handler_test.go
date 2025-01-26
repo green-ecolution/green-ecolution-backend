@@ -12,8 +12,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -152,7 +152,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		mockClusterService.EXPECT().GetByID(
 			mock.Anything,
 			int32(999),
-		).Return(nil, storage.ErrTreeClusterNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster/999", nil)
@@ -346,7 +346,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 			mock.Anything,
 			int32(1),
 			mock.Anything,
-		).Return(nil, storage.ErrTreeClusterNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		body, _ := json.Marshal(TestClusterRequest)
@@ -433,7 +433,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 		mockClusterService.EXPECT().Delete(
 			mock.Anything,
 			int32(clusterID),
-		).Return(storage.ErrTreeClusterNotFound)
+		).Return(service.NewError(service.NotFound, "not found"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/"+strconv.Itoa(clusterID), nil)

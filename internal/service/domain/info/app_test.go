@@ -2,6 +2,7 @@ package info
 
 import (
 	"context"
+	"log/slog"
 	"net"
 	"net/url"
 	"testing"
@@ -13,6 +14,8 @@ import (
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/stretchr/testify/assert"
 )
+
+var rootCtx = context.WithValue(context.Background(), "logger", slog.Default())
 
 func TestNewInfoService(t *testing.T) {
 	repo := storageMock.NewMockInfoRepository(t)
@@ -37,9 +40,9 @@ func TestGetAppInfo(t *testing.T) {
 		for k, v := range tests {
 			// when
 			repo.EXPECT().
-				GetAppInfo(context.Background()).
+				GetAppInfo(rootCtx).
 				Return(nil, k)
-			appInfo, err := svc.GetAppInfo(context.Background())
+			appInfo, err := svc.GetAppInfo(rootCtx)
 
 			// then
 			assert.Nil(t, appInfo)
@@ -113,8 +116,8 @@ func TestGetAppInfo(t *testing.T) {
 		}
 
 		// when
-		repo.EXPECT().GetAppInfo(context.Background()).Return(&givenAppInfo, nil)
-		appInfo, err := svc.GetAppInfo(context.Background())
+		repo.EXPECT().GetAppInfo(rootCtx).Return(&givenAppInfo, nil)
+		appInfo, err := svc.GetAppInfo(rootCtx)
 
 		// then
 		assert.NoError(t, err)

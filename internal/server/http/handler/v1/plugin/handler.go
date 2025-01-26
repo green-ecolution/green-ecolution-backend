@@ -17,8 +17,9 @@ import (
 
 func getPluginFiles(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
 		pluginParam := strings.Clone(c.Params("plugin"))
-		plugin, err := svc.Get(pluginParam)
+		plugin, err := svc.Get(ctx, pluginParam)
 		if err != nil {
 			return err
 		}
@@ -114,8 +115,9 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 // @Security		Keycloak
 func pluginHeartbeat(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
 		slug := strings.Clone(c.Params("plugin"))
-		if err := svc.HeartBeat(slug); err != nil {
+		if err := svc.HeartBeat(ctx, slug); err != nil {
 			slog.Error("Failed to heartbeat", "plugin", slug, "error", err)
 			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 		}
@@ -139,7 +141,8 @@ func pluginHeartbeat(svc service.PluginService) fiber.Handler {
 // @Security		Keycloak
 func GetPluginsList(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		p, h := svc.GetAll()
+		ctx := c.Context()
+		p, h := svc.GetAll(ctx)
 		log.Println(h)
 		plugins := utils.Map(p, func(plugin domain.Plugin) entities.PluginResponse {
 			return entities.PluginResponse{
@@ -173,8 +176,9 @@ func GetPluginsList(svc service.PluginService) fiber.Handler {
 // @Security		Keycloak
 func GetPluginInfo(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
 		pluginParam := strings.Clone(c.Params("plugin"))
-		plugin, err := svc.Get(pluginParam)
+		plugin, err := svc.Get(ctx, pluginParam)
 		if err != nil {
 			return c.Status(fiber.StatusNotFound).SendString("plugin not found")
 		}

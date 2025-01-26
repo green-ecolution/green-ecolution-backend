@@ -41,8 +41,11 @@ func (s *Server) Run(ctx context.Context) error {
 	app.Mount("/", s.middleware())
 
 	go func() {
+		slog.Info("starting plugin cleanup service: cleaning up unhealthy plugins")
 		err := s.services.PluginService.StartCleanup(ctx)
-		slog.Error("Error while running plugin cleanup", "error", err)
+		if err != nil {
+			slog.Error("error while running plugin cleanup", "error", err)
+		}
 	}()
 
 	go func() {
@@ -51,12 +54,13 @@ func (s *Server) Run(ctx context.Context) error {
 
 	go func() {
 		<-ctx.Done()
-		fmt.Println("Shutting down HTTP Server")
+		slog.Info("shutting down http server")
 		if err := app.Shutdown(); err != nil {
-			fmt.Println("Error while shutting down HTTP Server:", err)
+			slog.Error("error while shutting down http server", "error", err, "service", "fiber")
 		}
 	}()
 
+	slog.Info("starting server", "url", s.cfg.Server.AppURL, "port", s.cfg.Server.Port, "service", "fiber")
 	return app.Listen(fmt.Sprintf(":%d", s.cfg.Server.Port))
 }
 

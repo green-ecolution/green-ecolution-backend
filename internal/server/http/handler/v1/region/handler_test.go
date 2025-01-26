@@ -10,8 +10,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -167,7 +167,7 @@ func TestGetRegionByID(t *testing.T) {
 		mockRegionService.EXPECT().GetByID(
 			mock.Anything,
 			int32(1),
-		).Return(nil, storage.ErrRegionNotFound)
+		).Return(nil, service.NewError(service.NotFound, "region not found"))
 
 		app.Get("/v1/region/:id", handler)
 

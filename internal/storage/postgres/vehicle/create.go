@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
@@ -26,6 +27,7 @@ func defaultVehicle() *entities.Vehicle {
 }
 
 func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.Vehicle) (bool, error)) (*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
 	}
@@ -65,7 +67,12 @@ func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.
 	})
 
 	if err != nil {
+		log.Error("failed to create vehicle entity in db", "error", err)
 		return nil, err
+	}
+
+	if createdVh != nil {
+		log.Debug("vehicle entity created successfully in db", "vehicle_id", createdVh.ID)
 	}
 
 	return createdVh, nil
@@ -88,7 +95,7 @@ func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.V
 
 	id, err := r.store.CreateVehicle(ctx, &args)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	return &id, nil

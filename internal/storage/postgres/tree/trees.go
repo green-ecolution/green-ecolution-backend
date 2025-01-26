@@ -2,13 +2,14 @@ package tree
 
 import (
 	"context"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	imgMapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
-	"github.com/pkg/errors"
 )
 
 type TreeRepository struct {
@@ -111,9 +112,10 @@ func WithWateringStatus(wateringStatus entities.WateringStatus) entities.EntityF
 }
 
 func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	images, err := r.GetAllImagesByID(ctx, id)
 	if err != nil {
-		return r.store.HandleError(errors.Wrap(err, "failed to get images"))
+		return err
 	}
 
 	for _, img := range images {
@@ -123,25 +125,29 @@ func (r *TreeRepository) Delete(ctx context.Context, id int32) error {
 		}
 		_, err = r.store.UnlinkTreeImage(ctx, &args)
 		if err != nil {
-			return r.store.HandleError(errors.Wrap(err, "failed to unlink image"))
+			log.Debug("failed to unlink image of tree in db", "error", err, "tree_id", id, "image_id", img.ID)
+			return err
 		}
 
-		if err = r.store.DeleteImage(ctx, img.ID); err != nil {
-			return r.store.HandleError(errors.Wrap(err, "failed to delete image"))
+		if err := r.store.DeleteImage(ctx, img.ID); err != nil {
+			log.Debug("failed to delete image of tree in db", "error", err, "tree_id", id, "image_id", img.ID)
+			return err
 		}
 	}
 
 	_, err = r.store.DeleteTree(ctx, id)
 	if err != nil {
+		log.Debug("failed to delete tree in db", "error", err, "tree_id", id)
 		return err
 	}
 
+	log.Debug("tree entity deleted successfully in db", "tree_id", id)
 	return nil
 }
 
 func (r *TreeRepository) DeleteAndUnlinkImages(ctx context.Context, id int32) error {
 	if err := r.UnlinkAllImages(ctx, id); err != nil {
-		return r.store.HandleError(errors.Wrap(err, "failed to unlink images"))
+		return err
 	}
 
 	return r.Delete(ctx, id)
@@ -161,11 +167,20 @@ func (r *TreeRepository) UnlinkAllImages(ctx context.Context, treeID int32) erro
 }
 
 func (r *TreeRepository) UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error {
+	log := logger.GetLogger(ctx)
+
 	_, err := r.store.GetTreeClusterByID(ctx, treeClusterID)
 	if err != nil {
 		return err
 	}
-	return r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
+	unlinkTreeIDs, err := r.store.UnlinkTreeClusterID(ctx, &treeClusterID)
+	if err != nil {
+		log.Error("failed to unlink tree cluster from trees", "error", err, "cluster_id", treeClusterID)
+	}
+
+	log.Info("unlink trees from following tree cluster", "cluster_id", treeClusterID, "unlinked_trees", unlinkTreeIDs)
+
+	return nil
 }
 
 func (r *TreeRepository) UnlinkSensorID(ctx context.Context, sensorID string) error {

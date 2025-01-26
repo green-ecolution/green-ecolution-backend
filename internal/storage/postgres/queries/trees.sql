@@ -78,8 +78,8 @@ WHERE id = $1;
 -- name: DeleteTree :one
 DELETE FROM trees WHERE id = $1 RETURNING id;
 
--- name: UnlinkTreeClusterID :exec
-UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
+-- name: UnlinkTreeClusterID :many
+UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1 RETURNING id;
 
 -- name: UnlinkSensorIDFromTrees :exec
 UPDATE trees SET sensor_id = NULL WHERE sensor_id = $1;
