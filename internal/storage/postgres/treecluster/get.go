@@ -11,22 +11,26 @@ import (
 	"github.com/twpayne/go-geos"
 )
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, error) {
+func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllTreeClusters(ctx)
+	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
+		Limit: limit,
+		Offset: (page - 1) * limit,
+	})
+
 	if err != nil {
 		log.Debug("failed to get tree clusters in db")
-		return nil, r.store.MapError(err, sqlc.TreeCluster{})
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
 	data := r.mapper.FromSqlList(rows)
 	for _, tc := range data {
 		if err := r.store.MapClusterFields(ctx, tc); err != nil {
-			return nil, r.store.MapError(err, sqlc.TreeCluster{})
+			return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 		}
 	}
 
-	return data, nil
+	return data, totalCount, nil
 }
 
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {

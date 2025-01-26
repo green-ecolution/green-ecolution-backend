@@ -28,26 +28,49 @@ var (
 // @Router			/v1/cluster [get]
 // @Param			page	query	string	false	"Page"
 // @Param			limit	query	string	false	"Limit"
-// @Param			status	query	string	false	"Status"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
+    return func(c *fiber.Ctx) error {
+        ctx := c.Context()
 
-		data := make([]*entities.TreeClusterInListResponse, len(domainData))
-		for i, domain := range domainData {
-			data[i] = treeClusterMapper.FromInListResponse(domain)
-		}
+        page, err := strconv.Atoi(c.Query("page", "1"))
+        if err != nil || page < 1 {
+            page = 1
+        }
 
-		return c.JSON(entities.TreeClusterListResponse{
-			Data:       data,
-			Pagination: &entities.Pagination{}, // TODO: Handle pagination
-		})
-	}
+        limit, err := strconv.Atoi(c.Query("limit", "10"))
+        if err != nil || limit == 0 {
+            limit = 10
+        }
+
+        domainData, totalCount, err := svc.GetAll(ctx, int32(page), int32(limit))
+        if err != nil {
+            return errorhandler.HandleError(err)
+        }
+
+        data := make([]*entities.TreeClusterInListResponse, len(domainData))
+        for i, domain := range domainData {
+            data[i] = treeClusterMapper.FromInListResponse(domain)
+        }
+
+        var pagination *entities.Pagination
+        if limit != -1 {
+			totalPages, prevPage, nextPage := entities.CalculatePagination(int32(totalCount), int32(limit), int32(page))
+
+            pagination = &entities.Pagination{
+                Total:       totalCount,
+                CurrentPage: int32(page),
+                TotalPages:  totalPages,
+                NextPage:    nextPage,
+                PrevPage:    prevPage,
+            }
+        }
+
+        return c.JSON(entities.TreeClusterListResponse{
+            Data:       data,
+            Pagination: pagination,
+        })
+    }
 }
 
 // @Summary		Get tree cluster by ID

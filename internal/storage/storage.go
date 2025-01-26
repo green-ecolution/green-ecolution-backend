@@ -125,7 +125,7 @@ type WateringPlanRepository interface {
 
 type TreeClusterRepository interface {
 	// GetAll returns all tree clusters
-	GetAll(ctx context.Context) ([]*entities.TreeCluster, error)
+	GetAll(ctx context.Context, page, limit int32) ([]*entities.TreeCluster, int64, error)
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids

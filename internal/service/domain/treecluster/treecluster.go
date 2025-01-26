@@ -38,15 +38,14 @@ func NewTreeClusterService(
 	}
 }
 
-func (s *TreeClusterService) GetAll(ctx context.Context) ([]*domain.TreeCluster, error) {
+func (s *TreeClusterService) GetAll(ctx context.Context) ([]*domain.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
-	treeClusters, err := s.treeClusterRepo.GetAll(ctx)
+	treeClusters, totalCount, err := s.treeClusterRepo.GetAll(ctx)
 	if err != nil {
 		log.Debug("failed to fetch tree clsuters", "error", err)
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
-
-	return treeClusters, nil
+	return treeClusters, totalCount, nil
 }
 
 func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error) {
