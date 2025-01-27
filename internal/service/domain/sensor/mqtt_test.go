@@ -40,11 +40,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		}
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.Device).Return(TestSensor, nil)
-		sensorRepo.EXPECT().Update(context.Background(),
-			TestSensor.ID,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything).Return(TestSensor, nil)
+		sensorRepo.EXPECT().Update(context.Background(), TestSensor.ID, mock.Anything).Return(TestSensor, nil)
 		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.Device).Return(nil)
 		sensorRepo.EXPECT().GetLatestSensorDataBySensorID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil)
 
@@ -74,12 +70,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		testPayload := TestListMQTTPayload[0]
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayload.Device).Return(TestSensor, nil)
-		sensorRepo.EXPECT().Update(context.Background(),
-			TestSensor.ID,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything).
-			Return(nil, errors.New("update error"))
+		sensorRepo.EXPECT().Update(context.Background(), TestSensor.ID, mock.Anything).Return(nil, errors.New("update error"))
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayload)
@@ -103,12 +94,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		}
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.Device).Return(nil, nil).Once()
-		sensorRepo.EXPECT().Create(context.Background(),
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything).
-			Return(TestSensor, nil).Once()
+		sensorRepo.EXPECT().Create(context.Background(), mock.Anything).Return(TestSensor, nil).Once()
 		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, TestSensor.ID).Return(nil).Once()
 		sensorRepo.EXPECT().GetLatestSensorDataBySensorID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil).Once()
 		sensorRepo.EXPECT().GetByID(context.Background(), TestSensor.ID).Return(TestSensor, nil).Once()
@@ -139,12 +125,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		testPayload := TestListMQTTPayload[0]
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayload.Device).Return(nil, nil)
-		sensorRepo.EXPECT().Create(context.Background(),
-			mock.Anything,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything).
-			Return(nil, errors.New("create error"))
+		sensorRepo.EXPECT().Create(context.Background(), mock.Anything).Return(nil, errors.New("create error"))
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayload)
@@ -215,11 +196,7 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		}
 
 		sensorRepo.EXPECT().GetByID(context.Background(), testPayLoad.Device).Return(TestSensor, nil)
-		sensorRepo.EXPECT().Update(context.Background(),
-			TestSensor.ID,
-			mock.Anything,
-			mock.Anything,
-			mock.Anything).Return(TestSensor, nil)
+		sensorRepo.EXPECT().Update(context.Background(), TestSensor.ID, mock.Anything).Return(TestSensor, nil)
 		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.Device).Return(errors.New("insert error"))
 
 		// when

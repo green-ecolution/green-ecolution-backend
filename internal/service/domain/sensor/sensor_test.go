@@ -103,11 +103,7 @@ func TestSensorService_Create(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
-		sensorRepo.EXPECT().Create(
-			context.Background(),
-			mock.Anything,
-			mock.Anything,
-		).Return(TestSensor, nil)
+		sensorRepo.EXPECT().Create(context.Background(), mock.Anything).Return(TestSensor, nil)
 
 		// when
 		result, err := svc.Create(context.Background(), newSensor)
@@ -126,11 +122,7 @@ func TestSensorService_Create(t *testing.T) {
 
 		newSensor.LatestData = &entities.SensorData{}
 
-		sensorRepo.EXPECT().Create(
-			context.Background(),
-			mock.Anything,
-			mock.Anything,
-		).Return(TestSensor, nil)
+		sensorRepo.EXPECT().Create(context.Background(), mock.Anything).Return(TestSensor, nil)
 
 		// when
 		result, err := svc.Create(context.Background(), newSensor)
@@ -211,11 +203,7 @@ func TestSensorService_Create(t *testing.T) {
 		newSensor.Latitude = 9.446741
 		newSensor.Longitude = 54.801539
 
-		sensorRepo.EXPECT().Create(
-			context.Background(),
-			mock.Anything,
-			mock.Anything,
-		).Return(nil, expectedErr)
+		sensorRepo.EXPECT().Create(context.Background(), mock.Anything).Return(nil, expectedErr)
 
 		// when
 		result, err := svc.Create(context.Background(), newSensor)
@@ -245,12 +233,7 @@ func TestSensorService_Update(t *testing.T) {
 
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
-		sensorRepo.EXPECT().Update(
-			context.Background(),
-			id,
-			mock.Anything,
-			mock.Anything,
-		).Return(TestSensor, nil)
+		sensorRepo.EXPECT().Update(context.Background(), id, mock.Anything).Return(TestSensor, nil)
 
 		// when
 		result, err := svc.Update(context.Background(), id, updateSensor)
@@ -291,12 +274,7 @@ func TestSensorService_Update(t *testing.T) {
 
 		sensorRepo.EXPECT().GetByID(context.Background(), id).Return(TestSensor, nil)
 
-		sensorRepo.EXPECT().Update(
-			context.Background(),
-			id,
-			mock.Anything,
-			mock.Anything,
-		).Return(nil, expectedErr)
+		sensorRepo.EXPECT().Update(context.Background(), id, mock.Anything).Return(nil, expectedErr)
 
 		// when
 		result, err := svc.Update(context.Background(), id, updateSensor)

@@ -7,7 +7,6 @@ import (
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
-	storageSensor "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
 )
 
 func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttPayload) (*domain.SensorData, error) {
@@ -48,11 +47,13 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		sensor = updatedSensor
 	} else {
 		log.Info("a new sensor has joined the party! creating sensor record", "sensor_id", payload.Device, "sensor_latitude", payload.Latitude, "sensor_longitude", payload.Longitude)
-		createdSensor, err := s.sensorRepo.Create(ctx, storageSensor.WithSensorID(payload.Device),
-			storageSensor.WithLatitude(payload.Latitude),
-			storageSensor.WithLongitude(payload.Longitude),
-			storageSensor.WithStatus(domain.SensorStatusOnline),
-		)
+		createdSensor, err := s.sensorRepo.Create(ctx, func(s *domain.Sensor) (bool, error) {
+			s.ID = payload.Device
+			s.Latitude = payload.Latitude
+			s.Longitude = payload.Longitude
+			s.Status = domain.SensorStatusOnline
+			return true, nil
+		})
 		if err != nil {
 			log.Error("failed to update sensor", "error", err)
 			return nil, err
@@ -82,12 +83,12 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 func (s *SensorService) updateSensorCoordsAndStatus(ctx context.Context, payload *domain.MqttPayload, sensor *domain.Sensor) (*domain.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	if sensor.Latitude != payload.Latitude || sensor.Longitude != payload.Longitude || sensor.Status != domain.SensorStatusOnline {
-		updatedSensor, err := s.sensorRepo.Update(
-			ctx,
-			sensor.ID,
-			storageSensor.WithLatitude(payload.Latitude),
-			storageSensor.WithLongitude(payload.Longitude),
-			storageSensor.WithStatus(domain.SensorStatusOnline))
+		updatedSensor, err := s.sensorRepo.Update(ctx, sensor.ID, func(s *domain.Sensor) (bool, error) {
+			s.Latitude = payload.Latitude
+			s.Longitude = payload.Longitude
+			s.Status = domain.SensorStatusOnline
+			return true, nil
+		})
 		if err != nil {
 			return nil, err
 		}

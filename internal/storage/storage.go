@@ -167,8 +167,8 @@ type TreeRepository interface {
 type SensorRepository interface {
 	GetAll(ctx context.Context) ([]*entities.Sensor, error)
 	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
-	Create(ctx context.Context, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
-	Update(ctx context.Context, id string, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
+	Create(ctx context.Context, createFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
+	Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
 	Delete(ctx context.Context, id string) error
 
 	GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error)
