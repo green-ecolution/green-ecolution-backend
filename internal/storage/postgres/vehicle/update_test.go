@@ -17,7 +17,7 @@ func TestVehicleRepository_UpdateSuite(t *testing.T) {
 		WaterCapacity:  10000,
 		Type:           entities.VehicleTypeTransporter,
 		Status:         entities.VehicleStatusAvailable,
-		DrivingLicense: entities.DrivingLicenseCar,
+		DrivingLicense: entities.DrivingLicenseB,
 		Height:         2.75,
 		Length:         6.0,
 		Width:          5.0,

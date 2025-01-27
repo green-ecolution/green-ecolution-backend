@@ -158,8 +158,8 @@ func keyCloakUserToUser(ctx context.Context, user *gocloak.User) (*entities.User
 		return nil, err
 	}
 
-	var phoneNumber, employeeID, drivingLicenseClass, status string
-	var userRoles []string
+	var phoneNumber, employeeID, status string
+	var userRoles, drivingLicenses []string
 	if user.Attributes != nil {
 		if val, ok := (*user.Attributes)["phone_number"]; ok && len(val) > 0 {
 			phoneNumber = val[0]
@@ -169,8 +169,8 @@ func keyCloakUserToUser(ctx context.Context, user *gocloak.User) (*entities.User
 			employeeID = val[0]
 		}
 
-		if val, ok := (*user.Attributes)["driving_license_class"]; ok && len(val) > 0 {
-			drivingLicenseClass = val[0]
+		if val, ok := (*user.Attributes)["driving_licenses"]; ok && len(val) > 0 {
+			drivingLicenses = val
 		}
 
 		if val, ok := (*user.Attributes)["user_roles"]; ok && len(val) > 0 {
@@ -183,34 +183,49 @@ func keyCloakUserToUser(ctx context.Context, user *gocloak.User) (*entities.User
 	}
 
 	roles := convertRoles(userRoles)
+	lisences := convertDrivingLicenses(drivingLicenses)
 
 	const millisecondsInSecond = 1000
 	return &entities.User{
-		ID:             userID,
-		CreatedAt:      time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
-		Username:       *user.Username,
-		FirstName:      *user.FirstName,
-		LastName:       *user.LastName,
-		Email:          *user.Email,
-		PhoneNumber:    phoneNumber,
-		EmployeeID:     employeeID,
-		Roles:          roles,
-		DrivingLicense: entities.DrivingLicense(drivingLicenseClass),
-		Status:         entities.ParseUserStatus(status),
+		ID:              userID,
+		CreatedAt:       time.Unix(*user.CreatedTimestamp/millisecondsInSecond, 0),
+		Username:        *user.Username,
+		FirstName:       *user.FirstName,
+		LastName:        *user.LastName,
+		Email:           *user.Email,
+		PhoneNumber:     phoneNumber,
+		EmployeeID:      employeeID,
+		Roles:           roles,
+		DrivingLicenses: lisences,
+		Status:          entities.ParseUserStatus(status),
 	}, nil
 }
 
-func convertRoles(userRoles []string) []entities.Role {
-	var roles []entities.Role
+func convertRoles(userRoles []string) []entities.UserRole {
+	if userRoles == nil {
+		return []entities.UserRole{}
+	}
+
+	var roles []entities.UserRole
 	for _, roleName := range userRoles {
-		var userRole entities.Role
-		userRole.SetName(roleName)
+		userRole := entities.ParseUserRole(roleName)
 		roles = append(roles, userRole)
 	}
-	if roles == nil {
-		roles = []entities.Role{}
-	}
 	return roles
+}
+
+func convertDrivingLicenses(drivingLicenses []string) []entities.DrivingLicense {
+	if drivingLicenses == nil {
+		return []entities.DrivingLicense{}
+	}
+
+	var licenses []entities.DrivingLicense
+	for _, drivingLicense := range drivingLicenses {
+		license := entities.ParseDrivingLicense(drivingLicense)
+		licenses = append(licenses, license)
+	}
+
+	return licenses
 }
 
 func validateRequiredAttributes(user *gocloak.User) error {

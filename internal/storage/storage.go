@@ -33,7 +33,10 @@ var (
 	ErrTreeNotFound         = errors.New("tree not found")
 	ErrVehicleNotFound      = errors.New("vehicle not found")
 	ErrWateringPlanNotFound = errors.New("watering plan not found")
-	ErrUserNotFound         = errors.New("user not found")
+
+	ErrUserNotFound           = errors.New("user not found")
+	ErrUserNotCorrectRole     = errors.New("user has an incorrect role")
+	ErrUserNotMatchingLicense = errors.New("user has no matching driving license")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")
@@ -76,10 +79,6 @@ type UserRepository interface {
 	RemoveSession(ctx context.Context, token string) error
 	GetAll(ctx context.Context) ([]*entities.User, error)
 	GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error)
-}
-
-type RoleRepository interface {
-	GetByName(ctx context.Context, name string) (*entities.Role, error)
 }
 
 type ImageRepository interface {
@@ -217,7 +216,6 @@ type Repository struct {
 	Sensor       SensorRepository
 	Tree         TreeRepository
 	User         UserRepository
-	Role         RoleRepository
 	Image        ImageRepository
 	Vehicle      VehicleRepository
 	TreeCluster  TreeClusterRepository

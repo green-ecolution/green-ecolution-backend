@@ -172,9 +172,10 @@ func TestMapDrivingLicense(t *testing.T) {
 		input    sqlc.DrivingLicense
 		expected entities.DrivingLicense
 	}{
-		{input: sqlc.DrivingLicenseB, expected: entities.DrivingLicenseCar},
-		{input: sqlc.DrivingLicenseBE, expected: entities.DrivingLicenseTrailer},
-		{input: sqlc.DrivingLicenseC, expected: entities.DrivingLicenseTransporter},
+		{input: sqlc.DrivingLicenseB, expected: entities.DrivingLicenseB},
+		{input: sqlc.DrivingLicenseBE, expected: entities.DrivingLicenseBE},
+		{input: sqlc.DrivingLicenseC, expected: entities.DrivingLicenseC},
+		{input: sqlc.DrivingLicenseCE, expected: entities.DrivingLicenseCE},
 	}
 
 	for _, test := range tests {

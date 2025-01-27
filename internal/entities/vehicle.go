@@ -45,7 +45,7 @@ type VehicleCreate struct {
 	Status         VehicleStatus  `validate:"oneof=active available 'not available' unknown"`
 	Type           VehicleType    `validate:"oneof=transporter trailer unknown"`
 	Model          string         `validate:"required"`
-	DrivingLicense DrivingLicense `validate:"oneof=B BE C"`
+	DrivingLicense DrivingLicense `validate:"oneof=B BE C CE"`
 	Height         float64        `validate:"gt=0"`
 	Width          float64        `validate:"gt=0"`
 	Length         float64        `validate:"gt=0"`
@@ -59,9 +59,20 @@ type VehicleUpdate struct {
 	Status         VehicleStatus  `validate:"oneof=active available 'not available' unknown"`
 	Type           VehicleType    `validate:"oneof=transporter trailer unknown"`
 	Model          string         `validate:"required"`
-	DrivingLicense DrivingLicense `validate:"oneof=B BE C"`
+	DrivingLicense DrivingLicense `validate:"oneof=B BE C CE"`
 	Height         float64        `validate:"gt=0"`
 	Width          float64        `validate:"gt=0"`
 	Length         float64        `validate:"gt=0"`
 	Weight         float64        `validate:"gt=0"`
+}
+
+func ParseVehicleType(vehicleTypeStr string) VehicleType {
+	switch vehicleTypeStr {
+	case string(VehicleTypeTrailer):
+		return VehicleTypeTrailer
+	case string(VehicleTypeTransporter):
+		return VehicleTypeTransporter
+	default:
+		return VehicleTypeUnknown
+	}
 }

@@ -131,27 +131,29 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
-	// TODO: validate driver license
-	if err := w.validateUserIDs(ctx, createWp.UserIDs); err != nil {
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
-	}
-
 	treeClusters, err := w.fetchTreeClusters(ctx, createWp.TreeClusterIDs)
 	if err != nil {
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	transporter, err := w.fetchVehicle(ctx, *createWp.TransporterID)
+	transporter, err := w.vehicleRepo.GetByID(ctx, *createWp.TransporterID)
 	if err != nil {
+		log.Debug("failed to get transporter by id", "error", err, "transporter_id", *createWp.TransporterID)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	var trailer *entities.Vehicle
 	if createWp.TrailerID != nil {
-		trailer, err = w.fetchVehicle(ctx, *createWp.TrailerID)
+		trailer, err = w.vehicleRepo.GetByID(ctx, *createWp.TrailerID)
 		if err != nil {
-			log.Warn("failed to get trailer by id. will continue without trailer", "error", err)
+			log.Debug("failed to get trailer by id", "error", err, "trailer_id", *createWp.TrailerID)
+			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
+	}
+
+	if err := w.validateUsers(ctx, createWp.UserIDs, transporter, trailer); err != nil {
+		log.Warn("selected user are not allowed to use this transporter and/or trailer", "error", err, "user_ids", createWp.UserIDs, "transporter_id", createWp.TransporterID, "trailer_id", createWp.TrailerID)
+		return nil, err // err is already a service error
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
@@ -182,7 +184,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 
 		metadata, err := w.routingRepo.GenerateRouteInformation(ctx, mergedVehicle, treeClusters)
 		if err != nil {
-			log.Warn("generating route information failed. will not route metadata", "error", err, "watering_plan_id", created.ID)
+			log.Warn("generating route information failed. will not save route metadata", "error", err, "watering_plan_id", created.ID)
 		} else {
 			wp.Distance = utils.P(metadata.Distance)
 			wp.Duration = metadata.Time
@@ -253,26 +255,28 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, err
 	}
 
-	if err := w.validateUserIDs(ctx, updateWp.UserIDs); err != nil {
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
-	}
-
 	treeClusters, err := w.fetchTreeClusters(ctx, updateWp.TreeClusterIDs)
 	if err != nil {
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	transporter, err := w.fetchVehicle(ctx, *updateWp.TransporterID)
+	transporter, err := w.vehicleRepo.GetByID(ctx, *updateWp.TransporterID)
 	if err != nil {
+		log.Debug("failed to get transporter by provided id", "error", err, "transporter_id", updateWp.TransporterID)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	var trailer *entities.Vehicle
 	if updateWp.TrailerID != nil {
-		trailer, err = w.fetchVehicle(ctx, *updateWp.TrailerID)
+		trailer, err = w.vehicleRepo.GetByID(ctx, *updateWp.TrailerID)
 		if err != nil {
-			log.Warn("failed to get trailer by id. will continue without trailer", "error", err)
+			log.Warn("failed to get trailer by provided id", "error", err, "trailer_id", updateWp.TrailerID)
+			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
+	}
+
+	if err := w.validateUsers(ctx, updateWp.UserIDs, transporter, trailer); err != nil {
+		return nil, err
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
@@ -367,57 +371,89 @@ func (w *WateringPlanService) shouldUpdateGpx(prevWp, newWp *entities.WateringPl
 	return false
 }
 
-func (w *WateringPlanService) fetchVehicle(ctx context.Context, vehicleID int32) (*entities.Vehicle, error) {
-	log := logger.GetLogger(ctx)
-	vehicle, err := w.vehicleRepo.GetByID(ctx, vehicleID)
-	if err != nil {
-		log.Debug("failed to fetch vehicle by provided id", "error", err, "vehicle_id", vehicleID)
-		return nil, storage.ErrEntityNotFound("vehicle not found")
-	}
-
-	return vehicle, nil
-}
-
+// returns service error
 func (w *WateringPlanService) fetchTreeClusters(ctx context.Context, treeClusterIDs []*int32) ([]*entities.TreeCluster, error) {
 	log := logger.GetLogger(ctx)
-	clusters, err := w.getTreeClusters(ctx, treeClusterIDs)
+	clusters, err := w.clusterRepo.GetByIDs(ctx, utils.Map(treeClusterIDs, func(cID *int32) int32 {
+		return *cID
+	}))
 	if err != nil {
 		log.Debug("failed to fetch tree cluster specified by requested ids", "cluster_ids", treeClusterIDs, "error", err)
 		return nil, err
 	}
+
 	if len(clusters) == 0 {
 		log.Debug("requested tree cluster ids in watering plan are not found", "cluster_ids", treeClusterIDs, "error", err)
-		return nil, storage.ErrEntityNotFound("treecluster not found")
+		return nil, storage.ErrEntityNotFound("treecluster")
 	}
 
 	return clusters, nil
 }
 
-func (w *WateringPlanService) getTreeClusters(ctx context.Context, ids []*int32) ([]*entities.TreeCluster, error) {
-	clusterIDs := make([]int32, len(ids))
-	for i, id := range ids {
-		clusterIDs[i] = *id
+// returns service error
+func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid.UUID, transporter, trailer *entities.Vehicle) error {
+	log := logger.GetLogger(ctx)
+	var userIDStrings []string
+	for _, id := range userIDs {
+		if id != nil {
+			userIDStrings = append(userIDStrings, utils.UUIDToString(*id))
+		}
 	}
 
-	return w.clusterRepo.GetByIDs(ctx, clusterIDs)
-}
-
-// Checks if the incoming user ids are belonging to valid users
-func (w *WateringPlanService) validateUserIDs(ctx context.Context, userIDs []*uuid.UUID) error {
-	log := logger.GetLogger(ctx)
-	userIDStr := utils.Map(userIDs, func(id *uuid.UUID) string {
-		return utils.UUIDToString(*id)
-	})
-
-	users, err := w.userRepo.GetByIDs(ctx, userIDStr)
+	// Checks if the incoming user ids are belonging to valid users
+	users, err := w.userRepo.GetByIDs(ctx, userIDStrings)
 	if err != nil {
-		log.Debug("failed to fetch users by id", "error", err, "user_ids", userIDStr)
-		return err
+		log.Debug("failed to fetch users by id", "error", err, "user_ids", userIDStrings)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	if len(users) == 0 {
-		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStr)
-		return storage.ErrEntityNotFound("user not found")
+		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStrings)
+		return service.MapError(ctx, storage.ErrEntityNotFound("users"), service.ErrorLogEntityNotFound)
+	}
+
+	// Checks if the users have correct user roles
+	// Only users with the user role »UserRoleTbz« should be linked to a watering plan
+	if !w.validateUserRoles(users) {
+		return service.ErrUserNotCorrectRole
+	}
+
+	// Checks if at least on of the users has a matching driving license
+	if err := w.validateUserDrivingLicenses(users, transporter, trailer); err != nil {
+		return err // err is already a service error
+	}
+
+	return nil
+}
+
+func (w *WateringPlanService) validateUserRoles(users []*entities.User) bool {
+	for _, user := range users {
+		if !containsUserRoleTbz(user.Roles) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// returns service error
+func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User, transporter, trailer *entities.Vehicle) error {
+	var requiredLicenses []entities.DrivingLicense
+
+	if transporter != nil && transporter.DrivingLicense != entities.DrivingLicenseUnknown {
+		requiredLicenses = append(requiredLicenses, transporter.DrivingLicense)
+	}
+
+	if trailer != nil && trailer.DrivingLicense != entities.DrivingLicenseUnknown {
+		requiredLicenses = append(requiredLicenses, trailer.DrivingLicense)
+	}
+
+	for _, user := range users {
+		for _, requiredLicense := range requiredLicenses {
+			if !hasValidLicense(user, requiredLicense) {
+				return service.NewError(service.BadRequest, fmt.Sprintf("user %s does not have the required license %s", user.ID, requiredLicense))
+			}
+		}
 	}
 
 	return nil
@@ -425,7 +461,6 @@ func (w *WateringPlanService) validateUserIDs(ctx context.Context, userIDs []*uu
 
 func (w *WateringPlanService) validateStatusDependentValues(ctx context.Context, entity *entities.WateringPlanUpdate) error {
 	log := logger.GetLogger(ctx)
-
 	// Set cancellation note to nothing if the current status is not fitting
 	if entity.CancellationNote != "" && entity.Status != entities.WateringPlanStatusCanceled {
 		log.Debug("cancellation note can only be set if watering plan is canceled")
@@ -476,4 +511,26 @@ func (w *WateringPlanService) mergeVehicle(transporter, trailer *entities.Vehicl
 		Type:          entities.VehicleTypeTransporter,
 		NumberPlate:   fmt.Sprintf("%s - %s", transporter.NumberPlate, trailer.NumberPlate),
 	}
+}
+
+func containsUserRoleTbz(roles []entities.UserRole) bool {
+	if len(roles) == 0 {
+		return false
+	}
+
+	for _, role := range roles {
+		if role == entities.UserRoleTbz {
+			return true
+		}
+	}
+	return false
+}
+
+func hasValidLicense(user *entities.User, requiredLicense entities.DrivingLicense) bool {
+	for _, userLicense := range user.DrivingLicenses {
+		if userLicense == requiredLicense {
+			return true
+		}
+	}
+	return false
 }

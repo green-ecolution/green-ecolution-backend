@@ -16,7 +16,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		WaterCapacity:  2000,
 		Type:           entities.VehicleTypeTrailer,
 		Status:         entities.VehicleStatusNotAvailable,
-		DrivingLicense: entities.DrivingLicenseTrailer,
+		DrivingLicense: entities.DrivingLicenseBE,
 		Height:         1.5,
 		Length:         2.0,
 		Width:          2.0,
@@ -92,7 +92,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		assert.Equal(t, input.WaterCapacity, got.WaterCapacity)
 		assert.Equal(t, entities.VehicleTypeUnknown, got.Type)
 		assert.Equal(t, entities.VehicleStatusUnknown, got.Status)
-		assert.Equal(t, entities.DrivingLicenseCar, got.DrivingLicense)
+		assert.Equal(t, entities.DrivingLicenseB, got.DrivingLicense)
 		assert.Equal(t, input.Height, got.Height)
 		assert.Equal(t, input.Length, got.Length)
 		assert.Equal(t, input.Width, got.Width)

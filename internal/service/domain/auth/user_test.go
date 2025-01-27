@@ -463,7 +463,7 @@ func TestGetAllByRole(t *testing.T) {
 		uuid01, _ := uuid.NewRandom()
 		uuid02, _ := uuid.NewRandom()
 
-		expectedRole := entities.Role{Name: entities.UserRoleTbz}
+		expectedRole := entities.UserRoleTbz
 		expectedUsers := []*entities.User{
 			{
 				ID:          uuid01,
@@ -472,7 +472,7 @@ func TestGetAllByRole(t *testing.T) {
 				LastName:    "Doe",
 				Email:       "admin1@example.com",
 				PhoneNumber: "+123456789",
-				Roles:       []entities.Role{{Name: entities.UserRoleTbz}},
+				Roles:       []entities.UserRole{entities.UserRoleTbz},
 			},
 			{
 				ID:          uuid02,
@@ -481,7 +481,7 @@ func TestGetAllByRole(t *testing.T) {
 				LastName:    "Smith",
 				Email:       "admin2@example.com",
 				PhoneNumber: "+987654321",
-				Roles:       []entities.Role{{Name: entities.UserRoleTbz}},
+				Roles:       []entities.UserRole{entities.UserRoleTbz},
 			},
 		}
 
@@ -492,7 +492,7 @@ func TestGetAllByRole(t *testing.T) {
 			LastName:    "Johnson",
 			Email:       "user3@example.com",
 			PhoneNumber: "+555555555",
-			Roles:       []entities.Role{{Name: entities.UserRoleGreenEcolution}},
+			Roles:       []entities.UserRole{entities.UserRoleGreenEcolution},
 		})
 
 		userRepo.EXPECT().GetAll(rootCtx).Return(allUsers, nil)
@@ -512,7 +512,7 @@ func TestGetAllByRole(t *testing.T) {
 		identityConfig := &config.IdentityAuthConfig{}
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
-		expectedRole := entities.Role{Name: entities.UserRoleTbz}
+		expectedRole := entities.UserRoleTbz
 		allUsers := []*entities.User{
 			{
 				ID:          uuid.New(),
@@ -521,7 +521,7 @@ func TestGetAllByRole(t *testing.T) {
 				LastName:    "Doe",
 				Email:       "user1@example.com",
 				PhoneNumber: "+123456789",
-				Roles:       []entities.Role{{Name: entities.UserRoleGreenEcolution}},
+				Roles:       []entities.UserRole{entities.UserRoleGreenEcolution},
 			},
 			{
 				ID:          uuid.New(),
@@ -530,7 +530,7 @@ func TestGetAllByRole(t *testing.T) {
 				LastName:    "Smith",
 				Email:       "user2@example.com",
 				PhoneNumber: "+987654321",
-				Roles:       []entities.Role{{Name: entities.UserRoleSmarteGrenzregion}},
+				Roles:       []entities.UserRole{entities.UserRoleSmarteGrenzregion},
 			},
 		}
 
@@ -554,7 +554,7 @@ func TestGetAllByRole(t *testing.T) {
 		userRepo.EXPECT().GetAll(rootCtx).Return(nil, errors.New("repository error"))
 
 		// when
-		users, err := svc.GetAllByRole(rootCtx, entities.Role{Name: entities.UserRoleTbz})
+		users, err := svc.GetAllByRole(rootCtx, entities.UserRoleTbz)
 
 		// then
 		assert.Error(t, err)
