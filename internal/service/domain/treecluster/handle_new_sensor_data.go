@@ -33,10 +33,12 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 
 	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, tree.TreeCluster.ID)
 	if err != nil {
+		log.Error("error while calculating watering status of tree cluster", "error", err)
 		return nil
 	}
 
 	if wateringStatus == tree.TreeCluster.WateringStatus {
+		log.Debug("watering status has not changed", "watering_status", wateringStatus)
 		return nil
 	}
 

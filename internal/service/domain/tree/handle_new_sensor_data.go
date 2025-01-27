@@ -22,6 +22,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 	status := utils.CalculateWateringStatus(ctx, t.PlantingYear, event.New.Data.Watermarks)
 
 	if status == t.WateringStatus {
+		log.Debug("sensor status has not changed", "sensor_status", status)
 		return nil
 	}
 

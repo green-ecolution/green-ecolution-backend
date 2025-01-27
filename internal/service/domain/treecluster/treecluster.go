@@ -234,11 +234,8 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 	log := logger.GetLogger(ctx)
 	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, id)
 	if err != nil {
-		slog.Error("could not update watering status", "error", err)
+		log.Error("could not update watering status", "error", err)
 	}
-
-	fmt.Println("___________WATERINGSTATUS__________")
-	fmt.Println(wateringStatus)
 
 	err = s.treeClusterRepo.Update(ctx, id, func(tc *domain.TreeCluster) (bool, error) {
 		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
