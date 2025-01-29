@@ -64,7 +64,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [get]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Param			cluster_id	path	int	true	"Tree Cluster ID"
 // @Security		Keycloak
 func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -131,7 +131,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [put]
-// @Param			cluster_id	path	string								true	"Tree Cluster ID"
+// @Param			cluster_id	path	int									true	"Tree Cluster ID"
 // @Param			body		body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
 // @Security		Keycloak
 func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
@@ -170,7 +170,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [delete]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Param			cluster_id	path	int	true	"Tree Cluster ID"
 // @Security		Keycloak
 func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

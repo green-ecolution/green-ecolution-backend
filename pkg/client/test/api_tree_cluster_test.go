@@ -38,7 +38,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var clusterId string
+		var clusterId int32
 
 		httpRes, err := apiClient.TreeClusterAPI.DeleteTreeCluster(context.Background(), clusterId).Execute()
 
@@ -63,7 +63,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var clusterId string
+		var clusterId int32
 
 		resp, httpRes, err := apiClient.TreeClusterAPI.GetTreeClusterById(context.Background(), clusterId).Execute()
 
@@ -77,7 +77,7 @@ func Test_client_TreeClusterAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var clusterId string
+		var clusterId int32
 
 		resp, httpRes, err := apiClient.TreeClusterAPI.UpdateTreeCluster(context.Background(), clusterId).Execute()
 

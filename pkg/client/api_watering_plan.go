@@ -193,7 +193,7 @@ func (a *WateringPlanAPIService) CreateWateringPlanExecute(r ApiCreateWateringPl
 type ApiDeleteWateringPlanRequest struct {
 	ctx        context.Context
 	ApiService *WateringPlanAPIService
-	id         string
+	id         int32
 }
 
 func (r ApiDeleteWateringPlanRequest) Execute() (*http.Response, error) {
@@ -209,7 +209,7 @@ Delete watering plan
 	@param id Watering Plan ID
 	@return ApiDeleteWateringPlanRequest
 */
-func (a *WateringPlanAPIService) DeleteWateringPlan(ctx context.Context, id string) ApiDeleteWateringPlanRequest {
+func (a *WateringPlanAPIService) DeleteWateringPlan(ctx context.Context, id int32) ApiDeleteWateringPlanRequest {
 	return ApiDeleteWateringPlanRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -533,7 +533,7 @@ func (a *WateringPlanAPIService) GetAllWateringPlansExecute(r ApiGetAllWateringP
 type ApiGetWateringPlanByIdRequest struct {
 	ctx        context.Context
 	ApiService *WateringPlanAPIService
-	id         string
+	id         int32
 }
 
 func (r ApiGetWateringPlanByIdRequest) Execute() (*WateringPlan, *http.Response, error) {
@@ -549,7 +549,7 @@ Get watering plan by ID
 	@param id Watering Plan ID
 	@return ApiGetWateringPlanByIdRequest
 */
-func (a *WateringPlanAPIService) GetWateringPlanById(ctx context.Context, id string) ApiGetWateringPlanByIdRequest {
+func (a *WateringPlanAPIService) GetWateringPlanById(ctx context.Context, id int32) ApiGetWateringPlanByIdRequest {
 	return ApiGetWateringPlanByIdRequest{
 		ApiService: a,
 		ctx:        ctx,

@@ -38,7 +38,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var treeId string
+		var treeId int32
 
 		httpRes, err := apiClient.TreeAPI.DeleteTree(context.Background(), treeId).Execute()
 
@@ -63,7 +63,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var treeId string
+		var treeId int32
 
 		resp, httpRes, err := apiClient.TreeAPI.GetTrees(context.Background(), treeId).Execute()
 
@@ -77,7 +77,7 @@ func Test_client_TreeAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var treeId string
+		var treeId int32
 
 		resp, httpRes, err := apiClient.TreeAPI.UpdateTree(context.Background(), treeId).Execute()
 

@@ -192,7 +192,7 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 type ApiDeleteTreeClusterRequest struct {
 	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	clusterId  string
+	clusterId  int32
 }
 
 func (r ApiDeleteTreeClusterRequest) Execute() (*http.Response, error) {
@@ -208,7 +208,7 @@ Delete tree cluster
 	@param clusterId Tree Cluster ID
 	@return ApiDeleteTreeClusterRequest
 */
-func (a *TreeClusterAPIService) DeleteTreeCluster(ctx context.Context, clusterId string) ApiDeleteTreeClusterRequest {
+func (a *TreeClusterAPIService) DeleteTreeCluster(ctx context.Context, clusterId int32) ApiDeleteTreeClusterRequest {
 	return ApiDeleteTreeClusterRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -532,7 +532,7 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 type ApiGetTreeClusterByIdRequest struct {
 	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	clusterId  string
+	clusterId  int32
 }
 
 func (r ApiGetTreeClusterByIdRequest) Execute() (*TreeCluster, *http.Response, error) {
@@ -548,7 +548,7 @@ Get tree cluster by ID
 	@param clusterId Tree Cluster ID
 	@return ApiGetTreeClusterByIdRequest
 */
-func (a *TreeClusterAPIService) GetTreeClusterById(ctx context.Context, clusterId string) ApiGetTreeClusterByIdRequest {
+func (a *TreeClusterAPIService) GetTreeClusterById(ctx context.Context, clusterId int32) ApiGetTreeClusterByIdRequest {
 	return ApiGetTreeClusterByIdRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -690,7 +690,7 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 type ApiUpdateTreeClusterRequest struct {
 	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	clusterId  string
+	clusterId  int32
 	body       *TreeClusterUpdate
 }
 
@@ -713,7 +713,7 @@ Update tree cluster
 	@param clusterId Tree Cluster ID
 	@return ApiUpdateTreeClusterRequest
 */
-func (a *TreeClusterAPIService) UpdateTreeCluster(ctx context.Context, clusterId string) ApiUpdateTreeClusterRequest {
+func (a *TreeClusterAPIService) UpdateTreeCluster(ctx context.Context, clusterId int32) ApiUpdateTreeClusterRequest {
 	return ApiUpdateTreeClusterRequest{
 		ApiService: a,
 		ctx:        ctx,

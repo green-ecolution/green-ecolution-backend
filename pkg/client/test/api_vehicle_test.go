@@ -38,7 +38,7 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		httpRes, err := apiClient.VehicleAPI.DeleteVehicle(context.Background(), id).Execute()
 
@@ -63,7 +63,7 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		resp, httpRes, err := apiClient.VehicleAPI.GetVehicleById(context.Background(), id).Execute()
 

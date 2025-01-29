@@ -38,7 +38,7 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		httpRes, err := apiClient.WateringPlanAPI.DeleteWateringPlan(context.Background(), id).Execute()
 
@@ -63,7 +63,7 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		resp, httpRes, err := apiClient.WateringPlanAPI.GetWateringPlanById(context.Background(), id).Execute()
 

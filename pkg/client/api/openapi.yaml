@@ -144,7 +144,7 @@ paths:
         name: cluster_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -193,7 +193,7 @@ paths:
         name: cluster_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -245,7 +245,7 @@ paths:
         name: cluster_id
         required: true
         schema:
-          type: string
+          type: integer
       requestBody:
         content:
           '*/*':
@@ -966,7 +966,7 @@ paths:
         name: tree_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -1015,7 +1015,7 @@ paths:
         name: tree_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -1067,7 +1067,7 @@ paths:
         name: tree_id
         required: true
         schema:
-          type: string
+          type: integer
       requestBody:
         content:
           '*/*':
@@ -1569,7 +1569,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -1618,7 +1618,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -1904,7 +1904,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -1953,7 +1953,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:

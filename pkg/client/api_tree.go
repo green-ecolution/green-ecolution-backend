@@ -192,7 +192,7 @@ func (a *TreeAPIService) CreateTreeExecute(r ApiCreateTreeRequest) (*Tree, *http
 type ApiDeleteTreeRequest struct {
 	ctx        context.Context
 	ApiService *TreeAPIService
-	treeId     string
+	treeId     int32
 }
 
 func (r ApiDeleteTreeRequest) Execute() (*http.Response, error) {
@@ -208,7 +208,7 @@ Delete tree
 	@param treeId Tree ID
 	@return ApiDeleteTreeRequest
 */
-func (a *TreeAPIService) DeleteTree(ctx context.Context, treeId string) ApiDeleteTreeRequest {
+func (a *TreeAPIService) DeleteTree(ctx context.Context, treeId int32) ApiDeleteTreeRequest {
 	return ApiDeleteTreeRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -522,7 +522,7 @@ func (a *TreeAPIService) GetAllTreesExecute(r ApiGetAllTreesRequest) (*TreeList,
 type ApiGetTreesRequest struct {
 	ctx        context.Context
 	ApiService *TreeAPIService
-	treeId     string
+	treeId     int32
 }
 
 func (r ApiGetTreesRequest) Execute() (*Tree, *http.Response, error) {
@@ -538,7 +538,7 @@ Get tree by ID
 	@param treeId Tree ID
 	@return ApiGetTreesRequest
 */
-func (a *TreeAPIService) GetTrees(ctx context.Context, treeId string) ApiGetTreesRequest {
+func (a *TreeAPIService) GetTrees(ctx context.Context, treeId int32) ApiGetTreesRequest {
 	return ApiGetTreesRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -680,7 +680,7 @@ func (a *TreeAPIService) GetTreesExecute(r ApiGetTreesRequest) (*Tree, *http.Res
 type ApiUpdateTreeRequest struct {
 	ctx        context.Context
 	ApiService *TreeAPIService
-	treeId     string
+	treeId     int32
 	body       *TreeUpdate
 }
 
@@ -703,7 +703,7 @@ Update tree
 	@param treeId Tree ID
 	@return ApiUpdateTreeRequest
 */
-func (a *TreeAPIService) UpdateTree(ctx context.Context, treeId string) ApiUpdateTreeRequest {
+func (a *TreeAPIService) UpdateTree(ctx context.Context, treeId int32) ApiUpdateTreeRequest {
 	return ApiUpdateTreeRequest{
 		ApiService: a,
 		ctx:        ctx,

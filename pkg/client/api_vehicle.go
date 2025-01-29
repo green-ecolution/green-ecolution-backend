@@ -192,7 +192,7 @@ func (a *VehicleAPIService) CreateVehicleExecute(r ApiCreateVehicleRequest) (*Ve
 type ApiDeleteVehicleRequest struct {
 	ctx        context.Context
 	ApiService *VehicleAPIService
-	id         string
+	id         int32
 }
 
 func (r ApiDeleteVehicleRequest) Execute() (*http.Response, error) {
@@ -208,7 +208,7 @@ Delete vehicle
 	@param id Vehicle ID
 	@return ApiDeleteVehicleRequest
 */
-func (a *VehicleAPIService) DeleteVehicle(ctx context.Context, id string) ApiDeleteVehicleRequest {
+func (a *VehicleAPIService) DeleteVehicle(ctx context.Context, id int32) ApiDeleteVehicleRequest {
 	return ApiDeleteVehicleRequest{
 		ApiService: a,
 		ctx:        ctx,
@@ -542,7 +542,7 @@ func (a *VehicleAPIService) GetAllVehiclesExecute(r ApiGetAllVehiclesRequest) (*
 type ApiGetVehicleByIdRequest struct {
 	ctx        context.Context
 	ApiService *VehicleAPIService
-	id         string
+	id         int32
 }
 
 func (r ApiGetVehicleByIdRequest) Execute() (*Vehicle, *http.Response, error) {
@@ -558,7 +558,7 @@ Get vehicle by ID
 	@param id Vehicle ID
 	@return ApiGetVehicleByIdRequest
 */
-func (a *VehicleAPIService) GetVehicleById(ctx context.Context, id string) ApiGetVehicleByIdRequest {
+func (a *VehicleAPIService) GetVehicleById(ctx context.Context, id int32) ApiGetVehicleByIdRequest {
 	return ApiGetVehicleByIdRequest{
 		ApiService: a,
 		ctx:        ctx,
