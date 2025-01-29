@@ -82,7 +82,9 @@ DELETE FROM trees WHERE id = $1 RETURNING id;
 UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1 RETURNING id;
 
 -- name: UnlinkSensorIDFromTrees :exec
-UPDATE trees SET sensor_id = NULL WHERE sensor_id = $1;
+UPDATE trees
+SET sensor_id = NULL, watering_status = 'unknown'
+WHERE sensor_id = $1;
 
 -- name: CalculateGroupedCentroids :one
 SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE id = ANY($1::int[]);

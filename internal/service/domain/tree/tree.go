@@ -42,32 +42,6 @@ func NewTreeService(
 	}
 }
 
-func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.EventNewSensorData) error {
-	log := logger.GetLogger(ctx)
-	log.Debug("handle event", "event", event.Type(), "service", "TreeService")
-	t, err := s.treeRepo.GetBySensorID(ctx, event.New.SensorID)
-	if err != nil {
-		log.Error("failed to get tree by sensor id", "sensor_id", event.New.SensorID, "err", err)
-		return nil
-	}
-
-	status := utils.CalculateWateringStatus(ctx, t.PlantingYear, event.New.Data.Watermarks)
-
-	if status == t.WateringStatus {
-		return nil
-	}
-
-	newTree, err := s.treeRepo.Update(ctx, t.ID, tree.WithWateringStatus(status))
-	if err != nil {
-		log.Error("failed to update tree with new watering status", "tree_id", t.ID, "watering_status", status, "err", err)
-	}
-
-	slog.Info("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)
-
-	s.publishUpdateTreeEvent(ctx, t, newTree)
-	return nil
-}
-
 func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
 	trees, err := s.treeRepo.GetAll(ctx)
@@ -146,12 +120,17 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 
 	if treeCreate.SensorID != nil {
-		sensorID, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
+		sensor, err := s.sensorRepo.GetByID(ctx, *treeCreate.SensorID)
 		if err != nil {
 			log.Debug("failed to fetch sensor by id specified in the tree create request", "sensor_id", treeCreate.SensorID)
 			return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 		}
-		fn = append(fn, tree.WithSensor(sensorID))
+		fn = append(fn, tree.WithSensor(sensor))
+
+		if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
+			status := utils.CalculateWateringStatus(ctx, treeCreate.PlantingYear, sensor.LatestData.Data.Watermarks)
+			fn = append(fn, tree.WithWateringStatus(status))
+		}
 	}
 
 	fn = append(fn,
@@ -202,6 +181,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
+	// TODO: Why is this still commented out?
 	// Check if the tree is readonly (imported from csv)
 	// if currentTree.Readonly {
 	// 	return nil, handleError(fmt.Errorf("tree with ID %d is readonly and cannot be updated", id))
@@ -228,8 +208,15 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			return nil, service.MapError(ctx, fmt.Errorf("failed to find Sensor with ID %v: %w", *tu.SensorID, err), service.ErrorLogEntityNotFound)
 		}
 		fn = append(fn, tree.WithSensor(sensor))
+
+		if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
+			status := utils.CalculateWateringStatus(ctx, tu.PlantingYear, sensor.LatestData.Data.Watermarks)
+			fn = append(fn, tree.WithWateringStatus(status))
+		}
 	} else {
-		fn = append(fn, tree.WithSensor(nil))
+		fn = append(fn,
+			tree.WithSensor(nil),
+			tree.WithWateringStatus(entities.WateringStatusUnknown))
 	}
 
 	fn = append(fn, tree.WithPlantingYear(tu.PlantingYear),

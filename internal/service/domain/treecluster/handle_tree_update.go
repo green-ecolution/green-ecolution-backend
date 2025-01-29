@@ -15,7 +15,7 @@ func (s *TreeClusterService) HandleCreateTree(ctx context.Context, event *entiti
 		return nil
 	}
 
-	return s.handleTreeClusterUpdate(ctx, event.New.TreeCluster)
+	return s.handleTreeClusterUpdate(ctx, event.New.TreeCluster, event.New)
 }
 
 func (s *TreeClusterService) HandleDeleteTree(ctx context.Context, event *entities.EventDeleteTree) error {
@@ -26,7 +26,7 @@ func (s *TreeClusterService) HandleDeleteTree(ctx context.Context, event *entiti
 		return nil
 	}
 
-	return s.handleTreeClusterUpdate(ctx, event.Prev.TreeCluster)
+	return s.handleTreeClusterUpdate(ctx, event.Prev.TreeCluster, event.Prev)
 }
 
 func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entities.EventUpdateTree) error {
@@ -41,12 +41,12 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 		return nil
 	}
 
-	if err := s.handleTreeClusterUpdate(ctx, event.Prev.TreeCluster); err != nil {
+	if err := s.handleTreeClusterUpdate(ctx, event.Prev.TreeCluster, event.New); err != nil {
 		return err
 	}
 
 	if event.Prev.TreeCluster != nil && event.New.TreeCluster != nil && event.Prev.TreeCluster.ID != event.New.TreeCluster.ID {
-		if err := s.handleTreeClusterUpdate(ctx, event.New.TreeCluster); err != nil {
+		if err := s.handleTreeClusterUpdate(ctx, event.New.TreeCluster, event.New); err != nil {
 			return err
 		}
 	}
@@ -57,13 +57,19 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 func (s *TreeClusterService) isNoUpdateNeeded(event *entities.EventUpdateTree) bool {
 	treePosSame := event.Prev.Latitude == event.New.Latitude && event.Prev.Longitude == event.New.Longitude
 	tcSame := event.Prev.TreeCluster != nil && event.New.TreeCluster != nil && event.Prev.TreeCluster.ID == event.New.TreeCluster.ID
-	return treePosSame && tcSame
+	sensorSame := event.Prev.Sensor == event.New.Sensor
+	return treePosSame && tcSame && sensorSame
 }
 
-func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *entities.TreeCluster) error {
+func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *entities.TreeCluster, tree *entities.Tree) error {
 	log := logger.GetLogger(ctx)
 	if tc == nil {
 		return nil
+	}
+
+	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, tree.TreeCluster.ID)
+	if err != nil {
+		log.Error("could not update watering status", "error", err)
 	}
 
 	updateFn := func(tc *entities.TreeCluster) (bool, error) {
@@ -75,6 +81,7 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 		tc.Latitude = lat
 		tc.Longitude = long
 		tc.Region = region
+		tc.WateringStatus = wateringStatus
 		return true, nil
 	}
 
@@ -82,5 +89,6 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 		log.Info("successfully updated new tree cluster position", "cluster_id", tc.ID)
 		return s.publishUpdateEvent(ctx, tc)
 	}
+
 	return nil
 }

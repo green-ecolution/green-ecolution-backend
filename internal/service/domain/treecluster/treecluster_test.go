@@ -26,7 +26,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		expectedClusters := getTestTreeClusters()
+		expectedClusters := testClusters
 		clusterRepo.EXPECT().GetAll(ctx).Return(expectedClusters, nil)
 
 		// when
@@ -83,7 +83,7 @@ func TestTreeClusterService_GetByID(t *testing.T) {
 
 	t.Run("should return tree cluster when found", func(t *testing.T) {
 		id := int32(1)
-		expectedCluster := getTestTreeClusters()[0]
+		expectedCluster := testClusters[0]
 		clusterRepo.EXPECT().GetByID(ctx, id).Return(expectedCluster, nil)
 
 		// when
@@ -125,18 +125,27 @@ func TestTreeClusterService_Create(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		expectedCluster := getTestTreeClusters()[0]
-		expectedTrees := getTestTrees()
+		expectedCluster := testClusters[0]
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
 			[]int32{1, 2},
-		).Return(expectedTrees, nil)
+		).Return(testTrees, nil)
 
 		clusterRepo.EXPECT().Create(
 			ctx,
 			mock.Anything,
 		).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(
+			ctx,
+			int32(1),
+		).Return(allLatestSensorData, nil)
+
+		treeRepo.EXPECT().GetBySensorIDs(
+			ctx,
+			"sensor-1",
+		).Return(testTrees, nil)
 
 		clusterRepo.EXPECT().Update(
 			ctx,
@@ -166,7 +175,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 			TreeIDs:       []*int32{},
 		}
 
-		expectedCluster := getTestTreeClusters()[1]
+		expectedCluster := testClusters[1]
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
@@ -177,6 +186,11 @@ func TestTreeClusterService_Create(t *testing.T) {
 			ctx,
 			mock.Anything,
 		).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(
+			ctx,
+			int32(2),
+		).Return(nil, storage.ErrSensorNotFound)
 
 		clusterRepo.EXPECT().Update(
 			ctx,
@@ -221,7 +235,7 @@ func TestTreeClusterService_Create(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
 		expectedErr := errors.New("Failed to create cluster")
-		expectedTrees := getTestTrees()
+		expectedTrees := testTrees
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
@@ -248,9 +262,9 @@ func TestTreeClusterService_Create(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		expectedCluster := getTestTreeClusters()[0]
+		expectedCluster := testClusters[0]
 		expectedErr := errors.New("Failed to create cluster")
-		expectedTrees := getTestTrees()
+		expectedTrees := testTrees
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
@@ -261,6 +275,16 @@ func TestTreeClusterService_Create(t *testing.T) {
 			ctx,
 			mock.Anything,
 		).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(
+			ctx,
+			int32(1),
+		).Return(allLatestSensorData, nil)
+
+		treeRepo.EXPECT().GetBySensorIDs(
+			ctx,
+			"sensor-1",
+		).Return(testTrees, nil)
 
 		clusterRepo.EXPECT().Update(
 			ctx,
@@ -319,8 +343,8 @@ func TestTreeClusterService_Update(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		expectedCluster := getTestTreeClusters()[0]
-		expectedTrees := getTestTrees()
+		expectedCluster := testClusters[0]
+		expectedTrees := testTrees
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
@@ -328,6 +352,17 @@ func TestTreeClusterService_Update(t *testing.T) {
 		).Return(expectedTrees, nil)
 
 		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(
+			ctx,
+			int32(1),
+		).Return(allLatestSensorData, nil)
+
+		treeRepo.EXPECT().GetBySensorIDs(
+			ctx,
+			"sensor-1",
+		).Return(testTrees, nil)
+
 		clusterRepo.EXPECT().Update(
 			ctx,
 			clusterID,
@@ -356,7 +391,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 			TreeIDs:       []*int32{},
 		}
 
-		expectedCluster := getTestTreeClusters()[1]
+		expectedCluster := testClusters[1]
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
@@ -364,6 +399,12 @@ func TestTreeClusterService_Update(t *testing.T) {
 		).Return(nil, nil)
 
 		clusterRepo.EXPECT().GetByID(ctx, expectedCluster.ID).Return(expectedCluster, nil)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(
+			ctx,
+			int32(2),
+		).Return(nil, storage.ErrSensorNotFound)
+
 		clusterRepo.EXPECT().Update(
 			ctx,
 			expectedCluster.ID,
@@ -405,7 +446,7 @@ func TestTreeClusterService_Update(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
 		expectedErr := errors.New("failed to update cluster")
-		expectedTrees := getTestTrees()
+		expectedTrees := testTrees
 
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
@@ -434,12 +475,10 @@ func TestTreeClusterService_Update(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		expectedTrees := getTestTrees()
-
 		treeRepo.EXPECT().GetTreesByIDs(
 			ctx,
 			[]int32{1, 2},
-		).Return(expectedTrees, nil)
+		).Return(testTrees, nil)
 		clusterRepo.EXPECT().GetByID(ctx, clusterID).Return(nil, nil)
 
 		clusterRepo.EXPECT().Update(
@@ -488,7 +527,7 @@ func TestTreeClusterService_EventSystem(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
 
-		clusters := getTestTreeClusters()
+		clusters := testClusters
 		prevCluster := *clusters[1]
 		updatedClusterEmptyTrees := &entities.TreeClusterUpdate{
 			Name:          "Cluster 1",
@@ -513,6 +552,17 @@ func TestTreeClusterService_EventSystem(t *testing.T) {
 		).Return(nil, nil)
 
 		clusterRepo.EXPECT().GetByID(ctx, expectedCluster.ID).Return(&expectedCluster, nil)
+
+		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(
+			ctx,
+			int32(2),
+		).Return(allLatestSensorData, nil)
+
+		treeRepo.EXPECT().GetBySensorIDs(
+			ctx,
+			"sensor-1",
+		).Return(testTrees, nil)
+
 		clusterRepo.EXPECT().Update(
 			ctx,
 			expectedCluster.ID,
@@ -552,7 +602,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
 	t.Run("should successfully delete a tree cluster", func(t *testing.T) {
 		id := int32(1)
 
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(testClusters[0], nil)
 		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
 		clusterRepo.EXPECT().Delete(ctx, id).Return(nil)
 
@@ -582,7 +632,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
 		id := int32(3)
 		expectedErr := errors.New("failed to unlink treecluster ID")
 
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(testClusters[0], nil)
 		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(expectedErr)
 
 		// when
@@ -597,7 +647,7 @@ func TestTreeClusterService_Delete(t *testing.T) {
 		id := int32(4)
 		expectedErr := errors.New("failed to delete")
 
-		clusterRepo.EXPECT().GetByID(ctx, id).Return(getTestTreeClusters()[0], nil)
+		clusterRepo.EXPECT().GetByID(ctx, id).Return(testClusters[0], nil)
 		treeRepo.EXPECT().UnlinkTreeClusterID(ctx, id).Return(nil)
 		clusterRepo.EXPECT().Delete(ctx, id).Return(expectedErr)
 
@@ -635,66 +685,64 @@ func TestReady(t *testing.T) {
 	})
 }
 
-func getTestTreeClusters() []*entities.TreeCluster {
-	now := time.Now()
-
-	return []*entities.TreeCluster{
-		{
-			ID:            1,
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			Name:          "Cluster 1",
-			Address:       "123 Main St",
-			Description:   "Test description",
-			SoilCondition: entities.TreeSoilConditionLehmig,
-			Archived:      false,
-			Latitude:      utils.P(9.446741),
-			Longitude:     utils.P(54.801539),
-			Trees:         getTestTrees(),
-		},
-		{
-			ID:            2,
-			CreatedAt:     now,
-			UpdatedAt:     now,
-			Name:          "Cluster 2",
-			Address:       "456 Second St",
-			Description:   "Test description",
-			SoilCondition: entities.TreeSoilConditionSandig,
-			Archived:      false,
-			Latitude:      nil,
-			Longitude:     nil,
-			Trees:         []*entities.Tree{},
-		},
-	}
+var testClusters = []*entities.TreeCluster{
+	{
+		ID:            1,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+		Name:          "Cluster 1",
+		Address:       "123 Main St",
+		Description:   "Test description",
+		SoilCondition: entities.TreeSoilConditionLehmig,
+		Archived:      false,
+		Latitude:      utils.P(9.446741),
+		Longitude:     utils.P(54.801539),
+		Trees:         testTrees,
+	},
+	{
+		ID:            2,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+		Name:          "Cluster 2",
+		Address:       "456 Second St",
+		Description:   "Test description",
+		SoilCondition: entities.TreeSoilConditionSandig,
+		Archived:      false,
+		Latitude:      nil,
+		Longitude:     nil,
+		Trees:         testTrees,
+	},
 }
 
-func getTestTrees() []*entities.Tree {
-	now := time.Now()
-
-	return []*entities.Tree{
-		{
-			ID:           1,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Oak",
-			Number:       "T001",
-			Latitude:     9.446741,
-			Longitude:    54.801539,
-			Description:  "A mature oak tree",
-			PlantingYear: 2023,
-			Readonly:     true,
+var testTrees = []*entities.Tree{
+	{
+		ID:           1,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		Species:      "Oak",
+		Number:       "T001",
+		Latitude:     9.446741,
+		Longitude:    54.801539,
+		Description:  "A mature oak tree",
+		PlantingYear: 2023,
+		Readonly:     true,
+		Sensor: &entities.Sensor{
+			ID: "sensor-1",
 		},
-		{
-			ID:           2,
-			CreatedAt:    now,
-			UpdatedAt:    now,
-			Species:      "Pine",
-			Number:       "T002",
-			Latitude:     9.446700,
-			Longitude:    54.801510,
-			Description:  "A young pine tree",
-			PlantingYear: 2023,
-			Readonly:     true,
+	},
+	{
+		ID:           2,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+		Species:      "Pine",
+		Number:       "T002",
+		Latitude:     9.446700,
+		Longitude:    54.801510,
+		Description:  "A young pine tree",
+		PlantingYear: 2023,
+		Readonly:     true,
+		Sensor: &entities.Sensor{
+			ID: "sensor-2",
 		},
-	}
+	},
 }
