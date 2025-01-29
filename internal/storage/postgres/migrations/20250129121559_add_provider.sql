@@ -29,22 +29,22 @@ ALTER TABLE trees
 DROP COLUMN provider,
 DROP COLUMN additional_informations;
 
-ALTER TABLE tree_clusters;
+ALTER TABLE tree_clusters
 DROP COLUMN provider,
 DROP COLUMN additional_informations;
 
-ALTER TABLE vehicles;
+ALTER TABLE vehicles
 DROP COLUMN provider,
 DROP COLUMN additional_informations;
 
-ALTER TABLE sensors;
+ALTER TABLE sensors
 DROP COLUMN provider,
 DROP COLUMN additional_informations;
 
-ALTER TABLE flowerbeds;
+ALTER TABLE flowerbeds
 DROP COLUMN provider,
 DROP COLUMN additional_informations;
 
-ALTER TABLE watering_plans;
+ALTER TABLE watering_plans
 DROP COLUMN provider,
 DROP COLUMN additional_informations;
