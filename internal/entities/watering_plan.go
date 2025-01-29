@@ -35,6 +35,8 @@ type WateringPlan struct {
 	GpxURL             string
 	RefillCount        int32
 	Duration           time.Duration
+	Provider           string
+	AdditionalInfo     map[string]interface{}
 }
 
 type WateringPlanCreate struct {

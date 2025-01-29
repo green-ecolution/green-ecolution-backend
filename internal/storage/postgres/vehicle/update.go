@@ -8,6 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Vehicle) (bool, error)) error {
@@ -52,19 +53,28 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(
 }
 
 func (r *VehicleRepository) updateEntity(ctx context.Context, vehicle *entities.Vehicle) error {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(vehicle.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", vehicle.AdditionalInfo)
+		return err
+	}
+
 	params := sqlc.UpdateVehicleParams{
-		ID:             vehicle.ID,
-		NumberPlate:    vehicle.NumberPlate,
-		Description:    vehicle.Description,
-		WaterCapacity:  vehicle.WaterCapacity,
-		Type:           sqlc.VehicleType(vehicle.Type),
-		Status:         sqlc.VehicleStatus(vehicle.Status),
-		DrivingLicense: sqlc.DrivingLicense(vehicle.DrivingLicense),
-		Model:          vehicle.Model,
-		Height:         vehicle.Height,
-		Length:         vehicle.Length,
-		Width:          vehicle.Width,
-		Weight:         vehicle.Weight,
+		ID:                     vehicle.ID,
+		NumberPlate:            vehicle.NumberPlate,
+		Description:            vehicle.Description,
+		WaterCapacity:          vehicle.WaterCapacity,
+		Type:                   sqlc.VehicleType(vehicle.Type),
+		Status:                 sqlc.VehicleStatus(vehicle.Status),
+		DrivingLicense:         sqlc.DrivingLicense(vehicle.DrivingLicense),
+		Model:                  vehicle.Model,
+		Height:                 vehicle.Height,
+		Length:                 vehicle.Length,
+		Width:                  vehicle.Width,
+		Weight:                 vehicle.Weight,
+		Provider:               &vehicle.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	return r.store.UpdateVehicle(ctx, &params)

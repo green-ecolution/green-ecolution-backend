@@ -87,6 +87,8 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor) (bool, error) {
 		s.LatestData = sc.LatestData
 		s.Status = sc.Status
+		s.Provider = sc.Provider
+		s.AdditionalInfo = sc.AdditionalInfo
 		return true, nil
 	})
 
@@ -114,6 +116,8 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor) (bool, error) {
 		s.LatestData = su.LatestData
 		s.Status = su.Status
+		s.Provider = su.Provider
+		s.AdditionalInfo = su.AdditionalInfo
 		return true, nil
 	})
 

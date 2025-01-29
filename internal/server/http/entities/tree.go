@@ -11,14 +11,16 @@ type TreeResponse struct {
 	TreeClusterID *int32          `json:"tree_cluster_id" validate:"optional"`
 	Sensor        *SensorResponse `json:"sensor" validate:"optional"`
 	// Images              []*ImageResponse `json:"images"`
-	Readonly       bool           `json:"readonly"`
-	PlantingYear   int32          `json:"planting_year"`
-	Species        string         `json:"species"`
-	Number         string         `json:"number"`
-	Latitude       float64        `json:"latitude"`
-	Longitude      float64        `json:"longitude"`
-	WateringStatus WateringStatus `json:"watering_status"`
-	Description    string         `json:"description"`
+	Readonly       bool                   `json:"readonly"`
+	PlantingYear   int32                  `json:"planting_year"`
+	Species        string                 `json:"species"`
+	Number         string                 `json:"number"`
+	Latitude       float64                `json:"latitude"`
+	Longitude      float64                `json:"longitude"`
+	WateringStatus WateringStatus         `json:"watering_status"`
+	Description    string                 `json:"description"`
+	Provider       string                 `json:"provider,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty"`
 } // @Name Tree
 
 type TreeListResponse struct {

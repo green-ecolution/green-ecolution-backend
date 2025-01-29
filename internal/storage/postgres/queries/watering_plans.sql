@@ -11,9 +11,9 @@ SELECT * FROM watering_plans WHERE id = $1;
 
 -- name: CreateWateringPlan :one
 INSERT INTO watering_plans (
-  date, description, status, distance, total_water_required, cancellation_note
+  date, description, status, distance, total_water_required, cancellation_note, provider, additional_informations
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4, $5, $6, $7, $8
 ) RETURNING id;
 
 -- name: UpdateWateringPlan :exec
@@ -26,7 +26,9 @@ UPDATE watering_plans SET
   cancellation_note = $7,
   gpx_url = $8,
   duration = $9,
-  refill_count = $10
+  refill_count = $10,
+  provider = $11,
+  additional_informations = $12
 WHERE id = $1;
 
 -- name: DeleteWateringPlan :one

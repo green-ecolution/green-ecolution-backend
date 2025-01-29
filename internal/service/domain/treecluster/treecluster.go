@@ -129,6 +129,8 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		tc.Address = createTc.Address
 		tc.Description = createTc.Description
 		tc.SoilCondition = createTc.SoilCondition
+		tc.Provider = createTc.Provider
+		tc.AdditionalInfo = createTc.AdditionalInfo
 
 		log.Debug("creating tree cluster with following attributes",
 			"tree_ids", createTc.TreeIDs,
@@ -180,6 +182,8 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		tc.Address = tcUpdate.Address
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
+		tc.Provider = tcUpdate.Provider
+		tc.AdditionalInfo = tcUpdate.AdditionalInfo
 
 		log.Debug("updating tree cluster with following attributes",
 			"cluster_id", id,
@@ -187,6 +191,8 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 			"address", tcUpdate.Address,
 			"description", tcUpdate.Description,
 			"soil_condition", tcUpdate.SoilCondition,
+			"provider", tcUpdate.Provider,
+			"additional_info", tcUpdate.AdditionalInfo,
 		)
 
 		return true, nil

@@ -51,6 +51,18 @@ func WithSpecies(species string) entities.EntityFunc[entities.Tree] {
 	}
 }
 
+func WithProvider(provider string) entities.EntityFunc[entities.Tree] {
+	return func(t *entities.Tree) {
+		t.Provider = provider
+	}
+}
+
+func WithAdditionalInfo(additionalInfo map[string]interface{}) entities.EntityFunc[entities.Tree] {
+	return func(t *entities.Tree) {
+		t.AdditionalInfo = additionalInfo
+	}
+}
+
 func WithDescription(description string) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.Description = description

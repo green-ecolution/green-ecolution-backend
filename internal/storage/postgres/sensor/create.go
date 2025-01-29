@@ -6,6 +6,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
@@ -16,10 +17,12 @@ import (
 
 func defaultSensor() *entities.Sensor {
 	return &entities.Sensor{
-		Status:     entities.SensorStatusUnknown,
-		LatestData: nil,
-		Latitude:   0,
-		Longitude:  0,
+		Status:         entities.SensorStatusUnknown,
+		LatestData:     nil,
+		Latitude:       0,
+		Longitude:      0,
+		Provider:       "",
+		AdditionalInfo: nil,
 	}
 }
 
@@ -118,9 +121,18 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *ent
 }
 
 func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Sensor) (string, error) {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(sensor.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", sensor.AdditionalInfo)
+		return "", err
+	}
+
 	id, err := r.store.CreateSensor(ctx, &sqlc.CreateSensorParams{
-		ID:     sensor.ID,
-		Status: sqlc.SensorStatus(sensor.Status),
+		ID:                     sensor.ID,
+		Status:                 sqlc.SensorStatus(sensor.Status),
+		Provider:               &sensor.Provider,
+		AdditionalInformations: additionalInfo,
 	})
 	if err != nil {
 		return "", err

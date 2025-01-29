@@ -35,6 +35,8 @@ type WateringPlanResponse struct {
 	GpxURL             string                       `json:"gpx_url"`
 	Duration           *float64                     `json:"duration"`
 	RefillCount        int32                        `json:"refill_count"`
+	Provider           string                       `json:"provider,omitempty"`
+	AdditionalInfo     map[string]interface{}       `json:"additional_information,omitempty"`
 } // @Name WateringPlan
 
 type WateringPlanInListResponse struct {

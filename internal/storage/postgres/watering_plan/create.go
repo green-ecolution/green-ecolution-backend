@@ -28,6 +28,8 @@ func defaultWateringPlan() *entities.WateringPlan {
 		CancellationNote:   "",
 		Duration:           time.Duration(0),
 		RefillCount:        0,
+		Provider:           "",
+		AdditionalInfo:     nil,
 	}
 }
 
@@ -88,17 +90,25 @@ func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*enti
 
 func (w *WateringPlanRepository) createEntity(ctx context.Context, entity *entities.WateringPlan) (*int32, error) {
 	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return nil, err
+	}
+
 	date, err := utils.TimeToPgDate(entity.Date)
 	if err != nil {
 		return nil, errors.New("failed to convert date")
 	}
 
 	args := sqlc.CreateWateringPlanParams{
-		Date:               date,
-		Description:        entity.Description,
-		Distance:           entity.Distance,
-		TotalWaterRequired: entity.TotalWaterRequired,
-		Status:             sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
+		Date:                   date,
+		Description:            entity.Description,
+		Distance:               entity.Distance,
+		TotalWaterRequired:     entity.TotalWaterRequired,
+		Status:                 sqlc.WateringPlanStatus(entities.WateringPlanStatusPlanned),
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	id, err := w.store.CreateWateringPlan(ctx, &args)

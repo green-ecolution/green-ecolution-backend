@@ -44,7 +44,12 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	data := r.mapper.FromSqlList(rows)
+	data, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tc := range data {
 		if err := r.store.MapClusterFields(ctx, tc); err != nil {
 			return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
@@ -62,7 +67,12 @@ func (r *TreeClusterRepository) GetAllByProvider(ctx context.Context, provider s
 		return nil, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	data := r.mapper.FromSqlList(rows)
+	data, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tc := range data {
 		if err := r.store.MapClusterFields(ctx, tc); err != nil {
 			return nil, r.store.MapError(err, sqlc.TreeCluster{})
@@ -80,7 +90,12 @@ func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entitie
 		return nil, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	tc := r.mapper.FromSql(row)
+	tc, err := r.mapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	if err := r.store.MapClusterFields(ctx, tc); err != nil {
 		return nil, r.store.MapError(err, sqlc.TreeCluster{})
 	}
@@ -96,7 +111,12 @@ func (r *TreeClusterRepository) GetByIDs(ctx context.Context, ids []int32) ([]*e
 		return nil, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	tc := r.mapper.FromSqlList(rows)
+	tc, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, cluster := range tc {
 		if err := r.store.MapClusterFields(ctx, cluster); err != nil {
 			return nil, r.store.MapError(err, sqlc.TreeCluster{})

@@ -11,13 +11,15 @@ const (
 )
 
 type Sensor struct {
-	ID         string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	Status     SensorStatus
-	LatestData *SensorData
-	Latitude   float64
-	Longitude  float64
+	ID             string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	Status         SensorStatus
+	LatestData     *SensorData
+	Latitude       float64
+	Longitude      float64
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 type SensorData struct {

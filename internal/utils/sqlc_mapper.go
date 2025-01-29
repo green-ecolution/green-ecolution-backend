@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -64,4 +65,34 @@ func ConvertNullableImage(img sqlc.Image) *entities.Image {
 		UpdatedAt: img.UpdatedAt.Time,
 		URL:       img.Url,
 	}
+}
+
+func MapAdditionalInfo(src []byte) (map[string]interface{}, error) {
+	if len(src) == 0 {
+		return nil, nil
+	}
+
+	additionalInfo := make(map[string]interface{}, 0)
+	err := json.Unmarshal(src, &additionalInfo)
+	if err != nil {
+		return nil, err
+	}
+	return additionalInfo, nil
+}
+
+func MapAdditionalInfoToByte(src map[string]interface{}) ([]byte, error) {
+	if src == nil {
+		return nil, nil
+	}
+
+	if len(src) == 0 {
+		return nil, nil
+	}
+
+	additionalInfo, err := json.Marshal(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return additionalInfo, nil
 }

@@ -19,7 +19,12 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSqlList(rows)
+	t, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
 			return nil, err
@@ -37,7 +42,12 @@ func (r *TreeRepository) GetAllByProvider(ctx context.Context, provider string) 
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSqlList(rows)
+	t, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
 			return nil, err
@@ -55,7 +65,12 @@ func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree,
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSql(row)
+	t, err := r.mapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	if err := r.mapFields(ctx, t); err != nil {
 		return nil, err
 	}
@@ -71,7 +86,12 @@ func (r *TreeRepository) GetBySensorID(ctx context.Context, id string) (*entitie
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSql(row)
+	t, err := r.mapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	if err := r.mapFields(ctx, t); err != nil {
 		return nil, err
 	}
@@ -87,7 +107,12 @@ func (r *TreeRepository) GetBySensorIDs(ctx context.Context, ids ...string) ([]*
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSqlList(rows)
+	t, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
 			return nil, err
@@ -105,7 +130,12 @@ func (r *TreeRepository) GetTreesByIDs(ctx context.Context, ids []int32) ([]*ent
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSqlList(rows)
+	t, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
 			return nil, err
@@ -123,7 +153,12 @@ func (r *TreeRepository) GetByTreeClusterID(ctx context.Context, id int32) ([]*e
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	t := r.mapper.FromSqlList(rows)
+	t, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
 			return nil, err
@@ -144,7 +179,11 @@ func (r *TreeRepository) GetByCoordinates(ctx context.Context, latitude, longitu
 		log.Debug("failed to get tree by coordinates in db", "error", err, "latitude", latitude, "longitude", longitude)
 		return nil, r.store.MapError(err, sqlc.Tree{})
 	}
-	tree := r.mapper.FromSql(row)
+	tree, err := r.mapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
 	if err := r.mapFields(ctx, tree); err != nil {
 		return nil, err
 	}
@@ -170,7 +209,12 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*
 		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	data := r.sMapper.FromSql(row)
+	data, err := r.sMapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	if err := r.store.MapSensorFields(ctx, data); err != nil { // TODO: handle error
 		return nil, err
 	}
@@ -179,12 +223,19 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*
 }
 
 func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int32) (*entities.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
 	row, err := r.store.GetTreeClusterByTreeID(ctx, treeID)
 	if err != nil {
 		return nil, err
 	}
 
-	return r.tcMapper.FromSql(row), nil
+	tc, err := r.tcMapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return tc, nil
 }
 
 // Map sensor, images and tree cluster entity to domain flowerbed
@@ -248,7 +299,12 @@ func (r *TreeRepository) FindNearestTree(ctx context.Context, latitude, longitud
 		return nil, err
 	}
 
-	tree := r.mapper.FromSql(nearestTree)
+	tree, err := r.mapper.FromSql(nearestTree)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	if err := r.mapFields(ctx, tree); err != nil {
 		return nil, err
 	}

@@ -12,6 +12,7 @@ import (
 // goverter:extend MapWateringStatus MapSoilCondition
 type InternalTreeRepoMapper interface {
 	// goverter:ignore Sensor Images TreeCluster
-	FromSql(*sqlc.Tree) *entities.Tree
-	FromSqlList([]*sqlc.Tree) []*entities.Tree
+	// goverter:map AdditionalInformations AdditionalInfo | github.com/green-ecolution/green-ecolution-backend/internal/utils:MapAdditionalInfo
+	FromSql(*sqlc.Tree) (*entities.Tree, error)
+	FromSqlList([]*sqlc.Tree) ([]*entities.Tree, error)
 }

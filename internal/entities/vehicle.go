@@ -36,6 +36,8 @@ type Vehicle struct {
 	Width          float64
 	Length         float64
 	Weight         float64
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 type VehicleCreate struct {

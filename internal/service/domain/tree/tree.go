@@ -147,6 +147,8 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		tree.WithNumber(treeCreate.Number),
 		tree.WithLatitude(treeCreate.Latitude),
 		tree.WithLongitude(treeCreate.Longitude),
+		tree.WithProvider(treeCreate.Provider),
+		tree.WithAdditionalInfo(treeCreate.AdditionalInfo),
 	)
 	newTree, err := s.treeRepo.Create(ctx, fn...)
 	if err != nil {
@@ -231,7 +233,10 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		tree.WithNumber(tu.Number),
 		tree.WithLatitude(tu.Latitude),
 		tree.WithLongitude(tu.Longitude),
-		tree.WithDescription(tu.Description))
+		tree.WithDescription(tu.Description),
+		tree.WithProvider(tu.Provider),
+		tree.WithAdditionalInfo(tu.AdditionalInfo),
+	)
 
 	updatedTree, err := s.treeRepo.Update(ctx, id, fn...)
 	if err != nil {

@@ -16,7 +16,12 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, erro
 		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	data := r.mapper.FromSqlList(rows)
+	data, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, sn := range data {
 		if err := r.store.MapSensorFields(ctx, sn); err != nil {
 			return nil, err
@@ -34,7 +39,12 @@ func (r *SensorRepository) GetAllByProvider(ctx context.Context, provider string
 		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	data := r.mapper.FromSqlList(rows)
+	data, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, sn := range data {
 		if err := r.store.MapSensorFields(ctx, sn); err != nil {
 			return nil, err
@@ -52,7 +62,12 @@ func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Se
 		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	data := r.mapper.FromSql(row)
+	data, err := r.mapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	if err := r.store.MapSensorFields(ctx, data); err != nil {
 		return nil, err
 	}

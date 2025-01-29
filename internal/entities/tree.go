@@ -19,6 +19,8 @@ type Tree struct {
 	Longitude      float64
 	WateringStatus WateringStatus
 	Description    string
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeCreate struct {

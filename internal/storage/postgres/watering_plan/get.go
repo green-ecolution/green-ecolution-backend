@@ -19,7 +19,12 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 		return nil, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	data := w.mapper.FromSqlList(rows)
+	data, err := w.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, wp := range data {
 		if err := w.mapFields(ctx, wp); err != nil {
 			return nil, err
@@ -37,7 +42,12 @@ func (w *WateringPlanRepository) GetAllByProvider(ctx context.Context, provider 
 		return nil, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	data := w.mapper.FromSqlList(rows)
+	data, err := w.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, wp := range data {
 		if err := w.mapFields(ctx, wp); err != nil {
 			return nil, err
@@ -55,7 +65,12 @@ func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entiti
 		return nil, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	wp := w.mapper.FromSql(row)
+	wp, err := w.mapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to map entity", "error", err)
+		return nil, err
+	}
+
 	if err := w.mapFields(ctx, wp); err != nil {
 		return nil, err
 	}
@@ -75,7 +90,13 @@ func (w *WateringPlanRepository) GetLinkedVehicleByIDAndType(ctx context.Context
 		return nil, err
 	}
 
-	return w.vehicleMapper.FromSql(row), nil
+	vehicle, err := w.vehicleMapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return vehicle, nil
 }
 
 func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, id int32) ([]*entities.TreeCluster, error) {
@@ -86,7 +107,12 @@ func (w *WateringPlanRepository) GetLinkedTreeClustersByID(ctx context.Context, 
 		return nil, err
 	}
 
-	tc := w.clusterMapper.FromSqlList(rows)
+	tc, err := w.clusterMapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
 	for _, cluster := range tc {
 		if err := w.store.MapClusterFields(ctx, cluster); err != nil {
 			return nil, err

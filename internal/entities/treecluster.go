@@ -28,6 +28,8 @@ type TreeCluster struct {
 	Trees          []*Tree
 	SoilCondition  TreeSoilCondition
 	Name           string
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeClusterCreate struct {

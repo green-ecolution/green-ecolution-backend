@@ -171,6 +171,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.TreeClusters = treeClusters
 		wp.UserIDs = createWp.UserIDs
 		wp.TotalWaterRequired = utils.P(float64(neededWater))
+		wp.Provider = createWp.Provider
+		wp.AdditionalInfo = createWp.AdditionalInfo
 
 		return true, nil
 	})
@@ -297,6 +299,8 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.Evaluation = updateWp.Evaluation
 		wp.UserIDs = updateWp.UserIDs
 		wp.TotalWaterRequired = &neededWater
+		wp.Provider = updateWp.Provider
+		wp.AdditionalInfo = updateWp.AdditionalInfo
 
 		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		if w.shouldUpdateGpx(prevWp, wp) {

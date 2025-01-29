@@ -15,8 +15,9 @@ import (
 type InternalWateringPlanRepoMapper interface {
 	// goverter:ignore TreeClusters UserIDs Transporter Trailer Evaluation
 	// goverter:map GpxUrl GpxURL
-	FromSql(src *sqlc.WateringPlan) *entities.WateringPlan
-	FromSqlList(src []*sqlc.WateringPlan) []*entities.WateringPlan
+	// goverter:map AdditionalInformations AdditionalInfo | github.com/green-ecolution/green-ecolution-backend/internal/utils:MapAdditionalInfo
+	FromSql(src *sqlc.WateringPlan) (*entities.WateringPlan, error)
+	FromSqlList(src []*sqlc.WateringPlan) ([]*entities.WateringPlan, error)
 
 	EvaluationFromSqlList(src []*sqlc.TreeClusterWateringPlan) []*entities.EvaluationValue
 }
