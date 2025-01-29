@@ -56,19 +56,23 @@ type TreeClusterListResponse struct {
 } // @Name TreeClusterList
 
 type TreeClusterCreateRequest struct {
-	Address       string            `json:"address"`
-	Description   string            `json:"description"`
-	TreeIDs       []*int32          `json:"tree_ids"`
-	SoilCondition TreeSoilCondition `json:"soil_condition"`
-	Name          string            `json:"name"`
+	Address        string                 `json:"address"`
+	Description    string                 `json:"description"`
+	TreeIDs        []*int32               `json:"tree_ids"`
+	SoilCondition  TreeSoilCondition      `json:"soil_condition"`
+	Name           string                 `json:"name"`
+	Provider       string                 `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name TreeClusterCreate
 
 type TreeClusterUpdateRequest struct {
-	Address       string            `json:"address"`
-	Description   string            `json:"description"`
-	TreeIDs       []*int32          `json:"tree_ids"`
-	SoilCondition TreeSoilCondition `json:"soil_condition"`
-	Name          string            `json:"name"`
+	Address        string                 `json:"address"`
+	Description    string                 `json:"description"`
+	TreeIDs        []*int32               `json:"tree_ids"`
+	SoilCondition  TreeSoilCondition      `json:"soil_condition"`
+	Name           string                 `json:"name"`
+	Provider       string                 `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name TreeClusterUpdate
 
 type TreeClusterAddTreesRequest struct {

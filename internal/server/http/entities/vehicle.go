@@ -42,29 +42,33 @@ type VehicleListResponse struct {
 } // @Name VehicleList
 
 type VehicleCreateRequest struct {
-	NumberPlate    string         `json:"number_plate"`
-	Description    string         `json:"description"`
-	WaterCapacity  float64        `json:"water_capacity"`
-	Status         VehicleStatus  `json:"status"`
-	Type           VehicleType    `json:"type"`
-	Model          string         `json:"model"`
-	DrivingLicense DrivingLicense `json:"driving_license"`
-	Height         float64        `json:"height"`
-	Width          float64        `json:"width"`
-	Length         float64        `json:"length"`
-	Weight         float64        `json:"weight"`
+	NumberPlate    string                 `json:"number_plate"`
+	Description    string                 `json:"description"`
+	WaterCapacity  float64                `json:"water_capacity"`
+	Status         VehicleStatus          `json:"status"`
+	Type           VehicleType            `json:"type"`
+	Model          string                 `json:"model"`
+	DrivingLicense DrivingLicense         `json:"driving_license"`
+	Height         float64                `json:"height"`
+	Width          float64                `json:"width"`
+	Length         float64                `json:"length"`
+	Weight         float64                `json:"weight"`
+	Provider       string                 `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name VehicleCreate
 
 type VehicleUpdateRequest struct {
-	NumberPlate    string         `json:"number_plate"`
-	Description    string         `json:"description"`
-	WaterCapacity  float64        `json:"water_capacity"`
-	Status         VehicleStatus  `json:"status"`
-	Type           VehicleType    `json:"type"`
-	Model          string         `json:"model"`
-	DrivingLicense DrivingLicense `json:"driving_license"`
-	Height         float64        `json:"height"`
-	Width          float64        `json:"width"`
-	Length         float64        `json:"length"`
-	Weight         float64        `json:"weight"`
+	NumberPlate    string                 `json:"number_plate"`
+	Description    string                 `json:"description"`
+	WaterCapacity  float64                `json:"water_capacity"`
+	Status         VehicleStatus          `json:"status"`
+	Type           VehicleType            `json:"type"`
+	Model          string                 `json:"model"`
+	DrivingLicense DrivingLicense         `json:"driving_license"`
+	Height         float64                `json:"height"`
+	Width          float64                `json:"width"`
+	Length         float64                `json:"length"`
+	Weight         float64                `json:"weight"`
+	Provider       string                 `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name VehicleUpdate

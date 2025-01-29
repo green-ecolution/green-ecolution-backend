@@ -50,6 +50,8 @@ type VehicleCreate struct {
 	Width          float64        `validate:"gt=0"`
 	Length         float64        `validate:"gt=0"`
 	Weight         float64        `validate:"gt=0"`
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 type VehicleUpdate struct {
@@ -64,6 +66,8 @@ type VehicleUpdate struct {
 	Width          float64        `validate:"gt=0"`
 	Length         float64        `validate:"gt=0"`
 	Weight         float64        `validate:"gt=0"`
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 func ParseVehicleType(vehicleTypeStr string) VehicleType {
