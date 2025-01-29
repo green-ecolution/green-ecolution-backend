@@ -21,12 +21,12 @@ type WateringPlanStatus string
 
 // List of WateringPlanStatus
 const (
-	WateringPlanStatusPlanned WateringPlanStatus = "planned"
-	WateringPlanStatusActive WateringPlanStatus = "active"
-	WateringPlanStatusCanceled WateringPlanStatus = "canceled"
-	WateringPlanStatusFinished WateringPlanStatus = "finished"
+	WateringPlanStatusPlanned     WateringPlanStatus = "planned"
+	WateringPlanStatusActive      WateringPlanStatus = "active"
+	WateringPlanStatusCanceled    WateringPlanStatus = "canceled"
+	WateringPlanStatusFinished    WateringPlanStatus = "finished"
 	WateringPlanStatusNotCompeted WateringPlanStatus = "not competed"
-	WateringPlanStatusUnknown WateringPlanStatus = "unknown"
+	WateringPlanStatusUnknown     WateringPlanStatus = "unknown"
 )
 
 // All allowed values of WateringPlanStatus enum
@@ -117,4 +117,3 @@ func (v *NullableWateringPlanStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

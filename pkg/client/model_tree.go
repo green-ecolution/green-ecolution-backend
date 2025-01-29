@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,19 +22,21 @@ var _ MappedNullable = &Tree{}
 
 // Tree struct for Tree
 type Tree struct {
-	CreatedAt string `json:"created_at"`
-	Description string `json:"description"`
-	Id int32 `json:"id"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	Number string `json:"number"`
-	PlantingYear int32 `json:"planting_year"`
+	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	CreatedAt             string                 `json:"created_at"`
+	Description           string                 `json:"description"`
+	Id                    int32                  `json:"id"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	Number                string                 `json:"number"`
+	PlantingYear          int32                  `json:"planting_year"`
+	Provider              string                 `json:"provider"`
 	// Images              []*ImageResponse `json:\"images\"`
-	Readonly bool `json:"readonly"`
-	Sensor *Sensor `json:"sensor,omitempty"`
-	Species string `json:"species"`
-	TreeClusterId *int32 `json:"tree_cluster_id,omitempty"`
-	UpdatedAt string `json:"updated_at"`
+	Readonly       bool           `json:"readonly"`
+	Sensor         *Sensor        `json:"sensor,omitempty"`
+	Species        string         `json:"species"`
+	TreeClusterId  *int32         `json:"tree_cluster_id,omitempty"`
+	UpdatedAt      string         `json:"updated_at"`
 	WateringStatus WateringStatus `json:"watering_status"`
 }
 
@@ -44,8 +46,9 @@ type _Tree Tree
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
+func NewTree(additionalInformation map[string]interface{}, createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
 	this := Tree{}
+	this.AdditionalInformation = additionalInformation
 	this.CreatedAt = createdAt
 	this.Description = description
 	this.Id = id
@@ -53,6 +56,7 @@ func NewTree(createdAt string, description string, id int32, latitude float32, l
 	this.Longitude = longitude
 	this.Number = number
 	this.PlantingYear = plantingYear
+	this.Provider = provider
 	this.Readonly = readonly
 	this.Species = species
 	this.UpdatedAt = updatedAt
@@ -66,6 +70,30 @@ func NewTree(createdAt string, description string, id int32, latitude float32, l
 func NewTreeWithDefaults() *Tree {
 	this := Tree{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value
+func (o *Tree) GetAdditionalInformation() map[string]interface{} {
+	if o == nil {
+		var ret map[string]interface{}
+		return ret
+	}
+
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
+// and a boolean to check if the value has been set.
+func (o *Tree) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// SetAdditionalInformation sets field value
+func (o *Tree) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetCreatedAt returns the CreatedAt field value
@@ -236,6 +264,30 @@ func (o *Tree) SetPlantingYear(v int32) {
 	o.PlantingYear = v
 }
 
+// GetProvider returns the Provider field value
+func (o *Tree) GetProvider() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value
+// and a boolean to check if the value has been set.
+func (o *Tree) GetProviderOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Provider, true
+}
+
+// SetProvider sets field value
+func (o *Tree) SetProvider(v string) {
+	o.Provider = v
+}
+
 // GetReadonly returns the Readonly field value
 func (o *Tree) GetReadonly() bool {
 	if o == nil {
@@ -397,7 +449,7 @@ func (o *Tree) SetWateringStatus(v WateringStatus) {
 }
 
 func (o Tree) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -406,6 +458,7 @@ func (o Tree) MarshalJSON() ([]byte, error) {
 
 func (o Tree) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["additional_information"] = o.AdditionalInformation
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["description"] = o.Description
 	toSerialize["id"] = o.Id
@@ -413,6 +466,7 @@ func (o Tree) ToMap() (map[string]interface{}, error) {
 	toSerialize["longitude"] = o.Longitude
 	toSerialize["number"] = o.Number
 	toSerialize["planting_year"] = o.PlantingYear
+	toSerialize["provider"] = o.Provider
 	toSerialize["readonly"] = o.Readonly
 	if !IsNil(o.Sensor) {
 		toSerialize["sensor"] = o.Sensor
@@ -431,6 +485,7 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"additional_information",
 		"created_at",
 		"description",
 		"id",
@@ -438,6 +493,7 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 		"longitude",
 		"number",
 		"planting_year",
+		"provider",
 		"readonly",
 		"species",
 		"updated_at",
@@ -449,10 +505,10 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -508,5 +564,3 @@ func (v *NullableTree) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

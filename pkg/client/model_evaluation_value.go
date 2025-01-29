@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,9 +22,9 @@ var _ MappedNullable = &EvaluationValue{}
 
 // EvaluationValue struct for EvaluationValue
 type EvaluationValue struct {
-	ConsumedWater float32 `json:"consumed_water"`
-	TreeClusterId int32 `json:"tree_cluster_id"`
-	WateringPlanId int32 `json:"watering_plan_id"`
+	ConsumedWater  float32 `json:"consumed_water"`
+	TreeClusterId  int32   `json:"tree_cluster_id"`
+	WateringPlanId int32   `json:"watering_plan_id"`
 }
 
 type _EvaluationValue EvaluationValue
@@ -122,7 +122,7 @@ func (o *EvaluationValue) SetWateringPlanId(v int32) {
 }
 
 func (o EvaluationValue) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -152,10 +152,10 @@ func (o *EvaluationValue) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -211,5 +211,3 @@ func (v *NullableEvaluationValue) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

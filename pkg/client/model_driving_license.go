@@ -21,9 +21,11 @@ type DrivingLicense string
 
 // List of DrivingLicense
 const (
-	DrivingLicenseCar DrivingLicense = "B"
-	DrivingLicenseTrailer DrivingLicense = "BE"
-	DrivingLicenseTransporter DrivingLicense = "C"
+	DrivingLicenseB       DrivingLicense = "B"
+	DrivingLicenseBE      DrivingLicense = "BE"
+	DrivingLicenseC       DrivingLicense = "C"
+	DrivingLicenseCE      DrivingLicense = "CE"
+	DrivingLicenseUnknown DrivingLicense = "Unknown"
 )
 
 // All allowed values of DrivingLicense enum
@@ -31,6 +33,8 @@ var AllowedDrivingLicenseEnumValues = []DrivingLicense{
 	"B",
 	"BE",
 	"C",
+	"CE",
+	"Unknown",
 }
 
 func (v *DrivingLicense) UnmarshalJSON(src []byte) error {
@@ -111,4 +115,3 @@ func (v *NullableDrivingLicense) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

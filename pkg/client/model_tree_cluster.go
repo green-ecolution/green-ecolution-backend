@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,21 +22,23 @@ var _ MappedNullable = &TreeCluster{}
 
 // TreeCluster struct for TreeCluster
 type TreeCluster struct {
-	Address string `json:"address"`
-	Archived bool `json:"archived"`
-	CreatedAt string `json:"created_at"`
-	Description string `json:"description"`
-	Id int32 `json:"id"`
-	LastWatered *string `json:"last_watered,omitempty"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	MoistureLevel float32 `json:"moisture_level"`
-	Name string `json:"name"`
-	Region *Region `json:"region,omitempty"`
-	SoilCondition SoilCondition `json:"soil_condition"`
-	Trees []Tree `json:"trees,omitempty"`
-	UpdatedAt string `json:"updated_at"`
-	WateringStatus WateringStatus `json:"watering_status"`
+	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	Address               string                 `json:"address"`
+	Archived              bool                   `json:"archived"`
+	CreatedAt             string                 `json:"created_at"`
+	Description           string                 `json:"description"`
+	Id                    int32                  `json:"id"`
+	LastWatered           *string                `json:"last_watered,omitempty"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	MoistureLevel         float32                `json:"moisture_level"`
+	Name                  string                 `json:"name"`
+	Provider              string                 `json:"provider"`
+	Region                *Region                `json:"region,omitempty"`
+	SoilCondition         SoilCondition          `json:"soil_condition"`
+	Trees                 []Tree                 `json:"trees,omitempty"`
+	UpdatedAt             string                 `json:"updated_at"`
+	WateringStatus        WateringStatus         `json:"watering_status"`
 }
 
 type _TreeCluster TreeCluster
@@ -45,8 +47,9 @@ type _TreeCluster TreeCluster
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeCluster(address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
+func NewTreeCluster(additionalInformation map[string]interface{}, address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, provider string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
 	this := TreeCluster{}
+	this.AdditionalInformation = additionalInformation
 	this.Address = address
 	this.Archived = archived
 	this.CreatedAt = createdAt
@@ -56,6 +59,7 @@ func NewTreeCluster(address string, archived bool, createdAt string, description
 	this.Longitude = longitude
 	this.MoistureLevel = moistureLevel
 	this.Name = name
+	this.Provider = provider
 	this.SoilCondition = soilCondition
 	this.UpdatedAt = updatedAt
 	this.WateringStatus = wateringStatus
@@ -68,6 +72,30 @@ func NewTreeCluster(address string, archived bool, createdAt string, description
 func NewTreeClusterWithDefaults() *TreeCluster {
 	this := TreeCluster{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value
+func (o *TreeCluster) GetAdditionalInformation() map[string]interface{} {
+	if o == nil {
+		var ret map[string]interface{}
+		return ret
+	}
+
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
+// and a boolean to check if the value has been set.
+func (o *TreeCluster) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// SetAdditionalInformation sets field value
+func (o *TreeCluster) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetAddress returns the Address field value
@@ -318,6 +346,30 @@ func (o *TreeCluster) SetName(v string) {
 	o.Name = v
 }
 
+// GetProvider returns the Provider field value
+func (o *TreeCluster) GetProvider() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value
+// and a boolean to check if the value has been set.
+func (o *TreeCluster) GetProviderOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Provider, true
+}
+
+// SetProvider sets field value
+func (o *TreeCluster) SetProvider(v string) {
+	o.Provider = v
+}
+
 // GetRegion returns the Region field value if set, zero value otherwise.
 func (o *TreeCluster) GetRegion() Region {
 	if o == nil || IsNil(o.Region) {
@@ -455,7 +507,7 @@ func (o *TreeCluster) SetWateringStatus(v WateringStatus) {
 }
 
 func (o TreeCluster) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -464,6 +516,7 @@ func (o TreeCluster) MarshalJSON() ([]byte, error) {
 
 func (o TreeCluster) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["additional_information"] = o.AdditionalInformation
 	toSerialize["address"] = o.Address
 	toSerialize["archived"] = o.Archived
 	toSerialize["created_at"] = o.CreatedAt
@@ -476,6 +529,7 @@ func (o TreeCluster) ToMap() (map[string]interface{}, error) {
 	toSerialize["longitude"] = o.Longitude
 	toSerialize["moisture_level"] = o.MoistureLevel
 	toSerialize["name"] = o.Name
+	toSerialize["provider"] = o.Provider
 	if !IsNil(o.Region) {
 		toSerialize["region"] = o.Region
 	}
@@ -493,6 +547,7 @@ func (o *TreeCluster) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"additional_information",
 		"address",
 		"archived",
 		"created_at",
@@ -502,6 +557,7 @@ func (o *TreeCluster) UnmarshalJSON(data []byte) (err error) {
 		"longitude",
 		"moisture_level",
 		"name",
+		"provider",
 		"soil_condition",
 		"updated_at",
 		"watering_status",
@@ -512,10 +568,10 @@ func (o *TreeCluster) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -571,5 +627,3 @@ func (v *NullableTreeCluster) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

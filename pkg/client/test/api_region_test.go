@@ -11,10 +11,10 @@ package client
 
 import (
 	"context"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_RegionAPIService(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_client_RegionAPIService(t *testing.T) {
 
 	t.Run("Test RegionAPIService V1RegionGet", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.RegionAPI.V1RegionGet(context.Background()).Execute()
 
@@ -36,7 +36,7 @@ func Test_client_RegionAPIService(t *testing.T) {
 
 	t.Run("Test RegionAPIService V1RegionIdGet", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var id string
 

@@ -20,14 +20,13 @@ import (
 	"strings"
 )
 
-
 // TreeClusterAPIService TreeClusterAPI service
 type TreeClusterAPIService service
 
 type ApiCreateTreeClusterRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	body *TreeClusterCreate
+	body       *TreeClusterCreate
 }
 
 // Tree Cluster Create Request
@@ -45,24 +44,25 @@ CreateTreeCluster Create tree cluster
 
 Create tree cluster
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateTreeClusterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateTreeClusterRequest
 */
 func (a *TreeClusterAPIService) CreateTreeCluster(ctx context.Context) ApiCreateTreeClusterRequest {
 	return ApiCreateTreeClusterRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
-//	@return	TreeCluster
+//
+//	@return TreeCluster
 func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterRequest) (*TreeCluster, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodPost
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *TreeCluster
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TreeCluster
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeClusterAPIService.CreateTreeCluster")
@@ -127,8 +127,8 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -138,8 +138,8 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -149,8 +149,8 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -160,8 +160,8 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -171,8 +171,8 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -190,9 +190,9 @@ func (a *TreeClusterAPIService) CreateTreeClusterExecute(r ApiCreateTreeClusterR
 }
 
 type ApiDeleteTreeClusterRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	clusterId string
+	clusterId  string
 }
 
 func (r ApiDeleteTreeClusterRequest) Execute() (*http.Response, error) {
@@ -204,24 +204,24 @@ DeleteTreeCluster Delete tree cluster
 
 Delete tree cluster
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param clusterId Tree Cluster ID
- @return ApiDeleteTreeClusterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param clusterId Tree Cluster ID
+	@return ApiDeleteTreeClusterRequest
 */
 func (a *TreeClusterAPIService) DeleteTreeCluster(ctx context.Context, clusterId string) ApiDeleteTreeClusterRequest {
 	return ApiDeleteTreeClusterRequest{
 		ApiService: a,
-		ctx: ctx,
-		clusterId: clusterId,
+		ctx:        ctx,
+		clusterId:  clusterId,
 	}
 }
 
 // Execute executes the request
 func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterRequest) (*http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodDelete
-		localVarPostBody     interface{}
-		formFiles            []formFile
+		localVarHTTPMethod = http.MethodDelete
+		localVarPostBody   interface{}
+		formFiles          []formFile
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeClusterAPIService.DeleteTreeCluster")
@@ -282,8 +282,8 @@ func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterR
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -293,8 +293,8 @@ func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterR
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -304,8 +304,8 @@ func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterR
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -315,8 +315,8 @@ func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterR
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -326,8 +326,8 @@ func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterR
 				newErr.error = err.Error()
 				return localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}
@@ -336,11 +336,12 @@ func (a *TreeClusterAPIService) DeleteTreeClusterExecute(r ApiDeleteTreeClusterR
 }
 
 type ApiGetAllTreeClustersRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	page *string
-	limit *string
-	status *string
+	page       *string
+	limit      *string
+	status     *string
+	provider   *string
 }
 
 // Page
@@ -361,6 +362,12 @@ func (r ApiGetAllTreeClustersRequest) Status(status string) ApiGetAllTreeCluster
 	return r
 }
 
+// Provider
+func (r ApiGetAllTreeClustersRequest) Provider(provider string) ApiGetAllTreeClustersRequest {
+	r.provider = &provider
+	return r
+}
+
 func (r ApiGetAllTreeClustersRequest) Execute() (*TreeClusterList, *http.Response, error) {
 	return r.ApiService.GetAllTreeClustersExecute(r)
 }
@@ -370,24 +377,25 @@ GetAllTreeClusters Get all tree clusters
 
 Get all tree clusters
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetAllTreeClustersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetAllTreeClustersRequest
 */
 func (a *TreeClusterAPIService) GetAllTreeClusters(ctx context.Context) ApiGetAllTreeClustersRequest {
 	return ApiGetAllTreeClustersRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
-//	@return	TreeClusterList
+//
+//	@return TreeClusterList
 func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeClustersRequest) (*TreeClusterList, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *TreeClusterList
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TreeClusterList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeClusterAPIService.GetAllTreeClusters")
@@ -409,6 +417,9 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 	}
 	if r.status != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "", "")
+	}
+	if r.provider != nil {
+		parameterAddToHeaderOrQuery(localVarQueryParams, "provider", r.provider, "", "")
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
@@ -456,8 +467,8 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -467,8 +478,8 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -478,8 +489,8 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -489,8 +500,8 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -500,8 +511,8 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -519,9 +530,9 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 }
 
 type ApiGetTreeClusterByIdRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	clusterId string
+	clusterId  string
 }
 
 func (r ApiGetTreeClusterByIdRequest) Execute() (*TreeCluster, *http.Response, error) {
@@ -533,26 +544,27 @@ GetTreeClusterById Get tree cluster by ID
 
 Get tree cluster by ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param clusterId Tree Cluster ID
- @return ApiGetTreeClusterByIdRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param clusterId Tree Cluster ID
+	@return ApiGetTreeClusterByIdRequest
 */
 func (a *TreeClusterAPIService) GetTreeClusterById(ctx context.Context, clusterId string) ApiGetTreeClusterByIdRequest {
 	return ApiGetTreeClusterByIdRequest{
 		ApiService: a,
-		ctx: ctx,
-		clusterId: clusterId,
+		ctx:        ctx,
+		clusterId:  clusterId,
 	}
 }
 
 // Execute executes the request
-//	@return	TreeCluster
+//
+//	@return TreeCluster
 func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByIdRequest) (*TreeCluster, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *TreeCluster
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TreeCluster
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeClusterAPIService.GetTreeClusterById")
@@ -613,8 +625,8 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -624,8 +636,8 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -635,8 +647,8 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -646,8 +658,8 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -657,8 +669,8 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -676,10 +688,10 @@ func (a *TreeClusterAPIService) GetTreeClusterByIdExecute(r ApiGetTreeClusterByI
 }
 
 type ApiUpdateTreeClusterRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeClusterAPIService
-	clusterId string
-	body *TreeClusterUpdate
+	clusterId  string
+	body       *TreeClusterUpdate
 }
 
 // Tree Cluster Update Request
@@ -697,26 +709,27 @@ UpdateTreeCluster Update tree cluster
 
 Update tree cluster
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param clusterId Tree Cluster ID
- @return ApiUpdateTreeClusterRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param clusterId Tree Cluster ID
+	@return ApiUpdateTreeClusterRequest
 */
 func (a *TreeClusterAPIService) UpdateTreeCluster(ctx context.Context, clusterId string) ApiUpdateTreeClusterRequest {
 	return ApiUpdateTreeClusterRequest{
 		ApiService: a,
-		ctx: ctx,
-		clusterId: clusterId,
+		ctx:        ctx,
+		clusterId:  clusterId,
 	}
 }
 
 // Execute executes the request
-//	@return	TreeCluster
+//
+//	@return TreeCluster
 func (a *TreeClusterAPIService) UpdateTreeClusterExecute(r ApiUpdateTreeClusterRequest) (*TreeCluster, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodPut
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *TreeCluster
+		localVarHTTPMethod  = http.MethodPut
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *TreeCluster
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeClusterAPIService.UpdateTreeCluster")
@@ -782,8 +795,8 @@ func (a *TreeClusterAPIService) UpdateTreeClusterExecute(r ApiUpdateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -793,8 +806,8 @@ func (a *TreeClusterAPIService) UpdateTreeClusterExecute(r ApiUpdateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -804,8 +817,8 @@ func (a *TreeClusterAPIService) UpdateTreeClusterExecute(r ApiUpdateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -815,8 +828,8 @@ func (a *TreeClusterAPIService) UpdateTreeClusterExecute(r ApiUpdateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -826,8 +839,8 @@ func (a *TreeClusterAPIService) UpdateTreeClusterExecute(r ApiUpdateTreeClusterR
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

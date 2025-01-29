@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -23,10 +23,10 @@ var _ MappedNullable = &Plugin{}
 // Plugin struct for Plugin
 type Plugin struct {
 	Description string `json:"description"`
-	HostPath string `json:"host_path"`
-	Name string `json:"name"`
-	Slug string `json:"slug"`
-	Version string `json:"version"`
+	HostPath    string `json:"host_path"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Version     string `json:"version"`
 }
 
 type _Plugin Plugin
@@ -174,7 +174,7 @@ func (o *Plugin) SetVersion(v string) {
 }
 
 func (o Plugin) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -208,10 +208,10 @@ func (o *Plugin) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -267,5 +267,3 @@ func (v *NullablePlugin) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-
