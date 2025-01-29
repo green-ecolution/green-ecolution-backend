@@ -1,6 +1,9 @@
 -- name: GetAllVehicles :many
 SELECT * FROM vehicles ORDER BY water_capacity DESC;
 
+-- name: GetAllVehiclesByProvider :many
+SELECT * FROM vehicles WHERE provider = $1 ORDER BY water_capacity DESC;
+
 -- name: GetAllVehiclesByType :many
 SELECT * FROM vehicles WHERE type = $1 ORDER BY water_capacity DESC;
 

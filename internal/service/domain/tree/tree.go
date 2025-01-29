@@ -42,9 +42,16 @@ func NewTreeService(
 	}
 }
 
-func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
+func (s *TreeService) GetAll(ctx context.Context, provider string) ([]*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
-	trees, err := s.treeRepo.GetAll(ctx)
+	var trees []*entities.Tree
+	var err error
+
+	if provider != "" {
+		trees, err = s.treeRepo.GetAllByProvider(ctx, provider)
+	} else {
+		trees, err = s.treeRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch trees", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)

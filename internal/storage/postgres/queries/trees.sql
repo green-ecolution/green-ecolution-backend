@@ -1,6 +1,9 @@
 -- name: GetAllTrees :many
 SELECT * FROM trees ORDER BY number ASC;
 
+-- name: GetAllTreesByProvider :many
+SELECT * FROM trees WHERE provider = $1 ORDER BY number ASC ;
+
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
 

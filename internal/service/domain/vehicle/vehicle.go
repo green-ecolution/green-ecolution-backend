@@ -24,9 +24,16 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context) ([]*entities.Vehicle, error) {
+func (v *VehicleService) GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, error) {
 	log := logger.GetLogger(ctx)
-	vehicles, err := v.vehicleRepo.GetAll(ctx)
+	var vehicles []*entities.Vehicle
+	var err error
+
+	if provider != "" {
+		vehicles, err = v.vehicleRepo.GetAllByProvider(ctx, provider)
+	} else {
+		vehicles, err = v.vehicleRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch vehicles", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)

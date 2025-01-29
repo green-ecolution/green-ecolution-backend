@@ -49,9 +49,15 @@ func (s *SensorService) publishNewSensorDataEvent(ctx context.Context, data *ent
 	}
 }
 
-func (s *SensorService) GetAll(ctx context.Context) ([]*entities.Sensor, error) {
+func (s *SensorService) GetAll(ctx context.Context, provider string) ([]*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
-	sensors, err := s.sensorRepo.GetAll(ctx)
+	var sensors []*entities.Sensor
+	var err error
+	if provider != "" {
+		sensors, err = s.sensorRepo.GetAllByProvider(ctx, provider)
+	} else {
+		sensors, err = s.sensorRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch sensors", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)

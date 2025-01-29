@@ -29,14 +29,15 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			age		query	string	false	"Age"
+// @Param			page		query	string	false	"Page"
+// @Param			limit		query	string	false	"Limit"
+// @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+		provider := c.Query("provider")
+		domainData, err := svc.GetAll(ctx, provider)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}

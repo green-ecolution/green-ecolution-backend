@@ -19,6 +19,17 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, er
 	return r.mapper.FromSqlList(rows), nil
 }
 
+func (r *VehicleRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllVehiclesByProvider(ctx, &provider)
+	if err != nil {
+		log.Debug("failed to get vehicle entities in db", "error", err)
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
+	}
+
+	return r.mapper.FromSqlList(rows), nil
+}
+
 func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
 	log := logger.GetLogger(ctx)
 	rows, err := r.store.GetAllVehiclesByType(ctx, sqlc.VehicleType(vehicleType))

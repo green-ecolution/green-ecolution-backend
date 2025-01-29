@@ -29,6 +29,24 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 	return data, nil
 }
 
+func (w *WateringPlanRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.WateringPlan, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := w.store.GetAllWateringPlansByProvider(ctx, &provider)
+	if err != nil {
+		log.Debug("failed to get watering plan entities in db", "error", err)
+		return nil, w.store.MapError(err, sqlc.WateringPlan{})
+	}
+
+	data := w.mapper.FromSqlList(rows)
+	for _, wp := range data {
+		if err := w.mapFields(ctx, wp); err != nil {
+			return nil, err
+		}
+	}
+
+	return data, nil
+}
+
 func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error) {
 	log := logger.GetLogger(ctx)
 	row, err := w.store.GetWateringPlanByID(ctx, id)

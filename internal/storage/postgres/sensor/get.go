@@ -26,6 +26,24 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, erro
 	return data, nil
 }
 
+func (r *SensorRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllSensorsByProvider(ctx, &provider)
+	if err != nil {
+		log.Debug("failed to get sensors in db", "error", err)
+		return nil, r.store.MapError(err, sqlc.Sensor{})
+	}
+
+	data := r.mapper.FromSqlList(rows)
+	for _, sn := range data {
+		if err := r.store.MapSensorFields(ctx, sn); err != nil {
+			return nil, err
+		}
+	}
+
+	return data, nil
+}
+
 func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	row, err := r.store.GetSensorByID(ctx, id)

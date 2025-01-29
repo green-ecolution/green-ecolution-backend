@@ -2,7 +2,6 @@ package tree
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -23,7 +22,24 @@ func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
 	t := r.mapper.FromSqlList(rows)
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
-			fmt.Println("hier ist der Fehler")
+			return nil, err
+		}
+	}
+
+	return t, nil
+}
+
+func (r *TreeRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllTreesByProvider(ctx, &provider)
+	if err != nil {
+		log.Debug("failed to get trees in db", "error", err)
+		return nil, r.store.MapError(err, sqlc.Tree{})
+	}
+
+	t := r.mapper.FromSqlList(rows)
+	for _, tree := range t {
+		if err := r.mapFields(ctx, tree); err != nil {
 			return nil, err
 		}
 	}

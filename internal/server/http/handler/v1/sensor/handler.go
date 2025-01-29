@@ -15,26 +15,28 @@ var (
 	sensorMapper = generated.SensorHTTPMapperImpl{}
 )
 
-// @Summary		Get all sensors
-// @Description	Get all sensors
-// @Id				get-all-sensors
-// @Tags			Sensor
-// @Produce		json
-// @Success		200	{object}	entities.SensorListResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor [get]
-// @Param			status	query	string	false	"Sensor Status"
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Security		Keycloak
+//	@Summary		Get all sensors
+//	@Description	Get all sensors
+//	@Id				get-all-sensors
+//	@Tags			Sensor
+//	@Produce		json
+//	@Success		200	{object}	entities.SensorListResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/sensor [get]
+//	@Param			status		query	string	false	"Sensor Status"
+//	@Param			page		query	string	false	"Page"
+//	@Param			limit		query	string	false	"Limit"
+//	@Param			provider	query	string	false	"Provider"
+//	@Security		Keycloak
 func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+		provider := c.Query("provider")
+		domainData, err := svc.GetAll(ctx, provider)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -51,20 +53,20 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 	}
 }
 
-// @Summary		Get sensor by ID
-// @Description	Get sensor by ID
-// @Id				get-sensor-by-id
-// @Tags			Sensor
-// @Produce		json
-// @Success		200	{object}	entities.SensorResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/{sensor_id} [get]
-// @Param			sensor_id	path	string	true	"Sensor ID"
-// @Security		Keycloak
+//	@Summary		Get sensor by ID
+//	@Description	Get sensor by ID
+//	@Id				get-sensor-by-id
+//	@Tags			Sensor
+//	@Produce		json
+//	@Success		200	{object}	entities.SensorResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/sensor/{sensor_id} [get]
+//	@Param			sensor_id	path	string	true	"Sensor ID"
+//	@Security		Keycloak
 func GetSensorByID(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -86,20 +88,20 @@ func GetSensorByID(svc service.SensorService) fiber.Handler {
 	}
 }
 
-// @Summary		Delete sensor
-// @Description	Delete sensor
-// @Id				delete-sensor
-// @Tags			Sensor
-// @Produce		json
-// @Success		204
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/{sensor_id} [delete]
-// @Param			sensor_id	path	string	true	"Sensor ID"
-// @Security		Keycloak
+//	@Summary		Delete sensor
+//	@Description	Delete sensor
+//	@Id				delete-sensor
+//	@Tags			Sensor
+//	@Produce		json
+//	@Success		204
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/sensor/{sensor_id} [delete]
+//	@Param			sensor_id	path	string	true	"Sensor ID"
+//	@Security		Keycloak
 func DeleteSensor(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()

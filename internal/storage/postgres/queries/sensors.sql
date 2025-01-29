@@ -1,6 +1,9 @@
 -- name: GetAllSensors :many
 SELECT * FROM sensors ORDER BY id;
 
+-- name: GetAllSensorsByProvider :many
+SELECT * FROM sensors WHERE provider = $1 ORDER BY id;
+
 -- name: GetSensorByID :one
 SELECT * FROM sensors WHERE id = $1;
 

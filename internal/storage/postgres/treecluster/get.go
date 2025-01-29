@@ -54,6 +54,24 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 	return data, totalCount, nil
 }
 
+func (r *TreeClusterRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.TreeCluster, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllTreeClustersByProvider(ctx, &provider)
+	if err != nil {
+		log.Debug("failed to get tree clusters in db")
+		return nil, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
+	data := r.mapper.FromSqlList(rows)
+	for _, tc := range data {
+		if err := r.store.MapClusterFields(ctx, tc); err != nil {
+			return nil, r.store.MapError(err, sqlc.TreeCluster{})
+		}
+	}
+
+	return data, nil
+}
+
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {
 	log := logger.GetLogger(ctx)
 	row, err := r.store.GetTreeClusterByID(ctx, id)
