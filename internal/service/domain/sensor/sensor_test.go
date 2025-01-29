@@ -23,7 +23,7 @@ func TestSensorService_GetAll(t *testing.T) {
 
 		// when
 		sensorRepo.EXPECT().GetAll(context.Background()).Return(TestSensorList, nil)
-		sensors, err := svc.GetAll(context.Background())
+		sensors, err := svc.GetAll(context.Background(), "")
 
 		// then
 		assert.NoError(t, err)
@@ -38,7 +38,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().GetAll(context.Background()).Return(nil, storage.ErrSensorNotFound)
-		sensors, err := svc.GetAll(context.Background())
+		sensors, err := svc.GetAll(context.Background(), "")
 
 		// then
 		assert.Error(t, err)

@@ -34,7 +34,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, nil)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -54,7 +54,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, nil)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -75,7 +75,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)

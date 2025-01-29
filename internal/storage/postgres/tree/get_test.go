@@ -68,13 +68,19 @@ func TestTreeRepository_GetByID(t *testing.T) {
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
 		}
-		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+		treeCluster, err := mappers.tcMapper.FromSql(sqlTreeCluster)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		sqlSensor, sensorErr := suite.Store.GetSensorByTreeID(context.Background(), treeID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
-		sensor := mappers.sMapper.FromSql(sqlSensor)
+		sensor, err := mappers.sMapper.FromSql(sqlSensor)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		// when
 		tree, err := r.GetByID(context.Background(), 1)

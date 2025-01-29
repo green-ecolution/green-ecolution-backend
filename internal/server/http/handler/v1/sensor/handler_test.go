@@ -26,6 +26,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestSensorList, nil)
 
 		app.Get("/v1/sensor", handler)
@@ -57,6 +58,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return([]*entities.Sensor{}, nil)
 
 		app.Get("/v1/sensor", handler)
@@ -85,6 +87,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(nil, errors.New("service error"))
 
 		app.Get("/v1/sensor", handler)

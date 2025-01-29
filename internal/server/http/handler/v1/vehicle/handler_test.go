@@ -27,6 +27,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestVehicles, nil)
 
 		// when
@@ -83,6 +84,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return([]*entities.Vehicle{}, nil)
 
 		// when
@@ -111,6 +113,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when

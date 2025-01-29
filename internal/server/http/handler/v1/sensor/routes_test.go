@@ -21,6 +21,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockSensorService.EXPECT().GetAll(
 				mock.Anything,
+				"",
 			).Return(TestSensorList, nil)
 
 			// when

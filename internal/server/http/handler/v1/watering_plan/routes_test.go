@@ -23,6 +23,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockWateringPlanService.EXPECT().GetAll(
 				mock.Anything,
+				"",
 			).Return(TestWateringPlans, nil)
 
 			// when

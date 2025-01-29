@@ -26,6 +26,7 @@ func TestGetAllTrees(t *testing.T) {
 		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestTrees, nil)
 
 		// when
@@ -45,6 +46,7 @@ func TestGetAllTrees(t *testing.T) {
 		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return([]*entities.Tree{}, nil)
 
 		// when
@@ -65,6 +67,7 @@ func TestGetAllTrees(t *testing.T) {
 
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
 
 		// when

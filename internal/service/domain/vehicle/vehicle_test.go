@@ -24,7 +24,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx).Return(expectedVehicles, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -38,7 +38,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx).Return([]*entities.Vehicle{}, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)

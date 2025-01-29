@@ -33,7 +33,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		treeRepo.EXPECT().GetAll(ctx).Return(expectedTrees, nil)
 
 		// when
-		trees, err := svc.GetAll(ctx)
+		trees, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -51,7 +51,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		treeRepo.EXPECT().GetAll(ctx).Return([]*entities.Tree{}, nil)
 
 		// when
-		trees, err := svc.GetAll(ctx)
+		trees, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -72,7 +72,7 @@ func TestTreeService_GetAll(t *testing.T) {
 		treeRepo.EXPECT().GetAll(ctx).Return(nil, expectedError)
 
 		// when
-		trees, err := svc.GetAll(ctx)
+		trees, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)

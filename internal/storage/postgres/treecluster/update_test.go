@@ -107,7 +107,12 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 		updateFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Trees = trees
 			return true, nil
