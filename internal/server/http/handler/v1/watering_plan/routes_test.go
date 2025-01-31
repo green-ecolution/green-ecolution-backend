@@ -32,7 +32,7 @@ func TestRegisterRoutes(t *testing.T) {
 			).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 
 			// then
 			resp, err := app.Test(req)
