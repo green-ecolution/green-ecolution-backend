@@ -11,6 +11,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/sensor"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -19,17 +20,17 @@ import (
 )
 
 func TestGetAllSensors(t *testing.T) {
-	t.Run("should return all sensors successfully with full MqttPayload", func(t *testing.T) {
-		mockSensorService := serviceMock.NewMockSensorService(t)
+	t.Run("should return all sensors successfully with default pagination values", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockSensorService := serviceMock.NewMockSensorService(t)
 		handler := sensor.GetAllSensors(mockSensorService)
+		app.Get("/v1/sensor", handler)
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return(TestSensorList, nil)
-
-		app.Get("/v1/sensor", handler)
+		).Return(TestSensorList, int64(len(TestSensorList)), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor", nil)
@@ -44,9 +45,84 @@ func TestGetAllSensors(t *testing.T) {
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 
-		// Assert response matches test data
+		// assert data
 		assert.Len(t, response.Data, len(TestSensorList))
 		assert.Equal(t, TestSensorList[0].ID, response.Data[0].ID)
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return all sensors successfully with limit 1 and offset 0", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		handler := sensor.GetAllSensors(mockSensorService)
+		app.Get("/v1/sensor", handler)
+
+		mockSensorService.EXPECT().GetAll(
+			mock.Anything,
+		).Return(TestSensorList, int64(len(TestSensorList)), nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor?page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		assert.Nil(t, err)
+		defer resp.Body.Close()
+
+		// then
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.SensorListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Len(t, response.Data, len(TestSensorList))
+		assert.Equal(t, TestSensorList[0].ID, response.Data[0].ID)
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(TestSensorList)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(TestSensorList))/1), response.Pagination.TotalPages)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when page is invalid", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		handler := sensor.GetAllSensors(mockSensorService)
+		app.Get("/v1/sensor", handler)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor?page=0&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when limit is invalid", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		handler := sensor.GetAllSensors(mockSensorService)
+		app.Get("/v1/sensor", handler)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor?page=1&limit=0", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 		mockSensorService.AssertExpectations(t)
 	})
@@ -88,16 +164,16 @@ func TestGetAllSensors(t *testing.T) {
 	})
 
 	t.Run("should return empty sensor list when no sensors found", func(t *testing.T) {
-		mockSensorService := serviceMock.NewMockSensorService(t)
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockSensorService := serviceMock.NewMockSensorService(t)
 		handler := sensor.GetAllSensors(mockSensorService)
+		app.Get("/v1/sensor", handler)
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return([]*entities.Sensor{}, nil)
-
-		app.Get("/v1/sensor", handler)
+			).Return([]*entities.Sensor{}, int64(0), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor", nil)
@@ -111,22 +187,27 @@ func TestGetAllSensors(t *testing.T) {
 		var response serverEntities.SensorListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
+
+		// assert data
 		assert.Len(t, response.Data, 0)
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
 
 		mockSensorService.AssertExpectations(t)
 	})
 
 	t.Run("should return 500 when service returns an error", func(t *testing.T) {
-		mockSensorService := serviceMock.NewMockSensorService(t)
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockSensorService := serviceMock.NewMockSensorService(t)
 		handler := sensor.GetAllSensors(mockSensorService)
+		app.Get("/v1/sensor", handler)
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return(nil, errors.New("service error"))
-
-		app.Get("/v1/sensor", handler)
+		).Return(nil, int64(0), errors.New("service error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor", nil)

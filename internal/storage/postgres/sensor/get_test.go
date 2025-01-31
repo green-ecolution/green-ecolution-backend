@@ -86,7 +86,6 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		assert.Equal(t, totalCount, int64(0))
 	})
 
-
 	t.Run("should return error on invalid limit value", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -104,7 +103,6 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		assert.Empty(t, got)
 		assert.Equal(t, totalCount, int64(0))
 	})
-
 
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
