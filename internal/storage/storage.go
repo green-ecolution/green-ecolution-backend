@@ -49,6 +49,8 @@ var (
 
 	ErrUnknownVehicleType = errors.New("unknown vehicle type")
 	ErrBucketNotExists    = errors.New("bucket don't exists")
+
+	ErrPaginationValueInvalid = errors.New("pagination values are invalid")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {

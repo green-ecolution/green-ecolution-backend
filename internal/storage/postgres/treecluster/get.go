@@ -7,14 +7,24 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/twpayne/go-geos"
 )
 
 func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
+	if page <= 0 || limit <= 0 {
+		return []*entities.TreeCluster{}, 0, storage.ErrPaginationValueInvalid
+	}
+
+	totalCount, err := r.store.GetAllTreeClustersCount(ctx)
+	if err != nil {
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
-		Limit: limit,
+		Limit:  limit,
 		Offset: (page - 1) * limit,
 	})
 

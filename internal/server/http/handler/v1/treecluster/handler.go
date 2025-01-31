@@ -30,47 +30,51 @@ var (
 // @Param			limit	query	string	false	"Limit"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
-    return func(c *fiber.Ctx) error {
-        ctx := c.Context()
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
 
-        page, err := strconv.Atoi(c.Query("page", "1"))
-        if err != nil || page < 1 {
-            page = 1
-        }
+		pageParam, err := strconv.Atoi(c.Query("page", "1"))
+		if err != nil || pageParam < 1 {
+			err := service.NewError(service.BadRequest, "invalid page format")
+			return errorhandler.HandleError(err)
+		}
+		page := int32(pageParam)
 
-        limit, err := strconv.Atoi(c.Query("limit", "10"))
-        if err != nil || limit == 0 {
-            limit = 10
-        }
+		limitParam, err := strconv.Atoi(c.Query("limit", "10"))
+		if err != nil || limitParam < 1 {
+			err := service.NewError(service.BadRequest, "invalid limit format")
+			return errorhandler.HandleError(err)
+		}
+		limit := int32(limitParam)
 
-        domainData, totalCount, err := svc.GetAll(ctx, int32(page), int32(limit))
-        if err != nil {
-            return errorhandler.HandleError(err)
-        }
+		domainData, totalCount, err := svc.GetAll(ctx, page, limit)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
 
-        data := make([]*entities.TreeClusterInListResponse, len(domainData))
-        for i, domain := range domainData {
-            data[i] = treeClusterMapper.FromInListResponse(domain)
-        }
+		data := make([]*entities.TreeClusterInListResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = treeClusterMapper.FromInListResponse(domain)
+		}
 
-        var pagination *entities.Pagination
-        if limit != -1 {
-			totalPages, nextPage, prevPage := entities.CalculatePagination(int32(totalCount), int32(limit), int32(page))
+		var pagination *entities.Pagination
+		if limit != -1 {
+			totalPages, nextPage, prevPage := entities.CalculatePagination(int32(totalCount), limit, page)
 
-            pagination = &entities.Pagination{
-                Total:       totalCount,
-                CurrentPage: int32(page),
-                TotalPages:  totalPages,
-                NextPage:    nextPage,
-                PrevPage:    prevPage,
-            }
-        }
+			pagination = &entities.Pagination{
+				Total:       totalCount,
+				CurrentPage: page,
+				TotalPages:  totalPages,
+				NextPage:    nextPage,
+				PrevPage:    prevPage,
+			}
+		}
 
-        return c.JSON(entities.TreeClusterListResponse{
-            Data:       data,
-            Pagination: pagination,
-        })
-    }
+		return c.JSON(entities.TreeClusterListResponse{
+			Data:       data,
+			Pagination: pagination,
+		})
+	}
 }
 
 // @Summary		Get tree cluster by ID

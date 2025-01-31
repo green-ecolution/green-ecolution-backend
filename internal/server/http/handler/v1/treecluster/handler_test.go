@@ -24,37 +24,35 @@ func TestGetAllTreeCluster(t *testing.T) {
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
-	
+
 		page := int32(1)
-	
+
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
 			page,
 			int32(10),
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
-		
+
 		// Create the HTTP request
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
-	
+
 		// Check for errors
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
-	
+
 		var response serverEntities.TreeClusterListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
-	
+
 		// Validate response data (assuming the TestClusterList is populated correctly)
-		assert.Equal(t, len(TestClusterList), len(response.Data)) // Ensure data length matches
+		assert.Equal(t, len(TestClusterList), len(response.Data))       // Ensure data length matches
 		assert.Equal(t, TestClusterList[0].Name, response.Data[0].Name) // Validate some field
-	
+
 		// Assert expectations on the mock service
 		mockClusterService.AssertExpectations(t)
 	})
-	
-
 
 	// t.Run("should return an empty list when no tree clusters are available", func(t *testing.T) {
 	// 	app := fiber.New()
