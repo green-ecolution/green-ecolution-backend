@@ -162,6 +162,7 @@ type VehicleService interface {
 }
 
 type WateringPlanService interface {
+	Service
 	// TODO: use CrudService as soon as every service has pagination
 	//CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
 	GetAll(ctx context.Context) ([]*domain.WateringPlan, int64, error)
