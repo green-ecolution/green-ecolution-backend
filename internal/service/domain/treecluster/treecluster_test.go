@@ -27,10 +27,10 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
 		expectedClusters := testClusters
-		clusterRepo.EXPECT().GetAll(ctx, int32(1), int32(10)).Return(expectedClusters, int64(len(expectedClusters)), nil)
+		clusterRepo.EXPECT().GetAll(ctx, int32(1), int32(-1)).Return(expectedClusters, int64(len(expectedClusters)), nil)
 
 		// when
-		clusters, totalCount, err := svc.GetAll(ctx, int32(1), int32(10))
+		clusters, totalCount, err := svc.GetAll(ctx, int32(1), int32(-1))
 
 		// then
 		assert.NoError(t, err)

@@ -40,12 +40,16 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 		}
 		page := int32(pageParam)
 
-		limitParam, err := strconv.Atoi(c.Query("limit", "10"))
-		if err != nil || limitParam < 1 {
-			err := service.NewError(service.BadRequest, "invalid limit format")
-			return errorhandler.HandleError(err)
+		limit := int32(-1)
+		limitParam := c.Query("limit", "-1")
+		if limitParam != "" {
+			limitParam, err := strconv.Atoi(limitParam)
+			if err != nil || (limitParam != -1 && limitParam <= 0) {
+				err := service.NewError(service.BadRequest, "invalid limit format")
+				return errorhandler.HandleError(err)
+			}
+			limit = int32(limitParam)
 		}
-		limit := int32(limitParam)
 
 		domainData, totalCount, err := svc.GetAll(ctx, page, limit)
 		if err != nil {

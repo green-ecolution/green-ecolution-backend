@@ -16,7 +16,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
 		// when
-		got, totalCount, err := r.GetAll(context.Background(), int32(1), int32(len(allTestCluster)))
+		got, totalCount, err := r.GetAll(context.Background(), int32(1), int32(-1))
 
 		// then
 		assert.NoError(t, err)

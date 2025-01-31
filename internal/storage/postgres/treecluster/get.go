@@ -14,13 +14,18 @@ import (
 
 func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
-	if page <= 0 || limit <= 0 {
+	if page <= 0 || (limit != -1 && limit <= 0) {
 		return []*entities.TreeCluster{}, 0, storage.ErrPaginationValueInvalid
 	}
 
 	totalCount, err := r.store.GetAllTreeClustersCount(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
+	if limit == -1 {
+		limit = int32(totalCount)
+		page = 1
 	}
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
