@@ -5,6 +5,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,9 +15,11 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
+	
+		ctx := context.WithValue(context.Background(), middleware.Page, int32(1))
+		ctx = context.WithValue(ctx, middleware.Limit, int32(-1))
 
-		// when
-		got, totalCount, err := r.GetAll(context.Background(), int32(1), int32(-1))
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -59,8 +62,11 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), middleware.Page, int32(2))
+		ctx = context.WithValue(ctx, middleware.Limit, int32(2))
+
 		// when
-		got, totalCount, err := r.GetAll(context.Background(), int32(2), int32(2))
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -84,8 +90,11 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), middleware.Page, int32(0))
+		ctx = context.WithValue(ctx, middleware.Limit, int32(2))
+
 		// when
-		got, totalCount, err := r.GetAll(context.Background(), int32(0), int32(2))
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)
@@ -99,8 +108,11 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), middleware.Page, int32(2))
+		ctx = context.WithValue(ctx, middleware.Limit, int32(0))
+
 		// when
-		got, totalCount, err := r.GetAll(context.Background(), int32(2), int32(0))
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)
@@ -113,8 +125,11 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		suite.ResetDB(t)
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), middleware.Page, int32(2))
+		ctx = context.WithValue(ctx, middleware.Limit, int32(2))
+
 		// when
-		got, totalCount, err := r.GetAll(context.Background(), int32(2), int32(2))
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -129,7 +144,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		_, _, err := r.GetAll(ctx, int32(2), int32(2))
+		_, _, err := r.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)

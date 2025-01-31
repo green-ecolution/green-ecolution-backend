@@ -30,7 +30,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		clusterRepo.EXPECT().GetAll(ctx, int32(1), int32(-1)).Return(expectedClusters, int64(len(expectedClusters)), nil)
 
 		// when
-		clusters, totalCount, err := svc.GetAll(ctx, int32(1), int32(-1))
+		clusters, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -44,10 +44,10 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		clusterRepo.EXPECT().GetAll(ctx, int32(1), int32(10)).Return([]*entities.TreeCluster{}, int64(0), nil)
+		clusterRepo.EXPECT().GetAll(ctx).Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
-		clusters, totalCount, err := svc.GetAll(ctx, int32(1), int32(10))
+		clusters, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -63,52 +63,16 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 
 		expectedErr := errors.New("GetAll failed")
 
-		clusterRepo.EXPECT().GetAll(ctx, int32(1), int32(10)).Return(nil, int64(0), expectedErr)
+		clusterRepo.EXPECT().GetAll(ctx).Return(nil, int64(0), expectedErr)
 
 		// when
-		clusters, totalCount, err := svc.GetAll(ctx, int32(1), int32(10))
+		clusters, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, clusters)
 		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: GetAll failed")
-	})
-
-	t.Run("should return error when page has invalid value", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
-
-		clusterRepo.EXPECT().GetAll(ctx, int32(0), int32(10)).Return(nil, int64(0), storage.ErrPaginationValueInvalid)
-
-		// when
-		clusters, totalCount, err := svc.GetAll(ctx, int32(0), int32(10))
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, clusters)
-		assert.Equal(t, totalCount, int64(0))
-		//assert.EqualError(t, err, "500: pagination values are invalid")
-	})
-
-	t.Run("should return error when limit has invalid value", func(t *testing.T) {
-		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
-		treeRepo := storageMock.NewMockTreeRepository(t)
-		regionRepo := storageMock.NewMockRegionRepository(t)
-		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
-
-		clusterRepo.EXPECT().GetAll(ctx, int32(2), int32(0)).Return(nil, int64(0), storage.ErrPaginationValueInvalid)
-
-		// when
-		clusters, totalCount, err := svc.GetAll(ctx, int32(2), int32(0))
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, clusters)
-		assert.Equal(t, totalCount, int64(0))
-		//assert.EqualError(t, err, "500: pagination values are invalid")
 	})
 }
 

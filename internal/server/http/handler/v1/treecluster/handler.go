@@ -33,7 +33,7 @@ var (
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-
+		
 		domainData, totalCount, err := svc.GetAll(ctx)
 		if err != nil {
 			return errorhandler.HandleError(err)

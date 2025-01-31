@@ -12,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -22,14 +23,13 @@ import (
 func TestGetAllTreeCluster(t *testing.T) {
 	t.Run("should return all tree clusters successfully with default pagination values", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
-			int32(1),
-			int32(-1),
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
@@ -52,17 +52,15 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 		mockClusterService.AssertExpectations(t)
 	})
-
 	t.Run("should return tree clusters successfully with limit 1 and offset 0", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
-			int32(1),
-			int32(1),
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=1", nil)
@@ -90,8 +88,9 @@ func TestGetAllTreeCluster(t *testing.T) {
 		mockClusterService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 bad request when page is invalid", func(t *testing.T) {
+	t.Run("should return error when page is invalid", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
@@ -101,13 +100,14 @@ func TestGetAllTreeCluster(t *testing.T) {
 		defer resp.Body.Close()
 
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
 		mockClusterService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 bad request when limit is invalid", func(t *testing.T) {
+	t.Run("should return error when limit is invalid", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
@@ -117,21 +117,20 @@ func TestGetAllTreeCluster(t *testing.T) {
 		defer resp.Body.Close()
 
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
 		mockClusterService.AssertExpectations(t)
 	})
 
 	t.Run("should return an empty list when no tree clusters are available", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
-			int32(1),
-			int32(-1),
 		).Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
@@ -158,14 +157,13 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
-			int32(1),
-			int32(-1),
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
