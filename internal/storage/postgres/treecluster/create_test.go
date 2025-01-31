@@ -49,6 +49,17 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
+		newRegion := &entities.Region{
+			ID:        1,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "Mürwik",
+		}
+		lat := 54.3
+		long := 9.5
+		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		assert.NoError(t, err)
+		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
 		createFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "test"
 			tc.Address = "address"
@@ -56,6 +67,10 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 			tc.MoistureLevel = 1.0
 			tc.WateringStatus = entities.WateringStatusGood
 			tc.SoilCondition = entities.TreeSoilConditionSchluffig
+			tc.Region = newRegion
+			tc.Latitude = &lat
+			tc.Longitude = &long
+			tc.Trees = trees
 			return true, nil
 		}
 
@@ -69,17 +84,24 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.NotZero(t, got.ID)
 		assert.WithinDuration(t, got.CreatedAt, time.Now(), time.Second)
 		assert.WithinDuration(t, got.UpdatedAt, time.Now(), time.Second)
-		assert.Nil(t, got.Region)
-		assert.Empty(t, got.Trees)
+		assert.Equal(t, newRegion.ID, got.Region.ID)
+		assert.Equal(t, newRegion.Name, got.Region.Name)
 		assert.Equal(t, "address", got.Address)
 		assert.Equal(t, "description", got.Description)
 		assert.Equal(t, 1.0, got.MoistureLevel)
-		assert.Nil(t, got.Latitude)
-		assert.Nil(t, got.Longitude)
+		assert.NotNil(t, got.Latitude)
+		assert.NotNil(t, got.Longitude)
+		assert.Equal(t, lat, *got.Latitude)
+		assert.Equal(t, long, *got.Longitude)
 		assert.Equal(t, entities.WateringStatusGood, got.WateringStatus)
 		assert.Equal(t, entities.TreeSoilConditionSchluffig, got.SoilCondition)
 		assert.False(t, got.Archived)
 		assert.Nil(t, got.LastWatered)
+		assert.NotNil(t, got.Trees)
+		assert.Len(t, got.Trees, len(trees))
+		for _, tree := range testTrees[0:2] {
+			assert.Equal(t, got.ID, *tree.TreeClusterID)
+		}
 	})
 
 	t.Run("should return tree cluster with trees and link tree cluster id to trees", func(t *testing.T) {
