@@ -31,7 +31,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
-		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, nil)
+		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, int64(len(allTestWateringPlans)), nil)
 
 		// when
 		wateringPlans, err := svc.GetAll(ctx, "")
@@ -55,10 +55,12 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 		// when
 		wateringPlans, err := svc.GetAll(ctx, "test-provider")
+		wateringPlans, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, allTestWateringPlans, wateringPlans)
+		assert.Equal(t, totalCount, int64(len(allTestWateringPlans)))
 	})
 
 	t.Run("should return empty slice when no watering plans are found", func(t *testing.T) {
@@ -71,14 +73,15 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
-		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, nil)
+		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, int64(0), nil)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx, "")
+		wateringPlans, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, wateringPlans)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when GetAll fails", func(t *testing.T) {
@@ -92,14 +95,15 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		expectedErr := errors.New("GetAll failed")
-		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
+		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, int64(0), expectedErr)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx, "")
+		wateringPlans, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, wateringPlans)
+		assert.Equal(t, totalCount, int64(0))
 		// assert.Equal(t, "500: GetAll failed", err.Error())
 	})
 }
