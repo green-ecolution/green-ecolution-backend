@@ -9,6 +9,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -19,14 +20,18 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockClusterService := serviceMock.NewMockTreeClusterService(t)
 			app := fiber.New()
+			app.Use(middleware.PaginationMiddleware())
 			treecluster.RegisterRoutes(app, mockClusterService)
+
+			ctx := context.WithValue(context.Background(), "page", int32(1))
+			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockClusterService.EXPECT().GetAll(
 				mock.Anything,
-			).Return(TestClusterList, nil)
+			).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 
 			// then
 			resp, err := app.Test(req)

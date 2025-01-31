@@ -9,20 +9,23 @@ import (
 )
 
 func TestTreeClusterRepository_GetAll(t *testing.T) {
-	t.Run("should return all tree clusters ordered by name", func(t *testing.T) {
+	t.Run("should return all tree clusters ordered by name without limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		// when
-		got, err := r.GetAll(context.Background())
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
 		assert.Len(t, got, len(allTestCluster))
+		assert.Equal(t, totalCount, int64(len(allTestCluster)))
 
 		sortedTestCluster := sortClusterByName(allTestCluster)
 
@@ -52,17 +55,85 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return tree clusters ordered by name limited by 2 and with an offset of 2", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, 2)
+		assert.Equal(t, totalCount, int64(len(allTestCluster)))
+
+		sortedTestCluster := sortClusterByName(allTestCluster)
+		sortedTestCluster = sortedTestCluster[2:4]
+
+		for i, tc := range got {
+			assert.Equal(t, sortedTestCluster[i].ID, tc.ID)
+			assert.Equal(t, sortedTestCluster[i].Name, tc.Name)
+		}
+	})
+
+	t.Run("should return error on invalid page value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(0))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
+	t.Run("should return error on invalid limit value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(0))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -72,7 +143,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		_, err := r.GetAll(ctx)
+		_, _, err := r.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)

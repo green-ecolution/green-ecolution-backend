@@ -49,6 +49,8 @@ var (
 
 	ErrUnknownVehicleType = errors.New("unknown vehicle type")
 	ErrBucketNotExists    = errors.New("bucket don't exists")
+
+	ErrPaginationValueInvalid = errors.New("pagination values are invalid")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
@@ -125,7 +127,7 @@ type WateringPlanRepository interface {
 
 type TreeClusterRepository interface {
 	// GetAll returns all tree clusters
-	GetAll(ctx context.Context) ([]*entities.TreeCluster, error)
+	GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error)
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids

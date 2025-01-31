@@ -123,7 +123,14 @@ type RegionService interface {
 
 type TreeClusterService interface {
 	Service
-	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
+	// TODO: use CrudService as soon as every service has pagination
+	// CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
+	GetAll(ctx context.Context) ([]*domain.TreeCluster, int64, error)
+	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
+	Create(ctx context.Context, createData *domain.TreeClusterCreate) (*domain.TreeCluster, error)
+	Update(ctx context.Context, id int32, updateData *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
+	Delete(ctx context.Context, id int32) error
+
 	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
 	HandleCreateTree(context.Context, *domain.EventCreateTree) error
 	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error

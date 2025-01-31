@@ -27,14 +27,15 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
 		expectedClusters := testClusters
-		clusterRepo.EXPECT().GetAll(ctx).Return(expectedClusters, nil)
+		clusterRepo.EXPECT().GetAll(ctx).Return(expectedClusters, int64(len(expectedClusters)), nil)
 
 		// when
-		clusters, err := svc.GetAll(ctx)
+		clusters, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedClusters, clusters)
+		assert.Equal(t, totalCount, int64(len(expectedClusters)))
 	})
 
 	t.Run("should return empty slice when no clusters are found", func(t *testing.T) {
@@ -43,14 +44,15 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		clusterRepo.EXPECT().GetAll(ctx).Return([]*entities.TreeCluster{}, nil)
+		clusterRepo.EXPECT().GetAll(ctx).Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
-		clusters, err := svc.GetAll(ctx)
+		clusters, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, clusters)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when GetAll fails", func(t *testing.T) {
@@ -61,14 +63,15 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 
 		expectedErr := errors.New("GetAll failed")
 
-		clusterRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
+		clusterRepo.EXPECT().GetAll(ctx).Return(nil, int64(0), expectedErr)
 
 		// when
-		clusters, err := svc.GetAll(ctx)
+		clusters, totalCount, err := svc.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, clusters)
+		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: GetAll failed")
 	})
 }

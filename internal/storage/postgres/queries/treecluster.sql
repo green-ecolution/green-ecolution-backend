@@ -1,5 +1,10 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters ORDER BY name ASC;
+SELECT * FROM tree_clusters 
+ORDER BY name ASC
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllTreeClustersCount :one
+SELECT COUNT(*) FROM tree_clusters;
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
