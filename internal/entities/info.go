@@ -30,3 +30,9 @@ type Server struct {
 	Interface string
 	Uptime    time.Duration
 }
+
+type Map struct {
+	Center         GeoJSONLocation
+	BoundSouthWest GeoJSONLocation
+	BoundNorthEast GeoJSONLocation
+}

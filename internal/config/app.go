@@ -60,9 +60,9 @@ type RoutingVroomConfig struct {
 }
 
 type MapConfig struct {
-	Center []float64			`mapstructure:"center"`
-	BoundSouthWest []float64 	`mapstucture:"bound_south_west"`
-	BoundNorthEast []float64	`mapstructure:"bound_north_east"`
+	Center         []float64 `mapstructure:"center"`
+	BoundSouthWest []float64 `mapstucture:"bound_south_west"`
+	BoundNorthEast []float64 `mapstructure:"bound_north_east"`
 }
 
 type S3Config struct {

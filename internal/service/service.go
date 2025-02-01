@@ -93,6 +93,8 @@ type InfoService interface {
 	Service
 	GetAppInfo(context.Context) (*domain.App, error)
 	GetAppInfoResponse(context.Context) (*domain.App, error)
+	GetMapInfo(context.Context) (*domain.Map, error)
+	GetMapInfoResponse(context.Context) (*domain.Map, error)
 }
 
 type TreeService interface {

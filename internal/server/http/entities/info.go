@@ -24,3 +24,9 @@ type ServerResponse struct {
 	Interface string `json:"interface"`
 	Uptime    string `json:"uptime"`
 } // @Name ServerInfo
+
+type MapResponse struct {
+	Center         GeoJSONLocation `json:"center"`
+	BoundSouthWest GeoJSONLocation `json:"bounds_south_west"`
+	BoundNorthEast GeoJSONLocation `json:"bounds_north_east"`
+} // @Name MapInfo
