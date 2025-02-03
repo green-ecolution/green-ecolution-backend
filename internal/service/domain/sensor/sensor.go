@@ -142,6 +142,7 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 }
 
 func (s *SensorService) UpdateStatuses(ctx context.Context) error {
+	log := logger.GetLogger(ctx)
 	sensors, err := s.sensorRepo.GetAll(ctx)
 	if err != nil {
 		return err
@@ -152,9 +153,9 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 		if sens.UpdatedAt.Before(cutoffTime) {
 			_, err = s.sensorRepo.Update(ctx, sens.ID, sensor.WithStatus(entities.SensorStatusOffline))
 			if err != nil {
-				slog.Error("Failed to update sensor %s to offline: %v", sens.ID, err.Error())
+				log.Error("failed to update sensor status to offline", "sensor_id", sens.ID, "error", err, "prev_sensor_status", sens.Status)
 			} else {
-				slog.Info("Sensor marked as offline due to inactivity", "id", sens.ID)
+				log.Info("sensor marked as offline due to inactivity", "sensor_id", sens.ID, "prev_sensor_status", sens.Status)
 			}
 		}
 	}
