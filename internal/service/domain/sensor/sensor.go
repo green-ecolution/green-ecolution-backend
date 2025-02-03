@@ -151,7 +151,11 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 	cutoffTime := time.Now().Add(-72 * time.Hour) // 3 days ago
 	for _, sens := range sensors {
 		if sens.UpdatedAt.Before(cutoffTime) {
-			_, err = s.sensorRepo.Update(ctx, sens.ID, sensor.WithStatus(entities.SensorStatusOffline))
+			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor) (bool, error) {
+				s.Status = entities.SensorStatusOffline
+				return true, nil
+			})
+
 			if err != nil {
 				log.Error("failed to update sensor status to offline", "sensor_id", sens.ID, "error", err, "prev_sensor_status", sens.Status)
 			} else {
