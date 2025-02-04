@@ -47,7 +47,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 	data, err := r.mapper.FromSqlList(rows)
 	if err != nil {
 		log.Debug("failed to convert entity", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
 	for _, tc := range data {

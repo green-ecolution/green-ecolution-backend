@@ -62,6 +62,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=1", nil)

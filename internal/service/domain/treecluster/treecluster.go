@@ -38,14 +38,15 @@ func NewTreeClusterService(
 	}
 }
 
-func (s *TreeClusterService) GetAll(ctx context.Context, provider string) ([]*domain.TreeCluster, error) {
+func (s *TreeClusterService) GetAll(ctx context.Context, provider string) ([]*domain.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
 	var treeClusters []*domain.TreeCluster
-	var totalCount int
+	var totalCount int64
 	var err error
 
 	if provider != "" {
-		treeClusters, totalCount, err = s.treeClusterRepo.GetAll(ctx, provider)
+		treeClusters, err = s.treeClusterRepo.GetAllByProvider(ctx, provider)
+		totalCount = int64(len(treeClusters))
 	} else {
 		treeClusters, totalCount, err = s.treeClusterRepo.GetAll(ctx)
 	}
