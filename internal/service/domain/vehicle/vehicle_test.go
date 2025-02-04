@@ -31,6 +31,21 @@ func TestVehicleService_GetAll(t *testing.T) {
 		assert.Equal(t, expectedVehicles, vehicles)
 	})
 
+	t.Run("should return all vehicles when successful with provider", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		expectedVehicles := getTestVehicles()
+		vehicleRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedVehicles, nil)
+
+		// when
+		vehicles, err := svc.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVehicles, vehicles)
+	})
+
 	t.Run("should return empty slice when no vehicles are found", func(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)

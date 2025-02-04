@@ -38,6 +38,24 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		assert.Equal(t, totalCount, int64(len(expectedClusters)))
 	})
 
+	t.Run("should return all tree clusters when successful with provider", func(t *testing.T) {
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		regionRepo := storageMock.NewMockRegionRepository(t)
+		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
+
+		expectedClusters := testClusters
+		clusterRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedClusters, nil)
+
+		// when
+		clusters, totalCount, err := svc.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedClusters, clusters)
+		assert.Equal(t, totalCount, int64(len(expectedClusters)))
+	})
+
 	t.Run("should return empty slice when no clusters are found", func(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)

@@ -40,6 +40,25 @@ func TestTreeService_GetAll(t *testing.T) {
 		assert.Equal(t, expectedTrees, trees)
 	})
 
+	t.Run("should return all trees when successful with provider", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
+
+		expectedTrees := TestTreesList
+		treeRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedTrees, nil)
+
+		// when
+		trees, err := svc.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedTrees, trees)
+	})
+
 	t.Run("should return empty slice when no trees are found", func(t *testing.T) {
 		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
@@ -252,6 +271,8 @@ func TestTreeService_Create(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(expectedTree, nil)
 
 		// when
@@ -353,6 +374,8 @@ func TestTreeService_Create(t *testing.T) {
 		treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeCreate.TreeClusterID).Return(expectedCluster, nil)
 		sensorRepo.EXPECT().GetByID(ctx, *TestTreeCreate.SensorID).Return(expectedSensor, nil)
 		treeRepo.EXPECT().Create(ctx,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
@@ -513,6 +536,7 @@ func TestTreeService_Update(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(updatedTree, nil)
 
 		// when
@@ -661,6 +685,7 @@ func TestTreeService_Update(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(nil, expectedError)
 
 		// when
@@ -698,7 +723,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 		go eventManager.Run(ctx)
 
 		// Mock expectations
-		treeRepo.EXPECT().Create(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&expectedTree, nil)
+		treeRepo.EXPECT().Create(ctx, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(&expectedTree, nil)
 
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, eventManager)
 
@@ -742,6 +767,8 @@ func TestTreeService_EventSystem(t *testing.T) {
 		treeRepo.EXPECT().GetByID(ctx, prevTree.ID).Return(&prevTree, nil)
 		treeClusterRepo.EXPECT().GetByID(ctx, TestTreeClusters[0].ID).Return(TestTreeClusters[0], nil)
 		treeRepo.EXPECT().Update(ctx, prevTree.ID,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
