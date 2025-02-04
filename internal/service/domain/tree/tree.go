@@ -211,9 +211,9 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			tree.Sensor = sensor
 			if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
 				status := utils.CalculateWateringStatus(ctx, tu.PlantingYear, sensor.LatestData.Data.Watermarks)
-			tree.WateringStatus = status
+				tree.WateringStatus = status
 			}
-		}else{
+		} else {
 			tree.Sensor = nil
 			tree.WateringStatus = entities.WateringStatusUnknown
 		}

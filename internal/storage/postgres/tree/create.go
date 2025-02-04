@@ -86,7 +86,6 @@ func (r *TreeRepository) createWithTx(
 
 		id, err := r.createEntity(ctx, &entity)
 		if err != nil {
-
 			log.Error("failed to create tree entity in db", "error", err)
 			return err
 		}
