@@ -43,6 +43,38 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all verhicles with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		expectedVehicle := allTestVehicles[len(allTestVehicles)-1]
+
+		// when
+		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 1)
+		assert.Equal(t, expectedVehicle.ID, got[0].ID)
+		assert.Equal(t, expectedVehicle.Description, got[0].Description)
+		assert.Equal(t, expectedVehicle.NumberPlate, got[0].NumberPlate)
+		assert.Equal(t, expectedVehicle.WaterCapacity, got[0].WaterCapacity)
+		assert.Equal(t, expectedVehicle.Type, got[0].Type)
+		assert.Equal(t, expectedVehicle.Status, got[0].Status)
+		assert.Equal(t, expectedVehicle.DrivingLicense, got[0].DrivingLicense)
+		assert.Equal(t, expectedVehicle.Height, got[0].Height)
+		assert.Equal(t, expectedVehicle.Width, got[0].Width)
+		assert.Equal(t, expectedVehicle.Length, got[0].Length)
+		assert.Equal(t, expectedVehicle.Weight, got[0].Weight)
+		assert.Equal(t, expectedVehicle.Model, got[0].Model)
+		assert.Equal(t, expectedVehicle.Provider, got[0].Provider)
+		assert.Equal(t, expectedVehicle.AdditionalInfo, got[0].AdditionalInfo)
+		assert.NotZero(t, got[0].CreatedAt)
+		assert.NotZero(t, got[0].UpdatedAt)
+	})
+
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -83,7 +115,7 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, 1, len(got))
+		assert.Len(t, got, 2)
 		for _, vehicle := range got {
 			assert.Equal(t, entities.VehicleTypeTransporter, vehicle.Type)
 		}
@@ -338,6 +370,24 @@ var allTestVehicles = []*entities.Vehicle{
 		Length:         5.0,
 		Width:          2.4,
 		Weight:         3.7,
+	},
+	{
+		ID:             3,
+		NumberPlate:    "B-1001",
+		Description:    "Test vehicle 3",
+		WaterCapacity:  150.0,
+		Type:           entities.VehicleTypeTransporter,
+		Status:         entities.VehicleStatusUnknown,
+		Model:          "Actros L Mercedes Benz",
+		DrivingLicense: entities.DrivingLicenseC,
+		Height:         2.1,
+		Length:         5.0,
+		Width:          2.4,
+		Weight:         3.7,
+		Provider:       "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 }
 

@@ -55,6 +55,26 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all tree clusters with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		expectedCluster := allTestCluster[len(allTestCluster)-1]
+
+		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, 1)
+		assert.Equal(t, expectedCluster.ID, got[0].ID)
+		assert.Equal(t, expectedCluster.Name, got[0].Name)
+		assert.Equal(t, expectedCluster.Provider, got[0].Provider)
+		assert.Equal(t, expectedCluster.AdditionalInfo, got[0].AdditionalInfo)
+	})
+
 	t.Run("should return tree clusters ordered by name limited by 2 and with an offset of 2", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -346,10 +366,12 @@ func TestTreeClusterRepository_GetAllLatestSensorDataByClusterID(t *testing.T) {
 }
 
 type testTreeCluster struct {
-	ID       int32
-	Name     string
-	RegionID int32
-	TreeIDs  []int32
+	ID             int32
+	Name           string
+	RegionID       int32
+	TreeIDs        []int32
+	Provider       string
+	AdditionalInfo map[string]interface{}
 }
 
 var allTestCluster = []*testTreeCluster{
@@ -404,6 +426,10 @@ var allTestCluster = []*testTreeCluster{
 		Name:     "Gewerbegebiet Süd",
 		RegionID: -1, // no region
 		TreeIDs:  []int32{25, 26, 27, 28},
+		Provider: "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 }
 
