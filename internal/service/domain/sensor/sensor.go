@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
