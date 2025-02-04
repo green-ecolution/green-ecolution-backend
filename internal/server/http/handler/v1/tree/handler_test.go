@@ -40,6 +40,29 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.AssertExpectations(t)
 	})
 
+	t.Run("should return all trees with provider successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockTreeService := serviceMock.NewMockTreeService(t)
+		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
+		mockTreeService.EXPECT().GetAll(
+			mock.Anything,
+			"test-provider",
+		).Return(TestTrees, nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
+		query := req.URL.Query()
+		query.Add("provider", "test-provider")
+		req.URL.RawQuery = query.Encode()
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		mockTreeService.AssertExpectations(t)
+	})
+
 	t.Run("should return an empty list when no trees are available", func(t *testing.T) {
 		app := fiber.New()
 		mockTreeService := serviceMock.NewMockTreeService(t)

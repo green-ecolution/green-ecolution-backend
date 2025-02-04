@@ -53,6 +53,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 		mockClusterService.AssertExpectations(t)
 	})
+
 	t.Run("should return tree clusters successfully with limit 1 and offset 0", func(t *testing.T) {
 		app := fiber.New()
 		app.Use(middleware.PaginationMiddleware())
@@ -86,6 +87,42 @@ func TestGetAllTreeCluster(t *testing.T) {
 		assert.Equal(t, int32(2), *response.Pagination.NextPage)
 		assert.Empty(t, response.Pagination.PrevPage)
 		assert.Equal(t, int32((len(TestClusterList))/1), response.Pagination.TotalPages)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters successfully with provider", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything,
+			"test-provider",
+		).Return(TestClusterList, int64(len(TestClusterList)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
+		query := req.URL.Query()
+		query.Add("provider", "test-provider")
+		req.URL.RawQuery = query.Encode()
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Equal(t, len(TestClusterList), len(response.Data))
+		assert.Equal(t, TestClusterList[0].Name, response.Data[0].Name)
+
+		// assert pagination
+		assert.Nil(t, response.Pagination)
 
 		mockClusterService.AssertExpectations(t)
 	})

@@ -48,6 +48,38 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
+	t.Run("should return all vehicles successfully with provider", func(t *testing.T) {
+		app := fiber.New()
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
+
+		mockVehicleService.EXPECT().GetAll(
+			mock.Anything,
+			"test-provider",
+		).Return(TestVehicles, nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
+		query := req.URL.Query()
+		query.Add("provider", "test-provider")
+		req.URL.RawQuery = query.Encode()
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.VehicleListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+		assert.Equal(t, 2, len(response.Data))
+		assert.Equal(t, TestVehicles[0].ID, response.Data[0].ID)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
 	t.Run("should return all vehicles by one type successfully", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
