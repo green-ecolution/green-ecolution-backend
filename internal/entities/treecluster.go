@@ -51,3 +51,10 @@ type TreeClusterUpdate struct {
 	Provider       string
 	AdditionalInfo map[string]interface{}
 }
+
+type TreeClusterFilter struct {
+	WateringStatus WateringStatus
+	Region         string
+	Limit          int32
+	Offset         int32
+}

@@ -1,12 +1,33 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters 
-WHERE ($1 = '') OR (provider = $1)
-ORDER BY name ASC
-LIMIT $2 OFFSET $3;
+SELECT tc.*
+FROM tree_clusters tc
+         LEFT JOIN regions r ON r.id = tc.region_id
+WHERE
+    ($1 != '' AND $1 IS NOT NULL AND tc.watering_status = $1::watering_status OR $1 = '' OR $1 IS NULL)
+  AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL)
+ORDER BY tc.name ASC
+     LIMIT $3 OFFSET $4;
+
+
 
 -- name: GetAllTreeClustersCount :one
 SELECT COUNT(*) FROM tree_clusters
 WHERE ($1 = '') OR (provider = $1);
+
+-- name: GetTreeClustersCountByStatus :one
+SELECT COUNT(*) FROM tree_clusters
+WHERE watering_status = $1;
+
+-- name: GetTreeClustersCountByRegion :one
+SELECT COUNT(*)
+FROM tree_clusters tc
+         JOIN regions r ON r.id = tc.region
+WHERE r.name = $1;
+
+-- name: GetTreeClustersCountByStatusAndRegion :one
+SELECT COUNT(*) FROM tree_clusters tc
+         JOIN regions r ON r.id = tc.region
+WHERE watering_status = $1 AND r.name = $2;
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;

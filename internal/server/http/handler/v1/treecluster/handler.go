@@ -1,8 +1,11 @@
 package treecluster
 
 import (
+	"errors"
 	"strconv"
 	"strings"
+
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -28,14 +31,32 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [get]
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
+// @Param			page	query	string	false	"Page"
+// @Param			limit	query	string	false	"Limit"
+// @Param			status	query	string	false	"watering status (good, moderate, bad)"
+// @Param			region	query	string	false	"region name"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, totalCount, err := svc.GetAll(ctx, strings.Clone(c.Query("provider")))
+
+		statusQu := c.Query("status")
+		var wateringStatus domain.WateringStatus
+		if statusQu != "" {
+			var err error
+			wateringStatus, err = parseWateringStatus(statusQu)
+			if err != nil {
+				return service.NewError(service.BadRequest, err.Error())
+			}
+		}
+
+		filter := domain.TreeClusterFilter{
+			WateringStatus: wateringStatus,
+			Region:         strings.Clone(c.Query("region", "")),
+		}
+
+		domainData, totalCount, err := svc.GetAll(ctx, filter)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -187,5 +208,20 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		}
 
 		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
+
+func parseWateringStatus(status string) (domain.WateringStatus, error) {
+	switch status {
+	case string(domain.WateringStatusGood):
+		return domain.WateringStatusGood, nil
+	case string(domain.WateringStatusModerate):
+		return domain.WateringStatusModerate, nil
+	case string(domain.WateringStatusBad):
+		return domain.WateringStatusBad, nil
+	case string(domain.WateringStatusUnknown):
+		return domain.WateringStatusUnknown, nil
+	default:
+		return "", errors.New("invalid watering status")
 	}
 }

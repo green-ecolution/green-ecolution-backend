@@ -29,8 +29,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-			"",
+			mock.Anything, entities.TreeClusterFilter{},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
@@ -62,8 +61,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-			"",
+			mock.Anything, entities.TreeClusterFilter{},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=1", nil)
@@ -169,8 +167,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-			"",
+			mock.Anything, entities.TreeClusterFilter{},
 		).Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
@@ -203,8 +200,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-			"",
+			mock.Anything, entities.TreeClusterFilter{},
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
