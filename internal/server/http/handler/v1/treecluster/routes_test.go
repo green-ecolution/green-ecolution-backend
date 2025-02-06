@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"net/http"
 	"testing"
 
@@ -27,8 +28,7 @@ func TestRegisterRoutes(t *testing.T) {
 			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockClusterService.EXPECT().GetAll(
-				mock.Anything,
-				"",
+				mock.Anything, entities.TreeClusterFilter{},
 			).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 			// when
