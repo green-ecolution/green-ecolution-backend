@@ -55,6 +55,4 @@ type TreeClusterUpdate struct {
 type TreeClusterFilter struct {
 	WateringStatus WateringStatus
 	Region         string
-	Limit          int32
-	Offset         int32
 }

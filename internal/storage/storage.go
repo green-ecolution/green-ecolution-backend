@@ -145,7 +145,7 @@ type WateringPlanRepository interface {
 
 type TreeClusterRepository interface {
 	// GetAll returns all tree clusters
-	GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, error)
+	GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, int64, error)
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids
@@ -162,11 +162,6 @@ type TreeClusterRepository interface {
 	LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error
 	GetCenterPoint(ctx context.Context, id int32) (float64, float64, error)
 	GetAllLatestSensorDataByClusterID(ctx context.Context, tcID int32) ([]*entities.SensorData, error)
-
-	GetTreeClustersCount(ctx context.Context) (int64, error)
-	GetTreeClustersCountByStatus(ctx context.Context, status entities.WateringStatus) (int64, error)
-	GetTreeClustersCountByRegion(ctx context.Context, region string) (int64, error)
-	GetTreeClustersCountByStatusAndRegion(ctx context.Context, status entities.WateringStatus, region string) (int64, error)
 }
 
 type TreeRepository interface {

@@ -5,25 +5,50 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/twpayne/go-geos"
 )
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, error) {
+func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
+	page, limit, err := pagination.GetValues(ctx)
+	if err != nil {
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
+	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
+		Column1: sqlc.WateringStatus(filter.WateringStatus),
+		Column2: filter.Region,
+	})
+
+	if err != nil {
+		log.Debug("failed to get total tree cluster count in db", "error", err)
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
+	if totalCount == 0 {
+		return []*entities.TreeCluster{}, 0, nil
+	}
+
+	if limit == -1 {
+		limit = int32(totalCount)
+		page = 1
+	}
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
 		Column1: sqlc.WateringStatus(filter.WateringStatus),
 		Column2: filter.Region,
-		Limit:   filter.Limit,
-		Offset:  filter.Offset,
+		Limit:   limit,
+		Offset:  (page - 1) * limit,
 	})
 
 	if err != nil {
 		log.Debug("failed to get tree clusters in db")
-		return nil, r.store.MapError(err, sqlc.TreeCluster{})
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
 	data, err := r.mapper.FromSqlList(rows)
@@ -34,11 +59,11 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 
 	for _, tc := range data {
 		if err := r.store.MapClusterFields(ctx, tc); err != nil {
-			return nil, r.store.MapError(err, sqlc.TreeCluster{})
+			return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 		}
 	}
 
-	return data, nil
+	return data, totalCount, nil
 }
 
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {
@@ -120,47 +145,4 @@ func (r *TreeClusterRepository) GetAllLatestSensorDataByClusterID(ctx context.Co
 	}
 
 	return domainData, nil
-}
-
-func (r *TreeClusterRepository) GetTreeClustersCount(ctx context.Context) (int64, error) {
-	log := logger.GetLogger(ctx)
-	count, err := r.store.GetAllTreeClustersCount(ctx)
-	if err != nil {
-		log.Debug("Failed to get total tree cluster count", "error", err)
-		return 0, errors.New("failed to get the total tree cluster count")
-	}
-	return count, nil
-}
-
-func (r *TreeClusterRepository) GetTreeClustersCountByStatus(ctx context.Context, status entities.WateringStatus) (int64, error) {
-	log := logger.GetLogger(ctx)
-	count, err := r.store.GetTreeClustersCountByStatus(ctx, sqlc.WateringStatus(status))
-	if err != nil {
-		log.Debug("Failed to get count by status", "error", err)
-		return 0, errors.New("failed to get count by status")
-	}
-	return count, nil
-}
-
-func (r *TreeClusterRepository) GetTreeClustersCountByRegion(ctx context.Context, region string) (int64, error) {
-	log := logger.GetLogger(ctx)
-	count, err := r.store.GetTreeClustersCountByRegion(ctx, region)
-	if err != nil {
-		log.Debug("Failed to get count by region", "error", err)
-		return 0, errors.New("failed to get count by region")
-	}
-	return count, nil
-}
-
-func (r *TreeClusterRepository) GetTreeClustersCountByStatusAndRegion(ctx context.Context, status entities.WateringStatus, region string) (int64, error) {
-	log := logger.GetLogger(ctx)
-	count, err := r.store.GetTreeClustersCountByStatusAndRegion(ctx, &sqlc.GetTreeClustersCountByStatusAndRegionParams{
-		WateringStatus: sqlc.WateringStatus(status),
-		Name:           region,
-	})
-	if err != nil {
-		log.Debug("Failed to get count by status and region", "error", err)
-		return 0, errors.New("failed to get count by status and region")
-	}
-	return count, nil
 }

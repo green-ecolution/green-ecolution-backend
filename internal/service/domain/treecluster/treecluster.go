@@ -7,8 +7,6 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
-
 	"github.com/go-playground/validator/v10"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
@@ -43,49 +41,12 @@ func NewTreeClusterService(
 
 func (s *TreeClusterService) GetAll(ctx context.Context, filter domain.TreeClusterFilter) ([]*domain.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
-
-	page, limit, err := pagination.GetValues(ctx)
-	if err != nil {
-		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
-	}
-
-	totalCount, err := s.getTotalTreeClustersCount(ctx, filter)
-	if err != nil {
-		log.Debug("failed to get total tree cluster count in db", "error", err)
-		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
-	}
-
-	if totalCount == 0 {
-		return []*domain.TreeCluster{}, 0, nil
-	}
-
-	if limit == -1 {
-		limit = int32(totalCount)
-		page = 1
-	}
-
-	filter.Limit = limit
-	filter.Offset = (page - 1) * limit
-
-	treeClusters, err := s.treeClusterRepo.GetAll(ctx, filter)
+	treeClusters, totalCount, err := s.treeClusterRepo.GetAll(ctx, filter)
 	if err != nil {
 		log.Debug("failed to fetch tree clsuters", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 	return treeClusters, totalCount, nil
-}
-
-func (s *TreeClusterService) getTotalTreeClustersCount(ctx context.Context, filter domain.TreeClusterFilter) (int64, error) {
-	switch {
-	case filter.WateringStatus != "" && filter.Region != "":
-		return s.treeClusterRepo.GetTreeClustersCountByStatusAndRegion(ctx, filter.WateringStatus, filter.Region)
-	case filter.WateringStatus != "":
-		return s.treeClusterRepo.GetTreeClustersCountByStatus(ctx, filter.WateringStatus)
-	case filter.Region != "":
-		return s.treeClusterRepo.GetTreeClustersCountByRegion(ctx, filter.Region)
-	default:
-		return s.treeClusterRepo.GetTreeClustersCount(ctx)
-	}
 }
 
 func (s *TreeClusterService) GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error) {
