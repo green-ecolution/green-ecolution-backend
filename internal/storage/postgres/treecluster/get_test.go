@@ -149,6 +149,88 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 	})
+
+	t.Run("should return tree clusters filtered by watering status", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: entities.WateringStatusGood,
+		}
+
+		// when
+		got, _, err := r.GetAll(ctx, filter)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+
+		for _, cluster := range got {
+			assert.Equal(t, entities.WateringStatusGood, cluster.WateringStatus)
+		}
+	})
+
+	t.Run("should return tree clusters filtered by region", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		filter := entities.TreeClusterFilter{
+			Region: "Mürwik",
+		}
+
+		// when
+		got, _, err := r.GetAll(ctx, filter)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+
+		for _, cluster := range got {
+			assert.NotNil(t, cluster.Region)
+			assert.Equal(t, "Mürwik", cluster.Region.Name)
+		}
+	})
+
+	t.Run("should return tree clusters filtered by both watering status and region", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: entities.WateringStatusModerate,
+			Region:         "Mürwik",
+		}
+
+		// when
+		got, _, err := r.GetAll(ctx, filter)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+
+		for _, cluster := range got {
+			assert.Equal(t, entities.WateringStatusModerate, cluster.WateringStatus)
+			assert.NotNil(t, cluster.Region)
+			assert.Equal(t, "Mürwik", cluster.Region.Name)
+		}
+	})
 }
 
 func TestTreeClusterRepository_GetByID(t *testing.T) {

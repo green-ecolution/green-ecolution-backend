@@ -214,6 +214,125 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 		mockClusterService.AssertExpectations(t)
 	})
+
+	t.Run("should return tree clusters filtered by watering status", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: entities.WateringStatusModerate,
+		}
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2],
+		}
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, filter,
+		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+		for _, cluster := range response.Data {
+			assert.EqualValues(t, entities.WateringStatusModerate, cluster.WateringStatus)
+		}
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters filtered by region", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		filter := entities.TreeClusterFilter{
+			Region: "Mürwik",
+		}
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2],
+			TestClusterList[3],
+		}
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, filter,
+		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?region=Mürwik", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+		for _, cluster := range response.Data {
+			assert.NotNil(t, cluster.Region)
+			assert.Equal(t, "Mürwik", cluster.Region.Name)
+		}
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters filtered by watering status and region", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: entities.WateringStatusModerate,
+			Region:         "Mürwik",
+		}
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2],
+		}
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, filter,
+		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate&region=Mürwik", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+		for _, cluster := range response.Data {
+			assert.EqualValues(t, entities.WateringStatusModerate, cluster.WateringStatus)
+			assert.NotNil(t, cluster.Region)
+			assert.Equal(t, "Mürwik", cluster.Region.Name)
+		}
+
+		mockClusterService.AssertExpectations(t)
+	})
 }
 
 func TestGetTreeClusterByID(t *testing.T) {
