@@ -90,6 +90,7 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		return nil, service.ErrVehiclePlateTaken
 	}
 
+	//nolint:dupl // this is create specific
 	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
 		vh.NumberPlate = createData.NumberPlate
 		vh.Description = createData.Description
@@ -139,6 +140,7 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 		}
 	}
 
+	//nolint:dupl // this is update specific
 	err = v.vehicleRepo.Update(ctx, id, func(vh *entities.Vehicle) (bool, error) {
 		vh.NumberPlate = updateData.NumberPlate
 		vh.Description = updateData.Description

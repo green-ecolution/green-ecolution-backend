@@ -80,6 +80,6 @@ func DurationToPtrFloat64(source time.Duration) *float64 {
 	return P(float64(source))
 }
 
-func MapKeyValueInterface(src map[string]interface{}) map[string]interface{} {
+func MapKeyValueInterface(src map[string]any) map[string]any {
 	return src
 }

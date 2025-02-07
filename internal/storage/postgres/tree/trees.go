@@ -57,7 +57,7 @@ func WithProvider(provider string) entities.EntityFunc[entities.Tree] {
 	}
 }
 
-func WithAdditionalInfo(additionalInfo map[string]interface{}) entities.EntityFunc[entities.Tree] {
+func WithAdditionalInfo(additionalInfo map[string]any) entities.EntityFunc[entities.Tree] {
 	return func(t *entities.Tree) {
 		t.AdditionalInfo = additionalInfo
 	}
