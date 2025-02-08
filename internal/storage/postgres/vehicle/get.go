@@ -9,11 +9,12 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
-func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, int64, error) {
-	log := logger.GetLogger(ctx)
-	page, limit, err := pagination.GetValues(ctx)
-	
-	totalCount, err := r.store.GetAllVehiclesCount(ctx)
+func (r *VehicleRepository) GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error) {
+    log := logger.GetLogger(ctx)
+    page, limit, err := pagination.GetValues(ctx)
+    
+	totalCount, err := r.store.GetAllVehiclesCount(ctx, provider)
+
 	if err != nil {
 		log.Debug("failed to get total vehicle count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
@@ -29,6 +30,7 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, in
 	}
 
 	rows, err := r.store.GetAllVehicles(ctx, &sqlc.GetAllVehiclesParams{
+		Column1: provider,
 		Limit:  limit,
 		Offset: (page - 1) * limit,
 	})
@@ -41,25 +43,43 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, in
 	return r.mapFromList(ctx, rows, totalCount)
 }
 
-func (r *VehicleRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllVehiclesByProvider(ctx, &provider)
+// TODO: find a way to merge this with GetAll
+func (r *VehicleRepository) GetAllByType(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error) {
+    log := logger.GetLogger(ctx)
+    page, limit, err := pagination.GetValues(ctx)
+    
+	totalCount, err := r.store.GetAllVehiclesByTypeCount(ctx, &sqlc.GetAllVehiclesByTypeCountParams{
+		Column1: provider,
+		Type: sqlc.VehicleType(vehicleType),
+	})
+
+	if err != nil {
+		log.Debug("failed to get total vehicle count in db", "error", err)
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
+	}
+
+	if totalCount == 0 {
+		return []*entities.Vehicle{}, 0, nil
+	}
+
+	if limit == -1 {
+		limit = int32(totalCount)
+		page = 1
+	}
+
+	rows, err := r.store.GetAllVehiclesByType(ctx, &sqlc.GetAllVehiclesByTypeParams{
+		Column1: provider,
+		Type: sqlc.VehicleType(vehicleType),
+		Limit:  limit,
+		Offset: (page - 1) * limit,
+	})
+
 	if err != nil {
 		log.Debug("failed to get vehicle entities in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
 	return r.mapFromList(ctx, rows, totalCount)
-}
-
-func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error) {
-	log := logger.GetLogger(ctx)
-	page, limit, err := pagination.GetValues(ctx)
-	if err != nil {
-		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
-	}
-
-	return r.mapFromList(ctx, rows)
 }
 
 func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {

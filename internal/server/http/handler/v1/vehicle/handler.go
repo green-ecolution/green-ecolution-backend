@@ -42,18 +42,10 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		var totalCount int64
 		var err error
 
-		vehicleTypeStr := c.Query("type")
+		vehicleType := c.Query("type")
 		provider := c.Query("provider")
-		if vehicleTypeStr != "" {
-			vehicleType := domain.ParseVehicleType(vehicleTypeStr)
-			if vehicleType == domain.VehicleTypeUnknown {
-				return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid vehicle type"))
-			}
-			domainData, totalCount, err = svc.GetAllByType(ctx, vehicleType)
-		} else {
-			domainData, totalCount, err = svc.GetAll(ctx, provider)
-			paginationData = pagination.Create(ctx, totalCount)
-		} // TODO: move to service
+
+		domainData, totalCount, err = svc.GetAll(ctx, provider, vehicleType)
 
 		if err != nil {
 			return errorhandler.HandleError(err)

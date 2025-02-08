@@ -24,29 +24,25 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, error) {
+func (v *VehicleService) GetAll(ctx context.Context, provider string, vehicleType string) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
 	var vehicles []*entities.Vehicle
 	var err error
+	var totalCount int64
 
-	if provider != "" {
-		vehicles, totalCount, err = v.vehicleRepo.GetAllByProvider(ctx, provider)
+	if vehicleType != "" {
+		parsedVehicleType := entities.ParseVehicleType(vehicleType)
+		if parsedVehicleType == entities.VehicleTypeUnknown {
+			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", vehicleType)
+			return nil, 0, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
+		}
+		vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, parsedVehicleType)
 	} else {
-		vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx)
+		vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, provider)
 	}
+	
 	if err != nil {
 		log.Debug("failed to fetch vehicles", "error", err)
-		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
-	}
-
-	return vehicles, totalCount, nil
-}
-
-func (v *VehicleService) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error) {
-	log := logger.GetLogger(ctx)
-	vehicles, totalCount, err := v.vehicleRepo.GetAllByType(ctx, vehicleType)
-	if err != nil {
-		log.Debug("failed to fetch vehicles by a type", "error", err, "vehicle_type", vehicleType)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
