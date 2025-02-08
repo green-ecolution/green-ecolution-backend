@@ -27,7 +27,7 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, in
 		limit = int32(totalCount)
 		page = 1
 	}
-	
+
 	rows, err := r.store.GetAllVehicles(ctx, &sqlc.GetAllVehiclesParams{
 		Limit:  limit,
 		Offset: (page - 1) * limit,

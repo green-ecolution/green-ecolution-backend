@@ -37,7 +37,7 @@ var (
 func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		
+
 		var domainData []*domain.Vehicle
 		var totalCount int64
 		var err error
