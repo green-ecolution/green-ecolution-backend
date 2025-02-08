@@ -462,8 +462,6 @@ func TestGetAllByRole(t *testing.T) {
 
 		uuid01, _ := uuid.NewRandom()
 		uuid02, _ := uuid.NewRandom()
-
-		expectedRole := entities.UserRoleTbz
 		expectedUsers := []*entities.User{
 			{
 				ID:          uuid01,
@@ -485,20 +483,10 @@ func TestGetAllByRole(t *testing.T) {
 			},
 		}
 
-		allUsers := append(expectedUsers, &entities.User{
-			ID:          uuid.New(),
-			Username:    "user3",
-			FirstName:   "Bob",
-			LastName:    "Johnson",
-			Email:       "user3@example.com",
-			PhoneNumber: "+555555555",
-			Roles:       []entities.UserRole{entities.UserRoleGreenEcolution},
-		})
-
-		userRepo.EXPECT().GetAll(rootCtx).Return(allUsers, nil)
+		userRepo.EXPECT().GetAllByRole(rootCtx, entities.UserRoleTbz).Return(expectedUsers, nil)
 
 		// when
-		users, err := svc.GetAllByRole(rootCtx, expectedRole)
+		users, err := svc.GetAllByRole(rootCtx, entities.UserRoleTbz)
 
 		// then
 		assert.NoError(t, err)
@@ -512,32 +500,10 @@ func TestGetAllByRole(t *testing.T) {
 		identityConfig := &config.IdentityAuthConfig{}
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
-		expectedRole := entities.UserRoleTbz
-		allUsers := []*entities.User{
-			{
-				ID:          uuid.New(),
-				Username:    "user1",
-				FirstName:   "John",
-				LastName:    "Doe",
-				Email:       "user1@example.com",
-				PhoneNumber: "+123456789",
-				Roles:       []entities.UserRole{entities.UserRoleGreenEcolution},
-			},
-			{
-				ID:          uuid.New(),
-				Username:    "user2",
-				FirstName:   "Jane",
-				LastName:    "Smith",
-				Email:       "user2@example.com",
-				PhoneNumber: "+987654321",
-				Roles:       []entities.UserRole{entities.UserRoleSmarteGrenzregion},
-			},
-		}
-
-		userRepo.EXPECT().GetAll(rootCtx).Return(allUsers, nil)
+		userRepo.EXPECT().GetAllByRole(rootCtx, entities.UserRoleTbz).Return([]*entities.User{}, nil)
 
 		// when
-		users, err := svc.GetAllByRole(rootCtx, expectedRole)
+		users, err := svc.GetAllByRole(rootCtx, entities.UserRoleTbz)
 
 		// then
 		assert.NoError(t, err)
@@ -551,7 +517,7 @@ func TestGetAllByRole(t *testing.T) {
 		identityConfig := &config.IdentityAuthConfig{}
 		svc := NewAuthService(authRepo, userRepo, identityConfig)
 
-		userRepo.EXPECT().GetAll(rootCtx).Return(nil, errors.New("repository error"))
+		userRepo.EXPECT().GetAllByRole(rootCtx, entities.UserRoleTbz).Return(nil, errors.New("repository error"))
 
 		// when
 		users, err := svc.GetAllByRole(rootCtx, entities.UserRoleTbz)
