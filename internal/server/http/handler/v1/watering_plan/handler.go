@@ -33,7 +33,6 @@ var (
 // @Router			/v1/watering-plan [get]
 // @Param			page		query	string	false	"Page"
 // @Param			limit		query	string	false	"Limit"
-// @Param			status		query	string	false	"Status"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {

@@ -30,7 +30,6 @@ var (
 // @Router			/v1/vehicle [get]
 // @Param			page		query	string	false	"Page"
 // @Param			limit		query	string	false	"Limit"
-// @Param			status		query	string	false	"Status"
 // @Param			type		query	string	false	"Vehicle Type"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
