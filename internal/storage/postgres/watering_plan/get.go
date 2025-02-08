@@ -36,8 +36,8 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context, provider string) ([
 
 	rows, err := w.store.GetAllWateringPlans(ctx, &sqlc.GetAllWateringPlansParams{
 		Column1: provider,
-		Limit:  limit,
-		Offset: (page - 1) * limit,
+		Limit:   limit,
+		Offset:  (page - 1) * limit,
 	})
 
 	if err != nil {

@@ -89,10 +89,10 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
 		expectedPlan := allTestWateringPlans[1]
-		
+
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
-		
+
 		// when
 		got, totalCount, err := r.GetAll(ctx, "test-provider")
 
