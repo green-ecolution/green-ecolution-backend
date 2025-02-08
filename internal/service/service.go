@@ -162,7 +162,14 @@ type VehicleService interface {
 }
 
 type WateringPlanService interface {
-	CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
+	// TODO: use CrudService as soon as every service has pagination
+	//CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
+	GetAll(ctx context.Context) ([]*domain.WateringPlan, int64, error)
+	GetByID(ctx context.Context, id int32) (*domain.WateringPlan, error)
+	Create(ctx context.Context, createData *domain.WateringPlanCreate) (*domain.WateringPlan, error)
+	Update(ctx context.Context, id int32, updateData *domain.WateringPlanUpdate) (*domain.WateringPlan, error)
+	Delete(ctx context.Context, id int32) error
+
 	PreviewRoute(ctx context.Context, transporterID int32, trailerID *int32, clusterIDs []int32) (*domain.GeoJSON, error)
 	GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }

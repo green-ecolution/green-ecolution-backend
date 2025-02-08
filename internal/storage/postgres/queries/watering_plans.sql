@@ -1,6 +1,10 @@
 -- name: GetAllWateringPlans :many
 SELECT * FROM watering_plans
-ORDER BY date DESC;
+ORDER BY date DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllWateringPlansCount :one
+SELECT COUNT(*) FROM watering_plans;
 
 -- name: GetAllWateringPlansByProvider :many
 SELECT * FROM watering_plans WHERE provider = $1
