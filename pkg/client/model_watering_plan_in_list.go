@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,19 +22,19 @@ var _ MappedNullable = &WateringPlanInList{}
 
 // WateringPlanInList struct for WateringPlanInList
 type WateringPlanInList struct {
-	CancellationNote string `json:"cancellation_note"`
-	CreatedAt string `json:"created_at"`
-	Date string `json:"date"`
-	Description string `json:"description"`
-	Distance float32 `json:"distance"`
-	Id int32 `json:"id"`
-	Status WateringPlanStatus `json:"status"`
-	TotalWaterRequired float32 `json:"total_water_required"`
-	Trailer *Vehicle `json:"trailer,omitempty"`
-	Transporter Vehicle `json:"transporter"`
-	Treeclusters []TreeClusterInList `json:"treeclusters"`
-	UpdatedAt string `json:"updated_at"`
-	UserIds []string `json:"user_ids"`
+	CancellationNote   string              `json:"cancellation_note"`
+	CreatedAt          string              `json:"created_at"`
+	Date               string              `json:"date"`
+	Description        string              `json:"description"`
+	Distance           float32             `json:"distance"`
+	Id                 int32               `json:"id"`
+	Status             WateringPlanStatus  `json:"status"`
+	TotalWaterRequired float32             `json:"total_water_required"`
+	Trailer            *Vehicle            `json:"trailer,omitempty"`
+	Transporter        Vehicle             `json:"transporter"`
+	Treeclusters       []TreeClusterInList `json:"treeclusters"`
+	UpdatedAt          string              `json:"updated_at"`
+	UserIds            []string            `json:"user_ids"`
 }
 
 type _WateringPlanInList WateringPlanInList
@@ -389,7 +389,7 @@ func (o *WateringPlanInList) SetUserIds(v []string) {
 }
 
 func (o WateringPlanInList) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -440,10 +440,10 @@ func (o *WateringPlanInList) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -499,5 +499,3 @@ func (v *NullableWateringPlanInList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

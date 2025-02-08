@@ -31,14 +31,15 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			status	query	string	false	"Status"
+// @Param			page		query	string	false	"Page"
+// @Param			limit		query	string	false	"Limit"
+// @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+		provider := c.Query("provider")
+		domainData, err := svc.GetAll(ctx, provider)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -67,7 +68,7 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan/{id} [get]
-// @Param			id	path	string	true	"Watering Plan ID"
+// @Param			id	path int	true	"Watering Plan ID"
 // @Security		Keycloak
 func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -173,7 +174,7 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan/{id} [delete]
-// @Param			id	path	string	true	"Watering Plan ID"
+// @Param			id	path int	true	"Watering Plan ID"
 // @Security		Keycloak
 func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

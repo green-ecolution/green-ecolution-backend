@@ -88,8 +88,6 @@ Class | Method | HTTP request | Description
 *PluginAPI* | [**RegisterPlugin**](docs/PluginAPI.md#registerplugin) | **Post** /v1/plugin | Register a plugin
 *RegionAPI* | [**V1RegionGet**](docs/RegionAPI.md#v1regionget) | **Get** /v1/region | Get all regions
 *RegionAPI* | [**V1RegionIdGet**](docs/RegionAPI.md#v1regionidget) | **Get** /v1/region/{id} | Get a region by ID
-*RoleAPI* | [**V1RoleGet**](docs/RoleAPI.md#v1roleget) | **Get** /v1/role | Get all user roles
-*RoleAPI* | [**V1RoleIdGet**](docs/RoleAPI.md#v1roleidget) | **Get** /v1/role/{id} | Get a role by ID
 *SensorAPI* | [**DeleteSensor**](docs/SensorAPI.md#deletesensor) | **Delete** /v1/sensor/{sensor_id} | Delete sensor
 *SensorAPI* | [**GetAllSensors**](docs/SensorAPI.md#getallsensors) | **Get** /v1/sensor | Get all sensors
 *SensorAPI* | [**GetSensorById**](docs/SensorAPI.md#getsensorbyid) | **Get** /v1/sensor/{sensor_id} | Get sensor by ID
@@ -105,6 +103,7 @@ Class | Method | HTTP request | Description
 *TreeClusterAPI* | [**UpdateTreeCluster**](docs/TreeClusterAPI.md#updatetreecluster) | **Put** /v1/cluster/{cluster_id} | Update tree cluster
 *TreeSensorAPI* | [**GetTreeBySensorId**](docs/TreeSensorAPI.md#gettreebysensorid) | **Get** /v1/tree/sensor/{sensor_id} | Get tree by sensor ID
 *UserAPI* | [**GetAllUsers**](docs/UserAPI.md#getallusers) | **Get** /v1/user | Get all users
+*UserAPI* | [**GetUsersByRole**](docs/UserAPI.md#getusersbyrole) | **Get** /v1/user/role/{role} | Get users by role
 *UserAPI* | [**V1UserLoginGet**](docs/UserAPI.md#v1userloginget) | **Get** /v1/user/login | Request to login
 *UserAPI* | [**V1UserLoginTokenPost**](docs/UserAPI.md#v1userlogintokenpost) | **Post** /v1/user/login/token | Validate login code and request a access token
 *UserAPI* | [**V1UserLogoutPost**](docs/UserAPI.md#v1userlogoutpost) | **Post** /v1/user/logout | Logout from the system
@@ -121,6 +120,8 @@ Class | Method | HTTP request | Description
 *WateringPlanAPI* | [**GetAllWateringPlans**](docs/WateringPlanAPI.md#getallwateringplans) | **Get** /v1/watering-plan | Get all watering plans
 *WateringPlanAPI* | [**GetWateringPlanById**](docs/WateringPlanAPI.md#getwateringplanbyid) | **Get** /v1/watering-plan/{id} | Get watering plan by ID
 *WateringPlanAPI* | [**UpdateWateringPlan**](docs/WateringPlanAPI.md#updatewateringplan) | **Put** /v1/watering-plan/{id} | Update watering plan
+*WateringPlanAPI* | [**V1WateringPlanRouteGpxGpxNameGet**](docs/WateringPlanAPI.md#v1wateringplanroutegpxgpxnameget) | **Get** /v1/watering-plan/route/gpx/{gpx_name} | Generate route
+*WateringPlanAPI* | [**V1WateringPlanRoutePreviewPost**](docs/WateringPlanAPI.md#v1wateringplanroutepreviewpost) | **Post** /v1/watering-plan/route/preview | Generate preview route
 
 
 ## Documentation For Models
@@ -129,6 +130,12 @@ Class | Method | HTTP request | Description
  - [ClientToken](docs/ClientToken.md)
  - [DrivingLicense](docs/DrivingLicense.md)
  - [EvaluationValue](docs/EvaluationValue.md)
+ - [GeoJSONLocation](docs/GeoJSONLocation.md)
+ - [GeoJSONMetadata](docs/GeoJSONMetadata.md)
+ - [GeoJson](docs/GeoJson.md)
+ - [GeoJsonFeature](docs/GeoJsonFeature.md)
+ - [GeoJsonGeometry](docs/GeoJsonGeometry.md)
+ - [GeoJsonType](docs/GeoJsonType.md)
  - [GitInfo](docs/GitInfo.md)
  - [HTTPError](docs/HTTPError.md)
  - [LoginResponse](docs/LoginResponse.md)
@@ -142,8 +149,7 @@ Class | Method | HTTP request | Description
  - [RefreshTokenRequest](docs/RefreshTokenRequest.md)
  - [Region](docs/Region.md)
  - [RegionList](docs/RegionList.md)
- - [Role](docs/Role.md)
- - [RoleList](docs/RoleList.md)
+ - [RouteRequest](docs/RouteRequest.md)
  - [Sensor](docs/Sensor.md)
  - [SensorData](docs/SensorData.md)
  - [SensorList](docs/SensorList.md)
@@ -162,6 +168,8 @@ Class | Method | HTTP request | Description
  - [User](docs/User.md)
  - [UserList](docs/UserList.md)
  - [UserRegister](docs/UserRegister.md)
+ - [UserRole](docs/UserRole.md)
+ - [UserStatus](docs/UserStatus.md)
  - [Vehicle](docs/Vehicle.md)
  - [VehicleCreate](docs/VehicleCreate.md)
  - [VehicleList](docs/VehicleList.md)

@@ -25,6 +25,8 @@ func defaultTreeCluster() *entities.TreeCluster {
 		LastWatered:    nil,
 		Trees:          make([]*entities.Tree, 0),
 		Name:           "",
+		Provider:       "",
+		AdditionalInfo: nil,
 	}
 }
 
@@ -83,19 +85,28 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 }
 
 func (r *TreeClusterRepository) createEntity(ctx context.Context, entity *entities.TreeCluster) (int32, error) {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return -1, err
+	}
+
 	var region *int32
 	if entity.Region != nil {
 		region = &entity.Region.ID
 	}
 
 	args := sqlc.CreateTreeClusterParams{
-		RegionID:       region,
-		Address:        entity.Address,
-		Description:    entity.Description,
-		MoistureLevel:  entity.MoistureLevel,
-		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
-		SoilCondition:  sqlc.TreeSoilCondition(entity.SoilCondition),
-		Name:           entity.Name,
+		RegionID:               region,
+		Address:                entity.Address,
+		Description:            entity.Description,
+		MoistureLevel:          entity.MoistureLevel,
+		WateringStatus:         sqlc.WateringStatus(entity.WateringStatus),
+		SoilCondition:          sqlc.TreeSoilCondition(entity.SoilCondition),
+		Name:                   entity.Name,
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	id, err := r.store.CreateTreeCluster(ctx, &args)

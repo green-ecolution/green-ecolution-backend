@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
@@ -96,6 +97,7 @@ func (s *Store) getRegionByTreeClusterID(ctx context.Context, id int32) (*entiti
 }
 
 func (s *Store) getLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
 	rows, err := s.GetLinkedTreesByTreeClusterID(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -104,5 +106,11 @@ func (s *Store) getLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]
 		return nil, err
 	}
 
-	return treeMapper.FromSqlList(rows), nil
+	trees, err := treeMapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return trees, nil
 }

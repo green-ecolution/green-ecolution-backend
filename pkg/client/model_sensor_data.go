@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,10 +22,12 @@ var _ MappedNullable = &SensorData{}
 
 // SensorData struct for SensorData
 type SensorData struct {
-	Battery float32 `json:"battery"`
-	Humidity float32 `json:"humidity"`
-	Temperature float32 `json:"temperature"`
-	Watermarks []WatermarkResponse `json:"watermarks"`
+	Battery     float32             `json:"battery"`
+	CreatedAt   string              `json:"created_at"`
+	Humidity    float32             `json:"humidity"`
+	Temperature float32             `json:"temperature"`
+	UpdatedAt   string              `json:"updated_at"`
+	Watermarks  []WatermarkResponse `json:"watermarks"`
 }
 
 type _SensorData SensorData
@@ -34,11 +36,13 @@ type _SensorData SensorData
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensorData(battery float32, humidity float32, temperature float32, watermarks []WatermarkResponse) *SensorData {
+func NewSensorData(battery float32, createdAt string, humidity float32, temperature float32, updatedAt string, watermarks []WatermarkResponse) *SensorData {
 	this := SensorData{}
 	this.Battery = battery
+	this.CreatedAt = createdAt
 	this.Humidity = humidity
 	this.Temperature = temperature
+	this.UpdatedAt = updatedAt
 	this.Watermarks = watermarks
 	return &this
 }
@@ -73,6 +77,30 @@ func (o *SensorData) GetBatteryOk() (*float32, bool) {
 // SetBattery sets field value
 func (o *SensorData) SetBattery(v float32) {
 	o.Battery = v
+}
+
+// GetCreatedAt returns the CreatedAt field value
+func (o *SensorData) GetCreatedAt() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.CreatedAt
+}
+
+// GetCreatedAtOk returns a tuple with the CreatedAt field value
+// and a boolean to check if the value has been set.
+func (o *SensorData) GetCreatedAtOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.CreatedAt, true
+}
+
+// SetCreatedAt sets field value
+func (o *SensorData) SetCreatedAt(v string) {
+	o.CreatedAt = v
 }
 
 // GetHumidity returns the Humidity field value
@@ -123,6 +151,30 @@ func (o *SensorData) SetTemperature(v float32) {
 	o.Temperature = v
 }
 
+// GetUpdatedAt returns the UpdatedAt field value
+func (o *SensorData) GetUpdatedAt() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.UpdatedAt
+}
+
+// GetUpdatedAtOk returns a tuple with the UpdatedAt field value
+// and a boolean to check if the value has been set.
+func (o *SensorData) GetUpdatedAtOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.UpdatedAt, true
+}
+
+// SetUpdatedAt sets field value
+func (o *SensorData) SetUpdatedAt(v string) {
+	o.UpdatedAt = v
+}
+
 // GetWatermarks returns the Watermarks field value
 func (o *SensorData) GetWatermarks() []WatermarkResponse {
 	if o == nil {
@@ -148,7 +200,7 @@ func (o *SensorData) SetWatermarks(v []WatermarkResponse) {
 }
 
 func (o SensorData) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -158,8 +210,10 @@ func (o SensorData) MarshalJSON() ([]byte, error) {
 func (o SensorData) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["battery"] = o.Battery
+	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["humidity"] = o.Humidity
 	toSerialize["temperature"] = o.Temperature
+	toSerialize["updated_at"] = o.UpdatedAt
 	toSerialize["watermarks"] = o.Watermarks
 	return toSerialize, nil
 }
@@ -170,8 +224,10 @@ func (o *SensorData) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"battery",
+		"created_at",
 		"humidity",
 		"temperature",
+		"updated_at",
 		"watermarks",
 	}
 
@@ -180,10 +236,10 @@ func (o *SensorData) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -239,5 +295,3 @@ func (v *NullableSensorData) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

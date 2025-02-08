@@ -29,14 +29,15 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			age		query	string	false	"Age"
+// @Param			page		query	string	false	"Page"
+// @Param			limit		query	string	false	"Limit"
+// @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+		provider := c.Query("provider")
+		domainData, err := svc.GetAll(ctx, provider)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -65,7 +66,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [get]
-// @Param			tree_id	path	string	false	"Tree ID"
+// @Param			tree_id	path	int	false	"Tree ID"
 // @Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -164,7 +165,7 @@ func CreateTree(svc service.TreeService) fiber.Handler {
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [put]
 // @Security		Keycloak
-// @Param			tree_id	path	string						false	"Tree ID"
+// @Param			tree_id	path	int							false	"Tree ID"
 // @Param			body	body	entities.TreeUpdateRequest	true	"Tree to update"
 func UpdateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -200,7 +201,7 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [delete]
-// @Param			tree_id	path	string	false	"Tree ID"
+// @Param			tree_id	path	int	false	"Tree ID"
 // @Security		Keycloak
 func DeleteTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

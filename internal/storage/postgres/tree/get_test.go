@@ -28,6 +28,34 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all trees successfully with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+		expectedTree := testTrees[len(testTrees)-1]
+
+		// when
+		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, 1)
+		assert.Equal(t, expectedTree.ID, got[0].ID, "ID does not match")
+		assert.Equal(t, expectedTree.PlantingYear, got[0].PlantingYear, "PlantingYear does not match")
+		assert.Equal(t, expectedTree.Species, got[0].Species, "Species does not match")
+		assert.Equal(t, expectedTree.Number, got[0].Number, "Number does not match")
+		assert.Equal(t, expectedTree.Latitude, got[0].Latitude, "Latitude does not match")
+		assert.Equal(t, expectedTree.Longitude, got[0].Longitude, "Longitude does not match")
+		assert.Equal(t, expectedTree.Readonly, got[0].Readonly, "Readonly does not match")
+		assert.Equal(t, expectedTree.WateringStatus, got[0].WateringStatus, "WateringStatus does not match")
+		assert.Equal(t, expectedTree.Description, got[0].Description, "Description does not match")
+		assert.Equal(t, expectedTree.Provider, got[0].Provider, "Provider does not match")
+		assert.Equal(t, expectedTree.AdditionalInfo, got[0].AdditionalInfo, "AdditionalInfo does not match")
+	})
+
 	t.Run("should return empty list when no trees exist", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -68,13 +96,19 @@ func TestTreeRepository_GetByID(t *testing.T) {
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
 		}
-		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+		treeCluster, err := mappers.tcMapper.FromSql(sqlTreeCluster)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		sqlSensor, sensorErr := suite.Store.GetSensorByTreeID(context.Background(), treeID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
-		sensor := mappers.sMapper.FromSql(sqlSensor)
+		sensor, err := mappers.sMapper.FromSql(sqlSensor)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		// when
 		tree, err := r.GetByID(context.Background(), 1)
@@ -755,5 +789,20 @@ var testTrees = []*entities.Tree{
 		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 4",
+	},
+	{
+		ID:             5,
+		PlantingYear:   2020,
+		Species:        "Quercus robur",
+		Number:         "1008",
+		Latitude:       54.78780993841013,
+		Longitude:      9.444052105200551,
+		Readonly:       false,
+		WateringStatus: "bad",
+		Description:    "Sample description 5",
+		Provider:       "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 }

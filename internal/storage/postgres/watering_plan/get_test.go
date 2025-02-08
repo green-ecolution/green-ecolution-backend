@@ -2,6 +2,7 @@ package wateringplan
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -75,6 +76,33 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 				}
 			}
 		}
+	})
+
+	t.Run("should return all watering plans with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		expectedPlan := allTestWateringPlans[1]
+
+		// when
+		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+
+		fmt.Println(got)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, 1)
+		assert.Equal(t, expectedPlan.ID, got[0].ID)
+		assert.Equal(t, expectedPlan.Date, got[0].Date)
+		assert.Equal(t, expectedPlan.Description, got[0].Description)
+		assert.Equal(t, expectedPlan.Status, got[0].Status)
+		assert.Equal(t, expectedPlan.Distance, got[0].Distance)
+		assert.Equal(t, *expectedPlan.TotalWaterRequired, *got[0].TotalWaterRequired)
+		assert.Equal(t, expectedPlan.CancellationNote, got[0].CancellationNote)
 	})
 
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
@@ -624,6 +652,10 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TreeClusters:       allTestClusters[2:3],
 		CancellationNote:   "",
 		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab"}),
+		Provider:           "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 	{
 		ID:                 3,

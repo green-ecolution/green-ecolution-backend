@@ -35,6 +35,8 @@ type WateringPlan struct {
 	GpxURL             string
 	RefillCount        int32
 	Duration           time.Duration
+	Provider           string
+	AdditionalInfo     map[string]any
 }
 
 type WateringPlanCreate struct {
@@ -44,6 +46,8 @@ type WateringPlanCreate struct {
 	TransporterID  *int32   `validate:"required"`
 	TrailerID      *int32
 	UserIDs        []*uuid.UUID `validate:"required,min=1,dive,required"`
+	Provider       string
+	AdditionalInfo map[string]any
 }
 
 type WateringPlanUpdate struct {
@@ -56,6 +60,8 @@ type WateringPlanUpdate struct {
 	Status           WateringPlanStatus `validate:"oneof=planned active canceled finished 'not competed' unknown"`
 	Evaluation       []*EvaluationValue
 	UserIDs          []*uuid.UUID `validate:"required,min=1,dive,required"`
+	Provider         string
+	AdditionalInfo   map[string]any
 }
 
 type EvaluationValue struct {

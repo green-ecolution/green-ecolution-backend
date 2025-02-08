@@ -34,7 +34,27 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(allTestWateringPlans, nil)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx, "")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, allTestWateringPlans, wateringPlans)
+	})
+
+	t.Run("should return all watering plans when successful with provider", func(t *testing.T) {
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		wateringPlanRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(allTestWateringPlans, nil)
+
+		// when
+		wateringPlans, err := svc.GetAll(ctx, "test-provider")
 
 		// then
 		assert.NoError(t, err)
@@ -54,7 +74,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return([]*entities.WateringPlan{}, nil)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -75,7 +95,7 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		wateringPlanRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
 
 		// when
-		wateringPlans, err := svc.GetAll(ctx)
+		wateringPlans, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)

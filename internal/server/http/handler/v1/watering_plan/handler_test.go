@@ -28,10 +28,43 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestWateringPlans, nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/watering-plan", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.WateringPlanListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+		assert.Equal(t, len(TestWateringPlans), len(response.Data))
+		assert.Equal(t, TestWateringPlans[0].Date, response.Data[0].Date)
+
+		mockWateringPlanService.AssertExpectations(t)
+	})
+
+	t.Run("should return all watering plans successfully with provider", func(t *testing.T) {
+		app := fiber.New()
+		mockWateringPlanService := serviceMock.NewMockWateringPlanService(t)
+		handler := wateringplan.GetAllWateringPlans(mockWateringPlanService)
+		app.Get("/v1/watering-plan", handler)
+
+		mockWateringPlanService.EXPECT().GetAll(
+			mock.Anything,
+			"test-provider",
+		).Return(TestWateringPlans, nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/watering-plan", nil)
+		query := req.URL.Query()
+		query.Add("provider", "test-provider")
+		req.URL.RawQuery = query.Encode()
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -56,6 +89,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return([]*entities.WateringPlan{}, nil)
 
 		// when
@@ -83,6 +117,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when

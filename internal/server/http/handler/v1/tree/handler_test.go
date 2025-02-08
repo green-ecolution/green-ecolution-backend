@@ -26,10 +26,34 @@ func TestGetAllTrees(t *testing.T) {
 		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestTrees, nil)
 
 		// when
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		mockTreeService.AssertExpectations(t)
+	})
+
+	t.Run("should return all trees with provider successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockTreeService := serviceMock.NewMockTreeService(t)
+		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
+		mockTreeService.EXPECT().GetAll(
+			mock.Anything,
+			"test-provider",
+		).Return(TestTrees, nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
+		query := req.URL.Query()
+		query.Add("provider", "test-provider")
+		req.URL.RawQuery = query.Encode()
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -45,6 +69,7 @@ func TestGetAllTrees(t *testing.T) {
 		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return([]*entities.Tree{}, nil)
 
 		// when
@@ -65,6 +90,7 @@ func TestGetAllTrees(t *testing.T) {
 
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
 
 		// when

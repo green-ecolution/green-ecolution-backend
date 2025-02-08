@@ -33,6 +33,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(expectedTree, nil)
 
 		// When
@@ -66,6 +68,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything).Return(updatedTree, nil)
 
 		// When
@@ -91,6 +95,8 @@ func TestTreeService_ImportTree(t *testing.T) {
 		treeRepo.EXPECT().GetByID(ctx, existingTree.ID).Return(existingTree, nil)
 		treeRepo.EXPECT().Delete(ctx, existingTree.ID).Return(nil)
 		treeRepo.EXPECT().Create(ctx,
+			mock.Anything,
+			mock.Anything,
 			mock.Anything,
 			mock.Anything,
 			mock.Anything,

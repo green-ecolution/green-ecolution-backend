@@ -47,13 +47,22 @@ func TestTreeRepository_Create(t *testing.T) {
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
 		}
-		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+
+		treeCluster, err := mappers.tcMapper.FromSql(sqlTreeCluster)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		sensorID := "sensor-1"
 		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), sensorID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
-		sensor := mappers.sMapper.FromSql(sqlSensor)
+
+		sensor, err := mappers.sMapper.FromSql(sqlSensor)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		// when
 		got, err := r.Create(context.Background(),
@@ -163,13 +172,21 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
 		}
-		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+		treeCluster, err := mappers.tcMapper.FromSql(sqlTreeCluster)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		sensorID := "sensor-1"
 		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), sensorID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
-		sensor := mappers.sMapper.FromSql(sqlSensor)
+
+		sensor, err := mappers.sMapper.FromSql(sqlSensor)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		// when
 		tree, createErr := r.CreateAndLinkImages(context.Background(),

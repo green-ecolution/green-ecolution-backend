@@ -6,7 +6,7 @@ info:
     url: https://green-ecolution.de
   description: This is the API for the Green Ecolution Management System.
   license:
-    name: GPL-3.0
+    name: AGPL
     url: https://raw.githubusercontent.com/green-ecolution/green-ecolution-management/develop/LICENSE
   termsOfService: http://swagger.io/terms/
   title: Green Space Management API
@@ -32,6 +32,11 @@ paths:
       - description: Status
         in: query
         name: status
+        schema:
+          type: string
+      - description: Provider
+        in: query
+        name: provider
         schema:
           type: string
       responses:
@@ -139,7 +144,7 @@ paths:
         name: cluster_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -188,7 +193,7 @@ paths:
         name: cluster_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -240,7 +245,7 @@ paths:
         name: cluster_id
         required: true
         schema:
-          type: string
+          type: integer
       requestBody:
         content:
           '*/*':
@@ -667,84 +672,6 @@ paths:
       summary: Get a region by ID
       tags:
       - Region
-  /v1/role:
-    get:
-      description: Get all user roles
-      parameters:
-      - description: Page
-        in: query
-        name: page
-        schema:
-          type: string
-      - description: Limit
-        in: query
-        name: limit
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RoleList'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get all user roles
-      tags:
-      - Role
-  /v1/role/{id}:
-    get:
-      description: Get a role by ID
-      parameters:
-      - description: Role ID
-        in: path
-        name: id
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Role'
-          description: OK
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Get a role by ID
-      tags:
-      - Role
   /v1/sensor:
     get:
       description: Get all sensors
@@ -763,6 +690,11 @@ paths:
       - description: Limit
         in: query
         name: limit
+        schema:
+          type: string
+      - description: Provider
+        in: query
+        name: provider
         schema:
           type: string
       responses:
@@ -924,9 +856,9 @@ paths:
         name: limit
         schema:
           type: string
-      - description: Age
+      - description: Provider
         in: query
-        name: age
+        name: provider
         schema:
           type: string
       responses:
@@ -1034,7 +966,7 @@ paths:
         name: tree_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -1083,7 +1015,7 @@ paths:
         name: tree_id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -1135,7 +1067,7 @@ paths:
         name: tree_id
         required: true
         schema:
-          type: string
+          type: integer
       requestBody:
         content:
           '*/*':
@@ -1424,6 +1356,51 @@ paths:
       tags:
       - User
       x-codegen-request-body-name: body
+  /v1/user/role/{role}:
+    get:
+      description: Get users by role
+      operationId: get-users-by-role
+      parameters:
+      - description: Page
+        in: query
+        name: page
+        schema:
+          type: string
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: string
+      - description: Role
+        in: path
+        name: role
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Get users by role
+      tags:
+      - User
   /v1/user/token/refresh:
     post:
       description: Refresh token
@@ -1480,6 +1457,11 @@ paths:
       - description: Vehicle Type
         in: query
         name: type
+        schema:
+          type: string
+      - description: Provider
+        in: query
+        name: provider
         schema:
           type: string
       responses:
@@ -1587,7 +1569,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -1636,7 +1618,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -1812,6 +1794,11 @@ paths:
         name: status
         schema:
           type: string
+      - description: Provider
+        in: query
+        name: provider
+        schema:
+          type: string
       responses:
         "200":
           content:
@@ -1917,7 +1904,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "204":
           content: {}
@@ -1966,7 +1953,7 @@ paths:
         name: id
         required: true
         schema:
-          type: string
+          type: integer
       responses:
         "200":
           content:
@@ -2069,6 +2056,86 @@ paths:
       tags:
       - Watering Plan
       x-codegen-request-body-name: body
+  /v1/watering-plan/route/gpx/{gpx_name}:
+    get:
+      description: Generate route
+      parameters:
+      - description: gpx file name
+        in: path
+        name: gpx_name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/gpx+xml:
+              schema:
+                format: binary
+                type: string
+            application/json:
+              schema:
+                format: binary
+                type: string
+          description: OK
+        "400":
+          content:
+            application/gpx+xml:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "500":
+          content:
+            application/gpx+xml:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Generate route
+      tags:
+      - Watering Plan
+  /v1/watering-plan/route/preview:
+    post:
+      description: Generate preview route
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteRequest'
+        description: Route Request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeoJson'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Generate preview route
+      tags:
+      - Watering Plan
+      x-codegen-request-body-name: body
 components:
   schemas:
     AppInfo:
@@ -2153,15 +2220,19 @@ components:
       - B
       - BE
       - C
+      - CE
+      - Unknown
       type: string
       x-enum-varnames:
-      - DrivingLicenseCar
-      - DrivingLicenseTrailer
-      - DrivingLicenseTransporter
+      - DrivingLicenseB
+      - DrivingLicenseBE
+      - DrivingLicenseC
+      - DrivingLicenseCE
+      - DrivingLicenseUnknown
     EvaluationValue:
       example:
-        consumed_water: 6.027456183070403
-        tree_cluster_id: 1
+        consumed_water: 1.4658129805029452
+        tree_cluster_id: 5
         watering_plan_id: 5
       properties:
         consumed_water:
@@ -2175,6 +2246,165 @@ components:
       - tree_cluster_id
       - watering_plan_id
       type: object
+    GeoJSONLocation:
+      example:
+        latitude: 5.962133916683182
+        longitude: 5.637376656633329
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+      required:
+      - latitude
+      - longitude
+      type: object
+    GeoJSONMetadata:
+      example:
+        end_point:
+          latitude: 5.962133916683182
+          longitude: 5.637376656633329
+        start_point:
+          latitude: 5.962133916683182
+          longitude: 5.637376656633329
+        watering_point:
+          latitude: 5.962133916683182
+          longitude: 5.637376656633329
+      properties:
+        end_point:
+          $ref: '#/components/schemas/GeoJSONLocation'
+        start_point:
+          $ref: '#/components/schemas/GeoJSONLocation'
+        watering_point:
+          $ref: '#/components/schemas/GeoJSONLocation'
+      required:
+      - end_point
+      - start_point
+      - watering_point
+      type: object
+    GeoJson:
+      example:
+        features:
+        - bbox:
+          - 6.027456183070403
+          - 6.027456183070403
+          geometry:
+            coordinates:
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            type: FeatureCollection
+          type: null
+          properties:
+            key: "{}"
+        - bbox:
+          - 6.027456183070403
+          - 6.027456183070403
+          geometry:
+            coordinates:
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            type: FeatureCollection
+          type: null
+          properties:
+            key: "{}"
+        metadata:
+          end_point:
+            latitude: 5.962133916683182
+            longitude: 5.637376656633329
+          start_point:
+            latitude: 5.962133916683182
+            longitude: 5.637376656633329
+          watering_point:
+            latitude: 5.962133916683182
+            longitude: 5.637376656633329
+        bbox:
+        - 0.8008281904610115
+        - 0.8008281904610115
+        type: null
+      properties:
+        bbox:
+          items:
+            type: number
+          type: array
+        features:
+          items:
+            $ref: '#/components/schemas/GeoJsonFeature'
+          type: array
+        metadata:
+          $ref: '#/components/schemas/GeoJSONMetadata'
+        type:
+          $ref: '#/components/schemas/GeoJsonType'
+      required:
+      - bbox
+      - features
+      - metadata
+      - type
+      type: object
+    GeoJsonFeature:
+      example:
+        bbox:
+        - 6.027456183070403
+        - 6.027456183070403
+        geometry:
+          coordinates:
+          - - 1.4658129805029452
+            - 1.4658129805029452
+          - - 1.4658129805029452
+            - 1.4658129805029452
+          type: FeatureCollection
+        type: null
+        properties:
+          key: "{}"
+      properties:
+        bbox:
+          items:
+            type: number
+          type: array
+        geometry:
+          $ref: '#/components/schemas/GeoJsonGeometry'
+        properties:
+          additionalProperties:
+            type: object
+          type: object
+        type:
+          $ref: '#/components/schemas/GeoJsonType'
+      required:
+      - bbox
+      - geometry
+      - properties
+      - type
+      type: object
+    GeoJsonGeometry:
+      example:
+        coordinates:
+        - - 1.4658129805029452
+          - 1.4658129805029452
+        - - 1.4658129805029452
+          - 1.4658129805029452
+        type: FeatureCollection
+      properties:
+        coordinates:
+          items:
+            items:
+              type: number
+            type: array
+          type: array
+        type:
+          $ref: '#/components/schemas/GeoJsonType'
+      required:
+      - coordinates
+      - type
+      type: object
+    GeoJsonType:
+      enum:
+      - FeatureCollection
+      type: string
+      x-enum-varnames:
+      - FeatureCollection
     GitInfo:
       example:
         commit: commit
@@ -2401,53 +2631,34 @@ components:
       - pagination
       - regions
       type: object
-    Role:
+    RouteRequest:
       example:
-        name: name
-        description: description
-        id: id
+        trailer_id: 6
+        cluster_ids:
+        - 0
+        - 0
+        transporter_id: 1
       properties:
-        description:
-          type: string
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - description
-      - id
-      - name
-      type: object
-    RoleList:
-      example:
-        pagination:
-          next_page: 9
-          total_records: 4
-          total_pages: 2
-          prev_page: 3
-          current_page: 7
-        data:
-        - name: name
-          description: description
-          id: id
-        - name: name
-          description: description
-          id: id
-      properties:
-        data:
+        cluster_ids:
           items:
-            $ref: '#/components/schemas/Role'
+            type: integer
           type: array
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+        trailer_id:
+          type: integer
+        transporter_id:
+          type: integer
       required:
-      - data
-      - pagination
+      - cluster_ids
+      - transporter_id
       type: object
     Sensor:
       example:
+        additional_information:
+          key: ""
         latest_data:
+          updated_at: updated_at
           temperature: 4.145608029883936
+          created_at: created_at
           humidity: 2.027123023002322
           watermarks:
           - centibar: 7
@@ -2458,12 +2669,16 @@ components:
             resistance: 1
           battery: 3.616076749251911
         updated_at: updated_at
+        provider: provider
         latitude: 1.4894159098541704
         created_at: created_at
         id: id
         longitude: 6.84685269835264
         status: online
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         created_at:
           type: string
         id:
@@ -2474,22 +2689,28 @@ components:
           type: number
         longitude:
           type: number
+        provider:
+          type: string
         status:
           $ref: '#/components/schemas/SensorStatus'
         updated_at:
           type: string
       required:
+      - additional_information
       - created_at
       - id
       - latest_data
       - latitude
       - longitude
+      - provider
       - status
       - updated_at
       type: object
     SensorData:
       example:
+        updated_at: updated_at
         temperature: 4.145608029883936
+        created_at: created_at
         humidity: 2.027123023002322
         watermarks:
         - centibar: 7
@@ -2502,18 +2723,24 @@ components:
       properties:
         battery:
           type: number
+        created_at:
+          type: string
         humidity:
           type: number
         temperature:
           type: number
+        updated_at:
+          type: string
         watermarks:
           items:
             $ref: '#/components/schemas/WatermarkResponse'
           type: array
       required:
       - battery
+      - created_at
       - humidity
       - temperature
+      - updated_at
       - watermarks
       type: object
     SensorList:
@@ -2525,8 +2752,12 @@ components:
           prev_page: 3
           current_page: 7
         data:
-        - latest_data:
+        - additional_information:
+            key: ""
+          latest_data:
+            updated_at: updated_at
             temperature: 4.145608029883936
+            created_at: created_at
             humidity: 2.027123023002322
             watermarks:
             - centibar: 7
@@ -2537,13 +2768,18 @@ components:
               resistance: 1
             battery: 3.616076749251911
           updated_at: updated_at
+          provider: provider
           latitude: 1.4894159098541704
           created_at: created_at
           id: id
           longitude: 6.84685269835264
           status: online
-        - latest_data:
+        - additional_information:
+            key: ""
+          latest_data:
+            updated_at: updated_at
             temperature: 4.145608029883936
+            created_at: created_at
             humidity: 2.027123023002322
             watermarks:
             - centibar: 7
@@ -2554,6 +2790,7 @@ components:
               resistance: 1
             battery: 3.616076749251911
           updated_at: updated_at
+          provider: provider
           latitude: 1.4894159098541704
           created_at: created_at
           id: id
@@ -2637,15 +2874,22 @@ components:
         created_at: created_at
         description: description
         tree_cluster_id: 7
+        additional_information:
+          key: ""
         number: number
         readonly: true
         updated_at: updated_at
         watering_status: good
+        provider: provider
         species: species
         planting_year: 9
         sensor:
+          additional_information:
+            key: ""
           latest_data:
+            updated_at: updated_at
             temperature: 4.145608029883936
+            created_at: created_at
             humidity: 2.027123023002322
             watermarks:
             - centibar: 7
@@ -2656,6 +2900,7 @@ components:
               resistance: 1
             battery: 3.616076749251911
           updated_at: updated_at
+          provider: provider
           latitude: 1.4894159098541704
           created_at: created_at
           id: id
@@ -2664,6 +2909,9 @@ components:
         id: 5
         longitude: 7.061401241503109
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         created_at:
           type: string
         description:
@@ -2678,6 +2926,8 @@ components:
           type: string
         planting_year:
           type: integer
+        provider:
+          type: string
         readonly:
           description: "Images              []*ImageResponse `json:\"images\"`"
           type: boolean
@@ -2692,6 +2942,7 @@ components:
         watering_status:
           $ref: '#/components/schemas/WateringStatus'
       required:
+      - additional_information
       - created_at
       - description
       - id
@@ -2699,6 +2950,7 @@ components:
       - longitude
       - number
       - planting_year
+      - provider
       - readonly
       - species
       - updated_at
@@ -2716,15 +2968,22 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          additional_information:
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
+          provider: provider
           species: species
           planting_year: 9
           sensor:
+            additional_information:
+              key: ""
             latest_data:
+              updated_at: updated_at
               temperature: 4.145608029883936
+              created_at: created_at
               humidity: 2.027123023002322
               watermarks:
               - centibar: 7
@@ -2735,6 +2994,7 @@ components:
                 resistance: 1
               battery: 3.616076749251911
             updated_at: updated_at
+            provider: provider
             latitude: 1.4894159098541704
             created_at: created_at
             id: id
@@ -2746,15 +3006,22 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          additional_information:
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
+          provider: provider
           species: species
           planting_year: 9
           sensor:
+            additional_information:
+              key: ""
             latest_data:
+              updated_at: updated_at
               temperature: 4.145608029883936
+              created_at: created_at
               humidity: 2.027123023002322
               watermarks:
               - centibar: 7
@@ -2765,6 +3032,7 @@ components:
                 resistance: 1
               battery: 3.616076749251911
             updated_at: updated_at
+            provider: provider
             latitude: 1.4894159098541704
             created_at: created_at
             id: id
@@ -2773,9 +3041,12 @@ components:
           id: 5
           longitude: 7.061401241503109
         soil_condition: schluffig
+        additional_information:
+          key: ""
         archived: true
         updated_at: updated_at
         watering_status: null
+        provider: provider
         name: name
         moisture_level: 5.962133916683182
         id: 0
@@ -2784,6 +3055,9 @@ components:
           id: 5
         longitude: 1.4658129805029452
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         address:
           type: string
         archived:
@@ -2804,6 +3078,8 @@ components:
           type: number
         name:
           type: string
+        provider:
+          type: string
         region:
           $ref: '#/components/schemas/Region'
         soil_condition:
@@ -2817,6 +3093,7 @@ components:
         watering_status:
           $ref: '#/components/schemas/WateringStatus'
       required:
+      - additional_information
       - address
       - archived
       - created_at
@@ -2826,25 +3103,34 @@ components:
       - longitude
       - moisture_level
       - name
+      - provider
       - soil_condition
       - updated_at
       - watering_status
       type: object
     TreeClusterCreate:
       example:
+        additional_information:
+          key: ""
         address: address
         tree_ids:
         - 0
         - 0
+        provider: provider
         name: name
         description: description
         soil_condition: schluffig
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         address:
           type: string
         description:
           type: string
         name:
+          type: string
+        provider:
           type: string
         soil_condition:
           $ref: '#/components/schemas/SoilCondition'
@@ -2987,19 +3273,27 @@ components:
       type: object
     TreeClusterUpdate:
       example:
+        additional_information:
+          key: ""
         address: address
         tree_ids:
         - 0
         - 0
+        provider: provider
         name: name
         description: description
         soil_condition: schluffig
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         address:
           type: string
         description:
           type: string
         name:
+          type: string
+        provider:
           type: string
         soil_condition:
           $ref: '#/components/schemas/SoilCondition'
@@ -3017,8 +3311,11 @@ components:
     TreeCreate:
       example:
         sensor_id: sensor_id
+        additional_information:
+          key: ""
         number: number
         readonly: true
+        provider: provider
         species: species
         latitude: 0.8008281904610115
         description: description
@@ -3026,6 +3323,9 @@ components:
         tree_cluster_id: 5
         longitude: 6.027456183070403
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         description:
           type: string
         latitude:
@@ -3036,6 +3336,8 @@ components:
           type: string
         planting_year:
           type: integer
+        provider:
+          type: string
         readonly:
           type: boolean
         sensor_id:
@@ -3066,15 +3368,22 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          additional_information:
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
+          provider: provider
           species: species
           planting_year: 9
           sensor:
+            additional_information:
+              key: ""
             latest_data:
+              updated_at: updated_at
               temperature: 4.145608029883936
+              created_at: created_at
               humidity: 2.027123023002322
               watermarks:
               - centibar: 7
@@ -3085,6 +3394,7 @@ components:
                 resistance: 1
               battery: 3.616076749251911
             updated_at: updated_at
+            provider: provider
             latitude: 1.4894159098541704
             created_at: created_at
             id: id
@@ -3096,15 +3406,22 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          additional_information:
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
           watering_status: good
+          provider: provider
           species: species
           planting_year: 9
           sensor:
+            additional_information:
+              key: ""
             latest_data:
+              updated_at: updated_at
               temperature: 4.145608029883936
+              created_at: created_at
               humidity: 2.027123023002322
               watermarks:
               - centibar: 7
@@ -3115,6 +3432,7 @@ components:
                 resistance: 1
               battery: 3.616076749251911
             updated_at: updated_at
+            provider: provider
             latitude: 1.4894159098541704
             created_at: created_at
             id: id
@@ -3136,8 +3454,11 @@ components:
     TreeUpdate:
       example:
         sensor_id: sensor_id
+        additional_information:
+          key: ""
         number: number
         readonly: true
+        provider: provider
         species: species
         latitude: 0.8008281904610115
         description: description
@@ -3145,6 +3466,9 @@ components:
         tree_cluster_id: 5
         longitude: 6.027456183070403
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         description:
           type: string
         latitude:
@@ -3155,6 +3479,8 @@ components:
           type: string
         planting_year:
           type: integer
+        provider:
+          type: string
         readonly:
           type: boolean
         sensor_id:
@@ -3175,23 +3501,31 @@ components:
     User:
       example:
         email_verified: true
-        avatar_url: avatar_url
-        driving_license: B
-        employee_id: employee_id
+        roles:
+        - tbz
+        - tbz
         created_at: created_at
         last_name: last_name
+        driving_licenses:
+        - B
+        - B
+        avatar_url: avatar_url
+        employee_id: employee_id
         phone_number: phone_number
         id: id
         first_name: first_name
         email: email
+        status: available
         username: username
       properties:
         avatar_url:
           type: string
         created_at:
           type: string
-        driving_license:
-          $ref: '#/components/schemas/DrivingLicense'
+        driving_licenses:
+          items:
+            $ref: '#/components/schemas/DrivingLicense'
+          type: array
         email:
           type: string
         email_verified:
@@ -3206,12 +3540,18 @@ components:
           type: string
         phone_number:
           type: string
+        roles:
+          items:
+            $ref: '#/components/schemas/UserRole'
+          type: array
+        status:
+          $ref: '#/components/schemas/UserStatus'
         username:
           type: string
       required:
       - avatar_url
       - created_at
-      - driving_license
+      - driving_licenses
       - email
       - email_verified
       - employee_id
@@ -3219,6 +3559,8 @@ components:
       - id
       - last_name
       - phone_number
+      - roles
+      - status
       - username
       type: object
     UserList:
@@ -3231,26 +3573,38 @@ components:
           current_page: 7
         data:
         - email_verified: true
-          avatar_url: avatar_url
-          driving_license: B
-          employee_id: employee_id
+          roles:
+          - tbz
+          - tbz
           created_at: created_at
           last_name: last_name
+          driving_licenses:
+          - B
+          - B
+          avatar_url: avatar_url
+          employee_id: employee_id
           phone_number: phone_number
           id: id
           first_name: first_name
           email: email
+          status: available
           username: username
         - email_verified: true
-          avatar_url: avatar_url
-          driving_license: B
-          employee_id: employee_id
+          roles:
+          - tbz
+          - tbz
           created_at: created_at
           last_name: last_name
+          driving_licenses:
+          - B
+          - B
+          avatar_url: avatar_url
+          employee_id: employee_id
           phone_number: phone_number
           id: id
           first_name: first_name
           email: email
+          status: available
           username: username
       properties:
         data:
@@ -3308,6 +3662,28 @@ components:
       - roles
       - username
       type: object
+    UserRole:
+      enum:
+      - tbz
+      - green-ecolution
+      - smarte-grenzregion
+      - unknown
+      type: string
+      x-enum-varnames:
+      - UserRoleTbz
+      - UserRoleGreenEcolution
+      - UserRoleSmarteGrenzregion
+      - UserRoleUnknown
+    UserStatus:
+      enum:
+      - available
+      - absent
+      - unknown
+      type: string
+      x-enum-varnames:
+      - UserStatusAvailable
+      - UserStatusAbsent
+      - UserStatusUnknown
     Vehicle:
       example:
         water_capacity: 5.962133916683182
@@ -3315,15 +3691,22 @@ components:
         number_plate: number_plate
         created_at: created_at
         description: description
+        weight: 5.637376656633329
         type: transporter
+        additional_information:
+          key: ""
         driving_license: B
         updated_at: updated_at
-        width: 5.637376656633329
+        provider: provider
+        width: 2.3021358869347655
         model: model
         id: 6
         height: 0.8008281904610115
         status: active
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         created_at:
           type: string
         description:
@@ -3340,6 +3723,8 @@ components:
           type: string
         number_plate:
           type: string
+        provider:
+          type: string
         status:
           $ref: '#/components/schemas/VehicleStatus'
         type:
@@ -3348,9 +3733,12 @@ components:
           type: string
         water_capacity:
           type: number
+        weight:
+          type: number
         width:
           type: number
       required:
+      - additional_information
       - created_at
       - description
       - driving_license
@@ -3359,25 +3747,34 @@ components:
       - length
       - model
       - number_plate
+      - provider
       - status
       - type
       - updated_at
       - water_capacity
+      - weight
       - width
       type: object
     VehicleCreate:
       example:
-        driving_license: B
         water_capacity: 1.4658129805029452
         length: 6.027456183070403
         number_plate: number_plate
-        width: 5.962133916683182
         description: description
-        model: model
+        weight: 5.962133916683182
         type: transporter
+        additional_information:
+          key: ""
+        driving_license: B
+        provider: provider
+        width: 5.637376656633329
+        model: model
         height: 0.8008281904610115
         status: active
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         description:
           type: string
         driving_license:
@@ -3390,11 +3787,15 @@ components:
           type: string
         number_plate:
           type: string
+        provider:
+          type: string
         status:
           $ref: '#/components/schemas/VehicleStatus'
         type:
           $ref: '#/components/schemas/VehicleType'
         water_capacity:
+          type: number
+        weight:
           type: number
         width:
           type: number
@@ -3408,6 +3809,7 @@ components:
       - status
       - type
       - water_capacity
+      - weight
       - width
       type: object
     VehicleList:
@@ -3424,10 +3826,14 @@ components:
           number_plate: number_plate
           created_at: created_at
           description: description
+          weight: 5.637376656633329
           type: transporter
+          additional_information:
+            key: ""
           driving_license: B
           updated_at: updated_at
-          width: 5.637376656633329
+          provider: provider
+          width: 2.3021358869347655
           model: model
           id: 6
           height: 0.8008281904610115
@@ -3437,10 +3843,14 @@ components:
           number_plate: number_plate
           created_at: created_at
           description: description
+          weight: 5.637376656633329
           type: transporter
+          additional_information:
+            key: ""
           driving_license: B
           updated_at: updated_at
-          width: 5.637376656633329
+          provider: provider
+          width: 2.3021358869347655
           model: model
           id: 6
           height: 0.8008281904610115
@@ -3480,17 +3890,24 @@ components:
       - VehicleTypeUnknown
     VehicleUpdate:
       example:
-        driving_license: B
         water_capacity: 1.4658129805029452
         length: 6.027456183070403
         number_plate: number_plate
-        width: 5.962133916683182
         description: description
-        model: model
+        weight: 5.962133916683182
         type: transporter
+        additional_information:
+          key: ""
+        driving_license: B
+        provider: provider
+        width: 5.637376656633329
+        model: model
         height: 0.8008281904610115
         status: active
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         description:
           type: string
         driving_license:
@@ -3503,11 +3920,15 @@ components:
           type: string
         number_plate:
           type: string
+        provider:
+          type: string
         status:
           $ref: '#/components/schemas/VehicleStatus'
         type:
           $ref: '#/components/schemas/VehicleType'
         water_capacity:
+          type: number
+        weight:
           type: number
         width:
           type: number
@@ -3521,6 +3942,7 @@ components:
       - status
       - type
       - water_capacity
+      - weight
       - width
       type: object
     WateringPlan:
@@ -3570,15 +3992,17 @@ components:
         user_ids:
         - user_ids
         - user_ids
-        total_water_required: 2.3021358869347655
+        total_water_required: 9.301444243932576
+        refill_count: 7
         created_at: created_at
         description: description
+        duration: 6.027456183070403
         evaluation:
-        - consumed_water: 6.027456183070403
-          tree_cluster_id: 1
+        - consumed_water: 1.4658129805029452
+          tree_cluster_id: 5
           watering_plan_id: 5
-        - consumed_water: 6.027456183070403
-          tree_cluster_id: 1
+        - consumed_water: 1.4658129805029452
+          tree_cluster_id: 5
           watering_plan_id: 5
         trailer:
           water_capacity: 5.962133916683182
@@ -3586,32 +4010,47 @@ components:
           number_plate: number_plate
           created_at: created_at
           description: description
+          weight: 5.637376656633329
           type: transporter
+          additional_information:
+            key: ""
           driving_license: B
           updated_at: updated_at
-          width: 5.637376656633329
+          provider: provider
+          width: 2.3021358869347655
           model: model
           id: 6
           height: 0.8008281904610115
           status: active
+        additional_information:
+          key: ""
         updated_at: updated_at
+        provider: provider
+        gpx_url: gpx_url
         transporter:
           water_capacity: 5.962133916683182
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
           description: description
+          weight: 5.637376656633329
           type: transporter
+          additional_information:
+            key: ""
           driving_license: B
           updated_at: updated_at
-          width: 5.637376656633329
+          provider: provider
+          width: 2.3021358869347655
           model: model
           id: 6
           height: 0.8008281904610115
           status: active
-        id: 5
+        id: 2
         status: planned
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         cancellation_note:
           type: string
         created_at:
@@ -3622,11 +4061,19 @@ components:
           type: string
         distance:
           type: number
+        duration:
+          type: number
         evaluation:
           items:
             $ref: '#/components/schemas/EvaluationValue'
           type: array
+        gpx_url:
+          type: string
         id:
+          type: integer
+        provider:
+          type: string
+        refill_count:
           type: integer
         status:
           $ref: '#/components/schemas/WateringPlanStatus'
@@ -3647,13 +4094,18 @@ components:
             type: string
           type: array
       required:
+      - additional_information
       - cancellation_note
       - created_at
       - date
       - description
       - distance
+      - duration
       - evaluation
+      - gpx_url
       - id
+      - provider
+      - refill_count
       - status
       - total_water_required
       - transporter
@@ -3664,9 +4116,12 @@ components:
     WateringPlanCreate:
       example:
         date: date
+        additional_information:
+          key: ""
         tree_cluster_ids:
         - 1
         - 1
+        provider: provider
         user_ids:
         - user_ids
         - user_ids
@@ -3674,9 +4129,14 @@ components:
         description: description
         transporter_id: 6
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         date:
           type: string
         description:
+          type: string
+        provider:
           type: string
         trailer_id:
           type: integer
@@ -3753,10 +4213,14 @@ components:
           number_plate: number_plate
           created_at: created_at
           description: description
+          weight: 5.637376656633329
           type: transporter
+          additional_information:
+            key: ""
           driving_license: B
           updated_at: updated_at
-          width: 5.637376656633329
+          provider: provider
+          width: 2.3021358869347655
           model: model
           id: 6
           height: 0.8008281904610115
@@ -3768,10 +4232,14 @@ components:
           number_plate: number_plate
           created_at: created_at
           description: description
+          weight: 5.637376656633329
           type: transporter
+          additional_information:
+            key: ""
           driving_license: B
           updated_at: updated_at
-          width: 5.637376656633329
+          provider: provider
+          width: 2.3021358869347655
           model: model
           id: 6
           height: 0.8008281904610115
@@ -3886,10 +4354,14 @@ components:
             number_plate: number_plate
             created_at: created_at
             description: description
+            weight: 5.637376656633329
             type: transporter
+            additional_information:
+              key: ""
             driving_license: B
             updated_at: updated_at
-            width: 5.637376656633329
+            provider: provider
+            width: 2.3021358869347655
             model: model
             id: 6
             height: 0.8008281904610115
@@ -3901,10 +4373,14 @@ components:
             number_plate: number_plate
             created_at: created_at
             description: description
+            weight: 5.637376656633329
             type: transporter
+            additional_information:
+              key: ""
             driving_license: B
             updated_at: updated_at
-            width: 5.637376656633329
+            provider: provider
+            width: 2.3021358869347655
             model: model
             id: 6
             height: 0.8008281904610115
@@ -3965,10 +4441,14 @@ components:
             number_plate: number_plate
             created_at: created_at
             description: description
+            weight: 5.637376656633329
             type: transporter
+            additional_information:
+              key: ""
             driving_license: B
             updated_at: updated_at
-            width: 5.637376656633329
+            provider: provider
+            width: 2.3021358869347655
             model: model
             id: 6
             height: 0.8008281904610115
@@ -3980,10 +4460,14 @@ components:
             number_plate: number_plate
             created_at: created_at
             description: description
+            weight: 5.637376656633329
             type: transporter
+            additional_information:
+              key: ""
             driving_license: B
             updated_at: updated_at
-            width: 5.637376656633329
+            provider: provider
+            width: 2.3021358869347655
             model: model
             id: 6
             height: 0.8008281904610115
@@ -4021,16 +4505,19 @@ components:
       example:
         date: date
         evaluation:
-        - consumed_water: 6.027456183070403
-          tree_cluster_id: 1
+        - consumed_water: 1.4658129805029452
+          tree_cluster_id: 5
           watering_plan_id: 5
-        - consumed_water: 6.027456183070403
-          tree_cluster_id: 1
+        - consumed_water: 1.4658129805029452
+          tree_cluster_id: 5
           watering_plan_id: 5
+        additional_information:
+          key: ""
         cancellation_note: cancellation_note
         tree_cluster_ids:
         - 1
         - 1
+        provider: provider
         user_ids:
         - user_ids
         - user_ids
@@ -4039,6 +4526,9 @@ components:
         transporter_id: 6
         status: planned
       properties:
+        additional_information:
+          additionalProperties: true
+          type: object
         cancellation_note:
           type: string
         date:
@@ -4049,6 +4539,8 @@ components:
           items:
             $ref: '#/components/schemas/EvaluationValue'
           type: array
+        provider:
+          type: string
         status:
           $ref: '#/components/schemas/WateringPlanStatus'
         trailer_id:

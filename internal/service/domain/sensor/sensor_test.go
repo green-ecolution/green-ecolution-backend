@@ -23,7 +23,23 @@ func TestSensorService_GetAll(t *testing.T) {
 
 		// when
 		sensorRepo.EXPECT().GetAll(context.Background()).Return(TestSensorList, nil)
-		sensors, err := svc.GetAll(context.Background())
+		sensors, err := svc.GetAll(context.Background(), "")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, TestSensorList, sensors)
+	})
+
+	t.Run("should return all sensor by provider", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
+
+		// when
+		sensorRepo.EXPECT().GetAllByProvider(context.Background(), "test-provider").Return(TestSensorList, nil)
+		sensors, err := svc.GetAll(context.Background(), "test-provider")
 
 		// then
 		assert.NoError(t, err)
@@ -38,7 +54,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		sensorRepo.EXPECT().GetAll(context.Background()).Return(nil, storage.ErrSensorNotFound)
-		sensors, err := svc.GetAll(context.Background())
+		sensors, err := svc.GetAll(context.Background(), "")
 
 		// then
 		assert.Error(t, err)

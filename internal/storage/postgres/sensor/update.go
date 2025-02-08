@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -72,9 +73,19 @@ func (r *SensorRepository) Update(ctx context.Context, id string, updateFn func(
 }
 
 func (r *SensorRepository) updateEntity(ctx context.Context, sensor *entities.Sensor) error {
+	log := logger.GetLogger(ctx)
+
+	additionalInfo, err := utils.MapAdditionalInfoToByte(sensor.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", sensor.AdditionalInfo)
+		return err
+	}
+
 	params := sqlc.UpdateSensorParams{
-		ID:     sensor.ID,
-		Status: sqlc.SensorStatus(sensor.Status),
+		ID:                     sensor.ID,
+		Status:                 sqlc.SensorStatus(sensor.Status),
+		Provider:               &sensor.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	locationParams := &sqlc.SetSensorLocationParams{
@@ -86,8 +97,7 @@ func (r *SensorRepository) updateEntity(ctx context.Context, sensor *entities.Se
 	if err := r.validateCoordinates(locationParams); err != nil {
 		return err
 	}
-	err := r.store.SetSensorLocation(ctx, locationParams)
-	if err != nil {
+	if err := r.store.SetSensorLocation(ctx, locationParams); err != nil {
 		return err
 	}
 

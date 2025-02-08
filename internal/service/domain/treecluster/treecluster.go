@@ -38,9 +38,18 @@ func NewTreeClusterService(
 	}
 }
 
-func (s *TreeClusterService) GetAll(ctx context.Context) ([]*domain.TreeCluster, int64, error) {
+func (s *TreeClusterService) GetAll(ctx context.Context, provider string) ([]*domain.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
-	treeClusters, totalCount, err := s.treeClusterRepo.GetAll(ctx)
+	var treeClusters []*domain.TreeCluster
+	var totalCount int64
+	var err error
+
+	if provider != "" {
+		treeClusters, err = s.treeClusterRepo.GetAllByProvider(ctx, provider)
+		totalCount = int64(len(treeClusters))
+	} else {
+		treeClusters, totalCount, err = s.treeClusterRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch tree clsuters", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -121,6 +130,8 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		tc.Address = createTc.Address
 		tc.Description = createTc.Description
 		tc.SoilCondition = createTc.SoilCondition
+		tc.Provider = createTc.Provider
+		tc.AdditionalInfo = createTc.AdditionalInfo
 
 		log.Debug("creating tree cluster with following attributes",
 			"tree_ids", createTc.TreeIDs,
@@ -172,6 +183,8 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		tc.Address = tcUpdate.Address
 		tc.Description = tcUpdate.Description
 		tc.SoilCondition = tcUpdate.SoilCondition
+		tc.Provider = tcUpdate.Provider
+		tc.AdditionalInfo = tcUpdate.AdditionalInfo
 
 		log.Debug("updating tree cluster with following attributes",
 			"cluster_id", id,
@@ -179,6 +192,8 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 			"address", tcUpdate.Address,
 			"description", tcUpdate.Description,
 			"soil_condition", tcUpdate.SoilCondition,
+			"provider", tcUpdate.Provider,
+			"additional_info", tcUpdate.AdditionalInfo,
 		)
 
 		return true, nil

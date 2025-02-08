@@ -102,9 +102,15 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, transporterID in
 	return geoJSON, nil
 }
 
-func (w *WateringPlanService) GetAll(ctx context.Context) ([]*entities.WateringPlan, error) {
+func (w *WateringPlanService) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, error) {
 	log := logger.GetLogger(ctx)
-	plans, err := w.wateringPlanRepo.GetAll(ctx)
+	var plans []*entities.WateringPlan
+	var err error
+	if provider != "" {
+		plans, err = w.wateringPlanRepo.GetAllByProvider(ctx, provider)
+	} else {
+		plans, err = w.wateringPlanRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch watering plans", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -165,6 +171,8 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		wp.TreeClusters = treeClusters
 		wp.UserIDs = createWp.UserIDs
 		wp.TotalWaterRequired = utils.P(float64(neededWater))
+		wp.Provider = createWp.Provider
+		wp.AdditionalInfo = createWp.AdditionalInfo
 
 		return true, nil
 	})
@@ -291,6 +299,8 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		wp.Evaluation = updateWp.Evaluation
 		wp.UserIDs = updateWp.UserIDs
 		wp.TotalWaterRequired = &neededWater
+		wp.Provider = updateWp.Provider
+		wp.AdditionalInfo = updateWp.AdditionalInfo
 
 		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		if w.shouldUpdateGpx(prevWp, wp) {

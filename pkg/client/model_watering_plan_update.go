@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,15 +22,17 @@ var _ MappedNullable = &WateringPlanUpdate{}
 
 // WateringPlanUpdate struct for WateringPlanUpdate
 type WateringPlanUpdate struct {
-	CancellationNote string `json:"cancellation_note"`
-	Date string `json:"date"`
-	Description string `json:"description"`
-	Evaluation []EvaluationValue `json:"evaluation,omitempty"`
-	Status WateringPlanStatus `json:"status"`
-	TrailerId *int32 `json:"trailer_id,omitempty"`
-	TransporterId int32 `json:"transporter_id"`
-	TreeClusterIds []int32 `json:"tree_cluster_ids"`
-	UserIds []string `json:"user_ids"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	CancellationNote      string                 `json:"cancellation_note"`
+	Date                  string                 `json:"date"`
+	Description           string                 `json:"description"`
+	Evaluation            []EvaluationValue      `json:"evaluation,omitempty"`
+	Provider              *string                `json:"provider,omitempty"`
+	Status                WateringPlanStatus     `json:"status"`
+	TrailerId             *int32                 `json:"trailer_id,omitempty"`
+	TransporterId         int32                  `json:"transporter_id"`
+	TreeClusterIds        []int32                `json:"tree_cluster_ids"`
+	UserIds               []string               `json:"user_ids"`
 }
 
 type _WateringPlanUpdate WateringPlanUpdate
@@ -57,6 +59,38 @@ func NewWateringPlanUpdate(cancellationNote string, date string, description str
 func NewWateringPlanUpdateWithDefaults() *WateringPlanUpdate {
 	this := WateringPlanUpdate{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
+func (o *WateringPlanUpdate) GetAdditionalInformation() map[string]interface{} {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		var ret map[string]interface{}
+		return ret
+	}
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WateringPlanUpdate) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *WateringPlanUpdate) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *WateringPlanUpdate) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetCancellationNote returns the CancellationNote field value
@@ -161,6 +195,38 @@ func (o *WateringPlanUpdate) HasEvaluation() bool {
 // SetEvaluation gets a reference to the given []EvaluationValue and assigns it to the Evaluation field.
 func (o *WateringPlanUpdate) SetEvaluation(v []EvaluationValue) {
 	o.Evaluation = v
+}
+
+// GetProvider returns the Provider field value if set, zero value otherwise.
+func (o *WateringPlanUpdate) GetProvider() string {
+	if o == nil || IsNil(o.Provider) {
+		var ret string
+		return ret
+	}
+	return *o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WateringPlanUpdate) GetProviderOk() (*string, bool) {
+	if o == nil || IsNil(o.Provider) {
+		return nil, false
+	}
+	return o.Provider, true
+}
+
+// HasProvider returns a boolean if a field has been set.
+func (o *WateringPlanUpdate) HasProvider() bool {
+	if o != nil && !IsNil(o.Provider) {
+		return true
+	}
+
+	return false
+}
+
+// SetProvider gets a reference to the given string and assigns it to the Provider field.
+func (o *WateringPlanUpdate) SetProvider(v string) {
+	o.Provider = &v
 }
 
 // GetStatus returns the Status field value
@@ -292,7 +358,7 @@ func (o *WateringPlanUpdate) SetUserIds(v []string) {
 }
 
 func (o WateringPlanUpdate) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -301,11 +367,17 @@ func (o WateringPlanUpdate) MarshalJSON() ([]byte, error) {
 
 func (o WateringPlanUpdate) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["cancellation_note"] = o.CancellationNote
 	toSerialize["date"] = o.Date
 	toSerialize["description"] = o.Description
 	if !IsNil(o.Evaluation) {
 		toSerialize["evaluation"] = o.Evaluation
+	}
+	if !IsNil(o.Provider) {
+		toSerialize["provider"] = o.Provider
 	}
 	toSerialize["status"] = o.Status
 	if !IsNil(o.TrailerId) {
@@ -336,10 +408,10 @@ func (o *WateringPlanUpdate) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -395,5 +467,3 @@ func (v *NullableWateringPlanUpdate) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

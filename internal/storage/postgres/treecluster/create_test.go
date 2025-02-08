@@ -91,7 +91,12 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 		createFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "test"
 			tc.Trees = trees
@@ -285,7 +290,12 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 
 		tc, err := r.Create(context.Background(), createFn)
 		assert.NoError(t, err)
@@ -319,7 +329,12 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 
 		// when
 		err = r.LinkTreesToCluster(context.Background(), 99, utils.Map(trees, func(t *entities.Tree) int32 {
@@ -338,7 +353,12 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 
 		testTrees, err := suite.Store.GetAllTrees(context.Background())
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 		createFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "test"
 			return true, nil

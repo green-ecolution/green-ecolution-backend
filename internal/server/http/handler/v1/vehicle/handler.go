@@ -28,10 +28,10 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/vehicle [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			status	query	string	false	"Status"
-// @Param			type	query	string	false	"Vehicle Type"
+// @Param			page		query	string	false	"Page"
+// @Param			limit		query	string	false	"Limit"
+// @Param			type		query	string	false	"Vehicle Type"
+// @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -40,6 +40,7 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		var err error
 
 		vehicleTypeStr := c.Query("type")
+		provider := c.Query("provider")
 		if vehicleTypeStr != "" {
 			vehicleType := domain.ParseVehicleType(vehicleTypeStr)
 			if vehicleType == domain.VehicleTypeUnknown {
@@ -47,8 +48,8 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 			}
 			domainData, err = svc.GetAllByType(ctx, vehicleType)
 		} else {
-			domainData, err = svc.GetAll(ctx)
-		}
+			domainData, err = svc.GetAll(ctx, provider)
+		} // TODO: move to service
 
 		if err != nil {
 			return errorhandler.HandleError(err)
@@ -78,7 +79,7 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/vehicle/{id} [get]
-// @Param			id	path	string	true	"Vehicle ID"
+// @Param			id	path int	true	"Vehicle ID"
 // @Security		Keycloak
 func GetVehicleByID(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -220,7 +221,7 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/vehicle/{id} [delete]
-// @Param			id	path	string	true	"Vehicle ID"
+// @Param			id	path int	true	"Vehicle ID"
 // @Security		Keycloak
 func DeleteVehicle(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

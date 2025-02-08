@@ -49,25 +49,32 @@ func (r *TreeClusterRepository) Update(ctx context.Context, id int32, updateFn f
 
 func (r *TreeClusterRepository) updateEntity(ctx context.Context, tc *entities.TreeCluster) error {
 	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(tc.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", tc.AdditionalInfo)
+		return err
+	}
+
 	var regionID *int32
 	if tc.Region != nil {
 		regionID = &tc.Region.ID
 	}
 	args := sqlc.UpdateTreeClusterParams{
-		ID:             tc.ID,
-		RegionID:       regionID,
-		Address:        tc.Address,
-		Description:    tc.Description,
-		MoistureLevel:  tc.MoistureLevel,
-		WateringStatus: sqlc.WateringStatus(tc.WateringStatus),
-		SoilCondition:  sqlc.TreeSoilCondition(tc.SoilCondition),
-		LastWatered:    utils.TimeToPgTimestamp(tc.LastWatered),
-		Archived:       tc.Archived,
-		Name:           tc.Name,
+		ID:                     tc.ID,
+		RegionID:               regionID,
+		Address:                tc.Address,
+		Description:            tc.Description,
+		MoistureLevel:          tc.MoistureLevel,
+		WateringStatus:         sqlc.WateringStatus(tc.WateringStatus),
+		SoilCondition:          sqlc.TreeSoilCondition(tc.SoilCondition),
+		LastWatered:            utils.TimeToPgTimestamp(tc.LastWatered),
+		Archived:               tc.Archived,
+		Name:                   tc.Name,
+		Provider:               &tc.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
-	_, err := r.store.UnlinkTreeClusterID(ctx, &tc.ID)
-	if err != nil {
+	if _, err := r.store.UnlinkTreeClusterID(ctx, &tc.ID); err != nil {
 		log.Error("failed to unlink tree cluster from trees", "error", err, "cluster_id", tc.ID)
 		return err
 	}

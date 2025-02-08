@@ -8,6 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func defaultVehicle() *entities.Vehicle {
@@ -23,6 +24,8 @@ func defaultVehicle() *entities.Vehicle {
 		Length:         0,
 		Width:          0,
 		Weight:         0,
+		Provider:       "",
+		AdditionalInfo: nil,
 	}
 }
 
@@ -79,18 +82,27 @@ func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.
 }
 
 func (r *VehicleRepository) createEntity(ctx context.Context, entity *entities.Vehicle) (*int32, error) {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return nil, err
+	}
+
 	args := sqlc.CreateVehicleParams{
-		NumberPlate:    entity.NumberPlate,
-		Description:    entity.Description,
-		WaterCapacity:  entity.WaterCapacity,
-		Type:           sqlc.VehicleType(entity.Type),
-		Status:         sqlc.VehicleStatus(entity.Status),
-		DrivingLicense: sqlc.DrivingLicense(entity.DrivingLicense),
-		Model:          entity.Model,
-		Width:          entity.Width,
-		Height:         entity.Height,
-		Length:         entity.Length,
-		Weight:         entity.Weight,
+		NumberPlate:            entity.NumberPlate,
+		Description:            entity.Description,
+		WaterCapacity:          entity.WaterCapacity,
+		Type:                   sqlc.VehicleType(entity.Type),
+		Status:                 sqlc.VehicleStatus(entity.Status),
+		DrivingLicense:         sqlc.DrivingLicense(entity.DrivingLicense),
+		Model:                  entity.Model,
+		Width:                  entity.Width,
+		Height:                 entity.Height,
+		Length:                 entity.Length,
+		Weight:                 entity.Weight,
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	id, err := r.store.CreateVehicle(ctx, &args)

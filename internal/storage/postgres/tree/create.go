@@ -8,6 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func defaultTree() entities.Tree {
@@ -23,6 +24,8 @@ func defaultTree() entities.Tree {
 		Images:         nil,
 		WateringStatus: entities.WateringStatusUnknown,
 		Description:    "",
+		Provider:       "",
+		AdditionalInfo: nil,
 	}
 }
 
@@ -74,6 +77,13 @@ func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entitie
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return -1, err
+	}
+
 	var treeClusterID *int32
 	if entity.TreeCluster != nil {
 		treeClusterID = &entity.TreeCluster.ID
@@ -88,16 +98,18 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	}
 
 	args := sqlc.CreateTreeParams{
-		TreeClusterID:  treeClusterID,
-		Species:        entity.Species,
-		Readonly:       entity.Readonly,
-		SensorID:       sensorID,
-		PlantingYear:   entity.PlantingYear,
-		Latitude:       entity.Latitude,
-		Longitude:      entity.Longitude,
-		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
-		Description:    &entity.Description,
-		Number:         entity.Number,
+		TreeClusterID:          treeClusterID,
+		Species:                entity.Species,
+		Readonly:               entity.Readonly,
+		SensorID:               sensorID,
+		PlantingYear:           entity.PlantingYear,
+		Latitude:               entity.Latitude,
+		Longitude:              entity.Longitude,
+		WateringStatus:         sqlc.WateringStatus(entity.WateringStatus),
+		Description:            &entity.Description,
+		Number:                 entity.Number,
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	id, err := r.store.CreateTree(ctx, &args)

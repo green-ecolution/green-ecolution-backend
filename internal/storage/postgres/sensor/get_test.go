@@ -39,6 +39,29 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all sensors with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+		expectedSensor := TestSensorList[len(TestSensorList)-1]
+		// when
+		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(got))
+		assert.Equal(t, expectedSensor.ID, got[0].ID)
+		assert.Equal(t, expectedSensor.Status, got[0].Status)
+		assert.Equal(t, expectedSensor.Latitude, got[0].Latitude)
+		assert.Equal(t, expectedSensor.Longitude, got[0].Longitude)
+		assert.Equal(t, expectedSensor.Provider, got[0].Provider)
+		assert.Equal(t, expectedSensor.AdditionalInfo, got[0].AdditionalInfo)
+		assert.NotZero(t, got[0].CreatedAt)
+		assert.NotZero(t, got[0].UpdatedAt)
+		assert.NotZero(t, got[0].AdditionalInfo)
+	})
+
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -224,6 +247,18 @@ var TestSensorList = []*entities.Sensor{
 		Latitude:  54.82078826498143,
 		Longitude: 9.489684366114483,
 		Status:    entities.SensorStatusOnline,
+	},
+	{
+		ID:        "sensor-provider",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Latitude:  54.82078826498143,
+		Longitude: 9.489684366114483,
+		Status:    entities.SensorStatusOnline,
+		Provider:  "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 }
 

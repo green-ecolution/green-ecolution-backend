@@ -35,6 +35,8 @@ type WateringPlanResponse struct {
 	GpxURL             string                       `json:"gpx_url"`
 	Duration           *float64                     `json:"duration"`
 	RefillCount        int32                        `json:"refill_count"`
+	Provider           string                       `json:"provider,omitempty"`
+	AdditionalInfo     map[string]any               `json:"additional_information,omitempty"`
 } // @Name WateringPlan
 
 type WateringPlanInListResponse struct {
@@ -59,12 +61,14 @@ type WateringPlanListResponse struct {
 } // @Name WateringPlanList
 
 type WateringPlanCreateRequest struct {
-	Date           time.Time `json:"date"`
-	Description    string    `json:"description"`
-	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
-	TransporterID  *int32    `json:"transporter_id"`
-	TrailerID      *int32    `json:"trailer_id" validate:"optional"`
-	UserIDs        []string  `json:"user_ids"`
+	Date           time.Time      `json:"date"`
+	Description    string         `json:"description"`
+	TreeClusterIDs []*int32       `json:"tree_cluster_ids"`
+	TransporterID  *int32         `json:"transporter_id"`
+	TrailerID      *int32         `json:"trailer_id" validate:"optional"`
+	UserIDs        []string       `json:"user_ids"`
+	Provider       string         `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]any `json:"additional_information" validate:"optional"`
 } // @Name WateringPlanCreate
 
 type WateringPlanUpdateRequest struct {
@@ -77,6 +81,8 @@ type WateringPlanUpdateRequest struct {
 	CancellationNote string             `json:"cancellation_note"`
 	Status           WateringPlanStatus `json:"status"`
 	Evaluation       []*EvaluationValue `json:"evaluation" validate:"optional"`
+	Provider         string             `json:"provider" validate:"optional"`
+	AdditionalInfo   map[string]any     `json:"additional_information" validate:"optional"`
 } // @Name WateringPlanUpdate
 
 type EvaluationValue struct {

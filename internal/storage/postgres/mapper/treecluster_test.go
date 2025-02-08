@@ -22,10 +22,11 @@ func TestTreeclusterMapper_FromSql(t *testing.T) {
 		src := allTestTreecluster[0]
 
 		// when
-		got := treeclusterMapper.FromSql(src)
+		got, err := treeclusterMapper.FromSql(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
@@ -46,10 +47,11 @@ func TestTreeclusterMapper_FromSql(t *testing.T) {
 		var src *sqlc.TreeCluster = nil
 
 		// when
-		got := treeclusterMapper.FromSql(src)
+		got, err := treeclusterMapper.FromSql(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -61,10 +63,11 @@ func TestTreeclusterMapper_FromSqlList(t *testing.T) {
 		src := allTestTreecluster
 
 		// when
-		got := treeclusterMapper.FromSqlList(src)
+		got, err := treeclusterMapper.FromSqlList(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Len(t, got, 2)
 
 		for i, src := range src {
@@ -89,10 +92,11 @@ func TestTreeclusterMapper_FromSqlList(t *testing.T) {
 		var src []*sqlc.TreeCluster = nil
 
 		// when
-		got := treeclusterMapper.FromSqlList(src)
+		got, err := treeclusterMapper.FromSqlList(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 

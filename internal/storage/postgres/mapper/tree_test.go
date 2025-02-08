@@ -19,10 +19,11 @@ func TestTreeMapper_FromSql(t *testing.T) {
 		src := allTestTrees[0]
 
 		// when
-		got := treeMapper.FromSql(src)
+		got, err := treeMapper.FromSql(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
@@ -41,10 +42,11 @@ func TestTreeMapper_FromSql(t *testing.T) {
 		var src *sqlc.Tree = nil
 
 		// when
-		got := treeMapper.FromSql(src)
+		got, err := treeMapper.FromSql(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -56,10 +58,11 @@ func TestTreeMapper_FromSqlList(t *testing.T) {
 		src := allTestTrees
 
 		// when
-		got := treeMapper.FromSqlList(src)
+		got, err := treeMapper.FromSqlList(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Len(t, got, 2)
 
 		for i, src := range src {
@@ -83,10 +86,11 @@ func TestTreeMapper_FromSqlList(t *testing.T) {
 		var src []*sqlc.Tree = nil
 
 		// when
-		got := treeMapper.FromSqlList(src)
+		got, err := treeMapper.FromSqlList(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 

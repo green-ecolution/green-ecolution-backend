@@ -54,6 +54,13 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn 
 }
 
 func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entities.WateringPlan) error {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return err
+	}
+
 	date, err := utils.TimeToPgDate(entity.Date)
 	if err != nil {
 		return errors.New("failed to convert date")
@@ -64,16 +71,18 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 	}
 
 	params := sqlc.UpdateWateringPlanParams{
-		ID:                 entity.ID,
-		Date:               date,
-		Description:        entity.Description,
-		Distance:           entity.Distance,
-		TotalWaterRequired: entity.TotalWaterRequired,
-		Status:             sqlc.WateringPlanStatus(entity.Status),
-		CancellationNote:   entity.CancellationNote,
-		GpxUrl:             &entity.GpxURL,
-		Duration:           float64(entity.Duration) / float64(time.Second),
-		RefillCount:        entity.RefillCount,
+		ID:                     entity.ID,
+		Date:                   date,
+		Description:            entity.Description,
+		Distance:               entity.Distance,
+		TotalWaterRequired:     entity.TotalWaterRequired,
+		Status:                 sqlc.WateringPlanStatus(entity.Status),
+		CancellationNote:       entity.CancellationNote,
+		GpxUrl:                 &entity.GpxURL,
+		Duration:               float64(entity.Duration) / float64(time.Second),
+		RefillCount:            entity.RefillCount,
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	if err := w.store.DeleteAllVehiclesFromWateringPlan(ctx, entity.ID); err != nil {

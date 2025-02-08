@@ -35,13 +35,22 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	vehicle, err := mappers.vehicleMapper.FromSqlList(testVehicles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	treeClusters, err := mappers.clusterMapper.FromSqlList(testCluster)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	input := entities.WateringPlan{
 		Date:         time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC),
 		Description:  "Updated watering plan",
 		Distance:     utils.P(50.0),
-		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[3],
-		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		Trailer:      vehicle[3],
+		Transporter:  vehicle[1],
+		TreeClusters: treeClusters[0:3],
 		UserIDs:      []*uuid.UUID{&testUUID},
 		Status:       entities.WateringPlanStatusActive,
 	}

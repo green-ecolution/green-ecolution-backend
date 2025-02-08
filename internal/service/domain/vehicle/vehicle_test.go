@@ -24,7 +24,22 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx).Return(expectedVehicles, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAll(ctx, "")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVehicles, vehicles)
+	})
+
+	t.Run("should return all vehicles when successful with provider", func(t *testing.T) {
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		svc := NewVehicleService(vehicleRepo)
+
+		expectedVehicles := getTestVehicles()
+		vehicleRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedVehicles, nil)
+
+		// when
+		vehicles, err := svc.GetAll(ctx, "test-provider")
 
 		// then
 		assert.NoError(t, err)
@@ -38,7 +53,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx).Return([]*entities.Vehicle{}, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -53,7 +68,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
 
 		// when
-		vehicles, err := svc.GetAll(ctx)
+		vehicles, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)

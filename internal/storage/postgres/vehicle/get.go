@@ -16,7 +16,18 @@ func (r *VehicleRepository) GetAll(ctx context.Context) ([]*entities.Vehicle, er
 		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
-	return r.mapper.FromSqlList(rows), nil
+	return r.mapFromList(ctx, rows)
+}
+
+func (r *VehicleRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllVehiclesByProvider(ctx, &provider)
+	if err != nil {
+		log.Debug("failed to get vehicle entities in db", "error", err)
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
+	}
+
+	return r.mapFromList(ctx, rows)
 }
 
 func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
@@ -27,7 +38,7 @@ func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entiti
 		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
-	return r.mapper.FromSqlList(rows), nil
+	return r.mapFromList(ctx, rows)
 }
 
 func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
@@ -38,7 +49,7 @@ func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Ve
 		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
-	return r.mapper.FromSql(row), nil
+	return r.mapFromRow(ctx, row)
 }
 
 func (r *VehicleRepository) GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error) {
@@ -49,5 +60,27 @@ func (r *VehicleRepository) GetByPlate(ctx context.Context, plate string) (*enti
 		return nil, r.store.MapError(err, sqlc.Vehicle{})
 	}
 
-	return r.mapper.FromSql(row), nil
+	return r.mapFromRow(ctx, row)
+}
+
+func (r *VehicleRepository) mapFromRow(ctx context.Context, rows *sqlc.Vehicle) (*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
+	vehicles, err := r.mapper.FromSql(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return vehicles, nil
+}
+
+func (r *VehicleRepository) mapFromList(ctx context.Context, rows []*sqlc.Vehicle) ([]*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
+	vehicles, err := r.mapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return vehicles, nil
 }

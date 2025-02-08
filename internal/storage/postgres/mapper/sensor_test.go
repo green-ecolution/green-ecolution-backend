@@ -18,10 +18,11 @@ func TestSensorMapper_FromSql(t *testing.T) {
 		src := allTestSensors[0]
 
 		// when
-		got := sensorMapper.FromSql(src)
+		got, err := sensorMapper.FromSql(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
@@ -33,10 +34,11 @@ func TestSensorMapper_FromSql(t *testing.T) {
 		var src *sqlc.Sensor = nil
 
 		// when
-		got := sensorMapper.FromSql(src)
+		got, err := sensorMapper.FromSql(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -48,10 +50,11 @@ func TestSensorMapper_FromSqlList(t *testing.T) {
 		src := allTestSensors
 
 		// when
-		got := sensorMapper.FromSqlList(src)
+		got, err := sensorMapper.FromSqlList(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Len(t, got, 2)
 
 		for i, src := range src {
@@ -68,10 +71,11 @@ func TestSensorMapper_FromSqlList(t *testing.T) {
 		var src []*sqlc.Sensor = nil
 
 		// when
-		got := sensorMapper.FromSqlList(src)
+		got, err := sensorMapper.FromSqlList(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 

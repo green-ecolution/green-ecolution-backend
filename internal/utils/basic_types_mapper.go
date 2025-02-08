@@ -79,3 +79,7 @@ func Float64ToDuration(source float64) time.Duration {
 func DurationToPtrFloat64(source time.Duration) *float64 {
 	return P(float64(source))
 }
+
+func MapKeyValueInterface(src map[string]any) map[string]any {
+	return src
+}

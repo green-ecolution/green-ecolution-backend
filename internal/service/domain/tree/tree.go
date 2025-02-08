@@ -42,9 +42,16 @@ func NewTreeService(
 	}
 }
 
-func (s *TreeService) GetAll(ctx context.Context) ([]*entities.Tree, error) {
+func (s *TreeService) GetAll(ctx context.Context, provider string) ([]*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
-	trees, err := s.treeRepo.GetAll(ctx)
+	var trees []*entities.Tree
+	var err error
+
+	if provider != "" {
+		trees, err = s.treeRepo.GetAllByProvider(ctx, provider)
+	} else {
+		trees, err = s.treeRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch trees", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -140,6 +147,8 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		tree.WithNumber(treeCreate.Number),
 		tree.WithLatitude(treeCreate.Latitude),
 		tree.WithLongitude(treeCreate.Longitude),
+		tree.WithProvider(treeCreate.Provider),
+		tree.WithAdditionalInfo(treeCreate.AdditionalInfo),
 	)
 	newTree, err := s.treeRepo.Create(ctx, fn...)
 	if err != nil {
@@ -224,7 +233,10 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		tree.WithNumber(tu.Number),
 		tree.WithLatitude(tu.Latitude),
 		tree.WithLongitude(tu.Longitude),
-		tree.WithDescription(tu.Description))
+		tree.WithDescription(tu.Description),
+		tree.WithProvider(tu.Provider),
+		tree.WithAdditionalInfo(tu.AdditionalInfo),
+	)
 
 	updatedTree, err := s.treeRepo.Update(ctx, id, fn...)
 	if err != nil {

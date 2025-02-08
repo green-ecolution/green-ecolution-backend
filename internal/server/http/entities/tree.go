@@ -19,6 +19,8 @@ type TreeResponse struct {
 	Longitude      float64        `json:"longitude"`
 	WateringStatus WateringStatus `json:"watering_status"`
 	Description    string         `json:"description"`
+	Provider       string         `json:"provider,omitempty"`
+	AdditionalInfo map[string]any `json:"additional_information,omitempty"`
 } // @Name Tree
 
 type TreeListResponse struct {
@@ -27,27 +29,31 @@ type TreeListResponse struct {
 } // @Name TreeList
 
 type TreeCreateRequest struct {
-	TreeClusterID *int32  `json:"tree_cluster_id" validate:"optional"`
-	Readonly      bool    `json:"readonly"`
-	PlantingYear  int32   `json:"planting_year"`
-	Species       string  `json:"species"`
-	Number        string  `json:"number"`
-	Latitude      float64 `json:"latitude"`
-	Longitude     float64 `json:"longitude"`
-	SensorID      *string `json:"sensor_id" validate:"optional"`
-	Description   string  `json:"description"`
+	TreeClusterID  *int32         `json:"tree_cluster_id" validate:"optional"`
+	Readonly       bool           `json:"readonly"`
+	PlantingYear   int32          `json:"planting_year"`
+	Species        string         `json:"species"`
+	Number         string         `json:"number"`
+	Latitude       float64        `json:"latitude"`
+	Longitude      float64        `json:"longitude"`
+	SensorID       *string        `json:"sensor_id" validate:"optional"`
+	Description    string         `json:"description"`
+	Provider       string         `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]any `json:"additional_information" validate:"optional"`
 } // @Name TreeCreate
 
 type TreeUpdateRequest struct {
-	TreeClusterID *int32  `json:"tree_cluster_id" validate:"optional"`
-	Readonly      bool    `json:"readonly"`
-	PlantingYear  int32   `json:"planting_year"`
-	Species       string  `json:"species"`
-	Number        string  `json:"number"`
-	Latitude      float64 `json:"latitude"`
-	Longitude     float64 `json:"longitude"`
-	SensorID      *string `json:"sensor_id" validate:"optional"`
-	Description   string  `json:"description"`
+	TreeClusterID  *int32         `json:"tree_cluster_id" validate:"optional"`
+	Readonly       bool           `json:"readonly"`
+	PlantingYear   int32          `json:"planting_year"`
+	Species        string         `json:"species"`
+	Number         string         `json:"number"`
+	Latitude       float64        `json:"latitude"`
+	Longitude      float64        `json:"longitude"`
+	SensorID       *string        `json:"sensor_id" validate:"optional"`
+	Description    string         `json:"description"`
+	Provider       string         `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]any `json:"additional_information" validate:"optional"`
 } // @Name TreeUpdate
 
 type TreeAddImagesRequest struct {

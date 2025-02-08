@@ -24,6 +24,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockVehicleService.EXPECT().GetAll(
 				mock.Anything,
+				"",
 			).Return(TestVehicles, nil)
 
 			// when

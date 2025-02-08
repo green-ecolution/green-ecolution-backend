@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
@@ -76,6 +77,7 @@ func (r *FlowerbedRepository) GetAllImagesByID(ctx context.Context, flowerbedID 
 }
 
 func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
 	if err := r.flowerbedIDExists(ctx, flowerbedID); err != nil {
 		return nil, err
 	}
@@ -88,7 +90,13 @@ func (r *FlowerbedRepository) GetSensorByFlowerbedID(ctx context.Context, flower
 		return nil, err
 	}
 
-	return r.sensorMapper.FromSql(row), nil
+	sensor, err := r.sensorMapper.FromSql(row)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return sensor, nil
 }
 
 func (r *FlowerbedRepository) GetRegionByFlowerbedID(ctx context.Context, flowerbedID int32) (*entities.Region, error) {

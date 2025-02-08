@@ -24,9 +24,16 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context) ([]*entities.Vehicle, error) {
+func (v *VehicleService) GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, error) {
 	log := logger.GetLogger(ctx)
-	vehicles, err := v.vehicleRepo.GetAll(ctx)
+	var vehicles []*entities.Vehicle
+	var err error
+
+	if provider != "" {
+		vehicles, err = v.vehicleRepo.GetAllByProvider(ctx, provider)
+	} else {
+		vehicles, err = v.vehicleRepo.GetAll(ctx)
+	}
 	if err != nil {
 		log.Debug("failed to fetch vehicles", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -83,6 +90,7 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		return nil, service.ErrVehiclePlateTaken
 	}
 
+	//nolint:dupl // this is create specific
 	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
 		vh.NumberPlate = createData.NumberPlate
 		vh.Description = createData.Description
@@ -95,6 +103,8 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		vh.Model = createData.Model
 		vh.Weight = createData.Weight
 		vh.DrivingLicense = createData.DrivingLicense
+		vh.Provider = createData.Provider
+		vh.AdditionalInfo = createData.AdditionalInfo
 
 		return true, nil
 	})
@@ -130,6 +140,7 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 		}
 	}
 
+	//nolint:dupl // this is update specific
 	err = v.vehicleRepo.Update(ctx, id, func(vh *entities.Vehicle) (bool, error) {
 		vh.NumberPlate = updateData.NumberPlate
 		vh.Description = updateData.Description
@@ -142,6 +153,8 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 		vh.Model = updateData.Model
 		vh.Weight = updateData.Weight
 		vh.DrivingLicense = updateData.DrivingLicense
+		vh.Provider = updateData.Provider
+		vh.AdditionalInfo = updateData.AdditionalInfo
 
 		return true, nil
 	})
