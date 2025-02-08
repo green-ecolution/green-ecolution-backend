@@ -14,7 +14,7 @@ generate_client_docker() {
     --package-name $PACKAGE_NAME \
     --git-host github.com \
     --git-user-id green-ecolution \
-    --git-repo-id green-ecolution-backend \
+    --git-repo-id green-ecolution-backend/pkg \
     --skip-overwrite \
     --additional-properties=isGoSubmodule=true
 
