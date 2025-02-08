@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"errors"
 	"net/url"
 	"time"
 
@@ -21,7 +22,6 @@ const (
 	UserRoleTbz               UserRole = "tbz"
 	UserRoleGreenEcolution    UserRole = "green-ecolution"
 	UserRoleSmarteGrenzregion UserRole = "smarte-grenzregion"
-	UserRoleUnknown           UserRole = "unknown"
 )
 
 type User struct {
@@ -57,15 +57,15 @@ func ParseUserStatus(status string) UserStatus {
 	}
 }
 
-func ParseUserRole(role string) UserRole {
-	switch role {
-	case string(UserRoleTbz):
-		return UserRoleTbz
-	case string(UserRoleGreenEcolution):
-		return UserRoleGreenEcolution
-	case string(UserRoleSmarteGrenzregion):
-		return UserRoleSmarteGrenzregion
-	default:
-		return UserRoleUnknown
-	}
+func ParseUserRole(role string) (UserRole, error) {
+    switch role {
+    case string(UserRoleTbz):
+        return UserRoleTbz, nil
+    case string(UserRoleGreenEcolution):
+        return UserRoleGreenEcolution, nil
+    case string(UserRoleSmarteGrenzregion):
+        return UserRoleSmarteGrenzregion, nil
+    default:
+        return "", errors.New("invalid user role")
+    }
 }
