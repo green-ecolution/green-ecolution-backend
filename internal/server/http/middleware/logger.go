@@ -21,9 +21,9 @@ func AppLogger(createLoggerFn func() *slog.Logger) fiber.Handler {
 
 		err := c.Next()
 		if err != nil {
-			log.Info("fiber request", "method", c.Method(), "path", c.Path(), "error", err)
+			log.Info("fiber request", "method", c.Method(), "path", c.Path(), "code", c.Response().StatusCode(), "error", err)
 		} else {
-			log.Info("fiber request", "method", c.Method(), "path", c.Path())
+			log.Info("fiber request", "method", c.Method(), "path", c.Path(), "code", c.Response().StatusCode())
 		}
 
 		return err

@@ -94,6 +94,58 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 	return token, nil
 }
 
+// Unregister removes the plugin registration from the plugin host. It needs a authenticated client.
+//
+// This function performs the following steps:
+//  1. Constructs the API endpoint URL for unregistering the plugin based on the plugin's configuration.
+//  2. Creates an HTTP POST request with the given context to initiate the unregistration process.
+//  3. Sends the request using the configured HTTP client and handles any potential errors.
+//  4. Validates the response status code to ensure successful unregistration.
+//
+// Parameters:
+// - ctx: The context for managing request deadlines and cancellation.
+//
+// Returns:
+// - nil if the unregistration is successful.
+// - An error if the request fails, the HTTP client encounters an issue, or the response status code is not 204 No Content.
+//
+// Possible errors:
+// - If creating the HTTP request fails, an error is returned.
+// - If the HTTP request fails (e.g., network error), an error is returned.
+// - If the plugin host returns a non-204 status code, an error is returned with a generic failure message.
+//
+// Example usage:
+//
+//	err := pluginWorker.Unregister(ctx)
+//	if err != nil {
+//	    log.Fatalf("Failed to unregister plugin: %v", err)
+//	}
+//	log.Println("Successfully unregistered plugin")
+func (w *PluginWorker) Unregister(ctx context.Context) error {
+	unregisterPath := fmt.Sprintf("%s://%s/api/%s/plugin/%s/unregister", w.cfg.host.Scheme, w.cfg.host.Host, w.cfg.hostAPIVersion, w.cfg.plugin.Slug)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, unregisterPath, nil)
+	if err != nil {
+		return err
+	}
+
+	resp, err := w.cfg.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent {
+		return errors.New("failed to unregister plugin")
+	}
+
+	return nil
+}
+
+// TODO: implement
+func (w *PluginWorker) RefreshToken(ctx context.Context, clientID, clientSecret string) (*Token, error) {
+	return nil, nil
+}
+
 // Heartbeat sends a periodic heartbeat signal to the plugin host to indicate that the plugin is active and operational.
 //
 // This function performs the following steps:

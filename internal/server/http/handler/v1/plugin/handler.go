@@ -100,6 +100,28 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 	}
 }
 
+// @Summary		Unregister a plugin
+// @Description	Unregister a plugin
+// @Id				unregister-plugin
+// @Tags			Plugin
+// @Produce		json
+// @Success		204
+// @Failure		401	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/plugin/{plugin_slug}/unregister [post]
+// @Param			plugin_slug	path	string	true	"Slug of the plugin"
+// @Security		Keycloak
+func unregisterPlugin(svc service.PluginService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		slug := strings.Clone(c.Params("plugin"))
+		svc.Unregister(ctx, slug)
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
+
 // @Summary		Heartbeat for a plugin
 // @Description	Heartbeat for a plugin
 // @Id				plugin-heartbeat
