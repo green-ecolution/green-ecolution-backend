@@ -13,6 +13,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 var (
@@ -31,15 +32,14 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan [get]
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
+// @Param			page		query	int		false	"Page"
+// @Param			limit		query	int		false	"Limit"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		provider := c.Query("provider")
-		domainData, err := svc.GetAll(ctx, provider)
+		domainData, totalCount, err := svc.GetAll(ctx, c.Query("provider"))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -51,7 +51,7 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 
 		return c.JSON(entities.WateringPlanListResponse{
 			Data:       data,
-			Pagination: &entities.Pagination{}, // TODO: Handle pagination
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }
@@ -68,7 +68,7 @@ func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan/{id} [get]
-// @Param			id	path int	true	"Watering Plan ID"
+// @Param			id	path	int	true	"Watering Plan ID"
 // @Security		Keycloak
 func GetWateringPlanByID(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -174,7 +174,7 @@ func UpdateWateringPlan(svc service.WateringPlanService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/watering-plan/{id} [delete]
-// @Param			id	path int	true	"Watering Plan ID"
+// @Param			id	path	int	true	"Watering Plan ID"
 // @Security		Keycloak
 func DeleteWateringPlan(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

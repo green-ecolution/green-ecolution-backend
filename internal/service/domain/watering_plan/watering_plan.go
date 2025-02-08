@@ -102,21 +102,15 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, transporterID in
 	return geoJSON, nil
 }
 
-func (w *WateringPlanService) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, error) {
+func (w *WateringPlanService) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error) {
 	log := logger.GetLogger(ctx)
-	var plans []*entities.WateringPlan
-	var err error
-	if provider != "" {
-		plans, err = w.wateringPlanRepo.GetAllByProvider(ctx, provider)
-	} else {
-		plans, err = w.wateringPlanRepo.GetAll(ctx)
-	}
+	plans, totalCount, err := w.wateringPlanRepo.GetAll(ctx, provider)
 	if err != nil {
 		log.Debug("failed to fetch watering plans", "error", err)
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	return plans, nil
+	return plans, totalCount, nil
 }
 
 func (w *WateringPlanService) GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error) {

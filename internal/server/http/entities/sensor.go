@@ -26,7 +26,7 @@ type SensorResponse struct {
 
 type SensorListResponse struct {
 	Data       []*SensorResponse `json:"data"`
-	Pagination Pagination        `json:"pagination"`
+	Pagination *Pagination       `json:"pagination"`
 } // @Name SensorList
 
 type SensorDataResponse struct {
