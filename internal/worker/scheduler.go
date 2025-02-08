@@ -2,21 +2,23 @@ package worker
 
 import (
 	"context"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"log/slog"
 	"time"
 )
 
 func Scheduler(ctx context.Context, interval time.Duration, process func(ctx context.Context) error) {
+	log := logger.GetLogger(ctx)
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
 	if ctx.Err() == nil {
 		err := process(ctx)
 		if err != nil {
-			slog.Error("Error during initial process execution", "error", err)
+			log.Error("error during initial process execution", "error", err)
 		}
 	} else {
-		slog.Info("Stopping scheduler before first execution due to canceled context")
+		log.Debug("stopping scheduler before first execution due to canceled context")
 		return
 	}
 
@@ -25,10 +27,10 @@ func Scheduler(ctx context.Context, interval time.Duration, process func(ctx con
 		case <-ticker.C:
 			err := process(ctx)
 			if err != nil {
-				slog.Error("Error during process execution", "error", err)
+				slog.Error("error during process execution", "error", err)
 			}
 		case <-ctx.Done():
-			slog.Info("Stopping scheduler")
+			slog.Debug("stopping scheduler")
 			return
 		}
 	}
