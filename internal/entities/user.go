@@ -58,14 +58,14 @@ func ParseUserStatus(status string) UserStatus {
 }
 
 func ParseUserRole(role string) (UserRole, error) {
-    switch role {
-    case string(UserRoleTbz):
-        return UserRoleTbz, nil
-    case string(UserRoleGreenEcolution):
-        return UserRoleGreenEcolution, nil
-    case string(UserRoleSmarteGrenzregion):
-        return UserRoleSmarteGrenzregion, nil
-    default:
-        return "", errors.New("invalid user role")
-    }
+	switch role {
+	case string(UserRoleTbz):
+		return UserRoleTbz, nil
+	case string(UserRoleGreenEcolution):
+		return UserRoleGreenEcolution, nil
+	case string(UserRoleSmarteGrenzregion):
+		return UserRoleSmarteGrenzregion, nil
+	default:
+		return "", errors.New("invalid user role")
+	}
 }

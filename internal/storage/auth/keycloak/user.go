@@ -81,7 +81,13 @@ func (r *UserRepository) Create(ctx context.Context, user *entities.User, passwo
 
 	log.Debug("user created successfully", "user_id", *userKeyCloak.ID)
 
-	return r.keyCloakUserToUser(ctx, userKeyCloak, client, token)
+	userRoles, err := client.GetRealmRolesByUserID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, *userKeyCloak.ID)
+	if err != nil {
+		log.Error("failed to get user roles", "error", err, "user_id", *userKeyCloak.ID)
+		userRoles = []*gocloak.Role{}
+	}
+
+	return keyCloakUserToUser(ctx, userKeyCloak, userRoles)
 }
 
 func (r *UserRepository) RemoveSession(ctx context.Context, refreshToken string) error {
@@ -107,18 +113,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 		return nil, errors.Join(err, ErrGetUser)
 	}
 
-	allUsers := make([]*entities.User, len(users))
-	for i, kcUser := range users {
-		user, err := r.keyCloakUserToUser(ctx, kcUser, client, token)
-		if err != nil && !errors.Is(err, ErrUserWithNilAttributes) { // skip users without required attributes
-			return nil, err
-		}
-		if user != nil {
-			allUsers[i] = user
-		}
-	}
-
-	return allUsers, nil
+	return r.mapAllUsers(ctx, users, client, token.AccessToken)
 }
 
 func (r *UserRepository) GetAllByRole(ctx context.Context, role entities.UserRole) ([]*entities.User, error) {
@@ -134,10 +129,43 @@ func (r *UserRepository) GetAllByRole(ctx context.Context, role entities.UserRol
 		return nil, errors.Join(err, ErrGetUser)
 	}
 
+	return r.mapAllUsers(ctx, users, client, token.AccessToken)
+}
+
+func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
+	log := logger.GetLogger(ctx)
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]*gocloak.User, len(ids))
+	for i, id := range ids {
+		kcUser, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
+		if err != nil {
+			log.Error("failed to get user by id", "error", err, "user_id", id)
+			return nil, err
+		}
+		users[i] = kcUser
+	}
+
+	return r.mapAllUsers(ctx, users, client, token.AccessToken)
+}
+
+func (r *UserRepository) mapAllUsers(ctx context.Context, users []*gocloak.User, client *gocloak.GoCloak, accessToken string) ([]*entities.User, error) {
+	log := logger.GetLogger(ctx)
 	allUsers := make([]*entities.User, len(users))
 	for i, kcUser := range users {
-		user, err := r.keyCloakUserToUser(ctx, kcUser, client, token)
-		if err != nil && !errors.Is(err, ErrUserWithNilAttributes) { // skip users without required attributes
+		userRoles, err := client.GetRealmRolesByUserID(ctx, accessToken, r.cfg.OidcProvider.DomainName, *kcUser.ID)
+		if err != nil {
+			log.Error("failed to get user roles", "error", err, "user_id", *kcUser.ID)
+			userRoles = []*gocloak.Role{}
+		}
+
+		user, err := keyCloakUserToUser(ctx, kcUser, userRoles)
+
+		// skip users without required attributes
+		if err != nil && !errors.Is(err, ErrUserWithNilAttributes) {
 			return nil, err
 		}
 		if user != nil {
@@ -148,32 +176,7 @@ func (r *UserRepository) GetAllByRole(ctx context.Context, role entities.UserRol
 	return allUsers, nil
 }
 
-func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
-	log := logger.GetLogger(ctx)
-	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
-	if err != nil {
-		return nil, err
-	}
-
-	users := make([]*entities.User, len(ids))
-	for i, id := range ids {
-		kcUser, err := client.GetUserByID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, id)
-		if err != nil {
-			log.Error("failed to get user by id", "error", err, "user_id", id)
-			return nil, err
-		}
-
-		user, err := r.keyCloakUserToUser(ctx, kcUser, client, token)
-		if err != nil {
-			return nil, err
-		}
-		users[i] = user
-	}
-
-	return users, nil
-}
-
-func (r *UserRepository) keyCloakUserToUser(ctx context.Context, user *gocloak.User, client *gocloak.GoCloak, token *gocloak.JWT) (*entities.User, error) {
+func keyCloakUserToUser(ctx context.Context, user *gocloak.User, userRoles []*gocloak.Role) (*entities.User, error) {
 	log := logger.GetLogger(ctx)
 	userID, err := uuid.Parse(*user.ID)
 	if err != nil {
@@ -204,8 +207,6 @@ func (r *UserRepository) keyCloakUserToUser(ctx context.Context, user *gocloak.U
 			status = val[0]
 		}
 	}
-
-	userRoles, err := client.GetRealmRolesByUserID(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, *user.ID)
 
 	const millisecondsInSecond = 1000
 	return &entities.User{

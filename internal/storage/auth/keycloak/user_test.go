@@ -208,9 +208,12 @@ func TestKeyCloakUserRepo_RemoveSession(t *testing.T) {
 func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
 	t.Run("should convert keycloak user to user successfully", func(t *testing.T) {
 		// given
-		uuid, _ := uuid.NewRandom()
+		uuidUser, _ := uuid.NewRandom()
+		uuidRole, _ := uuid.NewRandom()
+		uuidContainer, _ := uuid.NewRandom()
+
 		user := &gocloak.User{
-			ID:               gocloak.StringP(uuid.String()),
+			ID:               gocloak.StringP(uuidUser.String()),
 			CreatedTimestamp: gocloak.Int64P(123456),
 			Username:         gocloak.StringP("test"),
 			FirstName:        gocloak.StringP("Toni"),
@@ -222,19 +225,32 @@ func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
 			},
 		}
 
+		userRole := &gocloak.Role{
+			ID:          gocloak.StringP(uuidRole.String()),
+			Name:        gocloak.StringP("tbz"),
+			Composite:   gocloak.BoolP(false),
+			ClientRole:  gocloak.BoolP(false),
+			ContainerID: gocloak.StringP(uuidContainer.String()),
+			Description: gocloak.StringP("This role should be added to all users belonging to the »Technisches Betriebszentrum«."),
+		}
+
 		// when
-		got, err := keyCloakUserToUser(context.Background(), user)
+		got, err := keyCloakUserToUser(context.Background(), user, []*gocloak.Role{userRole})
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
-		assert.Equal(t, uuid.String(), got.ID.String())
+		assert.Equal(t, uuidUser.String(), got.ID.String())
 		assert.Equal(t, "test", got.Username)
 		assert.Equal(t, "Toni", got.FirstName)
 		assert.Equal(t, "Tester", got.LastName)
 		assert.Equal(t, "dev@green-ecolution.de", got.Email)
 		assert.Equal(t, "+49 123456", got.PhoneNumber)
 		assert.Equal(t, "123456", got.EmployeeID)
+
+		for _, role := range got.Roles {
+			assert.Equal(t, "tbz", string(role))
+		}
 	})
 
 	t.Run("should return error when failed to parse user id", func(t *testing.T) {
@@ -253,7 +269,7 @@ func TestKeyCloakUserRepo_KeyCloakUserToUser(t *testing.T) {
 		}
 
 		// when
-		got, err := keyCloakUserToUser(context.Background(), user)
+		got, err := keyCloakUserToUser(context.Background(), user, []*gocloak.Role{})
 
 		// then
 		assert.Error(t, err)
@@ -341,6 +357,62 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 
 		// when
 		users, err := userRepo.GetAll(context.Background())
+
+		// then
+		assert.Error(t, err)
+		assert.ErrorIs(t, err, ErrLogin)
+		assert.Nil(t, users)
+	})
+}
+
+func TestKeyCloakUserRepo_GetAllByRole(t *testing.T) {
+	t.Run("should get all users by role successfully", func(t *testing.T) {
+		// given
+		identityConfig := suite.IdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+		user3 := &entities.User{
+			Username:    "user3",
+			FirstName:   "Peter",
+			LastName:    "Petersen",
+			Email:       "peter.petersen@green-ecolution.de",
+			EmployeeID:  "EMP001",
+			PhoneNumber: "+49 123456789",
+			Roles: []entities.UserRole{
+				entities.UserRoleGreenEcolution,
+			},
+		}
+		user4 := &entities.User{
+			Username:    "user4",
+			FirstName:   "Petra",
+			LastName:    "Petersen",
+			Email:       "petra.petersen@green-ecolution.de",
+			EmployeeID:  "EMP002",
+			PhoneNumber: "+49 987654321",
+			Roles: []entities.UserRole{
+				entities.UserRoleSmarteGrenzregion,
+			},
+		}
+
+		suite.EnsureUserExists(t, user3)
+		suite.EnsureUserExists(t, user4)
+
+		// when
+		users, err := userRepo.GetAllByRole(context.Background(), entities.UserRoleGreenEcolution)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, users)
+		assert.GreaterOrEqual(t, len(users), 1)
+		assert.True(t, containsUser(users, *user3), "user3 should be in the list")
+	})
+
+	t.Run("should return error when login fails", func(t *testing.T) {
+		// given
+		identityConfig := suite.InvalidIdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+
+		// when
+		users, err := userRepo.GetAllByRole(context.Background(), entities.UserRoleGreenEcolution)
 
 		// then
 		assert.Error(t, err)

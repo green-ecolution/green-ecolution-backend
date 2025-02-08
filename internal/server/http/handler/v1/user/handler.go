@@ -205,7 +205,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
+			Data: data,
 		})
 	}
 }
@@ -246,7 +246,7 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
+			Data: data,
 		})
 	}
 }
