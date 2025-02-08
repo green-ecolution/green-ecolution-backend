@@ -26,7 +26,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 			UpdatedAt: time.Now().Add(-1 * time.Hour), // 1 hour ago
 		}
 
-		sensorRepo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{staleSensor, recentSensor}, int64(2), nil)
+		sensorRepo.EXPECT().GetAll(mock.Anything, "").Return([]*entities.Sensor{staleSensor, recentSensor}, int64(2), nil)
 		sensorRepo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
 
 		go func() {
@@ -35,7 +35,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 
 		time.Sleep(100 * time.Millisecond)
 
-		sensorRepo.AssertCalled(t, "GetAll", mock.Anything)
+		sensorRepo.AssertCalled(t, "GetAll", mock.Anything, mock.Anything)
 		sensorRepo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		sensorRepo.AssertExpectations(t) // Verifies all expectations are met
 	})
@@ -64,7 +64,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		svc := NewStatusUpdater(sensorRepo)
 
-		sensorRepo.EXPECT().GetAll(mock.Anything).Return(nil, int64(0), errors.New("db error"))
+		sensorRepo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), errors.New("db error"))
 
 		go func() {
 			svc.RunStatusUpdater(ctx, 10*time.Millisecond) // Run every 10ms
@@ -72,7 +72,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 
 		time.Sleep(50 * time.Millisecond)
 
-		sensorRepo.AssertCalled(t, "GetAll", mock.Anything)
+		sensorRepo.AssertCalled(t, "GetAll", mock.Anything, mock.Anything)
 		sensorRepo.AssertNotCalled(t, "Update")
 		sensorRepo.AssertExpectations(t)
 	})
@@ -88,7 +88,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 			UpdatedAt: time.Now().Add(-73 * time.Hour), // 73 hours ago
 		}
 
-		sensorRepo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{staleSensor}, int64(1), nil)
+		sensorRepo.EXPECT().GetAll(mock.Anything, "").Return([]*entities.Sensor{staleSensor}, int64(1), nil)
 		sensorRepo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
 		go func() {
@@ -97,7 +97,7 @@ func TestSensorService_RunStatusUpdater(t *testing.T) {
 
 		time.Sleep(50 * time.Millisecond)
 
-		sensorRepo.AssertCalled(t, "GetAll", mock.Anything)
+		sensorRepo.AssertCalled(t, "GetAll", mock.Anything, mock.Anything)
 		sensorRepo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		sensorRepo.AssertExpectations(t)
 	})

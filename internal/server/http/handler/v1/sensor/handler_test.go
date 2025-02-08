@@ -173,7 +173,7 @@ func TestGetAllSensors(t *testing.T) {
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-			).Return([]*entities.Sensor{}, int64(0), nil)
+		).Return([]*entities.Sensor{}, int64(0), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor", nil)

@@ -20,7 +20,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -44,6 +44,37 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all sensors without limitation with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		exptectedSensor := TestSensorList[len(TestSensorList)-1]
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, 1, len(got))
+		assert.Equal(t, totalCount, int64(1))
+
+		for _, sensor := range got {
+			assert.Equal(t, exptectedSensor.ID, sensor.ID)
+			assert.Equal(t, exptectedSensor.Status, sensor.Status)
+			assert.Equal(t, exptectedSensor.Latitude, sensor.Latitude)
+			assert.Equal(t, exptectedSensor.Longitude, sensor.Longitude)
+			assert.Equal(t, exptectedSensor.AdditionalInfo, sensor.AdditionalInfo)
+			assert.Equal(t, exptectedSensor.Provider, sensor.Provider)
+			assert.NotZero(t, sensor.CreatedAt)
+			assert.NotZero(t, sensor.UpdatedAt)
+		}
+	})
+
 	t.Run("should return all sensors limited by 2 and with an offset of 2", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -54,7 +85,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -78,7 +109,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -96,7 +127,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -113,7 +144,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -128,7 +159,7 @@ func TestSensorRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		got, _, err := r.GetAll(ctx)
+		got, _, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
