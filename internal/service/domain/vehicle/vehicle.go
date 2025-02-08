@@ -24,7 +24,7 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context, provider string, vehicleType string) ([]*entities.Vehicle, int64, error) {
+func (v *VehicleService) GetAll(ctx context.Context, provider, vehicleType string) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
 	var vehicles []*entities.Vehicle
 	var err error

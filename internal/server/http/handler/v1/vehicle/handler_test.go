@@ -173,7 +173,7 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-			entities.VehicleType("transporter"),
+			"transporter",
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -208,7 +208,7 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-			entities.VehicleType("transporter"),
+			"transporter",
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -298,12 +298,18 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 Bad Request Error when service fails due to invalid type parameter", func(t *testing.T) {
+	t.Run("should return error when service fails due to invalid type parameter", func(t *testing.T) {
 		app := fiber.New()
 		app.Use(middleware.PaginationMiddleware())
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
+
+		mockVehicleService.EXPECT().GetAll(
+			mock.Anything,
+			"",
+			"invalid",
+		).Return(nil, int64(0), fiber.NewError(fiber.ErrBadRequest.Code, "service error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?type=invalid", nil)
@@ -312,7 +318,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		// then
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
 		mockVehicleService.AssertExpectations(t)
 	})

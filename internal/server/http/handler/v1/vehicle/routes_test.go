@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
@@ -51,7 +50,7 @@ func TestRegisterRoutes(t *testing.T) {
 			mockVehicleService.EXPECT().GetAll(
 				mock.Anything,
 				"",
-				entities.VehicleType("transporter"),
+				"transporter",
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when

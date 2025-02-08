@@ -18,6 +18,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 
 	vehicleCount, _ := suite.Store.GetAllVehiclesCount(context.Background(), "")
 	testVehicles, err := suite.Store.GetAllVehicles(context.Background(), &sqlc.GetAllVehiclesParams{
+		Column1: "",
 		Limit:  int32(vehicleCount),
 		Offset: 0,
 	})
