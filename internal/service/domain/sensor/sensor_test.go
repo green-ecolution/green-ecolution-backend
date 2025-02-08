@@ -524,15 +524,17 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 			UpdatedAt: time.Now().Add(-1 * time.Hour), // 1 hour ago
 		}
 
+		expectList := []*entities.Sensor{staleSensor, recentSensor}
+
 		// when
-		repo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{staleSensor, recentSensor}, nil)
+		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertCalled(t, "GetAll", mock.Anything, "")
 		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		repo.AssertExpectations(t) // Verifies all expectations are met
 	})
@@ -550,14 +552,16 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 			UpdatedAt: time.Now(),
 		}
 
+		expectList := []*entities.Sensor{freshSensor}
+
 		// when
-		repo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{freshSensor}, nil)
+		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertCalled(t, "GetAll", mock.Anything, "")
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
 	})
@@ -572,14 +576,14 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 
 		// when
 		expectedErr := errors.New("database error")
-		repo.EXPECT().GetAll(mock.Anything).Return(nil, expectedErr)
+		repo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertCalled(t, "GetAll", mock.Anything, "")
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
 	})
@@ -597,14 +601,16 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 			UpdatedAt: time.Now().Add(-100 * time.Hour),
 		}
 
+		expectList := []*entities.Sensor{staleSensor}
+
 		// when
-		repo.EXPECT().GetAll(mock.Anything).Return([]*entities.Sensor{staleSensor}, nil)
+		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
-		repo.AssertCalled(t, "GetAll", mock.Anything)
+		repo.AssertCalled(t, "GetAll", mock.Anything, "")
 		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		repo.AssertExpectations(t)
 		assert.NoError(t, err)
