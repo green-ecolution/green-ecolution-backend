@@ -16,7 +16,13 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 
-	testVehicles, err := suite.Store.GetAllVehicles(context.Background())
+	vehicleCount, _ := suite.Store.GetAllVehiclesCount(context.Background(), "")
+	testVehicles, err := suite.Store.GetAllVehicles(context.Background(), &sqlc.GetAllVehiclesParams{
+		Column1: "",
+		Limit:  int32(vehicleCount),
+		Offset: 0,
+	})
+
 	if err != nil {
 		t.Fatal(err)
 	}

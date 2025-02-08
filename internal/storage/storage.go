@@ -89,10 +89,9 @@ type ImageRepository interface {
 
 type VehicleRepository interface {
 	// GetAll returns all vehicles
-	GetAll(ctx context.Context) ([]*entities.Vehicle, error)
-	GetAllByProvider(ctx context.Context, provider string) ([]*entities.Vehicle, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
 	// GetAllByType returns all vehicles by vehicle type
-	GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error)
+	GetAllByType(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
 	// GetByID returns one vehicle by id
 	GetByID(ctx context.Context, id int32) (*entities.Vehicle, error)
 	// GetByPlate returns one vehicle by its plate

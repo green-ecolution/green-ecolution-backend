@@ -11,6 +11,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -19,8 +20,9 @@ import (
 )
 
 func TestGetAllVehicles(t *testing.T) {
-	t.Run("should return all vehicles successfully", func(t *testing.T) {
+	t.Run("should return all vehicles successfully with default pagination values", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
@@ -28,7 +30,8 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return(TestVehicles, nil)
+			"",
+		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
@@ -42,8 +45,87 @@ func TestGetAllVehicles(t *testing.T) {
 		var response serverEntities.VehicleListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
+
+		// assert data
 		assert.Equal(t, 2, len(response.Data))
 		assert.Equal(t, TestVehicles[0].ID, response.Data[0].ID)
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return all vehicles successfully with limit 1 and offset 0", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
+
+		mockVehicleService.EXPECT().GetAll(
+			mock.Anything,
+			"",
+			"",
+		).Return(TestVehicles, int64(len(TestVehicles)), nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.VehicleListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Equal(t, 2, len(response.Data))
+		assert.Equal(t, TestVehicles[0].ID, response.Data[0].ID)
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(TestVehicles)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(TestVehicles))/1), response.Pagination.TotalPages)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when page is invalid", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?page=0&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when limit is invalid", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?page=1&limit=0", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 		mockVehicleService.AssertExpectations(t)
 	})
@@ -57,7 +139,8 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"test-provider",
-		).Return(TestVehicles, nil)
+			"",
+		).Return(TestVehicles, int64(0), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
@@ -80,16 +163,18 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return all vehicles by one type successfully", func(t *testing.T) {
+	t.Run("should return all vehicles by one type successfully with default pagination values", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
 
-		mockVehicleService.EXPECT().GetAllByType(
+		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			entities.VehicleType("transporter"),
-		).Return([]*entities.Vehicle{TestVehicles[1]}, nil)
+			"",
+			"transporter",
+		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?type=transporter", nil)
@@ -103,13 +188,19 @@ func TestGetAllVehicles(t *testing.T) {
 		var response serverEntities.VehicleListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
+
+		// assert data
 		assert.Equal(t, 1, len(response.Data))
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
 
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return an empty list when no vehicles are available", func(t *testing.T) {
+	t.Run("should return all vehicles by one type successfully with limit 1 and offset 0", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
@@ -117,7 +208,47 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return([]*entities.Vehicle{}, nil)
+			"transporter",
+		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?type=transporter&page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.VehicleListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Equal(t, 1, len(response.Data))
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(1), response.Pagination.Total)
+		assert.Empty(t, response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32(1), response.Pagination.TotalPages)
+
+		mockVehicleService.AssertExpectations(t)
+	})
+
+	t.Run("should return an empty list when no vehicles are available", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockVehicleService := serviceMock.NewMockVehicleService(t)
+		handler := vehicle.GetAllVehicles(mockVehicleService)
+		app.Get("/v1/vehicle", handler)
+
+		mockVehicleService.EXPECT().GetAll(
+			mock.Anything,
+			"",
+			"",
+		).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
@@ -132,13 +263,19 @@ func TestGetAllVehicles(t *testing.T) {
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
 		assert.NoError(t, err)
+
+		// assert data
 		assert.Equal(t, 0, len(response.Data))
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
 
 		mockVehicleService.AssertExpectations(t)
 	})
 
 	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
@@ -146,7 +283,8 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+			"",
+		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle", nil)
@@ -160,11 +298,18 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.AssertExpectations(t)
 	})
 
-	t.Run("should return 400 Bad Request Error when service fails due to invalid type parameter", func(t *testing.T) {
+	t.Run("should return error when service fails due to invalid type parameter", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
+
+		mockVehicleService.EXPECT().GetAll(
+			mock.Anything,
+			"",
+			"invalid",
+		).Return(nil, int64(0), fiber.NewError(fiber.ErrBadRequest.Code, "service error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/vehicle?type=invalid", nil)
@@ -173,7 +318,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		// then
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
 		mockVehicleService.AssertExpectations(t)
 	})

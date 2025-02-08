@@ -28,9 +28,9 @@ func GetValues(ctx context.Context) (page, limit int32, err error) {
 
 func Create(ctx context.Context, totalCount int64) *entities.Pagination {
 	page, pageOk := ctx.Value("page").(int32)
-	limit, limitOK := ctx.Value("limit").(int32)
+	limit, limitOk := ctx.Value("limit").(int32)
 
-	if !pageOk || !limitOK || limit == -1 {
+	if !pageOk || !limitOk || limit == -1 {
 		return nil
 	}
 

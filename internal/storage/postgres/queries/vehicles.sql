@@ -1,11 +1,32 @@
 -- name: GetAllVehicles :many
-SELECT * FROM vehicles ORDER BY water_capacity DESC;
+SELECT * 
+FROM vehicles 
+WHERE 
+  ($1 = '') OR (provider = $1) 
+ORDER BY water_capacity DESC
+LIMIT $2 OFFSET $3;
 
--- name: GetAllVehiclesByProvider :many
-SELECT * FROM vehicles WHERE provider = $1 ORDER BY water_capacity DESC;
+-- name: GetAllVehiclesCount :one
+SELECT COUNT(*) 
+  FROM vehicles 
+  WHERE 
+    ($1 = '' OR provider = $1);
 
 -- name: GetAllVehiclesByType :many
-SELECT * FROM vehicles WHERE type = $1 ORDER BY water_capacity DESC;
+SELECT * 
+FROM vehicles 
+WHERE 
+  type = $1
+  AND ($2 = '' OR provider = $2)
+ORDER BY water_capacity DESC
+LIMIT $3 OFFSET $4;
+
+-- name: GetAllVehiclesByTypeCount :one
+SELECT COUNT(*) 
+  FROM vehicles 
+  WHERE 
+    type = $1
+    AND ($2 = '' OR provider = $2);
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;
