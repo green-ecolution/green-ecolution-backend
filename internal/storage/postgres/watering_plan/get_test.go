@@ -82,6 +82,34 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all watering plans with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		expectedPlan := allTestWateringPlans[1]
+		
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+		
+		// when
+		got, totalCount, err := r.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, expectedPlan.ID, got[0].ID)
+		assert.Equal(t, expectedPlan.Date, got[0].Date)
+		assert.Equal(t, expectedPlan.Description, got[0].Description)
+		assert.Equal(t, expectedPlan.Status, got[0].Status)
+		assert.Equal(t, expectedPlan.Distance, got[0].Distance)
+		assert.Equal(t, *expectedPlan.TotalWaterRequired, *got[0].TotalWaterRequired)
+		assert.Equal(t, expectedPlan.CancellationNote, got[0].CancellationNote)
+	})
+
 	t.Run("should return all watering plans limited by 2 and with an offset of 2", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)

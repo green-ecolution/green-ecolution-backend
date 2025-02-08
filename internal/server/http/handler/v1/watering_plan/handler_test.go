@@ -65,6 +65,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 		).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 		// when
@@ -137,7 +138,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
 			"test-provider",
-		).Return(TestWateringPlans, nil)
+		).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/watering-plan", nil)
