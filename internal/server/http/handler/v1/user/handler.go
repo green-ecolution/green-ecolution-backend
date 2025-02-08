@@ -311,6 +311,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			AccessToken:  token.AccessToken,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
 			TokenType:    token.TokenType,
 		}
 
