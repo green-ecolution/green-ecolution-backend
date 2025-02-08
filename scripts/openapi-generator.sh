@@ -5,6 +5,8 @@ API_DOCS_FILE="$2"
 API_DOCS_OUT_DIR="$3"
 
 generate_client_docker() {
+  rm -rf $API_DOCS_OUT_DIR
+
   docker run --rm -v "${PWD}":/local -u "$(id -u):$(id -g)" openapitools/openapi-generator-cli generate \
     -i /local/$API_DOCS_FILE \
     -o /local/$API_DOCS_OUT_DIR \
@@ -17,6 +19,11 @@ generate_client_docker() {
     --additional-properties=isGoSubmodule=true
 
   exit_on_error "Could not create the client"
+
+  cd $API_DOCS_OUT_DIR
+
+  go fmt ./...
+  go mod tidy
 }
 
 exit_on_error() {
