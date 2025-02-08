@@ -20,7 +20,7 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -47,6 +47,41 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all verhicles with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		expectedVehicle := allTestVehicles[len(allTestVehicles)-1]
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, expectedVehicle.ID, got[0].ID)
+		assert.Equal(t, expectedVehicle.Description, got[0].Description)
+		assert.Equal(t, expectedVehicle.NumberPlate, got[0].NumberPlate)
+		assert.Equal(t, expectedVehicle.WaterCapacity, got[0].WaterCapacity)
+		assert.Equal(t, expectedVehicle.Type, got[0].Type)
+		assert.Equal(t, expectedVehicle.Status, got[0].Status)
+		assert.Equal(t, expectedVehicle.DrivingLicense, got[0].DrivingLicense)
+		assert.Equal(t, expectedVehicle.Height, got[0].Height)
+		assert.Equal(t, expectedVehicle.Width, got[0].Width)
+		assert.Equal(t, expectedVehicle.Length, got[0].Length)
+		assert.Equal(t, expectedVehicle.Weight, got[0].Weight)
+		assert.Equal(t, expectedVehicle.Model, got[0].Model)
+		assert.Equal(t, expectedVehicle.Provider, got[0].Provider)
+		assert.Equal(t, expectedVehicle.AdditionalInfo, got[0].AdditionalInfo)
+		assert.NotZero(t, got[0].CreatedAt)
+		assert.NotZero(t, got[0].UpdatedAt)
+	})
+
 	t.Run("should return all verhicles ordered by water capacity limited by 1 and with an offset of 1", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -57,7 +92,7 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -81,7 +116,7 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -99,12 +134,12 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
 		assert.Empty(t, got)
-		assert.Equal(t, totalCount, int64(0))
+		assert.Equal(t, int64(0), totalCount)
 	})
 
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
@@ -116,7 +151,7 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -131,49 +166,12 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 		assert.Equal(t, totalCount, int64(0))
-	})
-}
-
-func TestVehicleRepository_GetAllByProvider(t *testing.T) {
-	t.Run("should return all verhicles with provider", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
-		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
-
-		expectedVehicle := allTestVehicles[len(allTestVehicles)-1]
-
-		ctx := context.WithValue(context.Background(), "page", int32(1))
-		ctx = context.WithValue(ctx, "limit", int32(-1))
-
-		// when
-		got, totalCount, err := r.GetAllByProvider(ctx, "test-provider")
-
-		// then
-		assert.NoError(t, err)
-		assert.Len(t, got, 1)
-		assert.Equal(t, expectedVehicle.ID, got[0].ID)
-		assert.Equal(t, expectedVehicle.Description, got[0].Description)
-		assert.Equal(t, expectedVehicle.NumberPlate, got[0].NumberPlate)
-		assert.Equal(t, expectedVehicle.WaterCapacity, got[0].WaterCapacity)
-		assert.Equal(t, expectedVehicle.Type, got[0].Type)
-		assert.Equal(t, expectedVehicle.Status, got[0].Status)
-		assert.Equal(t, expectedVehicle.DrivingLicense, got[0].DrivingLicense)
-		assert.Equal(t, expectedVehicle.Height, got[0].Height)
-		assert.Equal(t, expectedVehicle.Width, got[0].Width)
-		assert.Equal(t, expectedVehicle.Length, got[0].Length)
-		assert.Equal(t, expectedVehicle.Weight, got[0].Weight)
-		assert.Equal(t, expectedVehicle.Model, got[0].Model)
-		assert.Equal(t, expectedVehicle.Provider, got[0].Provider)
-		assert.Equal(t, expectedVehicle.AdditionalInfo, got[0].AdditionalInfo)
-		assert.NotZero(t, got[0].CreatedAt)
-		assert.NotZero(t, got[0].UpdatedAt)
 	})
 }
 
@@ -188,13 +186,13 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAllByType(ctx, entities.VehicleTypeTransporter)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
 		assert.Len(t, got, 2)
-		assert.Equal(t, 1, len(got))
-		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, 2, len(got))
+		assert.Equal(t, int64(2), totalCount)
 
 		for _, vehicle := range got {
 			assert.Equal(t, entities.VehicleTypeTransporter, vehicle.Type)
@@ -211,7 +209,7 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAllByType(ctx, entities.VehicleTypeTrailer)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeTrailer)
 
 		// then
 		assert.NoError(t, err)
@@ -221,6 +219,29 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		for _, vehicle := range got {
 			assert.Equal(t, entities.VehicleTypeTrailer, vehicle.Type)
 		}
+	})
+
+	t.Run("should return all verhicles with provider and transporter type", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		expectedVehicle := allTestVehicles[len(allTestVehicles)-1]
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		// when
+		got, totalCount, err := r.GetAllByType(ctx, "test-provider", entities.VehicleTypeTransporter)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, expectedVehicle.ID, got[0].ID)
+		assert.Equal(t, expectedVehicle.Provider, got[0].Provider)
+		assert.Equal(t, expectedVehicle.AdditionalInfo, got[0].AdditionalInfo)
+		assert.Equal(t, entities.VehicleTypeTransporter, got[0].Type)
 	})
 
 	t.Run("should return all verhicles of type trailer and with an limit of 1 and an offset of 2", func(t *testing.T) {
@@ -233,7 +254,7 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(1))
 
 		// when
-		got, totalCount, err := r.GetAllByType(ctx, entities.VehicleTypeTrailer)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeTrailer)
 
 		// then
 		assert.NoError(t, err)
@@ -250,7 +271,7 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAllByType(ctx, entities.VehicleTypeUnknown)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeUnknown)
 
 		// then
 		assert.NoError(t, err)
@@ -265,7 +286,7 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		cancel()
 
 		// when
-		got, totalCount, err := r.GetAllByType(ctx, entities.VehicleTypeUnknown)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeUnknown)
 
 		// then
 		assert.Error(t, err)

@@ -16,8 +16,8 @@ SELECT COUNT(*)
 SELECT * 
 FROM vehicles 
 WHERE 
-  ($1 = '') OR (provider = $1) 
-  AND type = $2
+  type = $1
+  AND ($2 = '' OR provider = $2)
 ORDER BY water_capacity DESC
 LIMIT $3 OFFSET $4;
 
@@ -25,8 +25,8 @@ LIMIT $3 OFFSET $4;
 SELECT COUNT(*) 
   FROM vehicles 
   WHERE 
-    ($1 = '' OR provider = $1)
-    AND type = $2;
+    type = $1
+    AND ($2 = '' OR provider = $2);
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;

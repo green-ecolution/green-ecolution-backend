@@ -30,6 +30,7 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
+			"",
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -64,6 +65,8 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
+			"",
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -136,6 +139,7 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"test-provider",
+			"",
 		).Return(TestVehicles, int64(0), nil)
 
 		// when
@@ -166,8 +170,9 @@ func TestGetAllVehicles(t *testing.T) {
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
 
-		mockVehicleService.EXPECT().GetAllByType(
+		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 			entities.VehicleType("transporter"),
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
@@ -200,8 +205,9 @@ func TestGetAllVehicles(t *testing.T) {
 		handler := vehicle.GetAllVehicles(mockVehicleService)
 		app.Get("/v1/vehicle", handler)
 
-		mockVehicleService.EXPECT().GetAllByType(
+		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 			entities.VehicleType("transporter"),
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
@@ -241,6 +247,7 @@ func TestGetAllVehicles(t *testing.T) {
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
 			"",
+			"",
 		).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
@@ -275,6 +282,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
+			"",
 			"",
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 

@@ -30,6 +30,7 @@ func TestRegisterRoutes(t *testing.T) {
 			mockVehicleService.EXPECT().GetAll(
 				mock.Anything,
 				"",
+				"",
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when
@@ -47,8 +48,9 @@ func TestRegisterRoutes(t *testing.T) {
 			app := fiber.New()
 			vehicle.RegisterRoutes(app, mockVehicleService)
 
-			mockVehicleService.EXPECT().GetAllByType(
+			mockVehicleService.EXPECT().GetAll(
 				mock.Anything,
+				"",
 				entities.VehicleType("transporter"),
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
