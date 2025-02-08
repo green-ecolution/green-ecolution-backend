@@ -9,14 +9,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
-func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, int64, error) {
+func (r *SensorRepository) GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	totalCount, err := r.store.GetAllSensorsCount(ctx)
+	totalCount, err := r.store.GetAllSensorsCount(ctx, provider)
 	if err != nil {
 		log.Debug("failed to get total sensor count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Sensor{})
@@ -32,6 +32,7 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, int6
 	}
 
 	rows, err := r.store.GetAllSensors(ctx, &sqlc.GetAllSensorsParams{
+		Column1: provider,
 		Limit:  limit,
 		Offset: (page - 1) * limit,
 	})
@@ -43,35 +44,12 @@ func (r *SensorRepository) GetAll(ctx context.Context) ([]*entities.Sensor, int6
 	data, err := r.mapper.FromSqlList(rows)
 	if err != nil {
 		log.Debug("failed to convert entity", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
 	for _, sn := range data {
 		if err := r.store.MapSensorFields(ctx, sn); err != nil {
-			return nil, err
-		}
-	}
-
-	return data, nil
-}
-
-func (r *SensorRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Sensor, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllSensorsByProvider(ctx, &provider)
-	if err != nil {
-		log.Debug("failed to get sensors in db", "error", err)
-		return nil, r.store.MapError(err, sqlc.Sensor{})
-	}
-
-	data, err := r.mapper.FromSqlList(rows)
-	if err != nil {
-		log.Debug("failed to convert entity", "error", err)
-		return nil, err
-	}
-
-	for _, sn := range data {
-		if err := r.store.MapSensorFields(ctx, sn); err != nil {
-			return nil, 0, r.store.MapError(err, sqlc.Sensor{})
+			return nil, 0, err
 		}
 	}
 
