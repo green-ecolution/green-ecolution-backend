@@ -1,14 +1,12 @@
 -- name: GetAllWateringPlans :many
 SELECT * FROM watering_plans
+WHERE ($1 = '') OR (provider = $1)
 ORDER BY date DESC
-LIMIT $1 OFFSET $2;
+LIMIT $2 OFFSET $3;
 
 -- name: GetAllWateringPlansCount :one
-SELECT COUNT(*) FROM watering_plans;
-
--- name: GetAllWateringPlansByProvider :many
-SELECT * FROM watering_plans WHERE provider = $1
-ORDER BY date DESC;
+SELECT COUNT(*) FROM watering_plans
+WHERE ($1 = '') OR (provider = $1);
 
 -- name: GetWateringPlanByID :one
 SELECT * FROM watering_plans WHERE id = $1;

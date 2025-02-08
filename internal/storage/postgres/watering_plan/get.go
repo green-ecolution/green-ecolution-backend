@@ -12,14 +12,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.WateringPlan, int64, error) {
+func (w *WateringPlanRepository) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	totalCount, err := w.store.GetAllWateringPlansCount(ctx)
+	totalCount, err := w.store.GetAllWateringPlansCount(ctx, provider)
 	if err != nil {
 		log.Debug("failed to get total watering plan count in db", "error", err)
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
@@ -35,6 +35,7 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 	}
 
 	rows, err := w.store.GetAllWateringPlans(ctx, &sqlc.GetAllWateringPlansParams{
+		Column1: provider,
 		Limit:  limit,
 		Offset: (page - 1) * limit,
 	})
@@ -47,35 +48,12 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context) ([]*entities.Wateri
 	data, err := w.mapper.FromSqlList(rows)
 	if err != nil {
 		log.Debug("failed to convert entity", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
 	for _, wp := range data {
 		if err := w.mapFields(ctx, wp); err != nil {
-			return nil, err
-		}
-	}
-
-	return data, nil
-}
-
-func (w *WateringPlanRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.WateringPlan, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := w.store.GetAllWateringPlansByProvider(ctx, &provider)
-	if err != nil {
-		log.Debug("failed to get watering plan entities in db", "error", err)
-		return nil, w.store.MapError(err, sqlc.WateringPlan{})
-	}
-
-	data, err := w.mapper.FromSqlList(rows)
-	if err != nil {
-		log.Debug("failed to convert entity", "error", err)
-		return nil, err
-	}
-
-	for _, wp := range data {
-		if err := w.mapFields(ctx, wp); err != nil {
-			return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
+			return nil, 0, err
 		}
 	}
 

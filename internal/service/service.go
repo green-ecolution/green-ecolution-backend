@@ -165,7 +165,7 @@ type WateringPlanService interface {
 	Service
 	// TODO: use CrudService as soon as every service has pagination
 	// CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
-	GetAll(ctx context.Context) ([]*domain.WateringPlan, int64, error)
+	GetAll(ctx context.Context, provider string) ([]*domain.WateringPlan, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.WateringPlan, error)
 	Create(ctx context.Context, createData *domain.WateringPlanCreate) (*domain.WateringPlan, error)
 	Update(ctx context.Context, id int32, updateData *domain.WateringPlanUpdate) (*domain.WateringPlan, error)
