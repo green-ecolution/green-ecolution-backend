@@ -22,14 +22,14 @@ var _ MappedNullable = &WateringPlanCreate{}
 
 // WateringPlanCreate struct for WateringPlanCreate
 type WateringPlanCreate struct {
-	AdditionalInformation map[string]map[string]interface{} `json:"additional_information,omitempty"`
-	Date                  string                            `json:"date"`
-	Description           string                            `json:"description"`
-	Provider              *string                           `json:"provider,omitempty"`
-	TrailerId             *int32                            `json:"trailer_id,omitempty"`
-	TransporterId         int32                             `json:"transporter_id"`
-	TreeClusterIds        []int32                           `json:"tree_cluster_ids"`
-	UserIds               []string                          `json:"user_ids"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	Date                  string                 `json:"date"`
+	Description           string                 `json:"description"`
+	Provider              *string                `json:"provider,omitempty"`
+	TrailerId             *int32                 `json:"trailer_id,omitempty"`
+	TransporterId         int32                  `json:"transporter_id"`
+	TreeClusterIds        []int32                `json:"tree_cluster_ids"`
+	UserIds               []string               `json:"user_ids"`
 }
 
 type _WateringPlanCreate WateringPlanCreate
@@ -57,9 +57,9 @@ func NewWateringPlanCreateWithDefaults() *WateringPlanCreate {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
-func (o *WateringPlanCreate) GetAdditionalInformation() map[string]map[string]interface{} {
+func (o *WateringPlanCreate) GetAdditionalInformation() map[string]interface{} {
 	if o == nil || IsNil(o.AdditionalInformation) {
-		var ret map[string]map[string]interface{}
+		var ret map[string]interface{}
 		return ret
 	}
 	return o.AdditionalInformation
@@ -67,9 +67,9 @@ func (o *WateringPlanCreate) GetAdditionalInformation() map[string]map[string]in
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WateringPlanCreate) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
+func (o *WateringPlanCreate) GetAdditionalInformationOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.AdditionalInformation) {
-		return map[string]map[string]interface{}{}, false
+		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
@@ -83,8 +83,8 @@ func (o *WateringPlanCreate) HasAdditionalInformation() bool {
 	return false
 }
 
-// SetAdditionalInformation gets a reference to the given map[string]map[string]interface{} and assigns it to the AdditionalInformation field.
-func (o *WateringPlanCreate) SetAdditionalInformation(v map[string]map[string]interface{}) {
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *WateringPlanCreate) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

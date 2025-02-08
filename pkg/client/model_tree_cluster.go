@@ -22,23 +22,23 @@ var _ MappedNullable = &TreeCluster{}
 
 // TreeCluster struct for TreeCluster
 type TreeCluster struct {
-	AdditionalInformation map[string]map[string]interface{} `json:"additional_information"`
-	Address               string                            `json:"address"`
-	Archived              bool                              `json:"archived"`
-	CreatedAt             string                            `json:"created_at"`
-	Description           string                            `json:"description"`
-	Id                    int32                             `json:"id"`
-	LastWatered           *string                           `json:"last_watered,omitempty"`
-	Latitude              float32                           `json:"latitude"`
-	Longitude             float32                           `json:"longitude"`
-	MoistureLevel         float32                           `json:"moisture_level"`
-	Name                  string                            `json:"name"`
-	Provider              string                            `json:"provider"`
-	Region                *Region                           `json:"region,omitempty"`
-	SoilCondition         SoilCondition                     `json:"soil_condition"`
-	Trees                 []Tree                            `json:"trees,omitempty"`
-	UpdatedAt             string                            `json:"updated_at"`
-	WateringStatus        WateringStatus                    `json:"watering_status"`
+	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	Address               string                 `json:"address"`
+	Archived              bool                   `json:"archived"`
+	CreatedAt             string                 `json:"created_at"`
+	Description           string                 `json:"description"`
+	Id                    int32                  `json:"id"`
+	LastWatered           *string                `json:"last_watered,omitempty"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	MoistureLevel         float32                `json:"moisture_level"`
+	Name                  string                 `json:"name"`
+	Provider              string                 `json:"provider"`
+	Region                *Region                `json:"region,omitempty"`
+	SoilCondition         SoilCondition          `json:"soil_condition"`
+	Trees                 []Tree                 `json:"trees,omitempty"`
+	UpdatedAt             string                 `json:"updated_at"`
+	WateringStatus        WateringStatus         `json:"watering_status"`
 }
 
 type _TreeCluster TreeCluster
@@ -47,7 +47,7 @@ type _TreeCluster TreeCluster
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeCluster(additionalInformation map[string]map[string]interface{}, address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, provider string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
+func NewTreeCluster(additionalInformation map[string]interface{}, address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, provider string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
 	this := TreeCluster{}
 	this.AdditionalInformation = additionalInformation
 	this.Address = address
@@ -75,9 +75,9 @@ func NewTreeClusterWithDefaults() *TreeCluster {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value
-func (o *TreeCluster) GetAdditionalInformation() map[string]map[string]interface{} {
+func (o *TreeCluster) GetAdditionalInformation() map[string]interface{} {
 	if o == nil {
-		var ret map[string]map[string]interface{}
+		var ret map[string]interface{}
 		return ret
 	}
 
@@ -86,15 +86,15 @@ func (o *TreeCluster) GetAdditionalInformation() map[string]map[string]interface
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
 // and a boolean to check if the value has been set.
-func (o *TreeCluster) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
+func (o *TreeCluster) GetAdditionalInformationOk() (map[string]interface{}, bool) {
 	if o == nil {
-		return map[string]map[string]interface{}{}, false
+		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
 // SetAdditionalInformation sets field value
-func (o *TreeCluster) SetAdditionalInformation(v map[string]map[string]interface{}) {
+func (o *TreeCluster) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

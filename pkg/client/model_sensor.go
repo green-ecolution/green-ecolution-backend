@@ -22,15 +22,15 @@ var _ MappedNullable = &Sensor{}
 
 // Sensor struct for Sensor
 type Sensor struct {
-	AdditionalInformation map[string]map[string]interface{} `json:"additional_information"`
-	CreatedAt             string                            `json:"created_at"`
-	Id                    string                            `json:"id"`
-	LatestData            SensorData                        `json:"latest_data"`
-	Latitude              float32                           `json:"latitude"`
-	Longitude             float32                           `json:"longitude"`
-	Provider              string                            `json:"provider"`
-	Status                SensorStatus                      `json:"status"`
-	UpdatedAt             string                            `json:"updated_at"`
+	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	CreatedAt             string                 `json:"created_at"`
+	Id                    string                 `json:"id"`
+	LatestData            SensorData             `json:"latest_data"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	Provider              string                 `json:"provider"`
+	Status                SensorStatus           `json:"status"`
+	UpdatedAt             string                 `json:"updated_at"`
 }
 
 type _Sensor Sensor
@@ -39,7 +39,7 @@ type _Sensor Sensor
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensor(additionalInformation map[string]map[string]interface{}, createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status SensorStatus, updatedAt string) *Sensor {
+func NewSensor(additionalInformation map[string]interface{}, createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status SensorStatus, updatedAt string) *Sensor {
 	this := Sensor{}
 	this.AdditionalInformation = additionalInformation
 	this.CreatedAt = createdAt
@@ -62,9 +62,9 @@ func NewSensorWithDefaults() *Sensor {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value
-func (o *Sensor) GetAdditionalInformation() map[string]map[string]interface{} {
+func (o *Sensor) GetAdditionalInformation() map[string]interface{} {
 	if o == nil {
-		var ret map[string]map[string]interface{}
+		var ret map[string]interface{}
 		return ret
 	}
 
@@ -73,15 +73,15 @@ func (o *Sensor) GetAdditionalInformation() map[string]map[string]interface{} {
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
 // and a boolean to check if the value has been set.
-func (o *Sensor) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
+func (o *Sensor) GetAdditionalInformationOk() (map[string]interface{}, bool) {
 	if o == nil {
-		return map[string]map[string]interface{}{}, false
+		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
 // SetAdditionalInformation sets field value
-func (o *Sensor) SetAdditionalInformation(v map[string]map[string]interface{}) {
+func (o *Sensor) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

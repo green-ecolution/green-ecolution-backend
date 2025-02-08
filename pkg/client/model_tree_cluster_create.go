@@ -22,13 +22,13 @@ var _ MappedNullable = &TreeClusterCreate{}
 
 // TreeClusterCreate struct for TreeClusterCreate
 type TreeClusterCreate struct {
-	AdditionalInformation map[string]map[string]interface{} `json:"additional_information,omitempty"`
-	Address               string                            `json:"address"`
-	Description           string                            `json:"description"`
-	Name                  string                            `json:"name"`
-	Provider              *string                           `json:"provider,omitempty"`
-	SoilCondition         SoilCondition                     `json:"soil_condition"`
-	TreeIds               []int32                           `json:"tree_ids"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	Address               string                 `json:"address"`
+	Description           string                 `json:"description"`
+	Name                  string                 `json:"name"`
+	Provider              *string                `json:"provider,omitempty"`
+	SoilCondition         SoilCondition          `json:"soil_condition"`
+	TreeIds               []int32                `json:"tree_ids"`
 }
 
 type _TreeClusterCreate TreeClusterCreate
@@ -56,9 +56,9 @@ func NewTreeClusterCreateWithDefaults() *TreeClusterCreate {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
-func (o *TreeClusterCreate) GetAdditionalInformation() map[string]map[string]interface{} {
+func (o *TreeClusterCreate) GetAdditionalInformation() map[string]interface{} {
 	if o == nil || IsNil(o.AdditionalInformation) {
-		var ret map[string]map[string]interface{}
+		var ret map[string]interface{}
 		return ret
 	}
 	return o.AdditionalInformation
@@ -66,9 +66,9 @@ func (o *TreeClusterCreate) GetAdditionalInformation() map[string]map[string]int
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TreeClusterCreate) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
+func (o *TreeClusterCreate) GetAdditionalInformationOk() (map[string]interface{}, bool) {
 	if o == nil || IsNil(o.AdditionalInformation) {
-		return map[string]map[string]interface{}{}, false
+		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
@@ -82,8 +82,8 @@ func (o *TreeClusterCreate) HasAdditionalInformation() bool {
 	return false
 }
 
-// SetAdditionalInformation gets a reference to the given map[string]map[string]interface{} and assigns it to the AdditionalInformation field.
-func (o *TreeClusterCreate) SetAdditionalInformation(v map[string]map[string]interface{}) {
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *TreeClusterCreate) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

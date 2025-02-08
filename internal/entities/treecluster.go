@@ -29,7 +29,7 @@ type TreeCluster struct {
 	SoilCondition  TreeSoilCondition
 	Name           string
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeClusterCreate struct {
@@ -39,7 +39,7 @@ type TreeClusterCreate struct {
 	SoilCondition  TreeSoilCondition
 	TreeIDs        []*int32
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeClusterUpdate struct {
@@ -49,5 +49,5 @@ type TreeClusterUpdate struct {
 	TreeIDs        []*int32
 	Name           string `validate:"required"`
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }

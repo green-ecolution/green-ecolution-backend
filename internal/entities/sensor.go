@@ -19,7 +19,7 @@ type Sensor struct {
 	Latitude       float64
 	Longitude      float64
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type SensorData struct {
@@ -37,7 +37,7 @@ type SensorCreate struct {
 	Latitude       float64 `validate:"required,max=90,min=-90"`
 	Longitude      float64 `validate:"required,max=180,min=-180"`
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type SensorUpdate struct {
@@ -46,5 +46,5 @@ type SensorUpdate struct {
 	Latitude       float64 `validate:"required,max=90,min=-90"`
 	Longitude      float64 `validate:"required,max=180,min=-180"`
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }

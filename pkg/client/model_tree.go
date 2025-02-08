@@ -22,15 +22,15 @@ var _ MappedNullable = &Tree{}
 
 // Tree struct for Tree
 type Tree struct {
-	AdditionalInformation map[string]map[string]interface{} `json:"additional_information"`
-	CreatedAt             string                            `json:"created_at"`
-	Description           string                            `json:"description"`
-	Id                    int32                             `json:"id"`
-	Latitude              float32                           `json:"latitude"`
-	Longitude             float32                           `json:"longitude"`
-	Number                string                            `json:"number"`
-	PlantingYear          int32                             `json:"planting_year"`
-	Provider              string                            `json:"provider"`
+	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	CreatedAt             string                 `json:"created_at"`
+	Description           string                 `json:"description"`
+	Id                    int32                  `json:"id"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	Number                string                 `json:"number"`
+	PlantingYear          int32                  `json:"planting_year"`
+	Provider              string                 `json:"provider"`
 	// Images              []*ImageResponse `json:\"images\"`
 	Readonly       bool           `json:"readonly"`
 	Sensor         *Sensor        `json:"sensor,omitempty"`
@@ -46,7 +46,7 @@ type _Tree Tree
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTree(additionalInformation map[string]map[string]interface{}, createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
+func NewTree(additionalInformation map[string]interface{}, createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
 	this := Tree{}
 	this.AdditionalInformation = additionalInformation
 	this.CreatedAt = createdAt
@@ -73,9 +73,9 @@ func NewTreeWithDefaults() *Tree {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value
-func (o *Tree) GetAdditionalInformation() map[string]map[string]interface{} {
+func (o *Tree) GetAdditionalInformation() map[string]interface{} {
 	if o == nil {
-		var ret map[string]map[string]interface{}
+		var ret map[string]interface{}
 		return ret
 	}
 
@@ -84,15 +84,15 @@ func (o *Tree) GetAdditionalInformation() map[string]map[string]interface{} {
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
 // and a boolean to check if the value has been set.
-func (o *Tree) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
+func (o *Tree) GetAdditionalInformationOk() (map[string]interface{}, bool) {
 	if o == nil {
-		return map[string]map[string]interface{}{}, false
+		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
 // SetAdditionalInformation sets field value
-func (o *Tree) SetAdditionalInformation(v map[string]map[string]interface{}) {
+func (o *Tree) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

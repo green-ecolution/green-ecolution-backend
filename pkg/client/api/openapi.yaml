@@ -2643,7 +2643,7 @@ components:
     Sensor:
       example:
         additional_information:
-          key: "{}"
+          key: ""
         latest_data:
           updated_at: updated_at
           temperature: 4.145608029883936
@@ -2666,8 +2666,7 @@ components:
         status: online
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         created_at:
           type: string
@@ -2743,7 +2742,7 @@ components:
           current_page: 7
         data:
         - additional_information:
-            key: "{}"
+            key: ""
           latest_data:
             updated_at: updated_at
             temperature: 4.145608029883936
@@ -2765,7 +2764,7 @@ components:
           longitude: 6.84685269835264
           status: online
         - additional_information:
-            key: "{}"
+            key: ""
           latest_data:
             updated_at: updated_at
             temperature: 4.145608029883936
@@ -2865,7 +2864,7 @@ components:
         description: description
         tree_cluster_id: 7
         additional_information:
-          key: "{}"
+          key: ""
         number: number
         readonly: true
         updated_at: updated_at
@@ -2875,7 +2874,7 @@ components:
         planting_year: 9
         sensor:
           additional_information:
-            key: "{}"
+            key: ""
           latest_data:
             updated_at: updated_at
             temperature: 4.145608029883936
@@ -2900,8 +2899,7 @@ components:
         longitude: 7.061401241503109
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         created_at:
           type: string
@@ -2960,7 +2958,7 @@ components:
           description: description
           tree_cluster_id: 7
           additional_information:
-            key: "{}"
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
@@ -2970,7 +2968,7 @@ components:
           planting_year: 9
           sensor:
             additional_information:
-              key: "{}"
+              key: ""
             latest_data:
               updated_at: updated_at
               temperature: 4.145608029883936
@@ -2998,7 +2996,7 @@ components:
           description: description
           tree_cluster_id: 7
           additional_information:
-            key: "{}"
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
@@ -3008,7 +3006,7 @@ components:
           planting_year: 9
           sensor:
             additional_information:
-              key: "{}"
+              key: ""
             latest_data:
               updated_at: updated_at
               temperature: 4.145608029883936
@@ -3033,7 +3031,7 @@ components:
           longitude: 7.061401241503109
         soil_condition: schluffig
         additional_information:
-          key: "{}"
+          key: ""
         archived: true
         updated_at: updated_at
         watering_status: null
@@ -3047,8 +3045,7 @@ components:
         longitude: 1.4658129805029452
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         address:
           type: string
@@ -3103,7 +3100,7 @@ components:
     TreeClusterCreate:
       example:
         additional_information:
-          key: "{}"
+          key: ""
         address: address
         tree_ids:
         - 0
@@ -3114,8 +3111,7 @@ components:
         soil_condition: schluffig
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         address:
           type: string
@@ -3267,7 +3263,7 @@ components:
     TreeClusterUpdate:
       example:
         additional_information:
-          key: "{}"
+          key: ""
         address: address
         tree_ids:
         - 0
@@ -3278,8 +3274,7 @@ components:
         soil_condition: schluffig
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         address:
           type: string
@@ -3306,7 +3301,7 @@ components:
       example:
         sensor_id: sensor_id
         additional_information:
-          key: "{}"
+          key: ""
         number: number
         readonly: true
         provider: provider
@@ -3318,8 +3313,7 @@ components:
         longitude: 6.027456183070403
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         description:
           type: string
@@ -3364,7 +3358,7 @@ components:
           description: description
           tree_cluster_id: 7
           additional_information:
-            key: "{}"
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
@@ -3374,7 +3368,7 @@ components:
           planting_year: 9
           sensor:
             additional_information:
-              key: "{}"
+              key: ""
             latest_data:
               updated_at: updated_at
               temperature: 4.145608029883936
@@ -3402,7 +3396,7 @@ components:
           description: description
           tree_cluster_id: 7
           additional_information:
-            key: "{}"
+            key: ""
           number: number
           readonly: true
           updated_at: updated_at
@@ -3412,7 +3406,7 @@ components:
           planting_year: 9
           sensor:
             additional_information:
-              key: "{}"
+              key: ""
             latest_data:
               updated_at: updated_at
               temperature: 4.145608029883936
@@ -3450,7 +3444,7 @@ components:
       example:
         sensor_id: sensor_id
         additional_information:
-          key: "{}"
+          key: ""
         number: number
         readonly: true
         provider: provider
@@ -3462,8 +3456,7 @@ components:
         longitude: 6.027456183070403
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         description:
           type: string
@@ -3690,7 +3683,7 @@ components:
         weight: 5.637376656633329
         type: transporter
         additional_information:
-          key: "{}"
+          key: ""
         driving_license: B
         updated_at: updated_at
         provider: provider
@@ -3701,8 +3694,7 @@ components:
         status: active
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         created_at:
           type: string
@@ -3761,7 +3753,7 @@ components:
         weight: 5.962133916683182
         type: transporter
         additional_information:
-          key: "{}"
+          key: ""
         driving_license: B
         provider: provider
         width: 5.637376656633329
@@ -3770,8 +3762,7 @@ components:
         status: active
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         description:
           type: string
@@ -3827,7 +3818,7 @@ components:
           weight: 5.637376656633329
           type: transporter
           additional_information:
-            key: "{}"
+            key: ""
           driving_license: B
           updated_at: updated_at
           provider: provider
@@ -3844,7 +3835,7 @@ components:
           weight: 5.637376656633329
           type: transporter
           additional_information:
-            key: "{}"
+            key: ""
           driving_license: B
           updated_at: updated_at
           provider: provider
@@ -3895,7 +3886,7 @@ components:
         weight: 5.962133916683182
         type: transporter
         additional_information:
-          key: "{}"
+          key: ""
         driving_license: B
         provider: provider
         width: 5.637376656633329
@@ -3904,8 +3895,7 @@ components:
         status: active
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         description:
           type: string
@@ -4012,7 +4002,7 @@ components:
           weight: 5.637376656633329
           type: transporter
           additional_information:
-            key: "{}"
+            key: ""
           driving_license: B
           updated_at: updated_at
           provider: provider
@@ -4022,7 +4012,7 @@ components:
           height: 0.8008281904610115
           status: active
         additional_information:
-          key: "{}"
+          key: ""
         updated_at: updated_at
         provider: provider
         gpx_url: gpx_url
@@ -4035,7 +4025,7 @@ components:
           weight: 5.637376656633329
           type: transporter
           additional_information:
-            key: "{}"
+            key: ""
           driving_license: B
           updated_at: updated_at
           provider: provider
@@ -4048,8 +4038,7 @@ components:
         status: planned
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         cancellation_note:
           type: string
@@ -4117,7 +4106,7 @@ components:
       example:
         date: date
         additional_information:
-          key: "{}"
+          key: ""
         tree_cluster_ids:
         - 1
         - 1
@@ -4130,8 +4119,7 @@ components:
         transporter_id: 6
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         date:
           type: string
@@ -4217,7 +4205,7 @@ components:
           weight: 5.637376656633329
           type: transporter
           additional_information:
-            key: "{}"
+            key: ""
           driving_license: B
           updated_at: updated_at
           provider: provider
@@ -4236,7 +4224,7 @@ components:
           weight: 5.637376656633329
           type: transporter
           additional_information:
-            key: "{}"
+            key: ""
           driving_license: B
           updated_at: updated_at
           provider: provider
@@ -4358,7 +4346,7 @@ components:
             weight: 5.637376656633329
             type: transporter
             additional_information:
-              key: "{}"
+              key: ""
             driving_license: B
             updated_at: updated_at
             provider: provider
@@ -4377,7 +4365,7 @@ components:
             weight: 5.637376656633329
             type: transporter
             additional_information:
-              key: "{}"
+              key: ""
             driving_license: B
             updated_at: updated_at
             provider: provider
@@ -4445,7 +4433,7 @@ components:
             weight: 5.637376656633329
             type: transporter
             additional_information:
-              key: "{}"
+              key: ""
             driving_license: B
             updated_at: updated_at
             provider: provider
@@ -4464,7 +4452,7 @@ components:
             weight: 5.637376656633329
             type: transporter
             additional_information:
-              key: "{}"
+              key: ""
             driving_license: B
             updated_at: updated_at
             provider: provider
@@ -4513,7 +4501,7 @@ components:
           tree_cluster_id: 5
           watering_plan_id: 5
         additional_information:
-          key: "{}"
+          key: ""
         cancellation_note: cancellation_note
         tree_cluster_ids:
         - 1
@@ -4528,8 +4516,7 @@ components:
         status: planned
       properties:
         additional_information:
-          additionalProperties:
-            type: object
+          additionalProperties: true
           type: object
         cancellation_note:
           type: string
