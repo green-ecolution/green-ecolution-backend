@@ -165,7 +165,7 @@ type VehicleService interface {
 	Update(ctx context.Context, id int32, updateData *domain.VehicleUpdate) (*domain.Vehicle, error)
 	Delete(ctx context.Context, id int32) error
 
-	GetAllByType(ctx context.Context, vehicleType domain.VehicleType) ([]*domain.Vehicle, error)
+	GetAllByType(ctx context.Context, vehicleType domain.VehicleType) ([]*domain.Vehicle, int64, error)
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
 }
 

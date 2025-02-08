@@ -89,28 +89,30 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		expectedVehicles := []*entities.Vehicle{getTestVehicles()[0]}
-		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(expectedVehicles, nil)
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(expectedVehicles, int64(len(expectedVehicles)), nil)
 
 		// when
-		vehicles, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
+		vehicles, totalCount, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedVehicles, vehicles)
+		assert.Equal(t, totalCount, int64(1))
 	})
 
 	t.Run("should return empty slice when no vehicles are found", func(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
-		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return([]*entities.Vehicle{}, nil)
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
-		vehicles, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
+		vehicles, totalCount, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, vehicles)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when GetAllByType fails", func(t *testing.T) {
@@ -118,14 +120,15 @@ func TestVehicleService_GetAllByType(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		expectedErr := errors.New("GetAllByType failed")
-		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(nil, expectedErr)
+		vehicleRepo.EXPECT().GetAllByType(ctx, entities.VehicleTypeTransporter).Return(nil, int64(0), expectedErr)
 
 		// when
-		vehicles, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
+		vehicles, totalCount, err := svc.GetAllByType(ctx, entities.VehicleTypeTransporter)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicles)
+		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: GetAllByType failed")
 	})
 }

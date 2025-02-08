@@ -50,7 +50,7 @@ func TestRegisterRoutes(t *testing.T) {
 			mockVehicleService.EXPECT().GetAllByType(
 				mock.Anything,
 				entities.VehicleType("transporter"),
-			).Return(TestVehicles, nil)
+			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/?type=transporter", nil)

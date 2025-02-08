@@ -52,12 +52,11 @@ func (r *VehicleRepository) GetAllByProvider(ctx context.Context, provider strin
 	return r.mapFromList(ctx, rows, totalCount)
 }
 
-func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
+func (r *VehicleRepository) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllVehiclesByType(ctx, sqlc.VehicleType(vehicleType))
+	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
-		log.Debug("failed to get vehicle entities by provides type in db", "error", err, "vehicle_type", vehicleType)
-		return nil, r.store.MapError(err, sqlc.Vehicle{})
+		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
 	return r.mapFromList(ctx, rows)

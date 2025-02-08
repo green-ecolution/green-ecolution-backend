@@ -10,7 +10,13 @@ SELECT COUNT(*) FROM vehicles;
 SELECT * FROM vehicles WHERE provider = $1 ORDER BY water_capacity DESC;
 
 -- name: GetAllVehiclesByType :many
-SELECT * FROM vehicles WHERE type = $1 ORDER BY water_capacity DESC;
+SELECT * FROM vehicles 
+WHERE type = $1 
+ORDER BY water_capacity DESC
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllVehiclesByTypeCount :one
+SELECT COUNT(*) FROM vehicles WHERE type = $1;
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;

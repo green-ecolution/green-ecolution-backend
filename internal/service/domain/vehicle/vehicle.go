@@ -42,15 +42,15 @@ func (v *VehicleService) GetAll(ctx context.Context, provider string) ([]*entiti
 	return vehicles, totalCount, nil
 }
 
-func (v *VehicleService) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {
+func (v *VehicleService) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
-	vehicles, err := v.vehicleRepo.GetAllByType(ctx, vehicleType)
+	vehicles, totalCount, err := v.vehicleRepo.GetAllByType(ctx, vehicleType)
 	if err != nil {
 		log.Debug("failed to fetch vehicles by a type", "error", err, "vehicle_type", vehicleType)
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	return vehicles, nil
+	return vehicles, totalCount, nil
 }
 
 func (v *VehicleService) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
