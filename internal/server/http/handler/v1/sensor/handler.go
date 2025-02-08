@@ -9,6 +9,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 var (
@@ -27,16 +28,15 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor [get]
-// @Param			status		query	string	false	"Sensor Status"
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
+// @Param			page		query	int	false	"Page"
+// @Param			limit		query	int	false	"Limit"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		provider := c.Query("provider")
-		domainData, err := svc.GetAll(ctx, provider)
+		domainData, totalCount, err := svc.GetAll(ctx, provider)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -48,7 +48,7 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 
 		return c.JSON(entities.SensorListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle Pagination
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }

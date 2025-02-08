@@ -1,5 +1,10 @@
 -- name: GetAllSensors :many
-SELECT * FROM sensors ORDER BY id;
+SELECT * FROM sensors 
+ORDER BY id 
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllSensorsCount :one
+SELECT COUNT(*) FROM sensors;
 
 -- name: GetAllSensorsByProvider :many
 SELECT * FROM sensors WHERE provider = $1 ORDER BY id;
