@@ -30,16 +30,16 @@ func (v *VehicleService) GetAll(ctx context.Context, provider string) ([]*entiti
 	var err error
 
 	if provider != "" {
-		vehicles, err = v.vehicleRepo.GetAllByProvider(ctx, provider)
+		vehicles, totalCount, err = v.vehicleRepo.GetAllByProvider(ctx, provider)
 	} else {
-		vehicles, err = v.vehicleRepo.GetAll(ctx)
+		vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx)
 	}
 	if err != nil {
 		log.Debug("failed to fetch vehicles", "error", err)
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	return vehicles, nil
+	return vehicles, totalCount, nil
 }
 
 func (v *VehicleService) GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error) {

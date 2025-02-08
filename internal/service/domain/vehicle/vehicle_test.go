@@ -21,14 +21,15 @@ func TestVehicleService_GetAll(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		expectedVehicles := getTestVehicles()
-		vehicleRepo.EXPECT().GetAll(ctx).Return(expectedVehicles, nil)
+		vehicleRepo.EXPECT().GetAll(ctx).Return(expectedVehicles, int64(len(expectedVehicles)), nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx, "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedVehicles, vehicles)
+		assert.Equal(t, totalCount, int64(len(expectedVehicles)))
 	})
 
 	t.Run("should return all vehicles when successful with provider", func(t *testing.T) {
@@ -39,25 +40,27 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedVehicles, nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx, "test-provider")
+		vehicles, totalCount, err := svc.GetAll(ctx, "test-provider")
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedVehicles, vehicles)
+		assert.Equal(t, totalCount, int64(len(expectedVehicles)))
 	})
 
 	t.Run("should return empty slice when no vehicles are found", func(t *testing.T) {
 		vehicleRepo := storageMock.NewMockVehicleRepository(t)
 		svc := NewVehicleService(vehicleRepo)
 
-		vehicleRepo.EXPECT().GetAll(ctx).Return([]*entities.Vehicle{}, nil)
+		vehicleRepo.EXPECT().GetAll(ctx).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
-		vehicles, err := svc.GetAll(ctx, "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, vehicles)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when GetAll fails", func(t *testing.T) {
@@ -65,14 +68,15 @@ func TestVehicleService_GetAll(t *testing.T) {
 		svc := NewVehicleService(vehicleRepo)
 
 		expectedErr := errors.New("GetAll failed")
-		vehicleRepo.EXPECT().GetAll(ctx).Return(nil, expectedErr)
+		vehicleRepo.EXPECT().GetAll(ctx).Return(nil, int64(0), expectedErr)
 
 		// when
-		vehicles, err := svc.GetAll(ctx, "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, vehicles)
+		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: GetAll failed")
 	})
 }

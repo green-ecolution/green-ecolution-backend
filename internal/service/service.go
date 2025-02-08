@@ -156,7 +156,15 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 }
 
 type VehicleService interface {
-	CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
+	Service
+	// TODO: use CrudService as soon as every service has pagination
+	// CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
+	GetAll(ctx context.Context) ([]*domain.Vehicle, int64, error)
+	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
+	Create(ctx context.Context, createData *domain.VehicleCreate) (*domain.Vehicle, error)
+	Update(ctx context.Context, id int32, updateData *domain.VehicleUpdate) (*domain.Vehicle, error)
+	Delete(ctx context.Context, id int32) error
+
 	GetAllByType(ctx context.Context, vehicleType domain.VehicleType) ([]*domain.Vehicle, error)
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
 }

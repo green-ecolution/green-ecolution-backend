@@ -94,8 +94,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		assert.Len(t, got, 2)
 		assert.Equal(t, totalCount, int64(len(allTestCluster)))
 
-		sortedTestCluster := sortClusterByName(allTestCluster)
-		sortedTestCluster = sortedTestCluster[2:4]
+		sortedTestCluster := sortClusterByName(allTestCluster)[2:4]
 
 		for i, tc := range got {
 			assert.Equal(t, sortedTestCluster[i].ID, tc.ID)

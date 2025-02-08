@@ -1,5 +1,10 @@
 -- name: GetAllVehicles :many
-SELECT * FROM vehicles ORDER BY water_capacity DESC;
+SELECT * FROM vehicles 
+ORDER BY water_capacity DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllVehiclesCount :one
+SELECT COUNT(*) FROM vehicles;
 
 -- name: GetAllVehiclesByProvider :many
 SELECT * FROM vehicles WHERE provider = $1 ORDER BY water_capacity DESC;
