@@ -2,9 +2,10 @@ package worker
 
 import (
 	"context"
-	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"log/slog"
 	"time"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 func Scheduler(ctx context.Context, interval time.Duration, process func(ctx context.Context) error) {
