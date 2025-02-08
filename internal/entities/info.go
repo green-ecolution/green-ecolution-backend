@@ -12,6 +12,7 @@ type App struct {
 	BuildTime time.Time
 	Git       Git
 	Server    Server
+	Map       Map
 }
 
 type Git struct {

@@ -35,17 +35,3 @@ func GetAppInfo(svc service.InfoService) fiber.Handler {
 		return c.JSON(response)
 	}
 }
-
-func GetMapInfo(svc service.InfoService) fiber.Handler {
-	var m mapper.MapHTTPMapper = &generated.MapHTTPMapperImpl{}
-
-	return func(c *fiber.Ctx) error {
-		domainInfo, err := svc.GetMapInfoResponse(c.Context())
-		if err != nil {
-			return errorhandler.HandleError(err)
-		}
-
-		response := m.ToResponse(domainInfo)
-		return c.JSON(response)
-	}
-}

@@ -11,5 +11,4 @@ import (
 type InfoHTTPMapper interface {
 	ToResponse(src *domain.App) *entities.AppInfoResponse
 	FromResponse(src *entities.AppInfoResponse) *domain.App
-	ToMapResponse(src *domain.App) *entities.MapResponse
 }
