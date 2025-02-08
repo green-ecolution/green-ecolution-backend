@@ -340,7 +340,6 @@ type ApiGetAllTreeClustersRequest struct {
 	ApiService *TreeClusterAPIService
 	page       *string
 	limit      *string
-	status     *string
 	provider   *string
 }
 
@@ -353,12 +352,6 @@ func (r ApiGetAllTreeClustersRequest) Page(page string) ApiGetAllTreeClustersReq
 // Limit
 func (r ApiGetAllTreeClustersRequest) Limit(limit string) ApiGetAllTreeClustersRequest {
 	r.limit = &limit
-	return r
-}
-
-// Status
-func (r ApiGetAllTreeClustersRequest) Status(status string) ApiGetAllTreeClustersRequest {
-	r.status = &status
 	return r
 }
 
@@ -414,9 +407,6 @@ func (a *TreeClusterAPIService) GetAllTreeClustersExecute(r ApiGetAllTreeCluster
 	}
 	if r.limit != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "limit", r.limit, "", "")
-	}
-	if r.status != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "", "")
 	}
 	if r.provider != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "provider", r.provider, "", "")

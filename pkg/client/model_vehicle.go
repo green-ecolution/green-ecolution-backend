@@ -22,22 +22,22 @@ var _ MappedNullable = &Vehicle{}
 
 // Vehicle struct for Vehicle
 type Vehicle struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information"`
-	CreatedAt             string                 `json:"created_at"`
-	Description           string                 `json:"description"`
-	DrivingLicense        DrivingLicense         `json:"driving_license"`
-	Height                float32                `json:"height"`
-	Id                    int32                  `json:"id"`
-	Length                float32                `json:"length"`
-	Model                 string                 `json:"model"`
-	NumberPlate           string                 `json:"number_plate"`
-	Provider              string                 `json:"provider"`
-	Status                VehicleStatus          `json:"status"`
-	Type                  VehicleType            `json:"type"`
-	UpdatedAt             string                 `json:"updated_at"`
-	WaterCapacity         float32                `json:"water_capacity"`
-	Weight                float32                `json:"weight"`
-	Width                 float32                `json:"width"`
+	AdditionalInformation map[string]map[string]interface{} `json:"additional_information"`
+	CreatedAt             string                            `json:"created_at"`
+	Description           string                            `json:"description"`
+	DrivingLicense        DrivingLicense                    `json:"driving_license"`
+	Height                float32                           `json:"height"`
+	Id                    int32                             `json:"id"`
+	Length                float32                           `json:"length"`
+	Model                 string                            `json:"model"`
+	NumberPlate           string                            `json:"number_plate"`
+	Provider              string                            `json:"provider"`
+	Status                VehicleStatus                     `json:"status"`
+	Type                  VehicleType                       `json:"type"`
+	UpdatedAt             string                            `json:"updated_at"`
+	WaterCapacity         float32                           `json:"water_capacity"`
+	Weight                float32                           `json:"weight"`
+	Width                 float32                           `json:"width"`
 }
 
 type _Vehicle Vehicle
@@ -46,7 +46,7 @@ type _Vehicle Vehicle
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewVehicle(additionalInformation map[string]interface{}, createdAt string, description string, drivingLicense DrivingLicense, height float32, id int32, length float32, model string, numberPlate string, provider string, status VehicleStatus, type_ VehicleType, updatedAt string, waterCapacity float32, weight float32, width float32) *Vehicle {
+func NewVehicle(additionalInformation map[string]map[string]interface{}, createdAt string, description string, drivingLicense DrivingLicense, height float32, id int32, length float32, model string, numberPlate string, provider string, status VehicleStatus, type_ VehicleType, updatedAt string, waterCapacity float32, weight float32, width float32) *Vehicle {
 	this := Vehicle{}
 	this.AdditionalInformation = additionalInformation
 	this.CreatedAt = createdAt
@@ -76,9 +76,9 @@ func NewVehicleWithDefaults() *Vehicle {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value
-func (o *Vehicle) GetAdditionalInformation() map[string]interface{} {
+func (o *Vehicle) GetAdditionalInformation() map[string]map[string]interface{} {
 	if o == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 
@@ -87,15 +87,15 @@ func (o *Vehicle) GetAdditionalInformation() map[string]interface{} {
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
 // and a boolean to check if the value has been set.
-func (o *Vehicle) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+func (o *Vehicle) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
 	if o == nil {
-		return map[string]interface{}{}, false
+		return map[string]map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
 // SetAdditionalInformation sets field value
-func (o *Vehicle) SetAdditionalInformation(v map[string]interface{}) {
+func (o *Vehicle) SetAdditionalInformation(v map[string]map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

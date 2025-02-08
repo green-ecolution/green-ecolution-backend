@@ -340,7 +340,6 @@ type ApiGetAllVehiclesRequest struct {
 	ApiService *VehicleAPIService
 	page       *string
 	limit      *string
-	status     *string
 	type_      *string
 	provider   *string
 }
@@ -354,12 +353,6 @@ func (r ApiGetAllVehiclesRequest) Page(page string) ApiGetAllVehiclesRequest {
 // Limit
 func (r ApiGetAllVehiclesRequest) Limit(limit string) ApiGetAllVehiclesRequest {
 	r.limit = &limit
-	return r
-}
-
-// Status
-func (r ApiGetAllVehiclesRequest) Status(status string) ApiGetAllVehiclesRequest {
-	r.status = &status
 	return r
 }
 
@@ -421,9 +414,6 @@ func (a *VehicleAPIService) GetAllVehiclesExecute(r ApiGetAllVehiclesRequest) (*
 	}
 	if r.limit != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "limit", r.limit, "", "")
-	}
-	if r.status != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "", "")
 	}
 	if r.type_ != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "type", r.type_, "", "")

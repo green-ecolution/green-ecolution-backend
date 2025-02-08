@@ -22,17 +22,17 @@ var _ MappedNullable = &TreeCreate{}
 
 // TreeCreate struct for TreeCreate
 type TreeCreate struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
-	Description           string                 `json:"description"`
-	Latitude              float32                `json:"latitude"`
-	Longitude             float32                `json:"longitude"`
-	Number                string                 `json:"number"`
-	PlantingYear          int32                  `json:"planting_year"`
-	Provider              *string                `json:"provider,omitempty"`
-	Readonly              bool                   `json:"readonly"`
-	SensorId              *string                `json:"sensor_id,omitempty"`
-	Species               string                 `json:"species"`
-	TreeClusterId         *int32                 `json:"tree_cluster_id,omitempty"`
+	AdditionalInformation map[string]map[string]interface{} `json:"additional_information,omitempty"`
+	Description           string                            `json:"description"`
+	Latitude              float32                           `json:"latitude"`
+	Longitude             float32                           `json:"longitude"`
+	Number                string                            `json:"number"`
+	PlantingYear          int32                             `json:"planting_year"`
+	Provider              *string                           `json:"provider,omitempty"`
+	Readonly              bool                              `json:"readonly"`
+	SensorId              *string                           `json:"sensor_id,omitempty"`
+	Species               string                            `json:"species"`
+	TreeClusterId         *int32                            `json:"tree_cluster_id,omitempty"`
 }
 
 type _TreeCreate TreeCreate
@@ -62,9 +62,9 @@ func NewTreeCreateWithDefaults() *TreeCreate {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
-func (o *TreeCreate) GetAdditionalInformation() map[string]interface{} {
+func (o *TreeCreate) GetAdditionalInformation() map[string]map[string]interface{} {
 	if o == nil || IsNil(o.AdditionalInformation) {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 	return o.AdditionalInformation
@@ -72,9 +72,9 @@ func (o *TreeCreate) GetAdditionalInformation() map[string]interface{} {
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *TreeCreate) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+func (o *TreeCreate) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
 	if o == nil || IsNil(o.AdditionalInformation) {
-		return map[string]interface{}{}, false
+		return map[string]map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
@@ -88,8 +88,8 @@ func (o *TreeCreate) HasAdditionalInformation() bool {
 	return false
 }
 
-// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
-func (o *TreeCreate) SetAdditionalInformation(v map[string]interface{}) {
+// SetAdditionalInformation gets a reference to the given map[string]map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *TreeCreate) SetAdditionalInformation(v map[string]map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 

@@ -22,25 +22,25 @@ var _ MappedNullable = &WateringPlan{}
 
 // WateringPlan struct for WateringPlan
 type WateringPlan struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information"`
-	CancellationNote      string                 `json:"cancellation_note"`
-	CreatedAt             string                 `json:"created_at"`
-	Date                  string                 `json:"date"`
-	Description           string                 `json:"description"`
-	Distance              float32                `json:"distance"`
-	Duration              float32                `json:"duration"`
-	Evaluation            []EvaluationValue      `json:"evaluation"`
-	GpxUrl                string                 `json:"gpx_url"`
-	Id                    int32                  `json:"id"`
-	Provider              string                 `json:"provider"`
-	RefillCount           int32                  `json:"refill_count"`
-	Status                WateringPlanStatus     `json:"status"`
-	TotalWaterRequired    float32                `json:"total_water_required"`
-	Trailer               *Vehicle               `json:"trailer,omitempty"`
-	Transporter           Vehicle                `json:"transporter"`
-	Treeclusters          []TreeClusterInList    `json:"treeclusters"`
-	UpdatedAt             string                 `json:"updated_at"`
-	UserIds               []string               `json:"user_ids"`
+	AdditionalInformation map[string]map[string]interface{} `json:"additional_information"`
+	CancellationNote      string                            `json:"cancellation_note"`
+	CreatedAt             string                            `json:"created_at"`
+	Date                  string                            `json:"date"`
+	Description           string                            `json:"description"`
+	Distance              float32                           `json:"distance"`
+	Duration              float32                           `json:"duration"`
+	Evaluation            []EvaluationValue                 `json:"evaluation"`
+	GpxUrl                string                            `json:"gpx_url"`
+	Id                    int32                             `json:"id"`
+	Provider              string                            `json:"provider"`
+	RefillCount           int32                             `json:"refill_count"`
+	Status                WateringPlanStatus                `json:"status"`
+	TotalWaterRequired    float32                           `json:"total_water_required"`
+	Trailer               *Vehicle                          `json:"trailer,omitempty"`
+	Transporter           Vehicle                           `json:"transporter"`
+	Treeclusters          []TreeClusterInList               `json:"treeclusters"`
+	UpdatedAt             string                            `json:"updated_at"`
+	UserIds               []string                          `json:"user_ids"`
 }
 
 type _WateringPlan WateringPlan
@@ -49,7 +49,7 @@ type _WateringPlan WateringPlan
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWateringPlan(additionalInformation map[string]interface{}, cancellationNote string, createdAt string, date string, description string, distance float32, duration float32, evaluation []EvaluationValue, gpxUrl string, id int32, provider string, refillCount int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlan {
+func NewWateringPlan(additionalInformation map[string]map[string]interface{}, cancellationNote string, createdAt string, date string, description string, distance float32, duration float32, evaluation []EvaluationValue, gpxUrl string, id int32, provider string, refillCount int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlan {
 	this := WateringPlan{}
 	this.AdditionalInformation = additionalInformation
 	this.CancellationNote = cancellationNote
@@ -81,9 +81,9 @@ func NewWateringPlanWithDefaults() *WateringPlan {
 }
 
 // GetAdditionalInformation returns the AdditionalInformation field value
-func (o *WateringPlan) GetAdditionalInformation() map[string]interface{} {
+func (o *WateringPlan) GetAdditionalInformation() map[string]map[string]interface{} {
 	if o == nil {
-		var ret map[string]interface{}
+		var ret map[string]map[string]interface{}
 		return ret
 	}
 
@@ -92,15 +92,15 @@ func (o *WateringPlan) GetAdditionalInformation() map[string]interface{} {
 
 // GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
 // and a boolean to check if the value has been set.
-func (o *WateringPlan) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+func (o *WateringPlan) GetAdditionalInformationOk() (map[string]map[string]interface{}, bool) {
 	if o == nil {
-		return map[string]interface{}{}, false
+		return map[string]map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
 // SetAdditionalInformation sets field value
-func (o *WateringPlan) SetAdditionalInformation(v map[string]interface{}) {
+func (o *WateringPlan) SetAdditionalInformation(v map[string]map[string]interface{}) {
 	o.AdditionalInformation = v
 }
 
