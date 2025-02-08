@@ -82,7 +82,7 @@ func (s *AuthService) LogoutRequest(ctx context.Context, logoutRequest *domain.L
 
 func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
 	log := logger.GetLogger(ctx)
-	users, err := s.userRepo.GetAll(ctx) // TODO: Pagination
+	users, err := s.userRepo.GetAll(ctx)
 	if err != nil {
 		log.Debug("failed to fetch all user lists", "error", err)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -93,7 +93,7 @@ func (s *AuthService) GetAll(ctx context.Context) ([]*domain.User, error) {
 
 func (s *AuthService) GetByIDs(ctx context.Context, ids []string) ([]*domain.User, error) {
 	log := logger.GetLogger(ctx)
-	users, err := s.userRepo.GetByIDs(ctx, ids) // TODO: Pagination
+	users, err := s.userRepo.GetByIDs(ctx, ids)
 	if err != nil {
 		log.Debug("failed to fetch users by ids", "error", err, "user_ids", ids)
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -103,20 +103,12 @@ func (s *AuthService) GetByIDs(ctx context.Context, ids []string) ([]*domain.Use
 }
 
 func (s *AuthService) GetAllByRole(ctx context.Context, role domain.UserRole) ([]*domain.User, error) {
-	users, err := s.GetAll(ctx)
+	log := logger.GetLogger(ctx)
+	users, err := s.userRepo.GetAllByRole(ctx, role)
 	if err != nil {
-		return nil, err
+		log.Debug("failed to fetch users by role", "error", err, "role", role)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	var filteredUsers []*domain.User
-	for _, user := range users {
-		for _, userRole := range user.Roles {
-			if userRole == role {
-				filteredUsers = append(filteredUsers, user)
-				break
-			}
-		}
-	} // TODO: Move to repository
-
-	return filteredUsers, nil
+	return users, nil
 }

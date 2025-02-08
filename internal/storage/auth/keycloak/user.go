@@ -121,6 +121,33 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	return allUsers, nil
 }
 
+func (r *UserRepository) GetAllByRole(ctx context.Context, role entities.UserRole) ([]*entities.User, error) {
+	log := logger.GetLogger(ctx)
+	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)
+	if err != nil {
+		return nil, err
+	}
+
+	users, err := client.GetUsersByRoleName(ctx, token.AccessToken, r.cfg.OidcProvider.DomainName, string(role), gocloak.GetUsersByRoleParams{})
+	if err != nil {
+		log.Error("failed to get user from keycloak", "error", err)
+		return nil, errors.Join(err, ErrGetUser)
+	}
+
+	allUsers := make([]*entities.User, len(users))
+	for i, kcUser := range users {
+		user, err := keyCloakUserToUser(ctx, kcUser)
+		if err != nil && !errors.Is(err, ErrUserWithNilAttributes) { // skip users without required attributes
+			return nil, err
+		}
+		if user != nil {
+			allUsers[i] = user
+		}
+	}
+
+	return allUsers, nil
+}
+
 func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
 	log := logger.GetLogger(ctx)
 	client, token, err := loginRestAPIClient(ctx, r.cfg.OidcProvider.BaseURL, r.cfg.OidcProvider.Backend.ClientID, r.cfg.OidcProvider.Backend.ClientSecret, r.cfg.OidcProvider.DomainName)

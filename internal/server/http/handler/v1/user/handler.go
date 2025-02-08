@@ -176,9 +176,6 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Success		200			{object}	entities.UserListResponse
 // @Failure		400			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
-// @Param			page		query		string	false	"Page"
-// @Param			limit		query		string	false	"Limit"
-// @Param			limit		query		string	false	"Limit"
 // @Param			user_ids	query		string	false	"User IDs"
 // @Router			/v1/user [get]
 // @Security		Keycloak
@@ -209,7 +206,6 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
 		})
 	}
 }
@@ -223,8 +219,6 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 // @Failure		400	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/user/role/{role} [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
 // @Param			role	path	string	true	"Role"
 // @Security		Keycloak
 func GetUsersByRole(svc service.AuthService) fiber.Handler {
@@ -253,7 +247,6 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
 		})
 	}
 }
