@@ -40,7 +40,7 @@ func (v *VehicleService) GetAll(ctx context.Context, provider string, vehicleTyp
 	} else {
 		vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, provider)
 	}
-	
+
 	if err != nil {
 		log.Debug("failed to fetch vehicles", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)

@@ -10,12 +10,12 @@ import (
 )
 
 func (r *VehicleRepository) GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error) {
-    log := logger.GetLogger(ctx)
-    page, limit, err := pagination.GetValues(ctx)
+	log := logger.GetLogger(ctx)
+	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
-    
+
 	totalCount, err := r.store.GetAllVehiclesCount(ctx, provider)
 
 	if err != nil {
@@ -34,8 +34,8 @@ func (r *VehicleRepository) GetAll(ctx context.Context, provider string) ([]*ent
 
 	rows, err := r.store.GetAllVehicles(ctx, &sqlc.GetAllVehiclesParams{
 		Column1: provider,
-		Limit:  limit,
-		Offset: (page - 1) * limit,
+		Limit:   limit,
+		Offset:  (page - 1) * limit,
 	})
 
 	if err != nil {
@@ -48,14 +48,14 @@ func (r *VehicleRepository) GetAll(ctx context.Context, provider string) ([]*ent
 
 // TODO: find a way to merge this with GetAll
 func (r *VehicleRepository) GetAllByType(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error) {
-    log := logger.GetLogger(ctx)
-    page, limit, err := pagination.GetValues(ctx)
+	log := logger.GetLogger(ctx)
+	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
-	
+
 	totalCount, err := r.store.GetAllVehiclesByTypeCount(ctx, &sqlc.GetAllVehiclesByTypeCountParams{
-		Type: sqlc.VehicleType(vehicleType),
+		Type:    sqlc.VehicleType(vehicleType),
 		Column2: provider,
 	})
 
@@ -74,10 +74,10 @@ func (r *VehicleRepository) GetAllByType(ctx context.Context, provider string, v
 	}
 
 	rows, err := r.store.GetAllVehiclesByType(ctx, &sqlc.GetAllVehiclesByTypeParams{
-		Type: sqlc.VehicleType(vehicleType),
+		Type:    sqlc.VehicleType(vehicleType),
 		Column2: provider,
-		Limit:  limit,
-		Offset: (page - 1) * limit,
+		Limit:   limit,
+		Offset:  (page - 1) * limit,
 	})
 
 	if err != nil {

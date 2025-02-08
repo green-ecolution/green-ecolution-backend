@@ -129,7 +129,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.AssertExpectations(t)
 	})
-	
+
 	t.Run("should return all vehicles successfully with provider", func(t *testing.T) {
 		app := fiber.New()
 		mockVehicleService := serviceMock.NewMockVehicleService(t)
