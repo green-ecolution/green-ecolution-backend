@@ -170,8 +170,7 @@ type TreeRepository interface {
 }
 
 type SensorRepository interface {
-	GetAll(ctx context.Context) ([]*entities.Sensor, error)
-	GetAllByProvider(ctx context.Context, provider string) ([]*entities.Sensor, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
 	Create(ctx context.Context, createFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
 	Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)

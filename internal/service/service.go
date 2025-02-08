@@ -140,7 +140,7 @@ type TreeClusterService interface {
 
 type SensorService interface {
 	Service
-	GetAll(ctx context.Context, provider string) ([]*domain.Sensor, error)
+	GetAll(ctx context.Context, provider string) ([]*domain.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*domain.Sensor, error)
 	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
 	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)

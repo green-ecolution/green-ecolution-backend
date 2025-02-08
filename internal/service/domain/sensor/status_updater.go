@@ -40,7 +40,7 @@ func (s *StatusUpdater) RunStatusUpdater(ctx context.Context, interval time.Dura
 
 func (s *StatusUpdater) updateStaleSensorStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	sensors, err := s.sensorRepo.GetAll(ctx)
+	sensors, _, err := s.sensorRepo.GetAll(ctx, "")
 	if err != nil {
 		return err
 	}

@@ -22,11 +22,12 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
-		sensorRepo.EXPECT().GetAll(context.Background()).Return(TestSensorList, nil)
-		sensors, err := svc.GetAll(context.Background(), "")
+		sensorRepo.EXPECT().GetAll(context.Background(), "").Return(TestSensorList, int64(len(TestSensorList)), nil)
+		sensors, totalCount, err := svc.GetAll(context.Background(), "")
 
 		// then
 		assert.NoError(t, err)
+		assert.Equal(t, totalCount, int64(len(TestSensorList)))
 		assert.Equal(t, TestSensorList, sensors)
 	})
 
@@ -38,12 +39,13 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
 		// when
-		sensorRepo.EXPECT().GetAllByProvider(context.Background(), "test-provider").Return(TestSensorList, nil)
-		sensors, err := svc.GetAll(context.Background(), "test-provider")
+		sensorRepo.EXPECT().GetAll(context.Background(), "test-provider").Return(TestSensorList, int64(len(TestSensorList)), nil)
+		sensors, totalCount, err := svc.GetAll(context.Background(), "test-provider")
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, TestSensorList, sensors)
+		assert.Equal(t, totalCount, int64(len(TestSensorList)))
 	})
 
 	t.Run("should return error when repository fails", func(t *testing.T) {
@@ -53,12 +55,13 @@ func TestSensorService_GetAll(t *testing.T) {
 		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, flowerbedRepo, globalEventManager)
 
-		sensorRepo.EXPECT().GetAll(context.Background()).Return(nil, storage.ErrSensorNotFound)
-		sensors, err := svc.GetAll(context.Background(), "")
+		sensorRepo.EXPECT().GetAll(context.Background(), "").Return(nil, int64(0), storage.ErrSensorNotFound)
+		sensors, totalCount, err := svc.GetAll(context.Background(), "")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, sensors)
+		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: sensor not found")
 	})
 }
