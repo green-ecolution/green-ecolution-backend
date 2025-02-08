@@ -86,8 +86,6 @@ func (s *Server) v1(router fiber.Router, authMiddlewares ...fiber.Handler) {
 	})
 
 	app.Route("/plugin", func(router fiber.Router) {
-		plugin.RegisterRoutes(router, s.services.PluginService)
-		router.Use(authMiddleware...)
-		plugin.RegisterPrivateRoutes(router, s.services.PluginService)
+		plugin.RegisterRoutes(router, s.services.PluginService, authMiddlewares...)
 	})
 }
