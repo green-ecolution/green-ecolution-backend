@@ -1,4 +1,4 @@
-module github.com/green-ecolution/green-ecolution-backend/plugin
+module github.com/green-ecolution/green-ecolution-backend/pkg/plugin
 
 go 1.23.2
 

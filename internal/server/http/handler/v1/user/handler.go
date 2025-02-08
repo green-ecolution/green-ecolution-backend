@@ -114,6 +114,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		response := entities.ClientTokenResponse{
 			AccessToken:  token.AccessToken,
+			Expiry:       token.Expiry,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
 			TokenType:    token.TokenType,
@@ -310,6 +311,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			AccessToken:  token.AccessToken,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
 			TokenType:    token.TokenType,
 		}
 

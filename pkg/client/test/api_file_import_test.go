@@ -11,7 +11,7 @@ package client
 
 import (
 	"context"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"

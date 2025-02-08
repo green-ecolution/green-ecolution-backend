@@ -20,7 +20,7 @@ type Tree struct {
 	WateringStatus WateringStatus
 	Description    string
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeCreate struct {
@@ -34,7 +34,7 @@ type TreeCreate struct {
 	Longitude      float64 `validate:"required,max=180,min=-180"`
 	Description    string
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeUpdate struct {
@@ -47,7 +47,7 @@ type TreeUpdate struct {
 	Longitude      float64 `validate:"omitempty,min=-180,max=180"`
 	Description    string
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type TreeImport struct {

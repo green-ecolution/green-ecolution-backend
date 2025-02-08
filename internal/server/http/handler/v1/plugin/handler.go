@@ -92,6 +92,7 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 			AccessToken:  token.AccessToken,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
 			TokenType:    token.TokenType,
 		}
 

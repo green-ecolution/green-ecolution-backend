@@ -341,7 +341,6 @@ type ApiGetAllWateringPlansRequest struct {
 	ApiService *WateringPlanAPIService
 	page       *string
 	limit      *string
-	status     *string
 	provider   *string
 }
 
@@ -354,12 +353,6 @@ func (r ApiGetAllWateringPlansRequest) Page(page string) ApiGetAllWateringPlansR
 // Limit
 func (r ApiGetAllWateringPlansRequest) Limit(limit string) ApiGetAllWateringPlansRequest {
 	r.limit = &limit
-	return r
-}
-
-// Status
-func (r ApiGetAllWateringPlansRequest) Status(status string) ApiGetAllWateringPlansRequest {
-	r.status = &status
 	return r
 }
 
@@ -415,9 +408,6 @@ func (a *WateringPlanAPIService) GetAllWateringPlansExecute(r ApiGetAllWateringP
 	}
 	if r.limit != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "limit", r.limit, "", "")
-	}
-	if r.status != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "", "")
 	}
 	if r.provider != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "provider", r.provider, "", "")

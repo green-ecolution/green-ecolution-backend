@@ -29,11 +29,6 @@ paths:
         name: limit
         schema:
           type: string
-      - description: Status
-        in: query
-        name: status
-        schema:
-          type: string
       - description: Provider
         in: query
         name: provider
@@ -1449,11 +1444,6 @@ paths:
         name: limit
         schema:
           type: string
-      - description: Status
-        in: query
-        name: status
-        schema:
-          type: string
       - description: Vehicle Type
         in: query
         name: type
@@ -1787,11 +1777,6 @@ paths:
       - description: Limit
         in: query
         name: limit
-        schema:
-          type: string
-      - description: Status
-        in: query
-        name: status
         schema:
           type: string
       - description: Provider
@@ -2181,6 +2166,7 @@ components:
         refresh_expires_in: 1
         scope: scope
         id_token: id_token
+        expiry: expiry
         not_before_policy: 6
         session_state: session_state
         token_type: token_type
@@ -2190,6 +2176,8 @@ components:
           type: string
         expires_in:
           type: integer
+        expiry:
+          type: string
         id_token:
           type: string
         not_before_policy:
@@ -2207,6 +2195,7 @@ components:
       required:
       - access_token
       - expires_in
+      - expiry
       - id_token
       - not_before_policy
       - refresh_expires_in

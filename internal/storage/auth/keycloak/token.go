@@ -2,6 +2,7 @@ package keycloak
 
 import (
 	"context"
+	"time"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -48,6 +49,7 @@ func (r *KeycloakRepository) GetAccessTokenFromClientCode(ctx context.Context, c
 		AccessToken:      token.AccessToken,
 		RefreshToken:     token.RefreshToken,
 		ExpiresIn:        token.ExpiresIn,
+		Expiry:           time.Now().Add(time.Duration(token.ExpiresIn) * time.Second).Add(-1 * time.Second),
 		RefreshExpiresIn: token.RefreshExpiresIn,
 		TokenType:        token.TokenType,
 		NotBeforePolicy:  token.NotBeforePolicy,
@@ -76,6 +78,7 @@ func (r *KeycloakRepository) RefreshToken(ctx context.Context, refreshToken stri
 		NotBeforePolicy:  token.NotBeforePolicy,
 		SessionState:     token.SessionState,
 		Scope:            token.Scope,
+		Expiry:           time.Now().Add(time.Duration(token.ExpiresIn) * time.Second).Add(-1 * time.Second),
 	}, nil
 }
 
@@ -103,6 +106,7 @@ func (r *KeycloakRepository) GetAccessTokenFromClientCredentials(ctx context.Con
 		TokenType:        token.TokenType,
 		NotBeforePolicy:  token.NotBeforePolicy,
 		SessionState:     token.SessionState,
+		Expiry:           time.Now().Add(time.Duration(token.ExpiresIn) * time.Second).Add(-1 * time.Second),
 		Scope:            token.Scope,
 	}, nil
 }

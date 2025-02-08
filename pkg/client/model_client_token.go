@@ -24,6 +24,7 @@ var _ MappedNullable = &ClientToken{}
 type ClientToken struct {
 	AccessToken      string `json:"access_token"`
 	ExpiresIn        int32  `json:"expires_in"`
+	Expiry           string `json:"expiry"`
 	IdToken          string `json:"id_token"`
 	NotBeforePolicy  int32  `json:"not_before_policy"`
 	RefreshExpiresIn int32  `json:"refresh_expires_in"`
@@ -39,10 +40,11 @@ type _ClientToken ClientToken
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewClientToken(accessToken string, expiresIn int32, idToken string, notBeforePolicy int32, refreshExpiresIn int32, refreshToken string, scope string, sessionState string, tokenType string) *ClientToken {
+func NewClientToken(accessToken string, expiresIn int32, expiry string, idToken string, notBeforePolicy int32, refreshExpiresIn int32, refreshToken string, scope string, sessionState string, tokenType string) *ClientToken {
 	this := ClientToken{}
 	this.AccessToken = accessToken
 	this.ExpiresIn = expiresIn
+	this.Expiry = expiry
 	this.IdToken = idToken
 	this.NotBeforePolicy = notBeforePolicy
 	this.RefreshExpiresIn = refreshExpiresIn
@@ -107,6 +109,30 @@ func (o *ClientToken) GetExpiresInOk() (*int32, bool) {
 // SetExpiresIn sets field value
 func (o *ClientToken) SetExpiresIn(v int32) {
 	o.ExpiresIn = v
+}
+
+// GetExpiry returns the Expiry field value
+func (o *ClientToken) GetExpiry() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Expiry
+}
+
+// GetExpiryOk returns a tuple with the Expiry field value
+// and a boolean to check if the value has been set.
+func (o *ClientToken) GetExpiryOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Expiry, true
+}
+
+// SetExpiry sets field value
+func (o *ClientToken) SetExpiry(v string) {
+	o.Expiry = v
 }
 
 // GetIdToken returns the IdToken field value
@@ -289,6 +315,7 @@ func (o ClientToken) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["access_token"] = o.AccessToken
 	toSerialize["expires_in"] = o.ExpiresIn
+	toSerialize["expiry"] = o.Expiry
 	toSerialize["id_token"] = o.IdToken
 	toSerialize["not_before_policy"] = o.NotBeforePolicy
 	toSerialize["refresh_expires_in"] = o.RefreshExpiresIn
@@ -306,6 +333,7 @@ func (o *ClientToken) UnmarshalJSON(data []byte) (err error) {
 	requiredProperties := []string{
 		"access_token",
 		"expires_in",
+		"expiry",
 		"id_token",
 		"not_before_policy",
 		"refresh_expires_in",

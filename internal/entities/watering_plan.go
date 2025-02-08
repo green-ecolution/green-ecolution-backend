@@ -36,7 +36,7 @@ type WateringPlan struct {
 	RefillCount        int32
 	Duration           time.Duration
 	Provider           string
-	AdditionalInfo     map[string]any
+	AdditionalInfo     map[string]interface{}
 }
 
 type WateringPlanCreate struct {
@@ -47,7 +47,7 @@ type WateringPlanCreate struct {
 	TrailerID      *int32
 	UserIDs        []*uuid.UUID `validate:"required,min=1,dive,required"`
 	Provider       string
-	AdditionalInfo map[string]any
+	AdditionalInfo map[string]interface{}
 }
 
 type WateringPlanUpdate struct {
@@ -61,7 +61,7 @@ type WateringPlanUpdate struct {
 	Evaluation       []*EvaluationValue
 	UserIDs          []*uuid.UUID `validate:"required,min=1,dive,required"`
 	Provider         string
-	AdditionalInfo   map[string]any
+	AdditionalInfo   map[string]interface{}
 }
 
 type EvaluationValue struct {
