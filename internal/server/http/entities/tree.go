@@ -25,7 +25,7 @@ type TreeResponse struct {
 
 type TreeListResponse struct {
 	Data       []*TreeResponse `json:"data"`
-	Pagination *Pagination      `json:"pagination"`
+	Pagination *Pagination     `json:"pagination"`
 } // @Name TreeList
 
 type TreeCreateRequest struct {

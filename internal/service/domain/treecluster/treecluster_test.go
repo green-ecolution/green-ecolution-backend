@@ -27,7 +27,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
 		expectedClusters := testClusters
-		clusterRepo.EXPECT().GetAll(ctx).Return(expectedClusters, int64(len(expectedClusters)), nil)
+		clusterRepo.EXPECT().GetAll(ctx, "").Return(expectedClusters, int64(len(expectedClusters)), nil)
 
 		// when
 		clusters, totalCount, err := svc.GetAll(ctx, "")
@@ -45,7 +45,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
 		expectedClusters := testClusters
-		clusterRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedClusters, nil)
+		clusterRepo.EXPECT().GetAll(ctx, "test-provider").Return(expectedClusters, int64(len(expectedClusters)), nil)
 
 		// when
 		clusters, totalCount, err := svc.GetAll(ctx, "test-provider")
@@ -62,7 +62,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 		regionRepo := storageMock.NewMockRegionRepository(t)
 		svc := NewTreeClusterService(clusterRepo, treeRepo, regionRepo, globalEventManager)
 
-		clusterRepo.EXPECT().GetAll(ctx).Return([]*entities.TreeCluster{}, int64(0), nil)
+		clusterRepo.EXPECT().GetAll(ctx, "").Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
 		clusters, totalCount, err := svc.GetAll(ctx, "")
@@ -81,7 +81,7 @@ func TestTreeClusterService_GetAll(t *testing.T) {
 
 		expectedErr := errors.New("GetAll failed")
 
-		clusterRepo.EXPECT().GetAll(ctx).Return(nil, int64(0), expectedErr)
+		clusterRepo.EXPECT().GetAll(ctx, "").Return(nil, int64(0), expectedErr)
 
 		// when
 		clusters, totalCount, err := svc.GetAll(ctx, "")
