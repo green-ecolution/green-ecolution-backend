@@ -2,7 +2,6 @@ package tree
 
 import (
 	"context"
-	"log/slog"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
@@ -25,7 +24,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 		return nil
 	}
 	newTree, err := s.treeRepo.Update(ctx, t.ID, func(s *entities.Tree) (bool, error) {
-		slog.Debug("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)
+		log.Debug("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)
 		s.WateringStatus = status
 		return true, nil
 	})
@@ -34,8 +33,6 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 		log.Error("failed to update tree with new watering status", "tree_id", t.ID, "watering_status", status, "err", err)
 		return err
 	}
-
-	slog.Info("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)
 
 	s.publishUpdateTreeEvent(ctx, t, newTree)
 	return nil
