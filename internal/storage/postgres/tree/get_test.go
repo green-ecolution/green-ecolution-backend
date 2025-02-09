@@ -9,22 +9,25 @@ import (
 )
 
 func TestTreeRepository_GetAll(t *testing.T) {
-	t.Run("should return all trees successfully", func(t *testing.T) {
+	t.Run("should return all trees successfully without limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		trees, err := r.GetAll(context.Background())
+		trees, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, trees)
 		assert.NotEmpty(t, trees)
-		assert.Len(t, trees, len(testTrees))
-		for i, expected := range trees {
-			assertExpectedEqualToTree(t, expected, trees[i])
+		assert.Equal(t, totalCount, int64(len(testTrees)))
+		for i, tree := range trees {
+			assertExpectedEqualToTree(t, testTrees[i], tree)
 		}
 	})
 
@@ -35,14 +38,17 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 		expectedTree := testTrees[len(testTrees)-1]
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+		got, totalCount, err := r.GetAll(ctx, "test-provider")
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
-		assert.Len(t, got, 1)
+		assert.Equal(t, totalCount, int64(1))
 		assert.Equal(t, expectedTree.ID, got[0].ID, "ID does not match")
 		assert.Equal(t, expectedTree.PlantingYear, got[0].PlantingYear, "PlantingYear does not match")
 		assert.Equal(t, expectedTree.Species, got[0].Species, "Species does not match")
@@ -56,17 +62,82 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		assert.Equal(t, expectedTree.AdditionalInfo, got[0].AdditionalInfo, "AdditionalInfo does not match")
 	})
 
+	t.Run("should return all trees successfully limited by 2 and with an offset of 2", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		exptectedTrees := testTrees[2:4]
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		trees, totalCount, err := r.GetAll(ctx, "")
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, trees)
+		assert.NotEmpty(t, trees)
+		assert.Equal(t, totalCount, int64(len(testTrees)))
+		assert.Len(t, trees, 2)
+		for i, got := range trees {
+			assert.Equal(t, exptectedTrees[i].ID, got.ID, "ID does not match")
+		}
+	})
+
+	t.Run("should return error on invalid page value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(0))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
+	t.Run("should return error on invalid limit value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(0))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
 	t.Run("should return empty list when no trees exist", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewTreeRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error if context is canceled", func(t *testing.T) {
@@ -76,11 +147,12 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		trees, err := r.GetAll(ctx)
+		trees, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, trees)
+		assert.Equal(t, totalCount, int64(0))
 	})
 }
 
@@ -743,6 +815,8 @@ func assertExpectedEqualToTree(t *testing.T, expectedTree, tree *entities.Tree) 
 	assert.Equal(t, expectedTree.Readonly, tree.Readonly, "Readonly does not match")
 	assert.Equal(t, expectedTree.WateringStatus, tree.WateringStatus, "WateringStatus does not match")
 	assert.Equal(t, expectedTree.Description, tree.Description, "Description does not match")
+	assert.Equal(t, expectedTree.Provider, tree.Provider, "Provider does not match")
+	assert.Equal(t, expectedTree.AdditionalInfo, tree.AdditionalInfo, "AdditionalInfo does not match")
 }
 
 var testTrees = []*entities.Tree{
@@ -772,7 +846,7 @@ var testTrees = []*entities.Tree{
 		ID:             3,
 		PlantingYear:   2023,
 		Species:        "Betula pendula",
-		Number:         "1010",
+		Number:         "1007",
 		Latitude:       54.78780993841013,
 		Longitude:      9.444052105200551,
 		Readonly:       false,
@@ -784,19 +858,19 @@ var testTrees = []*entities.Tree{
 		PlantingYear:   2020,
 		Species:        "Quercus robur",
 		Number:         "1008",
-		Latitude:       54.787330993834613,
-		Longitude:      9.4440523405200551,
+		Latitude:       54.1000,
+		Longitude:      9.2000,
 		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 4",
 	},
 	{
 		ID:             5,
-		PlantingYear:   2020,
-		Species:        "Quercus robur",
-		Number:         "1008",
-		Latitude:       54.78780993841013,
-		Longitude:      9.444052105200551,
+		PlantingYear:   2022,
+		Species:        "Betula pendula",
+		Number:         "1009",
+		Latitude:       54.22,
+		Longitude:      9.11,
 		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 5",
