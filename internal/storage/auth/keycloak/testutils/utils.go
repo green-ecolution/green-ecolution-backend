@@ -76,7 +76,7 @@ func (s *KeycloakTestSuite) EnsureUserExists(t testing.TB, user *entities.User) 
 	return userID
 }
 
-func ensureUserRolesExists(client *gocloak.GoCloak, accessToken string, realm string, userID string, userRoles []entities.UserRole) {
+func ensureUserRolesExists(client *gocloak.GoCloak, accessToken, realm, userID string, userRoles []entities.UserRole) {
 	var roles []gocloak.Role
 
 	if len(userRoles) > 0 {
