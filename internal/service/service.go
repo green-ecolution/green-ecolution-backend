@@ -82,7 +82,7 @@ const (
 )
 
 type BasicCrudService[T any, CreateType any, UpdateType any] interface {
-	GetAll(ctx context.Context, provider string) ([]*T, error)
+	GetAll(ctx context.Context, provider string) ([]*T, int64, error)
 	GetByID(ctx context.Context, id int32) (*T, error)
 	Create(ctx context.Context, createData *CreateType) (*T, error)
 	Update(ctx context.Context, id int32, updateData *UpdateType) (*T, error)
@@ -123,14 +123,7 @@ type RegionService interface {
 
 type TreeClusterService interface {
 	Service
-	// TODO: use CrudService as soon as every service has pagination
-	// CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
-	GetAll(ctx context.Context, provider string) ([]*domain.TreeCluster, int64, error)
-	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
-	Create(ctx context.Context, createData *domain.TreeClusterCreate) (*domain.TreeCluster, error)
-	Update(ctx context.Context, id int32, updateData *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
-	Delete(ctx context.Context, id int32) error
-
+	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
 	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
 	HandleCreateTree(context.Context, *domain.EventCreateTree) error
 	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error
@@ -157,8 +150,6 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 
 type VehicleService interface {
 	Service
-	// TODO: use CrudService as soon as every service has pagination
-	// CrudService[domain.Vehicle, domain.VehicleCreate, domain.VehicleUpdate]
 	GetAll(ctx context.Context, provider string, vehicleType string) ([]*domain.Vehicle, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
 	Create(ctx context.Context, createData *domain.VehicleCreate) (*domain.Vehicle, error)
@@ -169,8 +160,7 @@ type VehicleService interface {
 
 type WateringPlanService interface {
 	Service
-	// TODO: use CrudService as soon as every service has pagination
-	// CrudService[domain.WateringPlan, domain.WateringPlanCreate, domain.WateringPlanUpdate]
+
 	GetAll(ctx context.Context, provider string) ([]*domain.WateringPlan, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.WateringPlan, error)
 	Create(ctx context.Context, createData *domain.WateringPlanCreate) (*domain.WateringPlan, error)
