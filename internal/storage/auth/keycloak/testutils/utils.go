@@ -84,24 +84,23 @@ func ensureUserRolesExists(client *gocloak.GoCloak, accessToken, realm, userID s
 			roleName := string(userRole)
 			role, err := client.GetRealmRole(context.Background(), accessToken, realm, roleName)
 
-			if err != nil && strings.Contains(err.Error(), "404") {
-				log.Printf("ensureUserRolesExists::role %s does not exist. Creating it...", roleName)
+			if err != nil {
+				if strings.Contains(err.Error(), "404") {
+					log.Printf("ensureUserRolesExists::role %s does not exist. Creating it...", roleName)
 
-				newRole := gocloak.Role{Name: gocloak.StringP(roleName)}
-				_, err = client.CreateRealmRole(context.Background(), accessToken, realm, newRole)
-				if err != nil {
-					log.Fatalf("ensureUserRolesExists::failed to create role %s: %v", roleName, err)
+					newRole := gocloak.Role{Name: gocloak.StringP(roleName)}
+					_, err = client.CreateRealmRole(context.Background(), accessToken, realm, newRole)
+					if err != nil {
+						log.Fatalf("ensureUserRolesExists::failed to create role %s: %v", roleName, err)
+					}
+
+					role = &newRole
+				} else {
+					log.Fatalf("ensureUserRolesExists::failed to check role %s: %v", roleName, err)
 				}
-
-				role, err = client.GetRealmRole(context.Background(), accessToken, realm, roleName)
-				if err != nil {
-					log.Fatalf("ensureUserRolesExists::failed to retrieve newly created role %s: %v", roleName, err)
-				}
-
-				roles = append(roles, *role)
-			} else if err != nil {
-				log.Fatalf("ensureUserRolesExists::failed to check role %s: %v", roleName, err)
 			}
+
+			roles = append(roles, *role)
 		}
 
 		if len(roles) > 0 {
