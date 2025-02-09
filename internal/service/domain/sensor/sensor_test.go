@@ -378,7 +378,7 @@ func TestSensorService_Delete(t *testing.T) {
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, globalEventManager)
-		
+
 		expectedErr := errors.New("failed to delete")
 
 		sensorRepo.EXPECT().GetByID(ctx, id).Return(TestSensor, nil)
