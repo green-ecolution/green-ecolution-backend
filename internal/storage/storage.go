@@ -127,7 +127,7 @@ type WateringPlanRepository interface {
 
 type TreeClusterRepository interface {
 	// GetAll returns all tree clusters
-	GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.TreeCluster, int64, error)
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids
@@ -140,7 +140,6 @@ type TreeClusterRepository interface {
 	// Delete deletes a tree cluster by id
 	Delete(ctx context.Context, id int32) error
 
-	GetAllByProvider(ctx context.Context, provider string) ([]*entities.TreeCluster, error)
 	Archive(ctx context.Context, id int32) error
 	LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error
 	GetCenterPoint(ctx context.Context, id int32) (float64, float64, error)

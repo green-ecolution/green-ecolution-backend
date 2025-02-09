@@ -12,14 +12,14 @@ import (
 	"github.com/twpayne/go-geos"
 )
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeCluster, int64, error) {
+func (r *TreeClusterRepository) GetAll(ctx context.Context, provider string) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	totalCount, err := r.store.GetAllTreeClustersCount(ctx)
+	totalCount, err := r.store.GetAllTreeClustersCount(ctx, provider)
 	if err != nil {
 		log.Debug("failed to get total tree cluster count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
@@ -35,8 +35,9 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 	}
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
-		Limit:  limit,
-		Offset: (page - 1) * limit,
+		Column1: provider,
+		Limit:   limit,
+		Offset:  (page - 1) * limit,
 	})
 
 	if err != nil {
@@ -57,29 +58,6 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context) ([]*entities.TreeClu
 	}
 
 	return data, totalCount, nil
-}
-
-func (r *TreeClusterRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.TreeCluster, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllTreeClustersByProvider(ctx, &provider)
-	if err != nil {
-		log.Debug("failed to get tree clusters in db")
-		return nil, r.store.MapError(err, sqlc.TreeCluster{})
-	}
-
-	data, err := r.mapper.FromSqlList(rows)
-	if err != nil {
-		log.Debug("failed to convert entity", "error", err)
-		return nil, err
-	}
-
-	for _, tc := range data {
-		if err := r.store.MapClusterFields(ctx, tc); err != nil {
-			return nil, r.store.MapError(err, sqlc.TreeCluster{})
-		}
-	}
-
-	return data, nil
 }
 
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {

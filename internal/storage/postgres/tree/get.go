@@ -33,13 +33,13 @@ func (r *TreeRepository) GetAll(ctx context.Context, provider string) ([]*entiti
 		limit = int32(totalCount)
 		page = 1
 	}
-	
+
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
 		Column1: provider,
 		Limit:   limit,
 		Offset:  (page - 1) * limit,
 	})
-	
+
 	if err != nil {
 		log.Debug("failed to get trees in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})

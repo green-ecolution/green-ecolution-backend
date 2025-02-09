@@ -18,7 +18,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -62,13 +62,16 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		expectedCluster := allTestCluster[len(allTestCluster)-1]
 
-		got, err := r.GetAllByProvider(context.Background(), "test-provider")
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		got, totalCount, err := r.GetAll(ctx, "test-provider")
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
-		assert.Len(t, got, 1)
+		assert.Equal(t, totalCount, int64(1))
 		assert.Equal(t, expectedCluster.ID, got[0].ID)
 		assert.Equal(t, expectedCluster.Name, got[0].Name)
 		assert.Equal(t, expectedCluster.Provider, got[0].Provider)
@@ -85,7 +88,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -112,7 +115,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -130,7 +133,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -147,7 +150,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
@@ -162,7 +165,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		_, _, err := r.GetAll(ctx)
+		_, _, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
