@@ -174,6 +174,7 @@ type WateringPlanService interface {
 type PluginService interface {
 	Service
 	Register(ctx context.Context, plugin *domain.Plugin) (*domain.ClientToken, error)
+	RefreshToken(ctx context.Context, auth *domain.AuthPlugin, slug string) (*domain.ClientToken, error)
 	Get(ctx context.Context, slug string) (domain.Plugin, error)
 	GetAll(ctx context.Context) ([]domain.Plugin, []time.Time)
 	HeartBeat(ctx context.Context, slug string) error

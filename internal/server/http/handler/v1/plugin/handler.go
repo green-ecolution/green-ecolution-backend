@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
@@ -37,21 +38,21 @@ func getPluginFiles(svc service.PluginService) fiber.Handler {
 	}
 }
 
-//	@Summary		Register a plugin
-//	@Description	Register a plugin
-//	@Id				register-plugin
-//	@Tags			Plugin
-//	@Produce		json
-//	@Success		200	{object}	entities.ClientTokenResponse
-//	@Failure		400	{object}	HTTPError
-//	@Failure		401	{object}	HTTPError
-//	@Failure		403	{object}	HTTPError
-//	@Failure		404	{object}	HTTPError
-//	@Failure		500	{object}	HTTPError
-//	@Router			/v1/plugin [post]
+// @Summary		Register a plugin
+// @Description	Register a plugin
+// @Id				register-plugin
+// @Tags			Plugin
+// @Produce		json
+// @Success		200	{object}	entities.ClientTokenResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/plugin [post]
 //
 // @Param			body	body	entities.PluginRegisterRequest	true	"Plugin registration request"
-func registerPlugin(svc service.PluginService) fiber.Handler {
+func RegisterPlugin(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req entities.PluginRegisterRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -112,7 +113,7 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 // @Router			/v1/plugin/{plugin_slug}/unregister [post]
 // @Param			plugin_slug	path	string	true	"Slug of the plugin"
 // @Security		Keycloak
-func unregisterPlugin(svc service.PluginService) fiber.Handler {
+func UnregisterPlugin(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		slug := strings.Clone(c.Params("plugin"))
@@ -136,7 +137,7 @@ func unregisterPlugin(svc service.PluginService) fiber.Handler {
 // @Router			/v1/plugin/{plugin_slug}/heartbeat [post]
 // @Param			plugin_slug	path	string	true	"Name of the plugin specified by slug during registration"
 // @Security		Keycloak
-func pluginHeartbeat(svc service.PluginService) fiber.Handler {
+func PluginHeartbeat(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		slug := strings.Clone(c.Params("plugin"))
@@ -213,5 +214,51 @@ func GetPluginInfo(svc service.PluginService) fiber.Handler {
 			Description: plugin.Description,
 			HostPath:    plugin.Path.String(),
 		})
+	}
+}
+
+// @Summary		Refresh plugin token
+// @Description	Refresh plugin token
+// @Id				refresh-plugin-token
+// @Tags			Plugin
+// @Accept			json
+// @Produce		json
+// @Param			body	body		entities.PluginAuth	true	"Plugin authentication"
+// @Success		200		{object}	entities.ClientTokenResponse
+// @Failure		400		{object}	HTTPError
+// @Failure		500		{object}	HTTPError
+// @Router			/v1/plugin/{plugin_slug}/token/refresh [post]
+// @Param			plugin_slug	path	string	true	"Slug of the plugin"
+func RefreshToken(svc service.PluginService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req entities.PluginAuth
+		if err := c.BodyParser(&req); err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		if req.ClientID == "" || req.ClientSecret == "" {
+			return c.Status(fiber.StatusBadRequest).SendString("client_id or client_secret is empty")
+		}
+
+		auth := domain.AuthPlugin{
+			ClientID:     req.ClientID,
+			ClientSecret: req.ClientSecret,
+		}
+		pluginSlug := strings.Clone(c.Params("plugin"))
+
+		token, err := svc.RefreshToken(c.Context(), &auth, pluginSlug)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		response := entities.ClientTokenResponse{
+			AccessToken:  token.AccessToken,
+			ExpiresIn:    token.ExpiresIn,
+			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
+			TokenType:    token.TokenType,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
 	}
 }

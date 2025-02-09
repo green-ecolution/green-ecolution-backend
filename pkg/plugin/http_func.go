@@ -11,7 +11,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 )
 
-// Register registers the plugin with the plugin host and returns an authentication token.
+// Register registers the plugin with the plugin host and returns an authentication token. Upon successful registration of the plugin, the Authorisation header is set on every protected route to the backend, which already contains this token.
 //
 // This function performs the following steps:
 //  1. Constructs a registration request payload containing plugin metadata (such as slug, name, version, and description)
@@ -61,7 +61,7 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 		return nil, err
 	}
 
-	registerPath := fmt.Sprintf("%s://%s/api/%s/plugin/register", w.cfg.host.Scheme, w.cfg.host.Host, w.cfg.hostAPIVersion)
+	registerPath := fmt.Sprintf("%s/api/%s/plugin/register", w.cfg.host, w.cfg.hostAPIVersion)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, registerPath, bytes.NewReader(buf))
 	if err != nil {
 		return nil, err
@@ -88,13 +88,14 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 		RefreshToken: tokenResp.RefreshToken,
 		ExpiresIn:    int64(tokenResp.ExpiresIn),
 		Expiry:       tokenResp.Expiry,
+		TokenType:    tokenResp.TokenType,
 	}
 
 	w.cfg.token = token
 	return token, nil
 }
 
-// Unregister removes the plugin registration from the plugin host. It needs a authenticated client.
+// Unregister removes the plugin registration from the plugin host. The authorisation header will be set to internal hold access token.
 //
 // This function performs the following steps:
 //  1. Constructs the API endpoint URL for unregistering the plugin based on the plugin's configuration.
@@ -128,6 +129,7 @@ func (w *PluginWorker) Unregister(ctx context.Context) error {
 		return err
 	}
 
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", w.cfg.token.TokenType, w.cfg.token.AccessToken))
 	resp, err := w.cfg.client.Do(req)
 	if err != nil {
 		return err
@@ -141,12 +143,55 @@ func (w *PluginWorker) Unregister(ctx context.Context) error {
 	return nil
 }
 
-// TODO: implement
+// RefreshToken refreshes the authentication token for the plugin.
 func (w *PluginWorker) RefreshToken(ctx context.Context, clientID, clientSecret string) (*Token, error) {
-	return nil, nil
+	reqBody := entities.PluginAuth{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+	}
+
+	buf, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshPath := fmt.Sprintf("%s/api/%s/plugin/%s/token/refresh", w.cfg.host, w.cfg.hostAPIVersion, w.cfg.plugin.Slug)
+	fmt.Println(refreshPath)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, refreshPath, bytes.NewReader(buf))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := w.cfg.client.Do(req)
+	fmt.Println(resp, err)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, errors.New("failed to refresh plugin token")
+	}
+
+	var tokenResp entities.ClientTokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+		return nil, err
+	}
+
+	token := &Token{
+		AccessToken:  tokenResp.AccessToken,
+		RefreshToken: tokenResp.RefreshToken,
+		ExpiresIn:    int64(tokenResp.ExpiresIn),
+		Expiry:       tokenResp.Expiry,
+		TokenType:    tokenResp.TokenType,
+	}
+
+	w.cfg.token = token
+	return token, nil
 }
 
-// Heartbeat sends a periodic heartbeat signal to the plugin host to indicate that the plugin is active and operational.
+// Heartbeat sends a periodic heartbeat signal to the plugin host to indicate that the plugin is active and operational. The authorisation header will be set to internal hold access token.
 //
 // This function performs the following steps:
 // 1. Constructs the heartbeat API endpoint URL based on the plugin's slug and configuration settings.
@@ -176,12 +221,13 @@ func (w *PluginWorker) RefreshToken(ctx context.Context, clientID, clientSecret 
 // - The plugin's slug, host, and API version must be correctly configured in the `PluginWorker` instance.
 // - This function assumes that the plugin host's heartbeat API endpoint requires an HTTP POST request.
 func (w *PluginWorker) Heartbeat(ctx context.Context) error {
-	heartbeatPath := fmt.Sprintf("%s://%s/api/%s/plugin/%s/heartbeat", w.cfg.host.Scheme, w.cfg.host.Host, w.cfg.hostAPIVersion, w.cfg.plugin.Slug)
+	heartbeatPath := fmt.Sprintf("%s/api/%s/plugin/%s/heartbeat", w.cfg.host, w.cfg.hostAPIVersion, w.cfg.plugin.Slug)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, heartbeatPath, http.NoBody)
 	if err != nil {
 		return err
 	}
 
+	req.Header.Set("Authorization", fmt.Sprintf("%s %s", w.cfg.token.TokenType, w.cfg.token.AccessToken))
 	resp, err := w.cfg.client.Do(req)
 	if err != nil {
 		return err

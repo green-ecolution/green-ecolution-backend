@@ -10,19 +10,20 @@ func RegisterRoutes(r fiber.Router, svc service.PluginService, middlewares ...fi
 	handlers = append(handlers, GetPluginsList(svc))
 	r.Get("/", handlers...)
 
-	r.Post("/register", registerPlugin(svc))
+	r.Post("/register", RegisterPlugin(svc))
 
 	handlers = append([]fiber.Handler{}, middlewares...)
 	handlers = append(handlers, GetPluginInfo(svc))
 	r.Get("/:plugin", handlers...)
 
 	handlers = append([]fiber.Handler{}, middlewares...)
-	handlers = append(handlers, pluginHeartbeat(svc))
+	handlers = append(handlers, PluginHeartbeat(svc))
 	r.Post("/:plugin/heartbeat", handlers...)
 
 	handlers = append([]fiber.Handler{}, middlewares...)
-	handlers = append(handlers, unregisterPlugin(svc))
+	handlers = append(handlers, UnregisterPlugin(svc))
 	r.Post("/:plugin/unregister", handlers...)
 
+	r.Post("/:plugin/token/refresh", RefreshToken(svc))
 	r.Use("/:plugin", getPluginFiles(svc))
 }

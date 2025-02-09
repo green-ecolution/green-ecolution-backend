@@ -122,11 +122,6 @@ func WithToken(token *Token) PluginWorkerOption {
 	}
 }
 
-// SetClient change the http client inside the worker
-func (w *PluginWorker) SetClient(client *http.Client) {
-	w.cfg.client = client
-}
-
 // IsValid checks whether the PluginWorkerConfig is valid.
 //
 // Returns true if all required fields are properly set (e.g., host, plugin, interval, client), false otherwise.

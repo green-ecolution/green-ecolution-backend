@@ -338,20 +338,20 @@ func (a *VehicleAPIService) DeleteVehicleExecute(r ApiDeleteVehicleRequest) (*ht
 type ApiGetAllVehiclesRequest struct {
 	ctx        context.Context
 	ApiService *VehicleAPIService
-	page       *string
-	limit      *string
+	page       *int32
+	limit      *int32
 	type_      *string
 	provider   *string
 }
 
 // Page
-func (r ApiGetAllVehiclesRequest) Page(page string) ApiGetAllVehiclesRequest {
+func (r ApiGetAllVehiclesRequest) Page(page int32) ApiGetAllVehiclesRequest {
 	r.page = &page
 	return r
 }
 
 // Limit
-func (r ApiGetAllVehiclesRequest) Limit(limit string) ApiGetAllVehiclesRequest {
+func (r ApiGetAllVehiclesRequest) Limit(limit int32) ApiGetAllVehiclesRequest {
 	r.limit = &limit
 	return r
 }

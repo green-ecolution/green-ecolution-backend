@@ -62,6 +62,20 @@ func Test_client_PluginAPIService(t *testing.T) {
 
 	})
 
+	t.Run("Test PluginAPIService RefreshPluginToken", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var pluginSlug string
+
+		resp, httpRes, err := apiClient.PluginAPI.RefreshPluginToken(context.Background(), pluginSlug).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test PluginAPIService RegisterPlugin", func(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test
@@ -70,6 +84,19 @@ func Test_client_PluginAPIService(t *testing.T) {
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
+	t.Run("Test PluginAPIService UnregisterPlugin", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var pluginSlug string
+
+		httpRes, err := apiClient.PluginAPI.UnregisterPlugin(context.Background(), pluginSlug).Execute()
+
+		require.Nil(t, err)
 		assert.Equal(t, 200, httpRes.StatusCode)
 
 	})

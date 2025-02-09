@@ -589,6 +589,85 @@ paths:
       summary: Heartbeat for a plugin
       tags:
       - Plugin
+  /v1/plugin/{plugin_slug}/token/refresh:
+    post:
+      description: Refresh plugin token
+      operationId: refresh-plugin-token
+      parameters:
+      - description: Slug of the plugin
+        in: path
+        name: plugin_slug
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PluginAuth'
+        description: Plugin authentication
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientToken'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      summary: Refresh plugin token
+      tags:
+      - Plugin
+      x-codegen-request-body-name: body
+  /v1/plugin/{plugin_slug}/unregister:
+    post:
+      description: Unregister a plugin
+      operationId: unregister-plugin
+      parameters:
+      - description: Slug of the plugin
+        in: path
+        name: plugin_slug
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Unregister a plugin
+      tags:
+      - Plugin
   /v1/region:
     get:
       description: Get all regions
@@ -672,21 +751,16 @@ paths:
       description: Get all sensors
       operationId: get-all-sensors
       parameters:
-      - description: Sensor Status
-        in: query
-        name: status
-        schema:
-          type: string
       - description: Page
         in: query
         name: page
         schema:
-          type: string
+          type: integer
       - description: Limit
         in: query
         name: limit
         schema:
-          type: string
+          type: integer
       - description: Provider
         in: query
         name: provider
@@ -1438,12 +1512,12 @@ paths:
         in: query
         name: page
         schema:
-          type: string
+          type: integer
       - description: Limit
         in: query
         name: limit
         schema:
-          type: string
+          type: integer
       - description: Vehicle Type
         in: query
         name: type
@@ -1773,12 +1847,12 @@ paths:
         in: query
         name: page
         schema:
-          type: string
+          type: integer
       - description: Limit
         in: query
         name: limit
         schema:
-          type: string
+          type: integer
       - description: Provider
         in: query
         name: provider
