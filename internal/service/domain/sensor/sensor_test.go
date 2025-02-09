@@ -512,8 +512,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		ctx := context.Background()
 		repo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
-		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
 		staleSensor := &entities.Sensor{
 			ID:        "sensor-1",
@@ -544,8 +543,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		ctx := context.Background()
 		repo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
-		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
 		freshSensor := &entities.Sensor{
 			ID:        "sensor-1",
@@ -571,8 +569,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		ctx := context.Background()
 		repo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
-		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
 		// when
 		expectedErr := errors.New("database error")
@@ -593,8 +590,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		ctx := context.Background()
 		repo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
-		flowerbedRepo := storageMock.NewMockFlowerbedRepository(t)
-		svc := sensor.NewSensorService(repo, treeRepo, flowerbedRepo, globalEventManager)
+		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
 		staleSensor := &entities.Sensor{
 			ID:        "sensor-1",

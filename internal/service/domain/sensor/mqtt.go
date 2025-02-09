@@ -82,20 +82,16 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 
 func (s *SensorService) updateSensorCoordsAndStatus(ctx context.Context, payload *domain.MqttPayload, sensor *domain.Sensor) (*domain.Sensor, error) {
 	log := logger.GetLogger(ctx)
-	if sensor.Latitude != payload.Latitude || sensor.Longitude != payload.Longitude || sensor.Status != domain.SensorStatusOnline {
-		updatedSensor, err := s.sensorRepo.Update(ctx, sensor.ID, func(s *domain.Sensor) (bool, error) {
-			s.Latitude = payload.Latitude
-			s.Longitude = payload.Longitude
-			s.Status = domain.SensorStatusOnline
-			return true, nil
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		return updatedSensor, err
+	updatedSensor, err := s.sensorRepo.Update(ctx, sensor.ID, func(s *domain.Sensor) (bool, error) {
+		s.Latitude = payload.Latitude
+		s.Longitude = payload.Longitude
+		s.Status = domain.SensorStatusOnline
+		return true, nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	log.Debug("sensor don't need to update coordinates and status")
-	return sensor, nil
+	log.Debug("Coordinates and status of sensor have been updated successfully", "sensor_id", updatedSensor.ID)
+	return updatedSensor, err
 }
