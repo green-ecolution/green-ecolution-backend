@@ -100,8 +100,10 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.NotNil(t, got.Trees)
 		assert.Len(t, got.Trees, len(trees))
 		for _, tree := range testTrees[0:2] {
-			assert.Equal(t, got.ID, *tree.TreeClusterID)
+			assert.Equal(t, *tree.TreeClusterID, got.ID)
 		}
+		// Vergleiche falschen tree
+		// Liegt vielleicht an Sortierung?
 	})
 
 	t.Run("should return tree cluster with trees and link tree cluster id to trees", func(t *testing.T) {
