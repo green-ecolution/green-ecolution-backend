@@ -27,6 +27,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	}
 
 	testCluster, err := suite.Store.GetAllTreeClusters(context.Background(), &sqlc.GetAllTreeClustersParams{
+		Column1: "",
 		Offset: 0,
 		Limit:  5,
 	})
