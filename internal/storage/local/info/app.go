@@ -27,6 +27,7 @@ type InfoRepository struct {
 	localInterface string
 	buildTime      time.Time
 	gitRepository  *url.URL
+	mapInfo        entities.Map
 }
 
 func init() {
@@ -56,12 +57,18 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 		return nil, err
 	}
 
+	mapInfo, err := getMapInfo(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &InfoRepository{
 		cfg:            cfg,
 		localIP:        localIP,
 		localInterface: localInterface,
 		buildTime:      buildTime,
 		gitRepository:  gitRepository,
+		mapInfo:        mapInfo,
 	}, nil
 }
 
@@ -97,6 +104,28 @@ func (r *InfoRepository) GetAppInfo(ctx context.Context) (*entities.App, error) 
 			Port:      r.getPort(),
 			Interface: r.localInterface,
 			Uptime:    r.getUptime(),
+		},
+		Map: r.mapInfo,
+	}, nil
+}
+
+func getMapInfo(cfg *config.Config) (entities.Map, error) {
+	if len(cfg.Map.Center) != 2 || len(cfg.Map.BoundSouthWest) != 2 || len(cfg.Map.BoundNorthEast) != 2 {
+		return entities.Map{}, storage.ErrInvalidMapConfig
+	}
+
+	return entities.Map{
+		Center: entities.GeoJSONLocation{
+			Latitude:  cfg.Map.Center[0],
+			Longitude: cfg.Map.Center[1],
+		},
+		BoundSouthWest: entities.GeoJSONLocation{
+			Latitude:  cfg.Map.BoundSouthWest[0],
+			Longitude: cfg.Map.BoundSouthWest[1],
+		},
+		BoundNorthEast: entities.GeoJSONLocation{
+			Latitude:  cfg.Map.BoundNorthEast[0],
+			Longitude: cfg.Map.BoundNorthEast[1],
 		},
 	}, nil
 }
