@@ -24,5 +24,6 @@ func RegisterRoutes(r fiber.Router, svc service.PluginService, middlewares ...fi
 	handlers = append(handlers, unregisterPlugin(svc))
 	r.Post("/:plugin/unregister", handlers...)
 
+	r.Post("/:plugin/token/refresh", RefreshToken(svc))
 	r.Use("/:plugin", getPluginFiles(svc))
 }

@@ -98,6 +98,19 @@ func (p *PluginManager) Register(ctx context.Context, plugin *entities.Plugin) (
 	return token, nil
 }
 
+func (p *PluginManager) RefreshToken(ctx context.Context, auth *entities.AuthPlugin, slug string) (*entities.ClientToken, error) {
+	log := logger.GetLogger(ctx)
+	log.Debug("refresh token for plugin", "plugin_slug", slug, "client_id", auth.ClientID, "client_secret", "**********")
+
+	token, err := p.authRepository.GetAccessTokenFromClientCredentials(ctx, auth.ClientID, auth.ClientSecret)
+	if err != nil {
+		log.Debug("failed to refresh plugin token with credantials", "error", err, "plugin_client_id", auth.ClientID, "plugin_client_secret", "*******")
+		return nil, service.MapError(ctx, errors.Join(err, errors.New("failed to refresh plugin token with credantials")), service.ErrorLogAll)
+	}
+
+	return token, err
+}
+
 func (p *PluginManager) Get(ctx context.Context, slug string) (entities.Plugin, error) {
 	log := logger.GetLogger(ctx)
 	p.mutex.RLock()
