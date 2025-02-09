@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS flowerbeds (
   longitude FLOAT NOT NULL,
   geometry GEOMETRY(Polygon, 4326),
   provider TEXT,
-  additional_informations JSONB,
+  additional_informations JSONB
 );
 
 CREATE TRIGGER update_flowerbeds_updated_at
