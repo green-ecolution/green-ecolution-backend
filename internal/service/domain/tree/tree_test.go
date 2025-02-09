@@ -30,14 +30,15 @@ func TestTreeService_GetAll(t *testing.T) {
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
 
 		expectedTrees := TestTreesList
-		treeRepo.EXPECT().GetAll(ctx).Return(expectedTrees, nil)
+		treeRepo.EXPECT().GetAll(ctx, "").Return(expectedTrees, int64(len(expectedTrees)), nil)
 
 		// when
-		trees, err := svc.GetAll(ctx, "")
+		trees, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedTrees, trees)
+		assert.Equal(t, totalCount, int64(len(expectedTrees)))
 	})
 
 	t.Run("should return all trees when successful with provider", func(t *testing.T) {
@@ -49,14 +50,15 @@ func TestTreeService_GetAll(t *testing.T) {
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
 
 		expectedTrees := TestTreesList
-		treeRepo.EXPECT().GetAllByProvider(ctx, "test-provider").Return(expectedTrees, nil)
+		treeRepo.EXPECT().GetAll(ctx, "test-provider").Return(expectedTrees, int64(len(expectedTrees)), nil)
 
 		// when
-		trees, err := svc.GetAll(ctx, "test-provider")
+		trees, totalCount, err := svc.GetAll(ctx, "test-provider")
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedTrees, trees)
+		assert.Equal(t, totalCount, int64(len(expectedTrees)))
 	})
 
 	t.Run("should return empty slice when no trees are found", func(t *testing.T) {
@@ -67,14 +69,15 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
 
-		treeRepo.EXPECT().GetAll(ctx).Return([]*entities.Tree{}, nil)
+		treeRepo.EXPECT().GetAll(ctx, "").Return([]*entities.Tree{}, int64(0), nil)
 
 		// when
-		trees, err := svc.GetAll(ctx, "")
+		trees, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, trees)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when GetAll fails", func(t *testing.T) {
@@ -88,14 +91,15 @@ func TestTreeService_GetAll(t *testing.T) {
 
 		expectedError := errors.New("GetAll failed")
 
-		treeRepo.EXPECT().GetAll(ctx).Return(nil, expectedError)
+		treeRepo.EXPECT().GetAll(ctx, "").Return(nil, int64(0), expectedError)
 
 		// when
-		trees, err := svc.GetAll(ctx, "")
+		trees, totalCount, err := svc.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, trees)
+		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: GetAll failed")
 	})
 }
