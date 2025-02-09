@@ -6,55 +6,58 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) GetAll(ctx context.Context) ([]*entities.Tree, error) {
+func (r *TreeRepository) GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllTrees(ctx)
+	page, limit, err := pagination.GetValues(ctx)
+	if err != nil {
+		return nil, 0, r.store.MapError(err, sqlc.Tree{})
+	}
+
+	totalCount, err := r.store.GetAllTreesCount(ctx, provider)
+	if err != nil {
+		log.Debug("failed to get total watering plan count in db", "error", err)
+		return nil, 0, r.store.MapError(err, sqlc.Tree{})
+	}
+
+	if totalCount == 0 {
+		return []*entities.Tree{}, 0, nil
+	}
+
+	if limit == -1 {
+		limit = int32(totalCount)
+		page = 1
+	}
+
+	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
+		Column1: provider,
+		Limit:   limit,
+		Offset:  (page - 1) * limit,
+	})
+
 	if err != nil {
 		log.Debug("failed to get trees in db", "error", err)
-		return nil, r.store.MapError(err, sqlc.Tree{})
+		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
 
 	t, err := r.mapper.FromSqlList(rows)
 	if err != nil {
 		log.Debug("failed to convert entity", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
 	for _, tree := range t {
 		if err := r.mapFields(ctx, tree); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 	}
 
-	return t, nil
-}
-
-func (r *TreeRepository) GetAllByProvider(ctx context.Context, provider string) ([]*entities.Tree, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllTreesByProvider(ctx, &provider)
-	if err != nil {
-		log.Debug("failed to get trees in db", "error", err)
-		return nil, r.store.MapError(err, sqlc.Tree{})
-	}
-
-	t, err := r.mapper.FromSqlList(rows)
-	if err != nil {
-		log.Debug("failed to convert entity", "error", err)
-		return nil, err
-	}
-
-	for _, tree := range t {
-		if err := r.mapFields(ctx, tree); err != nil {
-			return nil, err
-		}
-	}
-
-	return t, nil
+	return t, totalCount, nil
 }
 
 func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {

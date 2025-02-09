@@ -27,7 +27,7 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return(TestTrees, nil)
+		).Return(TestTrees, int64(len(TestTrees)), nil)
 
 		// when
 		req := httptest.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
@@ -47,7 +47,7 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			"test-provider",
-		).Return(TestTrees, nil)
+		).Return(TestTrees, int64(len(TestTrees)), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
@@ -70,7 +70,7 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return([]*entities.Tree{}, nil)
+		).Return([]*entities.Tree{}, int64(0), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
@@ -91,7 +91,7 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			"",
-		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
+		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "internal server error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)

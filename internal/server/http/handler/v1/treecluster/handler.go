@@ -2,6 +2,7 @@ package treecluster
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -34,8 +35,7 @@ var (
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		provider := c.Query("provider")
-		domainData, totalCount, err := svc.GetAll(ctx, provider)
+		domainData, totalCount, err := svc.GetAll(ctx, strings.Clone(c.Query("provider")))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}

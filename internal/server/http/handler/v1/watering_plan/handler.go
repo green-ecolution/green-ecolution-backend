@@ -39,7 +39,7 @@ var (
 func GetAllWateringPlans(svc service.WateringPlanService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, totalCount, err := svc.GetAll(ctx, c.Query("provider"))
+		domainData, totalCount, err := svc.GetAll(ctx, strings.Clone(c.Query("provider")))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}

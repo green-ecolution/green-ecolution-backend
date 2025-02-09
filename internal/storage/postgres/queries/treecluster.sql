@@ -1,17 +1,12 @@
 -- name: GetAllTreeClusters :many
 SELECT * FROM tree_clusters 
+WHERE ($1 = '') OR (provider = $1)
 ORDER BY name ASC
-LIMIT $1 OFFSET $2;
+LIMIT $2 OFFSET $3;
 
 -- name: GetAllTreeClustersCount :one
-SELECT COUNT(*) FROM tree_clusters;
-
--- name: GetAllTreeClustersProviderCount :one
-SELECT COUNT(*) FROM tree_clusters WHERE provider = $1;
-
--- name: GetAllTreeClustersByProvider :many
-SELECT * FROM tree_clusters WHERE provider = $1 
-ORDER BY name ASC;
+SELECT COUNT(*) FROM tree_clusters
+WHERE ($1 = '') OR (provider = $1);
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
