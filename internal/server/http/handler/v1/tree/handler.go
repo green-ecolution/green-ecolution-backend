@@ -10,6 +10,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 var (
@@ -36,8 +37,7 @@ var (
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		provider := c.Query("provider")
-		domainData, err := svc.GetAll(ctx, provider)
+		domainData, totalCount, err := svc.GetAll(ctx, c.Query("provider"))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -49,7 +49,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 
 		return c.JSON(entities.TreeListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }

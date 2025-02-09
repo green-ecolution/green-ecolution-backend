@@ -148,8 +148,17 @@ type TreeClusterRepository interface {
 }
 
 type TreeRepository interface {
-	BasicCrudRepository[entities.Tree]
-	GetAllByProvider(ctx context.Context, provider string) ([]*entities.Tree, error)
+	// GetAll returns all trees
+	GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error)
+	// GetByID returns one tree by id
+	GetByID(ctx context.Context, id int32) (*entities.Tree, error)
+	// Create creates a new tree. It accepts a list of EntityFunc[T] to apply to the new tree
+	Create(ctx context.Context, fn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+	// Update updates an already existing tree. It accepts a list of EntityFunc[T] to apply to the tree
+	Update(ctx context.Context, id int32, fn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+	// Delete deletes a tree by id
+	Delete(ctx context.Context, id int32) error
+
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)

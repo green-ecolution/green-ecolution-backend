@@ -1,8 +1,12 @@
 -- name: GetAllTrees :many
-SELECT * FROM trees ORDER BY number ASC;
+SELECT * FROM trees
+WHERE ($1 = '') OR (provider = $1)
+ORDER BY number ASC
+LIMIT $2 OFFSET $3;
 
--- name: GetAllTreesByProvider :many
-SELECT * FROM trees WHERE provider = $1 ORDER BY number ASC ;
+-- name: GetAllTreesCount :one
+SELECT COUNT(*) FROM trees
+WHERE ($1 = '') OR (provider = $1);
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
