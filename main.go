@@ -152,7 +152,6 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (repos *sto
 		Tree:         postgresRepo.Tree,
 		TreeCluster:  postgresRepo.TreeCluster,
 		Vehicle:      postgresRepo.Vehicle,
-		Flowerbed:    postgresRepo.Flowerbed,
 		Image:        postgresRepo.Image,
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,

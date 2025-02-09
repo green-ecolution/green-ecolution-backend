@@ -241,7 +241,7 @@ func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int3
 	return tc, nil
 }
 
-// Map sensor, images and tree cluster entity to domain flowerbed
+// Map sensor, images and tree cluster entity to domain tree
 func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error {
 	if err := mapImages(ctx, r, t); err != nil {
 		return err

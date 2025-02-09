@@ -27,7 +27,6 @@ var (
 	ErrIDAlreadyExists      = errors.New("entity id already exists")
 	ErrSensorNotFound       = errors.New("sensor not found")
 	ErrImageNotFound        = errors.New("image not found")
-	ErrFlowerbedNotFound    = errors.New("flowerbed not found")
 	ErrTreeClusterNotFound  = errors.New("treecluster not found")
 	ErrRegionNotFound       = errors.New("region not found")
 	ErrTreeNotFound         = errors.New("tree not found")
@@ -171,7 +170,7 @@ type TreeRepository interface {
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkSensorID(ctx context.Context, sensorID string) error
-	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
+	UnlinkImage(ctx context.Context, treeID, imageID int32) error
 	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 }
@@ -200,22 +199,6 @@ type S3Repository interface {
 	GetObject(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }
 
-type FlowerbedRepository interface {
-	BasicCrudRepository[entities.Flowerbed]
-	// GetAllByProvider(ctx context.Context, provider string) ([]*entities.Sensor, error)
-	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
-	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
-	GetRegionByFlowerbedID(ctx context.Context, id int32) (*entities.Region, error)
-
-	CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-	DeleteAndUnlinkImages(ctx context.Context, id int32) error
-	UnlinkAllImages(ctx context.Context, id int32) error
-	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
-	UnlinkSensorID(ctx context.Context, sensorID string) error
-	Archive(ctx context.Context, id int32) error
-}
-
 type AuthRepository interface {
 	RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error)
 	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error)
@@ -232,7 +215,6 @@ type Repository struct {
 	Image        ImageRepository
 	Vehicle      VehicleRepository
 	TreeCluster  TreeClusterRepository
-	Flowerbed    FlowerbedRepository
 	Region       RegionRepository
 	WateringPlan WateringPlanRepository
 	Routing      RoutingRepository

@@ -12,7 +12,6 @@ Smart irrigation is needed to save water, staff and costs. This project is the s
 
 - trees
 - tree clusters
-- flowerbeds
 - sensors
 
 In the current setup sensors are connected to an ESP32 with an integrated LoRaWAN module.

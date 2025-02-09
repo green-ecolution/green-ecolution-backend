@@ -18,7 +18,6 @@ import (
 type SensorService struct {
 	sensorRepo    storage.SensorRepository
 	treeRepo      storage.TreeRepository
-	flowerbedRepo storage.FlowerbedRepository
 	validator     *validator.Validate
 	StatusUpdater *StatusUpdater
 	eventManager  *worker.EventManager
@@ -27,13 +26,11 @@ type SensorService struct {
 func NewSensorService(
 	sensorRepo storage.SensorRepository,
 	treeRepo storage.TreeRepository,
-	flowerbedRepo storage.FlowerbedRepository,
 	eventManager *worker.EventManager,
 ) service.SensorService {
 	return &SensorService{
 		sensorRepo:    sensorRepo,
 		treeRepo:      treeRepo,
-		flowerbedRepo: flowerbedRepo,
 		validator:     validator.New(),
 		StatusUpdater: &StatusUpdater{sensorRepo: sensorRepo},
 		eventManager:  eventManager,
@@ -135,12 +132,6 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 	err = s.treeRepo.UnlinkSensorID(ctx, id)
 	if err != nil {
 		log.Debug("failed to unlink sensor from tree", "error", err, "sensor_id", id)
-		return service.MapError(ctx, err, service.ErrorLogAll)
-	}
-
-	err = s.flowerbedRepo.UnlinkSensorID(ctx, id)
-	if err != nil {
-		log.Debug("failed to unlink sensor from flowerbed", "error", err, "sensor_id", id)
 		return service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
