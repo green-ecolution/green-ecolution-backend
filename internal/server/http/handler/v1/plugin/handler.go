@@ -52,7 +52,7 @@ func getPluginFiles(svc service.PluginService) fiber.Handler {
 // @Router			/v1/plugin [post]
 //
 // @Param			body	body	entities.PluginRegisterRequest	true	"Plugin registration request"
-func registerPlugin(svc service.PluginService) fiber.Handler {
+func RegisterPlugin(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var req entities.PluginRegisterRequest
 		if err := c.BodyParser(&req); err != nil {
@@ -113,7 +113,7 @@ func registerPlugin(svc service.PluginService) fiber.Handler {
 // @Router			/v1/plugin/{plugin_slug}/unregister [post]
 // @Param			plugin_slug	path	string	true	"Slug of the plugin"
 // @Security		Keycloak
-func unregisterPlugin(svc service.PluginService) fiber.Handler {
+func UnregisterPlugin(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		slug := strings.Clone(c.Params("plugin"))
@@ -137,7 +137,7 @@ func unregisterPlugin(svc service.PluginService) fiber.Handler {
 // @Router			/v1/plugin/{plugin_slug}/heartbeat [post]
 // @Param			plugin_slug	path	string	true	"Name of the plugin specified by slug during registration"
 // @Security		Keycloak
-func pluginHeartbeat(svc service.PluginService) fiber.Handler {
+func PluginHeartbeat(svc service.PluginService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 		slug := strings.Clone(c.Params("plugin"))
