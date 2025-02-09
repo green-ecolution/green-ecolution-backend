@@ -30,7 +30,6 @@ packages:
       RegionRepository:
       ImageRepository:
       VehicleRepository:
-      FlowerbedRepository:
       WateringPlanRepository:
       RoutingRepository:
       S3Repository:
