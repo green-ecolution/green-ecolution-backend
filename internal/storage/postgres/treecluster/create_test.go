@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -87,7 +88,13 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Column1: "",
+			Limit: int32(totalCountTree),
+			Offset: 0,
+		})
+
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -288,7 +295,12 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 			return true, nil
 		}
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Column1: "",
+			Limit: int32(totalCountTree),
+			Offset: 0,
+		})
 		assert.NoError(t, err)
 		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
 		if err != nil {
@@ -327,7 +339,12 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Column1: "",
+			Limit: int32(totalCountTree),
+			Offset: 0,
+		})
 		assert.NoError(t, err)
 		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
 		if err != nil {
@@ -351,7 +368,12 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Column1: "",
+			Limit: int32(totalCountTree),
+			Offset: 0,
+		})
 		assert.NoError(t, err)
 		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
 		if err != nil {
