@@ -32,30 +32,6 @@ func defaultTree() entities.Tree {
 }
 
 func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
-	return r.createWithTx(ctx, createFn, nil)
-}
-
-func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
-	return r.createWithTx(ctx, createFn, func(ctx context.Context, tree *entities.Tree) error {
-		if tree.Images != nil {
-			if err := r.handleImages(ctx, tree.ID, tree.Images); err != nil {
-				return err
-			}
-
-			linkedImages, err := r.GetAllImagesByID(ctx, tree.ID)
-			if err != nil {
-				return err
-			}
-			tree.Images = linkedImages
-		}
-		return nil
-	})
-}
-
-func (r *TreeRepository) createWithTx(
-	ctx context.Context,
-	createFn func(*entities.Tree) (bool, error),
-	afterCreateFn func(ctx context.Context, tree *entities.Tree) error) (*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
@@ -91,10 +67,16 @@ func (r *TreeRepository) createWithTx(
 		}
 		entity.ID = id
 
-		if afterCreateFn != nil {
-			if err := afterCreateFn(ctx, &entity); err != nil {
+		if entity.Images != nil {
+			if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
 				return err
 			}
+
+			linkedImages, err := r.GetAllImagesByID(ctx, entity.ID)
+			if err != nil {
+				return err
+			}
+			entity.Images = linkedImages
 		}
 
 		createdTree, err = r.GetByID(ctx, id)

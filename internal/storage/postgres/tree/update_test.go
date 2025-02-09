@@ -113,9 +113,7 @@ func TestTreeRepository_Update(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, updatedTree)
 	})
-}
 
-func TestTreeRepository_UpdateWithImages(t *testing.T) {
 	t.Run("should update tree and link new images successfully when tree has other images", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -144,7 +142,7 @@ func TestTreeRepository_UpdateWithImages(t *testing.T) {
 		assert.NoError(t, getErr)
 
 		// when
-		updatedTree, updateErr := r.UpdateWithImages(
+		updatedTree, updateErr := r.Update(
 			context.Background(),
 			treeID,
 			func(tree *entities.Tree) (bool, error) {
@@ -197,7 +195,7 @@ func TestTreeRepository_UpdateWithImages(t *testing.T) {
 		assert.Empty(t, tree.Images)
 
 		// when
-		updatedTree, err := r.UpdateWithImages(
+		updatedTree, err := r.Update(
 			context.Background(),
 			treeID,
 			func(tree *entities.Tree) (bool, error) {
@@ -221,30 +219,6 @@ func TestTreeRepository_UpdateWithImages(t *testing.T) {
 			assert.Equal(t, images[i].MimeType, img.MimeType, "Image MimeType should match")
 			assert.Equal(t, images[i].Filename, img.Filename, "Image Filename should match")
 		}
-	})
-
-	t.Run("should return error when context is canceled", func(t *testing.T) {
-		// given
-		r := NewTreeRepository(suite.Store, mappers)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		sqlImages, err := suite.Store.GetAllImages(context.Background())
-		if err != nil {
-			t.Fatal(err)
-		}
-		images := mappers.iMapper.FromSqlList(sqlImages)
-
-		// when
-		updatedTree, err := r.UpdateWithImages(ctx, int32(1), func(tree *entities.Tree) (bool, error) {
-			tree.Species = "Canceled context species"
-			tree.Images = images
-			return true, nil
-		})
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, updatedTree)
 	})
 }
 

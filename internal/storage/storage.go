@@ -165,14 +165,11 @@ type TreeRepository interface {
 	GetBySensorID(ctx context.Context, id string) (*entities.Tree, error)
 	GetBySensorIDs(ctx context.Context, ids ...string) ([]*entities.Tree, error)
 
-	UpdateWithImages(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkSensorID(ctx context.Context, sensorID string) error
 	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
-	// CreateAndLinkImages creates a new tree and links images to it. It accepts a function that takes a tree entity that can be modified.
-	CreateAndLinkImages(ctx context.Context, fn func(tree *entities.Tree) (bool, error)) (*entities.Tree, error)
 	FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 }
 

@@ -25,6 +25,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 		return nil
 	}
 	newTree, err := s.treeRepo.Update(ctx, t.ID, func(s *entities.Tree) (bool, error) {
+		slog.Debug("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)
 		s.WateringStatus = status
 		return true, nil
 	})

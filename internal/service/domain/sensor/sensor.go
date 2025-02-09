@@ -163,6 +163,7 @@ func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Senso
 	if nearestTree != nil {
 		_, err = s.treeRepo.Update(ctx, nearestTree.ID, func(tree *entities.Tree) (bool, error) {
 			tree.Sensor = sen
+			log.Debug("update sensor on tree", "tree_id", tree.ID, "sensor_id", sen.ID)
 			return true, nil
 		})
 		if err != nil {

@@ -40,7 +40,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Equal(t, entities.WateringStatusUnknown, got.WateringStatus)
 	})
 
-	t.Run("should create a tree with all values set", func(t *testing.T) {
+	t.Run("should create a tree with all values set, except images", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
@@ -163,9 +163,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
-}
 
-func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 	t.Run("should create tree and link images successfully", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -198,7 +196,7 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		}
 
 		// when
-		tree, createErr := r.CreateAndLinkImages(context.Background(), func(tree *entities.Tree) (bool, error) {
+		tree, createErr := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
 			tree.Species = "Oak"
 			tree.Number = "T001"
 			tree.Latitude = 54.801539
@@ -237,62 +235,5 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 			assert.Equal(t, *images[i].Filename, *img.Filename)
 			assert.Equal(t, *images[i].MimeType, *img.MimeType)
 		}
-	})
-
-	t.Run("should create tree without images if they are not given", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-
-		// when
-		tree, createErr := r.CreateAndLinkImages(context.Background(), func(tree *entities.Tree) (bool, error) {
-			tree.Species = "Oak"
-			tree.Number = "T001"
-			tree.Latitude = 54.801539
-			tree.Longitude = 9.446741
-			tree.PlantingYear = 2023
-			tree.Readonly = true
-			tree.Description = "Test tree with images"
-			return true, nil
-		})
-
-		// then
-		assert.NoError(t, createErr)
-		assert.NotNil(t, tree)
-		assert.Equal(t, "Oak", tree.Species)
-		assert.Equal(t, "T001", tree.Number)
-		assert.Equal(t, 54.801539, tree.Latitude)
-		assert.Equal(t, 9.446741, tree.Longitude)
-		assert.Equal(t, int32(2023), tree.PlantingYear)
-		assert.Equal(t, true, tree.Readonly)
-		assert.Equal(t, "Test tree with images", tree.Description)
-		assert.Empty(t, tree.Images)
-	})
-
-	t.Run("should return error if context is canceled", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		sqlImages, err := suite.Store.GetAllImages(context.Background())
-		if err != nil {
-			t.Fatal(err)
-		}
-		images := mappers.iMapper.FromSqlList(sqlImages)
-
-		// when
-		got, err := r.CreateAndLinkImages(ctx, func(tree *entities.Tree) (bool, error) {
-			tree.Species = "Oak"
-			tree.Images = images
-			return true, nil
-		})
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 }
