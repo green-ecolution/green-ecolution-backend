@@ -5,7 +5,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/flowerbed"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
 	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/region"
@@ -55,15 +54,6 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	sensorRepo := sensor.NewSensorRepository(store.NewStore(conn, sqlc.New(conn)), sensorMappers)
 	slog.Info("successfully initialized sensor repository", "service", "postgres")
 
-	flowerbedMappers := flowerbed.NewFlowerbedMappers(
-		&mapper.InternalFlowerbedRepoMapperImpl{},
-		&mapper.InternalImageRepoMapperImpl{},
-		&mapper.InternalSensorRepoMapperImpl{},
-		&mapper.InternalRegionRepoMapperImpl{},
-	)
-	flowerbedRepo := flowerbed.NewFlowerbedRepository(store.NewStore(conn, sqlc.New(conn)), flowerbedMappers)
-	slog.Info("successfully initialized flowerbed repository", "service", "postgres")
-
 	regionMappers := region.NewRegionMappers(
 		&mapper.InternalRegionRepoMapperImpl{},
 	)
@@ -84,7 +74,6 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 		Image:        imageRepo,
 		Vehicle:      vehicleRepo,
 		Sensor:       sensorRepo,
-		Flowerbed:    flowerbedRepo,
 		Region:       regionRepo,
 		WateringPlan: wateringPlanRepo,
 	}

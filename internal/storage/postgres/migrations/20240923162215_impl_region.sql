@@ -29,8 +29,7 @@ EXECUTE FUNCTION update_updated_at_column();
 ALTER TABLE tree_clusters DROP COLUMN region_id;
 ALTER TABLE tree_clusters ADD COLUMN region TEXT;
 
-
-ALTER TABLE flowerbeds DROP COLUMN region_id;
+ALTER TABLE flowerbeds DROP COLUMN IF EXISTS region;
 ALTER TABLE flowerbeds ADD COLUMN region TEXT;
 
 DROP TRIGGER IF EXISTS update_region_updated_at ON regions;
