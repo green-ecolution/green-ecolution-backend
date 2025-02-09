@@ -339,19 +339,19 @@ func (a *WateringPlanAPIService) DeleteWateringPlanExecute(r ApiDeleteWateringPl
 type ApiGetAllWateringPlansRequest struct {
 	ctx        context.Context
 	ApiService *WateringPlanAPIService
-	page       *string
-	limit      *string
+	page       *int32
+	limit      *int32
 	provider   *string
 }
 
 // Page
-func (r ApiGetAllWateringPlansRequest) Page(page string) ApiGetAllWateringPlansRequest {
+func (r ApiGetAllWateringPlansRequest) Page(page int32) ApiGetAllWateringPlansRequest {
 	r.page = &page
 	return r
 }
 
 // Limit
-func (r ApiGetAllWateringPlansRequest) Limit(limit string) ApiGetAllWateringPlansRequest {
+func (r ApiGetAllWateringPlansRequest) Limit(limit int32) ApiGetAllWateringPlansRequest {
 	r.limit = &limit
 	return r
 }

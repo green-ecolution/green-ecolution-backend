@@ -85,7 +85,9 @@ Class | Method | HTTP request | Description
 *PluginAPI* | [**GetPluginInfo**](docs/PluginAPI.md#getplugininfo) | **Get** /v1/plugin/{plugin_slug} | Get a plugin info
 *PluginAPI* | [**GetPluginsList**](docs/PluginAPI.md#getpluginslist) | **Get** /v1/plugin | Get a list of all registered plugins
 *PluginAPI* | [**PluginHeartbeat**](docs/PluginAPI.md#pluginheartbeat) | **Post** /v1/plugin/{plugin_slug}/heartbeat | Heartbeat for a plugin
+*PluginAPI* | [**RefreshPluginToken**](docs/PluginAPI.md#refreshplugintoken) | **Post** /v1/plugin/{plugin_slug}/token/refresh | Refresh plugin token
 *PluginAPI* | [**RegisterPlugin**](docs/PluginAPI.md#registerplugin) | **Post** /v1/plugin | Register a plugin
+*PluginAPI* | [**UnregisterPlugin**](docs/PluginAPI.md#unregisterplugin) | **Post** /v1/plugin/{plugin_slug}/unregister | Unregister a plugin
 *RegionAPI* | [**V1RegionGet**](docs/RegionAPI.md#v1regionget) | **Get** /v1/region | Get all regions
 *RegionAPI* | [**V1RegionIdGet**](docs/RegionAPI.md#v1regionidget) | **Get** /v1/region/{id} | Get a region by ID
 *SensorAPI* | [**DeleteSensor**](docs/SensorAPI.md#deletesensor) | **Delete** /v1/sensor/{sensor_id} | Delete sensor

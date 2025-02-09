@@ -172,26 +172,19 @@ func (a *SensorAPIService) DeleteSensorExecute(r ApiDeleteSensorRequest) (*http.
 type ApiGetAllSensorsRequest struct {
 	ctx        context.Context
 	ApiService *SensorAPIService
-	status     *string
-	page       *string
-	limit      *string
+	page       *int32
+	limit      *int32
 	provider   *string
 }
 
-// Sensor Status
-func (r ApiGetAllSensorsRequest) Status(status string) ApiGetAllSensorsRequest {
-	r.status = &status
-	return r
-}
-
 // Page
-func (r ApiGetAllSensorsRequest) Page(page string) ApiGetAllSensorsRequest {
+func (r ApiGetAllSensorsRequest) Page(page int32) ApiGetAllSensorsRequest {
 	r.page = &page
 	return r
 }
 
 // Limit
-func (r ApiGetAllSensorsRequest) Limit(limit string) ApiGetAllSensorsRequest {
+func (r ApiGetAllSensorsRequest) Limit(limit int32) ApiGetAllSensorsRequest {
 	r.limit = &limit
 	return r
 }
@@ -243,9 +236,6 @@ func (a *SensorAPIService) GetAllSensorsExecute(r ApiGetAllSensorsRequest) (*Sen
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if r.status != nil {
-		parameterAddToHeaderOrQuery(localVarQueryParams, "status", r.status, "", "")
-	}
 	if r.page != nil {
 		parameterAddToHeaderOrQuery(localVarQueryParams, "page", r.page, "", "")
 	}
