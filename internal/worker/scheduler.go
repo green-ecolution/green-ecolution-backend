@@ -2,7 +2,6 @@ package worker
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
@@ -28,10 +27,10 @@ func Scheduler(ctx context.Context, interval time.Duration, process func(ctx con
 		case <-ticker.C:
 			err := process(ctx)
 			if err != nil {
-				slog.Error("error during process execution", "error", err)
+				log.Error("error during process execution", "error", err)
 			}
 		case <-ctx.Done():
-			slog.Debug("stopping scheduler")
+			log.Debug("stopping scheduler")
 			return
 		}
 	}
