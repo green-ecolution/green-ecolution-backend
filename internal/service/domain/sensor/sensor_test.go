@@ -515,18 +515,24 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
 		staleSensor := &entities.Sensor{
-			ID:        "sensor-1",
-			UpdatedAt: time.Now().Add(-73 * time.Hour), // 73 hours ago
+			ID: "sensor-1",
 		}
 		recentSensor := &entities.Sensor{
-			ID:        "sensor-2",
-			UpdatedAt: time.Now().Add(-1 * time.Hour), // 1 hour ago
+			ID: "sensor-2",
+		}
+		staleSensorData := &entities.SensorData{
+			CreatedAt: time.Now().Add(-73 * time.Hour), // Older than 72h
+		}
+		recentSensorData := &entities.SensorData{
+			CreatedAt: time.Now().Add(-1 * time.Hour), // 1 hour ago (not stale)
 		}
 
 		expectList := []*entities.Sensor{staleSensor, recentSensor}
 
 		// when
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(staleSensorData, nil)
+		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, recentSensor.ID).Return(recentSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
 
 		err := svc.UpdateStatuses(ctx)
@@ -534,6 +540,8 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		// then
 		assert.NoError(t, err)
 		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, staleSensor.ID)
+		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, recentSensor.ID)
 		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		repo.AssertExpectations(t) // Verifies all expectations are met
 	})
@@ -545,21 +553,23 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
-		freshSensor := &entities.Sensor{
-			ID:        "sensor-1",
-			UpdatedAt: time.Now(),
+		freshSensor := &entities.Sensor{ID: "sensor-1"}
+		freshSensorData := &entities.SensorData{
+			CreatedAt: time.Now(),
 		}
 
 		expectList := []*entities.Sensor{freshSensor}
 
 		// when
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, freshSensor.ID).Return(freshSensorData, nil)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
 		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, freshSensor.ID)
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
 	})
@@ -581,6 +591,33 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
 		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertNotCalled(t, "GetLatestSensorDataBySensorID")
+		repo.AssertNotCalled(t, "Update")
+		repo.AssertExpectations(t)
+	})
+
+	t.Run("should log an error when fetching latest sensor sata fails", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		repo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
+
+		staleSensor := &entities.Sensor{ID: "sensor-1"}
+		expectList := []*entities.Sensor{staleSensor}
+
+		expectedErr := errors.New("failed to fetch sensor data")
+
+		// when
+		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(nil, expectedErr)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.NoError(t, err)
+		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, staleSensor.ID)
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
 	})
@@ -592,21 +629,23 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := sensor.NewSensorService(repo, treeRepo, globalEventManager)
 
-		staleSensor := &entities.Sensor{
-			ID:        "sensor-1",
-			UpdatedAt: time.Now().Add(-100 * time.Hour),
+		staleSensor := &entities.Sensor{ID: "sensor-1"}
+		staleSensorData := &entities.SensorData{
+			CreatedAt: time.Now().Add(-100 * time.Hour),
 		}
 
 		expectList := []*entities.Sensor{staleSensor}
 
 		// when
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(staleSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, staleSensor.ID)
 		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		repo.AssertExpectations(t)
 		assert.NoError(t, err)
