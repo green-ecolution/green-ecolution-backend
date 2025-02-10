@@ -169,7 +169,7 @@ type TreeRepository interface {
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkSensorID(ctx context.Context, sensorID string) error
-	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
+	UnlinkImage(ctx context.Context, treeID, imageID int32) error
 	FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 }
 
