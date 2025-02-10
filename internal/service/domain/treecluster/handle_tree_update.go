@@ -2,7 +2,6 @@ package treecluster
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
@@ -114,8 +113,6 @@ func (s *TreeClusterService) updateWateringStatusOfPrevTreeCluster(ctx context.C
 		return nil
 	}
 
-	fmt.Println("UPDATE_WATERING_STATUS_OF_PREV_TREE_CLUSTER")
-	
 	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, prevTc.ID)
 	if err != nil {
 		log.Error("could not update watering status", "error", err)
@@ -125,7 +122,7 @@ func (s *TreeClusterService) updateWateringStatusOfPrevTreeCluster(ctx context.C
 		tc.WateringStatus = wateringStatus
 		return true, nil
 	}
-	
+
 	if err := s.treeClusterRepo.Update(ctx, prevTc.ID, updateFn); err == nil {
 		log.Info("successfully updated watering status of previous tree cluster", "cluster_id", prevTc.ID)
 		return s.publishUpdateEvent(ctx, prevTc)
