@@ -145,12 +145,18 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
 	sensors, _, err := s.sensorRepo.GetAll(ctx, "")
 	if err != nil {
+		log.Error("failed to fetch sensors", "error", err)
 		return err
 	}
 
 	cutoffTime := time.Now().Add(-72 * time.Hour) // 3 days ago
 	for _, sens := range sensors {
-		if sens.UpdatedAt.Before(cutoffTime) {
+		sensorData, err := s.sensorRepo.GetLatestSensorDataBySensorID(ctx, sens.ID)
+		if err != nil {
+			log.Error("failed to fetch latest sensor data", "sensor_id", sens.ID, "error", err)
+			continue
+		}
+		if sensorData.CreatedAt.Before(cutoffTime) {
 			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor) (bool, error) {
 				s.Status = entities.SensorStatusOffline
 				return true, nil
@@ -164,6 +170,7 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 		}
 	}
 
+	log.Info("sensor status update process completed successfully")
 	return nil
 }
 

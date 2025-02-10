@@ -13,8 +13,7 @@ func Scheduler(ctx context.Context, interval time.Duration, process func(ctx con
 	defer ticker.Stop()
 
 	if ctx.Err() == nil {
-		err := process(ctx)
-		if err != nil {
+		if err := process(ctx); err != nil {
 			log.Error("error during initial process execution", "error", err)
 		}
 	} else {
@@ -25,9 +24,8 @@ func Scheduler(ctx context.Context, interval time.Duration, process func(ctx con
 	for {
 		select {
 		case <-ticker.C:
-			err := process(ctx)
-			if err != nil {
-				log.Error("error during process execution", "error", err)
+			if err := process(ctx); err != nil {
+				log.Error("error during initial process execution", "error", err)
 			}
 		case <-ctx.Done():
 			log.Debug("stopping scheduler")
