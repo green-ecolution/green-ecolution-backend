@@ -13,7 +13,7 @@ import (
 )
 
 func TestTreeClusterService_HandleUpdateWateringPlan(t *testing.T) {
-	t.Run("should update tree cluster last watered", func(t *testing.T) {
+	t.Run("should update tree cluster last watered and watering status to »just watered«", func(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		regionRepo := storageMock.NewMockRegionRepository(t)
@@ -51,7 +51,13 @@ func TestTreeClusterService_HandleUpdateWateringPlan(t *testing.T) {
 
 		event := entities.NewEventUpdateWateringPlan(&prevWp, &updatedWp)
 
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).Return(nil)
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+			cluster := entities.TreeCluster{}
+			_, err := f(&cluster)
+			assert.NoError(t, err)
+			assert.Equal(t, entities.WateringStatusJustWatered, cluster.WateringStatus)
+			return nil
+		})
 		clusterRepo.EXPECT().GetByID(mock.Anything, int32(1)).Return(&updatedTc, nil)
 
 		// when
