@@ -41,6 +41,7 @@ func NewTreeClusterService(
 
 func (s *TreeClusterService) GetAll(ctx context.Context, filter domain.TreeClusterFilter) ([]*domain.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
+
 	treeClusters, totalCount, err := s.treeClusterRepo.GetAll(ctx, filter)
 	if err != nil {
 		log.Debug("failed to fetch tree clsuters", "error", err)

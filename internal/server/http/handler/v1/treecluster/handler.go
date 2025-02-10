@@ -31,29 +31,19 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			status	query	string	false	"watering status (good, moderate, bad)"
-// @Param			region	query	string	false	"region name"
+// @Param			page		query	string	false	"Page"
+// @Param			limit		query	string	false	"Limit"
+// @Param			status		query	string	false	"watering status (good, moderate, bad)"
+// @Param			region		query	string	false	"region name"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		statusQu := c.Query("status")
-		var wateringStatus domain.WateringStatus
-		if statusQu != "" {
-			var err error
-			wateringStatus, err = parseWateringStatus(statusQu)
-			if err != nil {
-				return service.NewError(service.BadRequest, err.Error())
-			}
-		}
-
-		filter := domain.TreeClusterFilter{
-			WateringStatus: wateringStatus,
-			Region:         strings.Clone(c.Query("region", "")),
+		filter, err := getTreeClusterParams(c)
+		if err != nil {
+			return errorhandler.HandleError(err)
 		}
 
 		domainData, totalCount, err := svc.GetAll(ctx, filter)
@@ -71,6 +61,48 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
+}
+
+func getTreeClusterParams(c *fiber.Ctx) (domain.TreeClusterFilter, error) {
+	var err error
+	statusQu := c.Query("status")
+	var wateringStatus domain.WateringStatus
+
+	if statusQu != "" {
+		wateringStatus, err = parseWateringStatus(statusQu)
+		if err != nil {
+			return domain.TreeClusterFilter{}, service.NewError(service.BadRequest, err.Error())
+		}
+	}
+
+	page, err := parseQueryParam(c, "page", 0)
+	if err != nil {
+		return domain.TreeClusterFilter{}, err
+	}
+
+	limit, err := parseQueryParam(c, "limit", 0)
+	if err != nil {
+		return domain.TreeClusterFilter{}, err
+	}
+
+	return domain.TreeClusterFilter{
+		WateringStatus: wateringStatus,
+		Region:         strings.Clone(c.Query("region")),
+		Provider:       strings.Clone(c.Query("provider")),
+		Limit:          int32(limit),
+		Page:           int32(page),
+	}, nil
+}
+
+func parseQueryParam(c *fiber.Ctx, param string, defaultValue int) (int, error) {
+	if c.Query(param) != "" {
+		value, err := strconv.Atoi(c.Query(param))
+		if err != nil {
+			return 0, service.NewError(service.BadRequest, "invalid "+param+" format")
+		}
+		return value, nil
+	}
+	return defaultValue, nil
 }
 
 // @Summary		Get tree cluster by ID
