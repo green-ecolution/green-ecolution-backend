@@ -84,9 +84,9 @@ func GetSensorByID(svc service.SensorService) fiber.Handler {
 	}
 }
 
-// @Summary		Get all sensor data by tree id
-// @Description	Get all sensor data by tree id
-// @Id				get-all-sensor-data-by-tree-id
+// @Summary		Get all sensor data by id
+// @Description	Get all sensor data by id
+// @Id				get-all-sensor-data-by-id
 // @Tags			Sensor
 // @Produce		json
 // @Success		200	{object}	entities.SensorDataListResponse
@@ -95,8 +95,8 @@ func GetSensorByID(svc service.SensorService) fiber.Handler {
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
-// @Router			/v1/sensor/data/{tree_id} [get]
-// @Param			tree_id	path	string	true	"Tree ID"
+// @Router			/v1/sensor/data/{sensor_id} [get]
+// @Param			sensor_id	path	string	true	"Sensor ID"
 // @Security		Keycloak
 func GetAllSensorDataByID(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
