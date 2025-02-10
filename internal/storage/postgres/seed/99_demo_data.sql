@@ -142,6 +142,17 @@ VALUES
             {"resistance": 900, "centibar": 9, "depth": 90}
         ]
     }'),
+    ('sensor-2', '{
+        "device": "sensor-2",
+        "temperature": 2.0,
+        "humidity": 0.5,
+        "battery": 3.921,
+        "watermarks": [
+            {"resistance": 1018, "centibar": 11, "depth": 30},
+            {"resistance": 999, "centibar": 9, "depth": 60},
+            {"resistance": 899, "centibar": 8, "depth": 90}
+        ]
+    }'),
     ('sensor-3', '{
         "device": "sensor-3",
         "temperature": 4.0,
