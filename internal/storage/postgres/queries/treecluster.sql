@@ -4,9 +4,10 @@ FROM tree_clusters tc
          LEFT JOIN regions r ON r.id = tc.region_id
 WHERE
     ($1 != '' AND $1 IS NOT NULL AND tc.watering_status = $1::watering_status OR $1 = '' OR $1 IS NULL)
-  AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL)
+    AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL)
+    AND ($3 != '' AND $3 IS NOT NULL AND provider = $3 OR $3 = '' OR $3 IS NULL)
 ORDER BY tc.name ASC
-     LIMIT $3 OFFSET $4;
+     LIMIT $4 OFFSET $5;
 
 -- name: GetTreeClustersCount :one
 SELECT COUNT(*)
@@ -14,7 +15,8 @@ FROM tree_clusters tc
          LEFT JOIN regions r ON r.id = tc.region_id
 WHERE
     ($1 != '' AND $1 IS NOT NULL AND tc.watering_status = $1::watering_status OR $1 = '' OR $1 IS NULL)
-  AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL);
+    AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL)
+    AND ($3 != '' AND $3 IS NOT NULL AND provider = $3 OR $3 = '' OR $3 IS NULL);
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;

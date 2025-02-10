@@ -61,7 +61,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, entities.TreeClusterFilter{},
+			mock.Anything, entities.TreeClusterFilter{Page: 1, Limit: 1},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=1", nil)
@@ -98,7 +98,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything,
-			"test-provider",
+			entities.TreeClusterFilter{Provider: "test-provider"},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)

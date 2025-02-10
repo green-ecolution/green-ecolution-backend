@@ -13,8 +13,19 @@ import (
 	"github.com/twpayne/go-geos"
 )
 
+type contextKey string
+
+const (
+	pageKey  contextKey = "page"
+	limitKey contextKey = "limit"
+)
+
 func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
+
+	ctx = context.WithValue(ctx, pageKey, filter.Page)
+	ctx = context.WithValue(ctx, limitKey, filter.Limit)
+
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
@@ -23,6 +34,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
 		Column1: sqlc.WateringStatus(filter.WateringStatus),
 		Column2: filter.Region,
+		Column3: filter.Provider,
 	})
 
 	if err != nil {
@@ -42,6 +54,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
 		Column1: sqlc.WateringStatus(filter.WateringStatus),
 		Column2: filter.Region,
+		Column3: filter.Provider,
 		Limit:   limit,
 		Offset:  (page - 1) * limit,
 	})
@@ -54,7 +67,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	data, err := r.mapper.FromSqlList(rows)
 	if err != nil {
 		log.Debug("failed to convert entity", "error", err)
-		return nil, err
+		return nil, 0, err
 	}
 
 	for _, tc := range data {
