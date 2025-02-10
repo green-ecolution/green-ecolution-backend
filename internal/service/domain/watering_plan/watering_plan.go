@@ -252,8 +252,6 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	// TODO: validate driver license
-
 	if err := w.validateStatusDependentValues(ctx, updateWp); err != nil {
 		return nil, err
 	}
