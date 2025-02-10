@@ -167,6 +167,73 @@ func TestSensorRepository_GetAll(t *testing.T) {
 	})
 }
 
+func TestSensorRepository_GetAllDataById(t *testing.T) {
+	t.Run("should return all sensor data", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.GetAllDataByID(context.Background(), "sensor-1")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, len(TestSensorData), len(got))
+
+		for i, sensor := range got {
+			assert.Equal(t, TestSensorData[i].SensorID, sensor.SensorID)
+			assert.Equal(t, TestSensorData[i].Data.Battery, sensor.Data.Battery)
+			assert.Equal(t, TestSensorData[i].Data.Device, sensor.Data.Device)
+			assert.Equal(t, TestSensorData[i].Data.Humidity, sensor.Data.Humidity)
+			assert.Equal(t, TestSensorData[i].Data.Temperature, sensor.Data.Temperature)
+			assert.NotZero(t, sensor.CreatedAt)
+			assert.NotZero(t, sensor.UpdatedAt)
+		}
+	})
+
+	t.Run("should return empty slice when db is empty", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.GetAllDataByID(context.Background(), "sensor-1")
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return empty slice when no data is found", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		got, err := r.GetAllDataByID(context.Background(), "")
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		got, err := r.GetAllDataByID(ctx, "sensor-1")
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, got)
+	})
+}
+
 func TestSensorRepository_GetByID(t *testing.T) {
 	t.Run("should return sensor by id", func(t *testing.T) {
 		// given
@@ -359,6 +426,45 @@ var TestMqttPayload = &entities.MqttPayload{
 			Resistance: 23,
 			Centibar:   38,
 			Depth:      90,
+		},
+	},
+}
+
+var TestSensorData = []*entities.SensorData{
+	{
+		ID:        1,
+		SensorID:  "sensor-1",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data:      TestMqttPayload,
+	},
+	{
+		ID:        2,
+		SensorID:  "sensor-1",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Data: &entities.MqttPayload{
+			Device:      "sensor-123",
+			Battery:     32.0,
+			Humidity:    40,
+			Temperature: 10,
+			Watermarks: []entities.Watermark{
+				{
+					Resistance: 20,
+					Centibar:   10,
+					Depth:      30,
+				},
+				{
+					Resistance: 20,
+					Centibar:   10,
+					Depth:      60,
+				},
+				{
+					Resistance: 20,
+					Centibar:   10,
+					Depth:      90,
+				},
+			},
 		},
 	},
 }
