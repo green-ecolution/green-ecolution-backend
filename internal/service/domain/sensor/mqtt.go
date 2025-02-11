@@ -92,7 +92,7 @@ func (s *SensorService) updateSensorCoordsAndStatus(ctx context.Context, payload
 		if err != nil {
 			return nil, err
 		}
-		log.Debug("Coordinates and status of sensor have been updated successfully", "sensor_id", updatedSensor.ID)
+		log.Info("coordinates and status of sensor have been updated successfully", "sensor_id", updatedSensor.ID)
 		return updatedSensor, err
 	}
 

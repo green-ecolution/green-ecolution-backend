@@ -50,9 +50,8 @@ func (s *Server) Run(ctx context.Context) error {
 		}
 	}()
 
-	go func() {
-		worker.Scheduler(ctx, 1*time.Hour, s.services.SensorService.UpdateStatuses)
-	}()
+	scheduler := worker.NewScheduler(ctx, 3*time.Hour, s.services.SensorService)
+	go scheduler.Run()
 
 	go func() {
 		<-ctx.Done()
