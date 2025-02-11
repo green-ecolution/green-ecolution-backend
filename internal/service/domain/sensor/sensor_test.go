@@ -506,7 +506,7 @@ func TestReady(t *testing.T) {
 	})
 }
 
-func TestSensorService_UpdateStatuses(t *testing.T) {
+func TestSensorService_Do(t *testing.T) {
 	t.Run("should update stale sensors successfully", func(t *testing.T) {
 		// given
 		ctx := context.Background()
@@ -535,7 +535,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, recentSensor.ID).Return(recentSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
 
-		err := svc.UpdateStatuses(ctx)
+		err := svc.Do(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -564,7 +564,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, freshSensor.ID).Return(freshSensorData, nil)
 
-		err := svc.UpdateStatuses(ctx)
+		err := svc.Do(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -585,7 +585,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		expectedErr := errors.New("database error")
 		repo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
 
-		err := svc.UpdateStatuses(ctx)
+		err := svc.Do(ctx)
 
 		// then
 		assert.Error(t, err)
@@ -612,7 +612,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(nil, expectedErr)
 
-		err := svc.UpdateStatuses(ctx)
+		err := svc.Do(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -641,7 +641,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(staleSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
-		err := svc.UpdateStatuses(ctx)
+		err := svc.Do(ctx)
 
 		// then
 		repo.AssertCalled(t, "GetAll", mock.Anything, "")
