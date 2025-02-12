@@ -2691,7 +2691,6 @@ components:
             $ref: '#/components/schemas/Region'
           type: array
       required:
-      - pagination
       - regions
       type: object
     RouteRequest:
@@ -2868,7 +2867,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     SensorStatus:
       enum:
@@ -3332,7 +3330,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     TreeClusterUpdate:
       example:
@@ -3512,7 +3509,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     TreeUpdate:
       example:
@@ -3678,7 +3674,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     UserRegister:
       example:
@@ -3927,7 +3922,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     VehicleStatus:
       enum:
@@ -4546,7 +4540,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     WateringPlanStatus:
       enum:
