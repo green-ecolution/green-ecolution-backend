@@ -14,8 +14,8 @@ func GetValues(ctx context.Context) (page, limit int32, err error) {
 	limit, limitOK := ctx.Value("limit").(int32)
 
 	if !pageOk || !limitOK {
-		log.Debug("pagination values not found in context", "page", ctx.Value("page"), "limit", ctx.Value("limit"))
-		return 0, 0, storage.ErrPaginationValueInvalid
+		page = 1
+		limit = -1
 	}
 
 	if page <= 0 || (limit != -1 && limit <= 0) {
