@@ -535,7 +535,7 @@ func TestSensorService_Do(t *testing.T) {
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, recentSensor.ID).Return(recentSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
 
-		err := svc.Do(ctx)
+		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -564,7 +564,7 @@ func TestSensorService_Do(t *testing.T) {
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, freshSensor.ID).Return(freshSensorData, nil)
 
-		err := svc.Do(ctx)
+		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -585,7 +585,7 @@ func TestSensorService_Do(t *testing.T) {
 		expectedErr := errors.New("database error")
 		repo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
 
-		err := svc.Do(ctx)
+		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.Error(t, err)
@@ -612,7 +612,7 @@ func TestSensorService_Do(t *testing.T) {
 		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(nil, expectedErr)
 
-		err := svc.Do(ctx)
+		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
@@ -641,7 +641,7 @@ func TestSensorService_Do(t *testing.T) {
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(staleSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
-		err := svc.Do(ctx)
+		err := svc.UpdateStatuses(ctx)
 
 		// then
 		repo.AssertCalled(t, "GetAll", mock.Anything, "")

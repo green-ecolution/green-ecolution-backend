@@ -141,7 +141,7 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *SensorService) Do(ctx context.Context) error {
+func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
 	sensors, _, err := s.sensorRepo.GetAll(ctx, "")
 	if err != nil {
