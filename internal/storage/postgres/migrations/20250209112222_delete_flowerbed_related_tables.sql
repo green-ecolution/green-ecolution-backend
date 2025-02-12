@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS flowerbeds (
   description TEXT NOT NULL,
   number_of_plants INT NOT NULL DEFAULT 0,
   moisture_level FLOAT NOT NULL,
-  region TEXT NOT NULL,
   address TEXT NOT NULL,
   archived BOOLEAN NOT NULL DEFAULT FALSE,
   latitude FLOAT NOT NULL,
@@ -26,6 +25,8 @@ CREATE TABLE IF NOT EXISTS flowerbeds (
   additional_informations JSONB,
   region_id INT
 );
+
+ALTER TABLE flowerbeds ADD FOREIGN KEY (region_id) REFERENCES regions(id);
 
 CREATE TRIGGER update_flowerbeds_updated_at
 BEFORE UPDATE ON flowerbeds
