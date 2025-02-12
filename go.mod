@@ -1,6 +1,6 @@
 module github.com/green-ecolution/green-ecolution-backend
 
-go 1.23.2
+go 1.23.6
 
 require (
 	github.com/Nerzal/gocloak/v13 v13.9.0
