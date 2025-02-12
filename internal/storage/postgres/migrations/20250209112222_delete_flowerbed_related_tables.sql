@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS flowerbeds (
   region_id INT
 );
 
+ALTER TABLE flowerbeds ADD FOREIGN KEY (region_id) REFERENCES regions(id);
+
 CREATE TRIGGER update_flowerbeds_updated_at
 BEFORE UPDATE ON flowerbeds
 FOR EACH ROW
