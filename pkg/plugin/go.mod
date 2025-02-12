@@ -1,6 +1,6 @@
 module github.com/green-ecolution/green-ecolution-backend/pkg/plugin
 
-go 1.23.2
+go 1.23.6
 
 require github.com/green-ecolution/green-ecolution-backend v1.1.0
 
