@@ -25,6 +25,7 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.34.0
 	github.com/twpayne/go-geos v0.18.1
 	github.com/twpayne/pgx-geos v0.0.3
+	golang.org/x/net v0.33.0
 	golang.org/x/sync v0.10.0
 )
 
@@ -120,7 +121,6 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
-	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
