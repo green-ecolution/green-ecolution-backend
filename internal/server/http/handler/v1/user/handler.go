@@ -210,7 +210,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Pagination: nil, // TODO: Handle pagination
 		})
 	}
 }
@@ -254,7 +254,7 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Pagination: nil, // TODO: Handle pagination
 		})
 	}
 }
