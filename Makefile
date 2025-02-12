@@ -257,7 +257,17 @@ seed/reset: migrate/up
 
 .PHONY: tidy
 tidy:
-	@echo "Fmt and Tidying..."
+	@echo "backend: fmt and tidying..."
+	go fmt ./...
+	go mod tidy
+
+	@echo "pkg/plugin: fmt and tidying..."
+	@cd pkg/plugin
+	go fmt ./...
+	go mod tidy
+
+	@echo "pkg/client: fmt and tidying..."
+	@cd pkg/client
 	go fmt ./...
 	go mod tidy
 
