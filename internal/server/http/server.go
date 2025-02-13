@@ -44,10 +44,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	go func() {
 		slog.Info("starting plugin cleanup service: cleaning up unhealthy plugins")
-		err := s.services.PluginService.StartCleanup(ctx)
-		if err != nil {
-			slog.Error("error while running plugin cleanup", "error", err)
-		}
+		s.services.PluginService.StartCleanup(ctx)
 	}()
 
 	scheduler := worker.NewScheduler(3*time.Hour, worker.SchedulerFunc(s.services.SensorService.UpdateStatuses))
