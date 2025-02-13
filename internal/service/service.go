@@ -179,7 +179,7 @@ type PluginService interface {
 	GetAll(ctx context.Context) ([]domain.Plugin, []time.Time)
 	HeartBeat(ctx context.Context, slug string) error
 	Unregister(ctx context.Context, slug string)
-	StartCleanup(ctx context.Context) error
+	StartCleanup(ctx context.Context)
 }
 
 type Service interface {

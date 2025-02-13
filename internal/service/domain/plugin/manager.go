@@ -15,6 +15,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 )
 
 type PluginManagerConfig struct {
@@ -187,17 +188,15 @@ func (p *PluginManager) batchUnregister(ctx context.Context, slugs []string) {
 	}
 }
 
-func (p *PluginManager) StartCleanup(ctx context.Context) error {
-	ticker := time.NewTicker(p.interval)
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-ticker.C:
-			slugsToDelete := p.checkHeartbeats()
-			p.batchUnregister(ctx, slugsToDelete)
-		}
-	}
+func (p *PluginManager) StartCleanup(ctx context.Context) {
+	scheduler := worker.NewScheduler(p.interval, worker.SchedulerFunc(func(ctx context.Context) error {
+		slugsToDelete := p.checkHeartbeats()
+		p.batchUnregister(ctx, slugsToDelete)
+
+		return nil
+	}))
+
+	scheduler.Run(ctx)
 }
 
 func (p *PluginManager) Ready() bool {
