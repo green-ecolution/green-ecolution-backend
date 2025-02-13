@@ -110,23 +110,13 @@ func (r *InfoRepository) GetAppInfo(ctx context.Context) (*entities.App, error) 
 }
 
 func getMapInfo(cfg *config.Config) (entities.Map, error) {
-	if len(cfg.Map.Center) != 2 || len(cfg.Map.BoundSouthWest) != 2 || len(cfg.Map.BoundNorthEast) != 2 {
+	if len(cfg.Map.Center) != 2 || len(cfg.Map.BBox) != 4 {
 		return entities.Map{}, storage.ErrInvalidMapConfig
 	}
 
 	return entities.Map{
-		Center: entities.GeoJSONLocation{
-			Latitude:  cfg.Map.Center[0],
-			Longitude: cfg.Map.Center[1],
-		},
-		BoundSouthWest: entities.GeoJSONLocation{
-			Latitude:  cfg.Map.BoundSouthWest[0],
-			Longitude: cfg.Map.BoundSouthWest[1],
-		},
-		BoundNorthEast: entities.GeoJSONLocation{
-			Latitude:  cfg.Map.BoundNorthEast[0],
-			Longitude: cfg.Map.BoundNorthEast[1],
-		},
+		Center: cfg.Map.Center,
+		BBox:   cfg.Map.BBox,
 	}, nil
 }
 

@@ -33,7 +33,6 @@ type Server struct {
 }
 
 type Map struct {
-	Center         GeoJSONLocation
-	BoundSouthWest GeoJSONLocation
-	BoundNorthEast GeoJSONLocation
+	Center []float64
+	BBox   []float64
 }

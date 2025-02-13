@@ -27,7 +27,6 @@ type ServerResponse struct {
 } // @Name ServerInfo
 
 type MapResponse struct {
-	Center         GeoJSONLocation `json:"center"`
-	BoundSouthWest GeoJSONLocation `json:"bounds_south_west"`
-	BoundNorthEast GeoJSONLocation `json:"bounds_north_east"`
+	Center []float64 `json:"center"`
+	BBox   []float64 `json:"bbox"`
 } // @Name MapInfo
