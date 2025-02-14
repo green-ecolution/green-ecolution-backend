@@ -13,18 +13,8 @@ import (
 	"github.com/twpayne/go-geos"
 )
 
-type contextKey string
-
-const (
-	pageKey  contextKey = "page"
-	limitKey contextKey = "limit"
-)
-
 func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
-
-	ctx = context.WithValue(ctx, pageKey, filter.Page)
-	ctx = context.WithValue(ctx, limitKey, filter.Limit)
 
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
