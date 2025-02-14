@@ -27,13 +27,15 @@ type EventUpdateTree struct {
 	BasicEvent
 	Prev *Tree
 	New  *Tree
+	PrevOfSensor *Tree
 }
 
-func NewEventUpdateTree(prev, newTree *Tree) EventUpdateTree {
+func NewEventUpdateTree(prev, newTree, prevOfSensor *Tree) EventUpdateTree {
 	return EventUpdateTree{
 		BasicEvent: BasicEvent{eventType: EventTypeUpdateTree},
 		Prev:       prev,
 		New:        newTree,
+		PrevOfSensor: prevOfSensor,
 	}
 }
 

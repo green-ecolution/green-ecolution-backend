@@ -51,6 +51,13 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 		}
 	}
 
+	// if the sensor was previously assigned to a different tree, the linked tree cluster must also be updated
+	if event.PrevOfSensor != nil && event.PrevOfSensor.TreeCluster != nil {
+		if err := s.updateWateringStatusOfPrevTreeCluster(ctx, event.PrevOfSensor.TreeCluster); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -86,8 +93,32 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 	}
 
 	if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err == nil {
-		log.Info("successfully updated new tree cluster position", "cluster_id", tc.ID)
+		log.Info("successfully updated new tree cluster", "cluster_id", tc.ID)
 		return s.publishUpdateEvent(ctx, tc)
+	}
+
+	return nil
+}
+
+func (s *TreeClusterService) updateWateringStatusOfPrevTreeCluster(ctx context.Context, prevTc *entities.TreeCluster) error {
+	log := logger.GetLogger(ctx)
+	if prevTc == nil {
+		return nil
+	}
+
+	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, prevTc.ID)
+	if err != nil {
+		log.Error("could not update watering status", "error", err)
+	}
+
+	updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		tc.WateringStatus = wateringStatus
+		return true, nil
+	}
+	
+	if err := s.treeClusterRepo.Update(ctx, prevTc.ID, updateFn); err == nil {
+		log.Info("successfully updated watering status of previous tree cluster", "cluster_id", prevTc.ID)
+		return s.publishUpdateEvent(ctx, prevTc)
 	}
 
 	return nil
