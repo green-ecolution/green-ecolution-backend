@@ -2,6 +2,7 @@ package treecluster
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
@@ -10,6 +11,13 @@ import (
 func (s *TreeClusterService) HandleCreateTree(ctx context.Context, event *entities.EventCreateTree) error {
 	log := logger.GetLogger(ctx)
 	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
+
+	// if the sensor was previously assigned to a different tree, the linked tree cluster must also be updated
+	if event.PrevOfSensor != nil && event.PrevOfSensor.TreeCluster != nil {
+		if err := s.updateWateringStatusOfPrevTreeCluster(ctx, event.PrevOfSensor.TreeCluster); err != nil {
+			return err
+		}
+	}
 
 	if event.New.TreeCluster == nil {
 		return nil
@@ -33,6 +41,13 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 	log := logger.GetLogger(ctx)
 	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
 
+	// if the sensor was previously assigned to a different tree, the linked tree cluster must also be updated
+	if event.PrevOfSensor != nil && event.PrevOfSensor.TreeCluster != nil {
+		if err := s.updateWateringStatusOfPrevTreeCluster(ctx, event.PrevOfSensor.TreeCluster); err != nil {
+			return err
+		}
+	}
+
 	if event.Prev.TreeCluster == nil && event.New.TreeCluster == nil {
 		return nil
 	}
@@ -47,13 +62,6 @@ func (s *TreeClusterService) HandleUpdateTree(ctx context.Context, event *entiti
 
 	if event.Prev.TreeCluster != nil && event.New.TreeCluster != nil && event.Prev.TreeCluster.ID != event.New.TreeCluster.ID {
 		if err := s.handleTreeClusterUpdate(ctx, event.New.TreeCluster, event.New); err != nil {
-			return err
-		}
-	}
-
-	// if the sensor was previously assigned to a different tree, the linked tree cluster must also be updated
-	if event.PrevOfSensor != nil && event.PrevOfSensor.TreeCluster != nil {
-		if err := s.updateWateringStatusOfPrevTreeCluster(ctx, event.PrevOfSensor.TreeCluster); err != nil {
 			return err
 		}
 	}
@@ -106,6 +114,8 @@ func (s *TreeClusterService) updateWateringStatusOfPrevTreeCluster(ctx context.C
 		return nil
 	}
 
+	fmt.Println("UPDATE_WATERING_STATUS_OF_PREV_TREE_CLUSTER")
+	
 	wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, prevTc.ID)
 	if err != nil {
 		log.Error("could not update watering status", "error", err)

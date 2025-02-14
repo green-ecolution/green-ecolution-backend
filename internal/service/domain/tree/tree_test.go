@@ -790,7 +790,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 
 		// EventSystem
 		eventManager := worker.NewEventManager(entities.EventTypeCreateTree)
-		expectedEvent := entities.NewEventCreateTree(&expectedTree)
+		expectedEvent := entities.NewEventCreateTree(&expectedTree, nil)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go eventManager.Run(ctx)
@@ -829,7 +829,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 
 		// Event
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
-		expectedEvent := entities.NewEventUpdateTree(&prevTree, &expectedTree)
+		expectedEvent := entities.NewEventUpdateTree(&prevTree, &expectedTree, nil)
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		go eventManager.Run(ctx)

@@ -26,7 +26,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		defer cancel()
 		go eventManager.Run(ctx)
 
-		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
+		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
 
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(allLatestSensorData, nil)
 		treeRepo.EXPECT().GetBySensorIDs(mock.Anything, "sensor-1").Return([]*entities.Tree{&updatedTree}, nil)
@@ -64,7 +64,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		defer cancel()
 		go eventManager.Run(ctx)
 
-		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
+		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
 
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(nil, storage.ErrSensorNotFound)
 		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
@@ -107,7 +107,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		updatedWithoutCluster := updatedTree
 		updatedWithoutCluster.TreeCluster = nil
 
-		event := entities.NewEventUpdateTree(&prevWithoutCluster, &updatedWithoutCluster)
+		event := entities.NewEventUpdateTree(&prevWithoutCluster, &updatedWithoutCluster, nil)
 
 		// when
 		err := svc.HandleUpdateTree(context.Background(), &event)
@@ -147,7 +147,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 			Longitude:   *prevTc.Longitude,
 		}
 
-		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
+		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
 
 		// when
 		err := svc.HandleUpdateTree(context.Background(), &event)
@@ -186,7 +186,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		}
 		updatedTree.TreeCluster = &newTc
 
-		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
+		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
 
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(2)).Return(nil, storage.ErrSensorNotFound)
 		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).Return(nil)
@@ -214,7 +214,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	t.Run("should listen on create new tree event", func(t *testing.T) {
 		// given
 		eventManager := worker.NewEventManager(entities.EventTypeCreateTree)
-		event := entities.NewEventCreateTree(&updatedTree)
+		event := entities.NewEventCreateTree(&updatedTree, nil)
 
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeCreateTree)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -237,7 +237,7 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 	t.Run("should listen on update tree event", func(t *testing.T) {
 		// given
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
-		event := entities.NewEventUpdateTree(&prevTree, &updatedTree)
+		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
 
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTree)
 		ctx, cancel := context.WithCancel(context.Background())

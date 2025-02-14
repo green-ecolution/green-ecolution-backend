@@ -42,12 +42,14 @@ func NewEventUpdateTree(prev, newTree, prevOfSensor *Tree) EventUpdateTree {
 type EventCreateTree struct {
 	BasicEvent
 	New *Tree
+	PrevOfSensor *Tree
 }
 
-func NewEventCreateTree(newTree *Tree) EventCreateTree {
+func NewEventCreateTree(newTree *Tree, prevOfSensor *Tree) EventCreateTree {
 	return EventCreateTree{
 		BasicEvent: BasicEvent{eventType: EventTypeCreateTree},
 		New:        newTree,
+		PrevOfSensor: prevOfSensor,
 	}
 }
 
