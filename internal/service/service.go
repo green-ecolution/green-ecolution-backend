@@ -100,6 +100,7 @@ type TreeService interface {
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
 	GetBySensorID(ctx context.Context, id string) (*domain.Tree, error)
 	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
+	UpdateWateringStatuses(ctx context.Context) error
 }
 
 type AuthService interface {

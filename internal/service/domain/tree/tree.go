@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -228,6 +229,44 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	slog.Info("tree updated successfully", "tree_id", id)
 	s.publishUpdateTreeEvent(ctx, prevTree, updatedTree)
 	return updatedTree, nil
+}
+
+func (s *TreeService) UpdateWateringStatuses(ctx context.Context) error {
+	log := logger.GetLogger(ctx)
+	trees, _, err := s.treeRepo.GetAll(ctx, "")
+	if err != nil {
+		log.Error("failed to fetch trees", "error", err)
+		return err
+	}
+
+	cutoffTime := time.Now().Add(-24 * time.Hour) // 1 day ago
+	for _, tree := range trees {
+		// Do nothing if watering status is not »just watered«
+		if tree.WateringStatus != entities.WateringStatusJustWatered {
+			continue
+		}
+
+		if tree.LastWatered.Before(cutoffTime) {
+			wateringStatus := entities.WateringStatusUnknown
+
+			if tree.Sensor != nil {
+				wateringStatus = utils.CalculateWateringStatus(ctx, tree.PlantingYear, tree.Sensor.LatestData.Data.Watermarks)
+			}
+			_, err = s.treeRepo.Update(ctx, tree.ID, func(tr *entities.Tree) (bool, error) {
+				tr.WateringStatus = wateringStatus
+				return true, nil
+			})
+
+			if err != nil {
+				log.Error("failed to update watering status of tree", "tree_id", tree.ID, "error", err)
+			} else {
+				log.Debug("watering status of tree is updated by scheduler", "tree_id", tree.ID)
+			}
+		}
+	}
+
+	log.Info("watering status update for tree completed successfully")
+	return nil
 }
 
 func (s *TreeService) Ready() bool {

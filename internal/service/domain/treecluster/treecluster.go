@@ -244,7 +244,7 @@ func (s *TreeClusterService) UpdateWateringStatuses(ctx context.Context) error {
 		if cluster.WateringStatus != domain.WateringStatusJustWatered {
 			continue
 		}
-		fmt.Println(cluster.LastWatered.Before(cutoffTime))
+
 		if cluster.LastWatered.Before(cutoffTime) {
 			wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, cluster.ID)
 			if err != nil {
