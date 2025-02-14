@@ -6,7 +6,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/tree"
 )
 
 func (s *TreeClusterService) HandleUpdateWateringPlan(ctx context.Context, event *entities.EventUpdateWateringPlan) error {
@@ -50,12 +49,17 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 			}
 		}
 
-		// TODO: update to transaction
 		for _, tr := range tc.Trees {
-			_, err := s.treeRepo.Update(ctx, tr.ID, tree.WithWateringStatus(entities.WateringStatusJustWatered))
+			_, err := s.treeRepo.Update(ctx, tr.ID, func(tree *entities.Tree) (bool, error) {
+				log.Debug("updating tree watering status", "prev_status", tr.WateringStatus, "new_status", entities.WateringStatusJustWatered)
+				tree.WateringStatus = entities.WateringStatusJustWatered
+				return true, nil
+			})
+
 			if err != nil {
 				return err
 			}
+
 		}
 	}
 
