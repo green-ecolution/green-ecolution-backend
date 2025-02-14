@@ -53,7 +53,8 @@ UPDATE trees SET
   watering_status = $8,
   description = $9,
   provider = $10,
-  additional_informations = $11
+  additional_informations = $11,
+  last_watered = $12
 WHERE id = $1;
 
 -- name: SetTreeLocation :exec

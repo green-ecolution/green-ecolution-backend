@@ -817,6 +817,7 @@ func assertExpectedEqualToTree(t *testing.T, expectedTree, tree *entities.Tree) 
 	assert.Equal(t, expectedTree.Description, tree.Description, "Description does not match")
 	assert.Equal(t, expectedTree.Provider, tree.Provider, "Provider does not match")
 	assert.Equal(t, expectedTree.AdditionalInfo, tree.AdditionalInfo, "AdditionalInfo does not match")
+	assert.Equal(t, expectedTree.LastWatered, tree.LastWatered, "Last watered does not match")
 }
 
 var testTrees = []*entities.Tree{
@@ -830,6 +831,7 @@ var testTrees = []*entities.Tree{
 		Readonly:       true,
 		WateringStatus: "unknown",
 		Description:    "Sample description 1",
+		LastWatered:    nil,
 	},
 	{
 		ID:             2,
@@ -841,6 +843,7 @@ var testTrees = []*entities.Tree{
 		Readonly:       true,
 		WateringStatus: "good",
 		Description:    "Sample description 2",
+		LastWatered:    nil,
 	},
 	{
 		ID:             3,
@@ -852,6 +855,7 @@ var testTrees = []*entities.Tree{
 		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 3",
+		LastWatered:    nil,
 	},
 	{
 		ID:             4,
@@ -863,6 +867,7 @@ var testTrees = []*entities.Tree{
 		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 4",
+		LastWatered:    nil,
 	},
 	{
 		ID:             5,
@@ -878,5 +883,6 @@ var testTrees = []*entities.Tree{
 		AdditionalInfo: map[string]interface{}{
 			"foo": "bar",
 		},
+		LastWatered: nil,
 	},
 }

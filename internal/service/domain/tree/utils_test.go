@@ -36,6 +36,7 @@ var (
 			Latitude:      nil,
 			Longitude:     nil,
 			Trees:         []*entities.Tree{},
+			LastWatered:   nil,
 		},
 	}
 
@@ -52,6 +53,7 @@ var (
 			PlantingYear:   2023,
 			Readonly:       true,
 			WateringStatus: entities.WateringStatusBad,
+			LastWatered:    nil,
 		},
 		{
 			ID:             2,
@@ -65,6 +67,7 @@ var (
 			PlantingYear:   2023,
 			Readonly:       true,
 			WateringStatus: entities.WateringStatusUnknown,
+			LastWatered:    nil,
 		},
 	}
 

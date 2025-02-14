@@ -99,6 +99,7 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 		Description:            &t.Description,
 		Provider:               &t.Provider,
 		AdditionalInformations: additionalInfo,
+		LastWatered:            utils.TimeToPgTimestamp(t.LastWatered),
 	}
 
 	if err := r.store.SetTreeLocation(ctx, &sqlc.SetTreeLocationParams{
