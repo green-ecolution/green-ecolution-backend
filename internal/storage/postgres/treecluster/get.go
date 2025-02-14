@@ -21,8 +21,13 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
+	var wateringStatuses []string
+	for _, ws := range filter.WateringStatus {
+		wateringStatuses = append(wateringStatuses, string(ws))
+	}
+
 	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
-		Column1: sqlc.WateringStatus(filter.WateringStatus),
+		Column1: wateringStatuses,
 		Column2: filter.Region,
 		Column3: filter.Provider,
 	})
@@ -42,7 +47,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	}
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
-		Column1: sqlc.WateringStatus(filter.WateringStatus),
+		Column1: wateringStatuses,
 		Column2: filter.Region,
 		Column3: filter.Provider,
 		Limit:   limit,

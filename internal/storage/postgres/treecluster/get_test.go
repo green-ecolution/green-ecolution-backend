@@ -3,6 +3,7 @@ package treecluster
 import (
 	"context"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
 
@@ -183,7 +184,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterFilter{
-			WateringStatus: entities.WateringStatusGood,
+			WateringStatus: []entities.WateringStatus{entities.WateringStatusGood},
 		}
 
 		// when
@@ -209,7 +210,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterFilter{
-			Region: "Mürwik",
+			Region: []string{"Mürwik"},
 		}
 
 		// when
@@ -236,8 +237,8 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterFilter{
-			WateringStatus: entities.WateringStatusModerate,
-			Region:         "Mürwik",
+			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
+			Region:         []string{"Mürwik"},
 		}
 
 		// when
@@ -253,6 +254,79 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 			assert.NotNil(t, cluster.Region)
 			assert.Equal(t, "Mürwik", cluster.Region.Name)
 		}
+	})
+
+	t.Run("should return tree clusters filtered by multiple watering statuses and multiple regions", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: []entities.WateringStatus{
+				entities.WateringStatusGood,
+				entities.WateringStatusModerate,
+			},
+			Region:   []string{"Mürwik", "Altstadt"},
+			Provider: "",
+		}
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, filter)
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Equal(t, len(got), totalCount)
+
+		for _, cluster := range got {
+			assert.Contains(t,
+				[]entities.WateringStatus{
+					entities.WateringStatusGood,
+					entities.WateringStatusModerate,
+				},
+				cluster.WateringStatus,
+				"Cluster has a status outside the expected list",
+			)
+
+			require.NotNil(t, cluster.Region)
+			assert.Contains(t,
+				[]string{"Mürwik", "Altstadt"},
+				cluster.Region.Name,
+				"Cluster has a region outside the expected list",
+			)
+		}
+	})
+
+	t.Run("should return empty list if multiple statuses and regions do not match any cluster", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: []entities.WateringStatus{
+				entities.WateringStatusBad,
+				entities.WateringStatusUnknown,
+			},
+			Region:   []string{"DoesNotExist", "FarAwayLand"},
+			Provider: "",
+		}
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, filter)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, int64(0), totalCount)
 	})
 }
 
