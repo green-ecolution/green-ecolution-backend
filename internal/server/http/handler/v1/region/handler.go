@@ -39,7 +39,7 @@ func GetAllRegions(svc service.RegionService) fiber.Handler {
 
 		return c.JSON(entities.RegionListResponse{
 			Regions:    dto,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Pagination: nil, // TODO: Handle pagination
 		})
 	}
 }

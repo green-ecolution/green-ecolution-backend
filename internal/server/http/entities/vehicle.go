@@ -40,7 +40,7 @@ type VehicleResponse struct {
 
 type VehicleListResponse struct {
 	Data       []*VehicleResponse `json:"data"`
-	Pagination *Pagination        `json:"pagination"`
+	Pagination *Pagination        `json:"pagination,omitempty" validate:"optional"`
 } // @Name VehicleList
 
 type VehicleCreateRequest struct {

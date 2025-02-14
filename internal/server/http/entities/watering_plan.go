@@ -57,7 +57,7 @@ type WateringPlanInListResponse struct {
 
 type WateringPlanListResponse struct {
 	Data       []*WateringPlanInListResponse `json:"data"`
-	Pagination *Pagination                   `json:"pagination"`
+	Pagination *Pagination                   `json:"pagination,omitempty" validate:"optional"`
 } // @Name WateringPlanList
 
 type WateringPlanCreateRequest struct {

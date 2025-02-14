@@ -54,7 +54,7 @@ type TreeClusterInListResponse struct {
 
 type TreeClusterListResponse struct {
 	Data       []*TreeClusterInListResponse `json:"data"`
-	Pagination *Pagination                  `json:"pagination"`
+	Pagination *Pagination                  `json:"pagination,omitempty" validate:"optional"`
 } // @Name TreeClusterList
 
 type TreeClusterCreateRequest struct {
