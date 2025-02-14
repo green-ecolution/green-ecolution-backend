@@ -50,7 +50,9 @@ func (s *Server) Run(ctx context.Context) error {
 	sensorStatusScheduler := worker.NewScheduler(3*time.Hour, worker.SchedulerFunc(s.services.SensorService.UpdateStatuses))
 	go sensorStatusScheduler.Run(ctx)
 
-	wateringPlanStatusScheduler := worker.NewScheduler(24*time.Hour, worker.SchedulerFunc(s.services.WateringPlanService.UpdateStatuses))
+	var onceADay = 24 * time.Hour
+
+	wateringPlanStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.WateringPlanService.UpdateStatuses))
 	go wateringPlanStatusScheduler.Run(ctx)
 
 	go func() {
