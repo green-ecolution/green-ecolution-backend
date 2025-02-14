@@ -53,7 +53,7 @@ type TreeClusterUpdate struct {
 }
 
 type TreeClusterFilter struct {
-	WateringStatus WateringStatus
-	Region         string
+	WateringStatus []WateringStatus
+	Region         []string
 	Provider       string
 }

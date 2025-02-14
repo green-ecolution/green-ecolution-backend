@@ -1,7 +1,6 @@
 package treecluster
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 
@@ -41,21 +40,9 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		statusQu := c.Query("status")
-		var wateringStatus domain.WateringStatus
-
-		if statusQu != "" {
-			var err error
-			wateringStatus, err = parseWateringStatus(statusQu)
-			if err != nil {
-				return service.NewError(service.BadRequest, err.Error())
-			}
-		}
-
-		filter := domain.TreeClusterFilter{
-			WateringStatus: wateringStatus,
-			Region:         strings.Clone(c.Query("region")),
-			Provider:       strings.Clone(c.Query("provider")),
+		filter, err := fillTreeClusterFilter(c)
+		if err != nil {
+			return service.NewError(service.BadRequest, err.Error())
 		}
 
 		domainData, totalCount, err := svc.GetAll(ctx, filter)
@@ -73,6 +60,34 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
+}
+
+func fillTreeClusterFilter(c *fiber.Ctx) (domain.TreeClusterFilter, error) {
+	var wateringStatues []domain.WateringStatus
+	if c.Query("status") != "" {
+		var err error
+		wateringStatues, err = domain.ParseWateringStatus(c.Query("status"))
+		if err != nil {
+			return domain.TreeClusterFilter{}, err
+		}
+	}
+
+	regionQuery := c.Query("region")
+	var regions []string
+	if regionQuery != "" {
+		regions = strings.Split(regionQuery, ",")
+		for i := range regions {
+			regions[i] = strings.TrimSpace(regions[i])
+		}
+	}
+
+	provider := strings.TrimSpace(c.Query("provider"))
+
+	return domain.TreeClusterFilter{
+		WateringStatus: wateringStatues,
+		Region:         regions,
+		Provider:       provider,
+	}, nil
 }
 
 // @Summary		Get tree cluster by ID
@@ -210,20 +225,5 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 		}
 
 		return c.SendStatus(fiber.StatusNoContent)
-	}
-}
-
-func parseWateringStatus(status string) (domain.WateringStatus, error) {
-	switch status {
-	case string(domain.WateringStatusGood):
-		return domain.WateringStatusGood, nil
-	case string(domain.WateringStatusModerate):
-		return domain.WateringStatusModerate, nil
-	case string(domain.WateringStatusBad):
-		return domain.WateringStatusBad, nil
-	case string(domain.WateringStatusUnknown):
-		return domain.WateringStatusUnknown, nil
-	default:
-		return "", errors.New("invalid watering status")
 	}
 }

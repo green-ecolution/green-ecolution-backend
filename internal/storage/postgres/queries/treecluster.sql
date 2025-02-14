@@ -3,9 +3,9 @@ SELECT tc.*
 FROM tree_clusters tc
          LEFT JOIN regions r ON r.id = tc.region_id
 WHERE
-    ($1 != '' AND $1 IS NOT NULL AND tc.watering_status = $1::watering_status OR $1 = '' OR $1 IS NULL)
-    AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL)
-    AND ($3 != '' AND $3 IS NOT NULL AND provider = $3 OR $3 = '' OR $3 IS NULL)
+    (COALESCE(array_length($1::TEXT[], 1), 0) = 0 OR watering_status = ANY(($1::TEXT[])::watering_status[]))
+    AND (COALESCE(array_length($2::TEXT[], 1), 0) = 0 OR r.name = ANY($2::TEXT[]))
+    AND (COALESCE($3, '') = '' OR provider = $3)
 ORDER BY tc.name ASC
      LIMIT $4 OFFSET $5;
 
@@ -14,9 +14,9 @@ SELECT COUNT(*)
 FROM tree_clusters tc
          LEFT JOIN regions r ON r.id = tc.region_id
 WHERE
-    ($1 != '' AND $1 IS NOT NULL AND tc.watering_status = $1::watering_status OR $1 = '' OR $1 IS NULL)
-    AND ($2 != '' AND $2 IS NOT NULL AND r.name = $2 OR $2 = '' OR $2 IS NULL)
-    AND ($3 != '' AND $3 IS NOT NULL AND provider = $3 OR $3 = '' OR $3 IS NULL);
+    (COALESCE(array_length($1::TEXT[], 1), 0) = 0 OR watering_status = ANY(($1::TEXT[])::watering_status[]))
+    AND (COALESCE(array_length($2::TEXT[], 1), 0) = 0 OR r.name = ANY($2::TEXT[]))
+    AND (COALESCE($3, '') = '' OR provider = $3);
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;

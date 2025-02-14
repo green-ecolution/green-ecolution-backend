@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"strconv"
 	"testing"
@@ -223,7 +224,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		filter := entities.TreeClusterFilter{
-			WateringStatus: entities.WateringStatusModerate,
+			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
@@ -261,7 +262,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		filter := entities.TreeClusterFilter{
-			Region: "Mürwik",
+			Region: []string{"Mürwik"},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
@@ -301,8 +302,8 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		filter := entities.TreeClusterFilter{
-			WateringStatus: entities.WateringStatusModerate,
-			Region:         "Mürwik",
+			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
+			Region:         []string{"Mürwik"},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
@@ -333,6 +334,72 @@ func TestGetAllTreeCluster(t *testing.T) {
 
 		mockClusterService.AssertExpectations(t)
 	})
+
+	t.Run("should return tree clusters filtered by multiple watering statuses and multiple regions", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: []entities.WateringStatus{
+				entities.WateringStatusGood,
+				entities.WateringStatusBad,
+			},
+			Region:   []string{"Mürwik", "Altstadt"},
+			Provider: "",
+		}
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2], //  Good + Mürwik
+			TestClusterList[3], //  Bad + Mürwik
+		}
+
+		mockClusterService.EXPECT().
+			GetAll(mock.Anything, filter).
+			Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(
+			context.Background(),
+			http.MethodGet,
+			"/v1/cluster?status=good,bad&region=Mürwik,Altstadt",
+			nil,
+		)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+
+		for _, cluster := range response.Data {
+			assert.Contains(t,
+				[]entities.WateringStatus{
+					entities.WateringStatusGood,
+					entities.WateringStatusModerate,
+				},
+				cluster.WateringStatus,
+				"Cluster watering status is outside the expected list",
+			)
+
+			require.NotNil(t, cluster.Region, "Cluster region must not be nil")
+			assert.Contains(t,
+				[]string{"Mürwik", "Altstadt"},
+				cluster.Region.Name,
+				"Cluster region is outside the expected list",
+			)
+		}
+
+		mockClusterService.AssertExpectations(t)
+	})
+
 }
 
 func TestGetTreeClusterByID(t *testing.T) {
