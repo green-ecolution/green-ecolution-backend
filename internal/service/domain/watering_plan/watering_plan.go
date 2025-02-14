@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
@@ -347,6 +348,40 @@ func (w *WateringPlanService) Delete(ctx context.Context, id int32) error {
 
 func (w *WateringPlanService) Ready() bool {
 	return w.wateringPlanRepo != nil
+}
+
+func (w *WateringPlanService) UpdateStatuses(ctx context.Context) error {
+	log := logger.GetLogger(ctx)
+	plans, _, err := w.wateringPlanRepo.GetAll(ctx, "")
+	if err != nil {
+		log.Error("failed to fetch watering plans", "error", err)
+		return err
+	}
+
+	cutoffTime := time.Now().Add(-24 * time.Hour) // 1 day ago
+	for _, plan := range plans {
+		if plan.Status != entities.WateringPlanStatusActive &&
+			plan.Status != entities.WateringPlanStatusPlanned &&
+			plan.Status != entities.WateringPlanStatusUnknown {
+			continue
+		}
+
+		if plan.Date.Before(cutoffTime) {
+			err = w.wateringPlanRepo.Update(ctx, plan.ID, func(wp *entities.WateringPlan) (bool, error) {
+				wp.Status = entities.WateringPlanStatusNotCompeted
+				return true, nil
+			})
+
+			if err != nil {
+				log.Error("failed to update watering plan status to »not competed«", "watering_plan_id", plan.ID, "error", err)
+			} else {
+				log.Debug("watering plan marked as »not competed«", "watering_plan_id", plan.ID)
+			}
+		}
+	}
+
+	log.Info("watering plan status update process completed successfully")
+	return nil
 }
 
 func (w *WateringPlanService) shouldUpdateGpx(prevWp, newWp *entities.WateringPlan) bool {
