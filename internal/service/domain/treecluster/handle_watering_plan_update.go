@@ -53,6 +53,7 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 			_, err := s.treeRepo.Update(ctx, tr.ID, func(tree *entities.Tree) (bool, error) {
 				log.Debug("updating tree watering status", "prev_status", tr.WateringStatus, "new_status", entities.WateringStatusJustWatered)
 				tree.WateringStatus = entities.WateringStatusJustWatered
+				tree.LastWatered = &date
 				return true, nil
 			})
 
