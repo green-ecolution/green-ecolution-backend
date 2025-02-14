@@ -47,10 +47,15 @@ func TestPaginationUtil_GetValues(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-	t.Run("should return error on empty context", func(t *testing.T) {
-		_, _, err := GetValues(context.Background())
+	t.Run("should return default values on empty context", func(t *testing.T) {
+		expectedPage := int32(1)
+		expectedLimit := int32(-1)
 
-		assert.NotNil(t, err)
+		page, limit, err := GetValues(context.Background())
+
+		assert.Equal(t, expectedPage, page)
+		assert.Equal(t, expectedLimit, limit)
+		assert.NoError(t, err)
 	})
 }
 
