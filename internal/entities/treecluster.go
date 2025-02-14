@@ -56,6 +56,4 @@ type TreeClusterFilter struct {
 	WateringStatus WateringStatus
 	Region         string
 	Provider       string
-	Page           int32
-	Limit          int32
 }
