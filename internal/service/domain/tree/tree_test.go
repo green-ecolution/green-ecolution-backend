@@ -260,6 +260,7 @@ func TestTreeService_Create(t *testing.T) {
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, globalEventManager)
 
 		expectedTree := TestTreesList[0]
+		expectedPrevSensorTree := TestTreesList[1]
 		expectedCluster := TestTreeClusters[0]
 		expectedSensor := TestSensors[0]
 
@@ -275,7 +276,7 @@ func TestTreeService_Create(t *testing.T) {
 				testTree := &entities.Tree{}
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeCreate.TreeClusterID).Return(expectedCluster, nil)
-
+				treeRepo.EXPECT().GetBySensorID(ctx, expectedSensor.ID).Return(expectedPrevSensorTree, nil)
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeCreate.SensorID).Return(expectedSensor, nil)
 
 				success, err := fn(testTree)
@@ -407,6 +408,7 @@ func TestTreeService_Create(t *testing.T) {
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, globalEventManager)
 
 		expectedCluster := TestTreeClusters[0]
+		expectedPrevSensorTree := TestTreesList[1]
 		expectedSensor := TestSensors[0]
 		expectedError := errors.New("tree creation failed")
 
@@ -422,7 +424,7 @@ func TestTreeService_Create(t *testing.T) {
 				testTree := &entities.Tree{}
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeCreate.TreeClusterID).Return(expectedCluster, nil)
-
+				treeRepo.EXPECT().GetBySensorID(ctx, expectedSensor.ID).Return(expectedPrevSensorTree, nil)
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeCreate.SensorID).Return(expectedSensor, nil)
 
 				success, err := fn(testTree)
@@ -568,6 +570,7 @@ func TestTreeService_Update(t *testing.T) {
 		treeCluster := TestTreeClusters[0]
 		currentTree.TreeCluster = treeCluster
 		sensor := TestSensors[0]
+		expectedPrevSensorTree := TestTreesList[1]
 		currentTree.Sensor = sensor
 
 		if TestTreeUpdate.TreeClusterID == nil {
@@ -584,7 +587,7 @@ func TestTreeService_Update(t *testing.T) {
 				testTree := *currentTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.TreeClusterID).Return(treeCluster, nil)
-
+				treeRepo.EXPECT().GetBySensorID(ctx, sensor.ID).Return(expectedPrevSensorTree, nil)
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.SensorID).Return(sensor, nil)
 
 				success, err := fn(&testTree)
@@ -743,15 +746,16 @@ func TestTreeService_Update(t *testing.T) {
 		treeCluster := TestTreeClusters[0]
 		currentTree.TreeCluster = treeCluster
 		sensor := TestSensors[0]
+		expectedPrevSensorTree := TestTreesList[1]
 		currentTree.Sensor = sensor
 
 		treeRepo.EXPECT().GetByID(ctx, id).Return(currentTree, nil)
-
 		treeRepo.EXPECT().Update(ctx, id, mock.Anything).RunAndReturn(
 			func(ctx context.Context, id int32, fn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
 				testTree := *currentTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.TreeClusterID).Return(treeCluster, nil)
+				treeRepo.EXPECT().GetBySensorID(ctx, sensor.ID).Return(expectedPrevSensorTree, nil)
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.SensorID).Return(sensor, nil)
 
 				success, err := fn(&testTree)
