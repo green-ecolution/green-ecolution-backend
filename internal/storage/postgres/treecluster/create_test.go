@@ -85,9 +85,6 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 			return true, nil
 		}
 
-		tree0 := trees[0].ID
-		tree1 := trees[1].ID
-
 		// when
 		got, err := r.Create(context.Background(), createFn)
 
@@ -113,15 +110,9 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Nil(t, got.LastWatered)
 		assert.NotNil(t, got.Trees)
 		assert.Len(t, got.Trees, len(trees))
-		assert.Equal(t, tree0, got.Trees[0].ID)
-		assert.Equal(t, tree1, got.Trees[0].ID)
-		/* for _, tree := range testTrees[len(testTrees)-2:] {
-			assert.Equal(t, *tree.TreeClusterID, got.ID)
-		} */
+		assert.Equal(t, trees[0].ID, got.Trees[0].ID)
+		assert.Equal(t, trees[1].ID, got.Trees[1].ID)
 	})
-
-	// Vergleiche falschen tree
-	// Liegt vielleicht an Sortierung?
 
 	t.Run("should return tree cluster with trees and link tree cluster id to trees", func(t *testing.T) {
 		// given
