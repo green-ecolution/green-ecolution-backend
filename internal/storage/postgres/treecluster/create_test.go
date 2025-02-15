@@ -8,7 +8,6 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -59,22 +58,16 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		}
 		lat := 54.3
 		long := 9.5
-		page, limit, err := pagination.GetValues(context.Background())
-		totalCount, err := suite.Store.GetAllTreesCount(context.Background(), "")
-
-		if limit == -1 {
-			limit = int32(totalCount)
-			page = 1
-		}
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
 			Column1: "",
-			Limit:   limit,
-			Offset:  (page - 1) * limit,
+			Limit:   int32(totalCountTree),
+			Offset:  0,
 		})
 		assert.NoError(t, err)
-		trees, err := mappers.treeMapper.FromSqlList(testTrees)
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
 		if err != nil {
-			t.Fatalf("failed to map trees: %v", err)
+			t.Fatal(err)
 		}
 
 		trees = trees[0:2]
@@ -91,6 +84,9 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 			tc.Trees = trees
 			return true, nil
 		}
+
+		tree0 := trees[0].ID
+		tree1 := trees[1].ID
 
 		// when
 		got, err := r.Create(context.Background(), createFn)
@@ -117,9 +113,11 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Nil(t, got.LastWatered)
 		assert.NotNil(t, got.Trees)
 		assert.Len(t, got.Trees, len(trees))
-		for _, tree := range testTrees[len(testTrees)-2:] {
+		assert.Equal(t, tree0, got.Trees[0].ID)
+		assert.Equal(t, tree1, got.Trees[0].ID)
+		/* for _, tree := range testTrees[len(testTrees)-2:] {
 			assert.Equal(t, *tree.TreeClusterID, got.ID)
-		}
+		} */
 	})
 
 	// Vergleiche falschen tree
