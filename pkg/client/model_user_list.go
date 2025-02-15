@@ -22,8 +22,7 @@ var _ MappedNullable = &UserList{}
 
 // UserList struct for UserList
 type UserList struct {
-	Data       []User      `json:"data"`
-	Pagination *Pagination `json:"pagination,omitempty"`
+	Data []User `json:"data"`
 }
 
 type _UserList UserList
@@ -70,38 +69,6 @@ func (o *UserList) SetData(v []User) {
 	o.Data = v
 }
 
-// GetPagination returns the Pagination field value if set, zero value otherwise.
-func (o *UserList) GetPagination() Pagination {
-	if o == nil || IsNil(o.Pagination) {
-		var ret Pagination
-		return ret
-	}
-	return *o.Pagination
-}
-
-// GetPaginationOk returns a tuple with the Pagination field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *UserList) GetPaginationOk() (*Pagination, bool) {
-	if o == nil || IsNil(o.Pagination) {
-		return nil, false
-	}
-	return o.Pagination, true
-}
-
-// HasPagination returns a boolean if a field has been set.
-func (o *UserList) HasPagination() bool {
-	if o != nil && !IsNil(o.Pagination) {
-		return true
-	}
-
-	return false
-}
-
-// SetPagination gets a reference to the given Pagination and assigns it to the Pagination field.
-func (o *UserList) SetPagination(v Pagination) {
-	o.Pagination = &v
-}
-
 func (o UserList) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -113,9 +80,6 @@ func (o UserList) MarshalJSON() ([]byte, error) {
 func (o UserList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["data"] = o.Data
-	if !IsNil(o.Pagination) {
-		toSerialize["pagination"] = o.Pagination
-	}
 	return toSerialize, nil
 }
 
