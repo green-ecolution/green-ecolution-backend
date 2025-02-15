@@ -255,7 +255,7 @@ func TestGetAllSensorDataById(t *testing.T) {
 		mockSensorService.AssertExpectations(t)
 	})
 
-	t.Run("should return empty sensor list when no sensor data is found", func(t *testing.T) {
+	t.Run("should return error when no sensor data is found", func(t *testing.T) {
 		app := fiber.New()
 		mockSensorService := serviceMock.NewMockSensorService(t)
 		handler := sensor.GetAllSensorDataByID(mockSensorService)
@@ -263,22 +263,17 @@ func TestGetAllSensorDataById(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAllDataByID(
 			mock.Anything,
-			"sensor-1",
-		).Return([]*entities.SensorData{}, nil)
+			"sensor-999",
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/data/sensor-1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/data/sensor-999", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
 		// then
 		assert.Nil(t, err)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-		var response serverEntities.SensorDataListResponse
-		err = utils.ParseJSONResponse(resp, &response)
-		assert.NoError(t, err)
-		assert.Len(t, response.Data, 0)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 
 		mockSensorService.AssertExpectations(t)
 	})

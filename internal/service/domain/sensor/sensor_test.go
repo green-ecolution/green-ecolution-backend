@@ -80,7 +80,7 @@ func TestSensorService_GetAllDataByID(t *testing.T) {
 		assert.Equal(t, TestSensorData, sensorData)
 	})
 
-	t.Run("should return error when repository fails", func(t *testing.T) {
+	t.Run("should return error when no sensor is found", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)

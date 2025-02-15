@@ -192,20 +192,21 @@ func TestSensorRepository_GetAllDataById(t *testing.T) {
 		}
 	})
 
-	t.Run("should return empty slice when db is empty", func(t *testing.T) {
+	t.Run("should return error when no data is found", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.GetAllDataByID(context.Background(), "sensor-1")
+		got, err := r.GetAllDataByID(context.Background(), "sensor-999")
 
 		// then
-		assert.NoError(t, err)
-		assert.Empty(t, got)
+		assert.Error(t, err)
+		assert.Nil(t, got)
 	})
 
-	t.Run("should return empty slice when no data is found", func(t *testing.T) {
+	t.Run("should return error when id is invalid", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
@@ -215,8 +216,8 @@ func TestSensorRepository_GetAllDataById(t *testing.T) {
 		got, err := r.GetAllDataByID(context.Background(), "")
 
 		// then
-		assert.NoError(t, err)
-		assert.Empty(t, got)
+		assert.Error(t, err)
+		assert.Nil(t, got)
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {

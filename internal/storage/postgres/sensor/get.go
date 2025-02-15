@@ -58,6 +58,13 @@ func (r *SensorRepository) GetAll(ctx context.Context, provider string) ([]*enti
 
 func (r *SensorRepository) GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error) {
 	log := logger.GetLogger(ctx)
+
+	_, err := r.GetByID(ctx, id)
+	if err != nil {
+		log.Debug("failed to get sensor in db", "error", err, "sensor_id", id)
+		return nil, r.store.MapError(err, sqlc.Sensor{})
+	}
+
 	rows, err := r.store.GetAllSensorDataByID(ctx, id)
 	if err != nil {
 		log.Debug("failed to get all sensor data by sensor id in db", "error", err, "sensor_id", id)
