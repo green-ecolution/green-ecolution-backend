@@ -8,6 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,9 +29,26 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		lat := 54.3
 		long := 9.5
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		page, limit, err := pagination.GetValues(context.Background())
+		totalCount, err := suite.Store.GetAllTreesCount(context.Background(), "")
+
+		if limit == -1 {
+			limit = int32(totalCount)
+			page = 1
+		}
+
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Column1: "",
+			Limit:   limit,
+			Offset:  (page - 1) * limit,
+		})
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees)
+		if err != nil {
+			t.Fatalf("failed to map trees: %v", err)
+		}
+
+		trees = trees[0:2]
 
 		updateFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "updated"
