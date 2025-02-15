@@ -292,9 +292,19 @@ func TestTreeClusterRepository_GetByIDs(t *testing.T) {
 			assert.Equal(t, allTestCluster[i].MoistureLevel, cluster.MoistureLevel)
 			assert.Equal(t, allTestCluster[i].WateringStatus, cluster.WateringStatus)
 			assert.Equal(t, allTestCluster[i].SoilCondition, cluster.SoilCondition)
-			assert.Equal(t, allTestCluster[i].Latitude, cluster.Latitude)
-			assert.Equal(t, allTestCluster[i].Longitude, cluster.Longitude)
 			assert.Equal(t, allTestCluster[i].Description, cluster.Description)
+
+			if cluster.Latitude != nil {
+				assert.Equal(t, allTestCluster[i].Latitude, *cluster.Latitude)
+			} else {
+				assert.Nil(t, cluster.Latitude)
+			}
+
+			if cluster.Longitude != nil {
+				assert.Equal(t, allTestCluster[i].Longitude, *cluster.Longitude)
+			} else {
+				assert.Nil(t, cluster.Longitude)
+			}
 
 			// assert region
 			if allTestCluster[i].RegionID == -1 {
@@ -513,7 +523,7 @@ var allTestCluster = []*testTreeCluster{
 		SoilCondition:  entities.TreeSoilConditionLehmig,
 		RegionID:       -1, // no region
 		TreeIDs:        []int32{25, 26, 27, 28},
-		Provider: "test-provider",
+		Provider:       "test-provider",
 		AdditionalInfo: map[string]interface{}{
 			"foo": "bar",
 		},
