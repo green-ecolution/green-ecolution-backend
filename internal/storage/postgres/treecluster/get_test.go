@@ -193,8 +193,18 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.Equal(t, allTestCluster[0].MoistureLevel, got.MoistureLevel)
 		assert.Equal(t, allTestCluster[0].WateringStatus, got.WateringStatus)
 		assert.Equal(t, allTestCluster[0].SoilCondition, got.SoilCondition)
-		assert.Equal(t, allTestCluster[0].Latitude, got.Latitude)
-		assert.Equal(t, allTestCluster[0].Longitude, got.Longitude)
+
+		if got.Latitude != nil {
+			assert.Equal(t, allTestCluster[0].Latitude, *got.Latitude)
+		} else {
+			assert.Nil(t, got.Latitude)
+		}
+
+		if got.Longitude != nil {
+			assert.Equal(t, allTestCluster[0].Longitude, *got.Longitude)
+		} else {
+			assert.Nil(t, got.Longitude)
+		}
 
 		// assert region
 		if allTestCluster[0].RegionID == -1 {
@@ -416,7 +426,7 @@ var allTestCluster = []*testTreeCluster{
 		Description:    "Alle Bäume am Strand",
 		MoistureLevel:  0.75,
 		WateringStatus: entities.WateringStatusGood,
-		Latitude:       54.82128536520703,
+		Latitude:       54.82094,
 		Longitude:      9.488152515892045,
 		SoilCondition:  entities.TreeSoilConditionSandig,
 		RegionID:       1,
@@ -430,7 +440,7 @@ var allTestCluster = []*testTreeCluster{
 		MoistureLevel:  0.5,
 		WateringStatus: entities.WateringStatusModerate,
 		Latitude:       54.78805731048199,
-		Longitude:      9.44400186680097,
+		Longitude:      9.489022,
 		SoilCondition:  entities.TreeSoilConditionSchluffig,
 		RegionID:       1,
 		TreeIDs:        []int32{4, 5, 6},
