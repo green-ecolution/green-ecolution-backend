@@ -31,7 +31,7 @@ type TreeClusterResponse struct {
 	SoilCondition  TreeSoilCondition      `json:"soil_condition"`
 	Name           string                 `json:"name"`
 	Provider       string                 `json:"provider,omitempty"`
-	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty" validate:"optional"`
 } // @Name TreeCluster
 
 type TreeClusterInListResponse struct {

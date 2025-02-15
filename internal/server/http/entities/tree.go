@@ -20,7 +20,7 @@ type TreeResponse struct {
 	WateringStatus WateringStatus         `json:"watering_status"`
 	Description    string                 `json:"description"`
 	Provider       string                 `json:"provider,omitempty"`
-	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty" validate:"optional"`
 } // @Name Tree
 
 type TreeListResponse struct {
