@@ -11,6 +11,7 @@ import (
 // goverter:extend MapSensorStatus MapLatestDataToResponse
 type SensorHTTPMapper interface {
 	FromResponse(src *domain.Sensor) *entities.SensorResponse
+	FromDataResponse(src *domain.SensorData) *entities.SensorDataResponse
 	FromWatermarkResponse(src *domain.Watermark) *entities.WatermarkResponse
 }
 
