@@ -427,7 +427,7 @@ var allTestCluster = []*testTreeCluster{
 		MoistureLevel:  0.75,
 		WateringStatus: entities.WateringStatusGood,
 		Latitude:       54.82094,
-		Longitude:      9.488152515892045,
+		Longitude:      9.489022,
 		SoilCondition:  entities.TreeSoilConditionSandig,
 		RegionID:       1,
 		TreeIDs:        []int32{1, 2, 3},

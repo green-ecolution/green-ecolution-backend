@@ -77,7 +77,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 			t.Fatalf("failed to map trees: %v", err)
 		}
 
-		trees = trees[0:1]
+		trees = trees[0:2]
 		createFn := func(tc *entities.TreeCluster) (bool, error) {
 			tc.Name = "test"
 			tc.Address = "address"
@@ -117,7 +117,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.Nil(t, got.LastWatered)
 		assert.NotNil(t, got.Trees)
 		assert.Len(t, got.Trees, len(trees))
-		for _, tree := range testTrees[0:2] {
+		for _, tree := range testTrees[len(testTrees)-2:] {
 			assert.Equal(t, *tree.TreeClusterID, got.ID)
 		}
 	})
