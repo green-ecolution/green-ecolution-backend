@@ -21,10 +21,11 @@ func TestVehicleMapper_FromSql(t *testing.T) {
 		src := allTestVehicles[0]
 
 		// when
-		got := verhicleMapper.FromSql(src)
+		got, err := verhicleMapper.FromSql(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
@@ -46,10 +47,11 @@ func TestVehicleMapper_FromSql(t *testing.T) {
 		var src *sqlc.Vehicle = nil
 
 		// when
-		got := verhicleMapper.FromSql(src)
+		got, err := verhicleMapper.FromSql(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -61,10 +63,11 @@ func TestVehicleMapper_FromSqlList(t *testing.T) {
 		src := allTestVehicles
 
 		// when
-		got := verhicleMapper.FromSqlList(src)
+		got, err := verhicleMapper.FromSqlList(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Len(t, got, 2)
 
 		for i, src := range src {
@@ -90,10 +93,11 @@ func TestVehicleMapper_FromSqlList(t *testing.T) {
 		var src []*sqlc.Vehicle = nil
 
 		// when
-		got := verhicleMapper.FromSqlList(src)
+		got, err := verhicleMapper.FromSqlList(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -172,9 +176,10 @@ func TestMapDrivingLicense(t *testing.T) {
 		input    sqlc.DrivingLicense
 		expected entities.DrivingLicense
 	}{
-		{input: sqlc.DrivingLicenseB, expected: entities.DrivingLicenseCar},
-		{input: sqlc.DrivingLicenseBE, expected: entities.DrivingLicenseTrailer},
-		{input: sqlc.DrivingLicenseC, expected: entities.DrivingLicenseTransporter},
+		{input: sqlc.DrivingLicenseB, expected: entities.DrivingLicenseB},
+		{input: sqlc.DrivingLicenseBE, expected: entities.DrivingLicenseBE},
+		{input: sqlc.DrivingLicenseC, expected: entities.DrivingLicenseC},
+		{input: sqlc.DrivingLicenseCE, expected: entities.DrivingLicenseCE},
 	}
 
 	for _, test := range tests {

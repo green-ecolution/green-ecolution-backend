@@ -12,20 +12,25 @@ import (
 )
 
 func TestWateringPlanRepository_GetAll(t *testing.T) {
-	t.Run("should return all watering plans", func(t *testing.T) {
+	t.Run("should return all watering plans without limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
 		assert.Len(t, got, len(allTestWateringPlans))
+		assert.Equal(t, totalCount, int64(len(allTestWateringPlans)))
+
 		for i, wp := range got {
 			assert.Equal(t, allTestWateringPlans[i].ID, wp.ID)
 			assert.Equal(t, allTestWateringPlans[i].Date, wp.Date)
@@ -77,17 +82,110 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all watering plans with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		expectedPlan := allTestWateringPlans[1]
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "test-provider")
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, expectedPlan.ID, got[0].ID)
+		assert.Equal(t, expectedPlan.Date, got[0].Date)
+		assert.Equal(t, expectedPlan.Description, got[0].Description)
+		assert.Equal(t, expectedPlan.Status, got[0].Status)
+		assert.Equal(t, expectedPlan.Distance, got[0].Distance)
+		assert.Equal(t, *expectedPlan.TotalWaterRequired, *got[0].TotalWaterRequired)
+		assert.Equal(t, expectedPlan.CancellationNote, got[0].CancellationNote)
+	})
+
+	t.Run("should return all watering plans limited by 2 and with an offset of 2", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "")
+		wateringPlans := allTestWateringPlans[2:4]
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Len(t, got, 2)
+		assert.Equal(t, totalCount, int64(len(allTestWateringPlans)))
+
+		for i, wp := range got {
+			assert.Equal(t, wateringPlans[i].ID, wp.ID)
+		}
+	})
+
+	t.Run("should return error on invalid page value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(0))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
+	t.Run("should return error on invalid limit value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(0))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx, "")
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -97,7 +195,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		_, err := r.GetAll(ctx)
+		_, _, err := r.GetAll(ctx, "")
 
 		// then
 		assert.Error(t, err)
@@ -624,6 +722,10 @@ var allTestWateringPlans = []*entities.WateringPlan{
 		TreeClusters:       allTestClusters[2:3],
 		CancellationNote:   "",
 		UserIDs:            parseUUIDs([]string{"6a1078e8-80fd-458f-b74e-e388fe2dd6ab"}),
+		Provider:           "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 	{
 		ID:                 3,

@@ -1,5 +1,12 @@
 -- name: GetAllSensors :many
-SELECT * FROM sensors ORDER BY id;
+SELECT * FROM sensors 
+WHERE ($1 = '') OR (provider = $1) 
+ORDER BY id 
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllSensorsCount :one
+SELECT COUNT(*) FROM sensors
+WHERE ($1 = '') OR (provider = $1);
 
 -- name: GetSensorByID :one
 SELECT * FROM sensors WHERE id = $1;
@@ -16,14 +23,16 @@ LIMIT 1;
 
 -- name: CreateSensor :one
 INSERT INTO sensors (
-    id, status, latitude, longitude
+    id, status, latitude, longitude, provider, additional_informations
 ) VALUES (
-  $1, $2, $3, $4
+  $1, $2, $3, $4, $5, $6
 ) RETURNING id;
 
 -- name: UpdateSensor :exec
 UPDATE sensors SET
-  status = $2
+  status = $2,
+  provider = $3,
+  additional_informations = $4
 WHERE id = $1;
 
 -- name: SetSensorLocation :exec

@@ -1,8 +1,32 @@
 -- name: GetAllVehicles :many
-SELECT * FROM vehicles ORDER BY water_capacity DESC;
+SELECT * 
+FROM vehicles 
+WHERE 
+  ($1 = '') OR (provider = $1) 
+ORDER BY water_capacity DESC
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllVehiclesCount :one
+SELECT COUNT(*) 
+  FROM vehicles 
+  WHERE 
+    ($1 = '' OR provider = $1);
 
 -- name: GetAllVehiclesByType :many
-SELECT * FROM vehicles WHERE type = $1 ORDER BY water_capacity DESC;
+SELECT * 
+FROM vehicles 
+WHERE 
+  type = $1
+  AND ($2 = '' OR provider = $2)
+ORDER BY water_capacity DESC
+LIMIT $3 OFFSET $4;
+
+-- name: GetAllVehiclesByTypeCount :one
+SELECT COUNT(*) 
+  FROM vehicles 
+  WHERE 
+    type = $1
+    AND ($2 = '' OR provider = $2);
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;
@@ -22,9 +46,11 @@ INSERT INTO vehicles (
   height, 
   length, 
   width,
-  weight
+  weight,
+  provider,
+  additional_informations
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,$11
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 ) RETURNING id;
 
 -- name: UpdateVehicle :exec
@@ -39,7 +65,9 @@ UPDATE vehicles SET
   height = $9,
   length = $10,
   width = $11,
-  weight = $12
+  weight = $12,
+  provider = $13,
+  additional_informations = $14
 WHERE id = $1;
 
 -- name: DeleteVehicle :one

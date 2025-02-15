@@ -40,11 +40,7 @@ func Login(svc service.AuthService) fiber.Handler {
 			RedirectURL: redirectURL,
 		}
 
-		resp, err := svc.LoginRequest(ctx, &req)
-		if err != nil {
-			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
-		}
-
+		resp := svc.LoginRequest(ctx, &req)
 		response := entities.LoginResponse{
 			LoginURL: resp.LoginURL.String(),
 		}
@@ -118,6 +114,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		response := entities.ClientTokenResponse{
 			AccessToken:  token.AccessToken,
+			Expiry:       token.Expiry,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
 			TokenType:    token.TokenType,
@@ -212,8 +209,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Data: data,
 		})
 	}
 }
@@ -240,10 +236,9 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role format"))
 		}
 
-		var userRole domain.Role
-		userRole.SetName(role)
-		if userRole.Name == domain.UserRoleUnknown {
-			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role name"))
+		userRole := domain.ParseUserRole(role)
+		if userRole == domain.UserRoleUnknown {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role type"))
 		}
 
 		users, err := svc.GetAllByRole(ctx, userRole)
@@ -257,8 +252,7 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Data: data,
 		})
 	}
 }
@@ -315,6 +309,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			AccessToken:  token.AccessToken,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
 			TokenType:    token.TokenType,
 		}
 

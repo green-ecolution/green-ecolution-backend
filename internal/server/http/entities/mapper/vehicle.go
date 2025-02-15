@@ -8,6 +8,7 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:MapKeyValueInterface
 // goverter:extend MapVehicleStatus MapVehicleType MapVehicleStatusReq MapVehicleTypeReq MapDrivingLicense MapDrivingLicenseReq
 type VehicleHTTPMapper interface {
 	FromResponse(*domain.Vehicle) *entities.VehicleResponse

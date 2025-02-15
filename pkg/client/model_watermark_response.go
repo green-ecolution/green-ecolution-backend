@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,8 +22,8 @@ var _ MappedNullable = &WatermarkResponse{}
 
 // WatermarkResponse struct for WatermarkResponse
 type WatermarkResponse struct {
-	Centibar int32 `json:"centibar"`
-	Depth int32 `json:"depth"`
+	Centibar   int32 `json:"centibar"`
+	Depth      int32 `json:"depth"`
 	Resistance int32 `json:"resistance"`
 }
 
@@ -122,7 +122,7 @@ func (o *WatermarkResponse) SetResistance(v int32) {
 }
 
 func (o WatermarkResponse) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -152,10 +152,10 @@ func (o *WatermarkResponse) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -211,5 +211,3 @@ func (v *NullableWatermarkResponse) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

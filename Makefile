@@ -1,4 +1,4 @@
-ENV ?= dev
+export ENV ?= dev
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := green-ecolution-backend
 APP_VERSION ?= $(shell git describe --tags --always --dirty)

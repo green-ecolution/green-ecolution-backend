@@ -23,7 +23,7 @@ func (r *ImageRepository) Create(ctx context.Context, iFn ...entities.EntityFunc
 
 	id, err := r.createEntity(ctx, entity)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	entity.ID = *id
@@ -39,7 +39,7 @@ func (r *ImageRepository) createEntity(ctx context.Context, image *entities.Imag
 
 	id, err := r.store.CreateImage(ctx, &args)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	return &id, nil

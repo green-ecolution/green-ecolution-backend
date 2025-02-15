@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,8 +22,8 @@ var _ MappedNullable = &UserList{}
 
 // UserList struct for UserList
 type UserList struct {
-	Data []User `json:"data"`
-	Pagination Pagination `json:"pagination"`
+	Data       []User      `json:"data"`
+	Pagination *Pagination `json:"pagination,omitempty"`
 }
 
 type _UserList UserList
@@ -32,10 +32,9 @@ type _UserList UserList
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUserList(data []User, pagination Pagination) *UserList {
+func NewUserList(data []User) *UserList {
 	this := UserList{}
 	this.Data = data
-	this.Pagination = pagination
 	return &this
 }
 
@@ -71,32 +70,40 @@ func (o *UserList) SetData(v []User) {
 	o.Data = v
 }
 
-// GetPagination returns the Pagination field value
+// GetPagination returns the Pagination field value if set, zero value otherwise.
 func (o *UserList) GetPagination() Pagination {
-	if o == nil {
+	if o == nil || IsNil(o.Pagination) {
 		var ret Pagination
 		return ret
 	}
-
-	return o.Pagination
+	return *o.Pagination
 }
 
-// GetPaginationOk returns a tuple with the Pagination field value
+// GetPaginationOk returns a tuple with the Pagination field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *UserList) GetPaginationOk() (*Pagination, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Pagination) {
 		return nil, false
 	}
-	return &o.Pagination, true
+	return o.Pagination, true
 }
 
-// SetPagination sets field value
+// HasPagination returns a boolean if a field has been set.
+func (o *UserList) HasPagination() bool {
+	if o != nil && !IsNil(o.Pagination) {
+		return true
+	}
+
+	return false
+}
+
+// SetPagination gets a reference to the given Pagination and assigns it to the Pagination field.
 func (o *UserList) SetPagination(v Pagination) {
-	o.Pagination = v
+	o.Pagination = &v
 }
 
 func (o UserList) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -106,7 +113,9 @@ func (o UserList) MarshalJSON() ([]byte, error) {
 func (o UserList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["data"] = o.Data
-	toSerialize["pagination"] = o.Pagination
+	if !IsNil(o.Pagination) {
+		toSerialize["pagination"] = o.Pagination
+	}
 	return toSerialize, nil
 }
 
@@ -116,7 +125,6 @@ func (o *UserList) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"data",
-		"pagination",
 	}
 
 	allProperties := make(map[string]interface{})
@@ -124,10 +132,10 @@ func (o *UserList) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -183,5 +191,3 @@ func (v *NullableUserList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

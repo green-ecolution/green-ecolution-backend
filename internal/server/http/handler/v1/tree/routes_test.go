@@ -24,7 +24,8 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 			mockTreeService.EXPECT().GetAll(
 				mock.Anything,
-			).Return(TestTrees, nil)
+				"",
+			).Return(TestTrees, int64(len(TestTrees)), nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)

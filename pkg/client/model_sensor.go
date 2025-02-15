@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,13 +22,15 @@ var _ MappedNullable = &Sensor{}
 
 // Sensor struct for Sensor
 type Sensor struct {
-	CreatedAt string `json:"created_at"`
-	Id string `json:"id"`
-	LatestData SensorData `json:"latest_data"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	Status SensorStatus `json:"status"`
-	UpdatedAt string `json:"updated_at"`
+	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	CreatedAt             string                 `json:"created_at"`
+	Id                    string                 `json:"id"`
+	LatestData            SensorData             `json:"latest_data"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	Provider              string                 `json:"provider"`
+	Status                SensorStatus           `json:"status"`
+	UpdatedAt             string                 `json:"updated_at"`
 }
 
 type _Sensor Sensor
@@ -37,13 +39,15 @@ type _Sensor Sensor
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensor(createdAt string, id string, latestData SensorData, latitude float32, longitude float32, status SensorStatus, updatedAt string) *Sensor {
+func NewSensor(additionalInformation map[string]interface{}, createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status SensorStatus, updatedAt string) *Sensor {
 	this := Sensor{}
+	this.AdditionalInformation = additionalInformation
 	this.CreatedAt = createdAt
 	this.Id = id
 	this.LatestData = latestData
 	this.Latitude = latitude
 	this.Longitude = longitude
+	this.Provider = provider
 	this.Status = status
 	this.UpdatedAt = updatedAt
 	return &this
@@ -55,6 +59,30 @@ func NewSensor(createdAt string, id string, latestData SensorData, latitude floa
 func NewSensorWithDefaults() *Sensor {
 	this := Sensor{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value
+func (o *Sensor) GetAdditionalInformation() map[string]interface{} {
+	if o == nil {
+		var ret map[string]interface{}
+		return ret
+	}
+
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
+// and a boolean to check if the value has been set.
+func (o *Sensor) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// SetAdditionalInformation sets field value
+func (o *Sensor) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetCreatedAt returns the CreatedAt field value
@@ -177,6 +205,30 @@ func (o *Sensor) SetLongitude(v float32) {
 	o.Longitude = v
 }
 
+// GetProvider returns the Provider field value
+func (o *Sensor) GetProvider() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value
+// and a boolean to check if the value has been set.
+func (o *Sensor) GetProviderOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Provider, true
+}
+
+// SetProvider sets field value
+func (o *Sensor) SetProvider(v string) {
+	o.Provider = v
+}
+
 // GetStatus returns the Status field value
 func (o *Sensor) GetStatus() SensorStatus {
 	if o == nil {
@@ -226,7 +278,7 @@ func (o *Sensor) SetUpdatedAt(v string) {
 }
 
 func (o Sensor) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -235,11 +287,13 @@ func (o Sensor) MarshalJSON() ([]byte, error) {
 
 func (o Sensor) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	toSerialize["additional_information"] = o.AdditionalInformation
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["id"] = o.Id
 	toSerialize["latest_data"] = o.LatestData
 	toSerialize["latitude"] = o.Latitude
 	toSerialize["longitude"] = o.Longitude
+	toSerialize["provider"] = o.Provider
 	toSerialize["status"] = o.Status
 	toSerialize["updated_at"] = o.UpdatedAt
 	return toSerialize, nil
@@ -250,11 +304,13 @@ func (o *Sensor) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"additional_information",
 		"created_at",
 		"id",
 		"latest_data",
 		"latitude",
 		"longitude",
+		"provider",
 		"status",
 		"updated_at",
 	}
@@ -264,10 +320,10 @@ func (o *Sensor) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -323,5 +379,3 @@ func (v *NullableSensor) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

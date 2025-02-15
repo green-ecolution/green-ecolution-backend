@@ -20,14 +20,13 @@ import (
 	"strings"
 )
 
-
 // TreeSensorAPIService TreeSensorAPI service
 type TreeSensorAPIService service
 
 type ApiGetTreeBySensorIdRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *TreeSensorAPIService
-	sensorId string
+	sensorId   string
 }
 
 func (r ApiGetTreeBySensorIdRequest) Execute() (*Tree, *http.Response, error) {
@@ -39,26 +38,27 @@ GetTreeBySensorId Get tree by sensor ID
 
 Get tree by sensor ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param sensorId Sensor ID
- @return ApiGetTreeBySensorIdRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param sensorId Sensor ID
+	@return ApiGetTreeBySensorIdRequest
 */
 func (a *TreeSensorAPIService) GetTreeBySensorId(ctx context.Context, sensorId string) ApiGetTreeBySensorIdRequest {
 	return ApiGetTreeBySensorIdRequest{
 		ApiService: a,
-		ctx: ctx,
-		sensorId: sensorId,
+		ctx:        ctx,
+		sensorId:   sensorId,
 	}
 }
 
 // Execute executes the request
-//	@return	Tree
+//
+//	@return Tree
 func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRequest) (*Tree, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Tree
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Tree
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "TreeSensorAPIService.GetTreeBySensorId")
@@ -119,8 +119,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 401 {
@@ -130,8 +130,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 403 {
@@ -141,8 +141,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -152,8 +152,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -163,8 +163,8 @@ func (a *TreeSensorAPIService) GetTreeBySensorIdExecute(r ApiGetTreeBySensorIdRe
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

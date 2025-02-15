@@ -18,7 +18,9 @@ func TestTreeRepository_Create(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background())
+		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+			return true, nil
+		})
 
 		// then
 		assert.NoError(t, err)
@@ -38,7 +40,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Equal(t, entities.WateringStatusUnknown, got.WateringStatus)
 	})
 
-	t.Run("should create a tree with all values set", func(t *testing.T) {
+	t.Run("should create a tree with all values set, except images", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
@@ -47,26 +49,37 @@ func TestTreeRepository_Create(t *testing.T) {
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
 		}
-		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+
+		treeCluster, err := mappers.tcMapper.FromSql(sqlTreeCluster)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		sensorID := "sensor-1"
 		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), sensorID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
-		sensor := mappers.sMapper.FromSql(sqlSensor)
+
+		sensor, err := mappers.sMapper.FromSql(sqlSensor)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithSpecies("Oak"),
-			WithNumber("T001"),
-			WithPlantingYear(2023),
-			WithLatitude(54.801539),
-			WithLongitude(9.446741),
-			WithDescription("A newly planted oak tree"),
-			WithWateringStatus(entities.WateringStatusGood),
-			WithTreeCluster(treeCluster),
-			WithSensor(sensor),
-		)
+		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "Oak"
+			tree.Number = "T001"
+			tree.PlantingYear = 2023
+			tree.Latitude = 54.801539
+			tree.Longitude = 9.446741
+			tree.Description = "A newly planted oak tree"
+			tree.WateringStatus = entities.WateringStatusGood
+			tree.TreeCluster = treeCluster
+			tree.Sensor = sensor
+			return true, nil
+		})
+
 		treeClusterByTree, errClusterByTree := r.getTreeClusterByTreeID(context.Background(), got.ID)
 		sensorByTree, errSensorByTree := r.GetSensorByTreeID(context.Background(), got.ID)
 
@@ -100,10 +113,11 @@ func TestTreeRepository_Create(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithLatitude(-200),
-			WithLongitude(0),
-		)
+		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+			tree.Latitude = -200
+			tree.Longitude = 0
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -118,10 +132,11 @@ func TestTreeRepository_Create(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithLatitude(0),
-			WithLongitude(200),
-		)
+		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+			tree.Latitude = 0
+			tree.Longitude = 200
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -139,15 +154,16 @@ func TestTreeRepository_Create(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Create(ctx, WithSpecies("Oak"))
+		got, err := r.Create(ctx, func(tree *entities.Tree) (bool, error) {
+			tree.Species = "Oak"
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
 	})
-}
 
-func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 	t.Run("should create tree and link images successfully", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
@@ -163,26 +179,36 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 		if clusterErr != nil {
 			t.Fatal(clusterErr)
 		}
-		treeCluster := mappers.tcMapper.FromSql(sqlTreeCluster)
+		treeCluster, err := mappers.tcMapper.FromSql(sqlTreeCluster)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		sensorID := "sensor-1"
 		sqlSensor, sensorErr := suite.Store.GetSensorByID(context.Background(), sensorID)
 		if sensorErr != nil {
 			t.Fatal(sensorErr)
 		}
-		sensor := mappers.sMapper.FromSql(sqlSensor)
+
+		sensor, err := mappers.sMapper.FromSql(sqlSensor)
+		if err != nil {
+			t.Fatal(err)
+		}
 
 		// when
-		tree, createErr := r.CreateAndLinkImages(context.Background(),
-			WithSpecies("Oak"),
-			WithNumber("T001"),
-			WithLatitude(54.801539),
-			WithLongitude(9.446741),
-			WithPlantingYear(2023),
-			WithDescription("Test tree with images"),
-			WithTreeCluster(treeCluster),
-			WithSensor(sensor),
-			WithImages(images),
-		)
+		tree, createErr := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+			tree.Species = "Oak"
+			tree.Number = "T001"
+			tree.Latitude = 54.801539
+			tree.Longitude = 9.446741
+			tree.PlantingYear = 2023
+			tree.Description = "Test tree with images"
+			tree.TreeCluster = treeCluster
+			tree.Sensor = sensor
+			tree.Images = images
+			return true, nil
+		})
+
 		treeClusterByTree, errClusterByTree := r.getTreeClusterByTreeID(context.Background(), tree.ID)
 		sensorByTree, errSensorByTree := r.GetSensorByTreeID(context.Background(), tree.ID)
 
@@ -209,57 +235,5 @@ func TestTreeRepository_CreateAndLinkImages(t *testing.T) {
 			assert.Equal(t, *images[i].Filename, *img.Filename)
 			assert.Equal(t, *images[i].MimeType, *img.MimeType)
 		}
-	})
-
-	t.Run("should create tree without images if they are not given", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-
-		// when
-		tree, createErr := r.CreateAndLinkImages(context.Background(),
-			WithSpecies("Oak"),
-			WithNumber("T001"),
-			WithLatitude(54.801539),
-			WithLongitude(9.446741),
-			WithPlantingYear(2023),
-			WithReadonly(true),
-			WithDescription("Test tree with images"),
-		)
-
-		// then
-		assert.NoError(t, createErr)
-		assert.NotNil(t, tree)
-		assert.Equal(t, "Oak", tree.Species)
-		assert.Equal(t, "T001", tree.Number)
-		assert.Equal(t, 54.801539, tree.Latitude)
-		assert.Equal(t, 9.446741, tree.Longitude)
-		assert.Equal(t, int32(2023), tree.PlantingYear)
-		assert.Equal(t, true, tree.Readonly)
-		assert.Equal(t, "Test tree with images", tree.Description)
-		assert.Empty(t, tree.Images)
-	})
-
-	t.Run("should return error if context is canceled", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		sqlImages, err := suite.Store.GetAllImages(context.Background())
-		if err != nil {
-			t.Fatal(err)
-		}
-		images := mappers.iMapper.FromSqlList(sqlImages)
-
-		// when
-		got, err := r.CreateAndLinkImages(ctx, WithSpecies("Oak"), WithImages(images))
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, got)
 	})
 }

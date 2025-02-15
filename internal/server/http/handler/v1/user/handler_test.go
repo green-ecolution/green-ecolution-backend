@@ -38,7 +38,7 @@ func TestLogin(t *testing.T) {
 		loginResponse := &domain.LoginResp{
 			LoginURL: parsedURLResponse,
 		}
-		mockAuthService.EXPECT().LoginRequest(mock.Anything, loginRequest).Return(loginResponse, nil)
+		mockAuthService.EXPECT().LoginRequest(mock.Anything, loginRequest).Return(loginResponse)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, "/v1/user/login?redirect_url="+parsedURLRedirect.String(), nil)
@@ -65,30 +65,6 @@ func TestLogin(t *testing.T) {
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-		mockAuthService.AssertExpectations(t)
-	})
-
-	t.Run("Should return 500 for invalid login.", func(t *testing.T) {
-		// given
-		app := fiber.New()
-		mockAuthService := serviceMock.NewMockAuthService(t)
-		app.Get("/v1/user/login", Login(mockAuthService))
-
-		parsedURLRedirect, _ := url.Parse("http://example.com/redirect")
-
-		loginRequest := &domain.LoginRequest{
-			RedirectURL: parsedURLRedirect,
-		}
-		mockAuthService.EXPECT().LoginRequest(mock.Anything, loginRequest).Return(nil, errors.New("service error"))
-
-		// when
-		req := httptest.NewRequest(http.MethodGet, "/v1/user/login?redirect_url="+parsedURLRedirect.String(), nil)
-		resp, err := app.Test(req, -1)
-		defer resp.Body.Close()
-
-		// then
-		assert.Nil(t, err)
-		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 		mockAuthService.AssertExpectations(t)
 	})
 
@@ -700,8 +676,8 @@ func TestGetUsersByRole(t *testing.T) {
 				Username:    "johndoe",
 				EmployeeID:  "1234",
 				PhoneNumber: "+123456789",
-				Roles: []domain.Role{
-					{Name: domain.UserRoleTbz},
+				Roles: []domain.UserRole{
+					domain.UserRoleTbz,
 				},
 			},
 			{
@@ -713,13 +689,13 @@ func TestGetUsersByRole(t *testing.T) {
 				Username:    "janedoe",
 				EmployeeID:  "5678",
 				PhoneNumber: "+987654321",
-				Roles: []domain.Role{
-					{Name: domain.UserRoleGreenEcolution},
+				Roles: []domain.UserRole{
+					domain.UserRoleSmarteGrenzregion,
 				},
 			},
 		}
 		expectedUsers := []*domain.User{users[1]}
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleGreenEcolution}).Return(expectedUsers, nil)
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleGreenEcolution).Return(expectedUsers, nil)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleGreenEcolution), nil)
@@ -767,7 +743,7 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleTbz}).
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleTbz).
 			Return(nil, service.NewError(service.InternalError, "service error"))
 
 		// when
@@ -786,7 +762,7 @@ func TestGetUsersByRole(t *testing.T) {
 		mockAuthService := serviceMock.NewMockAuthService(t)
 		app.Get("/v1/user/role/:role", GetUsersByRole(mockAuthService))
 
-		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.Role{Name: domain.UserRoleTbz}).Return([]*domain.User{}, nil)
+		mockAuthService.EXPECT().GetAllByRole(mock.Anything, domain.UserRoleTbz).Return([]*domain.User{}, nil)
 
 		// when
 		req := httptest.NewRequest(http.MethodGet, string("/v1/user/role/"+domain.UserRoleTbz), nil)

@@ -22,10 +22,11 @@ func TestWateringPlanMapper_FromSql(t *testing.T) {
 		src := allTestWateringPlans[0]
 
 		// when
-		got := wateringPlanMapper.FromSql(src)
+		got, err := wateringPlanMapper.FromSql(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
@@ -41,10 +42,11 @@ func TestWateringPlanMapper_FromSql(t *testing.T) {
 		var src *sqlc.WateringPlan = nil
 
 		// when
-		got := wateringPlanMapper.FromSql(src)
+		got, err := wateringPlanMapper.FromSql(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -56,14 +58,14 @@ func TestWateringPlanMapper_FromSqlList(t *testing.T) {
 		src := allTestWateringPlans
 
 		// when
-		got := wateringPlanMapper.FromSqlList(src)
+		got, err := wateringPlanMapper.FromSqlList(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Len(t, got, 5)
 
 		for i, src := range src {
-			assert.NotNil(t, got)
 			assert.NotNil(t, got)
 			assert.Equal(t, src.ID, got[i].ID)
 			assert.Equal(t, src.CreatedAt.Time, got[i].CreatedAt)
@@ -81,10 +83,11 @@ func TestWateringPlanMapper_FromSqlList(t *testing.T) {
 		var src []*sqlc.WateringPlan = nil
 
 		// when
-		got := wateringPlanMapper.FromSqlList(src)
+		got, err := wateringPlanMapper.FromSqlList(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 

@@ -32,9 +32,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   gofmt:
-    rewrite-rules:
-      - pattern: "interface{}"
-        replacement: "any"
+    rewrite-rules: []
   # goimports:
   #   local-prefixes: github.com/golangci/golangci-lint
   gomnd:

@@ -1,5 +1,12 @@
 -- name: GetAllTrees :many
-SELECT * FROM trees ORDER BY number ASC;
+SELECT * FROM trees
+WHERE ($1 = '') OR (provider = $1)
+ORDER BY number ASC
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllTreesCount :one
+SELECT COUNT(*) FROM trees
+WHERE ($1 = '') OR (provider = $1);
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
@@ -30,9 +37,9 @@ SELECT tree_clusters.* FROM tree_clusters JOIN trees ON tree_clusters.id = trees
 
 -- name: CreateTree :one
 INSERT INTO trees (
-  tree_cluster_id, sensor_id, planting_year, species, number, readonly, description, watering_status, latitude, longitude
+  tree_cluster_id, sensor_id, planting_year, species, number, readonly, description, watering_status, latitude, longitude, provider, additional_informations
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 ) RETURNING id;
 
 -- name: UpdateTree :exec
@@ -44,7 +51,9 @@ UPDATE trees SET
   number = $6,
   readonly = $7,
   watering_status = $8,
-  description = $9
+  description = $9,
+  provider = $10,
+  additional_informations = $11
 WHERE id = $1;
 
 -- name: SetTreeLocation :exec
@@ -78,11 +87,13 @@ WHERE id = $1;
 -- name: DeleteTree :one
 DELETE FROM trees WHERE id = $1 RETURNING id;
 
--- name: UnlinkTreeClusterID :exec
-UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1;
+-- name: UnlinkTreeClusterID :many
+UPDATE trees SET tree_cluster_id = NULL WHERE tree_cluster_id = $1 RETURNING id;
 
 -- name: UnlinkSensorIDFromTrees :exec
-UPDATE trees SET sensor_id = NULL WHERE sensor_id = $1;
+UPDATE trees
+SET sensor_id = NULL, watering_status = 'unknown'
+WHERE sensor_id = $1;
 
 -- name: CalculateGroupedCentroids :one
 SELECT ST_AsText(ST_Centroid(ST_Collect(geometry)))::text AS centroid FROM trees WHERE id = ANY($1::int[]);

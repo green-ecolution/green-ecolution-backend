@@ -3,11 +3,18 @@ package storage
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 )
+
+type ErrEntityNotFound string
+
+func (e ErrEntityNotFound) Error() string {
+	return fmt.Sprintf("entity not found: %s", string(e))
+}
 
 var (
 	ErrIPNotFound            = errors.New("local ip not found")
@@ -18,16 +25,17 @@ var (
 
 	ErrIDNotFound           = errors.New("entity id not found")
 	ErrIDAlreadyExists      = errors.New("entity id already exists")
-	ErrEntityNotFound       = errors.New("entity not found")
 	ErrSensorNotFound       = errors.New("sensor not found")
 	ErrImageNotFound        = errors.New("image not found")
-	ErrFlowerbedNotFound    = errors.New("flowerbed not found")
 	ErrTreeClusterNotFound  = errors.New("treecluster not found")
 	ErrRegionNotFound       = errors.New("region not found")
 	ErrTreeNotFound         = errors.New("tree not found")
 	ErrVehicleNotFound      = errors.New("vehicle not found")
 	ErrWateringPlanNotFound = errors.New("watering plan not found")
-	ErrUserNotFound         = errors.New("user not found")
+
+	ErrUserNotFound           = errors.New("user not found")
+	ErrUserNotCorrectRole     = errors.New("user has an incorrect role")
+	ErrUserNotMatchingLicense = errors.New("user has no matching driving license")
 
 	ErrUnknowError      = errors.New("unknown error")
 	ErrToManyRows       = errors.New("receive more rows then expected")
@@ -40,6 +48,8 @@ var (
 
 	ErrUnknownVehicleType = errors.New("unknown vehicle type")
 	ErrBucketNotExists    = errors.New("bucket don't exists")
+
+	ErrPaginationValueInvalid = errors.New("pagination values are invalid")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
@@ -72,19 +82,15 @@ type UserRepository interface {
 	GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error)
 }
 
-type RoleRepository interface {
-	GetByName(ctx context.Context, name string) (*entities.Role, error)
-}
-
 type ImageRepository interface {
 	BasicCrudRepository[entities.Image]
 }
 
 type VehicleRepository interface {
 	// GetAll returns all vehicles
-	GetAll(ctx context.Context) ([]*entities.Vehicle, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
 	// GetAllByType returns all vehicles by vehicle type
-	GetAllByType(ctx context.Context, vehicleType entities.VehicleType) ([]*entities.Vehicle, error)
+	GetAllByType(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
 	// GetByID returns one vehicle by id
 	GetByID(ctx context.Context, id int32) (*entities.Vehicle, error)
 	// GetByPlate returns one vehicle by its plate
@@ -99,7 +105,7 @@ type VehicleRepository interface {
 
 type WateringPlanRepository interface {
 	// GetAll returns all watering plans
-	GetAll(ctx context.Context) ([]*entities.WateringPlan, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error)
 	// GetByID returns one watering plan by id
 	GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error)
 	// GetLinkedVehicleByIDAndType returnes all vehicles linked to a watering plan by the watering plan id and the vehicle type
@@ -120,7 +126,7 @@ type WateringPlanRepository interface {
 
 type TreeClusterRepository interface {
 	// GetAll returns all tree clusters
-	GetAll(ctx context.Context) ([]*entities.TreeCluster, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.TreeCluster, int64, error)
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids
@@ -140,7 +146,17 @@ type TreeClusterRepository interface {
 }
 
 type TreeRepository interface {
-	BasicCrudRepository[entities.Tree]
+	// GetAll returns all trees
+	GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error)
+	// GetByID returns one tree by id
+	GetByID(ctx context.Context, id int32) (*entities.Tree, error)
+	// Create creates a new tree. It accepts a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be created, otherwise it will not be created.
+	Create(ctx context.Context, fn func(tree *entities.Tree) (bool, error)) (*entities.Tree, error)
+	// Update updates an already existing tree by id. It takes the id of the tree to update and a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be updated, otherwise it will not be updated.
+	Update(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error)
+	// Delete deletes a tree by id
+	Delete(ctx context.Context, id int32) error
+
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
 	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
@@ -149,21 +165,19 @@ type TreeRepository interface {
 	GetBySensorID(ctx context.Context, id string) (*entities.Tree, error)
 	GetBySensorIDs(ctx context.Context, ids ...string) ([]*entities.Tree, error)
 
-	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
 	DeleteAndUnlinkImages(ctx context.Context, id int32) error
 	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkSensorID(ctx context.Context, sensorID string) error
-	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
-	CreateAndLinkImages(ctx context.Context, tcFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error)
+	UnlinkImage(ctx context.Context, treeID, imageID int32) error
 	FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 }
 
 type SensorRepository interface {
-	GetAll(ctx context.Context) ([]*entities.Sensor, error)
+	GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
-	Create(ctx context.Context, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
-	Update(ctx context.Context, id string, fn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error)
+	Create(ctx context.Context, createFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
+	Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
 	Delete(ctx context.Context, id string) error
 
 	GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error)
@@ -183,21 +197,6 @@ type S3Repository interface {
 	GetObject(ctx context.Context, objName string) (io.ReadSeekCloser, error)
 }
 
-type FlowerbedRepository interface {
-	BasicCrudRepository[entities.Flowerbed]
-	GetSensorByFlowerbedID(ctx context.Context, id int32) (*entities.Sensor, error)
-	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
-	GetRegionByFlowerbedID(ctx context.Context, id int32) (*entities.Region, error)
-
-	CreateAndLinkImages(ctx context.Context, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-	UpdateWithImages(ctx context.Context, id int32, fFn ...entities.EntityFunc[entities.Flowerbed]) (*entities.Flowerbed, error)
-	DeleteAndUnlinkImages(ctx context.Context, id int32) error
-	UnlinkAllImages(ctx context.Context, id int32) error
-	UnlinkImage(ctx context.Context, flowerbedID, imageID int32) error
-	UnlinkSensorID(ctx context.Context, sensorID string) error
-	Archive(ctx context.Context, id int32) error
-}
-
 type AuthRepository interface {
 	RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error)
 	GetAccessTokenFromClientCode(ctx context.Context, code, redirectURL string) (*entities.ClientToken, error)
@@ -211,11 +210,9 @@ type Repository struct {
 	Sensor       SensorRepository
 	Tree         TreeRepository
 	User         UserRepository
-	Role         RoleRepository
 	Image        ImageRepository
 	Vehicle      VehicleRepository
 	TreeCluster  TreeClusterRepository
-	Flowerbed    FlowerbedRepository
 	Region       RegionRepository
 	WateringPlan WateringPlanRepository
 	Routing      RoutingRepository

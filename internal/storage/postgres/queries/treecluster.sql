@@ -1,5 +1,12 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters ORDER BY name ASC;
+SELECT * FROM tree_clusters 
+WHERE ($1 = '') OR (provider = $1)
+ORDER BY name ASC
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllTreeClustersCount :one
+SELECT COUNT(*) FROM tree_clusters
+WHERE ($1 = '') OR (provider = $1);
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;
@@ -15,9 +22,9 @@ SELECT trees.* FROM trees JOIN tree_clusters ON trees.tree_cluster_id = tree_clu
 
 -- name: CreateTreeCluster :one
 INSERT INTO tree_clusters (
-  name, region_id, address, description, moisture_level, watering_status, soil_condition
+  name, region_id, address, description, moisture_level, watering_status, soil_condition, provider, additional_informations
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7
+  $1, $2, $3, $4, $5, $6, $7, $8, $9
 ) RETURNING id;
 
 -- name: LinkTreesToTreeCluster :exec
@@ -47,7 +54,9 @@ UPDATE tree_clusters SET
   watering_status = $7,
   soil_condition = $8,
   last_watered = $9,
-  archived = $10
+  archived = $10,
+  provider = $11,
+  additional_informations = $12
 WHERE id = $1;
 
 -- name: ArchiveTreeCluster :one

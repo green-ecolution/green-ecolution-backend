@@ -2,11 +2,12 @@ package store
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"errors"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/jackc/pgx/v5"
 )
@@ -35,10 +36,11 @@ func (s *Store) MapClusterFields(ctx context.Context, tc *entities.TreeCluster) 
 // This function is required as soon as you want to add the data to the sensor object
 func (s *Store) MapSensorFields(ctx context.Context, sn *entities.Sensor) error {
 	var err error
-
 	sn.LatestData, err = s.GetLatestSensorDataBySensorID(ctx, sn.ID)
-	if err != nil && !errors.Is(err, storage.ErrEntityNotFound) {
-		return s.HandleError(err)
+
+	var entityNotFoundErr storage.ErrEntityNotFound
+	if err != nil && !errors.As(err, &entityNotFoundErr) {
+		return err
 	}
 
 	return nil
@@ -48,12 +50,12 @@ func (s *Store) MapSensorFields(ctx context.Context, sn *entities.Sensor) error 
 func (s *Store) GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error) {
 	row, err := s.GetLatestSensorDataByID(ctx, id)
 	if err != nil {
-		return nil, s.HandleError(err)
+		return nil, s.MapError(err, sqlc.SensorDatum{})
 	}
 
 	domainData, err := sensorMapper.FromSqlSensorData(row)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to map sensor data")
+		return nil, errors.Join(err, errors.New("failed to map sensor data"))
 	}
 
 	return domainData, nil
@@ -88,20 +90,27 @@ func (s *Store) getRegionByTreeClusterID(ctx context.Context, id int32) (*entiti
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, storage.ErrRegionNotFound
 		}
-		return nil, s.HandleError(err)
+		return nil, err
 	}
 
 	return regionMapper.FromSql(row), nil
 }
 
 func (s *Store) getLinkedTreesByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
 	rows, err := s.GetLinkedTreesByTreeClusterID(ctx, id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return []*entities.Tree{}, nil
 		}
-		return nil, s.HandleError(err)
+		return nil, err
 	}
 
-	return treeMapper.FromSqlList(rows), nil
+	trees, err := treeMapper.FromSqlList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return trees, nil
 }

@@ -11,10 +11,10 @@ package client
 
 import (
 	"context"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_SensorAPIService(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	t.Run("Test SensorAPIService DeleteSensor", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var sensorId string
 
@@ -37,7 +37,7 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	t.Run("Test SensorAPIService GetAllSensors", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.SensorAPI.GetAllSensors(context.Background()).Execute()
 
@@ -49,7 +49,7 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	t.Run("Test SensorAPIService GetSensorById", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var sensorId string
 

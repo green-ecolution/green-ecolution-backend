@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -41,22 +43,22 @@ func (s *Server) Run(ctx context.Context) error {
 	app.Mount("/", s.middleware())
 
 	go func() {
-		err := s.services.PluginService.StartCleanup(ctx)
-		slog.Error("Error while running plugin cleanup", "error", err)
+		slog.Info("starting plugin cleanup service: cleaning up unhealthy plugins")
+		s.services.PluginService.StartCleanup(ctx)
 	}()
 
-	go func() {
-		s.services.SensorService.RunStatusUpdater(ctx, 1*time.Hour)
-	}()
+	scheduler := worker.NewScheduler(3*time.Hour, worker.SchedulerFunc(s.services.SensorService.UpdateStatuses))
+	go scheduler.Run(ctx)
 
 	go func() {
 		<-ctx.Done()
-		fmt.Println("Shutting down HTTP Server")
+		slog.Info("shutting down http server")
 		if err := app.Shutdown(); err != nil {
-			fmt.Println("Error while shutting down HTTP Server:", err)
+			slog.Error("error while shutting down http server", "error", err, "service", "fiber")
 		}
 	}()
 
+	slog.Info("starting server", "url", s.cfg.Server.AppURL, "port", s.cfg.Server.Port, "service", "fiber")
 	return app.Listen(fmt.Sprintf(":%d", s.cfg.Server.Port))
 }
 

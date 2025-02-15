@@ -11,10 +11,10 @@ package client
 
 import (
 	"context"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_FileImportAPIService(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_client_FileImportAPIService(t *testing.T) {
 
 	t.Run("Test FileImportAPIService ImportTreesFromCsv", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		httpRes, err := apiClient.FileImportAPI.ImportTreesFromCsv(context.Background()).Execute()
 

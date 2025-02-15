@@ -12,11 +12,13 @@ import (
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:StringPtrToString
 // goverter:extend MapSensorStatus MapSensorData
 type InternalSensorRepoMapper interface {
 	// goverter:ignore LatestData
-	FromSql(src *sqlc.Sensor) *entities.Sensor
-	FromSqlList(src []*sqlc.Sensor) []*entities.Sensor
+	// goverter:map AdditionalInformations AdditionalInfo  | github.com/green-ecolution/green-ecolution-backend/internal/utils:MapAdditionalInfo
+	FromSql(src *sqlc.Sensor) (*entities.Sensor, error)
+	FromSqlList(src []*sqlc.Sensor) ([]*entities.Sensor, error)
 	// goverter:map Data | MapSensorData
 	FromSqlSensorData(src *sqlc.SensorDatum) (*entities.SensorData, error)
 	FromSqlSensorDataList(src []*sqlc.SensorDatum) ([]*entities.SensorData, error)

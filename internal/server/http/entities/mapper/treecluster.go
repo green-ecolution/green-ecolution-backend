@@ -8,6 +8,7 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:TimeToTimePtr
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:MapKeyValueInterface
 // goverter:extend MapWateringStatus MapSoilCondition MapSoilConditionReq MapTreesToIDs MapSensorStatus
 // goverter:ignoreMissing
 type TreeClusterHTTPMapper interface {

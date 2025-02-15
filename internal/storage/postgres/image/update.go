@@ -10,7 +10,7 @@ import (
 func (r *ImageRepository) Update(ctx context.Context, id int32, iFn ...entities.EntityFunc[entities.Image]) (*entities.Image, error) {
 	entity, err := r.GetByID(ctx, id)
 	if err != nil {
-		return nil, r.store.HandleError(err)
+		return nil, err
 	}
 
 	for _, fn := range iFn {

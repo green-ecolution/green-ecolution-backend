@@ -51,15 +51,15 @@ func (s *TreeService) ImportTree(ctx context.Context, trees []*entities.TreeImpo
 	}
 
 	if err := s.processDeleteQueue(ctx, deleteQueue); err != nil {
-		return handleError(err)
+		return err
 	}
 
 	if err := s.processUpdateQueue(ctx, updateQueue); err != nil {
-		return handleError(err)
+		return err
 	}
 
 	if err := s.processCreateQueue(ctx, createQueue); err != nil {
-		return handleError(err)
+		return err
 	}
 
 	return nil
@@ -73,7 +73,7 @@ func (s *TreeService) processDeleteQueue(ctx context.Context, deleteQueue []*ent
 				"index", i+1,
 				"tree_id", treeToDelete.ID,
 				"error", err)
-			return handleError(fmt.Errorf("error deleting tree %d: %w", i+1, err))
+			return fmt.Errorf("error deleting tree %d: %w", i+1, err)
 		}
 		if treeToDelete.Sensor != nil {
 			slog.Warn("Tree is being replaced, sensors are now unlinked.",
@@ -93,7 +93,7 @@ func (s *TreeService) processUpdateQueue(ctx context.Context, updateQueue []*ent
 				"index", i+1,
 				"tree_id", treeToUpdate.TreeID,
 				"error", err)
-			return handleError(err)
+			return err
 		}
 		slog.Info("Tree updated successfully",
 			"index", i+1,
@@ -118,7 +118,7 @@ func (s *TreeService) processCreateQueue(ctx context.Context, createQueue []*ent
 		_, err := s.Create(ctx, s.convertImportTreeToTreeCreate(newTree))
 		if err != nil {
 			slog.Error("Error creating tree", "index", i+1, "error", err)
-			return handleError(fmt.Errorf("error creating tree %d: %w", i+1, err))
+			return fmt.Errorf("error creating tree %d: %w", i+1, err)
 		}
 		slog.Info("Tree created successfully", "index", i+1)
 	}
