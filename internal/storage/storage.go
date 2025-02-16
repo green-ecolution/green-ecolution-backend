@@ -181,6 +181,7 @@ type SensorRepository interface {
 	Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
 	Delete(ctx context.Context, id string) error
 
+	GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error)
 	GetLatestSensorDataBySensorID(ctx context.Context, id string) (*entities.SensorData, error)
 	InsertSensorData(ctx context.Context, data *entities.SensorData, id string) error
 }

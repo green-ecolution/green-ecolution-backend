@@ -39,8 +39,7 @@ type SensorDataResponse struct {
 } // @Name SensorData
 
 type SensorDataListResponse struct {
-	Data       []*SensorDataResponse `json:"data"`
-	Pagination *Pagination           `json:"pagination,omitempty" validate:"optional"`
+	Data []*SensorDataResponse `json:"data"`
 } // @Name SensorDataList
 
 type WatermarkResponse struct {
