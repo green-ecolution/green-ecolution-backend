@@ -14,6 +14,12 @@ SELECT * FROM sensors WHERE id = $1;
 -- name: GetSensorByStatus :many
 SELECT * FROM sensors WHERE status = $1;
 
+-- name: GetAllSensorDataByID :many
+SELECT *
+FROM sensor_data
+WHERE sensor_id = $1
+ORDER BY created_at DESC;
+
 -- name: GetLatestSensorDataByID :one
 SELECT *
 FROM sensor_data
