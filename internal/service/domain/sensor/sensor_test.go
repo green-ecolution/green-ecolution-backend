@@ -15,7 +15,7 @@ import (
 )
 
 func TestSensorService_GetAll(t *testing.T) {
-	t.Run("should return all sensor", func(t *testing.T) {
+	t.Run("should return all sensors", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
@@ -31,7 +31,7 @@ func TestSensorService_GetAll(t *testing.T) {
 		assert.Equal(t, TestSensorList, sensors)
 	})
 
-	t.Run("should return all sensor by provider", func(t *testing.T) {
+	t.Run("should return all sensors by provider", func(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 		treeRepo := storageMock.NewMockTreeRepository(t)
@@ -60,6 +60,38 @@ func TestSensorService_GetAll(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, sensors)
 		assert.Equal(t, totalCount, int64(0))
+		// assert.EqualError(t, err, "500: sensor not found")
+	})
+}
+
+func TestSensorService_GetAllDataByID(t *testing.T) {
+	t.Run("should return all sensor data", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, globalEventManager)
+
+		// when
+		sensorRepo.EXPECT().GetAllDataByID(context.Background(), "sensor-1").Return(TestSensorData, nil)
+		sensorData, err := svc.GetAllDataByID(context.Background(), "sensor-1")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, TestSensorData, sensorData)
+	})
+
+	t.Run("should return error when no sensor is found", func(t *testing.T) {
+		// given
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		svc := sensor.NewSensorService(sensorRepo, treeRepo, globalEventManager)
+
+		sensorRepo.EXPECT().GetAllDataByID(context.Background(), "sensor-1").Return(nil, storage.ErrSensorNotFound)
+		sensorData, err := svc.GetAllDataByID(context.Background(), "sensor-1")
+
+		// then
+		assert.Error(t, err)
+		assert.Nil(t, sensorData)
 		// assert.EqualError(t, err, "500: sensor not found")
 	})
 }

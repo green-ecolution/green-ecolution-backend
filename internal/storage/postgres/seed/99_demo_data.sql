@@ -131,15 +131,59 @@ VALUES
             {"resistance": 944, "centibar": 8, "depth": 90}
         ]
     }'),
+    ('sensor-1', '{
+        "device": "sensor-1",
+        "temperature": 2.0,
+        "humidity": 0.5,
+        "battery": 2.1,
+        "watermarks": [
+            {"resistance": 800, "centibar": 8, "depth": 30},
+            {"resistance": 1000, "centibar": 7, "depth": 60},
+            {"resistance": 400, "centibar": 2, "depth": 90}
+        ]
+    }'),
     ('sensor-2', '{
         "device": "sensor-2",
         "temperature": 2.0,
         "humidity": 0.5,
         "battery": 3.943,
         "watermarks": [
-            {"resistance": 1020, "centibar": 11, "depth": 30},
-            {"resistance": 1000, "centibar": 10, "depth": 60},
-            {"resistance": 900, "centibar": 9, "depth": 90}
+            {"resistance": 1020, "centibar": 90, "depth": 30},
+            {"resistance": 1000, "centibar": 80, "depth": 60},
+            {"resistance": 900, "centibar": 20, "depth": 90}
+        ]
+    }'),
+    ('sensor-2', '{
+        "device": "sensor-2",
+        "temperature": 21.0,
+        "humidity": 10.0,
+        "battery": 3.0,
+        "watermarks": [
+            {"resistance": 1400, "centibar": 80, "depth": 30},
+            {"resistance": 400, "centibar": 40, "depth": 60},
+            {"resistance": 200, "centibar": 10, "depth": 90}
+        ]
+    }'),
+    ('sensor-2', '{
+        "device": "sensor-2",
+        "temperature": 23.0,
+        "humidity": 0.5,
+        "battery": 2.5,
+        "watermarks": [
+            {"resistance": 300, "centibar": 20, "depth": 30},
+            {"resistance": 500, "centibar": 40, "depth": 60},
+            {"resistance": 600, "centibar": 50, "depth": 90}
+        ]
+    }'),
+    ('sensor-2', '{
+        "device": "sensor-2",
+        "temperature": 10.0,
+        "humidity": 4.0,
+        "battery": 2.1,
+        "watermarks": [
+            {"resistance": 1200, "centibar": 12, "depth": 30},
+            {"resistance": 1100, "centibar": 11, "depth": 60},
+            {"resistance": 1000, "centibar": 10, "depth": 90}
         ]
     }'),
     ('sensor-3', '{
@@ -148,20 +192,53 @@ VALUES
         "humidity": 1,
         "battery": 3.4,
         "watermarks": [
-            {"resistance": 800, "centibar": 8, "depth": 30},
+            {"resistance": 800, "centibar": 80, "depth": 30},
             {"resistance": 1000, "centibar": 10, "depth": 60},
             {"resistance": 1200, "centibar": 12, "depth": 90}
+        ]
+    }'),
+    ('sensor-3', '{
+        "device": "sensor-3",
+        "temperature": 4.0,
+        "humidity": 1,
+        "battery": 3.4,
+        "watermarks": [
+            {"resistance": 200, "centibar": 20, "depth": 30},
+            {"resistance": 100, "centibar": 10, "depth": 60},
+            {"resistance": 230, "centibar": 20, "depth": 90}
         ]
     }'),
     ('sensor-4', '{
         "device": "sensor-4",
         "temperature": 2.0,
         "humidity": 0.5,
-        "battery": 3.3,
+        "battery": 3.0,
         "watermarks": [
             {"resistance": 2000, "centibar": 80, "depth": 30},
             {"resistance": 2200, "centibar": 85, "depth": 60},
             {"resistance": 2500, "centibar": 90, "depth": 90}
+        ]
+    }'),
+    ('sensor-4', '{
+        "device": "sensor-4",
+        "temperature": 2.0,
+        "humidity": 10.0,
+        "battery": 3.1,
+        "watermarks": [
+            {"resistance": 2100, "centibar": 10, "depth": 30},
+            {"resistance": 2400, "centibar": 20, "depth": 60},
+            {"resistance": 2600, "centibar": 30, "depth": 90}
+        ]
+    }'),
+    ('sensor-4', '{
+        "device": "sensor-4",
+        "temperature": 3.0,
+        "humidity": 2.0,
+        "battery": 2.8,
+        "watermarks": [
+            {"resistance": 300, "centibar": 30, "depth": 30},
+            {"resistance": 200, "centibar": 20, "depth": 60},
+            {"resistance": 100, "centibar": 10, "depth": 90}
         ]
     }'),
     ('sensor-5', '{
@@ -173,6 +250,17 @@ VALUES
             {"resistance": 2230, "centibar": 80, "depth": 30},
             {"resistance": 2240, "centibar": 85, "depth": 60},
             {"resistance": 2500, "centibar": 90, "depth": 90}
+        ]
+    }'),
+    ('sensor-5', '{
+        "device": "sensor-5",
+        "temperature": 2.23,
+        "humidity": 1.5,
+        "battery": 3.1,
+        "watermarks": [
+            {"resistance": 3030, "centibar": 70, "depth": 30},
+            {"resistance": 2020, "centibar": 60, "depth": 60},
+            {"resistance": 1010, "centibar": 50, "depth": 90}
         ]
     }'),
     ('sensor-6', '{
@@ -197,11 +285,33 @@ VALUES
             {"resistance": 2500, "centibar": 90, "depth": 90}
         ]
     }'),
+    ('sensor-7', '{
+        "device": "sensor-8",
+        "temperature": 10.2,
+        "humidity": 1.5,
+        "battery": 2.0,
+        "watermarks": [
+            {"resistance": 1230, "centibar": 50, "depth": 30},
+            {"resistance": 1240, "centibar": 55, "depth": 60},
+            {"resistance": 1500, "centibar": 60, "depth": 90}
+        ]
+    }'),
     ('sensor-8', '{
         "device": "sensor-9",
         "temperature": 2.0,
         "humidity": 0.5,
         "battery": 3.7,
+        "watermarks": [
+            {"resistance": 850, "centibar": 20, "depth": 30},
+            {"resistance": 600, "centibar": 30, "depth": 60},
+            {"resistance": 100, "centibar": 5, "depth": 90}
+        ]
+    }'),
+    ('sensor-8', '{
+        "device": "sensor-9",
+        "temperature": 2.0,
+        "humidity": 10.0,
+        "battery": 3.0,
         "watermarks": [
             {"resistance": 800, "centibar": 50, "depth": 30},
             {"resistance": 900, "centibar": 52, "depth": 60},

@@ -55,6 +55,18 @@ func (s *SensorService) GetAll(ctx context.Context, provider string) ([]*entitie
 	return sensors, totalCount, nil
 }
 
+func (s *SensorService) GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error) {
+	log := logger.GetLogger(ctx)
+	sensorData, err := s.sensorRepo.GetAllDataByID(ctx, id)
+
+	if err != nil {
+		log.Debug("failed to fetch sensor data", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+	}
+
+	return sensorData, nil
+}
+
 func (s *SensorService) GetByID(ctx context.Context, id string) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	get, err := s.sensorRepo.GetByID(ctx, id)

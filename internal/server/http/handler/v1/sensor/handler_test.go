@@ -223,6 +223,85 @@ func TestGetAllSensors(t *testing.T) {
 	})
 }
 
+func TestGetAllSensorDataById(t *testing.T) {
+
+	t.Run("should return all sensor data successfully", func(t *testing.T) {
+		app := fiber.New()
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		handler := sensor.GetAllSensorDataByID(mockSensorService)
+		app.Get("/v1/sensor/data/:id", handler)
+
+		mockSensorService.EXPECT().GetAllDataByID(
+			mock.Anything,
+			"sensor-1",
+		).Return([]*entities.SensorData{TestSensorData}, nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/data/sensor-1", nil)
+		resp, err := app.Test(req, -1)
+		assert.Nil(t, err)
+		defer resp.Body.Close()
+
+		// then
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.SensorListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Len(t, response.Data, 1)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when no sensor data is found", func(t *testing.T) {
+		app := fiber.New()
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		handler := sensor.GetAllSensorDataByID(mockSensorService)
+		app.Get("/v1/sensor/data/:id", handler)
+
+		mockSensorService.EXPECT().GetAllDataByID(
+			mock.Anything,
+			"sensor-999",
+		).Return(nil, service.NewError(service.NotFound, "not found"))
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/data/sensor-999", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+
+		mockSensorService.AssertExpectations(t)
+	})
+
+	t.Run("should return 500 when service returns an error", func(t *testing.T) {
+		app := fiber.New()
+		mockSensorService := serviceMock.NewMockSensorService(t)
+		handler := sensor.GetAllSensorDataByID(mockSensorService)
+		app.Get("/v1/sensor/data/:id", handler)
+
+		mockSensorService.EXPECT().GetAllDataByID(
+			mock.Anything,
+			"sensor-1",
+		).Return(nil, errors.New("service error"))
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/sensor/data/sensor-1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockSensorService.AssertExpectations(t)
+	})
+}
+
 func TestGetSensorById(t *testing.T) {
 	t.Run("should return sensor by id successfully", func(t *testing.T) {
 		mockSensorService := serviceMock.NewMockSensorService(t)
