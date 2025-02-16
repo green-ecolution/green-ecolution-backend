@@ -17,7 +17,8 @@ VALUES
 -- +goose StatementBegin
 INSERT INTO sensor_data (sensor_id, data)
 VALUES 
-   ('sensor-1', '{"device": "sensor-123", "battery": 34.0, "humidity": 50.0, "temperature": 20.0, "watermarks":[{"centibar": 38, "resistance": 23, "depth": 30}, {"centibar": 38, "resistance": 23, "depth": 60}, {"centibar": 38, "resistance": 23, "depth": 90}]}');
+   ('sensor-1', '{"device": "sensor-123", "battery": 34.0, "humidity": 50.0, "temperature": 20.0, "watermarks":[{"centibar": 38, "resistance": 23, "depth": 30}, {"centibar": 38, "resistance": 23, "depth": 60}, {"centibar": 38, "resistance": 23, "depth": 90}]}'),
+   ('sensor-1', '{"device": "sensor-123", "battery": 32.0, "humidity": 40.0, "temperature": 10.0, "watermarks":[{"centibar": 20, "resistance": 10, "depth": 30}, {"centibar": 20, "resistance": 10, "depth": 60}, {"centibar": 20, "resistance": 10, "depth": 90}]}');
 -- +goose StatementEnd
 
 -- +goose Down
