@@ -235,7 +235,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 			mock.Anything, filter,
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate&page=1&limit=1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -250,6 +250,14 @@ func TestGetAllTreeCluster(t *testing.T) {
 		for _, cluster := range response.Data {
 			assert.EqualValues(t, entities.WateringStatusModerate, cluster.WateringStatus)
 		}
+
+		// assert pagination
+		assert.NotEmpty(t, response.Pagination)
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Empty(t, response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
 
 		mockClusterService.AssertExpectations(t)
 	})
@@ -274,7 +282,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 			mock.Anything, filter,
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?region=Mürwik", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?region=Mürwik&page=1&limit=1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -290,6 +298,13 @@ func TestGetAllTreeCluster(t *testing.T) {
 			assert.NotNil(t, cluster.Region)
 			assert.Equal(t, "Mürwik", cluster.Region.Name)
 		}
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
 
 		mockClusterService.AssertExpectations(t)
 	})
@@ -314,7 +329,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 			mock.Anything, filter,
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate&region=Mürwik", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate&region=Mürwik&page=1&limit=1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -332,6 +347,13 @@ func TestGetAllTreeCluster(t *testing.T) {
 			assert.Equal(t, "Mürwik", cluster.Region.Name)
 		}
 
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Empty(t, response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
+
 		mockClusterService.AssertExpectations(t)
 	})
 
@@ -343,17 +365,20 @@ func TestGetAllTreeCluster(t *testing.T) {
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
+		wateringStatues := []entities.WateringStatus{
+			entities.WateringStatusModerate,
+			entities.WateringStatusBad,
+		}
+		regionNames := []string{"Mürwik", "Altstadt"}
+
 		filter := entities.TreeClusterFilter{
-			WateringStatus: []entities.WateringStatus{
-				entities.WateringStatusGood,
-				entities.WateringStatusBad,
-			},
-			Region:   []string{"Mürwik", "Altstadt"},
-			Provider: "",
+			WateringStatus: wateringStatues,
+			Region:         regionNames,
+			Provider:       "",
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
-			TestClusterList[2], //  Good + Mürwik
+			TestClusterList[2], //  moderate + Mürwik
 			TestClusterList[3], //  Bad + Mürwik
 		}
 
@@ -364,7 +389,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(
 			context.Background(),
 			http.MethodGet,
-			"/v1/cluster?status=good,bad&region=Mürwik,Altstadt",
+			"/v1/cluster?status=moderate,bad&region=Mürwik,Altstadt&page=1&limit=1",
 			nil,
 		)
 		resp, err := app.Test(req, -1)
@@ -380,26 +405,28 @@ func TestGetAllTreeCluster(t *testing.T) {
 		assert.Equal(t, len(expectedFiltered), len(response.Data))
 
 		for _, cluster := range response.Data {
-			assert.Contains(t,
-				[]entities.WateringStatus{
-					entities.WateringStatusGood,
-					entities.WateringStatusModerate,
-				},
-				cluster.WateringStatus,
+			assert.Contains(t, wateringStatues,
+				entities.WateringStatus(cluster.WateringStatus),
 				"Cluster watering status is outside the expected list",
 			)
 
 			require.NotNil(t, cluster.Region, "Cluster region must not be nil")
 			assert.Contains(t,
-				[]string{"Mürwik", "Altstadt"},
+				regionNames,
 				cluster.Region.Name,
 				"Cluster region is outside the expected list",
 			)
 		}
 
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
+
 		mockClusterService.AssertExpectations(t)
 	})
-
 }
 
 func TestGetTreeClusterByID(t *testing.T) {
