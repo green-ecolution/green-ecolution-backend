@@ -27,9 +27,9 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	}
 
 	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
-		Column1: wateringStatuses,
-		Column2: filter.Region,
-		Column3: filter.Provider,
+		WateringStatus: wateringStatuses,
+		Region:         filter.Region,
+		Provider:       filter.Provider,
 	})
 
 	if err != nil {
@@ -47,11 +47,11 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	}
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
-		Column1: wateringStatuses,
-		Column2: filter.Region,
-		Column3: filter.Provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		WateringStatus: wateringStatuses,
+		Region:         filter.Region,
+		Provider:       filter.Provider,
+		Limit:          limit,
+		Offset:         (page - 1) * limit,
 	})
 
 	if err != nil {
