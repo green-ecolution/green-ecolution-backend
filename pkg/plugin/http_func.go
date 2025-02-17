@@ -7,8 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-
-	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 )
 
 // Register registers the plugin with the plugin host and returns an authentication token. Upon successful registration of the plugin, the Authorisation header is set on every protected route to the backend, which already contains this token.
@@ -44,13 +42,13 @@ import (
 //	}
 //	log.Printf("Successfully registered. Access token: %s", token.AccessToken)
 func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret string) (*Token, error) {
-	reqBody := entities.PluginRegisterRequest{
+	reqBody := PluginRegisterRequest{
 		Slug:        w.cfg.plugin.Slug,
 		Name:        w.cfg.plugin.Name,
 		Path:        w.cfg.plugin.PluginHostPath.String(),
 		Version:     w.cfg.plugin.Version,
 		Description: w.cfg.plugin.Description,
-		Auth: entities.PluginAuth{
+		Auth: PluginAuth{
 			ClientID:     clientID,
 			ClientSecret: clientSecret,
 		},
@@ -78,7 +76,7 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 		return nil, errors.New("failed to register plugin")
 	}
 
-	var tokenResp entities.ClientTokenResponse
+	var tokenResp ClientTokenResponse
 	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
 		return nil, err
 	}
@@ -145,7 +143,7 @@ func (w *PluginWorker) Unregister(ctx context.Context) error {
 
 // RefreshToken refreshes the authentication token for the plugin.
 func (w *PluginWorker) RefreshToken(ctx context.Context, clientID, clientSecret string) (*Token, error) {
-	reqBody := entities.PluginAuth{
+	reqBody := PluginAuth{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
 	}
@@ -174,7 +172,7 @@ func (w *PluginWorker) RefreshToken(ctx context.Context, clientID, clientSecret 
 		return nil, errors.New("failed to refresh plugin token")
 	}
 
-	var tokenResp entities.ClientTokenResponse
+	var tokenResp ClientTokenResponse
 	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
 		return nil, err
 	}
