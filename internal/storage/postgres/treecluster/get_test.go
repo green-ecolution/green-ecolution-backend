@@ -2,6 +2,7 @@ package treecluster
 
 import (
 	"context"
+	"fmt"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/require"
 	"sort"
@@ -188,12 +189,13 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 
 		// when
-		got, _, err := r.GetAll(ctx, filter)
+		got, totalCount, err := r.GetAll(ctx, filter)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
+		assert.Equal(t, int64(len(got)), totalCount)
 
 		for _, cluster := range got {
 			assert.Equal(t, entities.WateringStatusGood, cluster.WateringStatus)
@@ -214,12 +216,13 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 
 		// when
-		got, _, err := r.GetAll(ctx, filter)
+		got, totalCount, err := r.GetAll(ctx, filter)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
+		assert.Equal(t, int64(len(got)), totalCount)
 
 		for _, cluster := range got {
 			assert.NotNil(t, cluster.Region)
@@ -242,12 +245,13 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 
 		// when
-		got, _, err := r.GetAll(ctx, filter)
+		got, totalCount, err := r.GetAll(ctx, filter)
 
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
+		assert.Equal(t, int64(len(got)), totalCount)
 
 		for _, cluster := range got {
 			assert.Equal(t, entities.WateringStatusModerate, cluster.WateringStatus)
@@ -265,40 +269,78 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
+		wateringstatues := []entities.WateringStatus{
+			entities.WateringStatusGood,
+			entities.WateringStatusModerate,
+		}
+		regionNames := []string{"Mürwik", "Altstadt"}
+
 		filter := entities.TreeClusterFilter{
-			WateringStatus: []entities.WateringStatus{
-				entities.WateringStatusGood,
-				entities.WateringStatusModerate,
-			},
-			Region:   []string{"Mürwik", "Altstadt"},
-			Provider: "",
+			WateringStatus: wateringstatues,
+			Region:         regionNames,
+			Provider:       "",
 		}
 
 		// when
 		got, totalCount, err := r.GetAll(ctx, filter)
 
+		fmt.Println(got)
+		fmt.Println(totalCount)
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.NotEmpty(t, got)
-		assert.Equal(t, len(got), totalCount)
+		assert.Equal(t, int64(len(got)), totalCount)
 
 		for _, cluster := range got {
 			assert.Contains(t,
-				[]entities.WateringStatus{
-					entities.WateringStatusGood,
-					entities.WateringStatusModerate,
-				},
-				cluster.WateringStatus,
-				"Cluster has a status outside the expected list",
+				wateringstatues, cluster.WateringStatus, "Cluster has a status outside the expected list",
 			)
 
 			require.NotNil(t, cluster.Region)
+			assert.Contains(t, regionNames, cluster.Region.Name, "Cluster has a region outside the expected list")
+		}
+	})
+
+	t.Run("should return tree clusters filtered by multiple statuses and regions limited by 2 and with an offset of 1", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		wateringstatues := []entities.WateringStatus{
+			entities.WateringStatusGood,
+			entities.WateringStatusModerate,
+		}
+		regionNames := []string{"Mürwik", "Altstadt"}
+
+		filter := entities.TreeClusterFilter{
+			WateringStatus: wateringstatues,
+			Region:         regionNames,
+			Provider:       "",
+		}
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, filter)
+
+		fmt.Println(got)
+		fmt.Println(totalCount)
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.NotEmpty(t, got)
+		assert.Equal(t, int64(len(got)), totalCount)
+
+		for _, cluster := range got {
 			assert.Contains(t,
-				[]string{"Mürwik", "Altstadt"},
-				cluster.Region.Name,
-				"Cluster has a region outside the expected list",
+				wateringstatues, cluster.WateringStatus, "Cluster has a status outside the expected list",
 			)
+
+			require.NotNil(t, cluster.Region)
+			assert.Contains(t, regionNames, cluster.Region.Name, "Cluster has a region outside the expected list")
 		}
 	})
 
