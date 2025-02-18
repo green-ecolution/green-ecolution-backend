@@ -3,10 +3,11 @@ package treecluster
 import (
 	"context"
 	"fmt"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	"github.com/stretchr/testify/require"
 	"sort"
 	"testing"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -284,8 +285,6 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		// when
 		got, totalCount, err := r.GetAll(ctx, filter)
 
-		fmt.Println(got)
-		fmt.Println(totalCount)
 		// then
 		assert.NoError(t, err)
 		assert.NotNil(t, got)
