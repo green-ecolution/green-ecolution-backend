@@ -169,6 +169,8 @@ type WateringPlanService interface {
 
 	PreviewRoute(ctx context.Context, transporterID int32, trailerID *int32, clusterIDs []int32) (*domain.GeoJSON, error)
 	GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error)
+
+	UpdateStatuses(ctx context.Context) error
 }
 
 type PluginService interface {

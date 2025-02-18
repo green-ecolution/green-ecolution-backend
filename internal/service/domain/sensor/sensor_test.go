@@ -628,7 +628,7 @@ func TestSensorService_Do(t *testing.T) {
 		repo.AssertExpectations(t)
 	})
 
-	t.Run("should log an error when fetching latest sensor sata fails", func(t *testing.T) {
+	t.Run("should log an error when fetching latest sensor data fails", func(t *testing.T) {
 		// given
 		ctx := context.Background()
 		repo := storageMock.NewMockSensorRepository(t)

@@ -1808,6 +1808,174 @@ func TestWateringPlanService_Delete(t *testing.T) {
 	})
 }
 
+func TestWateringPlanService_UpdateStatuses(t *testing.T) {
+	t.Run("should update not competed watering plans successfully", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		// should be updated
+		stalePlanActive := &entities.WateringPlan{
+			ID:     1,
+			Date:   time.Now().Add(-73 * time.Hour),
+			Status: entities.WateringPlanStatusActive,
+		}
+		stalePlanPlanned := &entities.WateringPlan{
+			ID:     2,
+			Date:   time.Now().Add(-73 * time.Hour),
+			Status: entities.WateringPlanStatusPlanned,
+		}
+		stalePlanUnknown := &entities.WateringPlan{
+			ID:     3,
+			Date:   time.Now().Add(-73 * time.Hour),
+			Status: entities.WateringPlanStatusUnknown,
+		}
+
+		// should not be updated
+		stalePlanNotCompeted := &entities.WateringPlan{
+			ID:     4,
+			Date:   time.Now().Add(-73 * time.Hour),
+			Status: entities.WateringPlanStatusNotCompeted,
+		}
+		stalePlanFinished := &entities.WateringPlan{
+			ID:     5,
+			Date:   time.Now().Add(-73 * time.Hour),
+			Status: entities.WateringPlanStatusFinished,
+		}
+		recentPlanActive := &entities.WateringPlan{
+			ID:     6,
+			Date:   time.Now(),
+			Status: entities.WateringPlanStatusActive,
+		}
+
+		expectList := []*entities.WateringPlan{
+			stalePlanActive,
+			stalePlanPlanned,
+			stalePlanUnknown,
+			stalePlanNotCompeted,
+			stalePlanFinished,
+			recentPlanActive,
+		}
+
+		// when
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanActive.ID, mock.Anything).Return(nil)
+		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanPlanned.ID, mock.Anything).Return(nil)
+		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanUnknown.ID, mock.Anything).Return(nil)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.NoError(t, err)
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanActive.ID, mock.Anything)
+		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanPlanned.ID, mock.Anything)
+		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanUnknown.ID, mock.Anything)
+		wateringPlanRepo.AssertNotCalled(t, "Update", mock.Anything, stalePlanNotCompeted.ID, mock.Anything)
+		wateringPlanRepo.AssertNotCalled(t, "Update", mock.Anything, stalePlanFinished.ID, mock.Anything)
+		wateringPlanRepo.AssertNotCalled(t, "Update", mock.Anything, recentPlanActive.ID, mock.Anything)
+		wateringPlanRepo.AssertExpectations(t)
+	})
+
+	t.Run("should do nothing when there are no stale watering plans", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		recentPlanActive := &entities.WateringPlan{
+			ID:     6,
+			Date:   time.Now(),
+			Status: entities.WateringPlanStatusActive,
+		}
+
+		expectList := []*entities.WateringPlan{recentPlanActive}
+
+		// when
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.NoError(t, err)
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertNotCalled(t, "Update")
+		wateringPlanRepo.AssertExpectations(t)
+	})
+
+	t.Run("should return an error when fetching watering plans fails", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		// when
+		expectedErr := errors.New("database error")
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, expectedErr, err)
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertNotCalled(t, "Update")
+		wateringPlanRepo.AssertExpectations(t)
+	})
+
+	t.Run("should log an error when updating a watering plan fails", func(t *testing.T) {
+		// given
+		ctx := context.Background()
+		wateringPlanRepo := storageMock.NewMockWateringPlanRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		vehicleRepo := storageMock.NewMockVehicleRepository(t)
+		userRepo := storageMock.NewMockUserRepository(t)
+		routingRepo := storageMock.NewMockRoutingRepository(t)
+		s3Repo := storageMock.NewMockS3Repository(t)
+
+		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
+
+		stalePlanUnknown := &entities.WateringPlan{
+			ID:     3,
+			Date:   time.Now().Add(-73 * time.Hour),
+			Status: entities.WateringPlanStatusUnknown,
+		}
+
+		expectList := []*entities.WateringPlan{stalePlanUnknown}
+
+		// when
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanUnknown.ID, mock.Anything).Return(errors.New("update failed"))
+
+		err := svc.UpdateStatuses(ctx)
+
+		// then
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanUnknown.ID, mock.Anything)
+		wateringPlanRepo.AssertExpectations(t)
+		assert.NoError(t, err)
+	})
+}
+
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 1,
