@@ -55,6 +55,9 @@ func (s *Server) Run(ctx context.Context) error {
 	wateringPlanStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.WateringPlanService.UpdateStatuses))
 	go wateringPlanStatusScheduler.Run(ctx)
 
+	clusterWateringStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.TreeClusterService.UpdateWateringStatuses))
+	go clusterWateringStatusScheduler.Run(ctx)
+
 	go func() {
 		<-ctx.Done()
 		slog.Info("shutting down http server")

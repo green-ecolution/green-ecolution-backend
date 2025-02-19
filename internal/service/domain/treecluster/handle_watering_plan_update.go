@@ -60,7 +60,6 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 			if err != nil {
 				return err
 			}
-
 		}
 	}
 

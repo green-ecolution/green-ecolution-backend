@@ -129,6 +129,7 @@ type TreeClusterService interface {
 	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error
 	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 	HandleUpdateWateringPlan(context.Context, *domain.EventUpdateWateringPlan) error
+	UpdateWateringStatuses(ctx context.Context) error
 }
 
 type SensorService interface {
