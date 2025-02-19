@@ -26,9 +26,6 @@ jobs:
         with:
           go-version-file: ./go.mod
 
-      - name: Setup
-        run: make setup/ci
-
       - name: Generate
         run: make generate
 
