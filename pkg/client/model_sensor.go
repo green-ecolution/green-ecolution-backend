@@ -22,7 +22,7 @@ var _ MappedNullable = &Sensor{}
 
 // Sensor struct for Sensor
 type Sensor struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
 	CreatedAt             string                 `json:"created_at"`
 	Id                    string                 `json:"id"`
 	LatestData            SensorData             `json:"latest_data"`
@@ -39,9 +39,8 @@ type _Sensor Sensor
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensor(additionalInformation map[string]interface{}, createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status SensorStatus, updatedAt string) *Sensor {
+func NewSensor(createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status SensorStatus, updatedAt string) *Sensor {
 	this := Sensor{}
-	this.AdditionalInformation = additionalInformation
 	this.CreatedAt = createdAt
 	this.Id = id
 	this.LatestData = latestData
@@ -61,26 +60,34 @@ func NewSensorWithDefaults() *Sensor {
 	return &this
 }
 
-// GetAdditionalInformation returns the AdditionalInformation field value
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
 func (o *Sensor) GetAdditionalInformation() map[string]interface{} {
-	if o == nil {
+	if o == nil || IsNil(o.AdditionalInformation) {
 		var ret map[string]interface{}
 		return ret
 	}
-
 	return o.AdditionalInformation
 }
 
-// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *Sensor) GetAdditionalInformationOk() (map[string]interface{}, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AdditionalInformation) {
 		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
-// SetAdditionalInformation sets field value
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *Sensor) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
 func (o *Sensor) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
@@ -287,7 +294,9 @@ func (o Sensor) MarshalJSON() ([]byte, error) {
 
 func (o Sensor) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["additional_information"] = o.AdditionalInformation
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["id"] = o.Id
 	toSerialize["latest_data"] = o.LatestData
@@ -304,7 +313,6 @@ func (o *Sensor) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"additional_information",
 		"created_at",
 		"id",
 		"latest_data",

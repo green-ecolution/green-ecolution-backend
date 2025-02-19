@@ -22,7 +22,7 @@ var _ MappedNullable = &WateringPlan{}
 
 // WateringPlan struct for WateringPlan
 type WateringPlan struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
 	CancellationNote      string                 `json:"cancellation_note"`
 	CreatedAt             string                 `json:"created_at"`
 	Date                  string                 `json:"date"`
@@ -49,9 +49,8 @@ type _WateringPlan WateringPlan
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWateringPlan(additionalInformation map[string]interface{}, cancellationNote string, createdAt string, date string, description string, distance float32, duration float32, evaluation []EvaluationValue, gpxUrl string, id int32, provider string, refillCount int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlan {
+func NewWateringPlan(cancellationNote string, createdAt string, date string, description string, distance float32, duration float32, evaluation []EvaluationValue, gpxUrl string, id int32, provider string, refillCount int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlan {
 	this := WateringPlan{}
-	this.AdditionalInformation = additionalInformation
 	this.CancellationNote = cancellationNote
 	this.CreatedAt = createdAt
 	this.Date = date
@@ -80,26 +79,34 @@ func NewWateringPlanWithDefaults() *WateringPlan {
 	return &this
 }
 
-// GetAdditionalInformation returns the AdditionalInformation field value
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
 func (o *WateringPlan) GetAdditionalInformation() map[string]interface{} {
-	if o == nil {
+	if o == nil || IsNil(o.AdditionalInformation) {
 		var ret map[string]interface{}
 		return ret
 	}
-
 	return o.AdditionalInformation
 }
 
-// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *WateringPlan) GetAdditionalInformationOk() (map[string]interface{}, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AdditionalInformation) {
 		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
-// SetAdditionalInformation sets field value
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *WateringPlan) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
 func (o *WateringPlan) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
@@ -554,7 +561,9 @@ func (o WateringPlan) MarshalJSON() ([]byte, error) {
 
 func (o WateringPlan) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["additional_information"] = o.AdditionalInformation
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["cancellation_note"] = o.CancellationNote
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["date"] = o.Date
@@ -583,7 +592,6 @@ func (o *WateringPlan) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"additional_information",
 		"cancellation_note",
 		"created_at",
 		"date",

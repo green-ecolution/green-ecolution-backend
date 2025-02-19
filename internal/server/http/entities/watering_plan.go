@@ -36,7 +36,7 @@ type WateringPlanResponse struct {
 	Duration           *float64                     `json:"duration"`
 	RefillCount        int32                        `json:"refill_count"`
 	Provider           string                       `json:"provider,omitempty"`
-	AdditionalInfo     map[string]interface{}       `json:"additional_information,omitempty"`
+	AdditionalInfo     map[string]interface{}       `json:"additional_information,omitempty" validate:"optional"`
 } // @Name WateringPlan
 
 type WateringPlanInListResponse struct {

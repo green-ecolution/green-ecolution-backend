@@ -21,7 +21,7 @@ type SensorResponse struct {
 	Latitude       float64                `json:"latitude"`
 	Longitude      float64                `json:"longitude"`
 	Provider       string                 `json:"provider,omitempty"`
-	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty" validate:"optional"`
 } // @Name Sensor
 
 type SensorListResponse struct {

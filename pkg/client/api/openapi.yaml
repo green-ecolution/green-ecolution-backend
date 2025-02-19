@@ -2758,7 +2758,6 @@ components:
         updated_at:
           type: string
       required:
-      - additional_information
       - created_at
       - id
       - latest_data
@@ -3003,7 +3002,6 @@ components:
         watering_status:
           $ref: '#/components/schemas/WateringStatus'
       required:
-      - additional_information
       - created_at
       - description
       - id
@@ -3154,7 +3152,6 @@ components:
         watering_status:
           $ref: '#/components/schemas/WateringStatus'
       required:
-      - additional_information
       - address
       - archived
       - created_at
@@ -3624,12 +3621,6 @@ components:
       type: object
     UserList:
       example:
-        pagination:
-          next_page: 9
-          total_records: 4
-          total_pages: 2
-          prev_page: 3
-          current_page: 7
         data:
         - email_verified: true
           roles:
@@ -3670,8 +3661,6 @@ components:
           items:
             $ref: '#/components/schemas/User'
           type: array
-        pagination:
-          $ref: '#/components/schemas/Pagination'
       required:
       - data
       type: object
@@ -3796,7 +3785,6 @@ components:
         width:
           type: number
       required:
-      - additional_information
       - created_at
       - description
       - driving_license
@@ -4151,7 +4139,6 @@ components:
             type: string
           type: array
       required:
-      - additional_information
       - cancellation_note
       - created_at
       - date
