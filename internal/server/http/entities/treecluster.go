@@ -31,7 +31,7 @@ type TreeClusterResponse struct {
 	SoilCondition  TreeSoilCondition      `json:"soil_condition"`
 	Name           string                 `json:"name"`
 	Provider       string                 `json:"provider,omitempty"`
-	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty" validate:"optional"`
 } // @Name TreeCluster
 
 type TreeClusterInListResponse struct {
@@ -54,7 +54,7 @@ type TreeClusterInListResponse struct {
 
 type TreeClusterListResponse struct {
 	Data       []*TreeClusterInListResponse `json:"data"`
-	Pagination *Pagination                  `json:"pagination"`
+	Pagination *Pagination                  `json:"pagination,omitempty" validate:"optional"`
 } // @Name TreeClusterList
 
 type TreeClusterCreateRequest struct {

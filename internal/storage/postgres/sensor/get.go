@@ -56,6 +56,30 @@ func (r *SensorRepository) GetAll(ctx context.Context, provider string) ([]*enti
 	return data, totalCount, nil
 }
 
+func (r *SensorRepository) GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error) {
+	log := logger.GetLogger(ctx)
+
+	_, err := r.GetByID(ctx, id)
+	if err != nil {
+		log.Debug("failed to get sensor in db", "error", err, "sensor_id", id)
+		return nil, r.store.MapError(err, sqlc.Sensor{})
+	}
+
+	rows, err := r.store.GetAllSensorDataByID(ctx, id)
+	if err != nil {
+		log.Debug("failed to get all sensor data by sensor id in db", "error", err, "sensor_id", id)
+		return nil, r.store.MapError(err, sqlc.Sensor{})
+	}
+
+	data, err := r.mapper.FromSqlSensorDataList(rows)
+	if err != nil {
+		log.Debug("failed to convert entity", "error", err)
+		return nil, err
+	}
+
+	return data, nil
+}
+
 func (r *SensorRepository) GetByID(ctx context.Context, id string) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	row, err := r.store.GetSensorByID(ctx, id)

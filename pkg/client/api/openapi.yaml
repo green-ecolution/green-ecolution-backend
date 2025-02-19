@@ -2691,7 +2691,6 @@ components:
             $ref: '#/components/schemas/Region'
           type: array
       required:
-      - pagination
       - regions
       type: object
     RouteRequest:
@@ -2759,7 +2758,6 @@ components:
         updated_at:
           type: string
       required:
-      - additional_information
       - created_at
       - id
       - latest_data
@@ -2868,7 +2866,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     SensorStatus:
       enum:
@@ -3005,7 +3002,6 @@ components:
         watering_status:
           $ref: '#/components/schemas/WateringStatus'
       required:
-      - additional_information
       - created_at
       - description
       - id
@@ -3156,7 +3152,6 @@ components:
         watering_status:
           $ref: '#/components/schemas/WateringStatus'
       required:
-      - additional_information
       - address
       - archived
       - created_at
@@ -3332,7 +3327,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     TreeClusterUpdate:
       example:
@@ -3512,7 +3506,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     TreeUpdate:
       example:
@@ -3628,12 +3621,6 @@ components:
       type: object
     UserList:
       example:
-        pagination:
-          next_page: 9
-          total_records: 4
-          total_pages: 2
-          prev_page: 3
-          current_page: 7
         data:
         - email_verified: true
           roles:
@@ -3674,11 +3661,8 @@ components:
           items:
             $ref: '#/components/schemas/User'
           type: array
-        pagination:
-          $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     UserRegister:
       example:
@@ -3801,7 +3785,6 @@ components:
         width:
           type: number
       required:
-      - additional_information
       - created_at
       - description
       - driving_license
@@ -3927,7 +3910,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     VehicleStatus:
       enum:
@@ -4157,7 +4139,6 @@ components:
             type: string
           type: array
       required:
-      - additional_information
       - cancellation_note
       - created_at
       - date
@@ -4546,7 +4527,6 @@ components:
           $ref: '#/components/schemas/Pagination'
       required:
       - data
-      - pagination
       type: object
     WateringPlanStatus:
       enum:

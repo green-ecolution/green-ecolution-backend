@@ -35,12 +35,12 @@ type VehicleResponse struct {
 	Length         float64                `json:"length"`
 	Weight         float64                `json:"weight"`
 	Provider       string                 `json:"provider,omitempty"`
-	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty" validate:"optional"`
 } // @Name Vehicle
 
 type VehicleListResponse struct {
 	Data       []*VehicleResponse `json:"data"`
-	Pagination *Pagination        `json:"pagination"`
+	Pagination *Pagination        `json:"pagination,omitempty" validate:"optional"`
 } // @Name VehicleList
 
 type VehicleCreateRequest struct {

@@ -22,7 +22,7 @@ var _ MappedNullable = &TreeCluster{}
 
 // TreeCluster struct for TreeCluster
 type TreeCluster struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
 	Address               string                 `json:"address"`
 	Archived              bool                   `json:"archived"`
 	CreatedAt             string                 `json:"created_at"`
@@ -47,9 +47,8 @@ type _TreeCluster TreeCluster
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeCluster(additionalInformation map[string]interface{}, address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, provider string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
+func NewTreeCluster(address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, provider string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeCluster {
 	this := TreeCluster{}
-	this.AdditionalInformation = additionalInformation
 	this.Address = address
 	this.Archived = archived
 	this.CreatedAt = createdAt
@@ -74,26 +73,34 @@ func NewTreeClusterWithDefaults() *TreeCluster {
 	return &this
 }
 
-// GetAdditionalInformation returns the AdditionalInformation field value
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
 func (o *TreeCluster) GetAdditionalInformation() map[string]interface{} {
-	if o == nil {
+	if o == nil || IsNil(o.AdditionalInformation) {
 		var ret map[string]interface{}
 		return ret
 	}
-
 	return o.AdditionalInformation
 }
 
-// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TreeCluster) GetAdditionalInformationOk() (map[string]interface{}, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.AdditionalInformation) {
 		return map[string]interface{}{}, false
 	}
 	return o.AdditionalInformation, true
 }
 
-// SetAdditionalInformation sets field value
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *TreeCluster) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
 func (o *TreeCluster) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
 }
@@ -516,7 +523,9 @@ func (o TreeCluster) MarshalJSON() ([]byte, error) {
 
 func (o TreeCluster) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["additional_information"] = o.AdditionalInformation
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["address"] = o.Address
 	toSerialize["archived"] = o.Archived
 	toSerialize["created_at"] = o.CreatedAt
@@ -547,7 +556,6 @@ func (o *TreeCluster) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"additional_information",
 		"address",
 		"archived",
 		"created_at",

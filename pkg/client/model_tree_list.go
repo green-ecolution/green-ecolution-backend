@@ -22,8 +22,8 @@ var _ MappedNullable = &TreeList{}
 
 // TreeList struct for TreeList
 type TreeList struct {
-	Data       []Tree     `json:"data"`
-	Pagination Pagination `json:"pagination"`
+	Data       []Tree      `json:"data"`
+	Pagination *Pagination `json:"pagination,omitempty"`
 }
 
 type _TreeList TreeList
@@ -32,10 +32,9 @@ type _TreeList TreeList
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeList(data []Tree, pagination Pagination) *TreeList {
+func NewTreeList(data []Tree) *TreeList {
 	this := TreeList{}
 	this.Data = data
-	this.Pagination = pagination
 	return &this
 }
 
@@ -71,28 +70,36 @@ func (o *TreeList) SetData(v []Tree) {
 	o.Data = v
 }
 
-// GetPagination returns the Pagination field value
+// GetPagination returns the Pagination field value if set, zero value otherwise.
 func (o *TreeList) GetPagination() Pagination {
-	if o == nil {
+	if o == nil || IsNil(o.Pagination) {
 		var ret Pagination
 		return ret
 	}
-
-	return o.Pagination
+	return *o.Pagination
 }
 
-// GetPaginationOk returns a tuple with the Pagination field value
+// GetPaginationOk returns a tuple with the Pagination field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *TreeList) GetPaginationOk() (*Pagination, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Pagination) {
 		return nil, false
 	}
-	return &o.Pagination, true
+	return o.Pagination, true
 }
 
-// SetPagination sets field value
+// HasPagination returns a boolean if a field has been set.
+func (o *TreeList) HasPagination() bool {
+	if o != nil && !IsNil(o.Pagination) {
+		return true
+	}
+
+	return false
+}
+
+// SetPagination gets a reference to the given Pagination and assigns it to the Pagination field.
 func (o *TreeList) SetPagination(v Pagination) {
-	o.Pagination = v
+	o.Pagination = &v
 }
 
 func (o TreeList) MarshalJSON() ([]byte, error) {
@@ -106,7 +113,9 @@ func (o TreeList) MarshalJSON() ([]byte, error) {
 func (o TreeList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["data"] = o.Data
-	toSerialize["pagination"] = o.Pagination
+	if !IsNil(o.Pagination) {
+		toSerialize["pagination"] = o.Pagination
+	}
 	return toSerialize, nil
 }
 
@@ -116,7 +125,6 @@ func (o *TreeList) UnmarshalJSON(data []byte) (err error) {
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"data",
-		"pagination",
 	}
 
 	allProperties := make(map[string]interface{})

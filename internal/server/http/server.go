@@ -47,8 +47,13 @@ func (s *Server) Run(ctx context.Context) error {
 		s.services.PluginService.StartCleanup(ctx)
 	}()
 
-	scheduler := worker.NewScheduler(3*time.Hour, worker.SchedulerFunc(s.services.SensorService.UpdateStatuses))
-	go scheduler.Run(ctx)
+	sensorStatusScheduler := worker.NewScheduler(3*time.Hour, worker.SchedulerFunc(s.services.SensorService.UpdateStatuses))
+	go sensorStatusScheduler.Run(ctx)
+
+	var onceADay = 24 * time.Hour
+
+	wateringPlanStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.WateringPlanService.UpdateStatuses))
+	go wateringPlanStatusScheduler.Run(ctx)
 
 	go func() {
 		<-ctx.Done()
