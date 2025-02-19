@@ -24,7 +24,7 @@ func validKey(t testing.TB) *rsa.PrivateKey {
 	t.Helper()
 	t.Log("Generating a valid public key")
 	random := rand.Reader
-	key, err := rsa.GenerateKey(random, 512)
+	key, err := rsa.GenerateKey(random, 2048)
 	if err != nil {
 		t.Fatalf("Failed to generate key: %v", err)
 	}
