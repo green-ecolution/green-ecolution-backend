@@ -28,6 +28,8 @@
         devShells.default = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [
             go_1_24
+            delve
+
             docker
             docker-compose
             gnumake
