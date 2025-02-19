@@ -58,7 +58,7 @@ func (s *Server) Run(ctx context.Context) error {
 	clusterWateringStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.TreeClusterService.UpdateWateringStatuses))
 	go clusterWateringStatusScheduler.Run(ctx)
 
-	treeWateringStatusScheduler := worker.NewScheduler(24*time.Hour, worker.SchedulerFunc(s.services.TreeService.UpdateWateringStatuses))
+	treeWateringStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.TreeService.UpdateWateringStatuses))
 	go treeWateringStatusScheduler.Run(ctx)
 
 	go func() {
