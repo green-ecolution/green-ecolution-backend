@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"net/http"
 	"testing"
 
@@ -28,7 +29,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockWateringPlanService.EXPECT().GetAll(
 				mock.Anything,
-				"",
+				entities.Query{},
 			).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 			// when

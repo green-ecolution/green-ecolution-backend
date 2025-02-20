@@ -83,7 +83,7 @@ const (
 )
 
 type BasicCrudService[T any, CreateType any, UpdateType any] interface {
-	GetAll(ctx context.Context, provider string) ([]*T, int64, error)
+	GetAll(ctx context.Context, query domain.Query) ([]*T, int64, error)
 	GetByID(ctx context.Context, id int32) (*T, error)
 	Create(ctx context.Context, createData *CreateType) (*T, error)
 	Update(ctx context.Context, id int32, updateData *UpdateType) (*T, error)
@@ -126,7 +126,7 @@ type TreeClusterService interface {
 	Service
 	// TODO: use CrudService as soon as every service has pagination
 	// CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
-	GetAll(ctx context.Context, filter domain.TreeClusterFilter) ([]*domain.TreeCluster, int64, error)
+	GetAll(ctx context.Context, query domain.TreeClusterQuery) ([]*domain.TreeCluster, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
 	Create(ctx context.Context, createData *domain.TreeClusterCreate) (*domain.TreeCluster, error)
 	Update(ctx context.Context, id int32, updateData *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
@@ -142,7 +142,7 @@ type TreeClusterService interface {
 
 type SensorService interface {
 	Service
-	GetAll(ctx context.Context, provider string) ([]*domain.Sensor, int64, error)
+	GetAll(ctx context.Context, query domain.Query) ([]*domain.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*domain.Sensor, error)
 	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
 	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
@@ -160,7 +160,7 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 
 type VehicleService interface {
 	Service
-	GetAll(ctx context.Context, provider, vehicleType string, withArchived bool) ([]*domain.Vehicle, int64, error)
+	GetAll(ctx context.Context, query domain.VehicleQuery) ([]*domain.Vehicle, int64, error)
 	GetAllArchived(ctx context.Context) ([]*domain.Vehicle, error)
 	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
 	Create(ctx context.Context, createData *domain.VehicleCreate) (*domain.Vehicle, error)
@@ -172,7 +172,7 @@ type VehicleService interface {
 
 type WateringPlanService interface {
 	Service
-	GetAll(ctx context.Context, provider string) ([]*domain.WateringPlan, int64, error)
+	GetAll(ctx context.Context, query domain.Query) ([]*domain.WateringPlan, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.WateringPlan, error)
 	Create(ctx context.Context, createData *domain.WateringPlanCreate) (*domain.WateringPlan, error)
 	Update(ctx context.Context, id int32, updateData *domain.WateringPlanUpdate) (*domain.WateringPlan, error)

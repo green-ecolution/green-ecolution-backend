@@ -22,7 +22,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterFilter{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -69,7 +69,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterFilter{Provider: "test-provider"})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterQuery{Query: entities.Query{Provider: "test-provider"}})
 
 		// then
 		assert.NoError(t, err)
@@ -92,7 +92,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterFilter{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -120,7 +120,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterFilter{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -138,7 +138,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterFilter{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -155,7 +155,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterFilter{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeClusterQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -170,7 +170,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		_, _, err := r.GetAll(ctx, entities.TreeClusterFilter{})
+		_, _, err := r.GetAll(ctx, entities.TreeClusterQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -185,7 +185,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		filter := entities.TreeClusterFilter{
+		filter := entities.TreeClusterQuery{
 			WateringStatus: []entities.WateringStatus{entities.WateringStatusGood},
 		}
 
@@ -212,7 +212,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		filter := entities.TreeClusterFilter{
+		filter := entities.TreeClusterQuery{
 			Region: []string{"Mürwik"},
 		}
 
@@ -240,7 +240,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		filter := entities.TreeClusterFilter{
+		filter := entities.TreeClusterQuery{
 			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
 			Region:         []string{"Mürwik"},
 		}
@@ -276,10 +276,10 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 		regionNames := []string{"Mürwik", "Altstadt"}
 
-		filter := entities.TreeClusterFilter{
+		filter := entities.TreeClusterQuery{
 			WateringStatus: wateringstatues,
 			Region:         regionNames,
-			Provider:       "",
+			Query:          entities.Query{Provider: ""},
 		}
 
 		// when
@@ -316,10 +316,10 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		}
 		regionNames := []string{"Mürwik", "Altstadt"}
 
-		filter := entities.TreeClusterFilter{
+		filter := entities.TreeClusterQuery{
 			WateringStatus: wateringstatues,
 			Region:         regionNames,
-			Provider:       "",
+			Query:          entities.Query{Provider: ""},
 		}
 
 		// when
@@ -352,13 +352,13 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		filter := entities.TreeClusterFilter{
+		filter := entities.TreeClusterQuery{
 			WateringStatus: []entities.WateringStatus{
 				entities.WateringStatusBad,
 				entities.WateringStatusUnknown,
 			},
-			Region:   []string{"DoesNotExist", "FarAwayLand"},
-			Provider: "",
+			Region: []string{"DoesNotExist", "FarAwayLand"},
+			Query:  entities.Query{Provider: ""},
 		}
 
 		// when

@@ -29,9 +29,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"",
-			"",
-			false,
+			entities.VehicleQuery{},
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -66,9 +64,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"",
-			"",
-			false,
+			entities.VehicleQuery{},
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -140,9 +136,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"test-provider",
-			"",
-			false,
+			entities.VehicleQuery{Query: entities.Query{Provider: "test-provider"}},
 		).Return(TestVehicles, int64(0), nil)
 
 		// when
@@ -175,9 +169,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"",
-			"transporter",
-			false,
+			entities.VehicleQuery{Type: "transporter"},
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -210,10 +202,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"transporter",
-			false,
+			mock.Anything, entities.VehicleQuery{Type: "transporter"},
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -250,10 +239,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"",
-			false,
+			mock.Anything, entities.VehicleQuery{},
 		).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
@@ -287,10 +273,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"",
-			false,
+			mock.Anything, entities.VehicleQuery{},
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
@@ -313,10 +296,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"invalid",
-			false,
+			mock.Anything, entities.VehicleQuery{Type: "invalid"},
 		).Return(nil, int64(0), fiber.NewError(fiber.ErrBadRequest.Code, "service error"))
 
 		// when

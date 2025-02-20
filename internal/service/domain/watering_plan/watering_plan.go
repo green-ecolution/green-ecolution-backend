@@ -103,9 +103,9 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, transporterID in
 	return geoJSON, nil
 }
 
-func (w *WateringPlanService) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error) {
+func (w *WateringPlanService) GetAll(ctx context.Context, query entities.Query) ([]*entities.WateringPlan, int64, error) {
 	log := logger.GetLogger(ctx)
-	plans, totalCount, err := w.wateringPlanRepo.GetAll(ctx, provider)
+	plans, totalCount, err := w.wateringPlanRepo.GetAll(ctx, query)
 	if err != nil {
 		log.Debug("failed to fetch watering plans", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -350,7 +350,7 @@ func (w *WateringPlanService) Ready() bool {
 
 func (w *WateringPlanService) UpdateStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	plans, _, err := w.wateringPlanRepo.GetAll(ctx, "")
+	plans, _, err := w.wateringPlanRepo.GetAll(ctx, entities.Query{Provider: ""})
 	if err != nil {
 		log.Error("failed to fetch watering plans", "error", err)
 		return err

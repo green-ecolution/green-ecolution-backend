@@ -73,6 +73,11 @@ type VehicleUpdate struct {
 	AdditionalInfo map[string]interface{}
 }
 
+type VehicleQuery struct {
+	Type  string `query:"type"`
+	Query `query:""`
+}
+
 func ParseVehicleType(vehicleTypeStr string) VehicleType {
 	switch vehicleTypeStr {
 	case string(VehicleTypeTrailer):

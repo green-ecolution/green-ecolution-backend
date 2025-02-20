@@ -22,8 +22,8 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, globalEventManager)
 
 		// when
-		sensorRepo.EXPECT().GetAll(context.Background(), "").Return(TestSensorList, int64(len(TestSensorList)), nil)
-		sensors, totalCount, err := svc.GetAll(context.Background(), "")
+		sensorRepo.EXPECT().GetAll(context.Background(), entities.Query{}).Return(TestSensorList, int64(len(TestSensorList)), nil)
+		sensors, totalCount, err := svc.GetAll(context.Background(), entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -38,8 +38,8 @@ func TestSensorService_GetAll(t *testing.T) {
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, globalEventManager)
 
 		// when
-		sensorRepo.EXPECT().GetAll(context.Background(), "test-provider").Return(TestSensorList, int64(len(TestSensorList)), nil)
-		sensors, totalCount, err := svc.GetAll(context.Background(), "test-provider")
+		sensorRepo.EXPECT().GetAll(context.Background(), entities.Query{Provider: "test-provider"}).Return(TestSensorList, int64(len(TestSensorList)), nil)
+		sensors, totalCount, err := svc.GetAll(context.Background(), entities.Query{Provider: "test-provider"})
 
 		// then
 		assert.NoError(t, err)
@@ -53,8 +53,8 @@ func TestSensorService_GetAll(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		svc := sensor.NewSensorService(sensorRepo, treeRepo, globalEventManager)
 
-		sensorRepo.EXPECT().GetAll(context.Background(), "").Return(nil, int64(0), storage.ErrSensorNotFound)
-		sensors, totalCount, err := svc.GetAll(context.Background(), "")
+		sensorRepo.EXPECT().GetAll(context.Background(), entities.Query{}).Return(nil, int64(0), storage.ErrSensorNotFound)
+		sensors, totalCount, err := svc.GetAll(context.Background(), entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -562,7 +562,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		expectList := []*entities.Sensor{staleSensor, recentSensor}
 
 		// when
-		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(staleSensorData, nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, recentSensor.ID).Return(recentSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(staleSensor, nil)
@@ -571,7 +571,7 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, staleSensor.ID)
 		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, recentSensor.ID)
 		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
@@ -593,14 +593,14 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		expectList := []*entities.Sensor{freshSensor}
 
 		// when
-		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, freshSensor.ID).Return(freshSensorData, nil)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, freshSensor.ID)
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
@@ -615,14 +615,14 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 
 		// when
 		expectedErr := errors.New("database error")
-		repo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
+		repo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(nil, int64(0), expectedErr)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		repo.AssertNotCalled(t, "GetLatestSensorDataBySensorID")
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
@@ -641,14 +641,14 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		expectedErr := errors.New("failed to fetch sensor data")
 
 		// when
-		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(nil, expectedErr)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
-		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, staleSensor.ID)
 		repo.AssertNotCalled(t, "Update")
 		repo.AssertExpectations(t)
@@ -669,14 +669,14 @@ func TestSensorService_UpdateStatuses(t *testing.T) {
 		expectList := []*entities.Sensor{staleSensor}
 
 		// when
-		repo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		repo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		repo.EXPECT().GetLatestSensorDataBySensorID(mock.Anything, staleSensor.ID).Return(staleSensorData, nil)
 		repo.EXPECT().Update(mock.Anything, staleSensor.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
-		repo.AssertCalled(t, "GetAll", mock.Anything, "")
+		repo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		repo.AssertCalled(t, "GetLatestSensorDataBySensorID", mock.Anything, staleSensor.ID)
 		repo.AssertCalled(t, "Update", mock.Anything, staleSensor.ID, mock.Anything)
 		repo.AssertExpectations(t)

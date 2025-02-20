@@ -44,15 +44,15 @@ func (r *VehicleRepository) getHelper(
 	return r.mapFromList(ctx, rows, totalCount)
 }
 
-func (r *VehicleRepository) GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error) {
+func (r *VehicleRepository) GetAll(ctx context.Context, query entities.Query) ([]*entities.Vehicle, int64, error) {
 	return r.getHelper(
 		ctx,
 		func() (int64, error) {
-			return r.store.GetAllVehiclesCount(ctx, provider)
+			return r.store.GetAllVehiclesCount(ctx, query.Provider)
 		},
 		func(page, limit int32) ([]*sqlc.Vehicle, error) {
 			return r.store.GetAllVehicles(ctx, &sqlc.GetAllVehiclesParams{
-				Column1: provider,
+				Column1: query.Provider,
 				Limit:   limit,
 				Offset:  (page - 1) * limit,
 			})

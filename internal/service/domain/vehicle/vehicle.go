@@ -24,29 +24,29 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context, provider, vehicleType string, withArchived bool) ([]*entities.Vehicle, int64, error) {
+func (v *VehicleService) GetAll(ctx context.Context, query entities.VehicleQuery) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
 	var vehicles []*entities.Vehicle
 	var totalCount int64
 	var err error
 
-	if vehicleType != "" {
-		parsedVehicleType := entities.ParseVehicleType(vehicleType)
+	if query.Type != "" {
+		parsedVehicleType := entities.ParseVehicleType(query.Type)
 		if parsedVehicleType == entities.VehicleTypeUnknown {
-			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", vehicleType)
+			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", query.Type)
 			return nil, 0, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 		}
 
-		if withArchived {
-			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, provider, parsedVehicleType)
+		if query.withArchived {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, query.Provider, parsedVehicleType)
 		} else {
-			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, parsedVehicleType)
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, query.Provider, parsedVehicleType)
 		}
 	} else {
-		if withArchived {
-			vehicles, totalCount, err = v.vehicleRepo.GetAllWithArchived(ctx, provider)
+		if query.withArchived {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllWithArchived(ctx, query.Provider)
 		} else {
-			vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, provider)
+			vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, entities.Query{Provider: query.Provider})
 		}
 	}
 

@@ -13,7 +13,7 @@ import (
 	"github.com/twpayne/go-geos"
 )
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, int64, error) {
+func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterQuery) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
 
 	page, limit, err := pagination.GetValues(ctx)

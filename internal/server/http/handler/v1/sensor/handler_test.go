@@ -29,7 +29,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return(TestSensorList, int64(len(TestSensorList)), nil)
 
 		// when
@@ -64,7 +64,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return(TestSensorList, int64(len(TestSensorList)), nil)
 
 		// when
@@ -135,7 +135,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
-			"test-provider",
+			entities.Query{Provider: "test-provider"},
 		).Return(TestSensorList, int64(len(TestSensorList)), nil)
 
 		app.Get("/v1/sensor", handler)
@@ -173,7 +173,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return([]*entities.Sensor{}, int64(0), nil)
 
 		// when
@@ -207,7 +207,7 @@ func TestGetAllSensors(t *testing.T) {
 
 		mockSensorService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return(nil, int64(0), errors.New("service error"))
 
 		// when

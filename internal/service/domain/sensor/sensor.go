@@ -43,9 +43,9 @@ func (s *SensorService) publishNewSensorDataEvent(ctx context.Context, data *ent
 	}
 }
 
-func (s *SensorService) GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error) {
+func (s *SensorService) GetAll(ctx context.Context, query entities.Query) ([]*entities.Sensor, int64, error) {
 	log := logger.GetLogger(ctx)
-	sensors, totalCount, err := s.sensorRepo.GetAll(ctx, provider)
+	sensors, totalCount, err := s.sensorRepo.GetAll(ctx, query)
 
 	if err != nil {
 		log.Debug("failed to fetch sensors", "error", err)
@@ -155,7 +155,7 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 
 func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	sensors, _, err := s.sensorRepo.GetAll(ctx, "")
+	sensors, _, err := s.sensorRepo.GetAll(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to fetch sensors", "error", err)
 		return err

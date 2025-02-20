@@ -12,14 +12,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error) {
+func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	totalCount, err := r.store.GetAllTreesCount(ctx, provider)
+	totalCount, err := r.store.GetAllTreesCount(ctx, query.Provider)
 	if err != nil {
 		log.Debug("failed to get total watering plan count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
@@ -35,7 +35,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, provider string) ([]*entiti
 	}
 
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
-		Column1: provider,
+		Column1: query.Provider,
 		Limit:   limit,
 		Offset:  (page - 1) * limit,
 	})

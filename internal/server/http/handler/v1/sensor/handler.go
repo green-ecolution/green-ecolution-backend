@@ -35,7 +35,13 @@ var (
 func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, totalCount, err := svc.GetAll(ctx, strings.Clone(c.Query("provider")))
+		var query domain.Query
+
+		if err := c.QueryParser(&query); err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, totalCount, err := svc.GetAll(ctx, query)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
