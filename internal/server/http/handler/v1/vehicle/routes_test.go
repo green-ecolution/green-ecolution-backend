@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"net/http"
 	"testing"
 
@@ -27,10 +28,7 @@ func TestRegisterRoutes(t *testing.T) {
 			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockVehicleService.EXPECT().GetAll(
-				mock.Anything,
-				"",
-				"",
-				false,
+				mock.Anything, domain.VehicleQuery{},
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when
@@ -49,10 +47,7 @@ func TestRegisterRoutes(t *testing.T) {
 			vehicle.RegisterRoutes(app, mockVehicleService)
 
 			mockVehicleService.EXPECT().GetAll(
-				mock.Anything,
-				"",
-				"transporter",
-				false,
+				mock.Anything, domain.VehicleQuery{Type: "transporter"},
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when

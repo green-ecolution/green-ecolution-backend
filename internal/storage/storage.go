@@ -99,7 +99,7 @@ type ImageRepository interface {
 
 type VehicleRepository interface {
 	// GetAll returns all vehicles that are not archived
-	GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
+	GetAll(ctx context.Context, query entities.Query) ([]*entities.Vehicle, int64, error)
 	// GetAllWithArchived returns all vehicles and archived as well
 	GetAllWithArchived(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
 	// GetAllByType returns all vehicles by vehicle type that are not archived
@@ -124,7 +124,7 @@ type VehicleRepository interface {
 
 type WateringPlanRepository interface {
 	// GetAll returns all watering plans
-	GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error)
+	GetAll(ctx context.Context, query entities.Query) ([]*entities.WateringPlan, int64, error)
 	// GetByID returns one watering plan by id
 	GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error)
 	// GetLinkedVehicleByIDAndType returnes all vehicles linked to a watering plan by the watering plan id and the vehicle type
@@ -145,7 +145,7 @@ type WateringPlanRepository interface {
 
 type TreeClusterRepository interface {
 	// GetAll returns all tree clusters
-	GetAll(ctx context.Context, filter entities.TreeClusterFilter) ([]*entities.TreeCluster, int64, error)
+	GetAll(ctx context.Context, query entities.TreeClusterQuery) ([]*entities.TreeCluster, int64, error)
 	// GetByID returns one tree cluster by id
 	GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error)
 	// GetByIDs returns multiple tree cluster by ids
@@ -166,7 +166,7 @@ type TreeClusterRepository interface {
 
 type TreeRepository interface {
 	// GetAll returns all trees
-	GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error)
+	GetAll(ctx context.Context, query entities.Query) ([]*entities.Tree, int64, error)
 	// GetByID returns one tree by id
 	GetByID(ctx context.Context, id int32) (*entities.Tree, error)
 	// Create creates a new tree. It accepts a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be created, otherwise it will not be created.
@@ -193,7 +193,7 @@ type TreeRepository interface {
 }
 
 type SensorRepository interface {
-	GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error)
+	GetAll(ctx context.Context, query entities.Query) ([]*entities.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
 	Create(ctx context.Context, createFn func(*entities.Sensor, SensorRepository) (bool, error)) (*entities.Sensor, error)
 	Update(ctx context.Context, id string, updateFn func(*entities.Sensor, SensorRepository) (bool, error)) (*entities.Sensor, error)

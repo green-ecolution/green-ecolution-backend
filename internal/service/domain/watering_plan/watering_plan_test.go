@@ -31,10 +31,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
-		wateringPlanRepo.EXPECT().GetAll(ctx, "").Return(allTestWateringPlans, int64(len(allTestWateringPlans)), nil)
+		wateringPlanRepo.EXPECT().GetAll(ctx, entities.Query{}).Return(allTestWateringPlans, int64(len(allTestWateringPlans)), nil)
 
 		// when
-		wateringPlans, totalCount, err := svc.GetAll(ctx, "")
+		wateringPlans, totalCount, err := svc.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -52,10 +52,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
-		wateringPlanRepo.EXPECT().GetAll(ctx, "test-provider").Return(allTestWateringPlans, int64(len(allTestWateringPlans)), nil)
+		wateringPlanRepo.EXPECT().GetAll(ctx, entities.Query{Provider: "test-provider"}).Return(allTestWateringPlans, int64(len(allTestWateringPlans)), nil)
 
 		// when
-		wateringPlans, totalCount, err := svc.GetAll(ctx, "test-provider")
+		wateringPlans, totalCount, err := svc.GetAll(ctx, entities.Query{Provider: "test-provider"})
 
 		// then
 		assert.NoError(t, err)
@@ -73,10 +73,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
-		wateringPlanRepo.EXPECT().GetAll(ctx, "").Return([]*entities.WateringPlan{}, int64(0), nil)
+		wateringPlanRepo.EXPECT().GetAll(ctx, entities.Query{}).Return([]*entities.WateringPlan{}, int64(0), nil)
 
 		// when
-		wateringPlans, totalCount, err := svc.GetAll(ctx, "")
+		wateringPlans, totalCount, err := svc.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -95,10 +95,10 @@ func TestWateringPlanService_GetAll(t *testing.T) {
 		svc := NewWateringPlanService(wateringPlanRepo, clusterRepo, vehicleRepo, userRepo, globalEventManager, routingRepo, s3Repo)
 
 		expectedErr := errors.New("GetAll failed")
-		wateringPlanRepo.EXPECT().GetAll(ctx, "").Return(nil, int64(0), expectedErr)
+		wateringPlanRepo.EXPECT().GetAll(ctx, entities.Query{}).Return(nil, int64(0), expectedErr)
 
 		// when
-		wateringPlans, totalCount, err := svc.GetAll(ctx, "")
+		wateringPlans, totalCount, err := svc.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -1865,7 +1865,7 @@ func TestWateringPlanService_UpdateStatuses(t *testing.T) {
 		}
 
 		// when
-		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanActive.ID, mock.Anything).Return(nil)
 		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanPlanned.ID, mock.Anything).Return(nil)
 		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanUnknown.ID, mock.Anything).Return(nil)
@@ -1874,7 +1874,7 @@ func TestWateringPlanService_UpdateStatuses(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanActive.ID, mock.Anything)
 		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanPlanned.ID, mock.Anything)
 		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanUnknown.ID, mock.Anything)
@@ -1905,13 +1905,13 @@ func TestWateringPlanService_UpdateStatuses(t *testing.T) {
 		expectList := []*entities.WateringPlan{recentPlanActive}
 
 		// when
-		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.NoError(t, err)
-		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		wateringPlanRepo.AssertNotCalled(t, "Update")
 		wateringPlanRepo.AssertExpectations(t)
 	})
@@ -1930,14 +1930,14 @@ func TestWateringPlanService_UpdateStatuses(t *testing.T) {
 
 		// when
 		expectedErr := errors.New("database error")
-		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(nil, int64(0), expectedErr)
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
-		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		wateringPlanRepo.AssertNotCalled(t, "Update")
 		wateringPlanRepo.AssertExpectations(t)
 	})
@@ -1963,13 +1963,13 @@ func TestWateringPlanService_UpdateStatuses(t *testing.T) {
 		expectList := []*entities.WateringPlan{stalePlanUnknown}
 
 		// when
-		wateringPlanRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		wateringPlanRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		wateringPlanRepo.EXPECT().Update(mock.Anything, stalePlanUnknown.ID, mock.Anything).Return(errors.New("update failed"))
 
 		err := svc.UpdateStatuses(ctx)
 
 		// then
-		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		wateringPlanRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		wateringPlanRepo.AssertCalled(t, "Update", mock.Anything, stalePlanUnknown.ID, mock.Anything)
 		wateringPlanRepo.AssertExpectations(t)
 		assert.NoError(t, err)

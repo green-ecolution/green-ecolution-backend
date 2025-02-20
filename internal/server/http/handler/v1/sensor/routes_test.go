@@ -27,7 +27,7 @@ func TestRegisterRoutes(t *testing.T) {
 
 			mockSensorService.EXPECT().GetAll(
 				mock.Anything,
-				"",
+				entities.Query{},
 			).Return(TestSensorList, int64(len(TestSensorList)), nil)
 
 			// when

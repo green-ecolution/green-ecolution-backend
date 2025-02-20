@@ -30,7 +30,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 		// when
@@ -65,7 +65,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 		// when
@@ -137,7 +137,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
-			"test-provider",
+			entities.Query{Provider: "test-provider"},
 		).Return(TestWateringPlans, int64(len(TestWateringPlans)), nil)
 
 		// when
@@ -170,7 +170,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return([]*entities.WateringPlan{}, int64(0), nil)
 
 		// when
@@ -204,7 +204,7 @@ func TestGetAllWateringPlans(t *testing.T) {
 
 		mockWateringPlanService.EXPECT().GetAll(
 			mock.Anything,
-			"",
+			entities.Query{},
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when

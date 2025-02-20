@@ -30,10 +30,10 @@ func TestTreeService_GetAll(t *testing.T) {
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
 
 		expectedTrees := TestTreesList
-		treeRepo.EXPECT().GetAll(ctx, "").Return(expectedTrees, int64(len(expectedTrees)), nil)
+		treeRepo.EXPECT().GetAll(ctx, entities.Query{}).Return(expectedTrees, int64(len(expectedTrees)), nil)
 
 		// when
-		trees, totalCount, err := svc.GetAll(ctx, "")
+		trees, totalCount, err := svc.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -50,10 +50,10 @@ func TestTreeService_GetAll(t *testing.T) {
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
 
 		expectedTrees := TestTreesList
-		treeRepo.EXPECT().GetAll(ctx, "test-provider").Return(expectedTrees, int64(len(expectedTrees)), nil)
+		treeRepo.EXPECT().GetAll(ctx, entities.Query{Provider: "test-provider"}).Return(expectedTrees, int64(len(expectedTrees)), nil)
 
 		// when
-		trees, totalCount, err := svc.GetAll(ctx, "test-provider")
+		trees, totalCount, err := svc.GetAll(ctx, entities.Query{Provider: "test-provider"})
 
 		// then
 		assert.NoError(t, err)
@@ -69,10 +69,10 @@ func TestTreeService_GetAll(t *testing.T) {
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, globalEventManager)
 
-		treeRepo.EXPECT().GetAll(ctx, "").Return([]*entities.Tree{}, int64(0), nil)
+		treeRepo.EXPECT().GetAll(ctx, entities.Query{}).Return([]*entities.Tree{}, int64(0), nil)
 
 		// when
-		trees, totalCount, err := svc.GetAll(ctx, "")
+		trees, totalCount, err := svc.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -91,10 +91,10 @@ func TestTreeService_GetAll(t *testing.T) {
 
 		expectedError := errors.New("GetAll failed")
 
-		treeRepo.EXPECT().GetAll(ctx, "").Return(nil, int64(0), expectedError)
+		treeRepo.EXPECT().GetAll(ctx, entities.Query{}).Return(nil, int64(0), expectedError)
 
 		// when
-		trees, totalCount, err := svc.GetAll(ctx, "")
+		trees, totalCount, err := svc.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)

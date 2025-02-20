@@ -52,8 +52,8 @@ type TreeClusterUpdate struct {
 	AdditionalInfo map[string]interface{}
 }
 
-type TreeClusterFilter struct {
-	WateringStatus []WateringStatus
-	Region         []string
-	Provider       string
+type TreeClusterQuery struct {
+	WateringStatus []WateringStatus `query:"status"`
+	Region         []string         `query:"region"`
+	Query          `query:""`
 }

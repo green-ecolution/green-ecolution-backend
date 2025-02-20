@@ -28,7 +28,7 @@ func TestRegisterRoutes(t *testing.T) {
 			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockClusterService.EXPECT().GetAll(
-				mock.Anything, entities.TreeClusterFilter{},
+				mock.Anything, entities.TreeClusterQuery{},
 			).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 			// when

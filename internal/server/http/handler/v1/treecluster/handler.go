@@ -2,7 +2,6 @@ package treecluster
 
 import (
 	"strconv"
-	"strings"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 
@@ -40,7 +39,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
-		filter, err := fillTreeClusterFilter(c)
+		filter, err := fillTreeClusterQueryParams(c)
 		if err != nil {
 			return service.NewError(service.BadRequest, err.Error())
 		}
@@ -62,32 +61,22 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	}
 }
 
-func fillTreeClusterFilter(c *fiber.Ctx) (domain.TreeClusterFilter, error) {
-	var wateringStatues []domain.WateringStatus
+func fillTreeClusterQueryParams(c *fiber.Ctx) (domain.TreeClusterQuery, error) {
+	var filter domain.TreeClusterQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeClusterQuery{}, err
+	}
+
 	if c.Query("status") != "" {
-		var err error
-		wateringStatues, err = domain.ParseWateringStatus(c.Query("status"))
+		wateringStatuses, err := domain.ParseWateringStatus(c.Query("status"))
 		if err != nil {
-			return domain.TreeClusterFilter{}, err
+			return domain.TreeClusterQuery{}, err
 		}
+		filter.WateringStatus = wateringStatuses
 	}
 
-	regionQuery := c.Query("region")
-	var regions []string
-	if regionQuery != "" {
-		regions = strings.Split(regionQuery, ",")
-		for i := range regions {
-			regions[i] = strings.TrimSpace(regions[i])
-		}
-	}
-
-	provider := strings.TrimSpace(c.Query("provider"))
-
-	return domain.TreeClusterFilter{
-		WateringStatus: wateringStatues,
-		Region:         regions,
-		Provider:       provider,
-	}, nil
+	return filter, nil
 }
 
 // @Summary		Get tree cluster by ID
