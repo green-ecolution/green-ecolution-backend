@@ -1,12 +1,12 @@
 -- name: GetAllTrees :many
 SELECT * FROM trees
-WHERE ($1 = '') OR (provider = $1)
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider)
 ORDER BY number ASC
-LIMIT $2 OFFSET $3;
+LIMIT $1 OFFSET $2;
 
 -- name: GetAllTreesCount :one
 SELECT COUNT(*) FROM trees
-WHERE ($1 = '') OR (provider = $1);
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider);
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;

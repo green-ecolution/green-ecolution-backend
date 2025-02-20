@@ -52,7 +52,7 @@ func (r *VehicleRepository) GetAll(ctx context.Context, query entities.Query) ([
 		},
 		func(page, limit int32) ([]*sqlc.Vehicle, error) {
 			return r.store.GetAllVehicles(ctx, &sqlc.GetAllVehiclesParams{
-				Column1: query.Provider,
+				Provider: query.Provider,
 				Limit:   limit,
 				Offset:  (page - 1) * limit,
 			})
@@ -100,16 +100,16 @@ func (r *VehicleRepository) GetAllByType(ctx context.Context, provider string, v
 		ctx,
 		func() (int64, error) {
 			return r.store.GetAllVehiclesByTypeCount(ctx, &sqlc.GetAllVehiclesByTypeCountParams{
-				Type:    sqlc.VehicleType(vehicleType),
-				Column2: provider,
+				Type:     sqlc.VehicleType(vehicleType),
+				Provider: provider,
 			})
 		},
 		func(page, limit int32) ([]*sqlc.Vehicle, error) {
 			return r.store.GetAllVehiclesByType(ctx, &sqlc.GetAllVehiclesByTypeParams{
-				Type:    sqlc.VehicleType(vehicleType),
-				Column2: provider,
-				Limit:   limit,
-				Offset:  (page - 1) * limit,
+				Type:     sqlc.VehicleType(vehicleType),
+				Provider: provider,
+				Limit:    limit,
+				Offset:   (page - 1) * limit,
 			})
 		},
 	)

@@ -35,9 +35,9 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 	}
 
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
-		Column1: query.Provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		Provider: query.Provider,
+		Limit:    limit,
+		Offset:   (page - 1) * limit,
 	})
 
 	if err != nil {

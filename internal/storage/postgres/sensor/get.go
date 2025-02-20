@@ -32,9 +32,9 @@ func (r *SensorRepository) GetAll(ctx context.Context, query entities.Query) ([]
 	}
 
 	rows, err := r.store.GetAllSensors(ctx, &sqlc.GetAllSensorsParams{
-		Column1: query.Provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		Provider: query.Provider,
+		Limit:    limit,
+		Offset:   (page - 1) * limit,
 	})
 	if err != nil {
 		log.Debug("failed to get sensors in db", "error", err)
