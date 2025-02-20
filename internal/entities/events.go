@@ -25,27 +25,31 @@ func (e BasicEvent) Type() EventType {
 
 type EventUpdateTree struct {
 	BasicEvent
-	Prev *Tree
-	New  *Tree
+	Prev         *Tree
+	New          *Tree
+	PrevOfSensor *Tree
 }
 
-func NewEventUpdateTree(prev, newTree *Tree) EventUpdateTree {
+func NewEventUpdateTree(prev, newTree, prevOfSensor *Tree) EventUpdateTree {
 	return EventUpdateTree{
-		BasicEvent: BasicEvent{eventType: EventTypeUpdateTree},
-		Prev:       prev,
-		New:        newTree,
+		BasicEvent:   BasicEvent{eventType: EventTypeUpdateTree},
+		Prev:         prev,
+		New:          newTree,
+		PrevOfSensor: prevOfSensor,
 	}
 }
 
 type EventCreateTree struct {
 	BasicEvent
-	New *Tree
+	New          *Tree
+	PrevOfSensor *Tree
 }
 
-func NewEventCreateTree(newTree *Tree) EventCreateTree {
+func NewEventCreateTree(newTree, prevOfSensor *Tree) EventCreateTree {
 	return EventCreateTree{
-		BasicEvent: BasicEvent{eventType: EventTypeCreateTree},
-		New:        newTree,
+		BasicEvent:   BasicEvent{eventType: EventTypeCreateTree},
+		New:          newTree,
+		PrevOfSensor: prevOfSensor,
 	}
 }
 
