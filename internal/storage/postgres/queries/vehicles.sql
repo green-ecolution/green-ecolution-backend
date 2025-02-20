@@ -1,27 +1,28 @@
 -- name: GetAllVehicles :many
 SELECT * 
 FROM vehicles 
-WHERE 
-  (($1 = '') OR (provider = $1)) AND archived_at IS NULL
+WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+    AND archived_at IS NULL
 ORDER BY water_capacity DESC
-LIMIT $2 OFFSET $3;
+LIMIT $1 OFFSET $2;
 
 -- name: GetAllVehiclesCount :one
-SELECT COUNT(*) 
-  FROM vehicles 
-  WHERE 
+SELECT COUNT(*)
+  FROM vehicles
+  WHERE
     ($1 = '' OR provider = $1)
     AND archived_at IS NULL;
 
 -- name: GetAllVehiclesWithArchived :many
-SELECT * FROM vehicles 
-WHERE 
+SELECT * FROM vehicles
+WHERE
  (($1 = '') OR (provider = $1))
 ORDER BY water_capacity DESC
 LIMIT $2 OFFSET $3;
 
 -- name: GetAllVehiclesWithArchivedCount :one
-SELECT COUNT(*) 
+SELECT COUNT(*)
   FROM vehicles 
   WHERE 
     ($1 = '' OR provider = $1);
@@ -29,41 +30,41 @@ SELECT COUNT(*)
 -- name: GetAllVehiclesByType :many
 SELECT * 
 FROM vehicles 
-WHERE 
-  type = $1
-  AND ($2 = '' OR provider = $2)
+WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
   AND archived_at IS NULL
+  AND type = $1
 ORDER BY water_capacity DESC
-LIMIT $3 OFFSET $4;
+LIMIT $2 OFFSET $3;
 
 -- name: GetAllVehiclesByTypeCount :one
 SELECT COUNT(*) 
   FROM vehicles 
-  WHERE 
-    type = $1
-    AND ($2 = '' OR provider = $2)
+  WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
     AND archived_at IS NULL;
+    AND type = $1;
 
 -- name: GetAllVehiclesByTypeWithArchived :many
-SELECT * 
-FROM vehicles 
-WHERE 
+SELECT *
+FROM vehicles
+WHERE
   type = $1
   AND ($2 = '' OR provider = $2)
 ORDER BY water_capacity DESC
 LIMIT $3 OFFSET $4;
 
 -- name: GetAllVehiclesByTypeWithArchivedCount :one
-SELECT COUNT(*) 
-  FROM vehicles 
-  WHERE 
+SELECT COUNT(*)
+  FROM vehicles
+  WHERE
     type = $1
     AND ($2 = '' OR provider = $2);
 
 -- name: GetAllArchivedVehicles :many
-SELECT * 
-FROM vehicles 
-WHERE 
+SELECT *
+FROM vehicles
+WHERE
   archived_at IS NOT NULL
 ORDER BY water_capacity DESC;
 

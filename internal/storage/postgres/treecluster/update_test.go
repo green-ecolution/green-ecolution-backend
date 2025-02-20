@@ -109,9 +109,9 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
-			Column1: "",
-			Limit:   int32(totalCountTree),
-			Offset:  0,
+			Provider: "",
+			Limit:    int32(totalCountTree),
+			Offset:   0,
 		})
 		assert.NoError(t, err)
 		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
