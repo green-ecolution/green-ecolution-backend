@@ -291,55 +291,6 @@ paths:
       tags:
       - Tree Cluster
       x-codegen-request-body-name: body
-  /v1/import/csv:
-    post:
-      description: Import trees from a CSV file
-      operationId: import-trees-from-csv
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/import_trees_from_csv_request'
-        required: true
-      responses:
-        "204":
-          content: {}
-          description: No Content
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Import trees from a CSV file
-      tags:
-      - File Import
   /v1/info:
     get:
       description: Get info about the app and the server
@@ -908,6 +859,59 @@ paths:
       security:
       - Keycloak: []
       summary: Get sensor by ID
+      tags:
+      - Sensor
+  /v1/sensor/data/{sensor_id}:
+    get:
+      description: Get all sensor data by id
+      operationId: get-all-sensor-data-by-id
+      parameters:
+      - description: Sensor ID
+        in: path
+        name: sensor_id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorDataList'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Get all sensor data by id
       tags:
       - Sensor
   /v1/tree:
@@ -2175,7 +2179,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GeoJson'
+                $ref: '#/components/schemas/entities.GeoJSON'
           description: OK
         "400":
           content:
@@ -2278,196 +2282,6 @@ components:
       - session_state
       - token_type
       type: object
-    DrivingLicense:
-      enum:
-      - B
-      - BE
-      - C
-      - CE
-      - Unknown
-      type: string
-      x-enum-varnames:
-      - DrivingLicenseB
-      - DrivingLicenseBE
-      - DrivingLicenseC
-      - DrivingLicenseCE
-      - DrivingLicenseUnknown
-    EvaluationValue:
-      example:
-        consumed_water: 1.4658129805029452
-        tree_cluster_id: 5
-        watering_plan_id: 5
-      properties:
-        consumed_water:
-          type: number
-        tree_cluster_id:
-          type: integer
-        watering_plan_id:
-          type: integer
-      required:
-      - consumed_water
-      - tree_cluster_id
-      - watering_plan_id
-      type: object
-    GeoJSONLocation:
-      example:
-        latitude: 5.962133916683182
-        longitude: 5.637376656633329
-      properties:
-        latitude:
-          type: number
-        longitude:
-          type: number
-      required:
-      - latitude
-      - longitude
-      type: object
-    GeoJSONMetadata:
-      example:
-        end_point:
-          latitude: 5.962133916683182
-          longitude: 5.637376656633329
-        start_point:
-          latitude: 5.962133916683182
-          longitude: 5.637376656633329
-        watering_point:
-          latitude: 5.962133916683182
-          longitude: 5.637376656633329
-      properties:
-        end_point:
-          $ref: '#/components/schemas/GeoJSONLocation'
-        start_point:
-          $ref: '#/components/schemas/GeoJSONLocation'
-        watering_point:
-          $ref: '#/components/schemas/GeoJSONLocation'
-      required:
-      - end_point
-      - start_point
-      - watering_point
-      type: object
-    GeoJson:
-      example:
-        features:
-        - bbox:
-          - 6.027456183070403
-          - 6.027456183070403
-          geometry:
-            coordinates:
-            - - 1.4658129805029452
-              - 1.4658129805029452
-            - - 1.4658129805029452
-              - 1.4658129805029452
-            type: FeatureCollection
-          type: null
-          properties:
-            key: "{}"
-        - bbox:
-          - 6.027456183070403
-          - 6.027456183070403
-          geometry:
-            coordinates:
-            - - 1.4658129805029452
-              - 1.4658129805029452
-            - - 1.4658129805029452
-              - 1.4658129805029452
-            type: FeatureCollection
-          type: null
-          properties:
-            key: "{}"
-        metadata:
-          end_point:
-            latitude: 5.962133916683182
-            longitude: 5.637376656633329
-          start_point:
-            latitude: 5.962133916683182
-            longitude: 5.637376656633329
-          watering_point:
-            latitude: 5.962133916683182
-            longitude: 5.637376656633329
-        bbox:
-        - 0.8008281904610115
-        - 0.8008281904610115
-        type: null
-      properties:
-        bbox:
-          items:
-            type: number
-          type: array
-        features:
-          items:
-            $ref: '#/components/schemas/GeoJsonFeature'
-          type: array
-        metadata:
-          $ref: '#/components/schemas/GeoJSONMetadata'
-        type:
-          $ref: '#/components/schemas/GeoJsonType'
-      required:
-      - bbox
-      - features
-      - metadata
-      - type
-      type: object
-    GeoJsonFeature:
-      example:
-        bbox:
-        - 6.027456183070403
-        - 6.027456183070403
-        geometry:
-          coordinates:
-          - - 1.4658129805029452
-            - 1.4658129805029452
-          - - 1.4658129805029452
-            - 1.4658129805029452
-          type: FeatureCollection
-        type: null
-        properties:
-          key: "{}"
-      properties:
-        bbox:
-          items:
-            type: number
-          type: array
-        geometry:
-          $ref: '#/components/schemas/GeoJsonGeometry'
-        properties:
-          additionalProperties:
-            type: object
-          type: object
-        type:
-          $ref: '#/components/schemas/GeoJsonType'
-      required:
-      - bbox
-      - geometry
-      - properties
-      - type
-      type: object
-    GeoJsonGeometry:
-      example:
-        coordinates:
-        - - 1.4658129805029452
-          - 1.4658129805029452
-        - - 1.4658129805029452
-          - 1.4658129805029452
-        type: FeatureCollection
-      properties:
-        coordinates:
-          items:
-            items:
-              type: number
-            type: array
-          type: array
-        type:
-          $ref: '#/components/schemas/GeoJsonType'
-      required:
-      - coordinates
-      - type
-      type: object
-    GeoJsonType:
-      enum:
-      - FeatureCollection
-      type: string
-      x-enum-varnames:
-      - FeatureCollection
     GitInfo:
       example:
         commit: commit
@@ -2754,7 +2568,7 @@ components:
         provider:
           type: string
         status:
-          $ref: '#/components/schemas/SensorStatus'
+          $ref: '#/components/schemas/entities.SensorStatus'
         updated_at:
           type: string
       required:
@@ -2803,6 +2617,41 @@ components:
       - temperature
       - updated_at
       - watermarks
+      type: object
+    SensorDataList:
+      example:
+        data:
+        - updated_at: updated_at
+          temperature: 4.145608029883936
+          created_at: created_at
+          humidity: 2.027123023002322
+          watermarks:
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          battery: 3.616076749251911
+        - updated_at: updated_at
+          temperature: 4.145608029883936
+          created_at: created_at
+          humidity: 2.027123023002322
+          watermarks:
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          battery: 3.616076749251911
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/SensorData'
+          type: array
+      required:
+      - data
       type: object
     SensorList:
       example:
@@ -2867,16 +2716,6 @@ components:
       required:
       - data
       type: object
-    SensorStatus:
-      enum:
-      - online
-      - offline
-      - unknown
-      type: string
-      x-enum-varnames:
-      - SensorStatusOnline
-      - SensorStatusOffline
-      - SensorStatusUnknown
     ServerInfo:
       example:
         hostname: hostname
@@ -2914,26 +2753,13 @@ components:
       - uptime
       - url
       type: object
-    SoilCondition:
-      enum:
-      - schluffig
-      - sandig
-      - lehmig
-      - tonig
-      - unknown
-      type: string
-      x-enum-varnames:
-      - TreeSoilConditionSchluffig
-      - TreeSoilConditionSandig
-      - TreeSoilConditionLehmig
-      - TreeSoilConditionTonig
-      - TreeSoilConditionUnknown
     Tree:
       example:
         latitude: 2.3021358869347655
         created_at: created_at
         description: description
         tree_cluster_id: 7
+        last_watered: last_watered
         additional_information:
           key: ""
         number: number
@@ -2978,6 +2804,9 @@ components:
           type: string
         id:
           type: integer
+        last_watered:
+          description: "Images              []*ImageResponse `json:\"images\"`"
+          type: string
         latitude:
           type: number
         longitude:
@@ -2989,7 +2818,6 @@ components:
         provider:
           type: string
         readonly:
-          description: "Images              []*ImageResponse `json:\"images\"`"
           type: boolean
         sensor:
           $ref: '#/components/schemas/Sensor'
@@ -3000,7 +2828,7 @@ components:
         updated_at:
           type: string
         watering_status:
-          $ref: '#/components/schemas/WateringStatus'
+          $ref: '#/components/schemas/entities.WateringStatus'
       required:
       - created_at
       - description
@@ -3027,6 +2855,7 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
@@ -3065,6 +2894,7 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
@@ -3142,7 +2972,7 @@ components:
         region:
           $ref: '#/components/schemas/Region'
         soil_condition:
-          $ref: '#/components/schemas/SoilCondition'
+          $ref: '#/components/schemas/entities.TreeSoilCondition'
         trees:
           items:
             $ref: '#/components/schemas/Tree'
@@ -3150,7 +2980,7 @@ components:
         updated_at:
           type: string
         watering_status:
-          $ref: '#/components/schemas/WateringStatus'
+          $ref: '#/components/schemas/entities.WateringStatus'
       required:
       - address
       - archived
@@ -3191,7 +3021,7 @@ components:
         provider:
           type: string
         soil_condition:
-          $ref: '#/components/schemas/SoilCondition'
+          $ref: '#/components/schemas/entities.TreeSoilCondition'
         tree_ids:
           items:
             type: integer
@@ -3248,7 +3078,7 @@ components:
         region:
           $ref: '#/components/schemas/Region'
         soil_condition:
-          $ref: '#/components/schemas/SoilCondition'
+          $ref: '#/components/schemas/entities.TreeSoilCondition'
         tree_ids:
           items:
             type: integer
@@ -3256,7 +3086,7 @@ components:
         updated_at:
           type: string
         watering_status:
-          $ref: '#/components/schemas/WateringStatus'
+          $ref: '#/components/schemas/entities.WateringStatus'
       required:
       - address
       - archived
@@ -3353,7 +3183,7 @@ components:
         provider:
           type: string
         soil_condition:
-          $ref: '#/components/schemas/SoilCondition'
+          $ref: '#/components/schemas/entities.TreeSoilCondition'
         tree_ids:
           items:
             type: integer
@@ -3425,6 +3255,7 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
@@ -3463,6 +3294,7 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
@@ -3580,7 +3412,7 @@ components:
           type: string
         driving_licenses:
           items:
-            $ref: '#/components/schemas/DrivingLicense'
+            $ref: '#/components/schemas/entities.DrivingLicense'
           type: array
         email:
           type: string
@@ -3598,10 +3430,10 @@ components:
           type: string
         roles:
           items:
-            $ref: '#/components/schemas/UserRole'
+            $ref: '#/components/schemas/entities.UserRole'
           type: array
         status:
-          $ref: '#/components/schemas/UserStatus'
+          $ref: '#/components/schemas/entities.UserStatus'
         username:
           type: string
       required:
@@ -3709,28 +3541,6 @@ components:
       - roles
       - username
       type: object
-    UserRole:
-      enum:
-      - tbz
-      - green-ecolution
-      - smarte-grenzregion
-      - unknown
-      type: string
-      x-enum-varnames:
-      - UserRoleTbz
-      - UserRoleGreenEcolution
-      - UserRoleSmarteGrenzregion
-      - UserRoleUnknown
-    UserStatus:
-      enum:
-      - available
-      - absent
-      - unknown
-      type: string
-      x-enum-varnames:
-      - UserStatusAvailable
-      - UserStatusAbsent
-      - UserStatusUnknown
     Vehicle:
       example:
         water_capacity: 5.962133916683182
@@ -3759,7 +3569,7 @@ components:
         description:
           type: string
         driving_license:
-          $ref: '#/components/schemas/DrivingLicense'
+          $ref: '#/components/schemas/entities.DrivingLicense'
         height:
           type: number
         id:
@@ -3773,9 +3583,9 @@ components:
         provider:
           type: string
         status:
-          $ref: '#/components/schemas/VehicleStatus'
+          $ref: '#/components/schemas/entities.VehicleStatus'
         type:
-          $ref: '#/components/schemas/VehicleType'
+          $ref: '#/components/schemas/entities.VehicleType'
         updated_at:
           type: string
         water_capacity:
@@ -3824,7 +3634,7 @@ components:
         description:
           type: string
         driving_license:
-          $ref: '#/components/schemas/DrivingLicense'
+          $ref: '#/components/schemas/entities.DrivingLicense'
         height:
           type: number
         length:
@@ -3836,9 +3646,9 @@ components:
         provider:
           type: string
         status:
-          $ref: '#/components/schemas/VehicleStatus'
+          $ref: '#/components/schemas/entities.VehicleStatus'
         type:
-          $ref: '#/components/schemas/VehicleType'
+          $ref: '#/components/schemas/entities.VehicleType'
         water_capacity:
           type: number
         weight:
@@ -3911,28 +3721,6 @@ components:
       required:
       - data
       type: object
-    VehicleStatus:
-      enum:
-      - active
-      - available
-      - not available
-      - unknown
-      type: string
-      x-enum-varnames:
-      - VehicleStatusActive
-      - VehicleStatusAvailable
-      - VehicleStatusNotAvailable
-      - VehicleStatusUnknown
-    VehicleType:
-      enum:
-      - transporter
-      - trailer
-      - unknown
-      type: string
-      x-enum-varnames:
-      - VehicleTypeTransporter
-      - VehicleTypeTrailer
-      - VehicleTypeUnknown
     VehicleUpdate:
       example:
         water_capacity: 1.4658129805029452
@@ -3956,7 +3744,7 @@ components:
         description:
           type: string
         driving_license:
-          $ref: '#/components/schemas/DrivingLicense'
+          $ref: '#/components/schemas/entities.DrivingLicense'
         height:
           type: number
         length:
@@ -3968,9 +3756,9 @@ components:
         provider:
           type: string
         status:
-          $ref: '#/components/schemas/VehicleStatus'
+          $ref: '#/components/schemas/entities.VehicleStatus'
         type:
-          $ref: '#/components/schemas/VehicleType'
+          $ref: '#/components/schemas/entities.VehicleType'
         water_capacity:
           type: number
         weight:
@@ -4043,12 +3831,12 @@ components:
         description: description
         duration: 6.027456183070403
         evaluation:
-        - consumed_water: 1.4658129805029452
-          tree_cluster_id: 5
-          watering_plan_id: 5
-        - consumed_water: 1.4658129805029452
-          tree_cluster_id: 5
-          watering_plan_id: 5
+        - consumedWater: 1.4658129805029452
+          treeClusterID: 5
+          wateringPlanID: 5
+        - consumedWater: 1.4658129805029452
+          treeClusterID: 5
+          wateringPlanID: 5
         trailer:
           water_capacity: 5.962133916683182
           length: 1.4658129805029452
@@ -4110,7 +3898,7 @@ components:
           type: number
         evaluation:
           items:
-            $ref: '#/components/schemas/EvaluationValue'
+            $ref: '#/components/schemas/entities.EvaluationValue'
           type: array
         gpx_url:
           type: string
@@ -4121,7 +3909,7 @@ components:
         refill_count:
           type: integer
         status:
-          $ref: '#/components/schemas/WateringPlanStatus'
+          $ref: '#/components/schemas/entities.WateringPlanStatus'
         total_water_required:
           type: number
         trailer:
@@ -4304,7 +4092,7 @@ components:
         id:
           type: integer
         status:
-          $ref: '#/components/schemas/WateringPlanStatus'
+          $ref: '#/components/schemas/entities.WateringPlanStatus'
         total_water_required:
           type: number
         trailer:
@@ -4528,32 +4316,16 @@ components:
       required:
       - data
       type: object
-    WateringPlanStatus:
-      enum:
-      - planned
-      - active
-      - canceled
-      - finished
-      - not competed
-      - unknown
-      type: string
-      x-enum-varnames:
-      - WateringPlanStatusPlanned
-      - WateringPlanStatusActive
-      - WateringPlanStatusCanceled
-      - WateringPlanStatusFinished
-      - WateringPlanStatusNotCompeted
-      - WateringPlanStatusUnknown
     WateringPlanUpdate:
       example:
         date: date
         evaluation:
-        - consumed_water: 1.4658129805029452
-          tree_cluster_id: 5
-          watering_plan_id: 5
-        - consumed_water: 1.4658129805029452
-          tree_cluster_id: 5
-          watering_plan_id: 5
+        - consumedWater: 1.4658129805029452
+          treeClusterID: 5
+          wateringPlanID: 5
+        - consumedWater: 1.4658129805029452
+          treeClusterID: 5
+          wateringPlanID: 5
         additional_information:
           key: ""
         cancellation_note: cancellation_note
@@ -4580,12 +4352,12 @@ components:
           type: string
         evaluation:
           items:
-            $ref: '#/components/schemas/EvaluationValue'
+            $ref: '#/components/schemas/entities.EvaluationValue'
           type: array
         provider:
           type: string
         status:
-          $ref: '#/components/schemas/WateringPlanStatus'
+          $ref: '#/components/schemas/entities.WateringPlanStatus'
         trailer_id:
           type: integer
         transporter_id:
@@ -4607,18 +4379,6 @@ components:
       - tree_cluster_ids
       - user_ids
       type: object
-    WateringStatus:
-      enum:
-      - good
-      - moderate
-      - bad
-      - unknown
-      type: string
-      x-enum-varnames:
-      - WateringStatusGood
-      - WateringStatusModerate
-      - WateringStatusBad
-      - WateringStatusUnknown
     WatermarkResponse:
       example:
         centibar: 7
@@ -4636,15 +4396,287 @@ components:
       - depth
       - resistance
       type: object
-    import_trees_from_csv_request:
+    entities.DrivingLicense:
+      enum:
+      - B
+      - BE
+      - C
+      - CE
+      - Unknown
+      type: string
+      x-enum-varnames:
+      - DrivingLicenseB
+      - DrivingLicenseBE
+      - DrivingLicenseC
+      - DrivingLicenseCE
+      - DrivingLicenseUnknown
+    entities.EvaluationValue:
+      example:
+        consumedWater: 1.4658129805029452
+        treeClusterID: 5
+        wateringPlanID: 5
       properties:
-        file:
-          description: CSV file to import
-          format: binary
-          type: string
-      required:
-      - file
+        consumedWater:
+          type: number
+        treeClusterID:
+          type: integer
+        wateringPlanID:
+          type: integer
       type: object
+    entities.GeoJSON:
+      example:
+        features:
+        - bbox:
+          - 6.027456183070403
+          - 6.027456183070403
+          geometry:
+            coordinates:
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            type: FeatureCollection
+          type: null
+          properties:
+            key: "{}"
+        - bbox:
+          - 6.027456183070403
+          - 6.027456183070403
+          geometry:
+            coordinates:
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            - - 1.4658129805029452
+              - 1.4658129805029452
+            type: FeatureCollection
+          type: null
+          properties:
+            key: "{}"
+        metadata:
+          endPoint:
+            latitude: 5.962133916683182
+            longitude: 5.637376656633329
+          wateringPoint:
+            latitude: 5.962133916683182
+            longitude: 5.637376656633329
+          startPoint:
+            latitude: 5.962133916683182
+            longitude: 5.637376656633329
+        bbox:
+        - 0.8008281904610115
+        - 0.8008281904610115
+        type: null
+      properties:
+        bbox:
+          items:
+            type: number
+          type: array
+        features:
+          items:
+            $ref: '#/components/schemas/entities.GeoJSONFeature'
+          type: array
+        metadata:
+          $ref: '#/components/schemas/entities.GeoJSONMetadata'
+        type:
+          $ref: '#/components/schemas/entities.GeoJSONType'
+      required:
+      - bbox
+      - features
+      - metadata
+      - type
+      type: object
+    entities.GeoJSONFeature:
+      example:
+        bbox:
+        - 6.027456183070403
+        - 6.027456183070403
+        geometry:
+          coordinates:
+          - - 1.4658129805029452
+            - 1.4658129805029452
+          - - 1.4658129805029452
+            - 1.4658129805029452
+          type: FeatureCollection
+        type: null
+        properties:
+          key: "{}"
+      properties:
+        bbox:
+          items:
+            type: number
+          type: array
+        geometry:
+          $ref: '#/components/schemas/entities.GeoJSONGeometry'
+        properties:
+          additionalProperties:
+            type: object
+          type: object
+        type:
+          $ref: '#/components/schemas/entities.GeoJSONType'
+      required:
+      - bbox
+      - geometry
+      - properties
+      - type
+      type: object
+    entities.GeoJSONGeometry:
+      example:
+        coordinates:
+        - - 1.4658129805029452
+          - 1.4658129805029452
+        - - 1.4658129805029452
+          - 1.4658129805029452
+        type: FeatureCollection
+      properties:
+        coordinates:
+          items:
+            items:
+              type: number
+            type: array
+          type: array
+        type:
+          $ref: '#/components/schemas/entities.GeoJSONType'
+      required:
+      - coordinates
+      - type
+      type: object
+    entities.GeoJSONLocation:
+      example:
+        latitude: 5.962133916683182
+        longitude: 5.637376656633329
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+      type: object
+    entities.GeoJSONMetadata:
+      example:
+        endPoint:
+          latitude: 5.962133916683182
+          longitude: 5.637376656633329
+        wateringPoint:
+          latitude: 5.962133916683182
+          longitude: 5.637376656633329
+        startPoint:
+          latitude: 5.962133916683182
+          longitude: 5.637376656633329
+      properties:
+        endPoint:
+          $ref: '#/components/schemas/entities.GeoJSONLocation'
+        startPoint:
+          $ref: '#/components/schemas/entities.GeoJSONLocation'
+        wateringPoint:
+          $ref: '#/components/schemas/entities.GeoJSONLocation'
+      type: object
+    entities.GeoJSONType:
+      enum:
+      - FeatureCollection
+      - Feature
+      - LineString
+      type: string
+      x-enum-varnames:
+      - FeatureCollection
+      - Feature
+      - LineString
+    entities.SensorStatus:
+      enum:
+      - online
+      - offline
+      - unknown
+      type: string
+      x-enum-varnames:
+      - SensorStatusOnline
+      - SensorStatusOffline
+      - SensorStatusUnknown
+    entities.TreeSoilCondition:
+      enum:
+      - schluffig
+      - sandig
+      - lehmig
+      - tonig
+      - unknown
+      type: string
+      x-enum-varnames:
+      - TreeSoilConditionSchluffig
+      - TreeSoilConditionSandig
+      - TreeSoilConditionLehmig
+      - TreeSoilConditionTonig
+      - TreeSoilConditionUnknown
+    entities.UserRole:
+      enum:
+      - tbz
+      - green-ecolution
+      - smarte-grenzregion
+      - unknown
+      type: string
+      x-enum-varnames:
+      - UserRoleTbz
+      - UserRoleGreenEcolution
+      - UserRoleSmarteGrenzregion
+      - UserRoleUnknown
+    entities.UserStatus:
+      enum:
+      - available
+      - absent
+      - unknown
+      type: string
+      x-enum-varnames:
+      - UserStatusAvailable
+      - UserStatusAbsent
+      - UserStatusUnknown
+    entities.VehicleStatus:
+      enum:
+      - active
+      - available
+      - not available
+      - unknown
+      type: string
+      x-enum-varnames:
+      - VehicleStatusActive
+      - VehicleStatusAvailable
+      - VehicleStatusNotAvailable
+      - VehicleStatusUnknown
+    entities.VehicleType:
+      enum:
+      - transporter
+      - trailer
+      - unknown
+      type: string
+      x-enum-varnames:
+      - VehicleTypeTransporter
+      - VehicleTypeTrailer
+      - VehicleTypeUnknown
+    entities.WateringPlanStatus:
+      enum:
+      - planned
+      - active
+      - canceled
+      - finished
+      - not competed
+      - unknown
+      type: string
+      x-enum-varnames:
+      - WateringPlanStatusPlanned
+      - WateringPlanStatusActive
+      - WateringPlanStatusCanceled
+      - WateringPlanStatusFinished
+      - WateringPlanStatusNotCompeted
+      - WateringPlanStatusUnknown
+    entities.WateringStatus:
+      enum:
+      - good
+      - moderate
+      - bad
+      - just watered
+      - unknown
+      type: string
+      x-enum-varnames:
+      - WateringStatusGood
+      - WateringStatusModerate
+      - WateringStatusBad
+      - WateringStatusJustWatered
+      - WateringStatusUnknown
   securitySchemes:
     Keycloak:
       flows:

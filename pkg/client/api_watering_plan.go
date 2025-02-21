@@ -985,7 +985,7 @@ func (r ApiV1WateringPlanRoutePreviewPostRequest) Body(body RouteRequest) ApiV1W
 	return r
 }
 
-func (r ApiV1WateringPlanRoutePreviewPostRequest) Execute() (*GeoJson, *http.Response, error) {
+func (r ApiV1WateringPlanRoutePreviewPostRequest) Execute() (*EntitiesGeoJSON, *http.Response, error) {
 	return r.ApiService.V1WateringPlanRoutePreviewPostExecute(r)
 }
 
@@ -1006,13 +1006,13 @@ func (a *WateringPlanAPIService) V1WateringPlanRoutePreviewPost(ctx context.Cont
 
 // Execute executes the request
 //
-//	@return GeoJson
-func (a *WateringPlanAPIService) V1WateringPlanRoutePreviewPostExecute(r ApiV1WateringPlanRoutePreviewPostRequest) (*GeoJson, *http.Response, error) {
+//	@return EntitiesGeoJSON
+func (a *WateringPlanAPIService) V1WateringPlanRoutePreviewPostExecute(r ApiV1WateringPlanRoutePreviewPostRequest) (*EntitiesGeoJSON, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *GeoJson
+		localVarReturnValue *EntitiesGeoJSON
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "WateringPlanAPIService.V1WateringPlanRoutePreviewPost")

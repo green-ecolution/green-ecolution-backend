@@ -29,7 +29,7 @@ type Sensor struct {
 	Latitude              float32                `json:"latitude"`
 	Longitude             float32                `json:"longitude"`
 	Provider              string                 `json:"provider"`
-	Status                SensorStatus           `json:"status"`
+	Status                EntitiesSensorStatus   `json:"status"`
 	UpdatedAt             string                 `json:"updated_at"`
 }
 
@@ -39,7 +39,7 @@ type _Sensor Sensor
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewSensor(createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status SensorStatus, updatedAt string) *Sensor {
+func NewSensor(createdAt string, id string, latestData SensorData, latitude float32, longitude float32, provider string, status EntitiesSensorStatus, updatedAt string) *Sensor {
 	this := Sensor{}
 	this.CreatedAt = createdAt
 	this.Id = id
@@ -237,9 +237,9 @@ func (o *Sensor) SetProvider(v string) {
 }
 
 // GetStatus returns the Status field value
-func (o *Sensor) GetStatus() SensorStatus {
+func (o *Sensor) GetStatus() EntitiesSensorStatus {
 	if o == nil {
-		var ret SensorStatus
+		var ret EntitiesSensorStatus
 		return ret
 	}
 
@@ -248,7 +248,7 @@ func (o *Sensor) GetStatus() SensorStatus {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *Sensor) GetStatusOk() (*SensorStatus, bool) {
+func (o *Sensor) GetStatusOk() (*EntitiesSensorStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -256,7 +256,7 @@ func (o *Sensor) GetStatusOk() (*SensorStatus, bool) {
 }
 
 // SetStatus sets field value
-func (o *Sensor) SetStatus(v SensorStatus) {
+func (o *Sensor) SetStatus(v EntitiesSensorStatus) {
 	o.Status = v
 }
 
