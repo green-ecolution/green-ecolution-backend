@@ -245,7 +245,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 func (s *TreeService) UpdateWateringStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	trees, _, err := s.treeRepo.GetAll(ctx, "")
+	trees, _, err := s.treeRepo.GetAll(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to fetch trees", "error", err)
 		return err
