@@ -949,14 +949,14 @@ func TestTreeService_UpdateWateringStatuses(t *testing.T) {
 		expectList := []*entities.Tree{staleTree, recentTree}
 
 		// when
-		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		treeRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		treeRepo.EXPECT().Update(mock.Anything, staleTree.ID, mock.Anything).Return(staleTree, nil)
 
 		err := svc.UpdateWateringStatuses(context.Background())
 
 		// then
 		assert.NoError(t, err)
-		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		treeRepo.AssertCalled(t, "Update", mock.Anything, staleTree.ID, mock.Anything)
 		treeRepo.AssertExpectations(t)
 	})
@@ -979,13 +979,13 @@ func TestTreeService_UpdateWateringStatuses(t *testing.T) {
 		expectList := []*entities.Tree{recentTree}
 
 		// when
-		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		treeRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 
 		err := svc.UpdateWateringStatuses(context.Background())
 
 		// then
 		assert.NoError(t, err)
-		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		treeRepo.AssertNotCalled(t, "GetAllLatestSensorDataByClusterID")
 		treeRepo.AssertNotCalled(t, "GetBySensorIDs")
 		treeRepo.AssertNotCalled(t, "Update")
@@ -1002,14 +1002,14 @@ func TestTreeService_UpdateWateringStatuses(t *testing.T) {
 
 		// when
 		expectedErr := errors.New("database error")
-		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
+		treeRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(nil, int64(0), expectedErr)
 
 		err := svc.UpdateWateringStatuses(context.Background())
 
 		// then
 		assert.Error(t, err)
 		assert.Equal(t, expectedErr, err)
-		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		treeRepo.AssertNotCalled(t, "Update")
 		treeRepo.AssertExpectations(t)
 	})
@@ -1031,13 +1031,13 @@ func TestTreeService_UpdateWateringStatuses(t *testing.T) {
 		expectList := []*entities.Tree{staleTree}
 
 		// when
-		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		treeRepo.EXPECT().GetAll(mock.Anything, entities.Query{}).Return(expectList, int64(len(expectList)), nil)
 		treeRepo.EXPECT().Update(mock.Anything, staleTree.ID, mock.Anything).Return(nil, errors.New("update failed"))
 
 		err := svc.UpdateWateringStatuses(context.Background())
 
 		// then
-		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, entities.Query{})
 		treeRepo.AssertCalled(t, "Update", mock.Anything, staleTree.ID, mock.Anything)
 		treeRepo.AssertExpectations(t)
 		assert.NoError(t, err)

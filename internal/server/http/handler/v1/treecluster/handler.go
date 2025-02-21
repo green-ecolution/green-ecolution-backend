@@ -41,7 +41,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 
 		filter, err := fillTreeClusterQueryParams(c)
 		if err != nil {
-			return service.NewError(service.BadRequest, err.Error())
+			return errorhandler.HandleError(service.NewError(service.BadRequest, err.Error()))
 		}
 
 		domainData, totalCount, err := svc.GetAll(ctx, filter)

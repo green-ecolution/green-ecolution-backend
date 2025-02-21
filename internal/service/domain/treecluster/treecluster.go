@@ -212,7 +212,7 @@ func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 
 func (s *TreeClusterService) UpdateWateringStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	treeClusters, _, err := s.treeClusterRepo.GetAll(ctx, "")
+	treeClusters, _, err := s.treeClusterRepo.GetAll(ctx, domain.TreeClusterQuery{})
 	if err != nil {
 		log.Error("failed to fetch tree cluster", "error", err)
 		return err

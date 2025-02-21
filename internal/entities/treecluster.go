@@ -55,5 +55,5 @@ type TreeClusterUpdate struct {
 type TreeClusterQuery struct {
 	WateringStatus []WateringStatus `query:"status"`
 	Region         []string         `query:"region"`
-	Query          `query:""`
+	Query
 }
