@@ -75,19 +75,19 @@ func (s *TreeService) GetBySensorID(ctx context.Context, id string) (*entities.T
 	return tr, nil
 }
 
-func (s *TreeService) publishUpdateTreeEvent(ctx context.Context, prevTree, updatedTree *entities.Tree) {
+func (s *TreeService) publishUpdateTreeEvent(ctx context.Context, prevTree, updatedTree, prevTreeOfSensor *entities.Tree) {
 	log := logger.GetLogger(ctx)
 	log.Debug("publish new event", "event", entities.EventTypeUpdateTree, "service", "TreeService")
-	event := entities.NewEventUpdateTree(prevTree, updatedTree)
+	event := entities.NewEventUpdateTree(prevTree, updatedTree, prevTreeOfSensor)
 	if err := s.eventManager.Publish(ctx, event); err != nil {
 		log.Error("error while sending event after updating tree", "err", err, "tree_id", prevTree.ID)
 	}
 }
 
-func (s *TreeService) publishCreateTreeEvent(ctx context.Context, newTree *entities.Tree) {
+func (s *TreeService) publishCreateTreeEvent(ctx context.Context, newTree, prevTreeOfSensor *entities.Tree) {
 	log := logger.GetLogger(ctx)
 	log.Debug("publish new event", "event", entities.EventTypeCreateTree, "service", "TreeService")
-	event := entities.NewEventCreateTree(newTree)
+	event := entities.NewEventCreateTree(newTree, prevTreeOfSensor)
 	if err := s.eventManager.Publish(ctx, event); err != nil {
 		log.Error("error while sending event after creating tree", "err", err, "tree_id", newTree.ID)
 	}
@@ -109,6 +109,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
+	var prevTreeOfSensor *entities.Tree
 	newTree, err := s.treeRepo.Create(ctx, func(tree *entities.Tree) (bool, error) {
 		tree.Readonly = treeCreate.Readonly
 		tree.PlantingYear = treeCreate.PlantingYear
@@ -136,6 +137,11 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 				return false, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 			}
 			tree.Sensor = sensor
+			prevTreeOfSensor, err = s.treeRepo.GetBySensorID(ctx, sensor.ID)
+			if err != nil {
+				// If the previous tree that was linked to the sensor could not be found, the create process should still be continued.
+				log.Debug("failed to find previous tree linked to sensor specified from create request", "sensor_id", treeCreate.SensorID)
+			}
 			if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
 				status := utils.CalculateWateringStatus(ctx, treeCreate.PlantingYear, sensor.LatestData.Data.Watermarks)
 				tree.WateringStatus = status
@@ -151,7 +157,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 
 	slog.Info("tree created successfully", "tree_id", newTree.ID)
-	s.publishCreateTreeEvent(ctx, newTree)
+	s.publishCreateTreeEvent(ctx, newTree, prevTreeOfSensor)
 	return newTree, nil
 }
 
@@ -184,6 +190,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
+	var prevTreeOfSensor *entities.Tree
 	updatedTree, err := s.treeRepo.Update(ctx, id, func(tree *entities.Tree) (bool, error) {
 		tree.PlantingYear = tu.PlantingYear
 		tree.Species = tu.Species
@@ -210,6 +217,12 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 				return false, service.MapError(ctx, fmt.Errorf("failed to find Sensor with ID %v: %w", *tu.SensorID, err), service.ErrorLogEntityNotFound)
 			}
 			tree.Sensor = sensor
+
+			prevTreeOfSensor, err = s.treeRepo.GetBySensorID(ctx, sensor.ID)
+			if err != nil {
+				// If the previous tree that was linked to the sensor could not be found, the update process should still be continued.
+				log.Debug("failed to find previous tree linked to sensor specified from update request", "sensor_id", tu.SensorID)
+			}
 			if sensor.LatestData != nil && sensor.LatestData.Data != nil && len(sensor.LatestData.Data.Watermarks) > 0 {
 				status := utils.CalculateWateringStatus(ctx, tu.PlantingYear, sensor.LatestData.Data.Watermarks)
 				tree.WateringStatus = status
@@ -227,7 +240,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	}
 
 	slog.Info("tree updated successfully", "tree_id", id)
-	s.publishUpdateTreeEvent(ctx, prevTree, updatedTree)
+	s.publishUpdateTreeEvent(ctx, prevTree, updatedTree, prevTreeOfSensor)
 	return updatedTree, nil
 }
 
