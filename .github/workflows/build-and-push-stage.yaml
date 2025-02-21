@@ -109,9 +109,6 @@ jobs:
         with:
           go-version-file: ./go.mod
 
-      - name: Install dependencies
-        run: make setup/ci
-
       - name: Go generate
         run: make generate
 
