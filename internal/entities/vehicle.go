@@ -74,8 +74,8 @@ type VehicleUpdate struct {
 }
 
 type VehicleQuery struct {
-	Type  string `query:"type"`
-	Query `query:""`
+	Type string `query:"type"`
+	Query
 }
 
 func ParseVehicleType(vehicleTypeStr string) VehicleType {
