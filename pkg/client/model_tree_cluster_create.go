@@ -22,13 +22,13 @@ var _ MappedNullable = &TreeClusterCreate{}
 
 // TreeClusterCreate struct for TreeClusterCreate
 type TreeClusterCreate struct {
-	AdditionalInformation map[string]interface{}    `json:"additional_information,omitempty"`
-	Address               string                    `json:"address"`
-	Description           string                    `json:"description"`
-	Name                  string                    `json:"name"`
-	Provider              *string                   `json:"provider,omitempty"`
-	SoilCondition         EntitiesTreeSoilCondition `json:"soil_condition"`
-	TreeIds               []int32                   `json:"tree_ids"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	Address               string                 `json:"address"`
+	Description           string                 `json:"description"`
+	Name                  string                 `json:"name"`
+	Provider              *string                `json:"provider,omitempty"`
+	SoilCondition         SoilCondition          `json:"soil_condition"`
+	TreeIds               []int32                `json:"tree_ids"`
 }
 
 type _TreeClusterCreate TreeClusterCreate
@@ -37,7 +37,7 @@ type _TreeClusterCreate TreeClusterCreate
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeClusterCreate(address string, description string, name string, soilCondition EntitiesTreeSoilCondition, treeIds []int32) *TreeClusterCreate {
+func NewTreeClusterCreate(address string, description string, name string, soilCondition SoilCondition, treeIds []int32) *TreeClusterCreate {
 	this := TreeClusterCreate{}
 	this.Address = address
 	this.Description = description
@@ -192,9 +192,9 @@ func (o *TreeClusterCreate) SetProvider(v string) {
 }
 
 // GetSoilCondition returns the SoilCondition field value
-func (o *TreeClusterCreate) GetSoilCondition() EntitiesTreeSoilCondition {
+func (o *TreeClusterCreate) GetSoilCondition() SoilCondition {
 	if o == nil {
-		var ret EntitiesTreeSoilCondition
+		var ret SoilCondition
 		return ret
 	}
 
@@ -203,7 +203,7 @@ func (o *TreeClusterCreate) GetSoilCondition() EntitiesTreeSoilCondition {
 
 // GetSoilConditionOk returns a tuple with the SoilCondition field value
 // and a boolean to check if the value has been set.
-func (o *TreeClusterCreate) GetSoilConditionOk() (*EntitiesTreeSoilCondition, bool) {
+func (o *TreeClusterCreate) GetSoilConditionOk() (*SoilCondition, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -211,7 +211,7 @@ func (o *TreeClusterCreate) GetSoilConditionOk() (*EntitiesTreeSoilCondition, bo
 }
 
 // SetSoilCondition sets field value
-func (o *TreeClusterCreate) SetSoilCondition(v EntitiesTreeSoilCondition) {
+func (o *TreeClusterCreate) SetSoilCondition(v SoilCondition) {
 	o.SoilCondition = v
 }
 

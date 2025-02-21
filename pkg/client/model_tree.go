@@ -27,18 +27,17 @@ type Tree struct {
 	Description           string                 `json:"description"`
 	Id                    int32                  `json:"id"`
 	// Images              []*ImageResponse `json:\"images\"`
-	LastWatered    *string                `json:"last_watered,omitempty"`
-	Latitude       float32                `json:"latitude"`
-	Longitude      float32                `json:"longitude"`
-	Number         string                 `json:"number"`
-	PlantingYear   int32                  `json:"planting_year"`
-	Provider       string                 `json:"provider"`
-	Readonly       bool                   `json:"readonly"`
-	Sensor         *Sensor                `json:"sensor,omitempty"`
-	Species        string                 `json:"species"`
-	TreeClusterId  *int32                 `json:"tree_cluster_id,omitempty"`
-	UpdatedAt      string                 `json:"updated_at"`
-	WateringStatus EntitiesWateringStatus `json:"watering_status"`
+	LastWatered    *string        `json:"last_watered,omitempty"`
+	Latitude       float32        `json:"latitude"`
+	Longitude      float32        `json:"longitude"`
+	Number         string         `json:"number"`
+	PlantingYear   int32          `json:"planting_year"`
+	Provider       string         `json:"provider"`
+	Sensor         *Sensor        `json:"sensor,omitempty"`
+	Species        string         `json:"species"`
+	TreeClusterId  *int32         `json:"tree_cluster_id,omitempty"`
+	UpdatedAt      string         `json:"updated_at"`
+	WateringStatus WateringStatus `json:"watering_status"`
 }
 
 type _Tree Tree
@@ -47,7 +46,7 @@ type _Tree Tree
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, readonly bool, species string, updatedAt string, wateringStatus EntitiesWateringStatus) *Tree {
+func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
 	this := Tree{}
 	this.CreatedAt = createdAt
 	this.Description = description
@@ -57,7 +56,6 @@ func NewTree(createdAt string, description string, id int32, latitude float32, l
 	this.Number = number
 	this.PlantingYear = plantingYear
 	this.Provider = provider
-	this.Readonly = readonly
 	this.Species = species
 	this.UpdatedAt = updatedAt
 	this.WateringStatus = wateringStatus
@@ -328,30 +326,6 @@ func (o *Tree) SetProvider(v string) {
 	o.Provider = v
 }
 
-// GetReadonly returns the Readonly field value
-func (o *Tree) GetReadonly() bool {
-	if o == nil {
-		var ret bool
-		return ret
-	}
-
-	return o.Readonly
-}
-
-// GetReadonlyOk returns a tuple with the Readonly field value
-// and a boolean to check if the value has been set.
-func (o *Tree) GetReadonlyOk() (*bool, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Readonly, true
-}
-
-// SetReadonly sets field value
-func (o *Tree) SetReadonly(v bool) {
-	o.Readonly = v
-}
-
 // GetSensor returns the Sensor field value if set, zero value otherwise.
 func (o *Tree) GetSensor() Sensor {
 	if o == nil || IsNil(o.Sensor) {
@@ -465,9 +439,9 @@ func (o *Tree) SetUpdatedAt(v string) {
 }
 
 // GetWateringStatus returns the WateringStatus field value
-func (o *Tree) GetWateringStatus() EntitiesWateringStatus {
+func (o *Tree) GetWateringStatus() WateringStatus {
 	if o == nil {
-		var ret EntitiesWateringStatus
+		var ret WateringStatus
 		return ret
 	}
 
@@ -476,7 +450,7 @@ func (o *Tree) GetWateringStatus() EntitiesWateringStatus {
 
 // GetWateringStatusOk returns a tuple with the WateringStatus field value
 // and a boolean to check if the value has been set.
-func (o *Tree) GetWateringStatusOk() (*EntitiesWateringStatus, bool) {
+func (o *Tree) GetWateringStatusOk() (*WateringStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -484,7 +458,7 @@ func (o *Tree) GetWateringStatusOk() (*EntitiesWateringStatus, bool) {
 }
 
 // SetWateringStatus sets field value
-func (o *Tree) SetWateringStatus(v EntitiesWateringStatus) {
+func (o *Tree) SetWateringStatus(v WateringStatus) {
 	o.WateringStatus = v
 }
 
@@ -512,7 +486,6 @@ func (o Tree) ToMap() (map[string]interface{}, error) {
 	toSerialize["number"] = o.Number
 	toSerialize["planting_year"] = o.PlantingYear
 	toSerialize["provider"] = o.Provider
-	toSerialize["readonly"] = o.Readonly
 	if !IsNil(o.Sensor) {
 		toSerialize["sensor"] = o.Sensor
 	}
@@ -538,7 +511,6 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 		"number",
 		"planting_year",
 		"provider",
-		"readonly",
 		"species",
 		"updated_at",
 		"watering_status",

@@ -22,21 +22,21 @@ var _ MappedNullable = &TreeClusterInList{}
 
 // TreeClusterInList struct for TreeClusterInList
 type TreeClusterInList struct {
-	Address        string                    `json:"address"`
-	Archived       bool                      `json:"archived"`
-	CreatedAt      string                    `json:"created_at"`
-	Description    string                    `json:"description"`
-	Id             int32                     `json:"id"`
-	LastWatered    *string                   `json:"last_watered,omitempty"`
-	Latitude       float32                   `json:"latitude"`
-	Longitude      float32                   `json:"longitude"`
-	MoistureLevel  float32                   `json:"moisture_level"`
-	Name           string                    `json:"name"`
-	Region         *Region                   `json:"region,omitempty"`
-	SoilCondition  EntitiesTreeSoilCondition `json:"soil_condition"`
-	TreeIds        []int32                   `json:"tree_ids,omitempty"`
-	UpdatedAt      string                    `json:"updated_at"`
-	WateringStatus EntitiesWateringStatus    `json:"watering_status"`
+	Address        string         `json:"address"`
+	Archived       bool           `json:"archived"`
+	CreatedAt      string         `json:"created_at"`
+	Description    string         `json:"description"`
+	Id             int32          `json:"id"`
+	LastWatered    *string        `json:"last_watered,omitempty"`
+	Latitude       float32        `json:"latitude"`
+	Longitude      float32        `json:"longitude"`
+	MoistureLevel  float32        `json:"moisture_level"`
+	Name           string         `json:"name"`
+	Region         *Region        `json:"region,omitempty"`
+	SoilCondition  SoilCondition  `json:"soil_condition"`
+	TreeIds        []int32        `json:"tree_ids,omitempty"`
+	UpdatedAt      string         `json:"updated_at"`
+	WateringStatus WateringStatus `json:"watering_status"`
 }
 
 type _TreeClusterInList TreeClusterInList
@@ -45,7 +45,7 @@ type _TreeClusterInList TreeClusterInList
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeClusterInList(address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, soilCondition EntitiesTreeSoilCondition, updatedAt string, wateringStatus EntitiesWateringStatus) *TreeClusterInList {
+func NewTreeClusterInList(address string, archived bool, createdAt string, description string, id int32, latitude float32, longitude float32, moistureLevel float32, name string, soilCondition SoilCondition, updatedAt string, wateringStatus WateringStatus) *TreeClusterInList {
 	this := TreeClusterInList{}
 	this.Address = address
 	this.Archived = archived
@@ -351,9 +351,9 @@ func (o *TreeClusterInList) SetRegion(v Region) {
 }
 
 // GetSoilCondition returns the SoilCondition field value
-func (o *TreeClusterInList) GetSoilCondition() EntitiesTreeSoilCondition {
+func (o *TreeClusterInList) GetSoilCondition() SoilCondition {
 	if o == nil {
-		var ret EntitiesTreeSoilCondition
+		var ret SoilCondition
 		return ret
 	}
 
@@ -362,7 +362,7 @@ func (o *TreeClusterInList) GetSoilCondition() EntitiesTreeSoilCondition {
 
 // GetSoilConditionOk returns a tuple with the SoilCondition field value
 // and a boolean to check if the value has been set.
-func (o *TreeClusterInList) GetSoilConditionOk() (*EntitiesTreeSoilCondition, bool) {
+func (o *TreeClusterInList) GetSoilConditionOk() (*SoilCondition, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -370,7 +370,7 @@ func (o *TreeClusterInList) GetSoilConditionOk() (*EntitiesTreeSoilCondition, bo
 }
 
 // SetSoilCondition sets field value
-func (o *TreeClusterInList) SetSoilCondition(v EntitiesTreeSoilCondition) {
+func (o *TreeClusterInList) SetSoilCondition(v SoilCondition) {
 	o.SoilCondition = v
 }
 
@@ -431,9 +431,9 @@ func (o *TreeClusterInList) SetUpdatedAt(v string) {
 }
 
 // GetWateringStatus returns the WateringStatus field value
-func (o *TreeClusterInList) GetWateringStatus() EntitiesWateringStatus {
+func (o *TreeClusterInList) GetWateringStatus() WateringStatus {
 	if o == nil {
-		var ret EntitiesWateringStatus
+		var ret WateringStatus
 		return ret
 	}
 
@@ -442,7 +442,7 @@ func (o *TreeClusterInList) GetWateringStatus() EntitiesWateringStatus {
 
 // GetWateringStatusOk returns a tuple with the WateringStatus field value
 // and a boolean to check if the value has been set.
-func (o *TreeClusterInList) GetWateringStatusOk() (*EntitiesWateringStatus, bool) {
+func (o *TreeClusterInList) GetWateringStatusOk() (*WateringStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -450,7 +450,7 @@ func (o *TreeClusterInList) GetWateringStatusOk() (*EntitiesWateringStatus, bool
 }
 
 // SetWateringStatus sets field value
-func (o *TreeClusterInList) SetWateringStatus(v EntitiesWateringStatus) {
+func (o *TreeClusterInList) SetWateringStatus(v WateringStatus) {
 	o.WateringStatus = v
 }
 
