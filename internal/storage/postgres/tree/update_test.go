@@ -26,6 +26,7 @@ func TestTreeRepository_Update(t *testing.T) {
 		newDescription := "Updated description"
 		newWateringStatus := entities.WateringStatusGood
 		newLastWateredValue := &date
+		newProvider := "foo-provider"
 
 		// when
 		updatedTree, err := r.Update(context.Background(), treeID, func(tree *entities.Tree) (bool, error) {
@@ -34,7 +35,7 @@ func TestTreeRepository_Update(t *testing.T) {
 			tree.Latitude = newLatitude
 			tree.Longitude = newLongitude
 			tree.PlantingYear = newPlantingYear
-			tree.Readonly = false
+			tree.Provider = newProvider
 			tree.Description = newDescription
 			tree.WateringStatus = newWateringStatus
 			tree.LastWatered = newLastWateredValue
@@ -49,7 +50,7 @@ func TestTreeRepository_Update(t *testing.T) {
 		assert.Equal(t, newLatitude, updatedTree.Latitude, "Latitude should match")
 		assert.Equal(t, newLongitude, updatedTree.Longitude, "Longitude should match")
 		assert.Equal(t, newPlantingYear, updatedTree.PlantingYear, "Planting Year should match")
-		assert.Equal(t, false, updatedTree.Readonly, "Readonly should match")
+		assert.Equal(t, newProvider, updatedTree.Provider, "Provider should match")
 		assert.Equal(t, newDescription, updatedTree.Description, "Description should match")
 		assert.Equal(t, newWateringStatus, updatedTree.WateringStatus, "Watering Status should match")
 		assert.Equal(t, newLastWateredValue, updatedTree.LastWatered, "Last watered should match")

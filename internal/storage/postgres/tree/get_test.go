@@ -55,7 +55,6 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		assert.Equal(t, expectedTree.Number, got[0].Number, "Number does not match")
 		assert.Equal(t, expectedTree.Latitude, got[0].Latitude, "Latitude does not match")
 		assert.Equal(t, expectedTree.Longitude, got[0].Longitude, "Longitude does not match")
-		assert.Equal(t, expectedTree.Readonly, got[0].Readonly, "Readonly does not match")
 		assert.Equal(t, expectedTree.WateringStatus, got[0].WateringStatus, "WateringStatus does not match")
 		assert.Equal(t, expectedTree.Description, got[0].Description, "Description does not match")
 		assert.Equal(t, expectedTree.Provider, got[0].Provider, "Provider does not match")
@@ -812,7 +811,6 @@ func assertExpectedEqualToTree(t *testing.T, expectedTree, tree *entities.Tree) 
 	assert.Equal(t, expectedTree.Number, tree.Number, "Number does not match")
 	assert.Equal(t, expectedTree.Latitude, tree.Latitude, "Latitude does not match")
 	assert.Equal(t, expectedTree.Longitude, tree.Longitude, "Longitude does not match")
-	assert.Equal(t, expectedTree.Readonly, tree.Readonly, "Readonly does not match")
 	assert.Equal(t, expectedTree.WateringStatus, tree.WateringStatus, "WateringStatus does not match")
 	assert.Equal(t, expectedTree.Description, tree.Description, "Description does not match")
 	assert.Equal(t, expectedTree.Provider, tree.Provider, "Provider does not match")
@@ -828,7 +826,6 @@ var testTrees = []*entities.Tree{
 		Number:         "1005",
 		Latitude:       54.82124518093376,
 		Longitude:      9.485702120628517,
-		Readonly:       true,
 		WateringStatus: "unknown",
 		Description:    "Sample description 1",
 		LastWatered:    nil,
@@ -840,7 +837,6 @@ var testTrees = []*entities.Tree{
 		Number:         "1006",
 		Latitude:       54.8215076622281,
 		Longitude:      9.487153277881877,
-		Readonly:       true,
 		WateringStatus: "good",
 		Description:    "Sample description 2",
 		LastWatered:    nil,
@@ -852,7 +848,6 @@ var testTrees = []*entities.Tree{
 		Number:         "1007",
 		Latitude:       54.78780993841013,
 		Longitude:      9.444052105200551,
-		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 3",
 		LastWatered:    nil,
@@ -864,7 +859,6 @@ var testTrees = []*entities.Tree{
 		Number:         "1008",
 		Latitude:       54.1000,
 		Longitude:      9.2000,
-		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 4",
 		LastWatered:    nil,
@@ -876,7 +870,6 @@ var testTrees = []*entities.Tree{
 		Number:         "1009",
 		Latitude:       54.22,
 		Longitude:      9.11,
-		Readonly:       false,
 		WateringStatus: "bad",
 		Description:    "Sample description 5",
 		Provider:       "test-provider",

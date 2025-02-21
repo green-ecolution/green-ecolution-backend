@@ -159,6 +159,5 @@ var (
 		Longitude:    9.487153277881877,
 		Description:  "A mature oak tree",
 		PlantingYear: 2023,
-		Readonly:     true,
 	}
 )
