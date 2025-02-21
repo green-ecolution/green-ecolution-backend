@@ -111,7 +111,6 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 
 	var prevTreeOfSensor *entities.Tree
 	newTree, err := s.treeRepo.Create(ctx, func(tree *entities.Tree) (bool, error) {
-		tree.Readonly = treeCreate.Readonly
 		tree.PlantingYear = treeCreate.PlantingYear
 		tree.Species = treeCreate.Species
 		tree.Number = treeCreate.Number

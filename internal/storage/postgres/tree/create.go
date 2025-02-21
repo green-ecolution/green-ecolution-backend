@@ -18,7 +18,6 @@ func defaultTree() entities.Tree {
 		TreeCluster:    nil,
 		Species:        "",
 		Number:         "",
-		Readonly:       false,
 		Sensor:         nil,
 		PlantingYear:   0,
 		Latitude:       0,
@@ -120,7 +119,6 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	args := sqlc.CreateTreeParams{
 		TreeClusterID:          treeClusterID,
 		Species:                entity.Species,
-		Readonly:               entity.Readonly,
 		SensorID:               sensorID,
 		PlantingYear:           entity.PlantingYear,
 		Latitude:               entity.Latitude,

@@ -22,19 +22,19 @@ var _ MappedNullable = &WateringPlanInList{}
 
 // WateringPlanInList struct for WateringPlanInList
 type WateringPlanInList struct {
-	CancellationNote   string                     `json:"cancellation_note"`
-	CreatedAt          string                     `json:"created_at"`
-	Date               string                     `json:"date"`
-	Description        string                     `json:"description"`
-	Distance           float32                    `json:"distance"`
-	Id                 int32                      `json:"id"`
-	Status             EntitiesWateringPlanStatus `json:"status"`
-	TotalWaterRequired float32                    `json:"total_water_required"`
-	Trailer            *Vehicle                   `json:"trailer,omitempty"`
-	Transporter        Vehicle                    `json:"transporter"`
-	Treeclusters       []TreeClusterInList        `json:"treeclusters"`
-	UpdatedAt          string                     `json:"updated_at"`
-	UserIds            []string                   `json:"user_ids"`
+	CancellationNote   string              `json:"cancellation_note"`
+	CreatedAt          string              `json:"created_at"`
+	Date               string              `json:"date"`
+	Description        string              `json:"description"`
+	Distance           float32             `json:"distance"`
+	Id                 int32               `json:"id"`
+	Status             WateringPlanStatus  `json:"status"`
+	TotalWaterRequired float32             `json:"total_water_required"`
+	Trailer            *Vehicle            `json:"trailer,omitempty"`
+	Transporter        Vehicle             `json:"transporter"`
+	Treeclusters       []TreeClusterInList `json:"treeclusters"`
+	UpdatedAt          string              `json:"updated_at"`
+	UserIds            []string            `json:"user_ids"`
 }
 
 type _WateringPlanInList WateringPlanInList
@@ -43,7 +43,7 @@ type _WateringPlanInList WateringPlanInList
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWateringPlanInList(cancellationNote string, createdAt string, date string, description string, distance float32, id int32, status EntitiesWateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlanInList {
+func NewWateringPlanInList(cancellationNote string, createdAt string, date string, description string, distance float32, id int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlanInList {
 	this := WateringPlanInList{}
 	this.CancellationNote = cancellationNote
 	this.CreatedAt = createdAt
@@ -213,9 +213,9 @@ func (o *WateringPlanInList) SetId(v int32) {
 }
 
 // GetStatus returns the Status field value
-func (o *WateringPlanInList) GetStatus() EntitiesWateringPlanStatus {
+func (o *WateringPlanInList) GetStatus() WateringPlanStatus {
 	if o == nil {
-		var ret EntitiesWateringPlanStatus
+		var ret WateringPlanStatus
 		return ret
 	}
 
@@ -224,7 +224,7 @@ func (o *WateringPlanInList) GetStatus() EntitiesWateringPlanStatus {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *WateringPlanInList) GetStatusOk() (*EntitiesWateringPlanStatus, bool) {
+func (o *WateringPlanInList) GetStatusOk() (*WateringPlanStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -232,7 +232,7 @@ func (o *WateringPlanInList) GetStatusOk() (*EntitiesWateringPlanStatus, bool) {
 }
 
 // SetStatus sets field value
-func (o *WateringPlanInList) SetStatus(v EntitiesWateringPlanStatus) {
+func (o *WateringPlanInList) SetStatus(v WateringPlanStatus) {
 	o.Status = v
 }
 

@@ -90,7 +90,6 @@ func (r *TreeRepository) updateEntity(ctx context.Context, t *entities.Tree) err
 	args := sqlc.UpdateTreeParams{
 		ID:                     t.ID,
 		Species:                t.Species,
-		Readonly:               t.Readonly,
 		PlantingYear:           t.PlantingYear,
 		Number:                 t.Number,
 		SensorID:               sensorID,

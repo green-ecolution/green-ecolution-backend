@@ -11,7 +11,6 @@ type Tree struct {
 	TreeCluster    *TreeCluster
 	Sensor         *Sensor
 	Images         []*Image
-	Readonly       bool
 	PlantingYear   int32
 	Species        string
 	Number         string
@@ -27,7 +26,6 @@ type Tree struct {
 type TreeCreate struct {
 	TreeClusterID  *int32
 	SensorID       *string
-	Readonly       bool
 	PlantingYear   int32 `validate:"required"`
 	Species        string
 	Number         string  `validate:"required"`

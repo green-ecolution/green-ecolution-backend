@@ -12,7 +12,6 @@ type TreeResponse struct {
 	Sensor        *SensorResponse `json:"sensor" validate:"optional"`
 	// Images              []*ImageResponse `json:"images"`
 	LastWatered    *time.Time             `json:"last_watered,omitempty" validate:"optional"`
-	Readonly       bool                   `json:"readonly"`
 	PlantingYear   int32                  `json:"planting_year"`
 	Species        string                 `json:"species"`
 	Number         string                 `json:"number"`
@@ -31,7 +30,6 @@ type TreeListResponse struct {
 
 type TreeCreateRequest struct {
 	TreeClusterID  *int32                 `json:"tree_cluster_id" validate:"optional"`
-	Readonly       bool                   `json:"readonly"`
 	PlantingYear   int32                  `json:"planting_year"`
 	Species        string                 `json:"species"`
 	Number         string                 `json:"number"`
@@ -45,7 +43,6 @@ type TreeCreateRequest struct {
 
 type TreeUpdateRequest struct {
 	TreeClusterID  *int32                 `json:"tree_cluster_id" validate:"optional"`
-	Readonly       bool                   `json:"readonly"`
 	PlantingYear   int32                  `json:"planting_year"`
 	Species        string                 `json:"species"`
 	Number         string                 `json:"number"`

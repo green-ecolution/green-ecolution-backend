@@ -29,7 +29,6 @@ type TreeUpdate struct {
 	Number                string                 `json:"number"`
 	PlantingYear          int32                  `json:"planting_year"`
 	Provider              *string                `json:"provider,omitempty"`
-	Readonly              bool                   `json:"readonly"`
 	SensorId              *string                `json:"sensor_id,omitempty"`
 	Species               string                 `json:"species"`
 	TreeClusterId         *int32                 `json:"tree_cluster_id,omitempty"`
@@ -41,14 +40,13 @@ type _TreeUpdate TreeUpdate
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeUpdate(description string, latitude float32, longitude float32, number string, plantingYear int32, readonly bool, species string) *TreeUpdate {
+func NewTreeUpdate(description string, latitude float32, longitude float32, number string, plantingYear int32, species string) *TreeUpdate {
 	this := TreeUpdate{}
 	this.Description = description
 	this.Latitude = latitude
 	this.Longitude = longitude
 	this.Number = number
 	this.PlantingYear = plantingYear
-	this.Readonly = readonly
 	this.Species = species
 	return &this
 }
@@ -245,30 +243,6 @@ func (o *TreeUpdate) SetProvider(v string) {
 	o.Provider = &v
 }
 
-// GetReadonly returns the Readonly field value
-func (o *TreeUpdate) GetReadonly() bool {
-	if o == nil {
-		var ret bool
-		return ret
-	}
-
-	return o.Readonly
-}
-
-// GetReadonlyOk returns a tuple with the Readonly field value
-// and a boolean to check if the value has been set.
-func (o *TreeUpdate) GetReadonlyOk() (*bool, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Readonly, true
-}
-
-// SetReadonly sets field value
-func (o *TreeUpdate) SetReadonly(v bool) {
-	o.Readonly = v
-}
-
 // GetSensorId returns the SensorId field value if set, zero value otherwise.
 func (o *TreeUpdate) GetSensorId() string {
 	if o == nil || IsNil(o.SensorId) {
@@ -378,7 +352,6 @@ func (o TreeUpdate) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Provider) {
 		toSerialize["provider"] = o.Provider
 	}
-	toSerialize["readonly"] = o.Readonly
 	if !IsNil(o.SensorId) {
 		toSerialize["sensor_id"] = o.SensorId
 	}
@@ -399,7 +372,6 @@ func (o *TreeUpdate) UnmarshalJSON(data []byte) (err error) {
 		"longitude",
 		"number",
 		"planting_year",
-		"readonly",
 		"species",
 	}
 

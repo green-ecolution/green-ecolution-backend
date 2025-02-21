@@ -17,25 +17,25 @@ import (
 	"fmt"
 )
 
-// checks if the EntitiesGeoJSON type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &EntitiesGeoJSON{}
+// checks if the GeoJson type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &GeoJson{}
 
-// EntitiesGeoJSON struct for EntitiesGeoJSON
-type EntitiesGeoJSON struct {
-	Bbox     []float32                `json:"bbox"`
-	Features []EntitiesGeoJSONFeature `json:"features"`
-	Metadata EntitiesGeoJSONMetadata  `json:"metadata"`
-	Type     EntitiesGeoJSONType      `json:"type"`
+// GeoJson struct for GeoJson
+type GeoJson struct {
+	Bbox     []float32        `json:"bbox"`
+	Features []GeoJsonFeature `json:"features"`
+	Metadata GeoJSONMetadata  `json:"metadata"`
+	Type     GeoJsonType      `json:"type"`
 }
 
-type _EntitiesGeoJSON EntitiesGeoJSON
+type _GeoJson GeoJson
 
-// NewEntitiesGeoJSON instantiates a new EntitiesGeoJSON object
+// NewGeoJson instantiates a new GeoJson object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewEntitiesGeoJSON(bbox []float32, features []EntitiesGeoJSONFeature, metadata EntitiesGeoJSONMetadata, type_ EntitiesGeoJSONType) *EntitiesGeoJSON {
-	this := EntitiesGeoJSON{}
+func NewGeoJson(bbox []float32, features []GeoJsonFeature, metadata GeoJSONMetadata, type_ GeoJsonType) *GeoJson {
+	this := GeoJson{}
 	this.Bbox = bbox
 	this.Features = features
 	this.Metadata = metadata
@@ -43,16 +43,16 @@ func NewEntitiesGeoJSON(bbox []float32, features []EntitiesGeoJSONFeature, metad
 	return &this
 }
 
-// NewEntitiesGeoJSONWithDefaults instantiates a new EntitiesGeoJSON object
+// NewGeoJsonWithDefaults instantiates a new GeoJson object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewEntitiesGeoJSONWithDefaults() *EntitiesGeoJSON {
-	this := EntitiesGeoJSON{}
+func NewGeoJsonWithDefaults() *GeoJson {
+	this := GeoJson{}
 	return &this
 }
 
 // GetBbox returns the Bbox field value
-func (o *EntitiesGeoJSON) GetBbox() []float32 {
+func (o *GeoJson) GetBbox() []float32 {
 	if o == nil {
 		var ret []float32
 		return ret
@@ -63,7 +63,7 @@ func (o *EntitiesGeoJSON) GetBbox() []float32 {
 
 // GetBboxOk returns a tuple with the Bbox field value
 // and a boolean to check if the value has been set.
-func (o *EntitiesGeoJSON) GetBboxOk() ([]float32, bool) {
+func (o *GeoJson) GetBboxOk() ([]float32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -71,14 +71,14 @@ func (o *EntitiesGeoJSON) GetBboxOk() ([]float32, bool) {
 }
 
 // SetBbox sets field value
-func (o *EntitiesGeoJSON) SetBbox(v []float32) {
+func (o *GeoJson) SetBbox(v []float32) {
 	o.Bbox = v
 }
 
 // GetFeatures returns the Features field value
-func (o *EntitiesGeoJSON) GetFeatures() []EntitiesGeoJSONFeature {
+func (o *GeoJson) GetFeatures() []GeoJsonFeature {
 	if o == nil {
-		var ret []EntitiesGeoJSONFeature
+		var ret []GeoJsonFeature
 		return ret
 	}
 
@@ -87,7 +87,7 @@ func (o *EntitiesGeoJSON) GetFeatures() []EntitiesGeoJSONFeature {
 
 // GetFeaturesOk returns a tuple with the Features field value
 // and a boolean to check if the value has been set.
-func (o *EntitiesGeoJSON) GetFeaturesOk() ([]EntitiesGeoJSONFeature, bool) {
+func (o *GeoJson) GetFeaturesOk() ([]GeoJsonFeature, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -95,14 +95,14 @@ func (o *EntitiesGeoJSON) GetFeaturesOk() ([]EntitiesGeoJSONFeature, bool) {
 }
 
 // SetFeatures sets field value
-func (o *EntitiesGeoJSON) SetFeatures(v []EntitiesGeoJSONFeature) {
+func (o *GeoJson) SetFeatures(v []GeoJsonFeature) {
 	o.Features = v
 }
 
 // GetMetadata returns the Metadata field value
-func (o *EntitiesGeoJSON) GetMetadata() EntitiesGeoJSONMetadata {
+func (o *GeoJson) GetMetadata() GeoJSONMetadata {
 	if o == nil {
-		var ret EntitiesGeoJSONMetadata
+		var ret GeoJSONMetadata
 		return ret
 	}
 
@@ -111,7 +111,7 @@ func (o *EntitiesGeoJSON) GetMetadata() EntitiesGeoJSONMetadata {
 
 // GetMetadataOk returns a tuple with the Metadata field value
 // and a boolean to check if the value has been set.
-func (o *EntitiesGeoJSON) GetMetadataOk() (*EntitiesGeoJSONMetadata, bool) {
+func (o *GeoJson) GetMetadataOk() (*GeoJSONMetadata, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -119,14 +119,14 @@ func (o *EntitiesGeoJSON) GetMetadataOk() (*EntitiesGeoJSONMetadata, bool) {
 }
 
 // SetMetadata sets field value
-func (o *EntitiesGeoJSON) SetMetadata(v EntitiesGeoJSONMetadata) {
+func (o *GeoJson) SetMetadata(v GeoJSONMetadata) {
 	o.Metadata = v
 }
 
 // GetType returns the Type field value
-func (o *EntitiesGeoJSON) GetType() EntitiesGeoJSONType {
+func (o *GeoJson) GetType() GeoJsonType {
 	if o == nil {
-		var ret EntitiesGeoJSONType
+		var ret GeoJsonType
 		return ret
 	}
 
@@ -135,7 +135,7 @@ func (o *EntitiesGeoJSON) GetType() EntitiesGeoJSONType {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *EntitiesGeoJSON) GetTypeOk() (*EntitiesGeoJSONType, bool) {
+func (o *GeoJson) GetTypeOk() (*GeoJsonType, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -143,11 +143,11 @@ func (o *EntitiesGeoJSON) GetTypeOk() (*EntitiesGeoJSONType, bool) {
 }
 
 // SetType sets field value
-func (o *EntitiesGeoJSON) SetType(v EntitiesGeoJSONType) {
+func (o *GeoJson) SetType(v GeoJsonType) {
 	o.Type = v
 }
 
-func (o EntitiesGeoJSON) MarshalJSON() ([]byte, error) {
+func (o GeoJson) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -155,7 +155,7 @@ func (o EntitiesGeoJSON) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o EntitiesGeoJSON) ToMap() (map[string]interface{}, error) {
+func (o GeoJson) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["bbox"] = o.Bbox
 	toSerialize["features"] = o.Features
@@ -164,7 +164,7 @@ func (o EntitiesGeoJSON) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *EntitiesGeoJSON) UnmarshalJSON(data []byte) (err error) {
+func (o *GeoJson) UnmarshalJSON(data []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
@@ -189,53 +189,53 @@ func (o *EntitiesGeoJSON) UnmarshalJSON(data []byte) (err error) {
 		}
 	}
 
-	varEntitiesGeoJSON := _EntitiesGeoJSON{}
+	varGeoJson := _GeoJson{}
 
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
-	err = decoder.Decode(&varEntitiesGeoJSON)
+	err = decoder.Decode(&varGeoJson)
 
 	if err != nil {
 		return err
 	}
 
-	*o = EntitiesGeoJSON(varEntitiesGeoJSON)
+	*o = GeoJson(varGeoJson)
 
 	return err
 }
 
-type NullableEntitiesGeoJSON struct {
-	value *EntitiesGeoJSON
+type NullableGeoJson struct {
+	value *GeoJson
 	isSet bool
 }
 
-func (v NullableEntitiesGeoJSON) Get() *EntitiesGeoJSON {
+func (v NullableGeoJson) Get() *GeoJson {
 	return v.value
 }
 
-func (v *NullableEntitiesGeoJSON) Set(val *EntitiesGeoJSON) {
+func (v *NullableGeoJson) Set(val *GeoJson) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableEntitiesGeoJSON) IsSet() bool {
+func (v NullableGeoJson) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableEntitiesGeoJSON) Unset() {
+func (v *NullableGeoJson) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableEntitiesGeoJSON(val *EntitiesGeoJSON) *NullableEntitiesGeoJSON {
-	return &NullableEntitiesGeoJSON{value: val, isSet: true}
+func NewNullableGeoJson(val *GeoJson) *NullableGeoJson {
+	return &NullableGeoJson{value: val, isSet: true}
 }
 
-func (v NullableEntitiesGeoJSON) MarshalJSON() ([]byte, error) {
+func (v NullableGeoJson) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableEntitiesGeoJSON) UnmarshalJSON(src []byte) error {
+func (v *NullableGeoJson) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

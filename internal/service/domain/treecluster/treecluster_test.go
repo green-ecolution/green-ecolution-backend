@@ -876,7 +876,6 @@ var testTrees = []*entities.Tree{
 		Longitude:    54.801539,
 		Description:  "A mature oak tree",
 		PlantingYear: 2023,
-		Readonly:     true,
 		Sensor: &entities.Sensor{
 			ID: "sensor-1",
 		},
@@ -891,7 +890,6 @@ var testTrees = []*entities.Tree{
 		Longitude:    54.801510,
 		Description:  "A young pine tree",
 		PlantingYear: 2023,
-		Readonly:     true,
 		Sensor: &entities.Sensor{
 			ID: "sensor-2",
 		},
