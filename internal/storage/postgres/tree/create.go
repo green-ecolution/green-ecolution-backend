@@ -28,6 +28,7 @@ func defaultTree() entities.Tree {
 		Description:    "",
 		Provider:       "",
 		AdditionalInfo: nil,
+		LastWatered:    nil,
 	}
 }
 

@@ -924,6 +924,126 @@ func TestTreeService_EventSystem(t *testing.T) {
 	})
 }
 
+func TestTreeService_UpdateWateringStatuses(t *testing.T) {
+	t.Run("should update »just watered« watering status of trees successfully", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, globalEventManager)
+
+		staleDate := time.Now().Add(-34 * time.Hour)
+		recentDate := time.Now().Add(-2 * time.Hour)
+
+		staleTree := &entities.Tree{
+			ID:             1,
+			LastWatered:    &staleDate, // Older than 24h
+			WateringStatus: entities.WateringStatusJustWatered,
+		}
+		recentTree := &entities.Tree{
+			ID:             2,
+			LastWatered:    &recentDate,
+			WateringStatus: entities.WateringStatusJustWatered,
+		}
+		expectList := []*entities.Tree{staleTree, recentTree}
+
+		// when
+		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		treeRepo.EXPECT().Update(mock.Anything, staleTree.ID, mock.Anything).Return(staleTree, nil)
+
+		err := svc.UpdateWateringStatuses(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertCalled(t, "Update", mock.Anything, staleTree.ID, mock.Anything)
+		treeRepo.AssertExpectations(t)
+	})
+
+	t.Run("should do nothing when there are no trees with correct watering status", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, globalEventManager)
+
+		recentDate := time.Now().Add(-2 * time.Hour)
+		recentTree := &entities.Tree{
+			ID:             1,
+			LastWatered:    &recentDate,
+			WateringStatus: entities.WateringStatusJustWatered,
+		}
+
+		expectList := []*entities.Tree{recentTree}
+
+		// when
+		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+
+		err := svc.UpdateWateringStatuses(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertNotCalled(t, "GetAllLatestSensorDataByClusterID")
+		treeRepo.AssertNotCalled(t, "GetBySensorIDs")
+		treeRepo.AssertNotCalled(t, "Update")
+		treeRepo.AssertExpectations(t)
+	})
+
+	t.Run("should return an error when fetching trees fails", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, globalEventManager)
+
+		// when
+		expectedErr := errors.New("database error")
+		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(nil, int64(0), expectedErr)
+
+		err := svc.UpdateWateringStatuses(context.Background())
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, expectedErr, err)
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertNotCalled(t, "Update")
+		treeRepo.AssertExpectations(t)
+	})
+
+	t.Run("should log an error when updating a tree fails", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		imageRepo := storageMock.NewMockImageRepository(t)
+		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, imageRepo, treeClusterRepo, globalEventManager)
+
+		staleDate := time.Now().Add(-34 * time.Hour)
+		staleTree := &entities.Tree{
+			ID:             1,
+			LastWatered:    &staleDate, // Older than 24h
+			WateringStatus: entities.WateringStatusJustWatered,
+		}
+		expectList := []*entities.Tree{staleTree}
+
+		// when
+		treeRepo.EXPECT().GetAll(mock.Anything, "").Return(expectList, int64(len(expectList)), nil)
+		treeRepo.EXPECT().Update(mock.Anything, staleTree.ID, mock.Anything).Return(nil, errors.New("update failed"))
+
+		err := svc.UpdateWateringStatuses(context.Background())
+
+		// then
+		treeRepo.AssertCalled(t, "GetAll", mock.Anything, "")
+		treeRepo.AssertCalled(t, "Update", mock.Anything, staleTree.ID, mock.Anything)
+		treeRepo.AssertExpectations(t)
+		assert.NoError(t, err)
+	})
+}
+
 func TestTreeService_Ready(t *testing.T) {
 	t.Run("should return true when treeRepo and sensorRepo are initialized", func(t *testing.T) {
 		// given

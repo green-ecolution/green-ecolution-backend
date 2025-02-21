@@ -19,6 +19,7 @@ type Tree struct {
 	Longitude      float64
 	WateringStatus WateringStatus
 	Description    string
+	LastWatered    *time.Time
 	Provider       string
 	AdditionalInfo map[string]interface{}
 }

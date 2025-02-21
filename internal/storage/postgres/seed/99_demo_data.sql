@@ -116,6 +116,11 @@ VALUES
   (NULL, NULL, 2024, 'Acer pseudoplatanus', 1060, 54.813655, 9.477633, ST_SetSRID(ST_MakePoint(54.813655, 9.477633), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
   (NULL, NULL, 2024, 'Acer pseudoplatanus', 1061, 54.811001, 9.484132, ST_SetSRID(ST_MakePoint(54.811001, 9.484132), 4326), true, 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt'),
   (NULL, NULL, 2024, 'Acer pseudoplatanus', 1062, 54.790366, 9.472744, ST_SetSRID(ST_MakePoint(54.790366, 9.472744), 4326), true, 'unknown', '');
+
+INSERT INTO trees (tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, readonly, watering_status, description, last_watered)
+VALUES
+  (NULL, NULL, 2023, 'Quercus robur', 1065, 54.780394213230196, 9.417514801025392, ST_SetSRID(ST_MakePoint(54.780394213230196, 9.417514801025392), 4326), true, 'good', 'Dieser Baum wurde im August das letzte mal gestuzt', '2025-02-14 12:34:56');
+
 ALTER SEQUENCE trees_id_seq RESTART WITH 67;
 
 INSERT INTO sensor_data (sensor_id, data)

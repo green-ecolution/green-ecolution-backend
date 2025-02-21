@@ -100,6 +100,7 @@ type TreeService interface {
 	ImportTree(ctx context.Context, trees []*domain.TreeImport) error
 	GetBySensorID(ctx context.Context, id string) (*domain.Tree, error)
 	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
+	UpdateWateringStatuses(ctx context.Context) error
 }
 
 type AuthService interface {
@@ -129,6 +130,7 @@ type TreeClusterService interface {
 	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error
 	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 	HandleUpdateWateringPlan(context.Context, *domain.EventUpdateWateringPlan) error
+	UpdateWateringStatuses(ctx context.Context) error
 }
 
 type SensorService interface {
