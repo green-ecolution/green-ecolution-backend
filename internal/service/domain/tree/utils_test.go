@@ -102,14 +102,6 @@ var (
 		SensorID:      utils.P("sensor-1"),
 	}
 
-	TestTreeImport = &entities.TreeImport{
-		Latitude:     testLatitude,
-		Longitude:    testLongitude,
-		PlantingYear: 2023,
-		Species:      "Oak",
-		Number:       "T001",
-	}
-
 	TestTreeUpdate = &entities.TreeUpdate{
 		TreeClusterID: utils.P(int32(1)),
 		SensorID:      utils.P("sensor-1"),
