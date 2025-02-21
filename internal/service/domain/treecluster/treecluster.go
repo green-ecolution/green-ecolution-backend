@@ -289,16 +289,19 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 			return false, err
 		}
 
-		if tc.Latitude != lat || tc.Longitude != long || tc.Region.ID != region.ID {
+		if tc.Region != nil && tc.Region.ID != region.ID {
+			tc.Region = region
+			log.Debug("updating region in tree cluster position", "id", region.ID, "name", region.Name)
+		}
+
+		if tc.Latitude != lat || tc.Longitude != long {
 			tc.Latitude = lat
 			tc.Longitude = long
-			tc.Region = region
 			tc.WateringStatus = wateringStatus
 
 			log.Info("update tree cluster position due to changed trees inside the tree cluster", "cluster_id", id)
 			log.Debug("detailed updated tree cluster position informations", "cluster_id", id,
 				slog.Group("new_position", "latitude", *lat, "longitude", *long),
-				slog.Group("region", "id", region.ID, "name", region.Name),
 			)
 		}
 
