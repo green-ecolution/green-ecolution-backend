@@ -22,13 +22,13 @@ var _ MappedNullable = &TreeClusterUpdate{}
 
 // TreeClusterUpdate struct for TreeClusterUpdate
 type TreeClusterUpdate struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
-	Address               string                 `json:"address"`
-	Description           string                 `json:"description"`
-	Name                  string                 `json:"name"`
-	Provider              *string                `json:"provider,omitempty"`
-	SoilCondition         SoilCondition          `json:"soil_condition"`
-	TreeIds               []int32                `json:"tree_ids"`
+	AdditionalInformation map[string]interface{}    `json:"additional_information,omitempty"`
+	Address               string                    `json:"address"`
+	Description           string                    `json:"description"`
+	Name                  string                    `json:"name"`
+	Provider              *string                   `json:"provider,omitempty"`
+	SoilCondition         EntitiesTreeSoilCondition `json:"soil_condition"`
+	TreeIds               []int32                   `json:"tree_ids"`
 }
 
 type _TreeClusterUpdate TreeClusterUpdate
@@ -37,7 +37,7 @@ type _TreeClusterUpdate TreeClusterUpdate
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTreeClusterUpdate(address string, description string, name string, soilCondition SoilCondition, treeIds []int32) *TreeClusterUpdate {
+func NewTreeClusterUpdate(address string, description string, name string, soilCondition EntitiesTreeSoilCondition, treeIds []int32) *TreeClusterUpdate {
 	this := TreeClusterUpdate{}
 	this.Address = address
 	this.Description = description
@@ -192,9 +192,9 @@ func (o *TreeClusterUpdate) SetProvider(v string) {
 }
 
 // GetSoilCondition returns the SoilCondition field value
-func (o *TreeClusterUpdate) GetSoilCondition() SoilCondition {
+func (o *TreeClusterUpdate) GetSoilCondition() EntitiesTreeSoilCondition {
 	if o == nil {
-		var ret SoilCondition
+		var ret EntitiesTreeSoilCondition
 		return ret
 	}
 
@@ -203,7 +203,7 @@ func (o *TreeClusterUpdate) GetSoilCondition() SoilCondition {
 
 // GetSoilConditionOk returns a tuple with the SoilCondition field value
 // and a boolean to check if the value has been set.
-func (o *TreeClusterUpdate) GetSoilConditionOk() (*SoilCondition, bool) {
+func (o *TreeClusterUpdate) GetSoilConditionOk() (*EntitiesTreeSoilCondition, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -211,7 +211,7 @@ func (o *TreeClusterUpdate) GetSoilConditionOk() (*SoilCondition, bool) {
 }
 
 // SetSoilCondition sets field value
-func (o *TreeClusterUpdate) SetSoilCondition(v SoilCondition) {
+func (o *TreeClusterUpdate) SetSoilCondition(v EntitiesTreeSoilCondition) {
 	o.SoilCondition = v
 }
 

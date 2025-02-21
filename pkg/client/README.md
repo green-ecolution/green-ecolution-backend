@@ -80,7 +80,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*FileImportAPI* | [**ImportTreesFromCsv**](docs/FileImportAPI.md#importtreesfromcsv) | **Post** /v1/import/csv | Import trees from a CSV file
 *InfoAPI* | [**GetAppInfo**](docs/InfoAPI.md#getappinfo) | **Get** /v1/info | Get info about the app
 *PluginAPI* | [**GetPluginInfo**](docs/PluginAPI.md#getplugininfo) | **Get** /v1/plugin/{plugin_slug} | Get a plugin info
 *PluginAPI* | [**GetPluginsList**](docs/PluginAPI.md#getpluginslist) | **Get** /v1/plugin | Get a list of all registered plugins
@@ -91,6 +90,7 @@ Class | Method | HTTP request | Description
 *RegionAPI* | [**V1RegionGet**](docs/RegionAPI.md#v1regionget) | **Get** /v1/region | Get all regions
 *RegionAPI* | [**V1RegionIdGet**](docs/RegionAPI.md#v1regionidget) | **Get** /v1/region/{id} | Get a region by ID
 *SensorAPI* | [**DeleteSensor**](docs/SensorAPI.md#deletesensor) | **Delete** /v1/sensor/{sensor_id} | Delete sensor
+*SensorAPI* | [**GetAllSensorDataById**](docs/SensorAPI.md#getallsensordatabyid) | **Get** /v1/sensor/data/{sensor_id} | Get all sensor data by id
 *SensorAPI* | [**GetAllSensors**](docs/SensorAPI.md#getallsensors) | **Get** /v1/sensor | Get all sensors
 *SensorAPI* | [**GetSensorById**](docs/SensorAPI.md#getsensorbyid) | **Get** /v1/sensor/{sensor_id} | Get sensor by ID
 *TreeAPI* | [**CreateTree**](docs/TreeAPI.md#createtree) | **Post** /v1/tree | Create tree
@@ -130,14 +130,22 @@ Class | Method | HTTP request | Description
 
  - [AppInfo](docs/AppInfo.md)
  - [ClientToken](docs/ClientToken.md)
- - [DrivingLicense](docs/DrivingLicense.md)
- - [EvaluationValue](docs/EvaluationValue.md)
- - [GeoJSONLocation](docs/GeoJSONLocation.md)
- - [GeoJSONMetadata](docs/GeoJSONMetadata.md)
- - [GeoJson](docs/GeoJson.md)
- - [GeoJsonFeature](docs/GeoJsonFeature.md)
- - [GeoJsonGeometry](docs/GeoJsonGeometry.md)
- - [GeoJsonType](docs/GeoJsonType.md)
+ - [EntitiesDrivingLicense](docs/EntitiesDrivingLicense.md)
+ - [EntitiesEvaluationValue](docs/EntitiesEvaluationValue.md)
+ - [EntitiesGeoJSON](docs/EntitiesGeoJSON.md)
+ - [EntitiesGeoJSONFeature](docs/EntitiesGeoJSONFeature.md)
+ - [EntitiesGeoJSONGeometry](docs/EntitiesGeoJSONGeometry.md)
+ - [EntitiesGeoJSONLocation](docs/EntitiesGeoJSONLocation.md)
+ - [EntitiesGeoJSONMetadata](docs/EntitiesGeoJSONMetadata.md)
+ - [EntitiesGeoJSONType](docs/EntitiesGeoJSONType.md)
+ - [EntitiesSensorStatus](docs/EntitiesSensorStatus.md)
+ - [EntitiesTreeSoilCondition](docs/EntitiesTreeSoilCondition.md)
+ - [EntitiesUserRole](docs/EntitiesUserRole.md)
+ - [EntitiesUserStatus](docs/EntitiesUserStatus.md)
+ - [EntitiesVehicleStatus](docs/EntitiesVehicleStatus.md)
+ - [EntitiesVehicleType](docs/EntitiesVehicleType.md)
+ - [EntitiesWateringPlanStatus](docs/EntitiesWateringPlanStatus.md)
+ - [EntitiesWateringStatus](docs/EntitiesWateringStatus.md)
  - [GitInfo](docs/GitInfo.md)
  - [HTTPError](docs/HTTPError.md)
  - [LoginResponse](docs/LoginResponse.md)
@@ -154,10 +162,9 @@ Class | Method | HTTP request | Description
  - [RouteRequest](docs/RouteRequest.md)
  - [Sensor](docs/Sensor.md)
  - [SensorData](docs/SensorData.md)
+ - [SensorDataList](docs/SensorDataList.md)
  - [SensorList](docs/SensorList.md)
- - [SensorStatus](docs/SensorStatus.md)
  - [ServerInfo](docs/ServerInfo.md)
- - [SoilCondition](docs/SoilCondition.md)
  - [Tree](docs/Tree.md)
  - [TreeCluster](docs/TreeCluster.md)
  - [TreeClusterCreate](docs/TreeClusterCreate.md)
@@ -170,21 +177,15 @@ Class | Method | HTTP request | Description
  - [User](docs/User.md)
  - [UserList](docs/UserList.md)
  - [UserRegister](docs/UserRegister.md)
- - [UserRole](docs/UserRole.md)
- - [UserStatus](docs/UserStatus.md)
  - [Vehicle](docs/Vehicle.md)
  - [VehicleCreate](docs/VehicleCreate.md)
  - [VehicleList](docs/VehicleList.md)
- - [VehicleStatus](docs/VehicleStatus.md)
- - [VehicleType](docs/VehicleType.md)
  - [VehicleUpdate](docs/VehicleUpdate.md)
  - [WateringPlan](docs/WateringPlan.md)
  - [WateringPlanCreate](docs/WateringPlanCreate.md)
  - [WateringPlanInList](docs/WateringPlanInList.md)
  - [WateringPlanList](docs/WateringPlanList.md)
- - [WateringPlanStatus](docs/WateringPlanStatus.md)
  - [WateringPlanUpdate](docs/WateringPlanUpdate.md)
- - [WateringStatus](docs/WateringStatus.md)
  - [WatermarkResponse](docs/WatermarkResponse.md)
 
 

@@ -25,15 +25,15 @@ type Vehicle struct {
 	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
 	CreatedAt             string                 `json:"created_at"`
 	Description           string                 `json:"description"`
-	DrivingLicense        DrivingLicense         `json:"driving_license"`
+	DrivingLicense        EntitiesDrivingLicense `json:"driving_license"`
 	Height                float32                `json:"height"`
 	Id                    int32                  `json:"id"`
 	Length                float32                `json:"length"`
 	Model                 string                 `json:"model"`
 	NumberPlate           string                 `json:"number_plate"`
 	Provider              string                 `json:"provider"`
-	Status                VehicleStatus          `json:"status"`
-	Type                  VehicleType            `json:"type"`
+	Status                EntitiesVehicleStatus  `json:"status"`
+	Type                  EntitiesVehicleType    `json:"type"`
 	UpdatedAt             string                 `json:"updated_at"`
 	WaterCapacity         float32                `json:"water_capacity"`
 	Weight                float32                `json:"weight"`
@@ -46,7 +46,7 @@ type _Vehicle Vehicle
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewVehicle(createdAt string, description string, drivingLicense DrivingLicense, height float32, id int32, length float32, model string, numberPlate string, provider string, status VehicleStatus, type_ VehicleType, updatedAt string, waterCapacity float32, weight float32, width float32) *Vehicle {
+func NewVehicle(createdAt string, description string, drivingLicense EntitiesDrivingLicense, height float32, id int32, length float32, model string, numberPlate string, provider string, status EntitiesVehicleStatus, type_ EntitiesVehicleType, updatedAt string, waterCapacity float32, weight float32, width float32) *Vehicle {
 	this := Vehicle{}
 	this.CreatedAt = createdAt
 	this.Description = description
@@ -155,9 +155,9 @@ func (o *Vehicle) SetDescription(v string) {
 }
 
 // GetDrivingLicense returns the DrivingLicense field value
-func (o *Vehicle) GetDrivingLicense() DrivingLicense {
+func (o *Vehicle) GetDrivingLicense() EntitiesDrivingLicense {
 	if o == nil {
-		var ret DrivingLicense
+		var ret EntitiesDrivingLicense
 		return ret
 	}
 
@@ -166,7 +166,7 @@ func (o *Vehicle) GetDrivingLicense() DrivingLicense {
 
 // GetDrivingLicenseOk returns a tuple with the DrivingLicense field value
 // and a boolean to check if the value has been set.
-func (o *Vehicle) GetDrivingLicenseOk() (*DrivingLicense, bool) {
+func (o *Vehicle) GetDrivingLicenseOk() (*EntitiesDrivingLicense, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -174,7 +174,7 @@ func (o *Vehicle) GetDrivingLicenseOk() (*DrivingLicense, bool) {
 }
 
 // SetDrivingLicense sets field value
-func (o *Vehicle) SetDrivingLicense(v DrivingLicense) {
+func (o *Vehicle) SetDrivingLicense(v EntitiesDrivingLicense) {
 	o.DrivingLicense = v
 }
 
@@ -323,9 +323,9 @@ func (o *Vehicle) SetProvider(v string) {
 }
 
 // GetStatus returns the Status field value
-func (o *Vehicle) GetStatus() VehicleStatus {
+func (o *Vehicle) GetStatus() EntitiesVehicleStatus {
 	if o == nil {
-		var ret VehicleStatus
+		var ret EntitiesVehicleStatus
 		return ret
 	}
 
@@ -334,7 +334,7 @@ func (o *Vehicle) GetStatus() VehicleStatus {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *Vehicle) GetStatusOk() (*VehicleStatus, bool) {
+func (o *Vehicle) GetStatusOk() (*EntitiesVehicleStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -342,14 +342,14 @@ func (o *Vehicle) GetStatusOk() (*VehicleStatus, bool) {
 }
 
 // SetStatus sets field value
-func (o *Vehicle) SetStatus(v VehicleStatus) {
+func (o *Vehicle) SetStatus(v EntitiesVehicleStatus) {
 	o.Status = v
 }
 
 // GetType returns the Type field value
-func (o *Vehicle) GetType() VehicleType {
+func (o *Vehicle) GetType() EntitiesVehicleType {
 	if o == nil {
-		var ret VehicleType
+		var ret EntitiesVehicleType
 		return ret
 	}
 
@@ -358,7 +358,7 @@ func (o *Vehicle) GetType() VehicleType {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *Vehicle) GetTypeOk() (*VehicleType, bool) {
+func (o *Vehicle) GetTypeOk() (*EntitiesVehicleType, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -366,7 +366,7 @@ func (o *Vehicle) GetTypeOk() (*VehicleType, bool) {
 }
 
 // SetType sets field value
-func (o *Vehicle) SetType(v VehicleType) {
+func (o *Vehicle) SetType(v EntitiesVehicleType) {
 	o.Type = v
 }
 

@@ -22,19 +22,19 @@ var _ MappedNullable = &User{}
 
 // User struct for User
 type User struct {
-	AvatarUrl       string           `json:"avatar_url"`
-	CreatedAt       string           `json:"created_at"`
-	DrivingLicenses []DrivingLicense `json:"driving_licenses"`
-	Email           string           `json:"email"`
-	EmailVerified   bool             `json:"email_verified"`
-	EmployeeId      string           `json:"employee_id"`
-	FirstName       string           `json:"first_name"`
-	Id              string           `json:"id"`
-	LastName        string           `json:"last_name"`
-	PhoneNumber     string           `json:"phone_number"`
-	Roles           []UserRole       `json:"roles"`
-	Status          UserStatus       `json:"status"`
-	Username        string           `json:"username"`
+	AvatarUrl       string                   `json:"avatar_url"`
+	CreatedAt       string                   `json:"created_at"`
+	DrivingLicenses []EntitiesDrivingLicense `json:"driving_licenses"`
+	Email           string                   `json:"email"`
+	EmailVerified   bool                     `json:"email_verified"`
+	EmployeeId      string                   `json:"employee_id"`
+	FirstName       string                   `json:"first_name"`
+	Id              string                   `json:"id"`
+	LastName        string                   `json:"last_name"`
+	PhoneNumber     string                   `json:"phone_number"`
+	Roles           []EntitiesUserRole       `json:"roles"`
+	Status          EntitiesUserStatus       `json:"status"`
+	Username        string                   `json:"username"`
 }
 
 type _User User
@@ -43,7 +43,7 @@ type _User User
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewUser(avatarUrl string, createdAt string, drivingLicenses []DrivingLicense, email string, emailVerified bool, employeeId string, firstName string, id string, lastName string, phoneNumber string, roles []UserRole, status UserStatus, username string) *User {
+func NewUser(avatarUrl string, createdAt string, drivingLicenses []EntitiesDrivingLicense, email string, emailVerified bool, employeeId string, firstName string, id string, lastName string, phoneNumber string, roles []EntitiesUserRole, status EntitiesUserStatus, username string) *User {
 	this := User{}
 	this.AvatarUrl = avatarUrl
 	this.CreatedAt = createdAt
@@ -118,9 +118,9 @@ func (o *User) SetCreatedAt(v string) {
 }
 
 // GetDrivingLicenses returns the DrivingLicenses field value
-func (o *User) GetDrivingLicenses() []DrivingLicense {
+func (o *User) GetDrivingLicenses() []EntitiesDrivingLicense {
 	if o == nil {
-		var ret []DrivingLicense
+		var ret []EntitiesDrivingLicense
 		return ret
 	}
 
@@ -129,7 +129,7 @@ func (o *User) GetDrivingLicenses() []DrivingLicense {
 
 // GetDrivingLicensesOk returns a tuple with the DrivingLicenses field value
 // and a boolean to check if the value has been set.
-func (o *User) GetDrivingLicensesOk() ([]DrivingLicense, bool) {
+func (o *User) GetDrivingLicensesOk() ([]EntitiesDrivingLicense, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -137,7 +137,7 @@ func (o *User) GetDrivingLicensesOk() ([]DrivingLicense, bool) {
 }
 
 // SetDrivingLicenses sets field value
-func (o *User) SetDrivingLicenses(v []DrivingLicense) {
+func (o *User) SetDrivingLicenses(v []EntitiesDrivingLicense) {
 	o.DrivingLicenses = v
 }
 
@@ -310,9 +310,9 @@ func (o *User) SetPhoneNumber(v string) {
 }
 
 // GetRoles returns the Roles field value
-func (o *User) GetRoles() []UserRole {
+func (o *User) GetRoles() []EntitiesUserRole {
 	if o == nil {
-		var ret []UserRole
+		var ret []EntitiesUserRole
 		return ret
 	}
 
@@ -321,7 +321,7 @@ func (o *User) GetRoles() []UserRole {
 
 // GetRolesOk returns a tuple with the Roles field value
 // and a boolean to check if the value has been set.
-func (o *User) GetRolesOk() ([]UserRole, bool) {
+func (o *User) GetRolesOk() ([]EntitiesUserRole, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -329,14 +329,14 @@ func (o *User) GetRolesOk() ([]UserRole, bool) {
 }
 
 // SetRoles sets field value
-func (o *User) SetRoles(v []UserRole) {
+func (o *User) SetRoles(v []EntitiesUserRole) {
 	o.Roles = v
 }
 
 // GetStatus returns the Status field value
-func (o *User) GetStatus() UserStatus {
+func (o *User) GetStatus() EntitiesUserStatus {
 	if o == nil {
-		var ret UserStatus
+		var ret EntitiesUserStatus
 		return ret
 	}
 
@@ -345,7 +345,7 @@ func (o *User) GetStatus() UserStatus {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *User) GetStatusOk() (*UserStatus, bool) {
+func (o *User) GetStatusOk() (*EntitiesUserStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -353,7 +353,7 @@ func (o *User) GetStatusOk() (*UserStatus, bool) {
 }
 
 // SetStatus sets field value
-func (o *User) SetStatus(v UserStatus) {
+func (o *User) SetStatus(v EntitiesUserStatus) {
 	o.Status = v
 }
 

@@ -22,17 +22,17 @@ var _ MappedNullable = &WateringPlanUpdate{}
 
 // WateringPlanUpdate struct for WateringPlanUpdate
 type WateringPlanUpdate struct {
-	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
-	CancellationNote      string                 `json:"cancellation_note"`
-	Date                  string                 `json:"date"`
-	Description           string                 `json:"description"`
-	Evaluation            []EvaluationValue      `json:"evaluation,omitempty"`
-	Provider              *string                `json:"provider,omitempty"`
-	Status                WateringPlanStatus     `json:"status"`
-	TrailerId             *int32                 `json:"trailer_id,omitempty"`
-	TransporterId         int32                  `json:"transporter_id"`
-	TreeClusterIds        []int32                `json:"tree_cluster_ids"`
-	UserIds               []string               `json:"user_ids"`
+	AdditionalInformation map[string]interface{}     `json:"additional_information,omitempty"`
+	CancellationNote      string                     `json:"cancellation_note"`
+	Date                  string                     `json:"date"`
+	Description           string                     `json:"description"`
+	Evaluation            []EntitiesEvaluationValue  `json:"evaluation,omitempty"`
+	Provider              *string                    `json:"provider,omitempty"`
+	Status                EntitiesWateringPlanStatus `json:"status"`
+	TrailerId             *int32                     `json:"trailer_id,omitempty"`
+	TransporterId         int32                      `json:"transporter_id"`
+	TreeClusterIds        []int32                    `json:"tree_cluster_ids"`
+	UserIds               []string                   `json:"user_ids"`
 }
 
 type _WateringPlanUpdate WateringPlanUpdate
@@ -41,7 +41,7 @@ type _WateringPlanUpdate WateringPlanUpdate
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWateringPlanUpdate(cancellationNote string, date string, description string, status WateringPlanStatus, transporterId int32, treeClusterIds []int32, userIds []string) *WateringPlanUpdate {
+func NewWateringPlanUpdate(cancellationNote string, date string, description string, status EntitiesWateringPlanStatus, transporterId int32, treeClusterIds []int32, userIds []string) *WateringPlanUpdate {
 	this := WateringPlanUpdate{}
 	this.CancellationNote = cancellationNote
 	this.Date = date
@@ -166,9 +166,9 @@ func (o *WateringPlanUpdate) SetDescription(v string) {
 }
 
 // GetEvaluation returns the Evaluation field value if set, zero value otherwise.
-func (o *WateringPlanUpdate) GetEvaluation() []EvaluationValue {
+func (o *WateringPlanUpdate) GetEvaluation() []EntitiesEvaluationValue {
 	if o == nil || IsNil(o.Evaluation) {
-		var ret []EvaluationValue
+		var ret []EntitiesEvaluationValue
 		return ret
 	}
 	return o.Evaluation
@@ -176,7 +176,7 @@ func (o *WateringPlanUpdate) GetEvaluation() []EvaluationValue {
 
 // GetEvaluationOk returns a tuple with the Evaluation field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WateringPlanUpdate) GetEvaluationOk() ([]EvaluationValue, bool) {
+func (o *WateringPlanUpdate) GetEvaluationOk() ([]EntitiesEvaluationValue, bool) {
 	if o == nil || IsNil(o.Evaluation) {
 		return nil, false
 	}
@@ -192,8 +192,8 @@ func (o *WateringPlanUpdate) HasEvaluation() bool {
 	return false
 }
 
-// SetEvaluation gets a reference to the given []EvaluationValue and assigns it to the Evaluation field.
-func (o *WateringPlanUpdate) SetEvaluation(v []EvaluationValue) {
+// SetEvaluation gets a reference to the given []EntitiesEvaluationValue and assigns it to the Evaluation field.
+func (o *WateringPlanUpdate) SetEvaluation(v []EntitiesEvaluationValue) {
 	o.Evaluation = v
 }
 
@@ -230,9 +230,9 @@ func (o *WateringPlanUpdate) SetProvider(v string) {
 }
 
 // GetStatus returns the Status field value
-func (o *WateringPlanUpdate) GetStatus() WateringPlanStatus {
+func (o *WateringPlanUpdate) GetStatus() EntitiesWateringPlanStatus {
 	if o == nil {
-		var ret WateringPlanStatus
+		var ret EntitiesWateringPlanStatus
 		return ret
 	}
 
@@ -241,7 +241,7 @@ func (o *WateringPlanUpdate) GetStatus() WateringPlanStatus {
 
 // GetStatusOk returns a tuple with the Status field value
 // and a boolean to check if the value has been set.
-func (o *WateringPlanUpdate) GetStatusOk() (*WateringPlanStatus, bool) {
+func (o *WateringPlanUpdate) GetStatusOk() (*EntitiesWateringPlanStatus, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -249,7 +249,7 @@ func (o *WateringPlanUpdate) GetStatusOk() (*WateringPlanStatus, bool) {
 }
 
 // SetStatus sets field value
-func (o *WateringPlanUpdate) SetStatus(v WateringPlanStatus) {
+func (o *WateringPlanUpdate) SetStatus(v EntitiesWateringPlanStatus) {
 	o.Status = v
 }
 
