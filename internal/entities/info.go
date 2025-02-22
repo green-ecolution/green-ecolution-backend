@@ -12,6 +12,7 @@ type App struct {
 	BuildTime time.Time
 	Git       Git
 	Server    Server
+	Map       Map
 }
 
 type Git struct {
@@ -29,4 +30,9 @@ type Server struct {
 	Port      int
 	Interface string
 	Uptime    time.Duration
+}
+
+type Map struct {
+	Center [2]float64
+	BBox   [4]float64
 }

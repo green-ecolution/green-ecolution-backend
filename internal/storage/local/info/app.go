@@ -27,6 +27,7 @@ type InfoRepository struct {
 	localInterface string
 	buildTime      time.Time
 	gitRepository  *url.URL
+	mapInfo        entities.Map
 }
 
 func init() {
@@ -56,12 +57,18 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 		return nil, err
 	}
 
+	mapInfo, err := getMapInfo(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &InfoRepository{
 		cfg:            cfg,
 		localIP:        localIP,
 		localInterface: localInterface,
 		buildTime:      buildTime,
 		gitRepository:  gitRepository,
+		mapInfo:        mapInfo,
 	}, nil
 }
 
@@ -98,6 +105,18 @@ func (r *InfoRepository) GetAppInfo(ctx context.Context) (*entities.App, error) 
 			Interface: r.localInterface,
 			Uptime:    r.getUptime(),
 		},
+		Map: r.mapInfo,
+	}, nil
+}
+
+func getMapInfo(cfg *config.Config) (entities.Map, error) {
+	if len(cfg.Map.Center) != 2 || len(cfg.Map.BBox) != 4 {
+		return entities.Map{}, storage.ErrInvalidMapConfig
+	}
+
+	return entities.Map{
+		Center: cfg.Map.Center,
+		BBox:   cfg.Map.BBox,
 	}, nil
 }
 
