@@ -80,7 +80,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*FileImportAPI* | [**ImportTreesFromCsv**](docs/FileImportAPI.md#importtreesfromcsv) | **Post** /v1/import/csv | Import trees from a CSV file
 *InfoAPI* | [**GetAppInfo**](docs/InfoAPI.md#getappinfo) | **Get** /v1/info | Get info about the app
 *PluginAPI* | [**GetPluginInfo**](docs/PluginAPI.md#getplugininfo) | **Get** /v1/plugin/{plugin_slug} | Get a plugin info
 *PluginAPI* | [**GetPluginsList**](docs/PluginAPI.md#getpluginslist) | **Get** /v1/plugin | Get a list of all registered plugins
@@ -91,6 +90,7 @@ Class | Method | HTTP request | Description
 *RegionAPI* | [**V1RegionGet**](docs/RegionAPI.md#v1regionget) | **Get** /v1/region | Get all regions
 *RegionAPI* | [**V1RegionIdGet**](docs/RegionAPI.md#v1regionidget) | **Get** /v1/region/{id} | Get a region by ID
 *SensorAPI* | [**DeleteSensor**](docs/SensorAPI.md#deletesensor) | **Delete** /v1/sensor/{sensor_id} | Delete sensor
+*SensorAPI* | [**GetAllSensorDataById**](docs/SensorAPI.md#getallsensordatabyid) | **Get** /v1/sensor/data/{sensor_id} | Get all sensor data by id
 *SensorAPI* | [**GetAllSensors**](docs/SensorAPI.md#getallsensors) | **Get** /v1/sensor | Get all sensors
 *SensorAPI* | [**GetSensorById**](docs/SensorAPI.md#getsensorbyid) | **Get** /v1/sensor/{sensor_id} | Get sensor by ID
 *TreeAPI* | [**CreateTree**](docs/TreeAPI.md#createtree) | **Post** /v1/tree | Create tree
@@ -154,6 +154,7 @@ Class | Method | HTTP request | Description
  - [RouteRequest](docs/RouteRequest.md)
  - [Sensor](docs/Sensor.md)
  - [SensorData](docs/SensorData.md)
+ - [SensorDataList](docs/SensorDataList.md)
  - [SensorList](docs/SensorList.md)
  - [SensorStatus](docs/SensorStatus.md)
  - [ServerInfo](docs/ServerInfo.md)

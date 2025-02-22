@@ -3,7 +3,6 @@
 .travis.yml
 README.md
 api/openapi.yaml
-api_file_import.go
 api_info.go
 api_plugin.go
 api_region.go
@@ -20,7 +19,6 @@ docs/AppInfo.md
 docs/ClientToken.md
 docs/DrivingLicense.md
 docs/EvaluationValue.md
-docs/FileImportAPI.md
 docs/GeoJSONLocation.md
 docs/GeoJSONMetadata.md
 docs/GeoJson.md
@@ -47,6 +45,7 @@ docs/RouteRequest.md
 docs/Sensor.md
 docs/SensorAPI.md
 docs/SensorData.md
+docs/SensorDataList.md
 docs/SensorList.md
 docs/SensorStatus.md
 docs/ServerInfo.md
@@ -114,6 +113,7 @@ model_region_list.go
 model_route_request.go
 model_sensor.go
 model_sensor_data.go
+model_sensor_data_list.go
 model_sensor_list.go
 model_sensor_status.go
 model_server_info.go
@@ -147,7 +147,6 @@ model_watering_plan_update.go
 model_watering_status.go
 model_watermark_response.go
 response.go
-test/api_file_import_test.go
 test/api_info_test.go
 test/api_plugin_test.go
 test/api_region_test.go

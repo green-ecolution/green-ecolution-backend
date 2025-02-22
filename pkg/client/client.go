@@ -51,8 +51,6 @@ type APIClient struct {
 
 	// API Services
 
-	FileImportAPI *FileImportAPIService
-
 	InfoAPI *InfoAPIService
 
 	PluginAPI *PluginAPIService
@@ -90,7 +88,6 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.common.client = c
 
 	// API Services
-	c.FileImportAPI = (*FileImportAPIService)(&c.common)
 	c.InfoAPI = (*InfoAPIService)(&c.common)
 	c.PluginAPI = (*PluginAPIService)(&c.common)
 	c.RegionAPI = (*RegionAPIService)(&c.common)

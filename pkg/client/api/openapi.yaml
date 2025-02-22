@@ -291,55 +291,6 @@ paths:
       tags:
       - Tree Cluster
       x-codegen-request-body-name: body
-  /v1/import/csv:
-    post:
-      description: Import trees from a CSV file
-      operationId: import-trees-from-csv
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/import_trees_from_csv_request'
-        required: true
-      responses:
-        "204":
-          content: {}
-          description: No Content
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Bad Request
-        "401":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Unauthorized
-        "403":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Not Found
-        "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPError'
-          description: Internal Server Error
-      security:
-      - Keycloak: []
-      summary: Import trees from a CSV file
-      tags:
-      - File Import
   /v1/info:
     get:
       description: Get info about the app and the server
@@ -908,6 +859,59 @@ paths:
       security:
       - Keycloak: []
       summary: Get sensor by ID
+      tags:
+      - Sensor
+  /v1/sensor/data/{sensor_id}:
+    get:
+      description: Get all sensor data by id
+      operationId: get-all-sensor-data-by-id
+      parameters:
+      - description: Sensor ID
+        in: path
+        name: sensor_id
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorDataList'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Get all sensor data by id
       tags:
       - Sensor
   /v1/tree:
@@ -2804,6 +2808,41 @@ components:
       - updated_at
       - watermarks
       type: object
+    SensorDataList:
+      example:
+        data:
+        - updated_at: updated_at
+          temperature: 4.145608029883936
+          created_at: created_at
+          humidity: 2.027123023002322
+          watermarks:
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          battery: 3.616076749251911
+        - updated_at: updated_at
+          temperature: 4.145608029883936
+          created_at: created_at
+          humidity: 2.027123023002322
+          watermarks:
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          - centibar: 7
+            depth: 1
+            resistance: 1
+          battery: 3.616076749251911
+      properties:
+        data:
+          items:
+            $ref: '#/components/schemas/SensorData'
+          type: array
+      required:
+      - data
+      type: object
     SensorList:
       example:
         pagination:
@@ -2934,10 +2973,10 @@ components:
         created_at: created_at
         description: description
         tree_cluster_id: 7
+        last_watered: last_watered
         additional_information:
           key: ""
         number: number
-        readonly: true
         updated_at: updated_at
         watering_status: good
         provider: provider
@@ -2978,6 +3017,9 @@ components:
           type: string
         id:
           type: integer
+        last_watered:
+          description: "Images              []*ImageResponse `json:\"images\"`"
+          type: string
         latitude:
           type: number
         longitude:
@@ -2988,9 +3030,6 @@ components:
           type: integer
         provider:
           type: string
-        readonly:
-          description: "Images              []*ImageResponse `json:\"images\"`"
-          type: boolean
         sensor:
           $ref: '#/components/schemas/Sensor'
         species:
@@ -3010,7 +3049,6 @@ components:
       - number
       - planting_year
       - provider
-      - readonly
       - species
       - updated_at
       - watering_status
@@ -3027,10 +3065,10 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
-          readonly: true
           updated_at: updated_at
           watering_status: good
           provider: provider
@@ -3065,10 +3103,10 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
-          readonly: true
           updated_at: updated_at
           watering_status: good
           provider: provider
@@ -3371,7 +3409,6 @@ components:
         additional_information:
           key: ""
         number: number
-        readonly: true
         provider: provider
         species: species
         latitude: 0.8008281904610115
@@ -3395,8 +3432,6 @@ components:
           type: integer
         provider:
           type: string
-        readonly:
-          type: boolean
         sensor_id:
           type: string
         species:
@@ -3409,7 +3444,6 @@ components:
       - longitude
       - number
       - planting_year
-      - readonly
       - species
       type: object
     TreeList:
@@ -3425,10 +3459,10 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
-          readonly: true
           updated_at: updated_at
           watering_status: good
           provider: provider
@@ -3463,10 +3497,10 @@ components:
           created_at: created_at
           description: description
           tree_cluster_id: 7
+          last_watered: last_watered
           additional_information:
             key: ""
           number: number
-          readonly: true
           updated_at: updated_at
           watering_status: good
           provider: provider
@@ -3513,7 +3547,6 @@ components:
         additional_information:
           key: ""
         number: number
-        readonly: true
         provider: provider
         species: species
         latitude: 0.8008281904610115
@@ -3537,8 +3570,6 @@ components:
           type: integer
         provider:
           type: string
-        readonly:
-          type: boolean
         sensor_id:
           type: string
         species:
@@ -3551,7 +3582,6 @@ components:
       - longitude
       - number
       - planting_year
-      - readonly
       - species
       type: object
     User:
@@ -4612,12 +4642,14 @@ components:
       - good
       - moderate
       - bad
+      - just watered
       - unknown
       type: string
       x-enum-varnames:
       - WateringStatusGood
       - WateringStatusModerate
       - WateringStatusBad
+      - WateringStatusJustWatered
       - WateringStatusUnknown
     WatermarkResponse:
       example:
@@ -4635,15 +4667,6 @@ components:
       - centibar
       - depth
       - resistance
-      type: object
-    import_trees_from_csv_request:
-      properties:
-        file:
-          description: CSV file to import
-          format: binary
-          type: string
-      required:
-      - file
       type: object
   securitySchemes:
     Keycloak:

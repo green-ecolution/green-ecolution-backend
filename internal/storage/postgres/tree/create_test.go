@@ -36,8 +36,9 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Equal(t, float64(0), got.Latitude)
 		assert.Equal(t, float64(0), got.Longitude)
 		assert.Equal(t, "", got.Description)
-		assert.Equal(t, false, got.Readonly)
+		assert.Equal(t, "", got.Provider)
 		assert.Equal(t, entities.WateringStatusUnknown, got.WateringStatus)
+		assert.Nil(t, got.LastWatered)
 	})
 
 	t.Run("should create a tree with all values set, except images", func(t *testing.T) {
@@ -102,8 +103,9 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.Equal(t, 54.801539, got.Latitude)
 		assert.Equal(t, 9.446741, got.Longitude)
 		assert.Equal(t, "A newly planted oak tree", got.Description)
-		assert.Equal(t, false, got.Readonly)
+		assert.Equal(t, "", got.Provider)
 		assert.Equal(t, entities.WateringStatusGood, got.WateringStatus)
+		assert.Nil(t, got.LastWatered)
 	})
 
 	t.Run("should return error if latitude is out of bounds", func(t *testing.T) {
@@ -228,7 +230,8 @@ func TestTreeRepository_Create(t *testing.T) {
 		assert.NoError(t, errSensorByTree)
 		assert.NotNil(t, sensorByTree)
 		assert.Equal(t, sensor.ID, sensorByTree.ID)
-		assert.Equal(t, false, tree.Readonly)
+		assert.Equal(t, "", tree.Provider)
+		assert.Nil(t, tree.LastWatered)
 		for i, img := range tree.Images {
 			assert.Equal(t, images[i].ID, img.ID)
 			assert.Equal(t, images[i].URL, img.URL)

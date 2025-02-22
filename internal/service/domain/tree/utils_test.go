@@ -36,6 +36,7 @@ var (
 			Latitude:      nil,
 			Longitude:     nil,
 			Trees:         []*entities.Tree{},
+			LastWatered:   nil,
 		},
 	}
 
@@ -50,8 +51,8 @@ var (
 			Longitude:      testLongitude,
 			Description:    "A mature oak tree",
 			PlantingYear:   2023,
-			Readonly:       true,
 			WateringStatus: entities.WateringStatusBad,
+			LastWatered:    nil,
 		},
 		{
 			ID:             2,
@@ -63,8 +64,8 @@ var (
 			Longitude:      54.801510,
 			Description:    "A young pine tree",
 			PlantingYear:   2023,
-			Readonly:       true,
 			WateringStatus: entities.WateringStatusUnknown,
+			LastWatered:    nil,
 		},
 	}
 
@@ -97,14 +98,6 @@ var (
 		Number:        "T001",
 		TreeClusterID: utils.P(int32(1)),
 		SensorID:      utils.P("sensor-1"),
-	}
-
-	TestTreeImport = &entities.TreeImport{
-		Latitude:     testLatitude,
-		Longitude:    testLongitude,
-		PlantingYear: 2023,
-		Species:      "Oak",
-		Number:       "T001",
 	}
 
 	TestTreeUpdate = &entities.TreeUpdate{

@@ -26,13 +26,13 @@ type Tree struct {
 	CreatedAt             string                 `json:"created_at"`
 	Description           string                 `json:"description"`
 	Id                    int32                  `json:"id"`
-	Latitude              float32                `json:"latitude"`
-	Longitude             float32                `json:"longitude"`
-	Number                string                 `json:"number"`
-	PlantingYear          int32                  `json:"planting_year"`
-	Provider              string                 `json:"provider"`
 	// Images              []*ImageResponse `json:\"images\"`
-	Readonly       bool           `json:"readonly"`
+	LastWatered    *string        `json:"last_watered,omitempty"`
+	Latitude       float32        `json:"latitude"`
+	Longitude      float32        `json:"longitude"`
+	Number         string         `json:"number"`
+	PlantingYear   int32          `json:"planting_year"`
+	Provider       string         `json:"provider"`
 	Sensor         *Sensor        `json:"sensor,omitempty"`
 	Species        string         `json:"species"`
 	TreeClusterId  *int32         `json:"tree_cluster_id,omitempty"`
@@ -46,7 +46,7 @@ type _Tree Tree
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
+func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
 	this := Tree{}
 	this.CreatedAt = createdAt
 	this.Description = description
@@ -56,7 +56,6 @@ func NewTree(createdAt string, description string, id int32, latitude float32, l
 	this.Number = number
 	this.PlantingYear = plantingYear
 	this.Provider = provider
-	this.Readonly = readonly
 	this.Species = species
 	this.UpdatedAt = updatedAt
 	this.WateringStatus = wateringStatus
@@ -173,6 +172,38 @@ func (o *Tree) GetIdOk() (*int32, bool) {
 // SetId sets field value
 func (o *Tree) SetId(v int32) {
 	o.Id = v
+}
+
+// GetLastWatered returns the LastWatered field value if set, zero value otherwise.
+func (o *Tree) GetLastWatered() string {
+	if o == nil || IsNil(o.LastWatered) {
+		var ret string
+		return ret
+	}
+	return *o.LastWatered
+}
+
+// GetLastWateredOk returns a tuple with the LastWatered field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Tree) GetLastWateredOk() (*string, bool) {
+	if o == nil || IsNil(o.LastWatered) {
+		return nil, false
+	}
+	return o.LastWatered, true
+}
+
+// HasLastWatered returns a boolean if a field has been set.
+func (o *Tree) HasLastWatered() bool {
+	if o != nil && !IsNil(o.LastWatered) {
+		return true
+	}
+
+	return false
+}
+
+// SetLastWatered gets a reference to the given string and assigns it to the LastWatered field.
+func (o *Tree) SetLastWatered(v string) {
+	o.LastWatered = &v
 }
 
 // GetLatitude returns the Latitude field value
@@ -293,30 +324,6 @@ func (o *Tree) GetProviderOk() (*string, bool) {
 // SetProvider sets field value
 func (o *Tree) SetProvider(v string) {
 	o.Provider = v
-}
-
-// GetReadonly returns the Readonly field value
-func (o *Tree) GetReadonly() bool {
-	if o == nil {
-		var ret bool
-		return ret
-	}
-
-	return o.Readonly
-}
-
-// GetReadonlyOk returns a tuple with the Readonly field value
-// and a boolean to check if the value has been set.
-func (o *Tree) GetReadonlyOk() (*bool, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Readonly, true
-}
-
-// SetReadonly sets field value
-func (o *Tree) SetReadonly(v bool) {
-	o.Readonly = v
 }
 
 // GetSensor returns the Sensor field value if set, zero value otherwise.
@@ -471,12 +478,14 @@ func (o Tree) ToMap() (map[string]interface{}, error) {
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["description"] = o.Description
 	toSerialize["id"] = o.Id
+	if !IsNil(o.LastWatered) {
+		toSerialize["last_watered"] = o.LastWatered
+	}
 	toSerialize["latitude"] = o.Latitude
 	toSerialize["longitude"] = o.Longitude
 	toSerialize["number"] = o.Number
 	toSerialize["planting_year"] = o.PlantingYear
 	toSerialize["provider"] = o.Provider
-	toSerialize["readonly"] = o.Readonly
 	if !IsNil(o.Sensor) {
 		toSerialize["sensor"] = o.Sensor
 	}
@@ -502,7 +511,6 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 		"number",
 		"planting_year",
 		"provider",
-		"readonly",
 		"species",
 		"updated_at",
 		"watering_status",

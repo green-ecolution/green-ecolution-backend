@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -229,6 +230,45 @@ func (s *TreeClusterService) Delete(ctx context.Context, id int32) error {
 	return nil
 }
 
+func (s *TreeClusterService) UpdateWateringStatuses(ctx context.Context) error {
+	log := logger.GetLogger(ctx)
+	treeClusters, _, err := s.treeClusterRepo.GetAll(ctx, "")
+	if err != nil {
+		log.Error("failed to fetch tree cluster", "error", err)
+		return err
+	}
+
+	cutoffTime := time.Now().Add(-24 * time.Hour) // 1 day ago
+	for _, cluster := range treeClusters {
+		// Do nothing if watering status is not »just watered«
+		if cluster.WateringStatus != domain.WateringStatusJustWatered {
+			continue
+		}
+
+		if cluster.LastWatered.Before(cutoffTime) {
+			wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, cluster.ID)
+			if err != nil {
+				log.Error("failed to get watering status of cluster", "cluster_id", cluster.ID, "error", err)
+				return err
+			}
+
+			err = s.treeClusterRepo.Update(ctx, cluster.ID, func(tc *domain.TreeCluster) (bool, error) {
+				tc.WateringStatus = wateringStatus
+				return true, nil
+			})
+
+			if err != nil {
+				log.Error("failed to update watering status of tree cluster", "cluster_id", cluster.ID, "error", err)
+			} else {
+				log.Debug("watering status of tree cluster is updated by scheduler", "cluster_id", cluster.ID)
+			}
+		}
+	}
+
+	log.Info("watering status update for tree clusters completed successfully")
+	return nil
+}
+
 func (s *TreeClusterService) Ready() bool {
 	return s.treeClusterRepo != nil
 }
@@ -249,16 +289,19 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 			return false, err
 		}
 
-		if tc.Latitude != lat || tc.Longitude != long || tc.Region.ID != region.ID {
+		if tc.Region != nil && tc.Region.ID != region.ID {
+			tc.Region = region
+			log.Debug("updating region in tree cluster position", "id", region.ID, "name", region.Name)
+		}
+
+		if tc.Latitude != lat || tc.Longitude != long {
 			tc.Latitude = lat
 			tc.Longitude = long
-			tc.Region = region
 			tc.WateringStatus = wateringStatus
 
 			log.Info("update tree cluster position due to changed trees inside the tree cluster", "cluster_id", id)
 			log.Debug("detailed updated tree cluster position informations", "cluster_id", id,
 				slog.Group("new_position", "latitude", *lat, "longitude", *long),
-				slog.Group("region", "id", region.ID, "name", region.Name),
 			)
 		}
 
