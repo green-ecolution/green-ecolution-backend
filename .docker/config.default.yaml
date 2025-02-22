@@ -51,6 +51,9 @@ s3:
         bucket: routes-gpx
         accessKey: routes-gpx
         secretAccessKey: secret_secret_secret
+map:
+    center: [54.792277136221905, 9.43580607453268]
+    bbox: [54.85, 9.6, 54.73, 9.3]
 mqtt:
   broker: eu1.cloud.thethings.industries:1883
   client_id: tree-sensor
