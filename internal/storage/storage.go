@@ -50,7 +50,7 @@ var (
 	ErrBucketNotExists    = errors.New("bucket don't exists")
 
 	ErrPaginationValueInvalid = errors.New("pagination values are invalid")
-	ErrInvalidMapConfig       = errors.New("mapData not valid")
+	ErrInvalidMapConfig       = errors.New("map configuration not valid")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {
