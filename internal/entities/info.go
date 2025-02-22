@@ -33,6 +33,6 @@ type Server struct {
 }
 
 type Map struct {
-	Center []float64
-	BBox   []float64
+	Center [2]float64
+	BBox   [4]float64
 }

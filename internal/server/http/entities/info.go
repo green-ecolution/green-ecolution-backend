@@ -27,6 +27,6 @@ type ServerResponse struct {
 } // @Name ServerInfo
 
 type MapResponse struct {
-	Center []float64 `json:"center"`
-	BBox   []float64 `json:"bbox"`
+	Center [2]float64 `json:"center"`
+	BBox   [4]float64 `json:"bbox"`
 } // @Name MapInfo
