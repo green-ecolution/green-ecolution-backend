@@ -3,6 +3,7 @@ package tree
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,8 @@ func TestTreeRepository_Update(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
 		treeID := int32(1)
+		date := time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC)
+
 		newSpecies := "Updated Species"
 		newNumber := "UpdatedNumber"
 		newLatitude := 55.123456
@@ -22,6 +25,8 @@ func TestTreeRepository_Update(t *testing.T) {
 		newPlantingYear := int32(2025)
 		newDescription := "Updated description"
 		newWateringStatus := entities.WateringStatusGood
+		newLastWateredValue := &date
+		newProvider := "foo-provider"
 
 		// when
 		updatedTree, err := r.Update(context.Background(), treeID, func(tree *entities.Tree) (bool, error) {
@@ -30,9 +35,10 @@ func TestTreeRepository_Update(t *testing.T) {
 			tree.Latitude = newLatitude
 			tree.Longitude = newLongitude
 			tree.PlantingYear = newPlantingYear
-			tree.Readonly = false
+			tree.Provider = newProvider
 			tree.Description = newDescription
 			tree.WateringStatus = newWateringStatus
+			tree.LastWatered = newLastWateredValue
 			return true, nil
 		})
 
@@ -44,9 +50,10 @@ func TestTreeRepository_Update(t *testing.T) {
 		assert.Equal(t, newLatitude, updatedTree.Latitude, "Latitude should match")
 		assert.Equal(t, newLongitude, updatedTree.Longitude, "Longitude should match")
 		assert.Equal(t, newPlantingYear, updatedTree.PlantingYear, "Planting Year should match")
-		assert.Equal(t, false, updatedTree.Readonly, "Readonly should match")
+		assert.Equal(t, newProvider, updatedTree.Provider, "Provider should match")
 		assert.Equal(t, newDescription, updatedTree.Description, "Description should match")
 		assert.Equal(t, newWateringStatus, updatedTree.WateringStatus, "Watering Status should match")
+		assert.Equal(t, newLastWateredValue, updatedTree.LastWatered, "Last watered should match")
 	})
 
 	t.Run("should return error when tree is not found", func(t *testing.T) {

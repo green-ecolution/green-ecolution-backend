@@ -36,13 +36,27 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 
 	for _, tc := range tcs {
 		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+			tc.WateringStatus = entities.WateringStatusJustWatered
 			tc.LastWatered = &date
 			return true, nil
 		}
 
 		if err := s.treeClusterRepo.Update(ctx, tc.ID, updateFn); err == nil {
-			log.Info("successfully updated last watered date in tree cluster", "cluster_id", tc.ID, "last_watered", date)
+			log.Info("successfully updated last watered date and watering status in tree cluster", "cluster_id", tc.ID, "last_watered", date)
 			err := s.publishUpdateEvent(ctx, tc)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, tr := range tc.Trees {
+			_, err := s.treeRepo.Update(ctx, tr.ID, func(tree *entities.Tree) (bool, error) {
+				log.Debug("updating tree watering status", "prev_status", tr.WateringStatus, "new_status", entities.WateringStatusJustWatered)
+				tree.WateringStatus = entities.WateringStatusJustWatered
+				tree.LastWatered = &date
+				return true, nil
+			})
+
 			if err != nil {
 				return err
 			}

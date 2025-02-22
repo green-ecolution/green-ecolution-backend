@@ -20,9 +20,6 @@ jobs:
         with:
           go-version-file: ./go.mod
 
-      - name: Setup
-        run: make setup/ci
-
       - name: Build
         run: make build
 
@@ -123,9 +120,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./go.mod
-
-      - name: Install dependencies
-        run: make setup/ci
 
       - name: Go generate
         run: make generate

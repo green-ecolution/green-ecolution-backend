@@ -11,7 +11,6 @@ type Tree struct {
 	TreeCluster    *TreeCluster
 	Sensor         *Sensor
 	Images         []*Image
-	Readonly       bool
 	PlantingYear   int32
 	Species        string
 	Number         string
@@ -19,6 +18,7 @@ type Tree struct {
 	Longitude      float64
 	WateringStatus WateringStatus
 	Description    string
+	LastWatered    *time.Time
 	Provider       string
 	AdditionalInfo map[string]interface{}
 }
@@ -26,7 +26,6 @@ type Tree struct {
 type TreeCreate struct {
 	TreeClusterID  *int32
 	SensorID       *string
-	Readonly       bool
 	PlantingYear   int32 `validate:"required"`
 	Species        string
 	Number         string  `validate:"required"`
@@ -48,15 +47,4 @@ type TreeUpdate struct {
 	Description    string
 	Provider       string
 	AdditionalInfo map[string]interface{}
-}
-
-type TreeImport struct {
-	Area         string `validate:"required"`
-	Number       string `validate:"required"`
-	Species      string
-	Latitude     float64 `validate:"required,max=90,min=-90"`
-	Longitude    float64 `validate:"required,max=180,min=-180"`
-	PlantingYear int32   `validate:"gt=0"`
-	Street       string  `validate:"required"`
-	TreeID       int32
 }

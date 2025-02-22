@@ -538,7 +538,7 @@ func TestReady(t *testing.T) {
 	})
 }
 
-func TestSensorService_Do(t *testing.T) {
+func TestSensorService_UpdateStatuses(t *testing.T) {
 	t.Run("should update stale sensors successfully", func(t *testing.T) {
 		// given
 		ctx := context.Background()

@@ -15,7 +15,7 @@ func TestUpdateTreeSubsciber(t *testing.T) {
 		// given
 		tcSvc := svcMock.NewMockTreeClusterService(t)
 		sub := NewUpdateTreeSubscriber(tcSvc)
-		event := entities.NewEventUpdateTree(nil, nil)
+		event := entities.NewEventUpdateTree(nil, nil, nil)
 
 		tcSvc.EXPECT().HandleUpdateTree(mock.Anything, &event).Return(nil)
 
@@ -32,7 +32,7 @@ func TestUpdateTreeSubsciber(t *testing.T) {
 		// given
 		tcSvc := svcMock.NewMockTreeClusterService(t)
 		sub := NewCreateTreeSubscriber(tcSvc)
-		event := entities.NewEventCreateTree(nil)
+		event := entities.NewEventCreateTree(nil, nil)
 
 		tcSvc.EXPECT().HandleCreateTree(mock.Anything, &event).Return(nil)
 

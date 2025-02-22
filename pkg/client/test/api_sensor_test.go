@@ -35,6 +35,20 @@ func Test_client_SensorAPIService(t *testing.T) {
 
 	})
 
+	t.Run("Test SensorAPIService GetAllSensorDataById", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var sensorId string
+
+		resp, httpRes, err := apiClient.SensorAPI.GetAllSensorDataById(context.Background(), sensorId).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test SensorAPIService GetAllSensors", func(t *testing.T) {
 
 		t.Skip("skip test") // remove to run test

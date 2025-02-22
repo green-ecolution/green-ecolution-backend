@@ -36,6 +36,6 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 
 	log.Info("watering status of tree has been successfully updated", "tree_id", t.ID, "prev_status", t.WateringStatus, "new_status", status)
 
-	s.publishUpdateTreeEvent(ctx, t, newTree)
+	s.publishUpdateTreeEvent(ctx, t, newTree, nil)
 	return nil
 }

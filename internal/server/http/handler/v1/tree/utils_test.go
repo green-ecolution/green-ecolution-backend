@@ -23,7 +23,6 @@ var (
 			Longitude:    testLongitude,
 			Description:  "A mature oak tree",
 			PlantingYear: 2023,
-			Readonly:     true,
 		},
 		{
 			ID:           2,
@@ -35,7 +34,6 @@ var (
 			Longitude:    testLongitude,
 			Description:  "A young pine tree",
 			PlantingYear: 2023,
-			Readonly:     true,
 		},
 	}
 )
@@ -43,7 +41,6 @@ var (
 func getMockTreeRequest(description string) *httpEntities.TreeCreateRequest {
 	return &httpEntities.TreeCreateRequest{
 		TreeClusterID: nil,
-		Readonly:      false,
 		PlantingYear:  2023,
 		Species:       "Oak",
 		Number:        "T001",
