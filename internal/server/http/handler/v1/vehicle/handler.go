@@ -1,7 +1,6 @@
 package vehicle
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -216,7 +215,6 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 func GetArchiveVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		fmt.Println("Hier")
 		v, err := svc.GetAllArchived(ctx)
 		if err != nil {
 			return errorhandler.HandleError(err)
