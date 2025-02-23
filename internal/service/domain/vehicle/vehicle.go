@@ -180,6 +180,27 @@ func (v *VehicleService) Delete(ctx context.Context, id int32) error {
 	return nil
 }
 
+func (v *VehicleService) Archive(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
+	vehicle, err := v.vehicleRepo.GetByID(ctx, id)
+	if err != nil {
+		log.Debug("failed to get vehicle by id in archive request", "error", err, "vehicle_id", id)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+	}
+
+	if !vehicle.ArchivedAt.IsZero() {
+		log.Debug("vehicle is already archived", "archived_at", vehicle.ArchivedAt, "vehicle_id", id)
+		return service.NewError(service.Conflict, "vehicle already archived")
+	}
+
+	if err := v.vehicleRepo.Archive(ctx, id); err != nil {
+		log.Debug("failed to archive vehicle", "error", err, "vehicle_id", id)
+	}
+
+	log.Info("vehicle archived successfully", "vehicle_id", id)
+	return nil
+}
+
 func (v *VehicleService) Ready() bool {
 	return v.vehicleRepo != nil
 }

@@ -70,5 +70,8 @@ UPDATE vehicles SET
   additional_informations = $14
 WHERE id = $1;
 
+-- name: ArchiveVehicle :one
+UPDATE vehicles SET archived_at = $2 WHERE id = $1 RETURNING id;
+
 -- name: DeleteVehicle :one
 DELETE FROM vehicles WHERE id = $1 RETURNING id;

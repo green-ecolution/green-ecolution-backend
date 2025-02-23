@@ -25,6 +25,7 @@ type Vehicle struct {
 	ID             int32
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	ArchivedAt     time.Time
 	NumberPlate    string
 	Description    string
 	WaterCapacity  float64

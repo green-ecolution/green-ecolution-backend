@@ -199,6 +199,38 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 	}
 }
 
+// @Summary		Archive vehicle
+// @Description	Archive vehicle
+// @Id				archive-vehicle
+// @Tags			Vehicle
+// @Produce		json
+// @Success		204
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/archive/{id} [post]
+// @Param			id	path	int	true	"Vehicle ID"
+// @Security		Keycloak
+func ArchiveVehicle(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		err = svc.Archive(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
+	}
+}
+
 // @Summary		Delete vehicle
 // @Description	Delete vehicle
 // @Id				delete-vehicle

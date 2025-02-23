@@ -2,9 +2,12 @@ package vehicle
 
 import (
 	"context"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
+	"github.com/jackc/pgx/v5/pgtype"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
@@ -41,5 +44,20 @@ func (r *VehicleRepository) Delete(ctx context.Context, id int32) error {
 	}
 
 	log.Debug("vehicle entity deleted successfully in db", "vehicle_id", id)
+	return nil
+}
+
+func (r *VehicleRepository) Archive(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
+	_, err := r.store.ArchiveVehicle(ctx, &sqlc.ArchiveVehicleParams{
+		ID:         id,
+		ArchivedAt: pgtype.Timestamp{Time: time.Now(), Valid: true},
+	})
+	if err != nil {
+		log.Error("failed to archive vehicle entity in db", "error", err, "vehicle_id", id)
+		return err
+	}
+
+	log.Debug("vehicle entity archived successfully in db", "vehicle_id", id)
 	return nil
 }

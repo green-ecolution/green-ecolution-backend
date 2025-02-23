@@ -11,5 +11,6 @@ func RegisterRoutes(r fiber.Router, svc service.VehicleService) {
 	r.Get("/plate/:plate", GetVehicleByPlate(svc))
 	r.Post("/", CreateVehicle(svc))
 	r.Put("/:id", UpdateVehicle(svc))
+	r.Post("/archive/:id", ArchiveVehicle(svc))
 	r.Delete("/:id", DeleteVehicle(svc))
 }

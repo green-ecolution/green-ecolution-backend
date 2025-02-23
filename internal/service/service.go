@@ -78,6 +78,7 @@ const (
 	Unauthorized  ErrorCode = 401
 	Forbidden     ErrorCode = 403
 	NotFound      ErrorCode = 404
+	Conflict      ErrorCode = 409
 	InternalError ErrorCode = 500
 )
 
@@ -157,6 +158,7 @@ type VehicleService interface {
 	Create(ctx context.Context, createData *domain.VehicleCreate) (*domain.Vehicle, error)
 	Update(ctx context.Context, id int32, updateData *domain.VehicleUpdate) (*domain.Vehicle, error)
 	Delete(ctx context.Context, id int32) error
+	Archive(ctx context.Context, id int32) error
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
 }
 
