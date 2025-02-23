@@ -24,17 +24,23 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context, provider string, vehicleType entities.VehicleType, withArchived bool) ([]*entities.Vehicle, int64, error) {
+func (v *VehicleService) GetAll(ctx context.Context, provider, vehicleType string, withArchived bool) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
 	var vehicles []*entities.Vehicle
 	var totalCount int64
 	var err error
 
-	if vehicleType != "" && vehicleType != entities.VehicleTypeUnknown {
+	if vehicleType != "" {
+		parsedVehicleType := entities.ParseVehicleType(vehicleType)
+		if parsedVehicleType == entities.VehicleTypeUnknown {
+			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", vehicleType)
+			return nil, 0, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
+		}
+
 		if withArchived {
-			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, provider, vehicleType)
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, provider, parsedVehicleType)
 		} else {
-			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, vehicleType)
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, parsedVehicleType)
 		}
 	} else {
 		if withArchived {
@@ -100,7 +106,6 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		return nil, service.ErrVehiclePlateTaken
 	}
 
-	//nolint:dupl // this is create specific
 	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
 		vh.NumberPlate = createData.NumberPlate
 		vh.Description = createData.Description
@@ -150,7 +155,6 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 		}
 	}
 
-	//nolint:dupl // this is update specific
 	err = v.vehicleRepo.Update(ctx, id, func(vh *entities.Vehicle) (bool, error) {
 		vh.NumberPlate = updateData.NumberPlate
 		vh.Description = updateData.Description

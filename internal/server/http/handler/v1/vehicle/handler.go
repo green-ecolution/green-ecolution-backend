@@ -44,8 +44,7 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		var totalCount int64
 		var err error
 
-		parsedVehicleType := domain.ParseVehicleType(c.Query("type"))
-		domainData, totalCount, err = svc.GetAll(ctx, strings.Clone(c.Query("provider")), parsedVehicleType, c.QueryBool("archived", false))
+		domainData, totalCount, err = svc.GetAll(ctx, strings.Clone(c.Query("provider")), strings.Clone(c.Query("type")), c.QueryBool("archived", false))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}

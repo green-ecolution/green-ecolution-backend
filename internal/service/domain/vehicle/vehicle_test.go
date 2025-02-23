@@ -24,7 +24,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx, "").Return(expectedVehicles, int64(len(expectedVehicles)), nil)
 
 		// when
-		vehicles, totalCount, err := svc.GetAll(ctx, "", "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "", "", false)
 
 		// then
 		assert.NoError(t, err)
@@ -40,7 +40,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx, "test-provider").Return(expectedVehicles, int64(len(expectedVehicles)), nil)
 
 		// when
-		vehicles, totalCount, err := svc.GetAll(ctx, "test-provider", "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "test-provider", "", false)
 
 		// then
 		assert.NoError(t, err)
@@ -56,7 +56,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByType(ctx, "", entities.VehicleTypeTrailer).Return(expectedVehicles, int64(len(expectedVehicles)), nil)
 
 		// when
-		vehicles, totalCount, err := svc.GetAll(ctx, "", "trailer")
+		vehicles, totalCount, err := svc.GetAll(ctx, "", "trailer", false)
 
 		// then
 		assert.NoError(t, err)
@@ -72,7 +72,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAllByType(ctx, "test-provider", entities.VehicleTypeTrailer).Return(expectedVehicles, int64(len(expectedVehicles)), nil)
 
 		// when
-		vehicles, totalCount, err := svc.GetAll(ctx, "test-provider", "trailer")
+		vehicles, totalCount, err := svc.GetAll(ctx, "test-provider", "trailer", false)
 
 		// then
 		assert.NoError(t, err)
@@ -87,7 +87,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx, "").Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
-		vehicles, totalCount, err := svc.GetAll(ctx, "", "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "", "", false)
 
 		// then
 		assert.NoError(t, err)
@@ -103,7 +103,7 @@ func TestVehicleService_GetAll(t *testing.T) {
 		vehicleRepo.EXPECT().GetAll(ctx, "").Return(nil, int64(0), expectedErr)
 
 		// when
-		vehicles, totalCount, err := svc.GetAll(ctx, "", "")
+		vehicles, totalCount, err := svc.GetAll(ctx, "", "", false)
 
 		// then
 		assert.Error(t, err)
