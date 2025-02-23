@@ -88,10 +88,16 @@ type ImageRepository interface {
 }
 
 type VehicleRepository interface {
-	// GetAll returns all vehicles
+	// GetAll returns all vehicles that are not archived
 	GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
-	// GetAllByType returns all vehicles by vehicle type
+	// GetAllWithArchived returns all vehicles and archived as well
+	GetAllWithArchived(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
+	// GetAllByType returns all vehicles by vehicle type that are not archived
 	GetAllByType(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
+	// GetAllByTypeWithArchived returns all vehicles by vehicle type and archived as well
+	GetAllByTypeWithArchived(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
+	// GetAllArchived returns all archived vehicles
+	GetAllArchived(ctx context.Context) ([]*entities.Vehicle, error)
 	// GetByID returns one vehicle by id
 	GetByID(ctx context.Context, id int32) (*entities.Vehicle, error)
 	// GetByPlate returns one vehicle by its plate

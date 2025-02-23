@@ -29,6 +29,8 @@ func HandleError(err error) error {
 			code = fiber.StatusUnauthorized
 		case service.InternalError:
 			code = fiber.StatusInternalServerError
+		case service.Conflict:
+			code = fiber.StatusConflict
 		default:
 			slog.Debug("missing service error code", "code", svcErr.Code)
 		}

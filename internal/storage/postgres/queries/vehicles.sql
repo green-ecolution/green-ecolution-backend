@@ -2,11 +2,25 @@
 SELECT * 
 FROM vehicles 
 WHERE 
-  ($1 = '') OR (provider = $1) 
+  (($1 = '') OR (provider = $1)) AND archived_at IS NULL
 ORDER BY water_capacity DESC
 LIMIT $2 OFFSET $3;
 
 -- name: GetAllVehiclesCount :one
+SELECT COUNT(*) 
+  FROM vehicles 
+  WHERE 
+    ($1 = '' OR provider = $1)
+    AND archived_at IS NULL;
+
+-- name: GetAllVehiclesWithArchived :many
+SELECT * FROM vehicles 
+WHERE 
+ (($1 = '') OR (provider = $1))
+ORDER BY water_capacity DESC
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllVehiclesWithArchivedCount :one
 SELECT COUNT(*) 
   FROM vehicles 
   WHERE 
@@ -18,6 +32,7 @@ FROM vehicles
 WHERE 
   type = $1
   AND ($2 = '' OR provider = $2)
+  AND archived_at IS NULL
 ORDER BY water_capacity DESC
 LIMIT $3 OFFSET $4;
 
@@ -26,7 +41,31 @@ SELECT COUNT(*)
   FROM vehicles 
   WHERE 
     type = $1
+    AND ($2 = '' OR provider = $2)
+    AND archived_at IS NULL;
+
+-- name: GetAllVehiclesByTypeWithArchived :many
+SELECT * 
+FROM vehicles 
+WHERE 
+  type = $1
+  AND ($2 = '' OR provider = $2)
+ORDER BY water_capacity DESC
+LIMIT $3 OFFSET $4;
+
+-- name: GetAllVehiclesByTypeWithArchivedCount :one
+SELECT COUNT(*) 
+  FROM vehicles 
+  WHERE 
+    type = $1
     AND ($2 = '' OR provider = $2);
+
+-- name: GetAllArchivedVehicles :many
+SELECT * 
+FROM vehicles 
+WHERE 
+  archived_at IS NOT NULL
+ORDER BY water_capacity DESC;
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;

@@ -24,29 +24,43 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context, provider, vehicleType string) ([]*entities.Vehicle, int64, error) {
+func (v *VehicleService) GetAll(ctx context.Context, provider string, vehicleType entities.VehicleType, withArchived bool) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
 	var vehicles []*entities.Vehicle
-	var err error
 	var totalCount int64
+	var err error
 
-	if vehicleType != "" {
-		parsedVehicleType := entities.ParseVehicleType(vehicleType)
-		if parsedVehicleType == entities.VehicleTypeUnknown {
-			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", vehicleType)
-			return nil, 0, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
+	if vehicleType != "" && vehicleType != entities.VehicleTypeUnknown {
+		if withArchived {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, provider, vehicleType)
+		} else {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, vehicleType)
 		}
-		vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, parsedVehicleType)
 	} else {
-		vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, provider)
+		if withArchived {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllWithArchived(ctx, provider)
+		} else {
+			vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, provider)
+		}
 	}
 
 	if err != nil {
-		log.Debug("failed to fetch vehicles", "error", err)
+		log.Error("failed to fetch vehicles", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return vehicles, totalCount, nil
+}
+
+func (v *VehicleService) GetAllArchived(ctx context.Context) ([]*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
+	vehicles, err := v.vehicleRepo.GetAllArchived(ctx)
+	if err != nil {
+		log.Error("failed to get all archived vehicles", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
+	}
+
+	return vehicles, nil
 }
 
 func (v *VehicleService) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {

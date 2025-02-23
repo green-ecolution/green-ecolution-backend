@@ -23,7 +23,7 @@ type VehicleResponse struct {
 	ID             int32                  `json:"id"`
 	CreatedAt      time.Time              `json:"created_at"`
 	UpdatedAt      time.Time              `json:"updated_at"`
-	ArchivedAt     time.Time              `json:"archived_at"`
+	ArchivedAt     *time.Time             `json:"archived_at,omitempty"`
 	NumberPlate    string                 `json:"number_plate"`
 	Description    string                 `json:"description"`
 	WaterCapacity  float64                `json:"water_capacity"`

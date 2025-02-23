@@ -1,6 +1,7 @@
 package vehicle
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -33,6 +34,7 @@ var (
 // @Param			limit		query	int		false	"Limit"
 // @Param			type		query	string	false	"Vehicle Type"
 // @Param			provider	query	string	false	"Provider"
+// @Param			archived	query	bool	false	"With archived vehicles"
 // @Security		Keycloak
 func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -42,8 +44,8 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		var totalCount int64
 		var err error
 
-		domainData, totalCount, err = svc.GetAll(ctx, strings.Clone(c.Query("provider")), strings.Clone(c.Query("type")))
-
+		parsedVehicleType := domain.ParseVehicleType(c.Query("type"))
+		domainData, totalCount, err = svc.GetAll(ctx, strings.Clone(c.Query("provider")), parsedVehicleType, c.QueryBool("archived", false))
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -199,6 +201,32 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 	}
 }
 
+// @Summary		Get archived vehicle
+// @Description	Get archived vehicle
+// @Id				get-archive-vehicle
+// @Tags			Vehicle
+// @Produce		json
+// @Success		200	{object}	[]entities.VehicleResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/archive [get]
+// @Security		Keycloak
+func GetArchiveVehicles(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		fmt.Println("Hier")
+		v, err := svc.GetAllArchived(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.JSON(vehicleMapper.FromResponseList(v))
+	}
+}
+
 // @Summary		Archive vehicle
 // @Description	Archive vehicle
 // @Id				archive-vehicle
@@ -209,6 +237,7 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 // @Failure		401	{object}	HTTPError
 // @Failure		403	{object}	HTTPError
 // @Failure		404	{object}	HTTPError
+// @Failure		409	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/vehicle/archive/{id} [post]
 // @Param			id	path	int	true	"Vehicle ID"
