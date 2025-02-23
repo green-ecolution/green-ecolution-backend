@@ -6,7 +6,7 @@ server:
     app_url: ENC[AES256_GCM,data:F/s7emDjLbQf92Z8hcm39Fo9pnxx,iv:9uGj+KOgQez1rMmOtzntMLK+/qq/REErJi+UfOJAS40=,tag:50q3h1Kro5AVO7HUutGXbw==,type:str]
     logs:
         level: ENC[AES256_GCM,data:rT15Vf8=,iv:FmhI99bx6TiKWaqhQ1lN36wMi9+ULC7kpIDc4viLp5s=,tag:64482ioKIKlislL+qqrD2Q==,type:str]
-        format: ENC[AES256_GCM,data:b3ivyw==,iv:WiSYo8JTUV4QOiMqmquwHZei6GoiWDhyPrAE9hfU3wo=,tag:A76icys2uQkzk/hYkVTgww==,type:str]
+        format: ENC[AES256_GCM,data:zn2ZEJoz3w==,iv:yUNSklmR7JgrjDWOm+sv05TZCPeEn0k85zjcSRGq3Ro=,tag:Kd+DdszM68LEkNz5ERFRjg==,type:str]
     database:
         host: ENC[AES256_GCM,data:9LxNDC7dQWiJ,iv:Cv8MEqNN6l+/UwIy1HMvvea2LpE43iKdDmDOUPKjecs=,tag:qH1Leb0uCoiJaI1iUm6wiw==,type:str]
         port: ENC[AES256_GCM,data:2iTrcg==,iv:sx46VGTG6zzjhyTyT5LtGXy7meGz8kXSt61k6WkJzwc=,tag:CzLaezpW6yCh3ZD4K3tfSg==,type:int]
@@ -85,8 +85,8 @@ sops:
             MU9NaC9WUWZnNWpvQWJSQzMvU0QxQnMK3L0kScwcs7KWKUJM95I5/wQ7Kd/T2KnZ
             6ayg7Q7KFLhCiSC0xDbR4OLpeAFHOMsDmCP94R2wSNc+7thcQAMQQg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-02-22T14:43:07Z"
-    mac: ENC[AES256_GCM,data:h4k14B6zu8JIEqA9QftFZdFKJVF+VRz1XMUcOe+mhLXoP+Ed/PheiTx3RXYKhX8Ow8Aj7FcbgU0DPl6yA90cxHza4RIOl9qJ6ucA2zDyio6rQ1tprzSpltEGdpGg6DUxpR1niDJUA4jw4Yb/Cgi3l7K1n/teur+9u5TFDzxhEUA=,iv:ZYrMAHnZknMwEPoc4jtOIsMglhqDriy9OoKKPAJiDl0=,tag:aXQInzhaooMn+346Sqf4XQ==,type:str]
+    lastmodified: "2025-02-23T13:42:39Z"
+    mac: ENC[AES256_GCM,data:lAJ3+u2NzITucb516YtQ7LkAenuamEUJKskgptKMaG4O+tkvVNYlzQw2ifM+8f0sj9ojeUb7wr6d018sq7BPxFrkKOnQE++RWpqAOG3/24xirtgWQnR8PozBfhuFe1l8s7GBtzgaACzBsQxZ0TMOmT5Nynw6KpFMaCkDDyoPvSA=,iv:IhTDxAme8x08VwANrRpoVkDeBqeFDrkrOzekDYsc4Ks=,tag:d8jVZd+dXKMPg9GBfuSl+g==,type:str]
     pgp: []
     unencrypted_suffix: _unencrypted
     version: 3.9.4
