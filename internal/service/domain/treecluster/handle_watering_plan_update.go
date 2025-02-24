@@ -36,7 +36,7 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 	}
 
 	for _, tc := range tcs {
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.WateringStatus = entities.WateringStatusJustWatered
 			tc.LastWatered = &date
 			return true, nil
