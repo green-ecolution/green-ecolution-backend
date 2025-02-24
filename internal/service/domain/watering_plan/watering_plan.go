@@ -158,7 +158,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
-	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
+	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		wp.Date = createWp.Date
 		wp.Description = createWp.Description
 		wp.Transporter = transporter

@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -33,7 +34,7 @@ func defaultWateringPlan() *entities.WateringPlan {
 	}
 }
 
-func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error) {
+func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*entities.WateringPlan, storage.WateringPlanRepository) (bool, error)) (*entities.WateringPlan, error) {
 	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
@@ -41,14 +42,9 @@ func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*enti
 
 	var createdWp *entities.WateringPlan
 	err := w.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := w.store
-		defer func() {
-			w.store = oldStore
-		}()
-		w.store = s
-
+		newRepo := NewWateringPlanRepository(s, w.WateringPlanMappers)
 		entity := defaultWateringPlan()
-		created, err := createFn(entity)
+		created, err := createFn(entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -57,16 +53,16 @@ func (w *WateringPlanRepository) Create(ctx context.Context, createFn func(*enti
 			return nil
 		}
 
-		if err := w.validateWateringPlan(entity); err != nil {
+		if err := newRepo.validateWateringPlan(entity); err != nil {
 			return err
 		}
 
-		id, err := w.createEntity(ctx, entity)
+		id, err := newRepo.createEntity(ctx, entity)
 		if err != nil {
 			return err
 		}
 
-		createdWp, err = w.GetByID(ctx, *id)
+		createdWp, err = newRepo.GetByID(ctx, *id)
 		if err != nil {
 			fmt.Println("failed to get vy id")
 			return err
