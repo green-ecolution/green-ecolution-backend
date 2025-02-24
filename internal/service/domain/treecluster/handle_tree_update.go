@@ -87,22 +87,24 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 		log.Error("could not update watering status", "error", err)
 	}
 
-	updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
-		lat, long, err := s.treeClusterRepo.GetCenterPoint(ctx, tc.ID)
-		if err != nil {
-			log.Error("failed to get center point of tree cluster", "error", err, "tree_cluster", tc)
-			return false, err
-		}
+	updateFn := func(tc *entities.TreeCluster, repo storage.TreeClusterRepository) (bool, error) {
+		if len(tc.Trees) != 0 {
+			lat, long, err := repo.GetCenterPoint(ctx, tc.ID)
+			if err != nil {
+				log.Error("failed to get center point of tree cluster", "error", err, "tree_cluster", tc)
+				return false, err
+			}
 
-		region, err := s.regionRepo.GetByPoint(ctx, lat, long)
-		if err != nil {
-			log.Error("can't find region by lat and long", "error", err, "latitude", lat, "longitude", long, "tree_cluster", tc)
-			return false, err
-		}
+			region, err := s.regionRepo.GetByPoint(ctx, lat, long)
+			if err != nil {
+				log.Error("can't find region by lat and long", "error", err, "latitude", lat, "longitude", long, "tree_cluster", tc)
+				return false, err
+			}
 
-		tc.Latitude = &lat
-		tc.Longitude = &long
-		tc.Region = region
+			tc.Latitude = &lat
+			tc.Longitude = &long
+			tc.Region = region
+		}
 		tc.WateringStatus = wateringStatus
 		return true, nil
 	}

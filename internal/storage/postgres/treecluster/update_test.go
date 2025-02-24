@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
@@ -16,7 +17,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "updated"
 			return true, nil
 		}
@@ -35,7 +36,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 	t.Run("should return error when update tree cluster with non-existing id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "updated"
 			return true, nil
 		}
@@ -50,7 +51,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 	t.Run("should return error when update tree cluster with negative id", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "updated"
 			return true, nil
 		}
@@ -65,7 +66,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "updated"
 			return true, nil
 		}
@@ -86,7 +87,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		r := NewTreeClusterRepository(suite.Store, mappers)
 		gotBefore, err := r.GetByID(context.Background(), 1)
 		assert.NoError(t, err)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			return false, nil
 		}
 
@@ -119,7 +120,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		}
 
 		trees = trees[0:2]
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Trees = trees
 			return true, nil
 		}
@@ -146,7 +147,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		assert.NoError(t, err)
 		beforeTrees := beforeTreeCluster.Trees
 
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Trees = nil
 			return true, nil
 		}
@@ -171,7 +172,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Latitude = utils.P(1.0)
 			tc.Longitude = utils.P(1.0)
 			return true, nil
@@ -196,7 +197,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Latitude = nil
 			tc.Longitude = nil
 			return true, nil
@@ -228,7 +229,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 	t.Run("should return error when updateFn returns error", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			return true, assert.AnError
 		}
 
@@ -242,7 +243,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 	t.Run("should not update when updateFn returns false", func(t *testing.T) {
 		// given
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			return false, nil
 		}
 
@@ -261,7 +262,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "updated"
 			return false, nil
 		}

@@ -27,12 +27,11 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		go eventManager.Run(ctx)
 
 		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
-
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(allLatestSensorData, nil)
 		treeRepo.EXPECT().GetBySensorIDs(mock.Anything, "sensor-1").Return([]*entities.Tree{&updatedTree}, nil)
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) error {
 			cluster := entities.TreeCluster{}
-			_, err := f(&cluster)
+			_, err := f(&cluster, clusterRepo)
 			assert.NoError(t, err)
 			assert.Equal(t, entities.WateringStatusGood, cluster.WateringStatus)
 			return nil
@@ -67,9 +66,9 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, nil)
 
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(nil, storage.ErrSensorNotFound)
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) error {
 			cluster := entities.TreeCluster{}
-			_, err := f(&cluster)
+			_, err := f(&cluster, clusterRepo)
 			assert.NoError(t, err)
 			assert.Equal(t, entities.WateringStatusUnknown, cluster.WateringStatus)
 			return nil
@@ -116,9 +115,9 @@ func TestTreeClusterService_HandleUpdateTree(t *testing.T) {
 		event := entities.NewEventUpdateTree(&prevTree, &updatedTree, &prevTreeOfSensor)
 
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(2)).Return([]*entities.SensorData{}, nil)
-		clusterRepo.EXPECT().Update(mock.Anything, int32(2), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+		clusterRepo.EXPECT().Update(mock.Anything, int32(2), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) error {
 			cluster := entities.TreeCluster{}
-			_, err := f(&cluster)
+			_, err := f(&cluster, clusterRepo)
 			assert.NoError(t, err)
 			assert.Equal(t, entities.WateringStatusUnknown, cluster.WateringStatus)
 			return nil
