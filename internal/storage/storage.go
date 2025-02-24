@@ -160,7 +160,7 @@ type TreeRepository interface {
 	// GetByID returns one tree by id
 	GetByID(ctx context.Context, id int32) (*entities.Tree, error)
 	// Create creates a new tree. It accepts a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be created, otherwise it will not be created.
-	Create(ctx context.Context, fn func(tree *entities.Tree) (bool, error)) (*entities.Tree, error)
+	Create(ctx context.Context, fn func(tree *entities.Tree, repo TreeRepository) (bool, error)) (*entities.Tree, error)
 	// Update updates an already existing tree by id. It takes the id of the tree to update and a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be updated, otherwise it will not be updated.
 	Update(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error)
 	// Delete deletes a tree by id

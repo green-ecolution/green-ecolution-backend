@@ -37,7 +37,9 @@ func NewTreeRepositoryMappers(
 	}
 }
 
-func NewTreeRepository(s *store.Store, mappers TreeMappers) storage.TreeRepository {
+var _ storage.TreeRepository = (*TreeRepository)(nil)
+
+func NewTreeRepository(s *store.Store, mappers TreeMappers) *TreeRepository {
 	return &TreeRepository{
 		store:       s,
 		TreeMappers: mappers,

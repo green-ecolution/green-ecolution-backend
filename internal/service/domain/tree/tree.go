@@ -110,7 +110,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 
 	var prevTreeOfSensor *entities.Tree
-	newTree, err := s.treeRepo.Create(ctx, func(tree *entities.Tree) (bool, error) {
+	newTree, err := s.treeRepo.Create(ctx, func(tree *entities.Tree, repo storage.TreeRepository) (bool, error) {
 		tree.PlantingYear = treeCreate.PlantingYear
 		tree.Species = treeCreate.Species
 		tree.Number = treeCreate.Number
@@ -136,7 +136,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 				return false, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 			}
 			tree.Sensor = sensor
-			prevTreeOfSensor, err = s.treeRepo.GetBySensorID(ctx, sensor.ID)
+			prevTreeOfSensor, err = repo.GetBySensorID(ctx, sensor.ID)
 			if err != nil {
 				// If the previous tree that was linked to the sensor could not be found, the create process should still be continued.
 				log.Debug("failed to find previous tree linked to sensor specified from create request", "sensor_id", treeCreate.SensorID)
