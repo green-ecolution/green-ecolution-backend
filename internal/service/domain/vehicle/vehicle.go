@@ -106,7 +106,7 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		return nil, service.ErrVehiclePlateTaken
 	}
 
-	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
+	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 		vh.NumberPlate = createData.NumberPlate
 		vh.Description = createData.Description
 		vh.WaterCapacity = createData.WaterCapacity
