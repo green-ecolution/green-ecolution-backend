@@ -114,7 +114,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor) (bool, error) {
+	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 		s.LatestData = su.LatestData
 		s.Status = su.Status
 		s.Provider = su.Provider
@@ -169,7 +169,7 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 			continue
 		}
 		if sensorData.CreatedAt.Before(cutoffTime) {
-			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor) (bool, error) {
+			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 				s.Status = entities.SensorStatusOffline
 				return true, nil
 			})

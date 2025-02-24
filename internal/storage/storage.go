@@ -186,7 +186,7 @@ type SensorRepository interface {
 	GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
 	Create(ctx context.Context, createFn func(*entities.Sensor, SensorRepository) (bool, error)) (*entities.Sensor, error)
-	Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
+	Update(ctx context.Context, id string, updateFn func(*entities.Sensor, SensorRepository) (bool, error)) (*entities.Sensor, error)
 	Delete(ctx context.Context, id string) error
 
 	GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error)
