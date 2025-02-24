@@ -18,7 +18,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+		got, err := r.Create(context.Background(), func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			return true, nil
 		})
 
@@ -68,7 +68,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		}
 
 		// when
-		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+		got, err := r.Create(context.Background(), func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Species = "Oak"
 			tree.Number = "T001"
 			tree.PlantingYear = 2023
@@ -115,7 +115,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+		got, err := r.Create(context.Background(), func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Latitude = -200
 			tree.Longitude = 0
 			return true, nil
@@ -134,7 +134,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		r := NewTreeRepository(suite.Store, mappers)
 
 		// when
-		got, err := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+		got, err := r.Create(context.Background(), func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Latitude = 0
 			tree.Longitude = 200
 			return true, nil
@@ -156,7 +156,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Create(ctx, func(tree *entities.Tree) (bool, error) {
+		got, err := r.Create(ctx, func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Species = "Oak"
 			return true, nil
 		})
@@ -198,7 +198,7 @@ func TestTreeRepository_Create(t *testing.T) {
 		}
 
 		// when
-		tree, createErr := r.Create(context.Background(), func(tree *entities.Tree) (bool, error) {
+		tree, createErr := r.Create(context.Background(), func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Species = "Oak"
 			tree.Number = "T001"
 			tree.Latitude = 54.801539
