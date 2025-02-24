@@ -6,21 +6,17 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Vehicle) (bool, error)) error {
+func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Vehicle, storage.VehicleRepository) (bool, error)) error {
 	log := logger.GetLogger(ctx)
 	return r.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := r.store
-		defer func() {
-			r.store = oldStore
-		}()
-		r.store = s
-
-		vh, err := r.GetByID(ctx, id)
+		newRepo := NewVehicleRepository(s, r.VehicleRepositoryMappers)
+		vh, err := newRepo.GetByID(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -29,7 +25,7 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(
 			return errors.New("updateFn is nil")
 		}
 
-		updated, err := updateFn(vh)
+		updated, err := updateFn(vh, newRepo)
 		if err != nil {
 			return err
 		}
@@ -38,11 +34,11 @@ func (r *VehicleRepository) Update(ctx context.Context, id int32, updateFn func(
 			return nil
 		}
 
-		if err := r.validateVehicle(vh); err != nil {
+		if err := newRepo.validateVehicle(vh); err != nil {
 			return err
 		}
 
-		if err := r.updateEntity(ctx, vh); err != nil {
+		if err := newRepo.updateEntity(ctx, vh); err != nil {
 			log.Error("failed to update vehicle entity in db", "error", err, "vehicle_id", id)
 			return err
 		}
