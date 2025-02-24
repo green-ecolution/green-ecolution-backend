@@ -91,7 +91,6 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 	}
 
 	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster, repo storage.TreeClusterRepository) (bool, error) {
-
 		if err = s.handlePrevTreeLocation(ctx, trees, repo.Update); err != nil {
 			log.Debug("failed to update prev tree location", "error", err, "trees", trees, "tree_cluster", tc)
 			return false, service.MapError(ctx, err, service.ErrorLogAll)
