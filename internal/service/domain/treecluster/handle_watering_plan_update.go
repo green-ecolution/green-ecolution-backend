@@ -6,6 +6,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
 func (s *TreeClusterService) HandleUpdateWateringPlan(ctx context.Context, event *entities.EventUpdateWateringPlan) error {
@@ -35,7 +36,7 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 	}
 
 	for _, tc := range tcs {
-		updateFn := func(tc *entities.TreeCluster) (bool, error) {
+		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.WateringStatus = entities.WateringStatusJustWatered
 			tc.LastWatered = &date
 			return true, nil
@@ -50,7 +51,7 @@ func (s *TreeClusterService) handleTreeClustersUpdate(ctx context.Context, tcs [
 		}
 
 		for _, tr := range tc.Trees {
-			_, err := s.treeRepo.Update(ctx, tr.ID, func(tree *entities.Tree) (bool, error) {
+			_, err := s.treeRepo.Update(ctx, tr.ID, func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 				log.Debug("updating tree watering status", "prev_status", tr.WateringStatus, "new_status", entities.WateringStatusJustWatered)
 				tree.WateringStatus = entities.WateringStatusJustWatered
 				tree.LastWatered = &date

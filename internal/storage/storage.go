@@ -103,9 +103,9 @@ type VehicleRepository interface {
 	// GetByPlate returns one vehicle by its plate
 	GetByPlate(ctx context.Context, plate string) (*entities.Vehicle, error)
 	// Create creates a new vehicle. It accepts a function that takes a vehicle that can be modified. Any changes made to the vehicle will be saved in the storage. If the function returns true, the vehicle will be created, otherwise it will not be created.
-	Create(ctx context.Context, fn func(tc *entities.Vehicle) (bool, error)) (*entities.Vehicle, error)
+	Create(ctx context.Context, fn func(tc *entities.Vehicle, repo VehicleRepository) (bool, error)) (*entities.Vehicle, error)
 	// Update updates a vehicle by id. It takes the id of the vehicle to update and a function that takes a vehicle that can be modified. Any changes made to the vehicle will be saved updated in the storage. If the function returns true, the vehicle will be updated, otherwise it will not be updated.
-	Update(ctx context.Context, id int32, fn func(tc *entities.Vehicle) (bool, error)) error
+	Update(ctx context.Context, id int32, fn func(tc *entities.Vehicle, repo VehicleRepository) (bool, error)) error
 	// Archive archives a vehicle by id
 	Archive(ctx context.Context, id int32) error
 	// Delete deletes a vehicle by id
@@ -126,9 +126,9 @@ type WateringPlanRepository interface {
 	// GetEvaluationValues returns all tree cluster relationship entities by a watering plan id
 	GetEvaluationValues(ctx context.Context, id int32) ([]*entities.EvaluationValue, error)
 	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.
-	Create(ctx context.Context, fn func(tc *entities.WateringPlan) (bool, error)) (*entities.WateringPlan, error)
+	Create(ctx context.Context, fn func(tc *entities.WateringPlan, repo WateringPlanRepository) (bool, error)) (*entities.WateringPlan, error)
 	// Update updates a watering plan by id. It takes the id of the watering plan to update and a function that takes a watering plan that can be modified. Any changes made to the plan will be saved updated in the storage. If the function returns true, the watering plan will be updated, otherwise it will not be updated.
-	Update(ctx context.Context, id int32, fn func(tc *entities.WateringPlan) (bool, error)) error
+	Update(ctx context.Context, id int32, fn func(tc *entities.WateringPlan, repo WateringPlanRepository) (bool, error)) error
 	// Delete deletes a watering plan by id
 	Delete(ctx context.Context, id int32) error
 }
@@ -142,9 +142,9 @@ type TreeClusterRepository interface {
 	// TODO: Add ability to optional preload
 	GetByIDs(ctx context.Context, ids []int32) ([]*entities.TreeCluster, error)
 	// Create creates a new tree cluster. It accepts a function that takes a tree cluster that can be modified. Any changes made to the tree cluster will be saved in the storage. If the function returns true, the tree cluster will be created, otherwise it will not be created.
-	Create(ctx context.Context, fn func(tc *entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error)
+	Create(ctx context.Context, fn func(tc *entities.TreeCluster, repo TreeClusterRepository) (bool, error)) (*entities.TreeCluster, error)
 	// Update updates a tree cluster by id. It takes the id of the tree cluster to update and a function that takes a tree cluster that can be modified. Any changes made to the tree cluster will be saved updated in the storage. If the function returns true, the tree cluster will be updated, otherwise it will not be updated.
-	Update(ctx context.Context, id int32, fn func(tc *entities.TreeCluster) (bool, error)) error
+	Update(ctx context.Context, id int32, fn func(tc *entities.TreeCluster, repo TreeClusterRepository) (bool, error)) error
 	// Delete deletes a tree cluster by id
 	Delete(ctx context.Context, id int32) error
 
@@ -160,9 +160,9 @@ type TreeRepository interface {
 	// GetByID returns one tree by id
 	GetByID(ctx context.Context, id int32) (*entities.Tree, error)
 	// Create creates a new tree. It accepts a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be created, otherwise it will not be created.
-	Create(ctx context.Context, fn func(tree *entities.Tree) (bool, error)) (*entities.Tree, error)
+	Create(ctx context.Context, fn func(tree *entities.Tree, repo TreeRepository) (bool, error)) (*entities.Tree, error)
 	// Update updates an already existing tree by id. It takes the id of the tree to update and a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be updated, otherwise it will not be updated.
-	Update(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error)
+	Update(ctx context.Context, id int32, updateFn func(tree *entities.Tree, repo TreeRepository) (bool, error)) (*entities.Tree, error)
 	// Delete deletes a tree by id
 	Delete(ctx context.Context, id int32) error
 
@@ -185,8 +185,8 @@ type TreeRepository interface {
 type SensorRepository interface {
 	GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*entities.Sensor, error)
-	Create(ctx context.Context, createFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
-	Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error)
+	Create(ctx context.Context, createFn func(*entities.Sensor, SensorRepository) (bool, error)) (*entities.Sensor, error)
+	Update(ctx context.Context, id string, updateFn func(*entities.Sensor, SensorRepository) (bool, error)) (*entities.Sensor, error)
 	Delete(ctx context.Context, id string) error
 
 	GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error)

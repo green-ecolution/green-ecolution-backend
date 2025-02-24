@@ -9,6 +9,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
+var _ storage.SensorRepository = (*SensorRepository)(nil)
+
 type SensorRepository struct {
 	store *store.Store
 	SensorRepositoryMappers
@@ -24,7 +26,7 @@ func NewSensorRepositoryMappers(sMapper mapper.InternalSensorRepoMapper) SensorR
 	}
 }
 
-func NewSensorRepository(s *store.Store, mappers SensorRepositoryMappers) storage.SensorRepository {
+func NewSensorRepository(s *store.Store, mappers SensorRepositoryMappers) *SensorRepository {
 	return &SensorRepository{
 		store:                   s,
 		SensorRepositoryMappers: mappers,

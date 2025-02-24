@@ -7,21 +7,17 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn func(*entities.WateringPlan) (bool, error)) error {
+func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn func(*entities.WateringPlan, storage.WateringPlanRepository) (bool, error)) error {
 	log := logger.GetLogger(ctx)
 	return w.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := w.store
-		defer func() {
-			w.store = oldStore
-		}()
-		w.store = s
-
-		entity, err := w.GetByID(ctx, id)
+		newRepo := NewWateringPlanRepository(s, w.WateringPlanMappers)
+		entity, err := newRepo.GetByID(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -30,7 +26,7 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn 
 			return errors.New("updateFn is nil")
 		}
 
-		updated, err := updateFn(entity)
+		updated, err := updateFn(entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -39,11 +35,11 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn 
 			return nil
 		}
 
-		if err := w.validateWateringPlan(entity); err != nil {
+		if err := newRepo.validateWateringPlan(entity); err != nil {
 			return err
 		}
 
-		if err := w.updateEntity(ctx, entity); err != nil {
+		if err := newRepo.updateEntity(ctx, entity); err != nil {
 			log.Error("failed to updated watering plan entity in db", "error", err, "watering_plan_id", id)
 			return err
 		}

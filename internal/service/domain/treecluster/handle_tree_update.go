@@ -5,6 +5,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
 func (s *TreeClusterService) HandleCreateTree(ctx context.Context, event *entities.EventCreateTree) error {
@@ -86,15 +87,24 @@ func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *en
 		log.Error("could not update watering status", "error", err)
 	}
 
-	updateFn := func(tc *entities.TreeCluster) (bool, error) {
-		lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
-		if err != nil {
-			log.Error("failed to calculate latitude, longitude and region based on tree cluster", "error", err, "cluster_id", tc.ID)
-			return false, err
+	updateFn := func(tc *entities.TreeCluster, repo storage.TreeClusterRepository) (bool, error) {
+		if len(tc.Trees) != 0 {
+			lat, long, err := repo.GetCenterPoint(ctx, tc.ID)
+			if err != nil {
+				log.Error("failed to get center point of tree cluster", "error", err, "tree_cluster", tc)
+				return false, err
+			}
+
+			region, err := s.regionRepo.GetByPoint(ctx, lat, long)
+			if err != nil {
+				log.Error("can't find region by lat and long", "error", err, "latitude", lat, "longitude", long, "tree_cluster", tc)
+				return false, err
+			}
+
+			tc.Latitude = &lat
+			tc.Longitude = &long
+			tc.Region = region
 		}
-		tc.Latitude = lat
-		tc.Longitude = long
-		tc.Region = region
 		tc.WateringStatus = wateringStatus
 		return true, nil
 	}
@@ -118,7 +128,7 @@ func (s *TreeClusterService) updateWateringStatusOfPrevTreeCluster(ctx context.C
 		log.Error("could not update watering status", "error", err)
 	}
 
-	updateFn := func(tc *entities.TreeCluster) (bool, error) {
+	updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 		tc.WateringStatus = wateringStatus
 		return true, nil
 	}

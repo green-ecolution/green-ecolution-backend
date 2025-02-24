@@ -9,6 +9,8 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
+var _ storage.WateringPlanRepository = (*WateringPlanRepository)(nil)
+
 type WateringPlanRepository struct {
 	store *store.Store
 	WateringPlanMappers
@@ -32,7 +34,7 @@ func NewWateringPlanRepositoryMappers(
 	}
 }
 
-func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) storage.WateringPlanRepository {
+func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) *WateringPlanRepository {
 	return &WateringPlanRepository{
 		store:               s,
 		WateringPlanMappers: mappers,

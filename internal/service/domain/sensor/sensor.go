@@ -85,7 +85,7 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
-	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor) (bool, error) {
+	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 		s.LatestData = sc.LatestData
 		s.Status = sc.Status
 		s.Provider = sc.Provider
@@ -114,7 +114,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor) (bool, error) {
+	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 		s.LatestData = su.LatestData
 		s.Status = su.Status
 		s.Provider = su.Provider
@@ -169,7 +169,7 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 			continue
 		}
 		if sensorData.CreatedAt.Before(cutoffTime) {
-			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor) (bool, error) {
+			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 				s.Status = entities.SensorStatusOffline
 				return true, nil
 			})
@@ -200,7 +200,7 @@ func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Senso
 	}
 
 	if nearestTree != nil {
-		_, err = s.treeRepo.Update(ctx, nearestTree.ID, func(tree *entities.Tree) (bool, error) {
+		_, err = s.treeRepo.Update(ctx, nearestTree.ID, func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Sensor = sen
 			log.Debug("update sensor on tree", "tree_id", tree.ID, "sensor_id", sen.ID)
 			return true, nil

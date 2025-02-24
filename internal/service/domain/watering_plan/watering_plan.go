@@ -158,7 +158,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
-	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
+	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		wp.Date = createWp.Date
 		wp.Description = createWp.Description
 		wp.Transporter = transporter
@@ -176,7 +176,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
-	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
+	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, mergedVehicle, treeClusters)
 		if err != nil {
@@ -281,7 +281,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
-	err = w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
+	err = w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		wp.Date = updateWp.Date
 		wp.Description = updateWp.Description
 		wp.Transporter = transporter
@@ -365,7 +365,7 @@ func (w *WateringPlanService) UpdateStatuses(ctx context.Context) error {
 		}
 
 		if plan.Date.Before(cutoffTime) {
-			err = w.wateringPlanRepo.Update(ctx, plan.ID, func(wp *entities.WateringPlan) (bool, error) {
+			err = w.wateringPlanRepo.Update(ctx, plan.ID, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 				wp.Status = entities.WateringPlanStatusNotCompeted
 				return true, nil
 			})

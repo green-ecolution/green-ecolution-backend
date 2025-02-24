@@ -13,6 +13,8 @@ import (
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
 
+var _ storage.VehicleRepository = (*VehicleRepository)(nil)
+
 type VehicleRepository struct {
 	store *store.Store
 	VehicleRepositoryMappers
@@ -28,7 +30,7 @@ func NewVehicleRepositoryMappers(vMapper mapper.InternalVehicleRepoMapper) Vehic
 	}
 }
 
-func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) storage.VehicleRepository {
+func NewVehicleRepository(s *store.Store, mappers VehicleRepositoryMappers) *VehicleRepository {
 	return &VehicleRepository{
 		store:                    s,
 		VehicleRepositoryMappers: mappers,

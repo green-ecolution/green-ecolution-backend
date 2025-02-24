@@ -42,7 +42,7 @@ func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *ent
 		return nil
 	}
 
-	updateFn := func(tc *entities.TreeCluster) (bool, error) {
+	updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 		tc.WateringStatus = wateringStatus
 		return true, nil
 	}

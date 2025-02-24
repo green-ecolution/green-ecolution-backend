@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,7 +31,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		numberPlate := "FL ZU 9876"
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.Description = input.Description
 			vh.NumberPlate = numberPlate
 			vh.Status = input.Status
@@ -70,7 +71,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		numberPlate := "FL ZB 9876"
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = numberPlate
 			vh.Height = input.Height
 			vh.Length = input.Length
@@ -103,7 +104,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = input.NumberPlate
 			vh.Height = input.Height
 			vh.Length = input.Length
@@ -126,7 +127,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = ""
 			vh.Height = input.Height
 			vh.Length = input.Length
@@ -151,7 +152,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		numberPlate := "FL ZB 9876"
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = numberPlate
 			vh.Height = 0
 			vh.Length = 0
@@ -174,7 +175,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = input.NumberPlate
 			vh.Height = input.Height
 			vh.Length = input.Length
@@ -200,7 +201,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 
 		numberPlate := "FL ZT 9876"
 
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = numberPlate
 			vh.Height = input.Height
 			vh.Length = input.Length
@@ -230,7 +231,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		cancel()
 
 		// when
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = input.NumberPlate
 			vh.Height = input.Height
 			vh.Length = input.Length
@@ -251,7 +252,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 	t.Run("should return error when createFn returns error", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
-		createFn := func(wp *entities.Vehicle) (bool, error) {
+		createFn := func(wp *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			return false, assert.AnError
 		}
 
@@ -263,7 +264,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 	t.Run("should not create watering plan when createFn returns false", func(t *testing.T) {
 		// given
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
-		createFn := func(wp *entities.Vehicle) (bool, error) {
+		createFn := func(wp *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			return false, nil
 		}
 
@@ -280,7 +281,7 @@ func TestVehicleRepository_Create(t *testing.T) {
 		newID := int32(9)
 
 		r := NewVehicleRepository(defaultFields.store, defaultFields.VehicleMappers)
-		createFn := func(vh *entities.Vehicle) (bool, error) {
+		createFn := func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 			vh.NumberPlate = input.NumberPlate
 			vh.Height = input.Height
 			vh.Length = input.Length
