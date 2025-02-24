@@ -30,6 +30,7 @@ func TestRegisterRoutes(t *testing.T) {
 				mock.Anything,
 				"",
 				"",
+				false,
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when
@@ -51,6 +52,7 @@ func TestRegisterRoutes(t *testing.T) {
 				mock.Anything,
 				"",
 				"transporter",
+				false,
 			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when

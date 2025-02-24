@@ -88,10 +88,16 @@ type ImageRepository interface {
 }
 
 type VehicleRepository interface {
-	// GetAll returns all vehicles
+	// GetAll returns all vehicles that are not archived
 	GetAll(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
-	// GetAllByType returns all vehicles by vehicle type
+	// GetAllWithArchived returns all vehicles and archived as well
+	GetAllWithArchived(ctx context.Context, provider string) ([]*entities.Vehicle, int64, error)
+	// GetAllByType returns all vehicles by vehicle type that are not archived
 	GetAllByType(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
+	// GetAllByTypeWithArchived returns all vehicles by vehicle type and archived as well
+	GetAllByTypeWithArchived(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
+	// GetAllArchived returns all archived vehicles
+	GetAllArchived(ctx context.Context) ([]*entities.Vehicle, error)
 	// GetByID returns one vehicle by id
 	GetByID(ctx context.Context, id int32) (*entities.Vehicle, error)
 	// GetByPlate returns one vehicle by its plate
@@ -100,6 +106,8 @@ type VehicleRepository interface {
 	Create(ctx context.Context, fn func(tc *entities.Vehicle) (bool, error)) (*entities.Vehicle, error)
 	// Update updates a vehicle by id. It takes the id of the vehicle to update and a function that takes a vehicle that can be modified. Any changes made to the vehicle will be saved updated in the storage. If the function returns true, the vehicle will be updated, otherwise it will not be updated.
 	Update(ctx context.Context, id int32, fn func(tc *entities.Vehicle) (bool, error)) error
+	// Archive archives a vehicle by id
+	Archive(ctx context.Context, id int32) error
 	// Delete deletes a vehicle by id
 	Delete(ctx context.Context, id int32) error
 }

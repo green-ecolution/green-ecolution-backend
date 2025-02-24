@@ -31,6 +31,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"",
+			false,
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -67,6 +68,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"",
+			false,
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -140,6 +142,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"test-provider",
 			"",
+			false,
 		).Return(TestVehicles, int64(0), nil)
 
 		// when
@@ -174,6 +177,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"transporter",
+			false,
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -209,6 +213,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"transporter",
+			false,
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -248,6 +253,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"",
+			false,
 		).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
@@ -284,6 +290,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"",
+			false,
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
@@ -309,6 +316,7 @@ func TestGetAllVehicles(t *testing.T) {
 			mock.Anything,
 			"",
 			"invalid",
+			false,
 		).Return(nil, int64(0), fiber.NewError(fiber.ErrBadRequest.Code, "service error"))
 
 		// when
