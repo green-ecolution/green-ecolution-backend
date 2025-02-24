@@ -583,14 +583,14 @@ func TestTreeService_Update(t *testing.T) {
 		treeRepo.EXPECT().GetByID(ctx, id).Return(currentTree, nil)
 
 		treeRepo.EXPECT().Update(ctx, id, mock.Anything).RunAndReturn(
-			func(ctx context.Context, id int32, fn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+			func(ctx context.Context, id int32, fn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 				testTree := *currentTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.TreeClusterID).Return(treeCluster, nil)
 				treeRepo.EXPECT().GetBySensorID(ctx, sensor.ID).Return(expectedPrevSensorTree, nil)
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.SensorID).Return(sensor, nil)
 
-				success, err := fn(&testTree)
+				success, err := fn(&testTree, treeRepo)
 				if !success {
 					return nil, err
 				}
@@ -669,12 +669,12 @@ func TestTreeService_Update(t *testing.T) {
 		treeRepo.EXPECT().GetByID(ctx, id).Return(currentTree, nil)
 
 		treeRepo.EXPECT().Update(ctx, id, mock.Anything).RunAndReturn(
-			func(ctx context.Context, id int32, fn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+			func(ctx context.Context, id int32, fn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 				testTree := *currentTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.TreeClusterID).Return(nil, expectedError)
 
-				success, err := fn(&testTree)
+				success, err := fn(&testTree, treeRepo)
 				if !success {
 					return nil, err
 				}
@@ -708,14 +708,14 @@ func TestTreeService_Update(t *testing.T) {
 		treeRepo.EXPECT().GetByID(ctx, id).Return(currentTree, nil)
 
 		treeRepo.EXPECT().Update(ctx, id, mock.Anything).RunAndReturn(
-			func(ctx context.Context, id int32, fn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+			func(ctx context.Context, id int32, fn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 				testTree := *currentTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.TreeClusterID).Return(treeCluster, nil)
 
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.SensorID).Return(nil, expectedError)
 
-				success, err := fn(&testTree)
+				success, err := fn(&testTree, treeRepo)
 				if !success {
 					return nil, err
 				}
@@ -751,14 +751,14 @@ func TestTreeService_Update(t *testing.T) {
 
 		treeRepo.EXPECT().GetByID(ctx, id).Return(currentTree, nil)
 		treeRepo.EXPECT().Update(ctx, id, mock.Anything).RunAndReturn(
-			func(ctx context.Context, id int32, fn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+			func(ctx context.Context, id int32, fn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 				testTree := *currentTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.TreeClusterID).Return(treeCluster, nil)
 				treeRepo.EXPECT().GetBySensorID(ctx, sensor.ID).Return(expectedPrevSensorTree, nil)
 				sensorRepo.EXPECT().GetByID(ctx, *TestTreeUpdate.SensorID).Return(sensor, nil)
 
-				success, err := fn(&testTree)
+				success, err := fn(&testTree, treeRepo)
 				if !success {
 					return nil, err
 				}
@@ -841,12 +841,12 @@ func TestTreeService_EventSystem(t *testing.T) {
 		// Mock expectations
 		treeRepo.EXPECT().GetByID(ctx, prevTree.ID).Return(&prevTree, nil)
 		treeRepo.EXPECT().Update(ctx, prevTree.ID, mock.Anything).RunAndReturn(
-			func(ctx context.Context, id int32, fn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+			func(ctx context.Context, id int32, fn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 				testTree := prevTree
 
 				treeClusterRepo.EXPECT().GetByID(ctx, TestTreeClusters[0].ID).Return(TestTreeClusters[0], nil)
 
-				success, err := fn(&testTree)
+				success, err := fn(&testTree, treeRepo)
 				if !success {
 					return nil, err
 				}
