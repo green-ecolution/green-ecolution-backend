@@ -125,15 +125,15 @@ func (s *PostgresTestSuite) ExecQuery(t testing.TB, query string, args ...any) (
 	return result, nil
 }
 
-func (s *PostgresTestSuite) SwitchQuerier(t testing.TB, querier sqlc.Querier) {
+func (s *PostgresTestSuite) SwitchQuerier(t testing.TB, querier *sqlc.Queries) {
 	t.Helper()
 	t.Log("Switching querier...")
 
-	oldQuerier := s.Store.Querier
-	s.Store.Querier = querier
+	oldQuerier := s.Store.Queries
+	s.Store.Queries = querier
 
 	t.Cleanup(func() {
 		t.Log("Restoring querier...")
-		s.Store.Querier = oldQuerier
+		s.Store.Queries = oldQuerier
 	})
 }

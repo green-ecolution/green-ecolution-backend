@@ -14,11 +14,11 @@ import (
 )
 
 type Store struct {
-	sqlc.Querier
+	*sqlc.Queries
 	db *pgxpool.Pool
 }
 
-func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
+func NewStore(db *pgxpool.Pool, querier *sqlc.Queries) *Store {
 	if db == nil {
 		slog.Error("db is nil")
 		panic("db is nil")
@@ -30,7 +30,7 @@ func NewStore(db *pgxpool.Pool, querier sqlc.Querier) *Store {
 	}
 
 	return &Store{
-		Querier: querier,
+		Queries: querier,
 		db:      db,
 	}
 }
@@ -71,13 +71,16 @@ func (s *Store) WithTx(ctx context.Context, fn func(*Store) error) error {
 		return errors.New("txFn is nil")
 	}
 
-	tx, err := s.db.BeginTx(ctx, pgx.TxOptions{})
+	tx, err := s.db.Begin(ctx)
 	if err != nil {
 		return err
 	}
 
-	qtx := sqlc.New(tx)
-	err = fn(NewStore(s.db, qtx))
+	qtx := s.Queries.WithTx(tx)
+
+	store := *s
+	store.Queries = qtx
+	err = fn(&store)
 	if err == nil {
 		log.Debug("committing transaction")
 		return tx.Commit(ctx)
