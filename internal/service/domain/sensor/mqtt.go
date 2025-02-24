@@ -47,7 +47,7 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		sensor = updatedSensor
 	} else {
 		log.Info("a new sensor has joined the party! creating sensor record", "sensor_id", payload.Device, "sensor_latitude", payload.Latitude, "sensor_longitude", payload.Longitude)
-		createdSensor, err := s.sensorRepo.Create(ctx, func(s *domain.Sensor) (bool, error) {
+		createdSensor, err := s.sensorRepo.Create(ctx, func(s *domain.Sensor, _ storage.SensorRepository) (bool, error) {
 			s.ID = payload.Device
 			s.Latitude = payload.Latitude
 			s.Longitude = payload.Longitude

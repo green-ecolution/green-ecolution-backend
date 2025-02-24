@@ -85,7 +85,7 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
-	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor) (bool, error) {
+	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 		s.LatestData = sc.LatestData
 		s.Status = sc.Status
 		s.Provider = sc.Provider
