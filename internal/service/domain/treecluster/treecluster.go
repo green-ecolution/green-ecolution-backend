@@ -111,8 +111,9 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster) (bool, error) {
-		if err = s.handlePrevTreeLocation(ctx, trees); err != nil {
+	c, err := s.treeClusterRepo.Create(ctx, func(tc *domain.TreeCluster, repo storage.TreeClusterRepository) (bool, error) {
+
+		if err = s.handlePrevTreeLocation(ctx, trees, repo.Update); err != nil {
 			log.Debug("failed to update prev tree location", "error", err, "trees", trees, "tree_cluster", tc)
 			return false, service.MapError(ctx, err, service.ErrorLogAll)
 		}
@@ -328,7 +329,7 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 // Notes:
 //   - Clusters with an ID of 0 are ignored.
 //   - Updates are performed via a callback mechanism in the `treeClusterRepo` to ensure thread safety or transactional consistency.
-func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees []*domain.Tree) error {
+func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees []*domain.Tree, updateFn func(context.Context, int32, func(tc *domain.TreeCluster) (bool, error)) error) error {
 	log := logger.GetLogger(ctx)
 	visitedClusters := make(map[int32]bool)
 	for _, tree := range trees {
@@ -340,7 +341,7 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 			continue
 		}
 
-		updateFn := func(tc *domain.TreeCluster) (bool, error) {
+		updateFunc := func(tc *domain.TreeCluster) (bool, error) {
 			lat, long, region, err := s.getUpdatedLatLong(ctx, tc)
 			if err != nil {
 				return false, err
@@ -353,7 +354,7 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 			return true, nil
 		}
 
-		if err := s.treeClusterRepo.Update(ctx, tree.TreeCluster.ID, updateFn); err != nil {
+		if err := updateFn(ctx, tree.TreeCluster.ID, updateFunc); err != nil {
 			log.Error("failed to update tree cluster after handling prev tree locations", "error", err, "cluster_id", tree.TreeCluster.ID, "tree_id", tree.ID)
 			return err
 		}

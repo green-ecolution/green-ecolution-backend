@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
@@ -35,7 +34,9 @@ func NewTreeClusterRepositoryMappers(
 	}
 }
 
-func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) storage.TreeClusterRepository {
+var _ = (*TreeClusterRepository)(nil)
+
+func NewTreeClusterRepository(s *store.Store, mappers TreeClusterMappers) *TreeClusterRepository {
 	return &TreeClusterRepository{
 		store:              s,
 		TreeClusterMappers: mappers,
