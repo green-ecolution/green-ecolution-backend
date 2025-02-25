@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"strconv"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
@@ -83,37 +82,30 @@ func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPaylo
 		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
-	endDevices := raw["end_device_ids"].(map[string]any)
 	uplinkMessage := raw["uplink_message"].(map[string]any)
 	decodedPayload := uplinkMessage["decoded_payload"].(map[string]any)
 
-	// Parse temperature from string to float64
-	temperature, err := strconv.ParseFloat(decodedPayload["temperature"].(string), 64)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing temperature: %w", err)
-	}
-
 	payload := &sensor.MqttPayloadResponse{
-		Device:      endDevices["device_id"].(string),
-		Battery:     decodedPayload["battery"].(float64),
-		Humidity:    decodedPayload["humidity"].(float64),
-		Temperature: temperature,
+		Device:      decodedPayload["deviceName"].(string),
+		Battery:     decodedPayload["batteryVoltage"].(float64),
+		Humidity:    decodedPayload["waterContent"].(float64),
+		Temperature: decodedPayload["temperature"].(float64),
 		Latitude:    decodedPayload["latitude"].(float64),
 		Longitude:   decodedPayload["longitude"].(float64),
 		Watermarks: []sensor.WatermarkResponse{
 			{
-				Resistance: int(decodedPayload["watermarkOneResistanceValue"].(float64)),
-				Centibar:   int(decodedPayload["watermarkOneCentibarValue"].(float64)),
+				Resistance: int(decodedPayload["WM30_Resistance"].(float64)),
+				Centibar:   int(decodedPayload["WM30_CB"].(float64)),
 				Depth:      30,
 			},
 			{
-				Resistance: int(decodedPayload["watermarkTwoResistanceValue"].(float64)),
-				Centibar:   int(decodedPayload["watermarkTwoCentibarValue"].(float64)),
+				Resistance: int(decodedPayload["WM60_Resistance"].(float64)),
+				Centibar:   int(decodedPayload["WM60_CB"].(float64)),
 				Depth:      60,
 			},
 			{
-				Resistance: int(decodedPayload["watermarkThreeResistanceValue"].(float64)),
-				Centibar:   int(decodedPayload["watermarkThreeCentibarValue"].(float64)),
+				Resistance: int(decodedPayload["WM90_Resistance"].(float64)),
+				Centibar:   int(decodedPayload["WM90_CB"].(float64)),
 				Depth:      90,
 			},
 		},
