@@ -477,11 +477,11 @@ func (w *WateringPlanService) validateUserRoles(users []*entities.User) bool {
 func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User, transporter, trailer *entities.Vehicle) error {
 	var requiredLicenses []entities.DrivingLicense
 
-	if transporter != nil && transporter.DrivingLicense != entities.DrivingLicenseUnknown {
+	if transporter != nil {
 		requiredLicenses = append(requiredLicenses, transporter.DrivingLicense)
 	}
 
-	if trailer != nil && trailer.DrivingLicense != entities.DrivingLicenseUnknown {
+	if trailer != nil {
 		requiredLicenses = append(requiredLicenses, trailer.DrivingLicense)
 	}
 
