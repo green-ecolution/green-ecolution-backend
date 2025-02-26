@@ -70,12 +70,23 @@ func (s *TreeClusterService) publishUpdateEvent(ctx context.Context, prevTc *dom
 	}
 
 	event := domain.NewEventUpdateTreeCluster(prevTc, updatedTc)
+
 	err = s.eventManager.Publish(ctx, event)
 	if err != nil {
 		log.Error("error while sending event after updating tree cluster", "err", err)
 	}
 
 	return nil
+}
+
+func (s *TreeClusterService) publishCreateEvent(ctx context.Context, tc *domain.TreeCluster) {
+	log := logger.GetLogger(ctx)
+	log.Debug("publish new event", "event", domain.EventTypeCreateTreeCluster, "service", "TreeClusterService")
+
+	event := domain.NewEventCreateTreeCluster(tc)
+	if err := s.eventManager.Publish(ctx, event); err != nil {
+		log.Error("error while sending event after creating tree cluster", "err", err)
+	}
 }
 
 func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeClusterCreate) (*domain.TreeCluster, error) {
@@ -127,9 +138,7 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 	}
 
 	log.Info("tree cluster created successfully", "cluster_id", c.ID)
-	if err := s.publishUpdateEvent(ctx, c); err != nil {
-		return nil, service.MapError(ctx, err, service.ErrorLogAll)
-	}
+	s.publishCreateEvent(ctx, c)
 
 	return c, nil
 }

@@ -183,6 +183,7 @@ func initializeEventManager() *worker.EventManager {
 	return worker.NewEventManager(
 		entities.EventTypeUpdateTree,
 		entities.EventTypeUpdateTreeCluster,
+		entities.EventTypeCreateTreeCluster,
 		entities.EventTypeCreateTree,
 		entities.EventTypeDeleteTree,
 		entities.EventTypeNewSensorData,
