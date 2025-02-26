@@ -3,6 +3,7 @@ package mqtt
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 
@@ -11,6 +12,10 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+	ErrCastValue = errors.New("failed to cast mqtt payload")
 )
 
 type Mqtt struct {
@@ -76,36 +81,113 @@ func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 	}
 }
 
+func saveCastPayload[T any](raw map[string]any, key string) (T, bool) {
+	v, ok := raw[key].(T)
+	if !ok {
+		slog.Debug("failed to cast value in payload", "key", key, "raw", raw)
+		return *new(T), false
+	}
+
+	return v, true
+}
+
 func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPayloadResponse, error) {
 	var raw map[string]any
 	if err := json.Unmarshal(msg.Payload(), &raw); err != nil {
 		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
-	uplinkMessage := raw["uplink_message"].(map[string]any)
-	decodedPayload := uplinkMessage["decoded_payload"].(map[string]any)
+	uplinkMessage, ok := saveCastPayload[map[string]any](raw, "uplink_message")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	decodedPayload, ok := saveCastPayload[map[string]any](uplinkMessage, "decoded_payload")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	deviceName, ok := saveCastPayload[string](decodedPayload, "deviceName")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	batteryVoltage, ok := saveCastPayload[float64](decodedPayload, "batteryVoltage")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	waterContent, ok := saveCastPayload[float64](decodedPayload, "waterContent")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	temperature, ok := saveCastPayload[float64](decodedPayload, "temperature")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	latitude, ok := saveCastPayload[float64](decodedPayload, "latitude")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	longitude, ok := saveCastPayload[float64](decodedPayload, "longitude")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm30Res, ok := saveCastPayload[float64](decodedPayload, "WM30_Resistance")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm30Cb, ok := saveCastPayload[float64](decodedPayload, "WM30_CB")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm60Res, ok := saveCastPayload[float64](decodedPayload, "WM60_Resistance")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm60Cb, ok := saveCastPayload[float64](decodedPayload, "WM60_CB")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm90Res, ok := saveCastPayload[float64](decodedPayload, "WM90_Resistance")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm90Cb, ok := saveCastPayload[float64](decodedPayload, "WM90_CB")
+	if !ok {
+		return nil, ErrCastValue
+	}
 
 	payload := &sensor.MqttPayloadResponse{
-		Device:      decodedPayload["deviceName"].(string),
-		Battery:     decodedPayload["batteryVoltage"].(float64),
-		Humidity:    decodedPayload["waterContent"].(float64),
-		Temperature: decodedPayload["temperature"].(float64),
-		Latitude:    decodedPayload["latitude"].(float64),
-		Longitude:   decodedPayload["longitude"].(float64),
+		Device:      deviceName,
+		Battery:     batteryVoltage,
+		Humidity:    waterContent,
+		Temperature: temperature,
+		Latitude:    latitude,
+		Longitude:   longitude,
 		Watermarks: []sensor.WatermarkResponse{
 			{
-				Resistance: int(decodedPayload["WM30_Resistance"].(float64)),
-				Centibar:   int(decodedPayload["WM30_CB"].(float64)),
+				Resistance: int(wm30Res),
+				Centibar:   int(wm30Cb),
 				Depth:      30,
 			},
 			{
-				Resistance: int(decodedPayload["WM60_Resistance"].(float64)),
-				Centibar:   int(decodedPayload["WM60_CB"].(float64)),
+				Resistance: int(wm60Res),
+				Centibar:   int(wm60Cb),
 				Depth:      60,
 			},
 			{
-				Resistance: int(decodedPayload["WM90_Resistance"].(float64)),
-				Centibar:   int(decodedPayload["WM90_CB"].(float64)),
+				Resistance: int(wm90Res),
+				Centibar:   int(wm90Cb),
 				Depth:      90,
 			},
 		},
