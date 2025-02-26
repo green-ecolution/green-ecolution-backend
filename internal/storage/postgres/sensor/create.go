@@ -147,10 +147,10 @@ func (r *SensorRepository) validateSensorEntity(sensor *entities.Sensor) error {
 	if sensor.ID == "" {
 		return errors.New("sensor id cannot be empty")
 	}
-	if sensor.Latitude < -90 || sensor.Latitude > 90 || sensor.Latitude == 0 {
+	if sensor.Latitude < -90 || sensor.Latitude > 90 {
 		return storage.ErrInvalidLatitude
 	}
-	if sensor.Longitude < -180 || sensor.Longitude > 180 || sensor.Longitude == 0 {
+	if sensor.Longitude < -180 || sensor.Longitude > 180 {
 		return storage.ErrInvalidLongitude
 	}
 
