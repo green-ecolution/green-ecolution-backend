@@ -59,4 +59,4 @@ mqtt:
   client_id: tree-sensor
   username: sgr-students@zde
   password: secret_secret_secret
-  topic: v3/sgr-students@zde/devices/tree-sensor/up
+  topic: v3/sgr-students@zde/devices/+/up
