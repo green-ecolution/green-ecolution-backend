@@ -14,7 +14,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 	log.Debug("handle event", "event", event.Type(), "service", "TreeService")
 	t, err := s.treeRepo.GetBySensorID(ctx, event.New.SensorID)
 	if err != nil {
-		log.Error("failed to get tree by sensor id", "sensor_id", event.New.SensorID, "err", err)
+		log.Debug("failed to get tree by sensor id", "sensor_id", event.New.SensorID, "err", err)
 		return nil
 	}
 
