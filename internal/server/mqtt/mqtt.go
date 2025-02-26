@@ -91,6 +91,7 @@ func saveCastPayload[T any](raw map[string]any, key string) (T, bool) {
 	return v, true
 }
 
+//nolint:gocyclo // quick and dirty safe cast for the user tests tomorrow, I want to go to bed
 func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPayloadResponse, error) {
 	var raw map[string]any
 	if err := json.Unmarshal(msg.Payload(), &raw); err != nil {
