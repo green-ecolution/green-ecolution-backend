@@ -127,6 +127,10 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 	}
 
 	log.Info("tree cluster created successfully", "cluster_id", c.ID)
+	if err := s.publishUpdateEvent(ctx, c); err != nil {
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
+	}
+
 	return c, nil
 }
 
