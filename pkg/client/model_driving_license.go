@@ -25,7 +25,6 @@ const (
 	DrivingLicenseBE      DrivingLicense = "BE"
 	DrivingLicenseC       DrivingLicense = "C"
 	DrivingLicenseCE      DrivingLicense = "CE"
-	DrivingLicenseUnknown DrivingLicense = "Unknown"
 )
 
 // All allowed values of DrivingLicense enum

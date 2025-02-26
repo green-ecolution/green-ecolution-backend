@@ -2295,7 +2295,6 @@ components:
       - DrivingLicenseBE
       - DrivingLicenseC
       - DrivingLicenseCE
-      - DrivingLicenseUnknown
     EvaluationValue:
       example:
         consumed_water: 1.4658129805029452

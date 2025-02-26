@@ -3,11 +3,10 @@ package entities
 type DrivingLicense string
 
 const (
-	DrivingLicenseB       DrivingLicense = "B"
-	DrivingLicenseBE      DrivingLicense = "BE"
-	DrivingLicenseC       DrivingLicense = "C"
-	DrivingLicenseCE      DrivingLicense = "CE"
-	DrivingLicenseUnknown DrivingLicense = "Unknown"
+	DrivingLicenseB  DrivingLicense = "B"
+	DrivingLicenseBE DrivingLicense = "BE"
+	DrivingLicenseC  DrivingLicense = "C"
+	DrivingLicenseCE DrivingLicense = "CE"
 )
 
 func ParseDrivingLicense(drivingLicense string) DrivingLicense {
@@ -21,6 +20,6 @@ func ParseDrivingLicense(drivingLicense string) DrivingLicense {
 	case string(DrivingLicenseCE):
 		return DrivingLicenseCE
 	default:
-		return DrivingLicenseUnknown
+		return DrivingLicenseB
 	}
 }
