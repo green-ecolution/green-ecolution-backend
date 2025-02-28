@@ -104,7 +104,7 @@ type TreeService interface {
 }
 
 type EvaluationService interface {
-	GetAll(ctx context.Context) (*domain.Evaluation, error)
+	GetEvaluation(ctx context.Context) (*domain.Evaluation, error)
 }
 
 type AuthService interface {
