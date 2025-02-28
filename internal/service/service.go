@@ -103,6 +103,10 @@ type TreeService interface {
 	UpdateWateringStatuses(ctx context.Context) error
 }
 
+type EvaluationService interface {
+	GetAll(ctx context.Context) (*domain.Evaluation, error)
+}
+
 type AuthService interface {
 	Service
 	LoginRequest(ctx context.Context, loginRequest *domain.LoginRequest) *domain.LoginResp
@@ -209,6 +213,7 @@ type Services struct {
 	VehicleService      VehicleService
 	PluginService       PluginService
 	WateringPlanService WateringPlanService
+	EvaluationService   EvaluationService
 }
 
 type ServicesInterface interface {
