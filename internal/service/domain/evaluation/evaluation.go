@@ -30,7 +30,7 @@ func NewEvaluationService(
 	}
 }
 
-func (e *EvaluationService) GetAll(ctx context.Context) (*entities.Evaluation, error) {
+func (e *EvaluationService) GetEvaluation(ctx context.Context) (*entities.Evaluation, error) {
 	log := logger.GetLogger(ctx)
 
 	clusterCount, err := e.treeClusterRepo.GetCount(ctx, "")
