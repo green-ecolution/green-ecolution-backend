@@ -53,10 +53,6 @@ type TreeUpdateRequest struct {
 	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name TreeUpdate
 
-type TreeAddImagesRequest struct {
-	ImageIDs []*int32 `json:"image_ids"`
-} // @Name TreeAddImages
-
 type TreeAddSensorRequest struct {
 	SensorID *string `json:"sensor_id"`
 } // @Name TreeAddSensor

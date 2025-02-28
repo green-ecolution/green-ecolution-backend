@@ -19,7 +19,6 @@ import (
 type TreeService struct {
 	treeRepo        storage.TreeRepository
 	sensorRepo      storage.SensorRepository
-	ImageRepo       storage.ImageRepository
 	treeClusterRepo storage.TreeClusterRepository
 	validator       *validator.Validate
 	eventManager    *worker.EventManager
@@ -28,14 +27,12 @@ type TreeService struct {
 func NewTreeService(
 	repoTree storage.TreeRepository,
 	repoSensor storage.SensorRepository,
-	repoImage storage.ImageRepository,
 	treeClusterRepo storage.TreeClusterRepository,
 	eventManager *worker.EventManager,
 ) service.TreeService {
 	return &TreeService{
 		treeRepo:        repoTree,
 		sensorRepo:      repoSensor,
-		ImageRepo:       repoImage,
 		treeClusterRepo: treeClusterRepo,
 		validator:       validator.New(),
 		eventManager:    eventManager,

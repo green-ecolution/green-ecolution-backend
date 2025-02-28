@@ -26,7 +26,6 @@ type Tree struct {
 	CreatedAt             string                 `json:"created_at"`
 	Description           string                 `json:"description"`
 	Id                    int32                  `json:"id"`
-	// Images              []*ImageResponse `json:\"images\"`
 	LastWatered    *string        `json:"last_watered,omitempty"`
 	Latitude       float32        `json:"latitude"`
 	Longitude      float32        `json:"longitude"`

@@ -17,10 +17,9 @@ func TestTreeService_HandleNewSensorData(t *testing.T) {
 	t.Run("should update watering status on new sensor data event", func(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, eventManager)
+		svc := NewTreeService(treeRepo, sensorRepo, clusterRepo, eventManager)
 
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTree)
 		ctx, cancel := context.WithCancel(context.Background())
@@ -72,10 +71,9 @@ func TestTreeService_HandleNewSensorData(t *testing.T) {
 	t.Run("should not update and not send event if the sensor has no linked tree", func(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, eventManager)
+		svc := NewTreeService(treeRepo, sensorRepo, clusterRepo, eventManager)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTree)
@@ -114,10 +112,9 @@ func TestTreeService_HandleNewSensorData(t *testing.T) {
 	t.Run("should not update and not send event if tree could not be updated", func(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		imageRepo := storageMock.NewMockImageRepository(t)
 		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
-		svc := NewTreeService(treeRepo, sensorRepo, imageRepo, clusterRepo, eventManager)
+		svc := NewTreeService(treeRepo, sensorRepo, clusterRepo, eventManager)
 
 		// event
 		_, ch, _ := eventManager.Subscribe(entities.EventTypeUpdateTree)

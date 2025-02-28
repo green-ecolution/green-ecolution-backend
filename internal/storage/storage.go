@@ -26,7 +26,6 @@ var (
 	ErrIDNotFound           = errors.New("entity id not found")
 	ErrIDAlreadyExists      = errors.New("entity id already exists")
 	ErrSensorNotFound       = errors.New("sensor not found")
-	ErrImageNotFound        = errors.New("image not found")
 	ErrTreeClusterNotFound  = errors.New("treecluster not found")
 	ErrRegionNotFound       = errors.New("region not found")
 	ErrTreeNotFound         = errors.New("tree not found")
@@ -91,10 +90,6 @@ type UserRepository interface {
 	GetAll(ctx context.Context) ([]*entities.User, error)
 	GetAllByRole(ctx context.Context, role entities.UserRole) ([]*entities.User, error)
 	GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error)
-}
-
-type ImageRepository interface {
-	BasicCrudRepository[entities.Image]
 }
 
 type VehicleRepository interface {
@@ -177,18 +172,14 @@ type TreeRepository interface {
 	Delete(ctx context.Context, id int32) error
 
 	GetByTreeClusterID(ctx context.Context, id int32) ([]*entities.Tree, error)
-	GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error)
 	GetSensorByTreeID(ctx context.Context, id int32) (*entities.Sensor, error)
 	GetTreesByIDs(ctx context.Context, ids []int32) ([]*entities.Tree, error)
 	GetByCoordinates(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 	GetBySensorID(ctx context.Context, id string) (*entities.Tree, error)
 	GetBySensorIDs(ctx context.Context, ids ...string) ([]*entities.Tree, error)
 
-	DeleteAndUnlinkImages(ctx context.Context, id int32) error
-	UnlinkAllImages(ctx context.Context, id int32) error
 	UnlinkTreeClusterID(ctx context.Context, treeClusterID int32) error
 	UnlinkSensorID(ctx context.Context, sensorID string) error
-	UnlinkImage(ctx context.Context, treeID, imageID int32) error
 	FindNearestTree(ctx context.Context, latitude, longitude float64) (*entities.Tree, error)
 }
 
@@ -230,12 +221,10 @@ type Repository struct {
 	Sensor       SensorRepository
 	Tree         TreeRepository
 	User         UserRepository
-	Image        ImageRepository
 	Vehicle      VehicleRepository
 	TreeCluster  TreeClusterRepository
 	Region       RegionRepository
 	WateringPlan WateringPlanRepository
 	Routing      RoutingRepository
 	GpxBucket    S3Repository
-	// ImageBucket  S3Repository
 }

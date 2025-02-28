@@ -193,17 +193,6 @@ func (r *TreeRepository) GetByCoordinates(ctx context.Context, latitude, longitu
 	return tree, nil
 }
 
-func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllImagesByTreeID(ctx, id)
-	if err != nil {
-		log.Debug("failed to get images from tree id in db", "error", err, "tree_id", id)
-		return nil, r.store.MapError(err, sqlc.Image{})
-	}
-
-	return r.iMapper.FromSqlList(rows), nil
-}
-
 func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	row, err := r.store.GetSensorByTreeID(ctx, treeID)
@@ -242,27 +231,14 @@ func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int3
 	return tc, nil
 }
 
-// Map sensor, images and tree cluster entity to domain tree
+// Map sensor and tree cluster entity to domain tree
 func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error {
-	if err := mapImages(ctx, r, t); err != nil {
-		return err
-	}
-
 	if err := mapSensor(ctx, r, t); err != nil {
 		return err
 	}
 
 	_ = mapTreeCluster(ctx, r, t)
 
-	return nil
-}
-
-func mapImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
-	images, err := r.GetAllImagesByID(ctx, t.ID)
-	if err != nil {
-		return err
-	}
-	t.Images = images
 	return nil
 }
 
