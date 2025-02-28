@@ -19,7 +19,7 @@ func TestAllServiceReady(t *testing.T) {
 		vehicleSvc := serviceMock.NewMockVehicleService(t)
 		pluginSvc := serviceMock.NewMockPluginService(t)
 		wateringPlanSvc := serviceMock.NewMockWateringPlanService(t)
-		evaluationSvc := serviceMock.NewEvaluationService(t)
+		evaluationSvc := serviceMock.NewMockEvaluationService(t)
 		svc := Services{
 			InfoService:         infoSvc,
 			TreeService:         treeSvc,
