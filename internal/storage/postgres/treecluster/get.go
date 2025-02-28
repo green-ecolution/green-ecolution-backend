@@ -19,9 +19,8 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, provider string) ([]
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	totalCount, err := r.store.GetAllTreeClustersCount(ctx, provider)
+	totalCount, err := r.GetCount(ctx, provider)
 	if err != nil {
-		log.Debug("failed to get total tree cluster count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
@@ -58,6 +57,17 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, provider string) ([]
 	}
 
 	return data, totalCount, nil
+}
+
+func (r *TreeClusterRepository) GetCount(ctx context.Context, provider string) (int64, error) {
+	log := logger.GetLogger(ctx)
+	totalCount, err := r.store.GetAllTreeClustersCount(ctx, provider)
+	if err != nil {
+		log.Debug("failed to get total tree cluster count in db", "error", err)
+		return 0, err
+	}
+
+	return totalCount, nil
 }
 
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {

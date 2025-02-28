@@ -19,9 +19,8 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context, provider string) ([
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	totalCount, err := w.store.GetAllWateringPlansCount(ctx, provider)
+	totalCount, err := w.GetCount(ctx, provider)
 	if err != nil {
-		log.Debug("failed to get total watering plan count in db", "error", err)
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
@@ -58,6 +57,17 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context, provider string) ([
 	}
 
 	return data, totalCount, nil
+}
+
+func (w *WateringPlanRepository) GetCount(ctx context.Context, provider string) (int64, error) {
+	log := logger.GetLogger(ctx)
+	totalCount, err := w.store.GetAllWateringPlansCount(ctx, provider)
+	if err != nil {
+		log.Debug("failed to get total watering plan count in db", "error", err)
+		return 0, err
+	}
+
+	return totalCount, nil
 }
 
 func (w *WateringPlanRepository) GetByID(ctx context.Context, id int32) (*entities.WateringPlan, error) {
@@ -154,6 +164,17 @@ func (w *WateringPlanRepository) GetLinkedUsersByID(ctx context.Context, id int3
 	}
 
 	return userUUIDs, nil
+}
+
+func (w *WateringPlanRepository) GetTotalConsumedWater(ctx context.Context) (int64, error) {
+	log := logger.GetLogger(ctx)
+	totalConsumedWater, err := w.store.GetTotalConsumedWater(ctx)
+	if err != nil {
+		log.Debug("failed to get total consumed water value in db", "error", err)
+		return 0, err
+	}
+
+	return totalConsumedWater, nil
 }
 
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
