@@ -59,11 +59,6 @@ func (s *Server) v1(router fiber.Router, authMiddlewares ...fiber.Handler) {
 		user.RegisterRoutes(router, s.services.AuthService)
 	})
 
-	// app.Route("/role", func(router fiber.Router) {
-	// 	router.Use(authMiddleware...)
-	// 	user.RegisterRoutes(router, s.services.AuthService)
-	// })
-
 	app.Route("/region", func(router fiber.Router) {
 		router.Use(authMiddleware...)
 		region.RegisterRoutes(router, s.services.RegionService)

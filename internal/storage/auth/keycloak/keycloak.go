@@ -66,8 +66,6 @@ func NewKeycloakRepository(cfg *config.IdentityAuthConfig) storage.AuthRepositor
 //	if err != nil {
 //	    log.Fatalf("Failed to authenticate: %v", err)
 //	}
-//
-//	fmt.Printf("Access Token: %s\n", token.AccessToken)
 func loginRestAPIClient(ctx context.Context, baseURL, clientID, clientSecret, realm string) (client *gocloak.GoCloak, token *gocloak.JWT, err error) {
 	log := logger.GetLogger(ctx)
 	client = gocloak.NewClient(baseURL)
