@@ -12,6 +12,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -119,6 +120,27 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]*entities.User, error) {
 	}
 
 	return allUsers, nil
+}
+
+func (r *UserRepository) GetAllByRole(ctx context.Context, role entities.UserRole) ([]*entities.User, error) {
+	log := logger.GetLogger(ctx)
+	users, err := r.GetAll(ctx)
+	if err != nil {
+		log.Debug("failed to fetch all users", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+	}
+
+	var filteredUsers []*entities.User
+	for _, user := range users {
+		for _, userRole := range user.Roles {
+			if userRole == role {
+				filteredUsers = append(filteredUsers, user)
+				break
+			}
+		}
+	}
+
+	return filteredUsers, nil
 }
 
 func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
