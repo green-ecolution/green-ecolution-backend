@@ -802,7 +802,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
-		treeClusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
 
 		prevTree := *TestTreesList[0]
 		expectedTree := *TestTreesList[0]
@@ -1022,7 +1022,7 @@ func TestTreeService_Ready(t *testing.T) {
 		treeRepo := storageMock.NewMockTreeRepository(t)
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 
-		svc := tree.NewTreeService(treeRepo, sensorRepo, nil, nil, nil)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, nil, nil)
 
 		// when
 		result := svc.Ready()
@@ -1035,7 +1035,7 @@ func TestTreeService_Ready(t *testing.T) {
 		// given
 		sensorRepo := storageMock.NewMockSensorRepository(t)
 
-		svc := tree.NewTreeService(nil, sensorRepo, nil, nil, nil)
+		svc := tree.NewTreeService(nil, sensorRepo, nil, nil)
 
 		// when
 		result := svc.Ready()
@@ -1048,7 +1048,7 @@ func TestTreeService_Ready(t *testing.T) {
 		// given
 		treeRepo := storageMock.NewMockTreeRepository(t)
 
-		svc := tree.NewTreeService(treeRepo, nil, nil, nil, nil)
+		svc := tree.NewTreeService(treeRepo, nil, nil, nil)
 
 		// when
 		result := svc.Ready()
@@ -1059,7 +1059,7 @@ func TestTreeService_Ready(t *testing.T) {
 
 	t.Run("should return false when both treeRepo and sensorRepo are nil", func(t *testing.T) {
 		// given
-		svc := tree.NewTreeService(nil, nil, nil, nil, nil)
+		svc := tree.NewTreeService(nil, nil, nil, nil)
 
 		// when
 		result := svc.Ready()
