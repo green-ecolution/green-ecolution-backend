@@ -104,6 +104,7 @@ type TreeService interface {
 }
 
 type EvaluationService interface {
+	Service
 	GetEvaluation(ctx context.Context) (*domain.Evaluation, error)
 }
 

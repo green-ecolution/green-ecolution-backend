@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/evaluation"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/info"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/plugin"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/region"
@@ -72,6 +73,11 @@ func (s *Server) v1(router fiber.Router, authMiddlewares ...fiber.Handler) {
 	app.Route("/watering-plan", func(router fiber.Router) {
 		router.Use(authMiddleware...)
 		wateringplan.RegisterRoutes(router, s.services.WateringPlanService)
+	})
+
+	app.Route("/evaluation", func(router fiber.Router) {
+		router.Use(authMiddleware...)
+		evaluation.RegisterRoutes(router, s.services.EvaluationService)
 	})
 
 	app.Route("/plugin", func(router fiber.Router) {
