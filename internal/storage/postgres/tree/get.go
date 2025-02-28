@@ -218,8 +218,9 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*
 		return nil, err
 	}
 
-	if err := r.store.MapSensorFields(ctx, data); err != nil { // TODO: handle error
-		return nil, err
+	if err := r.store.MapSensorFields(ctx, data); err != nil {
+		log.Debug("failed to convert sensor data", "error", err)
+		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
 	return data, nil

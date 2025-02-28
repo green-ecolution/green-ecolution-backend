@@ -147,6 +147,4 @@ func TestWateringPlanRepository_Delete(t *testing.T) {
 		// then
 		assert.Error(t, err)
 	})
-
-	// TODO: Add test cases to check if the user in the pivot table are deleted
 }

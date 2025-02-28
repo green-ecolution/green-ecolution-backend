@@ -372,19 +372,9 @@ func TestKeyCloakUserRepo_GetAllByRole(t *testing.T) {
 			PhoneNumber: "+49 987654321",
 			Roles:       []entities.UserRole{entities.UserRoleTbz},
 		}
-		user5 := &entities.User{
-			Username:    "user5",
-			FirstName:   "Peter",
-			LastName:    "Doe",
-			Email:       "user5@green-ecolution.de",
-			EmployeeID:  "EMP003",
-			PhoneNumber: "+49 987654321",
-			Roles:       []entities.UserRole{entities.UserRoleTbz},
-		}
 
 		suite.EnsureUserExists(t, user3)
 		suite.EnsureUserExists(t, user4)
-		suite.EnsureUserExists(t, user5)
 
 		// when
 		users, err := userRepo.GetAllByRole(context.Background(), entities.UserRoleGreenEcolution)
