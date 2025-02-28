@@ -7,7 +7,8 @@ type Entities interface {
 		TreeCluster |
 		Tree |
 		Region |
-		WateringPlan
+		WateringPlan |
+		Evaluation
 }
 
 type EntityFunc[T Entities] func(*T)
