@@ -118,7 +118,7 @@ type AuthService interface {
 
 type RegionService interface {
 	Service
-	GetAll(ctx context.Context) ([]*domain.Region, error)
+	GetAll(ctx context.Context) ([]*domain.Region, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.Region, error)
 }
 

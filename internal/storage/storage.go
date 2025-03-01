@@ -71,9 +71,18 @@ type InfoRepository interface {
 }
 
 type RegionRepository interface {
-	BasicCrudRepository[entities.Region]
-	GetByName(ctx context.Context, name string) (*entities.Region, error)
+	// GetAll returns all regions
+	GetAll(ctx context.Context) ([]*entities.Region, int64, error)
+	// GetByID returns one region by id
+	GetByID(ctx context.Context, id int32) (*entities.Region, error)
+	// GetByPoint returns one region by latitude and longitude
 	GetByPoint(ctx context.Context, latitude, longitude float64) (*entities.Region, error)
+	// Create creates a new region. It accepts a list of functions to apply to the new region
+	Create(ctx context.Context, fn ...entities.EntityFunc[entities.Region]) (*entities.Region, error)
+	// Update updates a already existing region. It accepts a list of functions to apply to the region
+	Update(ctx context.Context, id int32, fn ...entities.EntityFunc[entities.Region]) (*entities.Region, error)
+	// Delete deletes a region by id
+	Delete(ctx context.Context, id int32) error
 }
 
 type UserRepository interface {

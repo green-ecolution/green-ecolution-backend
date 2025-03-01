@@ -19,15 +19,15 @@ func NewRegionService(regionRepository storage.RegionRepository) service.RegionS
 	}
 }
 
-func (s *RegionService) GetAll(ctx context.Context) ([]*domain.Region, error) {
+func (s *RegionService) GetAll(ctx context.Context) ([]*domain.Region, int64, error) {
 	log := logger.GetLogger(ctx)
-	regions, err := s.regionRepo.GetAll(ctx)
+	regions, totalCount, err := s.regionRepo.GetAll(ctx)
 	if err != nil {
 		log.Debug("failed to get region by id", "error", err)
-		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	return regions, nil
+	return regions, totalCount, nil
 }
 
 func (s *RegionService) GetByID(ctx context.Context, id int32) (*domain.Region, error) {
