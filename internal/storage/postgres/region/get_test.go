@@ -9,18 +9,22 @@ import (
 )
 
 func TestRegionRepository_GetAll(t *testing.T) {
-	t.Run("should return all regions ordered by id", func(t *testing.T) {
+	t.Run("should return all regions ordered by id without limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/region")
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, len(allTestRegions), len(got))
+		assert.Equal(t, int64(len(allTestRegions)), totalCount)
 		for i, region := range got {
 			assert.Equal(t, allTestRegions[i].ID, region.ID)
 			assert.Equal(t, allTestRegions[i].Name, region.Name)
@@ -29,17 +33,79 @@ func TestRegionRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all regions limited by 1 and with an offset of 2", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/region")
+		r := NewRegionRepository(suite.Store, defaultRegionMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx)
+		testRegions := allTestRegions[2:4]
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, len(testRegions), len(got))
+		assert.Equal(t, int64(len(allTestRegions)), totalCount)
+		for i, region := range got {
+			assert.Equal(t, testRegions[i].ID, region.ID)
+			assert.Equal(t, testRegions[i].Name, region.Name)
+			assert.NotZero(t, region.CreatedAt)
+			assert.NotZero(t, region.UpdatedAt)
+		}
+	})
+
+	t.Run("should return error on invalid page value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/region")
+		r := NewRegionRepository(suite.Store, defaultRegionMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(0))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
+	t.Run("should return error on invalid limit value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/region")
+		r := NewRegionRepository(suite.Store, defaultRegionMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(0))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewRegionRepository(suite.Store, defaultRegionMappers())
 
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(context.Background())
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -49,11 +115,12 @@ func TestRegionRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 }
 
