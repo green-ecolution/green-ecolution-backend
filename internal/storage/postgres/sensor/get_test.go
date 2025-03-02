@@ -167,6 +167,36 @@ func TestSensorRepository_GetAll(t *testing.T) {
 	})
 }
 
+func TestSensorRepository_GetCount(t *testing.T) {
+	t.Run("should return count of all sensors in db", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/sensor")
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+
+		// when
+		totalCount, err := r.GetCount(context.Background(), "")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, int64(len(TestSensorList)), totalCount)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewSensorRepository(suite.Store, defaultSensorMappers())
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		totalCount, err := r.GetCount(ctx, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, int64(0), totalCount)
+	})
+}
+
 func TestSensorRepository_GetAllDataById(t *testing.T) {
 	t.Run("should return all sensor data", func(t *testing.T) {
 		// given

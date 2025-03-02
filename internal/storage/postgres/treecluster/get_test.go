@@ -172,6 +172,35 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 	})
 }
 
+func TestTreeClusterRepository_GetCount(t *testing.T) {
+	t.Run("should return count of all tree cluster in db", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		// when
+		totalCount, err := r.GetCount(context.Background(), "")
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, int64(len(allTestCluster)), totalCount)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewTreeClusterRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		totalCount, err := r.GetCount(ctx, "")
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, int64(0), totalCount)
+	})
+}
+
 func TestTreeClusterRepository_GetByID(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
