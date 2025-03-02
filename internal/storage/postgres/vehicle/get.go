@@ -53,8 +53,8 @@ func (r *VehicleRepository) GetAll(ctx context.Context, query entities.Query) ([
 		func(page, limit int32) ([]*sqlc.Vehicle, error) {
 			return r.store.GetAllVehicles(ctx, &sqlc.GetAllVehiclesParams{
 				Provider: query.Provider,
-				Limit:   limit,
-				Offset:  (page - 1) * limit,
+				Limit:    limit,
+				Offset:   (page - 1) * limit,
 			})
 		},
 	)
@@ -68,9 +68,9 @@ func (r *VehicleRepository) GetAllWithArchived(ctx context.Context, provider str
 		},
 		func(page, limit int32) ([]*sqlc.Vehicle, error) {
 			return r.store.GetAllVehiclesWithArchived(ctx, &sqlc.GetAllVehiclesWithArchivedParams{
-				Column1: provider,
-				Limit:   limit,
-				Offset:  (page - 1) * limit,
+				Provider: provider,
+				Limit:    limit,
+				Offset:   (page - 1) * limit,
 			})
 		},
 	)
@@ -81,15 +81,15 @@ func (r *VehicleRepository) GetAllByTypeWithArchived(ctx context.Context, provid
 		ctx,
 		func() (int64, error) {
 			return r.store.GetAllVehiclesByTypeWithArchivedCount(ctx, &sqlc.GetAllVehiclesByTypeWithArchivedCountParams{
-				Type:    sqlc.VehicleType(vehicleType),
-				Column2: provider})
+				Type:     sqlc.VehicleType(vehicleType),
+				Provider: provider})
 		},
 		func(page, limit int32) ([]*sqlc.Vehicle, error) {
 			return r.store.GetAllVehiclesByTypeWithArchived(ctx, &sqlc.GetAllVehiclesByTypeWithArchivedParams{
-				Type:    sqlc.VehicleType(vehicleType),
-				Column2: provider,
-				Limit:   limit,
-				Offset:  (page - 1) * limit,
+				Type:     sqlc.VehicleType(vehicleType),
+				Provider: provider,
+				Limit:    limit,
+				Offset:   (page - 1) * limit,
 			})
 		},
 	)
