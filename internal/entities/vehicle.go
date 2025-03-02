@@ -74,7 +74,8 @@ type VehicleUpdate struct {
 }
 
 type VehicleQuery struct {
-	Type string `query:"type"`
+	Type         string `query:"type"`
+	WithArchived bool   `query:"archived"`
 	Query
 }
 

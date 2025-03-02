@@ -37,13 +37,13 @@ func (v *VehicleService) GetAll(ctx context.Context, query entities.VehicleQuery
 			return nil, 0, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 		}
 
-		if query.withArchived {
+		if query.WithArchived {
 			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, query.Provider, parsedVehicleType)
 		} else {
 			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, query.Provider, parsedVehicleType)
 		}
 	} else {
-		if query.withArchived {
+		if query.WithArchived {
 			vehicles, totalCount, err = v.vehicleRepo.GetAllWithArchived(ctx, query.Provider)
 		} else {
 			vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, entities.Query{Provider: query.Provider})
