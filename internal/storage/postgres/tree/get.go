@@ -62,7 +62,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 
 func (r *TreeRepository) GetCount(ctx context.Context, provider string) (int64, error) {
 	log := logger.GetLogger(ctx)
-	totalCount, err := r.store.GetAllSensorsCount(ctx, provider)
+	totalCount, err := r.store.GetAllTreesCount(ctx, provider)
 	if err != nil {
 		log.Debug("failed to get total trees count in db", "error", err)
 		return 0, err
