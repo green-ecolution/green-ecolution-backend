@@ -98,6 +98,8 @@ type VehicleRepository interface {
 	GetAllByTypeWithArchived(ctx context.Context, provider string, vehicleType entities.VehicleType) ([]*entities.Vehicle, int64, error)
 	// GetAllArchived returns all archived vehicles
 	GetAllArchived(ctx context.Context) ([]*entities.Vehicle, error)
+	// GetAllWithWateringPlanCount retrieves all vehicles that are associated with at least one watering plan, along with the count of watering plans linked to each vehicle.
+	GetAllWithWateringPlanCount(ctx context.Context) ([]*entities.VehicleEvaluation, error)
 	// GetByID returns one vehicle by id
 	GetByID(ctx context.Context, id int32) (*entities.Vehicle, error)
 	// GetByPlate returns one vehicle by its plate

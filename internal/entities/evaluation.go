@@ -7,3 +7,8 @@ type Evaluation struct {
 	WateringPlanCount     int64
 	TotalWaterConsumption int64
 }
+
+type VehicleEvaluation struct {
+	NumberPlate       string
+	WateringPlanCount int64
+}
