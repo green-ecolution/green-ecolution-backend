@@ -26,12 +26,13 @@ func TestRegionService_GetAll(t *testing.T) {
 		}
 
 		// when
-		repo.EXPECT().GetAll(rootCtx).Return(expectedRegions, nil)
-		regions, err := svc.GetAll(rootCtx)
+		repo.EXPECT().GetAll(rootCtx).Return(expectedRegions, int64(len(expectedRegions)), nil)
+		regions, totalCount, err := svc.GetAll(rootCtx)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, expectedRegions, regions)
+		assert.Equal(t, int64(len(expectedRegions)), totalCount)
 	})
 
 	t.Run("should return error when repository fails", func(t *testing.T) {
@@ -40,12 +41,13 @@ func TestRegionService_GetAll(t *testing.T) {
 		svc := NewRegionService(repo)
 		expectedErr := errors.New("GetAll failed")
 
-		repo.EXPECT().GetAll(rootCtx).Return(nil, expectedErr)
-		regions, err := svc.GetAll(rootCtx)
+		repo.EXPECT().GetAll(rootCtx).Return(nil, int64(0), expectedErr)
+		regions, totalCount, err := svc.GetAll(rootCtx)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, regions)
+		assert.Equal(t, int64(0), totalCount)
 		//assert.EqualError(t, err, "500: GetAll failed")
 	})
 }
