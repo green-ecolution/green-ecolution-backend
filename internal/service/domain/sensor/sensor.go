@@ -186,7 +186,6 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 	return nil
 }
 
-// TODO: Not called by any function
 func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Sensor) error {
 	log := logger.GetLogger(ctx)
 	if sen == nil {
