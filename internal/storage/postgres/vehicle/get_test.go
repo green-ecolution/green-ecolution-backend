@@ -302,14 +302,28 @@ func TestVehicleRepository_GetAllWithWateringPlanCount(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
+		exptectedVehicles := getVehicleWateringPlanCounts()
+
 		got, err := r.GetAllWithWateringPlanCount(context.Background())
 
 		assert.NoError(t, err)
-		assert.Equal(t, 2, len(got))
+		assert.Equal(t, len(exptectedVehicles), len(got))
 
-		// for _, entry := range got {
-		// 	assert.Equal(t, , entry.NumberPlate)
-		// }
+		for i, entry := range got {
+			assert.Equal(t, exptectedVehicles[i].NumberPlate, entry.NumberPlate)
+			assert.Equal(t, exptectedVehicles[i].WateringPlanCount, entry.WateringPlanCount)
+		}
+	})
+
+	t.Run("should return empty slice on empty db", func(t *testing.T) {
+		suite.ResetDB(t)
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		got, err := r.GetAllWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(got))
+		assert.Empty(t, got)
 	})
 }
 
@@ -549,16 +563,31 @@ func sortVehicleByWaterCapacity(data []*entities.Vehicle) []*entities.Vehicle {
 	return sorted
 }
 
-func getVehicleWateringPlanCounts(wateringPlans []*entities.WateringPlan) map[string]int {
+func getVehicleWateringPlanCounts() []*entities.VehicleEvaluation {
 	vehicleCountMap := make(map[string]int)
 
-	for _, plan := range wateringplan {
+	for _, plan := range allTestWateringPlans {
 		if plan.Transporter != nil && plan.Transporter.NumberPlate != "" {
 			vehicleCountMap[plan.Transporter.NumberPlate]++
 		}
+		if plan.Trailer != nil && plan.Trailer.NumberPlate != "" {
+			vehicleCountMap[plan.Trailer.NumberPlate]++
+		}
 	}
 
-	return vehicleCountMap
+	var vehicleCounts []*entities.VehicleEvaluation
+	for plate, count := range vehicleCountMap {
+		vehicleCounts = append(vehicleCounts, &entities.VehicleEvaluation{
+			NumberPlate:       plate,
+			WateringPlanCount: int64(count),
+		})
+	}
+
+	sort.Slice(vehicleCounts, func(i, j int) bool {
+		return vehicleCounts[i].WateringPlanCount > vehicleCounts[j].WateringPlanCount
+	})
+
+	return vehicleCounts
 }
 
 type testWateringPlan struct {

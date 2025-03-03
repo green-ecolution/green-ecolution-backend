@@ -120,7 +120,6 @@ SELECT
     v.number_plate,
     COUNT(vwp.watering_plan_id) AS watering_plan_count
 FROM vehicles v
-LEFT JOIN vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
+INNER JOIN vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
 GROUP BY v.number_plate
 ORDER BY watering_plan_count DESC;
-
