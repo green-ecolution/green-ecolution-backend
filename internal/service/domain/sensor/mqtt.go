@@ -30,14 +30,6 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		}
 	}
 
-	if err != nil {
-		var entityNotFoundErr storage.ErrEntityNotFound
-		if !errors.As(err, &entityNotFoundErr) {
-			log.Error("failed to get sensor by id", "error", err)
-			return nil, err
-		}
-	}
-
 	if sensor != nil {
 		updatedSensor, err := s.updateSensorCoordsAndStatus(ctx, payload, sensor)
 		if err != nil {
@@ -75,8 +67,12 @@ func (s *SensorService) HandleMessage(ctx context.Context, payload *domain.MqttP
 		return nil, err
 	}
 
-	s.publishNewSensorDataEvent(ctx, sensorData)
+	err = s.MapSensorToTree(ctx, sensor)
+	if err != nil {
+		return nil, err
+	}
 
+	s.publishNewSensorDataEvent(ctx, sensorData)
 	return sensorData, nil
 }
 

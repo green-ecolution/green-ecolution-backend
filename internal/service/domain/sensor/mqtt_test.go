@@ -41,6 +41,8 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo.EXPECT().Update(context.Background(), TestSensor.ID, mock.Anything).Return(TestSensor, nil)
 		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, testPayLoad.Device).Return(nil)
 		sensorRepo.EXPECT().GetLatestSensorDataBySensorID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil)
+		treeRepo.EXPECT().FindNearestTree(context.Background(), TestSensor.Latitude, TestSensor.Longitude).Return(TestNearestTree, nil)
+		treeRepo.EXPECT().Update(context.Background(), TestNearestTree.ID, mock.Anything).Return(TestNearestTree, nil)
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)
@@ -94,6 +96,8 @@ func TestSensorService_HandleMessage(t *testing.T) {
 		sensorRepo.EXPECT().InsertSensorData(context.Background(), insertData, TestSensor.ID).Return(nil).Once()
 		sensorRepo.EXPECT().GetLatestSensorDataBySensorID(context.Background(), TestSensor.ID).Return(TestSensorData[0], nil).Once()
 		sensorRepo.EXPECT().GetByID(context.Background(), TestSensor.ID).Return(TestSensor, nil).Once()
+		treeRepo.EXPECT().FindNearestTree(context.Background(), TestSensor.Latitude, TestSensor.Longitude).Return(TestNearestTree, nil)
+		treeRepo.EXPECT().Update(context.Background(), TestNearestTree.ID, mock.Anything).Return(TestNearestTree, nil)
 
 		// when
 		sensorData, err := svc.HandleMessage(context.Background(), testPayLoad)
