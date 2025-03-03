@@ -19,29 +19,6 @@ type InternalVehicleRepoMapper interface {
 	FromSqlListVehicleWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error)
 }
 
-func FromSqlVehicleWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error) {
-	if src == nil {
-		return nil, nil
-	}
-
-	return &entities.VehicleEvaluation{
-		NumberPlate:       src.NumberPlate,
-		WateringPlanCount: int64(src.WateringPlanCount),
-	}, nil
-}
-
-func FromSqlListVehicleWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error) {
-	var result []*entities.VehicleEvaluation
-	for _, v := range src {
-		mapped, err := FromSqlVehicleWithCount(v)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, mapped)
-	}
-	return result, nil
-}
-
 func MapVehicleStatus(vehicleStatus sqlc.VehicleStatus) entities.VehicleStatus {
 	return entities.VehicleStatus(vehicleStatus)
 }

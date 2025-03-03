@@ -87,7 +87,7 @@ WHERE tc.id = $1
 
 -- name: GetAllTreeClusterRegionsWithWateringPlanCount :many
 SELECT 
-    r.name AS region_name,
+    r.name AS name,
     COUNT(twp.watering_plan_id) AS watering_plan_count
 FROM regions r
 INNER JOIN tree_clusters tc ON r.id = tc.region_id

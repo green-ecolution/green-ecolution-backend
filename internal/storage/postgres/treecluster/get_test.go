@@ -503,6 +503,10 @@ var allTestRegions = []*entities.Region{
 		Name: "Mürwik",
 	},
 	{
+		ID:   2,
+		Name: "Fruerlund",
+	},
+	{
 		ID:   4,
 		Name: "Sandberg",
 	},
@@ -562,21 +566,30 @@ var allTestWateringPlans = []*testWateringPlan{
 }
 
 func getRegionCounts() []*entities.RegionEvaluation {
-	regionCountMap := make(map[string]int64)
+	regionCountMap := make(map[int32]int64)
 
 	for _, plan := range allTestWateringPlans {
 		for _, cluster := range plan.TreeClusters {
-			regionCountMap[cluster.Name]++
+			regionCountMap[cluster.RegionID]++
 		}
 	}
 
 	var regionEvaluations []*entities.RegionEvaluation
-	for regionName, count := range regionCountMap {
-		regionEvaluations = append(regionEvaluations, &entities.RegionEvaluation{
-			Name:              regionName,
-			WateringPlanCount: count,
-		})
+	for regionID, count := range regionCountMap {
+		for _, region := range allTestRegions {
+			if region.ID == regionID {
+				regionEvaluations = append(regionEvaluations, &entities.RegionEvaluation{
+					Name:              region.Name,
+					WateringPlanCount: count,
+				})
+				break
+			}
+		}
 	}
+
+	sort.Slice(regionEvaluations, func(i, j int) bool {
+		return regionEvaluations[i].WateringPlanCount > regionEvaluations[j].WateringPlanCount
+	})
 
 	return regionEvaluations
 }
