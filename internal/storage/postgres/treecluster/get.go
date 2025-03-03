@@ -150,3 +150,14 @@ func (r *TreeClusterRepository) GetAllLatestSensorDataByClusterID(ctx context.Co
 
 	return domainData, nil
 }
+
+func (r *TreeClusterRepository) GetAllRegionsWithWateringPlanCount(ctx context.Context) ([]*entities.RegionEvaluation, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllTreeClusterRegionsWithWateringPlanCount(ctx)
+	if err != nil {
+		log.Debug("failed to get regions with watering plan count", "error", err)
+		return nil, r.store.MapError(err, sqlc.GetAllTreeClusterRegionsWithWateringPlanCountRow{})
+	}
+
+	return r.mapper.FromSqlRegionListWithCount(rows)
+}

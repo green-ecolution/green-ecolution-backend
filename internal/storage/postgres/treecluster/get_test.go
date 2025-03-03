@@ -4,7 +4,9 @@ import (
 	"context"
 	"sort"
 	"testing"
+	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -396,6 +398,37 @@ func TestTreeClusterRepository_GetAllLatestSensorDataByClusterID(t *testing.T) {
 	})
 }
 
+func TestVehicleRepository_GetAllWithWateringPlanCount(t *testing.T) {
+	t.Run("should return all regions with the associated watering plan count", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		exptectedRegions := getRegionCounts()
+
+		got, err := r.GetAllRegionsWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(exptectedRegions), len(got))
+
+		for i, entry := range got {
+			assert.Equal(t, exptectedRegions[i].Name, entry.Name)
+			assert.Equal(t, exptectedRegions[i].WateringPlanCount, entry.WateringPlanCount)
+		}
+	})
+
+	t.Run("should return empty slice on empty db", func(t *testing.T) {
+		suite.ResetDB(t)
+		r := NewTreeClusterRepository(suite.Store, mappers)
+
+		got, err := r.GetAllRegionsWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(got))
+		assert.Empty(t, got)
+	})
+}
+
 type testTreeCluster struct {
 	ID             int32
 	Name           string
@@ -464,6 +497,25 @@ var allTestCluster = []*testTreeCluster{
 	},
 }
 
+var allTestRegions = []*entities.Region{
+	{
+		ID:   1,
+		Name: "Mürwik",
+	},
+	{
+		ID:   4,
+		Name: "Sandberg",
+	},
+	{
+		ID:   10,
+		Name: "Friesischer Berg",
+	},
+	{
+		ID:   13,
+		Name: "Nordstadt",
+	},
+}
+
 func sortClusterByName(data []*testTreeCluster) []*testTreeCluster {
 	sorted := make([]*testTreeCluster, len(data))
 	copy(sorted, data)
@@ -473,4 +525,58 @@ func sortClusterByName(data []*testTreeCluster) []*testTreeCluster {
 	})
 
 	return sorted
+}
+
+type testWateringPlan struct {
+	ID           int32
+	Date         time.Time
+	TreeClusters []*testTreeCluster
+}
+
+var allTestWateringPlans = []*testWateringPlan{
+	{
+		ID:           1,
+		Date:         time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
+		TreeClusters: allTestCluster[0:2],
+	},
+	{
+		ID:           2,
+		Date:         time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		TreeClusters: allTestCluster[2:4],
+	},
+	{
+		ID:           3,
+		Date:         time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
+		TreeClusters: allTestCluster[2:6],
+	},
+	{
+		ID:           4,
+		Date:         time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
+		TreeClusters: allTestCluster[0:5],
+	},
+	{
+		ID:           5,
+		Date:         time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
+		TreeClusters: allTestCluster[1:4],
+	},
+}
+
+func getRegionCounts() []*entities.RegionEvaluation {
+	regionCountMap := make(map[string]int64)
+
+	for _, plan := range allTestWateringPlans {
+		for _, cluster := range plan.TreeClusters {
+			regionCountMap[cluster.Name]++
+		}
+	}
+
+	var regionEvaluations []*entities.RegionEvaluation
+	for regionName, count := range regionCountMap {
+		regionEvaluations = append(regionEvaluations, &entities.RegionEvaluation{
+			Name:              regionName,
+			WateringPlanCount: count,
+		})
+	}
+
+	return regionEvaluations
 }

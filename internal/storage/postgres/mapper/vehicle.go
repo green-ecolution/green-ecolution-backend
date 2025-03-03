@@ -15,11 +15,11 @@ type InternalVehicleRepoMapper interface {
 	FromSql(src *sqlc.Vehicle) (*entities.Vehicle, error)
 	FromSqlList(src []*sqlc.Vehicle) ([]*entities.Vehicle, error)
 
-	FromSqlWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error)
-	FromSqlListWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error)
+	FromSqlVehicleWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error)
+	FromSqlListVehicleWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error)
 }
 
-func FromSqlWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error) {
+func FromSqlVehicleWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error) {
 	if src == nil {
 		return nil, nil
 	}
@@ -30,10 +30,10 @@ func FromSqlWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entiti
 	}, nil
 }
 
-func FromSqlListWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error) {
+func FromSqlListVehicleWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error) {
 	var result []*entities.VehicleEvaluation
 	for _, v := range src {
-		mapped, err := FromSqlWithCount(v)
+		mapped, err := FromSqlVehicleWithCount(v)
 		if err != nil {
 			return nil, err
 		}

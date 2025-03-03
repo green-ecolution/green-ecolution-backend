@@ -155,6 +155,8 @@ type TreeClusterRepository interface {
 	Update(ctx context.Context, id int32, fn func(tc *entities.TreeCluster, repo TreeClusterRepository) (bool, error)) error
 	// Delete deletes a tree cluster by id
 	Delete(ctx context.Context, id int32) error
+	// GetAllRegionsWithWateringPlanCount retrieves all tree cluster regions that are associated with at least one watering plan, along with the count of watering plans linked to each treecluster.
+	GetAllRegionsWithWateringPlanCount(ctx context.Context) ([]*entities.RegionEvaluation, error)
 
 	Archive(ctx context.Context, id int32) error
 	LinkTreesToCluster(ctx context.Context, treeClusterID int32, treeIDs []int32) error
