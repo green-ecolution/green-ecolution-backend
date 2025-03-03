@@ -177,6 +177,17 @@ func (w *WateringPlanRepository) GetTotalConsumedWater(ctx context.Context) (int
 	return totalConsumedWater, nil
 }
 
+func (w *WateringPlanRepository) GetAllUserCount(ctx context.Context) (int64, error) {
+	log := logger.GetLogger(ctx)
+	userCount, err := w.store.GetAllUserWateringPlanCount(ctx)
+	if err != nil {
+		log.Debug("failed to get count of all user linked to watering plans in db", "error", err)
+		return 0, err
+	}
+
+	return userCount, nil
+}
+
 func (w *WateringPlanRepository) mapFields(ctx context.Context, wp *entities.WateringPlan) error {
 	log := logger.GetLogger(ctx)
 	var err error

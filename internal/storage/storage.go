@@ -131,6 +131,8 @@ type WateringPlanRepository interface {
 	GetEvaluationValues(ctx context.Context, id int32) ([]*entities.EvaluationValue, error)
 	// GetTotalConsumedWater returns the total consumed water for all watering plans
 	GetTotalConsumedWater(ctx context.Context) (int64, error)
+	// GetAllUserCount returns count of all users linked to a watering plan
+	GetAllUserCount(ctx context.Context) (int64, error)
 	// Create creates a new watering plan. It accepts a function that takes a watering plan that can be modified. Any changes made to the plan will be saved in the storage. If the function returns true, the watering plan will be created, otherwise it will not be created.
 	Create(ctx context.Context, fn func(tc *entities.WateringPlan, repo WateringPlanRepository) (bool, error)) (*entities.WateringPlan, error)
 	// Update updates a watering plan by id. It takes the id of the watering plan to update and a function that takes a watering plan that can be modified. Any changes made to the plan will be saved updated in the storage. If the function returns true, the watering plan will be updated, otherwise it will not be updated.
