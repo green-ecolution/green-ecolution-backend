@@ -6,6 +6,7 @@ type Evaluation struct {
 	SensorCount           int64
 	WateringPlanCount     int64
 	TotalWaterConsumption int64
+	UserWateringPlanCount int64
 	VehicleEvaluation     []*VehicleEvaluation
 	RegionEvaluation      []*RegionEvaluation
 }

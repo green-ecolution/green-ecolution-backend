@@ -6,6 +6,7 @@ type EvaluationResponse struct {
 	SensorCount           int64                        `json:"sensor_count"`
 	WateringPlanCount     int64                        `json:"watering_plan_count"`
 	TotalWaterConsumption int64                        `json:"total_water_consumption"`
+	UserWateringPlanCount int64                        `json:"user_watering_plan_count"`
 	VehicleEvaluation     []*VehicleEvaluationResponse `json:"vehicle_evaluation"`
 	RegionEvaluation      []*RegionEvaluationResponse  `json:"region_evaluation"`
 } // @Name Evaluation

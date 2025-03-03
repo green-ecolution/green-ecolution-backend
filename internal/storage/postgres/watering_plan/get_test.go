@@ -757,6 +757,38 @@ func TestWateringPlanRepository_GetEvaluationValues(t *testing.T) {
 	})
 }
 
+func TestWateringPlanRepository_GetAllUserCount(t *testing.T) {
+	t.Run("should return count of all user linked to a watering plan in db", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
+		r := NewWateringPlanRepository(suite.Store, mappers)
+
+		expectedCount := countUsersForWateringPlans()
+
+		// when
+		userCount, err := r.GetAllUserCount(context.Background())
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, int64(expectedCount), userCount)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewWateringPlanRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		userCount, err := r.GetAllUserCount(ctx)
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, int64(0), userCount)
+	})
+}
+
 var allTestWateringPlans = []*entities.WateringPlan{
 	{
 		ID:                 1,
@@ -943,4 +975,14 @@ func calculateCountTotalWater() int {
 	}
 
 	return count * 10
+}
+
+func countUsersForWateringPlans() int {
+	totalUsersCount := 0
+
+	for _, plan := range allTestWateringPlans {
+		totalUsersCount += len(plan.UserIDs)
+	}
+
+	return totalUsersCount
 }
