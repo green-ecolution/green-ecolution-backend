@@ -14,6 +14,7 @@ type EvaluationService struct {
 	treeRepo         storage.TreeRepository
 	sensorRepo       storage.SensorRepository
 	wateringPlanRepo storage.WateringPlanRepository
+	vehicleRepo      storage.VehicleRepository
 }
 
 func NewEvaluationService(
@@ -21,12 +22,14 @@ func NewEvaluationService(
 	treeRepo storage.TreeRepository,
 	sensorRepo storage.SensorRepository,
 	wateringPlanRepo storage.WateringPlanRepository,
+	vehicleRepo storage.VehicleRepository,
 ) service.EvaluationService {
 	return &EvaluationService{
 		treeClusterRepo:  treeClusterRepo,
 		treeRepo:         treeRepo,
 		sensorRepo:       sensorRepo,
 		wateringPlanRepo: wateringPlanRepo,
+		vehicleRepo:      vehicleRepo,
 	}
 }
 
@@ -63,12 +66,19 @@ func (e *EvaluationService) GetEvaluation(ctx context.Context) (*entities.Evalua
 		return &entities.Evaluation{}, err
 	}
 
+	vehicleCount, err := e.vehicleRepo.GetAllWithWateringPlanCount(ctx)
+	if err != nil {
+		log.Error("failed to get vehicle count", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
 	evaluation := &entities.Evaluation{
 		TreeClusterCount:      clusterCount,
 		TreeCount:             treeCount,
 		SensorCount:           sensorCount,
 		WateringPlanCount:     wateringPlanCount,
 		TotalWaterConsumption: totalConsumedWater,
+		VehicleEvaluation:     vehicleCount,
 	}
 
 	return evaluation, nil
@@ -78,5 +88,6 @@ func (e *EvaluationService) Ready() bool {
 	return e.treeClusterRepo != nil &&
 		e.treeRepo != nil &&
 		e.sensorRepo != nil &&
-		e.wateringPlanRepo != nil
+		e.wateringPlanRepo != nil &&
+		e.vehicleRepo != nil
 }

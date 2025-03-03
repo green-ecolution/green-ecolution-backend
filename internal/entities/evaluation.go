@@ -6,6 +6,7 @@ type Evaluation struct {
 	SensorCount           int64
 	WateringPlanCount     int64
 	TotalWaterConsumption int64
+	VehicleEvaluation     []*VehicleEvaluation
 }
 
 type VehicleEvaluation struct {
