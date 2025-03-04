@@ -331,7 +331,7 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 		assert.NotNil(t, users)
 		assert.GreaterOrEqual(t, len(users), 2)
 		assert.True(t, containsUser(users, *user1), "user1 should be in the list")
-		assert.True(t, containsUser(users, *user2), "user1 should be in the list")
+		assert.True(t, containsUser(users, *user2), "user2 should be in the list")
 	})
 
 	t.Run("should return error when login fails", func(t *testing.T) {
@@ -345,6 +345,58 @@ func TestKeyCloakUserRepo_GetAll(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.ErrorIs(t, err, ErrLogin)
+		assert.Nil(t, users)
+	})
+}
+
+func TestKeyCloakUserRepo_GetAllByRole(t *testing.T) {
+	t.Run("should get all users by role successfully", func(t *testing.T) {
+		// given
+		identityConfig := suite.IdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+		user3 := &entities.User{
+			Username:    "user3",
+			FirstName:   "John",
+			LastName:    "Doe",
+			Email:       "user3@green-ecolution.de",
+			EmployeeID:  "EMP001",
+			PhoneNumber: "+49 123456789",
+			Roles:       []entities.UserRole{entities.UserRoleSmarteGrenzregion},
+		}
+		user4 := &entities.User{
+			Username:    "user4",
+			FirstName:   "Jane",
+			LastName:    "Doe",
+			Email:       "user4@green-ecolution.de",
+			EmployeeID:  "EMP002",
+			PhoneNumber: "+49 987654321",
+			Roles:       []entities.UserRole{entities.UserRoleTbz},
+		}
+
+		suite.EnsureUserExists(t, user3)
+		suite.EnsureUserExists(t, user4)
+
+		// when
+		users, err := userRepo.GetAllByRole(context.Background(), entities.UserRoleGreenEcolution)
+
+		// then
+		assert.NoError(t, err)
+		assert.Empty(t, users)
+		assert.GreaterOrEqual(t, len(users), 0)
+		assert.False(t, containsUser(users, *user3), "user3 should not be in the list")
+		assert.False(t, containsUser(users, *user4), "user4 should not be in the list")
+	})
+
+	t.Run("should return error when login fails", func(t *testing.T) {
+		// given
+		identityConfig := suite.InvalidIdentityConfig(t, context.Background())
+		userRepo := NewUserRepository(identityConfig)
+
+		// when
+		users, err := userRepo.GetAllByRole(context.Background(), entities.UserRoleGreenEcolution)
+
+		// then
+		assert.Error(t, err)
 		assert.Nil(t, users)
 	})
 }

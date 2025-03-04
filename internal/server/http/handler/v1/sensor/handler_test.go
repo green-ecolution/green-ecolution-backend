@@ -333,7 +333,10 @@ func TestGetSensorById(t *testing.T) {
 		assert.WithinDuration(t, response.UpdatedAt, TestSensor.UpdatedAt, time.Second)
 		assert.Equal(t, entities.SensorStatus(response.Status), TestSensor.Status)
 
-		// TODO: compare data
+		// assert latest data
+		assert.Equal(t, response.LatestData.Battery, TestSensorList[0].LatestData.Data.Battery)
+		assert.Equal(t, response.LatestData.Humidity, TestSensorList[0].LatestData.Data.Humidity)
+		assert.Equal(t, response.LatestData.Temperature, TestSensorList[0].LatestData.Data.Temperature)
 
 		mockSensorService.AssertExpectations(t)
 	})
