@@ -26,17 +26,17 @@ type Tree struct {
 	CreatedAt             string                 `json:"created_at"`
 	Description           string                 `json:"description"`
 	Id                    int32                  `json:"id"`
-	LastWatered    *string        `json:"last_watered,omitempty"`
-	Latitude       float32        `json:"latitude"`
-	Longitude      float32        `json:"longitude"`
-	Number         string         `json:"number"`
-	PlantingYear   int32          `json:"planting_year"`
-	Provider       string         `json:"provider"`
-	Sensor         *Sensor        `json:"sensor,omitempty"`
-	Species        string         `json:"species"`
-	TreeClusterId  *int32         `json:"tree_cluster_id,omitempty"`
-	UpdatedAt      string         `json:"updated_at"`
-	WateringStatus WateringStatus `json:"watering_status"`
+	LastWatered           *string                `json:"last_watered,omitempty"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	Number                string                 `json:"number"`
+	PlantingYear          int32                  `json:"planting_year"`
+	Provider              string                 `json:"provider"`
+	Sensor                *Sensor                `json:"sensor,omitempty"`
+	Species               string                 `json:"species"`
+	TreeClusterId         *int32                 `json:"tree_cluster_id,omitempty"`
+	UpdatedAt             string                 `json:"updated_at"`
+	WateringStatus        WateringStatus         `json:"watering_status"`
 }
 
 type _Tree Tree
