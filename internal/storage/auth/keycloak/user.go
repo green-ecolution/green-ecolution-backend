@@ -14,6 +14,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 type UserRepository struct {
@@ -130,17 +131,14 @@ func (r *UserRepository) GetAllByRole(ctx context.Context, role entities.UserRol
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	var filteredUsers []*entities.User
-	for _, user := range users {
+	return utils.Filter(users, func(user *entities.User) bool {
 		for _, userRole := range user.Roles {
 			if userRole == role {
-				filteredUsers = append(filteredUsers, user)
-				break
+				return true
 			}
 		}
-	}
-
-	return filteredUsers, nil
+		return false
+	}), nil
 }
 
 func (r *UserRepository) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
