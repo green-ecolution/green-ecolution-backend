@@ -175,15 +175,27 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 		log.Debug("failed to update tree cluster", "error", err, "cluster_id", id)
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
+	log.Info("tree cluster updated successfully", "cluster_id", id)
 
-	if err := s.updateTreeClusterPosition(ctx, id); err != nil {
-		log.Error("error while update the cluster locations", "error", err, "cluster_id", id)
-		return nil, service.MapError(ctx, err, service.ErrorLogAll)
+	var eventTreeClusters []*domain.TreeCluster
+	if len(trees) > 0 {
+		eventTreeClusters = utils.Filter(utils.Map(trees, func(t *domain.Tree) *domain.TreeCluster {
+			return t.TreeCluster
+		}), func(treeCluster *domain.TreeCluster) bool {
+			return treeCluster != nil && treeCluster.ID != id
+		})
 	}
 
-	log.Info("tree cluster updated successfully", "cluster_id", id)
-	if err := s.publishUpdateEvent(ctx, prevTc); err != nil {
-		return nil, service.MapError(ctx, err, service.ErrorLogAll)
+	eventTreeClusters = append(eventTreeClusters, prevTc)
+	for _, eTC := range eventTreeClusters {
+		if err = s.updateTreeClusterPosition(ctx, eTC.ID); err != nil {
+			log.Error("error while update the cluster locations", "error", err, "cluster_id", eTC.ID)
+			return nil, service.MapError(ctx, err, service.ErrorLogAll)
+		}
+
+		if err = s.publishUpdateEvent(ctx, eTC); err != nil {
+			return nil, service.MapError(ctx, err, service.ErrorLogAll)
+		}
 	}
 
 	return s.GetByID(ctx, id)
