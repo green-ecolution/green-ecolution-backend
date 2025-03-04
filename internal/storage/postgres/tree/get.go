@@ -7,6 +7,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/pkg/errors"
@@ -237,7 +238,9 @@ func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error 
 		return err
 	}
 
-	_ = mapTreeCluster(ctx, r, t)
+	if err := mapTreeCluster(ctx, r, t); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -259,7 +262,7 @@ func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 
 func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 	treeCluster, err := r.getTreeClusterByTreeID(ctx, t.ID)
-	if err != nil {
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return err
 	}
 	t.TreeCluster = treeCluster
