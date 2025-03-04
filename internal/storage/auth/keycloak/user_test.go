@@ -381,7 +381,7 @@ func TestKeyCloakUserRepo_GetAllByRole(t *testing.T) {
 
 		// then
 		assert.NoError(t, err)
-		assert.Nil(t, users)
+		assert.Empty(t, users)
 		assert.GreaterOrEqual(t, len(users), 0)
 		assert.False(t, containsUser(users, *user3), "user3 should not be in the list")
 		assert.False(t, containsUser(users, *user4), "user4 should not be in the list")
