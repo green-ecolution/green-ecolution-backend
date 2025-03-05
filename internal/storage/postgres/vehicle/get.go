@@ -131,10 +131,10 @@ func (r *VehicleRepository) GetAllWithWateringPlanCount(ctx context.Context) ([]
 	rows, err := r.store.GetAllVehiclesWithWateringPlanCount(ctx)
 	if err != nil {
 		log.Debug("failed to get vehicles with watering plan count", "error", err)
-		return nil, r.store.MapError(err, sqlc.Vehicle{})
+		return nil, r.store.MapError(err, sqlc.GetAllVehiclesWithWateringPlanCountRow{})
 	}
 
-	return r.mapper.FromSqlListWithCount(rows)
+	return r.mapper.FromSqlListVehicleWithCount(rows)
 }
 
 func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {

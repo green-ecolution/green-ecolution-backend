@@ -98,3 +98,13 @@ WHERE tc.id = $1
     ORDER BY created_at DESC
     LIMIT 1
   );
+
+-- name: GetAllTreeClusterRegionsWithWateringPlanCount :many
+SELECT 
+    r.name AS name,
+    COUNT(DISTINCT twp.watering_plan_id) AS watering_plan_count
+FROM regions r
+INNER JOIN tree_clusters tc ON r.id = tc.region_id
+INNER JOIN tree_cluster_watering_plans twp ON tc.id = twp.tree_cluster_id
+GROUP BY r.name
+ORDER BY watering_plan_count DESC;

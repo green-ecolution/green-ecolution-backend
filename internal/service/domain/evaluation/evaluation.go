@@ -66,9 +66,15 @@ func (e *EvaluationService) GetEvaluation(ctx context.Context) (*entities.Evalua
 		return &entities.Evaluation{}, err
 	}
 
-	vehicleCount, err := e.vehicleRepo.GetAllWithWateringPlanCount(ctx)
+	vehicleEvaluation, err := e.vehicleRepo.GetAllWithWateringPlanCount(ctx)
 	if err != nil {
-		log.Error("failed to get vehicle count", "error", err)
+		log.Error("failed to get vehicle evaluation", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
+	regionEvaluation, err := e.treeClusterRepo.GetAllRegionsWithWateringPlanCount(ctx)
+	if err != nil {
+		log.Error("failed to get region evaluation", "error", err)
 		return &entities.Evaluation{}, err
 	}
 
@@ -78,7 +84,8 @@ func (e *EvaluationService) GetEvaluation(ctx context.Context) (*entities.Evalua
 		SensorCount:           sensorCount,
 		WateringPlanCount:     wateringPlanCount,
 		TotalWaterConsumption: totalConsumedWater,
-		VehicleEvaluation:     vehicleCount,
+		VehicleEvaluation:     vehicleEvaluation,
+		RegionEvaluation:      regionEvaluation,
 	}
 
 	return evaluation, nil
