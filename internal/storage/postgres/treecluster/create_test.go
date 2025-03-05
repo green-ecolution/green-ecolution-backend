@@ -121,7 +121,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
 			Provider: "",
 			Limit:    int32(totalCountTree),
@@ -328,7 +328,7 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 			return true, nil
 		}
 
-		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
 			Provider: "",
 			Limit:    int32(totalCountTree),
@@ -372,7 +372,7 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
 			Provider: "",
 			Limit:    int32(totalCountTree),
@@ -401,7 +401,7 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
 			Provider: "",
 			Limit:    int32(totalCountTree),

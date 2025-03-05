@@ -1,12 +1,38 @@
 -- name: GetAllTrees :many
-SELECT * FROM trees
-WHERE (COALESCE(@provider, '') = '' OR provider = @provider)
-ORDER BY number ASC
-LIMIT $1 OFFSET $2;
+SELECT t.*
+FROM trees t
+         LEFT JOIN tree_clusters tc ON tc.id = t.tree_cluster_id
+         LEFT JOIN regions r ON r.id = tc.region_id
+WHERE
+    (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
+        OR t.watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
+  AND (COALESCE(array_length(@region::TEXT[], 1), 0) = 0
+    OR r.name = ANY(@region::TEXT[]))
+  AND (COALESCE(@provider, '') = '' OR t.provider = @provider)
+  AND (
+        (COALESCE(@year_start::INTEGER, 0) = 0 OR t.planting_year >= @year_start::INTEGER)
+        AND
+        (COALESCE(@year_end::INTEGER, 0) = 0 OR t.planting_year <= @year_end::INTEGER)
+    )
+ORDER BY t.number ASC
+    LIMIT $1 OFFSET $2;
 
 -- name: GetAllTreesCount :one
-SELECT COUNT(*) FROM trees
-WHERE (COALESCE(@provider, '') = '' OR provider = @provider);
+SELECT COUNT(*)
+FROM trees t
+         LEFT JOIN tree_clusters tc ON tc.id = t.tree_cluster_id
+         LEFT JOIN regions r ON r.id = tc.region_id
+WHERE
+    (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
+        OR t.watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
+  AND (COALESCE(array_length(@region::TEXT[], 1), 0) = 0
+    OR r.name = ANY(@region::TEXT[]))
+  AND (COALESCE(@provider, '') = '' OR t.provider = @provider)
+  AND (
+        (COALESCE(@year_start::INTEGER, 0) = 0 OR t.planting_year >= @year_start::INTEGER)
+        AND
+        (COALESCE(@year_end::INTEGER, 0) = 0 OR t.planting_year <= @year_end::INTEGER)
+    );
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
