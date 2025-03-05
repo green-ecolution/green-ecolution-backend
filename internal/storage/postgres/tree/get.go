@@ -20,9 +20,8 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	totalCount, err := r.store.GetAllTreesCount(ctx, query.Provider)
+	totalCount, err := r.GetCount(ctx, query.Provider)
 	if err != nil {
-		log.Debug("failed to get total watering plan count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
 
@@ -59,6 +58,17 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 	}
 
 	return t, totalCount, nil
+}
+
+func (r *TreeRepository) GetCount(ctx context.Context, provider string) (int64, error) {
+	log := logger.GetLogger(ctx)
+	totalCount, err := r.store.GetAllSensorsCount(ctx, provider)
+	if err != nil {
+		log.Debug("failed to get total trees count in db", "error", err)
+		return 0, err
+	}
+
+	return totalCount, nil
 }
 
 func (r *TreeRepository) GetByID(ctx context.Context, id int32) (*entities.Tree, error) {

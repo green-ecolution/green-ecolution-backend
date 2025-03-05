@@ -32,7 +32,46 @@ func NewEvaluationService(
 
 func (e *EvaluationService) GetAll(ctx context.Context) (*entities.Evaluation, error) {
 	log := logger.GetLogger(ctx)
-	return nil, nil
+
+	clusterCount, err := e.treeClusterRepo.GetCount(ctx, "")
+	if err != nil {
+		log.Error("failed to get treecluster count", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
+	treeCount, err := e.treeRepo.GetCount(ctx, "")
+	if err != nil {
+		log.Error("failed to get tree count", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
+	sensorCount, err := e.sensorRepo.GetCount(ctx, "")
+	if err != nil {
+		log.Error("failed to get sensor count", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
+	wateringPlanCount, err := e.wateringPlanRepo.GetCount(ctx, "")
+	if err != nil {
+		log.Error("failed to get sensor count", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
+	totalConsumedWater, err := e.wateringPlanRepo.GetTotalConsumedWater(ctx)
+	if err != nil {
+		log.Error("failed to get sensor count", "error", err)
+		return &entities.Evaluation{}, err
+	}
+
+	evaluation := &entities.Evaluation{
+		TreeClusterCount:      clusterCount,
+		TreeCount:             treeCount,
+		SensorCount:           sensorCount,
+		WateringPlanCount:     wateringPlanCount,
+		TotalWaterConsumption: totalConsumedWater,
+	}
+
+	return evaluation, nil
 }
 
 func (e *EvaluationService) Ready() bool {
