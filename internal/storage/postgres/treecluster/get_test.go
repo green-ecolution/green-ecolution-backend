@@ -862,26 +862,35 @@ var allTestWateringPlans = []*testWateringPlan{
 	{
 		ID:           5,
 		Date:         time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
-		TreeClusters: allTestCluster[1:4],
+		TreeClusters: allTestCluster[0:4],
 	},
 }
 
 func getRegionCounts() []*entities.RegionEvaluation {
-	regionCountMap := make(map[int32]int64)
+	regionCountMap := make(map[int32]map[int32]struct{})
 
 	for _, plan := range allTestWateringPlans {
+		regionSet := make(map[int32]struct{})
+
 		for _, cluster := range plan.TreeClusters {
-			regionCountMap[cluster.RegionID]++
+			regionSet[cluster.RegionID] = struct{}{}
+		}
+
+		for regionID := range regionSet {
+			if regionCountMap[regionID] == nil {
+				regionCountMap[regionID] = make(map[int32]struct{})
+			}
+			regionCountMap[regionID][plan.ID] = struct{}{}
 		}
 	}
 
 	var regionEvaluations []*entities.RegionEvaluation
-	for regionID, count := range regionCountMap {
+	for regionID, planMap := range regionCountMap {
 		for _, region := range allTestRegions {
 			if region.ID == regionID {
 				regionEvaluations = append(regionEvaluations, &entities.RegionEvaluation{
 					Name:              region.Name,
-					WateringPlanCount: count,
+					WateringPlanCount: int64(len(planMap)),
 				})
 				break
 			}
