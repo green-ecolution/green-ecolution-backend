@@ -831,7 +831,7 @@ func TestTreeService_EventSystem(t *testing.T) {
 			},
 		)
 
-		svc := tree.NewTreeService(treeRepo, sensorRepo, treeClusterRepo, eventManager)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, clusterRepo, eventManager)
 
 		// when
 		subID, ch, err := eventManager.Subscribe(entities.EventTypeUpdateTree)
