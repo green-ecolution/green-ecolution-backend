@@ -162,7 +162,7 @@ func TestTreeRepository_GetCount(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
 		// when
-		totalCount, err := r.GetCount(context.Background(), "")
+		totalCount, err := r.GetCount(context.Background(), entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -176,7 +176,7 @@ func TestTreeRepository_GetCount(t *testing.T) {
 		cancel()
 
 		// when
-		totalCount, err := r.GetCount(ctx, "")
+		totalCount, err := r.GetCount(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)

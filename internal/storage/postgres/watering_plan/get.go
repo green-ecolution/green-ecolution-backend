@@ -19,7 +19,7 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context, query entities.Quer
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	totalCount, err := w.GetCount(ctx, query.Provider)
+	totalCount, err := w.GetCount(ctx, query)
 	if err != nil {
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
 	}
@@ -59,9 +59,9 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context, query entities.Quer
 	return data, totalCount, nil
 }
 
-func (w *WateringPlanRepository) GetCount(ctx context.Context, provider string) (int64, error) {
+func (w *WateringPlanRepository) GetCount(ctx context.Context, query entities.Query) (int64, error) {
 	log := logger.GetLogger(ctx)
-	totalCount, err := w.store.GetAllWateringPlansCount(ctx, provider)
+	totalCount, err := w.store.GetAllWateringPlansCount(ctx, query.Provider)
 	if err != nil {
 		log.Debug("failed to get total watering plan count in db", "error", err)
 		return 0, err

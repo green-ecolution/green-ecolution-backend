@@ -209,7 +209,7 @@ func TestWateringPlanRepository_GetCount(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 		r := NewWateringPlanRepository(suite.Store, mappers)
 		// when
-		totalCount, err := r.GetCount(context.Background(), "")
+		totalCount, err := r.GetCount(context.Background(), entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -223,7 +223,7 @@ func TestWateringPlanRepository_GetCount(t *testing.T) {
 		cancel()
 
 		// when
-		totalCount, err := r.GetCount(ctx, "")
+		totalCount, err := r.GetCount(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)

@@ -20,7 +20,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	totalCount, err := r.GetCount(ctx, query.Provider)
+	totalCount, err := r.GetCount(ctx, query)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
@@ -60,9 +60,9 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 	return t, totalCount, nil
 }
 
-func (r *TreeRepository) GetCount(ctx context.Context, provider string) (int64, error) {
+func (r *TreeRepository) GetCount(ctx context.Context, query entities.Query) (int64, error) {
 	log := logger.GetLogger(ctx)
-	totalCount, err := r.store.GetAllTreesCount(ctx, provider)
+	totalCount, err := r.store.GetAllTreesCount(ctx, query.Provider)
 	if err != nil {
 		log.Debug("failed to get total trees count in db", "error", err)
 		return 0, err

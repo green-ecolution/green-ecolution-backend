@@ -36,25 +36,25 @@ func NewEvaluationService(
 func (e *EvaluationService) GetEvaluation(ctx context.Context) (*entities.Evaluation, error) {
 	log := logger.GetLogger(ctx)
 
-	clusterCount, err := e.treeClusterRepo.GetCount(ctx, "")
+	clusterCount, err := e.treeClusterRepo.GetCount(ctx, entities.TreeClusterQuery{})
 	if err != nil {
 		log.Error("failed to get treecluster count", "error", err)
 		return &entities.Evaluation{}, err
 	}
 
-	treeCount, err := e.treeRepo.GetCount(ctx, "")
+	treeCount, err := e.treeRepo.GetCount(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to get tree count", "error", err)
 		return &entities.Evaluation{}, err
 	}
 
-	sensorCount, err := e.sensorRepo.GetCount(ctx, "")
+	sensorCount, err := e.sensorRepo.GetCount(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to get sensor count", "error", err)
 		return &entities.Evaluation{}, err
 	}
 
-	wateringPlanCount, err := e.wateringPlanRepo.GetCount(ctx, "")
+	wateringPlanCount, err := e.wateringPlanRepo.GetCount(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to get sensor count", "error", err)
 		return &entities.Evaluation{}, err

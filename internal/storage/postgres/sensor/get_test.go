@@ -175,7 +175,7 @@ func TestSensorRepository_GetCount(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		totalCount, err := r.GetCount(context.Background(), "")
+		totalCount, err := r.GetCount(context.Background(), entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -189,7 +189,7 @@ func TestSensorRepository_GetCount(t *testing.T) {
 		cancel()
 
 		// when
-		totalCount, err := r.GetCount(ctx, "")
+		totalCount, err := r.GetCount(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
