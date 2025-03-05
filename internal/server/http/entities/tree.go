@@ -5,12 +5,11 @@ import (
 )
 
 type TreeResponse struct {
-	ID            int32           `json:"id"`
-	CreatedAt     time.Time       `json:"created_at"`
-	UpdatedAt     time.Time       `json:"updated_at"`
-	TreeClusterID *int32          `json:"tree_cluster_id" validate:"optional"`
-	Sensor        *SensorResponse `json:"sensor" validate:"optional"`
-	// Images              []*ImageResponse `json:"images"`
+	ID             int32                  `json:"id"`
+	CreatedAt      time.Time              `json:"created_at"`
+	UpdatedAt      time.Time              `json:"updated_at"`
+	TreeClusterID  *int32                 `json:"tree_cluster_id" validate:"optional"`
+	Sensor         *SensorResponse        `json:"sensor" validate:"optional"`
 	LastWatered    *time.Time             `json:"last_watered,omitempty" validate:"optional"`
 	PlantingYear   int32                  `json:"planting_year"`
 	Species        string                 `json:"species"`
@@ -53,10 +52,6 @@ type TreeUpdateRequest struct {
 	Provider       string                 `json:"provider" validate:"optional"`
 	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name TreeUpdate
-
-type TreeAddImagesRequest struct {
-	ImageIDs []*int32 `json:"image_ids"`
-} // @Name TreeAddImages
 
 type TreeAddSensorRequest struct {
 	SensorID *string `json:"sensor_id"`

@@ -5,7 +5,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/image"
 	mapper "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/region"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/sensor"
@@ -20,7 +19,6 @@ import (
 func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	treeMappers := tree.NewTreeRepositoryMappers(
 		&mapper.InternalTreeRepoMapperImpl{},
-		&mapper.InternalImageRepoMapperImpl{},
 		&mapper.InternalSensorRepoMapperImpl{},
 		&mapper.InternalTreeClusterRepoMapperImpl{},
 	)
@@ -35,12 +33,6 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	)
 	treeClusterRepo := treecluster.NewTreeClusterRepository(store.NewStore(conn, sqlc.New(conn)), tcMappers)
 	slog.Info("successfully initialized treecluster repository", "service", "postgres")
-
-	imageMappers := image.NewImageRepositoryMappers(
-		&mapper.InternalImageRepoMapperImpl{},
-	)
-	imageRepo := image.NewImageRepository(store.NewStore(conn, sqlc.New(conn)), imageMappers)
-	slog.Info("successfully initialized image repository", "service", "postgres")
 
 	vehicleMappers := vehicle.NewVehicleRepositoryMappers(
 		&mapper.InternalVehicleRepoMapperImpl{},
@@ -71,7 +63,6 @@ func NewRepository(conn *pgxpool.Pool) *storage.Repository {
 	return &storage.Repository{
 		Tree:         treeRepo,
 		TreeCluster:  treeClusterRepo,
-		Image:        imageRepo,
 		Vehicle:      vehicleRepo,
 		Sensor:       sensorRepo,
 		Region:       regionRepo,

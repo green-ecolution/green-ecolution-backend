@@ -10,7 +10,6 @@ type Tree struct {
 	UpdatedAt      time.Time
 	TreeCluster    *TreeCluster
 	Sensor         *Sensor
-	Images         []*Image
 	PlantingYear   int32
 	Species        string
 	Number         string

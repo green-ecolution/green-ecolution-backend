@@ -1532,6 +1532,11 @@ paths:
         name: provider
         schema:
           type: string
+      - description: With archived vehicles
+        in: query
+        name: archived
+        schema:
+          type: boolean
       responses:
         "200":
           content:
@@ -1789,6 +1794,110 @@ paths:
       tags:
       - Vehicle
       x-codegen-request-body-name: body
+  /v1/vehicle/archive:
+    get:
+      description: Get archived vehicle
+      operationId: get-archive-vehicle
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+                type: array
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Get archived vehicle
+      tags:
+      - Vehicle
+  /v1/vehicle/archive/{id}:
+    post:
+      description: Archive vehicle
+      operationId: archive-vehicle
+      parameters:
+      - description: Vehicle ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          content: {}
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not Found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Conflict
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Internal Server Error
+      security:
+      - Keycloak: []
+      summary: Archive vehicle
+      tags:
+      - Vehicle
   /v1/vehicle/plate/{plate}:
     get:
       description: Get vehicle by plate
@@ -2206,7 +2315,7 @@ components:
         server:
           hostname: hostname
           os: os
-          port: 0
+          port: 1
           ip: ip
           arch: arch
           interface: interface
@@ -2218,6 +2327,13 @@ components:
           branch: branch
         buildTime: buildTime
         goVersion: goVersion
+        map:
+          bbox:
+          - 0.8008281904610115
+          - 0.8008281904610115
+          center:
+          - 6.027456183070403
+          - 6.027456183070403
         version: version
       properties:
         buildTime:
@@ -2226,6 +2342,8 @@ components:
           $ref: '#/components/schemas/GitInfo'
         goVersion:
           type: string
+        map:
+          $ref: '#/components/schemas/MapInfo'
         server:
           $ref: '#/components/schemas/ServerInfo'
         version:
@@ -2234,6 +2352,7 @@ components:
       - buildTime
       - git
       - goVersion
+      - map
       - server
       - version
       type: object
@@ -2288,7 +2407,6 @@ components:
       - BE
       - C
       - CE
-      - Unknown
       type: string
       x-enum-varnames:
       - DrivingLicenseB
@@ -2535,6 +2653,27 @@ components:
           type: string
       required:
       - refresh_token
+      type: object
+    MapInfo:
+      example:
+        bbox:
+        - 0.8008281904610115
+        - 0.8008281904610115
+        center:
+        - 6.027456183070403
+        - 6.027456183070403
+      properties:
+        bbox:
+          items:
+            type: number
+          type: array
+        center:
+          items:
+            type: number
+          type: array
+      required:
+      - bbox
+      - center
       type: object
     Pagination:
       example:
@@ -2919,7 +3058,7 @@ components:
       example:
         hostname: hostname
         os: os
-        port: 0
+        port: 1
         ip: ip
         arch: arch
         interface: interface
@@ -3017,7 +3156,6 @@ components:
         id:
           type: integer
         last_watered:
-          description: "Images              []*ImageResponse `json:\"images\"`"
           type: string
         latitude:
           type: number
@@ -3763,6 +3901,7 @@ components:
     Vehicle:
       example:
         water_capacity: 5.962133916683182
+        archived_at: archived_at
         length: 1.4658129805029452
         number_plate: number_plate
         created_at: created_at
@@ -3783,6 +3922,8 @@ components:
         additional_information:
           additionalProperties: true
           type: object
+        archived_at:
+          type: string
         created_at:
           type: string
         description:
@@ -3814,6 +3955,7 @@ components:
         width:
           type: number
       required:
+      - archived_at
       - created_at
       - description
       - driving_license
@@ -3897,6 +4039,7 @@ components:
           current_page: 7
         data:
         - water_capacity: 5.962133916683182
+          archived_at: archived_at
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
@@ -3914,6 +4057,7 @@ components:
           height: 0.8008281904610115
           status: active
         - water_capacity: 5.962133916683182
+          archived_at: archived_at
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
@@ -4080,6 +4224,7 @@ components:
           watering_plan_id: 5
         trailer:
           water_capacity: 5.962133916683182
+          archived_at: archived_at
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
@@ -4103,6 +4248,7 @@ components:
         gpx_url: gpx_url
         transporter:
           water_capacity: 5.962133916683182
+          archived_at: archived_at
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
@@ -4282,6 +4428,7 @@ components:
         description: description
         trailer:
           water_capacity: 5.962133916683182
+          archived_at: archived_at
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
@@ -4301,6 +4448,7 @@ components:
         updated_at: updated_at
         transporter:
           water_capacity: 5.962133916683182
+          archived_at: archived_at
           length: 1.4658129805029452
           number_plate: number_plate
           created_at: created_at
@@ -4423,6 +4571,7 @@ components:
           description: description
           trailer:
             water_capacity: 5.962133916683182
+            archived_at: archived_at
             length: 1.4658129805029452
             number_plate: number_plate
             created_at: created_at
@@ -4442,6 +4591,7 @@ components:
           updated_at: updated_at
           transporter:
             water_capacity: 5.962133916683182
+            archived_at: archived_at
             length: 1.4658129805029452
             number_plate: number_plate
             created_at: created_at
@@ -4510,6 +4660,7 @@ components:
           description: description
           trailer:
             water_capacity: 5.962133916683182
+            archived_at: archived_at
             length: 1.4658129805029452
             number_plate: number_plate
             created_at: created_at
@@ -4529,6 +4680,7 @@ components:
           updated_at: updated_at
           transporter:
             water_capacity: 5.962133916683182
+            archived_at: archived_at
             length: 1.4658129805029452
             number_plate: number_plate
             created_at: created_at

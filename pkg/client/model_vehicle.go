@@ -23,6 +23,7 @@ var _ MappedNullable = &Vehicle{}
 // Vehicle struct for Vehicle
 type Vehicle struct {
 	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	ArchivedAt            string                 `json:"archived_at"`
 	CreatedAt             string                 `json:"created_at"`
 	Description           string                 `json:"description"`
 	DrivingLicense        DrivingLicense         `json:"driving_license"`
@@ -46,8 +47,9 @@ type _Vehicle Vehicle
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewVehicle(createdAt string, description string, drivingLicense DrivingLicense, height float32, id int32, length float32, model string, numberPlate string, provider string, status VehicleStatus, type_ VehicleType, updatedAt string, waterCapacity float32, weight float32, width float32) *Vehicle {
+func NewVehicle(archivedAt string, createdAt string, description string, drivingLicense DrivingLicense, height float32, id int32, length float32, model string, numberPlate string, provider string, status VehicleStatus, type_ VehicleType, updatedAt string, waterCapacity float32, weight float32, width float32) *Vehicle {
 	this := Vehicle{}
+	this.ArchivedAt = archivedAt
 	this.CreatedAt = createdAt
 	this.Description = description
 	this.DrivingLicense = drivingLicense
@@ -104,6 +106,30 @@ func (o *Vehicle) HasAdditionalInformation() bool {
 // SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
 func (o *Vehicle) SetAdditionalInformation(v map[string]interface{}) {
 	o.AdditionalInformation = v
+}
+
+// GetArchivedAt returns the ArchivedAt field value
+func (o *Vehicle) GetArchivedAt() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.ArchivedAt
+}
+
+// GetArchivedAtOk returns a tuple with the ArchivedAt field value
+// and a boolean to check if the value has been set.
+func (o *Vehicle) GetArchivedAtOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.ArchivedAt, true
+}
+
+// SetArchivedAt sets field value
+func (o *Vehicle) SetArchivedAt(v string) {
+	o.ArchivedAt = v
 }
 
 // GetCreatedAt returns the CreatedAt field value
@@ -479,6 +505,7 @@ func (o Vehicle) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.AdditionalInformation) {
 		toSerialize["additional_information"] = o.AdditionalInformation
 	}
+	toSerialize["archived_at"] = o.ArchivedAt
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["description"] = o.Description
 	toSerialize["driving_license"] = o.DrivingLicense
@@ -502,6 +529,7 @@ func (o *Vehicle) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
+		"archived_at",
 		"created_at",
 		"description",
 		"driving_license",

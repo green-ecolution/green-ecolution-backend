@@ -22,7 +22,6 @@ func defaultTree() entities.Tree {
 		PlantingYear:   0,
 		Latitude:       0,
 		Longitude:      0,
-		Images:         nil,
 		WateringStatus: entities.WateringStatusUnknown,
 		Description:    "",
 		Provider:       "",
@@ -61,18 +60,6 @@ func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tre
 			return err
 		}
 		entity.ID = id
-
-		if entity.Images != nil {
-			if err := newRepo.handleImages(ctx, entity.ID, entity.Images); err != nil {
-				return err
-			}
-
-			linkedImages, err := newRepo.GetAllImagesByID(ctx, entity.ID)
-			if err != nil {
-				return err
-			}
-			entity.Images = linkedImages
-		}
 
 		createdTree, err = newRepo.GetByID(ctx, id)
 		if err != nil {
@@ -139,26 +126,6 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	}
 
 	return id, nil
-}
-
-func (r *TreeRepository) handleImages(ctx context.Context, treeID int32, images []*entities.Image) error {
-	for _, img := range images {
-		err := r.linkImages(ctx, treeID, img.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (r *TreeRepository) linkImages(ctx context.Context, treeID, imgID int32) error {
-	params := sqlc.LinkTreeImageParams{
-		TreeID:  treeID,
-		ImageID: imgID,
-	}
-
-	return r.store.LinkTreeImage(ctx, &params)
 }
 
 func (r *TreeRepository) validateTreeEntity(tree *entities.Tree) error {
