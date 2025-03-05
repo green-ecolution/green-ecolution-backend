@@ -19,7 +19,6 @@ import (
 type TreeService struct {
 	treeRepo        storage.TreeRepository
 	sensorRepo      storage.SensorRepository
-	ImageRepo       storage.ImageRepository
 	treeClusterRepo storage.TreeClusterRepository
 	validator       *validator.Validate
 	eventManager    *worker.EventManager
@@ -28,23 +27,21 @@ type TreeService struct {
 func NewTreeService(
 	repoTree storage.TreeRepository,
 	repoSensor storage.SensorRepository,
-	repoImage storage.ImageRepository,
 	treeClusterRepo storage.TreeClusterRepository,
 	eventManager *worker.EventManager,
 ) service.TreeService {
 	return &TreeService{
 		treeRepo:        repoTree,
 		sensorRepo:      repoSensor,
-		ImageRepo:       repoImage,
 		treeClusterRepo: treeClusterRepo,
 		validator:       validator.New(),
 		eventManager:    eventManager,
 	}
 }
 
-func (s *TreeService) GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error) {
+func (s *TreeService) GetAll(ctx context.Context, query entities.Query) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
-	trees, totalCount, err := s.treeRepo.GetAll(ctx, provider)
+	trees, totalCount, err := s.treeRepo.GetAll(ctx, query)
 	if err != nil {
 		log.Debug("failed to fetch trees", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -110,7 +107,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 	}
 
 	var prevTreeOfSensor *entities.Tree
-	newTree, err := s.treeRepo.Create(ctx, func(tree *entities.Tree) (bool, error) {
+	newTree, err := s.treeRepo.Create(ctx, func(tree *entities.Tree, repo storage.TreeRepository) (bool, error) {
 		tree.PlantingYear = treeCreate.PlantingYear
 		tree.Species = treeCreate.Species
 		tree.Number = treeCreate.Number
@@ -136,7 +133,7 @@ func (s *TreeService) Create(ctx context.Context, treeCreate *entities.TreeCreat
 				return false, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 			}
 			tree.Sensor = sensor
-			prevTreeOfSensor, err = s.treeRepo.GetBySensorID(ctx, sensor.ID)
+			prevTreeOfSensor, err = repo.GetBySensorID(ctx, sensor.ID)
 			if err != nil {
 				// If the previous tree that was linked to the sensor could not be found, the create process should still be continued.
 				log.Debug("failed to find previous tree linked to sensor specified from create request", "sensor_id", treeCreate.SensorID)
@@ -190,7 +187,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 	}
 
 	var prevTreeOfSensor *entities.Tree
-	updatedTree, err := s.treeRepo.Update(ctx, id, func(tree *entities.Tree) (bool, error) {
+	updatedTree, err := s.treeRepo.Update(ctx, id, func(tree *entities.Tree, repo storage.TreeRepository) (bool, error) {
 		tree.PlantingYear = tu.PlantingYear
 		tree.Species = tu.Species
 		tree.Number = tu.Number
@@ -217,7 +214,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			}
 			tree.Sensor = sensor
 
-			prevTreeOfSensor, err = s.treeRepo.GetBySensorID(ctx, sensor.ID)
+			prevTreeOfSensor, err = repo.GetBySensorID(ctx, sensor.ID)
 			if err != nil {
 				// If the previous tree that was linked to the sensor could not be found, the update process should still be continued.
 				log.Debug("failed to find previous tree linked to sensor specified from update request", "sensor_id", tu.SensorID)
@@ -245,7 +242,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 func (s *TreeService) UpdateWateringStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	trees, _, err := s.treeRepo.GetAll(ctx, "")
+	trees, _, err := s.treeRepo.GetAll(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to fetch trees", "error", err)
 		return err
@@ -264,7 +261,7 @@ func (s *TreeService) UpdateWateringStatuses(ctx context.Context) error {
 			if tree.Sensor != nil {
 				wateringStatus = utils.CalculateWateringStatus(ctx, tree.PlantingYear, tree.Sensor.LatestData.Data.Watermarks)
 			}
-			_, err = s.treeRepo.Update(ctx, tree.ID, func(tr *entities.Tree) (bool, error) {
+			_, err = s.treeRepo.Update(ctx, tree.ID, func(tr *entities.Tree, _ storage.TreeRepository) (bool, error) {
 				tr.WateringStatus = wateringStatus
 				return true, nil
 			})

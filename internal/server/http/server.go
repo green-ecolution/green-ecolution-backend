@@ -35,9 +35,10 @@ func NewServer(cfg *config.Config, services *service.Services) *Server {
 
 func (s *Server) Run(ctx context.Context) error {
 	app := fiber.New(fiber.Config{
-		AppName:      s.cfg.Dashboard.Title,
-		ServerHeader: s.cfg.Dashboard.Title,
-		ErrorHandler: errorHandler,
+		AppName:                  s.cfg.Dashboard.Title,
+		ServerHeader:             s.cfg.Dashboard.Title,
+		ErrorHandler:             errorHandler,
+		EnableSplittingOnParsers: true,
 	})
 
 	app.Mount("/", s.middleware())

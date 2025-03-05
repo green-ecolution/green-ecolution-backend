@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 )
@@ -105,48 +104,5 @@ func TestTimeToPgDate(t *testing.T) {
 		assert.Error(t, err)
 		assert.Empty(t, pgDate)
 		assert.Equal(t, "invalid date: zero value provided", err.Error())
-	})
-}
-
-func TestConvertNullableImage(t *testing.T) {
-	t.Run("should convert sqlc.Image to entities.Image", func(t *testing.T) {
-		img := sqlc.Image{
-			ID:        1,
-			CreatedAt: pgtype.Timestamp{Time: time.Now()},
-			UpdatedAt: pgtype.Timestamp{Time: time.Now()},
-			Url:       "http://example.com/image.jpg",
-		}
-		result := ConvertNullableImage(img)
-		assert.NotNil(t, result)
-		assert.Equal(t, img.ID, result.ID)
-		assert.Equal(t, img.CreatedAt.Time, result.CreatedAt)
-		assert.Equal(t, img.UpdatedAt.Time, result.UpdatedAt)
-		assert.Equal(t, img.Url, result.URL)
-	})
-
-	t.Run("should return nil for sqlc.Image with zero ID", func(t *testing.T) {
-		img := sqlc.Image{
-			ID:        0,
-			CreatedAt: pgtype.Timestamp{Time: time.Now()},
-			UpdatedAt: pgtype.Timestamp{Time: time.Now()},
-			Url:       "http://example.com/image.jpg",
-		}
-		result := ConvertNullableImage(img)
-		assert.Nil(t, result)
-	})
-
-	t.Run("should handle sqlc.Image with zero CreatedAt and UpdatedAt", func(t *testing.T) {
-		img := sqlc.Image{
-			ID:        1,
-			CreatedAt: pgtype.Timestamp{},
-			UpdatedAt: pgtype.Timestamp{},
-			Url:       "http://example.com/image.jpg",
-		}
-		result := ConvertNullableImage(img)
-		assert.NotNil(t, result)
-		assert.Equal(t, img.ID, result.ID)
-		assert.True(t, result.CreatedAt.IsZero())
-		assert.True(t, result.UpdatedAt.IsZero())
-		assert.Equal(t, img.Url, result.URL)
 	})
 }

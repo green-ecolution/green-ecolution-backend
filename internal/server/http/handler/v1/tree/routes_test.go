@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"net/http"
 	"testing"
 
@@ -24,7 +25,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 			mockTreeService.EXPECT().GetAll(
 				mock.Anything,
-				"",
+				entities.Query{},
 			).Return(TestTrees, int64(len(TestTrees)), nil)
 
 			// when

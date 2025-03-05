@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -51,20 +49,6 @@ func TimeToPgDate(date time.Time) (pgtype.Date, error) {
 	}
 
 	return pgDate, nil
-}
-
-//nolint:gocritic
-func ConvertNullableImage(img sqlc.Image) *entities.Image {
-	if img.ID == 0 {
-		return nil
-	}
-
-	return &entities.Image{
-		ID:        img.ID,
-		CreatedAt: img.CreatedAt.Time,
-		UpdatedAt: img.UpdatedAt.Time,
-		URL:       img.Url,
-	}
 }
 
 func MapAdditionalInfo(src []byte) (map[string]any, error) {

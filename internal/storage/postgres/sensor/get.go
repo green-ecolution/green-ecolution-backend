@@ -9,14 +9,14 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
-func (r *SensorRepository) GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error) {
+func (r *SensorRepository) GetAll(ctx context.Context, query entities.Query) ([]*entities.Sensor, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	totalCount, err := r.store.GetAllSensorsCount(ctx, provider)
+	totalCount, err := r.store.GetAllSensorsCount(ctx, query.Provider)
 	if err != nil {
 		log.Debug("failed to get total sensor count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Sensor{})
@@ -32,9 +32,9 @@ func (r *SensorRepository) GetAll(ctx context.Context, provider string) ([]*enti
 	}
 
 	rows, err := r.store.GetAllSensors(ctx, &sqlc.GetAllSensorsParams{
-		Column1: provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		Provider: query.Provider,
+		Limit:    limit,
+		Offset:   (page - 1) * limit,
 	})
 	if err != nil {
 		log.Debug("failed to get sensors in db", "error", err)

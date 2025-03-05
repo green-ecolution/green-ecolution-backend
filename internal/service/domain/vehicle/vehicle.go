@@ -24,29 +24,49 @@ func NewVehicleService(vehicleRepository storage.VehicleRepository) service.Vehi
 	}
 }
 
-func (v *VehicleService) GetAll(ctx context.Context, provider, vehicleType string) ([]*entities.Vehicle, int64, error) {
+func (v *VehicleService) GetAll(ctx context.Context, query entities.VehicleQuery) ([]*entities.Vehicle, int64, error) {
 	log := logger.GetLogger(ctx)
 	var vehicles []*entities.Vehicle
-	var err error
 	var totalCount int64
+	var err error
 
-	if vehicleType != "" {
-		parsedVehicleType := entities.ParseVehicleType(vehicleType)
+	if query.Type != "" {
+		parsedVehicleType := entities.ParseVehicleType(query.Type)
 		if parsedVehicleType == entities.VehicleTypeUnknown {
-			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", vehicleType)
+			log.Debug("failed to parse correct vehicle type", "error", err, "vehicle_type", query.Type)
 			return nil, 0, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 		}
-		vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, provider, parsedVehicleType)
+
+		if query.WithArchived {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByTypeWithArchived(ctx, query.Provider, parsedVehicleType)
+		} else {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllByType(ctx, query.Provider, parsedVehicleType)
+		}
 	} else {
-		vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, provider)
+		if query.WithArchived {
+			vehicles, totalCount, err = v.vehicleRepo.GetAllWithArchived(ctx, query.Provider)
+		} else {
+			vehicles, totalCount, err = v.vehicleRepo.GetAll(ctx, entities.Query{Provider: query.Provider})
+		}
 	}
 
 	if err != nil {
-		log.Debug("failed to fetch vehicles", "error", err)
+		log.Error("failed to fetch vehicles", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return vehicles, totalCount, nil
+}
+
+func (v *VehicleService) GetAllArchived(ctx context.Context) ([]*entities.Vehicle, error) {
+	log := logger.GetLogger(ctx)
+	vehicles, err := v.vehicleRepo.GetAllArchived(ctx)
+	if err != nil {
+		log.Error("failed to get all archived vehicles", "error", err)
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
+	}
+
+	return vehicles, nil
 }
 
 func (v *VehicleService) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
@@ -86,8 +106,7 @@ func (v *VehicleService) Create(ctx context.Context, createData *entities.Vehicl
 		return nil, service.ErrVehiclePlateTaken
 	}
 
-	//nolint:dupl // this is create specific
-	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle) (bool, error) {
+	created, err := v.vehicleRepo.Create(ctx, func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 		vh.NumberPlate = createData.NumberPlate
 		vh.Description = createData.Description
 		vh.WaterCapacity = createData.WaterCapacity
@@ -136,8 +155,7 @@ func (v *VehicleService) Update(ctx context.Context, id int32, updateData *entit
 		}
 	}
 
-	//nolint:dupl // this is update specific
-	err = v.vehicleRepo.Update(ctx, id, func(vh *entities.Vehicle) (bool, error) {
+	err = v.vehicleRepo.Update(ctx, id, func(vh *entities.Vehicle, _ storage.VehicleRepository) (bool, error) {
 		vh.NumberPlate = updateData.NumberPlate
 		vh.Description = updateData.Description
 		vh.WaterCapacity = updateData.WaterCapacity
@@ -177,6 +195,27 @@ func (v *VehicleService) Delete(ctx context.Context, id int32) error {
 	}
 
 	log.Info("vehicle deleted successfully", "vehicle_id", id)
+	return nil
+}
+
+func (v *VehicleService) Archive(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
+	vehicle, err := v.vehicleRepo.GetByID(ctx, id)
+	if err != nil {
+		log.Debug("failed to get vehicle by id in archive request", "error", err, "vehicle_id", id)
+		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
+	}
+
+	if !vehicle.ArchivedAt.IsZero() {
+		log.Debug("vehicle is already archived", "archived_at", vehicle.ArchivedAt, "vehicle_id", id)
+		return service.NewError(service.Conflict, "vehicle already archived")
+	}
+
+	if err := v.vehicleRepo.Archive(ctx, id); err != nil {
+		log.Debug("failed to archive vehicle", "error", err, "vehicle_id", id)
+	}
+
+	log.Info("vehicle archived successfully", "vehicle_id", id)
 	return nil
 }
 

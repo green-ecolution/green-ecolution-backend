@@ -1,12 +1,12 @@
 -- name: GetAllTrees :many
 SELECT * FROM trees
-WHERE ($1 = '') OR (provider = $1)
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider)
 ORDER BY number ASC
-LIMIT $2 OFFSET $3;
+LIMIT $1 OFFSET $2;
 
 -- name: GetAllTreesCount :one
 SELECT COUNT(*) FROM trees
-WHERE ($1 = '') OR (provider = $1);
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider);
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
@@ -25,9 +25,6 @@ SELECT * FROM trees WHERE tree_cluster_id = $1 ORDER BY number ASC;
 
 -- name: GetTreeByCoordinates :one
 SELECT * FROM trees WHERE latitude = $1 AND longitude = $2 LIMIT 1;
-
--- name: GetAllImagesByTreeID :many
-SELECT images.* FROM images JOIN tree_images ON images.id = tree_images.image_id WHERE tree_images.tree_id = $1;
 
 -- name: GetSensorByTreeID :one
 SELECT sensors.* FROM sensors JOIN trees ON sensors.id = trees.sensor_id WHERE trees.id = $1;
@@ -65,19 +62,6 @@ WHERE id = $1;
 
 -- name: UpdateTreeClusterID :exec
 UPDATE trees SET tree_cluster_id = $2 WHERE id = ANY($1::int[]);
-
--- name: LinkTreeImage :exec
-INSERT INTO tree_images (
-  tree_id, image_id
-) VALUES (
-  $1, $2
-);
-
--- name: UnlinkTreeImage :one
-DELETE FROM tree_images WHERE tree_id = $1 AND image_id = $2 RETURNING image_id;
-
--- name: UnlinkAllTreeImages :exec
-DELETE FROM tree_images WHERE tree_id = $1;
 
 -- name: UpdateTreeGeometry :exec
 UPDATE trees SET

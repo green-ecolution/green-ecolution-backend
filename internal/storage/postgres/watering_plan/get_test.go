@@ -22,7 +22,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -94,7 +94,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "test-provider")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{Provider: "test-provider"})
 
 		// then
 		assert.NoError(t, err)
@@ -120,7 +120,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 		wateringPlans := allTestWateringPlans[2:4]
 
 		// then
@@ -145,7 +145,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -163,7 +163,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -180,7 +180,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -195,7 +195,7 @@ func TestWateringPlanRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		_, _, err := r.GetAll(ctx, "")
+		_, _, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)

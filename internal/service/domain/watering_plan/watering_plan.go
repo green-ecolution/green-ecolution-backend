@@ -103,9 +103,9 @@ func (w *WateringPlanService) PreviewRoute(ctx context.Context, transporterID in
 	return geoJSON, nil
 }
 
-func (w *WateringPlanService) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error) {
+func (w *WateringPlanService) GetAll(ctx context.Context, query entities.Query) ([]*entities.WateringPlan, int64, error) {
 	log := logger.GetLogger(ctx)
-	plans, totalCount, err := w.wateringPlanRepo.GetAll(ctx, provider)
+	plans, totalCount, err := w.wateringPlanRepo.GetAll(ctx, query)
 	if err != nil {
 		log.Debug("failed to fetch watering plans", "error", err)
 		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
@@ -158,7 +158,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
-	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan) (bool, error) {
+	created, err := w.wateringPlanRepo.Create(ctx, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		wp.Date = createWp.Date
 		wp.Description = createWp.Description
 		wp.Transporter = transporter
@@ -176,7 +176,7 @@ func (w *WateringPlanService) Create(ctx context.Context, createWp *entities.Wat
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
-	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan) (bool, error) {
+	err = w.wateringPlanRepo.Update(ctx, created.ID, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		mergedVehicle := w.mergeVehicle(transporter, trailer)
 		gpxURL, err := w.getGpxRouteURL(ctx, created.ID, mergedVehicle, treeClusters)
 		if err != nil {
@@ -281,7 +281,7 @@ func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *en
 	}
 
 	neededWater := w.calculateRequiredWater(treeClusters)
-	err = w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan) (bool, error) {
+	err = w.wateringPlanRepo.Update(ctx, id, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 		wp.Date = updateWp.Date
 		wp.Description = updateWp.Description
 		wp.Transporter = transporter
@@ -350,7 +350,7 @@ func (w *WateringPlanService) Ready() bool {
 
 func (w *WateringPlanService) UpdateStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	plans, _, err := w.wateringPlanRepo.GetAll(ctx, "")
+	plans, _, err := w.wateringPlanRepo.GetAll(ctx, entities.Query{Provider: ""})
 	if err != nil {
 		log.Error("failed to fetch watering plans", "error", err)
 		return err
@@ -365,7 +365,7 @@ func (w *WateringPlanService) UpdateStatuses(ctx context.Context) error {
 		}
 
 		if plan.Date.Before(cutoffTime) {
-			err = w.wateringPlanRepo.Update(ctx, plan.ID, func(wp *entities.WateringPlan) (bool, error) {
+			err = w.wateringPlanRepo.Update(ctx, plan.ID, func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 				wp.Status = entities.WateringPlanStatusNotCompeted
 				return true, nil
 			})
@@ -477,11 +477,11 @@ func (w *WateringPlanService) validateUserRoles(users []*entities.User) bool {
 func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User, transporter, trailer *entities.Vehicle) error {
 	var requiredLicenses []entities.DrivingLicense
 
-	if transporter != nil && transporter.DrivingLicense != entities.DrivingLicenseUnknown {
+	if transporter != nil {
 		requiredLicenses = append(requiredLicenses, transporter.DrivingLicense)
 	}
 
-	if trailer != nil && trailer.DrivingLicense != entities.DrivingLicenseUnknown {
+	if trailer != nil {
 		requiredLicenses = append(requiredLicenses, trailer.DrivingLicense)
 	}
 
@@ -513,10 +513,10 @@ func (w *WateringPlanService) validateStatusDependentValues(ctx context.Context,
 }
 
 // This function calculates approximately how much water the irrigation schedule needs
-// Each tree in a linked tree cluster requires approximately 120 liters of water
+// Each tree in a linked tree cluster requires approximately 80 liters of water
 func (w *WateringPlanService) calculateRequiredWater(clusters []*entities.TreeCluster) float64 {
 	return utils.Reduce(clusters, func(acc float64, tc *entities.TreeCluster) float64 {
-		return acc + (float64(len(tc.Trees)) * 120.0)
+		return acc + (float64(len(tc.Trees)) * 80.0)
 	}, 0)
 }
 

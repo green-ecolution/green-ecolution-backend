@@ -1,12 +1,12 @@
 -- name: GetAllSensors :many
 SELECT * FROM sensors 
-WHERE ($1 = '') OR (provider = $1) 
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider)
 ORDER BY id 
-LIMIT $2 OFFSET $3;
+LIMIT $1 OFFSET $2;
 
 -- name: GetAllSensorsCount :one
 SELECT COUNT(*) FROM sensors
-WHERE ($1 = '') OR (provider = $1);
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider);
 
 -- name: GetSensorByID :one
 SELECT * FROM sensors WHERE id = $1;

@@ -7,19 +7,20 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) GetAll(ctx context.Context, provider string) ([]*entities.Tree, int64, error) {
+func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
 
-	totalCount, err := r.store.GetAllTreesCount(ctx, provider)
+	totalCount, err := r.store.GetAllTreesCount(ctx, query.Provider)
 	if err != nil {
 		log.Debug("failed to get total watering plan count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
@@ -35,9 +36,9 @@ func (r *TreeRepository) GetAll(ctx context.Context, provider string) ([]*entiti
 	}
 
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
-		Column1: provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		Provider: query.Provider,
+		Limit:    limit,
+		Offset:   (page - 1) * limit,
 	})
 
 	if err != nil {
@@ -193,17 +194,6 @@ func (r *TreeRepository) GetByCoordinates(ctx context.Context, latitude, longitu
 	return tree, nil
 }
 
-func (r *TreeRepository) GetAllImagesByID(ctx context.Context, id int32) ([]*entities.Image, error) {
-	log := logger.GetLogger(ctx)
-	rows, err := r.store.GetAllImagesByTreeID(ctx, id)
-	if err != nil {
-		log.Debug("failed to get images from tree id in db", "error", err, "tree_id", id)
-		return nil, r.store.MapError(err, sqlc.Image{})
-	}
-
-	return r.iMapper.FromSqlList(rows), nil
-}
-
 func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	row, err := r.store.GetSensorByTreeID(ctx, treeID)
@@ -218,8 +208,9 @@ func (r *TreeRepository) GetSensorByTreeID(ctx context.Context, treeID int32) (*
 		return nil, err
 	}
 
-	if err := r.store.MapSensorFields(ctx, data); err != nil { // TODO: handle error
-		return nil, err
+	if err := r.store.MapSensorFields(ctx, data); err != nil {
+		log.Debug("failed to convert sensor data", "error", err)
+		return nil, r.store.MapError(err, sqlc.Sensor{})
 	}
 
 	return data, nil
@@ -241,27 +232,16 @@ func (r *TreeRepository) getTreeClusterByTreeID(ctx context.Context, treeID int3
 	return tc, nil
 }
 
-// Map sensor, images and tree cluster entity to domain tree
+// Map sensor and tree cluster entity to domain tree
 func (r *TreeRepository) mapFields(ctx context.Context, t *entities.Tree) error {
-	if err := mapImages(ctx, r, t); err != nil {
-		return err
-	}
-
 	if err := mapSensor(ctx, r, t); err != nil {
 		return err
 	}
 
-	_ = mapTreeCluster(ctx, r, t)
-
-	return nil
-}
-
-func mapImages(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
-	images, err := r.GetAllImagesByID(ctx, t.ID)
-	if err != nil {
+	if err := mapTreeCluster(ctx, r, t); err != nil {
 		return err
 	}
-	t.Images = images
+
 	return nil
 }
 
@@ -282,7 +262,7 @@ func mapSensor(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 
 func mapTreeCluster(ctx context.Context, r *TreeRepository, t *entities.Tree) error {
 	treeCluster, err := r.getTreeClusterByTreeID(ctx, t.ID)
-	if err != nil {
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return err
 	}
 	t.TreeCluster = treeCluster

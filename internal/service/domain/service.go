@@ -19,7 +19,7 @@ import (
 func NewService(cfg *config.Config, repos *storage.Repository, eventMananger *worker.EventManager) *service.Services {
 	return &service.Services{
 		InfoService:         info.NewInfoService(repos.Info),
-		TreeService:         tree.NewTreeService(repos.Tree, repos.Sensor, repos.Image, repos.TreeCluster, eventMananger),
+		TreeService:         tree.NewTreeService(repos.Tree, repos.Sensor, repos.TreeCluster, eventMananger),
 		AuthService:         auth.NewAuthService(repos.Auth, repos.User, &cfg.IdentityAuth),
 		RegionService:       region.NewRegionService(repos.Region),
 		TreeClusterService:  treecluster.NewTreeClusterService(repos.TreeCluster, repos.Tree, repos.Region, eventMananger),

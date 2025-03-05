@@ -22,7 +22,6 @@ func defaultTree() entities.Tree {
 		PlantingYear:   0,
 		Latitude:       0,
 		Longitude:      0,
-		Images:         nil,
 		WateringStatus: entities.WateringStatusUnknown,
 		Description:    "",
 		Provider:       "",
@@ -31,7 +30,7 @@ func defaultTree() entities.Tree {
 	}
 }
 
-func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
@@ -39,15 +38,10 @@ func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tre
 
 	var createdTree *entities.Tree
 	err := r.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := r.store
-		defer func() {
-			r.store = oldStore
-		}()
-		r.store = s
-
+		newRepo := NewTreeRepository(s, r.TreeMappers)
 		entity := defaultTree()
 
-		created, err := createFn(&entity)
+		created, err := createFn(&entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -56,30 +50,18 @@ func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tre
 			return nil
 		}
 
-		if err := r.validateTreeEntity(&entity); err != nil {
+		if err := newRepo.validateTreeEntity(&entity); err != nil {
 			return err
 		}
 
-		id, err := r.createEntity(ctx, &entity)
+		id, err := newRepo.createEntity(ctx, &entity)
 		if err != nil {
 			log.Error("failed to create tree entity in db", "error", err)
 			return err
 		}
 		entity.ID = id
 
-		if entity.Images != nil {
-			if err := r.handleImages(ctx, entity.ID, entity.Images); err != nil {
-				return err
-			}
-
-			linkedImages, err := r.GetAllImagesByID(ctx, entity.ID)
-			if err != nil {
-				return err
-			}
-			entity.Images = linkedImages
-		}
-
-		createdTree, err = r.GetByID(ctx, id)
+		createdTree, err = newRepo.GetByID(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -144,26 +126,6 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	}
 
 	return id, nil
-}
-
-func (r *TreeRepository) handleImages(ctx context.Context, treeID int32, images []*entities.Image) error {
-	for _, img := range images {
-		err := r.linkImages(ctx, treeID, img.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (r *TreeRepository) linkImages(ctx context.Context, treeID, imgID int32) error {
-	params := sqlc.LinkTreeImageParams{
-		TreeID:  treeID,
-		ImageID: imgID,
-	}
-
-	return r.store.LinkTreeImage(ctx, &params)
 }
 
 func (r *TreeRepository) validateTreeEntity(tree *entities.Tree) error {

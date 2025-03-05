@@ -6,6 +6,6 @@ type RegionResponse struct {
 } // @Name Region
 
 type RegionListResponse struct {
-	Regions    []*RegionResponse `json:"regions"`
+	Data       []*RegionResponse `json:"data"`
 	Pagination *Pagination       `json:"pagination,omitempty" validate:"optional"`
 } // @Name RegionList

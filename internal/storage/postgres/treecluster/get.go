@@ -5,21 +5,33 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 	"github.com/twpayne/go-geos"
 )
 
-func (r *TreeClusterRepository) GetAll(ctx context.Context, provider string) ([]*entities.TreeCluster, int64, error) {
+func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.TreeClusterQuery) ([]*entities.TreeCluster, int64, error) {
 	log := logger.GetLogger(ctx)
+
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
-	totalCount, err := r.store.GetAllTreeClustersCount(ctx, provider)
+	var wateringStatuses []string
+	for _, ws := range filter.WateringStatus {
+		wateringStatuses = append(wateringStatuses, string(ws))
+	}
+
+	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
+		WateringStatus: wateringStatuses,
+		Region:         filter.Region,
+		Provider:       filter.Provider,
+	})
+
 	if err != nil {
 		log.Debug("failed to get total tree cluster count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
@@ -35,9 +47,11 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, provider string) ([]
 	}
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
-		Column1: provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		WateringStatus: wateringStatuses,
+		Region:         filter.Region,
+		Provider:       filter.Provider,
+		Limit:          limit,
+		Offset:         (page - 1) * limit,
 	})
 
 	if err != nil {

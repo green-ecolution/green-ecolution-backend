@@ -78,11 +78,12 @@ const (
 	Unauthorized  ErrorCode = 401
 	Forbidden     ErrorCode = 403
 	NotFound      ErrorCode = 404
+	Conflict      ErrorCode = 409
 	InternalError ErrorCode = 500
 )
 
 type BasicCrudService[T any, CreateType any, UpdateType any] interface {
-	GetAll(ctx context.Context, provider string) ([]*T, int64, error)
+	GetAll(ctx context.Context, query domain.Query) ([]*T, int64, error)
 	GetByID(ctx context.Context, id int32) (*T, error)
 	Create(ctx context.Context, createData *CreateType) (*T, error)
 	Update(ctx context.Context, id int32, updateData *UpdateType) (*T, error)
@@ -117,13 +118,20 @@ type AuthService interface {
 
 type RegionService interface {
 	Service
-	GetAll(ctx context.Context) ([]*domain.Region, error)
+	GetAll(ctx context.Context) ([]*domain.Region, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.Region, error)
 }
 
 type TreeClusterService interface {
 	Service
-	CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
+	// TODO: use CrudService as soon as every service has pagination
+	// CrudService[domain.TreeCluster, domain.TreeClusterCreate, domain.TreeClusterUpdate]
+	GetAll(ctx context.Context, query domain.TreeClusterQuery) ([]*domain.TreeCluster, int64, error)
+	GetByID(ctx context.Context, id int32) (*domain.TreeCluster, error)
+	Create(ctx context.Context, createData *domain.TreeClusterCreate) (*domain.TreeCluster, error)
+	Update(ctx context.Context, id int32, updateData *domain.TreeClusterUpdate) (*domain.TreeCluster, error)
+	Delete(ctx context.Context, id int32) error
+
 	HandleUpdateTree(context.Context, *domain.EventUpdateTree) error
 	HandleCreateTree(context.Context, *domain.EventCreateTree) error
 	HandleDeleteTree(context.Context, *domain.EventDeleteTree) error
@@ -134,7 +142,7 @@ type TreeClusterService interface {
 
 type SensorService interface {
 	Service
-	GetAll(ctx context.Context, provider string) ([]*domain.Sensor, int64, error)
+	GetAll(ctx context.Context, query domain.Query) ([]*domain.Sensor, int64, error)
 	GetByID(ctx context.Context, id string) (*domain.Sensor, error)
 	Create(ctx context.Context, createData *domain.SensorCreate) (*domain.Sensor, error)
 	Update(ctx context.Context, id string, updateData *domain.SensorUpdate) (*domain.Sensor, error)
@@ -152,17 +160,19 @@ type CrudService[T any, CreateType any, UpdateType any] interface {
 
 type VehicleService interface {
 	Service
-	GetAll(ctx context.Context, provider string, vehicleType string) ([]*domain.Vehicle, int64, error)
+	GetAll(ctx context.Context, query domain.VehicleQuery) ([]*domain.Vehicle, int64, error)
+	GetAllArchived(ctx context.Context) ([]*domain.Vehicle, error)
 	GetByID(ctx context.Context, id int32) (*domain.Vehicle, error)
 	Create(ctx context.Context, createData *domain.VehicleCreate) (*domain.Vehicle, error)
 	Update(ctx context.Context, id int32, updateData *domain.VehicleUpdate) (*domain.Vehicle, error)
 	Delete(ctx context.Context, id int32) error
+	Archive(ctx context.Context, id int32) error
 	GetByPlate(ctx context.Context, plate string) (*domain.Vehicle, error)
 }
 
 type WateringPlanService interface {
 	Service
-	GetAll(ctx context.Context, provider string) ([]*domain.WateringPlan, int64, error)
+	GetAll(ctx context.Context, query domain.Query) ([]*domain.WateringPlan, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.WateringPlan, error)
 	Create(ctx context.Context, createData *domain.WateringPlanCreate) (*domain.WateringPlan, error)
 	Update(ctx context.Context, id int32, updateData *domain.WateringPlanUpdate) (*domain.WateringPlan, error)

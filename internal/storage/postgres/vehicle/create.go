@@ -6,6 +6,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	store "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -29,7 +30,7 @@ func defaultVehicle() *entities.Vehicle {
 	}
 }
 
-func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.Vehicle) (bool, error)) (*entities.Vehicle, error) {
+func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.Vehicle, storage.VehicleRepository) (bool, error)) (*entities.Vehicle, error) {
 	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
@@ -37,14 +38,9 @@ func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.
 
 	var createdVh *entities.Vehicle
 	err := r.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := r.store
-		defer func() {
-			r.store = oldStore
-		}()
-		r.store = s
-
+		newRepo := NewVehicleRepository(s, r.VehicleRepositoryMappers)
 		entity := defaultVehicle()
-		created, err := createFn(entity)
+		created, err := createFn(entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -53,15 +49,15 @@ func (r *VehicleRepository) Create(ctx context.Context, createFn func(*entities.
 			return nil
 		}
 
-		if err := r.validateVehicle(entity); err != nil {
+		if err := newRepo.validateVehicle(entity); err != nil {
 			return err
 		}
 
-		id, err := r.createEntity(ctx, entity)
+		id, err := newRepo.createEntity(ctx, entity)
 		if err != nil {
 			return err
 		}
-		createdVh, err = r.GetByID(ctx, *id)
+		createdVh, err = newRepo.GetByID(ctx, *id)
 		if err != nil {
 			return err
 		}

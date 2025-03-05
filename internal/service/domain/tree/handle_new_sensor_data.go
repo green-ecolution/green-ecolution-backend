@@ -6,6 +6,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
 func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.EventNewSensorData) error {
@@ -13,7 +14,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 	log.Debug("handle event", "event", event.Type(), "service", "TreeService")
 	t, err := s.treeRepo.GetBySensorID(ctx, event.New.SensorID)
 	if err != nil {
-		log.Error("failed to get tree by sensor id", "sensor_id", event.New.SensorID, "err", err)
+		log.Debug("failed to get tree by sensor id", "sensor_id", event.New.SensorID, "err", err)
 		return nil
 	}
 
@@ -23,7 +24,7 @@ func (s *TreeService) HandleNewSensorData(ctx context.Context, event *entities.E
 		log.Debug("sensor status has not changed", "sensor_status", status)
 		return nil
 	}
-	newTree, err := s.treeRepo.Update(ctx, t.ID, func(s *entities.Tree) (bool, error) {
+	newTree, err := s.treeRepo.Update(ctx, t.ID, func(s *entities.Tree, _ storage.TreeRepository) (bool, error) {
 		log.Debug("updating tree watering status", "prev_status", t.WateringStatus, "new_status", status)
 		s.WateringStatus = status
 		return true, nil

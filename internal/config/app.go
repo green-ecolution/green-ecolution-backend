@@ -59,6 +59,11 @@ type RoutingVroomConfig struct {
 	Host string `mapstructure:"host"`
 }
 
+type MapConfig struct {
+	Center [2]float64 `mapstructure:"center"`
+	BBox   [4]float64 `mapstructure:"bbox"`
+}
+
 type S3Config struct {
 	Endpoint string          `mapstructure:"endpoint"`
 	Region   string          `mapstructure:"region"`
@@ -95,6 +100,7 @@ type Config struct {
 	S3           S3Config           `mapstructure:"s3"`
 	MQTT         MQTTConfig         `mapstructure:"mqtt"`
 	IdentityAuth IdentityAuthConfig `mapstructure:"auth"`
+	Map          MapConfig          `mapstructure:"map"`
 }
 
 func InitConfig() (*Config, error) {

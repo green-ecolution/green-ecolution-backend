@@ -18,14 +18,6 @@ INSERT INTO sensors (id, status, latitude, longitude, geometry) VALUES
     ('sensor-3', 'unknown', 54.77933725347423, 9.426465409018832, ST_SetSRID(ST_MakePoint(54.77933725347423, 9.426465409018832), 4326)),
     ('sensor-4', 'online', 54.82078826498143, 9.489684366114483, ST_SetSRID(ST_MakePoint(54.82078826498143, 9.489684366114483), 4326));
 
-INSERT INTO images (id, url, filename, mime_type) VALUES
-    (1, 'example/image1.jpg', 'image1.jpg', 'image/jpeg'),
-    (2, 'example/image2.jpg', 'image2.jpg', 'image/jpeg'),
-    (3, 'example/tree01_A.jpg', 'tree01_A.jpg', 'image/jpeg'),
-    (4, 'example/tree02_A.jpg', 'tree02_A.jpg', 'image/jpeg');
-
-ALTER SEQUENCE images_id_seq RESTART WITH 5;
-
 INSERT INTO trees (id, tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, watering_status, description, provider, additional_informations)
 VALUES
     (1, 1, 'sensor-1', 2021, 'Quercus robur', 1005, 54.82124518093376, 9.485702120628517, ST_SetSRID(ST_MakePoint(54.82124518093376, 9.485702120628517), 4326), 'unknown', 'Sample description 1', NULL, NULL),
@@ -36,7 +28,6 @@ VALUES
 
 ALTER SEQUENCE trees_id_seq RESTART WITH 6;
 
-INSERT INTO tree_images (tree_id, image_id) VALUES (1, 1), (1, 2);
 -- +goose StatementEnd
 
 -- +goose Down

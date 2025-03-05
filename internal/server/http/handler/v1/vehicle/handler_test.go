@@ -29,8 +29,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"",
-			"",
+			entities.VehicleQuery{},
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -65,8 +64,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"",
-			"",
+			entities.VehicleQuery{},
 		).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 		// when
@@ -138,8 +136,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"test-provider",
-			"",
+			entities.VehicleQuery{Query: entities.Query{Provider: "test-provider"}},
 		).Return(TestVehicles, int64(0), nil)
 
 		// when
@@ -172,8 +169,7 @@ func TestGetAllVehicles(t *testing.T) {
 
 		mockVehicleService.EXPECT().GetAll(
 			mock.Anything,
-			"",
-			"transporter",
+			entities.VehicleQuery{Type: "transporter"},
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -206,9 +202,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"transporter",
+			mock.Anything, entities.VehicleQuery{Type: "transporter"},
 		).Return([]*entities.Vehicle{TestVehicles[1]}, int64(1), nil)
 
 		// when
@@ -245,9 +239,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"",
+			mock.Anything, entities.VehicleQuery{},
 		).Return([]*entities.Vehicle{}, int64(0), nil)
 
 		// when
@@ -281,9 +273,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"",
+			mock.Anything, entities.VehicleQuery{},
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
@@ -306,9 +296,7 @@ func TestGetAllVehicles(t *testing.T) {
 		app.Get("/v1/vehicle", handler)
 
 		mockVehicleService.EXPECT().GetAll(
-			mock.Anything,
-			"",
-			"invalid",
+			mock.Anything, entities.VehicleQuery{Type: "invalid"},
 		).Return(nil, int64(0), fiber.NewError(fiber.ErrBadRequest.Code, "service error"))
 
 		// when

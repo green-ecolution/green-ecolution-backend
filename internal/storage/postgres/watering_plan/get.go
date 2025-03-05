@@ -12,14 +12,14 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (w *WateringPlanRepository) GetAll(ctx context.Context, provider string) ([]*entities.WateringPlan, int64, error) {
+func (w *WateringPlanRepository) GetAll(ctx context.Context, query entities.Query) ([]*entities.WateringPlan, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
 	}
 
-	totalCount, err := w.store.GetAllWateringPlansCount(ctx, provider)
+	totalCount, err := w.store.GetAllWateringPlansCount(ctx, query.Provider)
 	if err != nil {
 		log.Debug("failed to get total watering plan count in db", "error", err)
 		return nil, 0, w.store.MapError(err, sqlc.WateringPlan{})
@@ -35,9 +35,9 @@ func (w *WateringPlanRepository) GetAll(ctx context.Context, provider string) ([
 	}
 
 	rows, err := w.store.GetAllWateringPlans(ctx, &sqlc.GetAllWateringPlansParams{
-		Column1: provider,
-		Limit:   limit,
-		Offset:  (page - 1) * limit,
+		Provider: query.Provider,
+		Limit:    limit,
+		Offset:   (page - 1) * limit,
 	})
 
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/stretchr/testify/assert"
@@ -51,9 +52,9 @@ func TestTreeClusterService_HandleUpdateWateringPlan(t *testing.T) {
 
 		event := entities.NewEventUpdateWateringPlan(&prevWp, &updatedWp)
 
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) error {
 			cluster := entities.TreeCluster{}
-			_, err := f(&cluster)
+			_, err := f(&cluster, clusterRepo)
 			assert.NoError(t, err)
 			assert.Equal(t, entities.WateringStatusJustWatered, cluster.WateringStatus)
 			return nil

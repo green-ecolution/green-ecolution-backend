@@ -1,5 +1,10 @@
 -- name: GetAllRegions :many
-SELECT * FROM regions ORDER BY id;
+SELECT * FROM regions 
+ORDER BY id 
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllRegionsCount :one
+SELECT COUNT(*) FROM regions;
 
 -- name: GetRegionById :one
 SELECT * FROM regions WHERE id = $1;

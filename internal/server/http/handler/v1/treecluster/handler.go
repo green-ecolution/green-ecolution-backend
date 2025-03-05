@@ -2,7 +2,8 @@ package treecluster
 
 import (
 	"strconv"
-	"strings"
+
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
@@ -30,12 +31,20 @@ var (
 // @Router			/v1/cluster [get]
 // @Param			page		query	string	false	"Page"
 // @Param			limit		query	string	false	"Limit"
+// @Param			status		query	string	false	"watering status (good, moderate, bad)"
+// @Param			region		query	string	false	"region name"
 // @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, totalCount, err := svc.GetAll(ctx, strings.Clone(c.Query("provider")))
+
+		filter, err := fillTreeClusterQueryParams(c)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, err.Error()))
+		}
+
+		domainData, totalCount, err := svc.GetAll(ctx, filter)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -50,6 +59,24 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
+}
+
+func fillTreeClusterQueryParams(c *fiber.Ctx) (domain.TreeClusterQuery, error) {
+	var filter domain.TreeClusterQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeClusterQuery{}, err
+	}
+
+	if c.Query("status") != "" {
+		wateringStatuses, err := domain.ParseWateringStatus(c.Query("status"))
+		if err != nil {
+			return domain.TreeClusterQuery{}, err
+		}
+		filter.WateringStatus = wateringStatuses
+	}
+
+	return filter, nil
 }
 
 // @Summary		Get tree cluster by ID

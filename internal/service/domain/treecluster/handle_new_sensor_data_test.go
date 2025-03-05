@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	storageMock "github.com/green-ecolution/green-ecolution-backend/internal/storage/_mock"
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
 	"github.com/stretchr/testify/assert"
@@ -104,9 +105,9 @@ func TestTreeClusterService_HandleNewSensorData(t *testing.T) {
 		treeRepo.EXPECT().GetBySensorID(mock.Anything, "sensor-1").Return(&tree, nil)
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return(allLatestSensorData, nil)
 		treeRepo.EXPECT().GetBySensorIDs(mock.Anything, "sensor-1", "sensor-2").Return([]*entities.Tree{&treeWithSensorID1, &treeWithSensorID2}, nil)
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) error {
 			cluster := entities.TreeCluster{}
-			_, err := f(&cluster)
+			_, err := f(&cluster, clusterRepo)
 			assert.NoError(t, err)
 			assert.Equal(t, entities.WateringStatusGood, cluster.WateringStatus)
 			return nil
@@ -182,9 +183,9 @@ func TestTreeClusterService_HandleNewSensorData(t *testing.T) {
 		treeRepo.EXPECT().GetBySensorID(mock.Anything, "sensor-1").Return(&tree, nil)
 		clusterRepo.EXPECT().GetAllLatestSensorDataByClusterID(mock.Anything, int32(1)).Return([]*entities.SensorData{&sensorDataEvent}, nil)
 		treeRepo.EXPECT().GetBySensorIDs(mock.Anything, "sensor-1").Return([]*entities.Tree{&treeWithSensorID1}, nil)
-		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster) (bool, error)) error {
+		clusterRepo.EXPECT().Update(mock.Anything, int32(1), mock.Anything).RunAndReturn(func(ctx context.Context, i int32, f func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) error {
 			cluster := entities.TreeCluster{}
-			_, err := f(&cluster)
+			_, err := f(&cluster, clusterRepo)
 			assert.NoError(t, err)
 			assert.Equal(t, entities.WateringStatusBad, cluster.WateringStatus)
 			return nil

@@ -2,7 +2,6 @@ package entities
 
 type Entities interface {
 	Sensor |
-		Image |
 		Vehicle |
 		TreeCluster |
 		Tree |

@@ -3,6 +3,7 @@ package tree
 import (
 	"context"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -12,18 +13,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Tree) (bool, error)) (*entities.Tree, error) {
+func (r *TreeRepository) Update(ctx context.Context, id int32, updateFn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
 	log := logger.GetLogger(ctx)
 	var updatedTree *entities.Tree
 
 	err := r.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := r.store
-		defer func() {
-			r.store = oldStore
-		}()
-		r.store = s
+		newRepo := NewTreeRepository(s, r.TreeMappers)
 
-		tree, err := r.GetByID(ctx, id)
+		tree, err := newRepo.GetByID(ctx, id)
 		if err != nil {
 			log.Error("failed to get tree entity from db", "error", err, "tree_id", id)
 			return err
@@ -33,7 +30,7 @@ func (r *TreeRepository) Update(ctx context.Context, id int32, updateFn func(*en
 			return errors.New("updateFn is nil")
 		}
 
-		updated, err := updateFn(tree)
+		updated, err := updateFn(tree, newRepo)
 		if err != nil {
 			return err
 		}
@@ -43,12 +40,12 @@ func (r *TreeRepository) Update(ctx context.Context, id int32, updateFn func(*en
 			return nil
 		}
 
-		if err := r.updateEntity(ctx, tree); err != nil {
+		if err := newRepo.updateEntity(ctx, tree); err != nil {
 			log.Error("failed to update tree entity in db", "error", err, "tree_id", id)
 			return err
 		}
 
-		updatedTree, err = r.GetByID(ctx, id)
+		updatedTree, err = newRepo.GetByID(ctx, id)
 		if err != nil {
 			log.Error("failed to get updated tree entity from db", "error", err, "tree_id", id)
 			return err

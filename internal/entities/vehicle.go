@@ -25,6 +25,7 @@ type Vehicle struct {
 	ID             int32
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	ArchivedAt     time.Time
 	NumberPlate    string
 	Description    string
 	WaterCapacity  float64
@@ -70,6 +71,12 @@ type VehicleUpdate struct {
 	Weight         float64        `validate:"gt=0"`
 	Provider       string
 	AdditionalInfo map[string]interface{}
+}
+
+type VehicleQuery struct {
+	Type         string `query:"type"`
+	WithArchived bool   `query:"archived"`
+	Query
 }
 
 func ParseVehicleType(vehicleTypeStr string) VehicleType {

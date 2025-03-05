@@ -43,9 +43,9 @@ func (s *SensorService) publishNewSensorDataEvent(ctx context.Context, data *ent
 	}
 }
 
-func (s *SensorService) GetAll(ctx context.Context, provider string) ([]*entities.Sensor, int64, error) {
+func (s *SensorService) GetAll(ctx context.Context, query entities.Query) ([]*entities.Sensor, int64, error) {
 	log := logger.GetLogger(ctx)
-	sensors, totalCount, err := s.sensorRepo.GetAll(ctx, provider)
+	sensors, totalCount, err := s.sensorRepo.GetAll(ctx, query)
 
 	if err != nil {
 		log.Debug("failed to fetch sensors", "error", err)
@@ -85,7 +85,7 @@ func (s *SensorService) Create(ctx context.Context, sc *entities.SensorCreate) (
 		return nil, service.MapError(ctx, errors.Join(err, service.ErrValidation), service.ErrorLogValidation)
 	}
 
-	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor) (bool, error) {
+	created, err := s.sensorRepo.Create(ctx, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 		s.LatestData = sc.LatestData
 		s.Status = sc.Status
 		s.Provider = sc.Provider
@@ -114,7 +114,7 @@ func (s *SensorService) Update(ctx context.Context, id string, su *entities.Sens
 		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor) (bool, error) {
+	updated, err := s.sensorRepo.Update(ctx, id, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 		s.LatestData = su.LatestData
 		s.Status = su.Status
 		s.Provider = su.Provider
@@ -155,7 +155,7 @@ func (s *SensorService) Delete(ctx context.Context, id string) error {
 
 func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	sensors, _, err := s.sensorRepo.GetAll(ctx, "")
+	sensors, _, err := s.sensorRepo.GetAll(ctx, entities.Query{})
 	if err != nil {
 		log.Error("failed to fetch sensors", "error", err)
 		return err
@@ -169,7 +169,7 @@ func (s *SensorService) UpdateStatuses(ctx context.Context) error {
 			continue
 		}
 		if sensorData.CreatedAt.Before(cutoffTime) {
-			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor) (bool, error) {
+			_, err = s.sensorRepo.Update(ctx, sens.ID, func(s *entities.Sensor, _ storage.SensorRepository) (bool, error) {
 				s.Status = entities.SensorStatusOffline
 				return true, nil
 			})
@@ -200,7 +200,7 @@ func (s *SensorService) MapSensorToTree(ctx context.Context, sen *entities.Senso
 	}
 
 	if nearestTree != nil {
-		_, err = s.treeRepo.Update(ctx, nearestTree.ID, func(tree *entities.Tree) (bool, error) {
+		_, err = s.treeRepo.Update(ctx, nearestTree.ID, func(tree *entities.Tree, _ storage.TreeRepository) (bool, error) {
 			tree.Sensor = sen
 			log.Debug("update sensor on tree", "tree_id", tree.ID, "sensor_id", sen.ID)
 			return true, nil

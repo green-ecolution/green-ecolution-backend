@@ -1,32 +1,74 @@
 -- name: GetAllVehicles :many
 SELECT * 
 FROM vehicles 
-WHERE 
-  ($1 = '') OR (provider = $1) 
+WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+    AND archived_at IS NULL
 ORDER BY water_capacity DESC
-LIMIT $2 OFFSET $3;
+LIMIT $1 OFFSET $2;
 
 -- name: GetAllVehiclesCount :one
-SELECT COUNT(*) 
+SELECT COUNT(*)
+  FROM vehicles
+  WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+    AND archived_at IS NULL;
+
+-- name: GetAllVehiclesWithArchived :many
+SELECT * FROM vehicles
+WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+ORDER BY water_capacity DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllVehiclesWithArchivedCount :one
+SELECT COUNT(*)
   FROM vehicles 
-  WHERE 
-    ($1 = '' OR provider = $1);
+  WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider);
 
 -- name: GetAllVehiclesByType :many
 SELECT * 
 FROM vehicles 
-WHERE 
-  type = $1
-  AND ($2 = '' OR provider = $2)
+WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+  AND archived_at IS NULL
+  AND type = $1
 ORDER BY water_capacity DESC
-LIMIT $3 OFFSET $4;
+LIMIT $2 OFFSET $3;
 
 -- name: GetAllVehiclesByTypeCount :one
 SELECT COUNT(*) 
   FROM vehicles 
-  WHERE 
+  WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+    AND archived_at IS NULL
+    AND type = $1;
+
+-- name: GetAllVehiclesByTypeWithArchived :many
+SELECT *
+FROM vehicles
+WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+    AND
     type = $1
-    AND ($2 = '' OR provider = $2);
+ORDER BY water_capacity DESC
+LIMIT $2 OFFSET $3;
+
+-- name: GetAllVehiclesByTypeWithArchivedCount :one
+SELECT COUNT(*)
+  FROM vehicles
+  WHERE
+    (COALESCE(@provider, '') = '' OR provider = @provider)
+    AND
+    type = $1;
+
+-- name: GetAllArchivedVehicles :many
+SELECT *
+FROM vehicles
+WHERE
+  archived_at IS NOT NULL
+ORDER BY water_capacity DESC;
 
 -- name: GetVehicleByID :one
 SELECT * FROM vehicles WHERE id = $1;
@@ -69,6 +111,9 @@ UPDATE vehicles SET
   provider = $13,
   additional_informations = $14
 WHERE id = $1;
+
+-- name: ArchiveVehicle :one
+UPDATE vehicles SET archived_at = $2 WHERE id = $1 RETURNING id;
 
 -- name: DeleteVehicle :one
 DELETE FROM vehicles WHERE id = $1 RETURNING id;

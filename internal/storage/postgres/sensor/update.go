@@ -15,7 +15,7 @@ import (
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 )
 
-func (r *SensorRepository) Update(ctx context.Context, id string, updateFn func(*entities.Sensor) (bool, error)) (*entities.Sensor, error) {
+func (r *SensorRepository) Update(ctx context.Context, id string, updateFn func(*entities.Sensor, storage.SensorRepository) (bool, error)) (*entities.Sensor, error) {
 	log := logger.GetLogger(ctx)
 	if updateFn == nil {
 		return nil, errors.New("updateFn is nil")
@@ -23,18 +23,13 @@ func (r *SensorRepository) Update(ctx context.Context, id string, updateFn func(
 
 	var updatedSensor *entities.Sensor
 	err := r.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := r.store
-		defer func() {
-			r.store = oldStore
-		}()
-		r.store = s
-
-		entity, err := r.GetByID(ctx, id)
+		newRepo := NewSensorRepository(s, r.SensorRepositoryMappers)
+		entity, err := newRepo.GetByID(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		updated, err := updateFn(entity)
+		updated, err := updateFn(entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -44,19 +39,19 @@ func (r *SensorRepository) Update(ctx context.Context, id string, updateFn func(
 			return nil
 		}
 
-		if err := r.updateEntity(ctx, entity); err != nil {
+		if err := newRepo.updateEntity(ctx, entity); err != nil {
 			log.Error("failed to update sensor entity in db", "error", err, "sensor_id", id)
 			return err
 		}
 
 		if entity.LatestData != nil && entity.LatestData.Data != nil {
-			err = r.InsertSensorData(ctx, entity.LatestData, entity.ID)
+			err = newRepo.InsertSensorData(ctx, entity.LatestData, entity.ID)
 			if err != nil {
 				return err
 			}
 		}
 
-		updatedSensor, err = r.GetByID(ctx, entity.ID)
+		updatedSensor, err = newRepo.GetByID(ctx, entity.ID)
 		if err != nil {
 			return err
 		}

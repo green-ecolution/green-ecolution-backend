@@ -1,12 +1,26 @@
 -- name: GetAllTreeClusters :many
-SELECT * FROM tree_clusters 
-WHERE ($1 = '') OR (provider = $1)
-ORDER BY name ASC
-LIMIT $2 OFFSET $3;
+SELECT tc.*
+FROM tree_clusters tc
+         LEFT JOIN regions r ON r.id = tc.region_id
+WHERE
+    (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
+        OR watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
+  AND (COALESCE(array_length(@region::TEXT[], 1), 0) = 0
+    OR r.name = ANY(@region::TEXT[]))
+  AND (COALESCE(@provider, '') = '' OR provider = @provider)
+ORDER BY tc.name ASC
+    LIMIT $1 OFFSET $2;
 
--- name: GetAllTreeClustersCount :one
-SELECT COUNT(*) FROM tree_clusters
-WHERE ($1 = '') OR (provider = $1);
+-- name: GetTreeClustersCount :one
+SELECT COUNT(*)
+FROM tree_clusters tc
+         LEFT JOIN regions r ON r.id = tc.region_id
+WHERE
+    (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
+        OR watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
+  AND (COALESCE(array_length(@region::TEXT[], 1), 0) = 0
+    OR r.name = ANY(@region::TEXT[]))
+  AND (COALESCE(@provider, '') = '' OR provider = @provider);
 
 -- name: GetTreeClusterByID :one
 SELECT * FROM tree_clusters WHERE id = $1;

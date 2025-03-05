@@ -33,6 +33,7 @@ var (
 // @Param			limit		query	int		false	"Limit"
 // @Param			type		query	string	false	"Vehicle Type"
 // @Param			provider	query	string	false	"Provider"
+// @Param			archived	query	bool	false	"With archived vehicles"
 // @Security		Keycloak
 func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -41,8 +42,13 @@ func GetAllVehicles(svc service.VehicleService) fiber.Handler {
 		var domainData []*domain.Vehicle
 		var totalCount int64
 		var err error
+		var query domain.VehicleQuery
 
-		domainData, totalCount, err = svc.GetAll(ctx, strings.Clone(c.Query("provider")), strings.Clone(c.Query("type")))
+		if err := c.QueryParser(&query); err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, totalCount, err = svc.GetAll(ctx, query)
 
 		if err != nil {
 			return errorhandler.HandleError(err)
@@ -196,6 +202,64 @@ func UpdateVehicle(svc service.VehicleService) fiber.Handler {
 		}
 
 		return c.JSON(vehicleMapper.FromResponse(domainData))
+	}
+}
+
+// @Summary		Get archived vehicle
+// @Description	Get archived vehicle
+// @Id				get-archive-vehicle
+// @Tags			Vehicle
+// @Produce		json
+// @Success		200	{object}	[]entities.VehicleResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/archive [get]
+// @Security		Keycloak
+func GetArchiveVehicles(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		v, err := svc.GetAllArchived(ctx)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.JSON(vehicleMapper.FromResponseList(v))
+	}
+}
+
+// @Summary		Archive vehicle
+// @Description	Archive vehicle
+// @Id				archive-vehicle
+// @Tags			Vehicle
+// @Produce		json
+// @Success		204
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		409	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/vehicle/archive/{id} [post]
+// @Param			id	path	int	true	"Vehicle ID"
+// @Security		Keycloak
+func ArchiveVehicle(svc service.VehicleService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		id, err := strconv.Atoi(c.Params("id"))
+		if err != nil {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		err = svc.Archive(ctx, int32(id))
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
 

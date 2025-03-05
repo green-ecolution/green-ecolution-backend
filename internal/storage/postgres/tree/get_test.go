@@ -19,7 +19,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, "")
+		trees, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -42,7 +42,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "test-provider")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{Provider: "test-provider"})
 
 		// then
 		assert.NoError(t, err)
@@ -73,7 +73,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, "")
+		trees, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -96,7 +96,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -114,7 +114,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -131,7 +131,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, "")
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
@@ -146,7 +146,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, "")
+		trees, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
@@ -496,74 +496,6 @@ func TestTreeRepository_GetByCoordinates(t *testing.T) {
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, tree)
-	})
-}
-
-func TestTreeRepository_GetAllImagesByID(t *testing.T) {
-	t.Run("should return all images for the given tree ID", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
-		r := NewTreeRepository(suite.Store, mappers)
-		treeID := int32(1)
-
-		// when
-		images, err := r.GetAllImagesByID(context.Background(), treeID)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, images)
-		assert.NotEmpty(t, images, "Images list should not be empty")
-		for _, image := range images {
-			assert.NotZero(t, image.ID, "Image ID should not be zero")
-			assert.NotEmpty(t, image.URL, "Image URL should not be empty")
-			assert.NotEmpty(t, image.Filename, "Image Filename should not be empty")
-			assert.NotEmpty(t, image.MimeType, "Image MIME type should not be empty")
-		}
-	})
-
-	t.Run("should return an empty list when the tree has no images", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		r := NewTreeRepository(suite.Store, mappers)
-		treeID := int32(2)
-
-		// when
-		images, err := r.GetAllImagesByID(context.Background(), treeID)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, images)
-		assert.Empty(t, images, "Images list should be empty")
-	})
-
-	t.Run("should return an empty list when tree is not found", func(t *testing.T) {
-		// given
-		suite.ResetDB(t)
-		r := NewTreeRepository(suite.Store, mappers)
-		treeID := int32(999)
-
-		// when
-		images, err := r.GetAllImagesByID(context.Background(), treeID)
-
-		// then
-		assert.NoError(t, err)
-		assert.NotNil(t, images)
-		assert.Empty(t, images, "Images list should be empty")
-	})
-
-	t.Run("should return error when context is canceled", func(t *testing.T) {
-		// given
-		r := NewTreeRepository(suite.Store, mappers)
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-
-		// when
-		images, err := r.GetAllImagesByID(ctx, 1)
-
-		// then
-		assert.Error(t, err)
-		assert.Nil(t, images)
 	})
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
@@ -30,7 +31,7 @@ func defaultTreeCluster() *entities.TreeCluster {
 	}
 }
 
-func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entities.TreeCluster) (bool, error)) (*entities.TreeCluster, error) {
+func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entities.TreeCluster, storage.TreeClusterRepository) (bool, error)) (*entities.TreeCluster, error) {
 	log := logger.GetLogger(ctx)
 	if createFn == nil {
 		return nil, errors.New("createFn is nil")
@@ -38,14 +39,9 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 
 	var createdTc *entities.TreeCluster
 	err := r.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := r.store
-		defer func() {
-			r.store = oldStore
-		}()
-		r.store = s
-
+		newRepo := NewTreeClusterRepository(s, r.TreeClusterMappers)
 		entity := defaultTreeCluster()
-		created, err := createFn(entity)
+		created, err := createFn(entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -54,15 +50,15 @@ func (r *TreeClusterRepository) Create(ctx context.Context, createFn func(*entit
 			return nil
 		}
 
-		if err := r.validateTreeClusterEntity(entity); err != nil {
+		if err := newRepo.validateTreeClusterEntity(entity); err != nil {
 			return err
 		}
 
-		id, err := r.createEntity(ctx, entity)
+		id, err := newRepo.createEntity(ctx, entity)
 		if err != nil {
 			return err
 		}
-		createdTc, err = r.GetByID(ctx, id)
+		createdTc, err = newRepo.GetByID(ctx, id)
 		if err != nil {
 			return err
 		}

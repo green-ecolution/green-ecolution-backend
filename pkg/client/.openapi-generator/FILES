@@ -31,6 +31,7 @@ docs/InfoAPI.md
 docs/LoginResponse.md
 docs/LoginTokenRequest.md
 docs/LogoutRequest.md
+docs/MapInfo.md
 docs/Pagination.md
 docs/Plugin.md
 docs/PluginAPI.md
@@ -102,6 +103,7 @@ model_http_error.go
 model_login_response.go
 model_login_token_request.go
 model_logout_request.go
+model_map_info.go
 model_pagination.go
 model_plugin.go
 model_plugin_auth.go
