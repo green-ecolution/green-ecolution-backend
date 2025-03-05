@@ -1,9 +1,5 @@
 -- +goose Up
 -- +goose StatementBegin
-INSERT INTO images (url) VALUES ('https://avatars.githubusercontent.com/u/165842746?s=96&v=4');
-INSERT INTO images (url, filename, mime_type) VALUES ('https://app.dev.green-ecolution.de/api/v1/images/avatar.png', 'avatar.png', 'image/png');
-ALTER SEQUENCE images_id_seq RESTART WITH 3;
-
 INSERT INTO vehicles (id, number_plate, description, water_capacity, type, status, driving_license, model, width, height, length, weight) 
 VALUES 
   (1, 'B-1111', 'Test vehicle 1', 1000.0, 'trailer', 'active', 'BE', 'LK1615/17 - Conrad - MAN TGE 3.180', 2.0, 1.5, 2.0, 3.5),
@@ -366,7 +362,6 @@ VALUES
 
 -- +goose Down
 -- +goose StatementBegin
-DELETE FROM images;
 DELETE FROM vehicles;
 DELETE FROM trees;
 DELETE FROM tree_clusters;
