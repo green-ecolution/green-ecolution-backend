@@ -37,13 +37,13 @@ var (
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		var query domain.Query
 
-		if err := c.QueryParser(&query); err != nil {
-			return errorhandler.HandleError(err)
+		filter, err := fillTreeQueryParams(c)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, err.Error()))
 		}
 
-		domainData, totalCount, err := svc.GetAll(ctx, query)
+		domainData, totalCount, err := svc.GetAll(ctx, filter)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -60,6 +60,38 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 	}
 }
 
+func fillTreeQueryParams(c *fiber.Ctx) (domain.TreeQuery, error) {
+	var filter domain.TreeQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeQuery{}, err
+	}
+
+	if c.Query("status") != "" {
+		wateringStatuses, err := domain.ParseWateringStatus(c.Query("status"))
+		if err != nil {
+			return domain.TreeQuery{}, err
+		}
+		filter.WateringStatus = wateringStatuses
+	}
+
+	return filter, nil
+}
+
+// @Summary		Get tree by ID
+// @Description	Get tree by ID
+// @Id				get-trees
+// @Tags			Tree
+// @Produce		json
+// @Success		200	{object}	entities.TreeResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/tree/{tree_id} [get]
+// @Param			tree_id	path	int	false	"Tree ID"
+// @Security		Keycloak
 //	@Summary		Get tree by ID
 //	@Description	Get tree by ID
 //	@Id				get-trees

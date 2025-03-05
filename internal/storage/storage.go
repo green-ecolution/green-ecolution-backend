@@ -177,7 +177,7 @@ type TreeClusterRepository interface {
 
 type TreeRepository interface {
 	// GetAll returns all trees
-	GetAll(ctx context.Context, query entities.Query) ([]*entities.Tree, int64, error)
+	GetAll(ctx context.Context, query entities.TreeQuery) ([]*entities.Tree, int64, error)
 	// GetCount returns count of all trees
 	GetCount(ctx context.Context, query entities.Query) (int64, error)
 	// GetByID returns one tree by id

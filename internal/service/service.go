@@ -113,7 +113,13 @@ type InfoService interface {
 }
 
 type TreeService interface {
-	CrudService[domain.Tree, domain.TreeCreate, domain.TreeUpdate]
+	Service
+	GetAll(ctx context.Context, query domain.TreeQuery) ([]*domain.Tree, int64, error)
+	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
+	Create(ctx context.Context, createData *domain.TreeCreate) (*domain.Tree, error)
+	Update(ctx context.Context, id int32, updateData *domain.TreeUpdate) (*domain.Tree, error)
+	Delete(ctx context.Context, id int32) error
+
 	GetBySensorID(ctx context.Context, id string) (*domain.Tree, error)
 	HandleNewSensorData(context.Context, *domain.EventNewSensorData) error
 	UpdateWateringStatuses(ctx context.Context) error

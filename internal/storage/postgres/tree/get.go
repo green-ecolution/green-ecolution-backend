@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*entities.Tree, int64, error) {
+func (r *TreeRepository) GetAll(ctx context.Context, query entities.TreeQuery) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
@@ -21,6 +21,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 	}
 
 	totalCount, err := r.GetCount(ctx, query)
+
 	if err != nil {
 		return nil, 0, r.store.MapError(err, sqlc.Tree{})
 	}
@@ -34,10 +35,19 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 		page = 1
 	}
 
+	var wateringStatuses []string
+	for _, ws := range query.WateringStatus {
+		wateringStatuses = append(wateringStatuses, string(ws))
+	}
+
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
-		Provider: query.Provider,
-		Limit:    limit,
-		Offset:   (page - 1) * limit,
+		WateringStatus: wateringStatuses,
+		Region:         query.Region,
+		Provider:       query.Provider,
+		YearStart:      query.YearStart,
+		YearEnd:        query.YearEnd,
+		Limit:          limit,
+		Offset:         (page - 1) * limit,
 	})
 
 	if err != nil {
@@ -60,9 +70,22 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.Query) ([]*e
 	return t, totalCount, nil
 }
 
-func (r *TreeRepository) GetCount(ctx context.Context, query entities.Query) (int64, error) {
+func (r *TreeRepository) GetCount(ctx context.Context, query entities.TreeQuery) (int64, error) {
 	log := logger.GetLogger(ctx)
-	totalCount, err := r.store.GetAllTreesCount(ctx, query.Provider)
+
+	var wateringStatuses []string
+	for _, ws := range query.WateringStatus {
+		wateringStatuses = append(wateringStatuses, string(ws))
+	}
+
+	totalCount, err := r.store.GetAllTreesCount(ctx, &sqlc.GetAllTreesCountParams{
+		WateringStatus: wateringStatuses,
+		Region:         query.Region,
+		Provider:       query.Provider,
+		YearStart:      query.YearStart,
+		YearEnd:        query.YearEnd,
+	})
+
 	if err != nil {
 		log.Debug("failed to get total trees count in db", "error", err)
 		return 0, err
