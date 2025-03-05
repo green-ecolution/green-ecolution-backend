@@ -513,10 +513,10 @@ func (w *WateringPlanService) validateStatusDependentValues(ctx context.Context,
 }
 
 // This function calculates approximately how much water the irrigation schedule needs
-// Each tree in a linked tree cluster requires approximately 120 liters of water
+// Each tree in a linked tree cluster requires approximately 80 liters of water
 func (w *WateringPlanService) calculateRequiredWater(clusters []*entities.TreeCluster) float64 {
 	return utils.Reduce(clusters, func(acc float64, tc *entities.TreeCluster) float64 {
-		return acc + (float64(len(tc.Trees)) * 120.0)
+		return acc + (float64(len(tc.Trees)) * 80.0)
 	}, 0)
 }
 

@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	treeScale = 120 // how much water does a tree need
+	treeScale = 80 // how much water does a tree need
 )
 
 type VroomClientConfig struct {
