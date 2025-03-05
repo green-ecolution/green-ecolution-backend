@@ -117,3 +117,12 @@ UPDATE vehicles SET archived_at = $2 WHERE id = $1 RETURNING id;
 
 -- name: DeleteVehicle :one
 DELETE FROM vehicles WHERE id = $1 RETURNING id;
+
+-- name: GetAllVehiclesWithWateringPlanCount :many
+SELECT 
+    v.number_plate,
+    COUNT(vwp.watering_plan_id) AS watering_plan_count
+FROM vehicles v
+INNER JOIN vehicle_watering_plans vwp ON v.id = vwp.vehicle_id
+GROUP BY v.number_plate
+ORDER BY watering_plan_count DESC;

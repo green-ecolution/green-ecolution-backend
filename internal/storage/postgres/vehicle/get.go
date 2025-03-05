@@ -126,6 +126,17 @@ func (r *VehicleRepository) GetAllArchived(ctx context.Context) ([]*entities.Veh
 	return r.mapper.FromSqlList(rows)
 }
 
+func (r *VehicleRepository) GetAllWithWateringPlanCount(ctx context.Context) ([]*entities.VehicleEvaluation, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllVehiclesWithWateringPlanCount(ctx)
+	if err != nil {
+		log.Debug("failed to get vehicles with watering plan count", "error", err)
+		return nil, r.store.MapError(err, sqlc.Vehicle{})
+	}
+
+	return r.mapper.FromSqlListWithCount(rows)
+}
+
 func (r *VehicleRepository) GetByID(ctx context.Context, id int32) (*entities.Vehicle, error) {
 	log := logger.GetLogger(ctx)
 	row, err := r.store.GetVehicleByID(ctx, id)
