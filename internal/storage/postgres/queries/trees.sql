@@ -2,7 +2,6 @@
 SELECT t.*
 FROM trees t
          LEFT JOIN tree_clusters tc ON tc.id = t.tree_cluster_id
-         LEFT JOIN regions r ON r.id = tc.region_id
 WHERE
     (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
         OR t.watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
@@ -15,7 +14,6 @@ WHERE
 SELECT COUNT(*)
 FROM trees t
          LEFT JOIN tree_clusters tc ON tc.id = t.tree_cluster_id
-         LEFT JOIN regions r ON r.id = tc.region_id
 WHERE
     (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
         OR t.watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
