@@ -60,7 +60,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		}
 		lat := 54.3
 		long := 9.5
-		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
 			Limit:  int32(totalCountTree),
 			Offset: 0,
