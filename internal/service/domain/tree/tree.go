@@ -39,7 +39,7 @@ func NewTreeService(
 	}
 }
 
-func (s *TreeService) GetAll(ctx context.Context, query entities.TreeQuery) ([]*entities.Tree, int64, error) {
+func (s *TreeService) GetAll(ctx context.Context, query *entities.TreeQuery) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
 	trees, totalCount, err := s.treeRepo.GetAll(ctx, query)
 	if err != nil {
@@ -242,7 +242,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 
 func (s *TreeService) UpdateWateringStatuses(ctx context.Context) error {
 	log := logger.GetLogger(ctx)
-	trees, _, err := s.treeRepo.GetAll(ctx, entities.TreeQuery{})
+	trees, _, err := s.treeRepo.GetAll(ctx, &entities.TreeQuery{})
 	if err != nil {
 		log.Error("failed to fetch trees", "error", err)
 		return err

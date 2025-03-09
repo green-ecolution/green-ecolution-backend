@@ -51,7 +51,6 @@ type TreeUpdate struct {
 type TreeQuery struct {
 	WateringStatus []WateringStatus `query:"status"`
 	Region         []string         `query:"region"`
-	YearStart      int32            `query:"year_start"`
-	YearEnd        int32            `query:"year_end"`
+	Years          []int32          `query:"years"`
 	Query
 }

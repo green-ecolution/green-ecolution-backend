@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) GetAll(ctx context.Context, query entities.TreeQuery) ([]*entities.Tree, int64, error) {
+func (r *TreeRepository) GetAll(ctx context.Context, query *entities.TreeQuery) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
@@ -42,10 +42,8 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.TreeQuery) (
 
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
 		WateringStatus: wateringStatuses,
-		Region:         query.Region,
 		Provider:       query.Provider,
-		YearStart:      query.YearStart,
-		YearEnd:        query.YearEnd,
+		Years:          query.Years,
 		Limit:          limit,
 		Offset:         (page - 1) * limit,
 	})
@@ -70,7 +68,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query entities.TreeQuery) (
 	return t, totalCount, nil
 }
 
-func (r *TreeRepository) GetCount(ctx context.Context, query entities.TreeQuery) (int64, error) {
+func (r *TreeRepository) GetCount(ctx context.Context, query *entities.TreeQuery) (int64, error) {
 	log := logger.GetLogger(ctx)
 
 	var wateringStatuses []string
@@ -80,10 +78,8 @@ func (r *TreeRepository) GetCount(ctx context.Context, query entities.TreeQuery)
 
 	totalCount, err := r.store.GetAllTreesCount(ctx, &sqlc.GetAllTreesCountParams{
 		WateringStatus: wateringStatuses,
-		Region:         query.Region,
 		Provider:       query.Provider,
-		YearStart:      query.YearStart,
-		YearEnd:        query.YearEnd,
+		Years:          query.Years,
 	})
 
 	if err != nil {
