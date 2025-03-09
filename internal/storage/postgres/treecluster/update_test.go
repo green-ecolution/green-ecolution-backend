@@ -31,9 +31,9 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 
 		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
-			Column1: "",
-			Limit:   int32(totalCountTree),
-			Offset:  0,
+			Limit:    int32(totalCountTree),
+			Offset:   0,
+			Provider: "",
 		})
 		assert.NoError(t, err)
 		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
@@ -42,7 +42,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		}
 
 		trees = trees[0:2]
-    
+
 		updateFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "updated"
 			tc.Address = "updated"

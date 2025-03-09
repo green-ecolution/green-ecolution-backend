@@ -62,9 +62,8 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		long := 9.5
 		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), "")
 		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
-			Column1: "",
-			Limit:   int32(totalCountTree),
-			Offset:  0,
+			Limit:  int32(totalCountTree),
+			Offset: 0,
 		})
 		assert.NoError(t, err)
 		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
@@ -73,7 +72,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		}
 
 		trees = trees[0:2]
-    
+
 		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			tc.Address = "address"
