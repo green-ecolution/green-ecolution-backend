@@ -8,7 +8,6 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -386,6 +385,23 @@ func TestTreeClusterRepository_GetByID(t *testing.T) {
 		assert.NotNil(t, got)
 		assert.Equal(t, allTestCluster[0].ID, got.ID)
 		assert.Equal(t, allTestCluster[0].Name, got.Name)
+		assert.Equal(t, allTestCluster[0].Address, got.Address)
+		assert.Equal(t, allTestCluster[0].Description, got.Description)
+		assert.Equal(t, allTestCluster[0].MoistureLevel, got.MoistureLevel)
+		assert.Equal(t, allTestCluster[0].WateringStatus, got.WateringStatus)
+		assert.Equal(t, allTestCluster[0].SoilCondition, got.SoilCondition)
+
+		if got.Latitude != nil {
+			assert.Equal(t, allTestCluster[0].Latitude, *got.Latitude)
+		} else {
+			assert.Nil(t, got.Latitude)
+		}
+
+		if got.Longitude != nil {
+			assert.Equal(t, allTestCluster[0].Longitude, *got.Longitude)
+		} else {
+			assert.Nil(t, got.Longitude)
+		}
 
 		// assert region
 		if allTestCluster[0].RegionID == -1 {
@@ -479,6 +495,23 @@ func TestTreeClusterRepository_GetByIDs(t *testing.T) {
 		for i, cluster := range got {
 			assert.Equal(t, allTestCluster[i].ID, cluster.ID)
 			assert.Equal(t, allTestCluster[i].Name, cluster.Name)
+			assert.Equal(t, allTestCluster[i].Address, cluster.Address)
+			assert.Equal(t, allTestCluster[i].MoistureLevel, cluster.MoistureLevel)
+			assert.Equal(t, allTestCluster[i].WateringStatus, cluster.WateringStatus)
+			assert.Equal(t, allTestCluster[i].SoilCondition, cluster.SoilCondition)
+			assert.Equal(t, allTestCluster[i].Description, cluster.Description)
+
+			if cluster.Latitude != nil {
+				assert.Equal(t, allTestCluster[i].Latitude, *cluster.Latitude)
+			} else {
+				assert.Nil(t, cluster.Latitude)
+			}
+
+			if cluster.Longitude != nil {
+				assert.Equal(t, allTestCluster[i].Longitude, *cluster.Longitude)
+			} else {
+				assert.Nil(t, cluster.Longitude)
+			}
 
 			// assert region
 			if allTestCluster[i].RegionID == -1 {
@@ -569,6 +602,13 @@ func TestTreeClusterRepository_GetAllLatestSensorDataByClusterID(t *testing.T) {
 type testTreeCluster struct {
 	ID             int32
 	Name           string
+	Address        string
+	Description    string
+	MoistureLevel  float64
+	WateringStatus entities.WateringStatus
+	Latitude       float64
+	Longitude      float64
+	SoilCondition  entities.TreeSoilCondition
 	RegionID       int32
 	TreeIDs        []int32
 	Provider       string
@@ -577,57 +617,120 @@ type testTreeCluster struct {
 
 var allTestCluster = []*testTreeCluster{
 	{
-		ID:       1,
-		Name:     "Solitüde Strand",
-		RegionID: 1,
-		TreeIDs:  []int32{1, 2, 3},
+		ID:             1,
+		Name:           "Solitüde Strand",
+		Address:        "Solitüde Strand",
+		Description:    "Alle Bäume am Strand",
+		MoistureLevel:  0.75,
+		WateringStatus: entities.WateringStatusGood,
+		Latitude:       54.82094,
+		Longitude:      9.489022,
+		SoilCondition:  entities.TreeSoilConditionSandig,
+		RegionID:       1,
+		TreeIDs:        []int32{1, 2, 3},
 	},
 	{
-		ID:       2,
-		Name:     "Sankt-Jürgen-Platz",
-		RegionID: 1,
-		TreeIDs:  []int32{4, 5, 6},
+		ID:             2,
+		Name:           "Sankt-Jürgen-Platz",
+		Address:        "Ulmenstraße",
+		Description:    "Bäume beim Sankt-Jürgen-Platz",
+		MoistureLevel:  0.5,
+		WateringStatus: entities.WateringStatusModerate,
+		Latitude:       54.78805731048199,
+		Longitude:      9.44400186680097,
+		SoilCondition:  entities.TreeSoilConditionSchluffig,
+		RegionID:       1,
+		TreeIDs:        []int32{4, 5, 6},
 	},
 	{
-		ID:       3,
-		Name:     "Flensburger Stadion",
-		RegionID: 1,
-		TreeIDs:  []int32{16, 17, 18, 19, 20},
+		ID:             3,
+		Name:           "Flensburger Stadion",
+		Address:        "Flensburger Stadion",
+		Description:    "Alle Bäume in der Gegend des Stadions in Mürwik",
+		MoistureLevel:  0.7,
+		WateringStatus: entities.WateringStatusUnknown,
+		Latitude:       54.802163,
+		Longitude:      9.446398,
+		SoilCondition:  entities.TreeSoilConditionSchluffig,
+		RegionID:       1,
+		TreeIDs:        []int32{16, 17, 18, 19, 20},
 	},
 	{
-		ID:       4,
-		Name:     "Campus Hochschule",
-		RegionID: 4,
-		TreeIDs:  []int32{12, 13, 14, 15},
+		ID:             4,
+		Name:           "Campus Hochschule",
+		Address:        "Thomas-Finke Straße",
+		Description:    "Gruppe ist besonders anfällig",
+		MoistureLevel:  0.1,
+		WateringStatus: entities.WateringStatusGood,
+		Latitude:       54.77578311851497,
+		Longitude:      9.450294506300525,
+		SoilCondition:  entities.TreeSoilConditionSchluffig,
+		RegionID:       4,
+		TreeIDs:        []int32{12, 13, 14, 15},
 	},
 	{
-		ID:       5,
-		Name:     "Mathildenstraße",
-		RegionID: 10,
-		TreeIDs:  []int32{7, 8, 9, 10, 11},
+		ID:             5,
+		Name:           "Mathildenstraße",
+		Address:        "Mathildenstraße",
+		Description:    "Sehr enge Straße und dadurch schlecht zu bewässern.",
+		MoistureLevel:  0.4,
+		WateringStatus: entities.WateringStatusBad,
+		Latitude:       54.78219253876479,
+		Longitude:      9.423978982828825,
+		SoilCondition:  entities.TreeSoilConditionSchluffig,
+		RegionID:       10,
+		TreeIDs:        []int32{7, 8, 9, 10, 11},
 	},
 	{
-		ID:       6,
-		Name:     "Nordstadt",
-		RegionID: 13,
-		TreeIDs:  []int32{21, 22, 23, 24},
+		ID:             6,
+		Name:           "Nordstadt",
+		Address:        "Apenrader Straße",
+		Description:    "Guter Baumbestand mit großen Kronen.",
+		MoistureLevel:  0.6,
+		WateringStatus: entities.WateringStatusUnknown,
+		Latitude:       54.807162,
+		Longitude:      9.423138,
+		SoilCondition:  entities.TreeSoilConditionSandig,
+		RegionID:       13,
+		TreeIDs:        []int32{21, 22, 23, 24},
 	},
 	{
-		ID:       7,
-		Name:     "TSB Neustadt",
-		RegionID: 13,
+		ID:             7,
+		Name:           "TSB Neustadt",
+		Address:        "Ecknerstraße",
+		Description:    "Kleiner Baumbestand.",
+		MoistureLevel:  0.75,
+		WateringStatus: entities.WateringStatusGood,
+		Latitude:       54.797162,
+		Longitude:      9.41962,
+		SoilCondition:  entities.TreeSoilConditionSandig,
+		RegionID:       13,
 	},
 	{
-		ID:       8,
-		Name:     "Gewerbegebiet Süd",
-		RegionID: -1, // no region
+		ID:             8,
+		Name:           "Gewerbegebiet Süd",
+		Address:        "Address8",
+		Description:    "Description8",
+		MoistureLevel:  8.0,
+		WateringStatus: entities.WateringStatusGood,
+		Latitude:       0xc0012fc3d0,
+		Longitude:      0xc0012fc3d8,
+		SoilCondition:  entities.TreeSoilConditionLehmig,
+		RegionID:       -1, // no region
 	},
 	{
-		ID:       50,
-		Name:     "Gewerbegebiet Süd",
-		RegionID: -1, // no region
-		TreeIDs:  []int32{25, 26, 27, 28},
-		Provider: "test-provider",
+		ID:             50,
+		Name:           "Gewerbegebiet Süd",
+		Address:        "Address9",
+		Description:    "Description9",
+		MoistureLevel:  9.0,
+		WateringStatus: entities.WateringStatusGood,
+		Latitude:       0xc0011fc3d0,
+		Longitude:      0xc0011fc3d8,
+		SoilCondition:  entities.TreeSoilConditionLehmig,
+		RegionID:       -1, // no region
+		TreeIDs:        []int32{25, 26, 27, 28},
+		Provider:       "test-provider",
 		AdditionalInfo: map[string]interface{}{
 			"foo": "bar",
 		},
