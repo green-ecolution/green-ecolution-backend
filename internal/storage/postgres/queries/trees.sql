@@ -7,8 +7,8 @@ WHERE
   AND (COALESCE(@provider, '') = '' OR t.provider = @provider)
   AND (COALESCE(array_length(@years::INTEGER[], 1), 0) = 0 OR t.planting_year = ANY(@years::INTEGER[]))
   AND (
-    sqlc.narg('isInCluster')::BOOLEAN IS NULL
-    OR (t.tree_cluster_id IS NOT NULL) = sqlc.narg('isInCluster')::BOOLEAN
+    sqlc.narg('hasCluster')::BOOLEAN IS NULL
+    OR (t.tree_cluster_id IS NOT NULL) = sqlc.narg('hasCluster')::BOOLEAN
       )
   ORDER BY t.number ASC
     LIMIT $1 OFFSET $2;
@@ -22,8 +22,8 @@ WHERE
   AND (COALESCE(@provider, '') = '' OR t.provider = @provider)
   AND (COALESCE(array_length(@years::INTEGER[], 1), 0) = 0 OR t.planting_year = ANY(@years::INTEGER[]))
   AND (
-    sqlc.narg('isInCluster')::BOOLEAN IS NULL
-    OR (t.tree_cluster_id IS NOT NULL) = sqlc.narg('isInCluster')::BOOLEAN
+    sqlc.narg('hasCluster')::BOOLEAN IS NULL
+    OR (t.tree_cluster_id IS NOT NULL) = sqlc.narg('hasCluster')::BOOLEAN
       );
 
 -- name: GetTreeByID :one

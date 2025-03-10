@@ -44,7 +44,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query *entities.TreeQuery) 
 		WateringStatus: wateringStatuses,
 		Provider:       query.Provider,
 		Years:          query.Years,
-		IsInCluster:    query.IsInCluster,
+		HasCluster:     query.HasCluster,
 		Limit:          limit,
 		Offset:         (page - 1) * limit,
 	})
@@ -81,7 +81,7 @@ func (r *TreeRepository) GetCount(ctx context.Context, query *entities.TreeQuery
 		WateringStatus: wateringStatuses,
 		Provider:       query.Provider,
 		Years:          query.Years,
-		IsInCluster:    query.IsInCluster,
+		HasCluster:     query.HasCluster,
 	})
 
 	if err != nil {

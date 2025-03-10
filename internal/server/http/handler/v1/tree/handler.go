@@ -33,10 +33,10 @@ var (
 //	@Param			page		query	int		false	"Page"
 //	@Param			limit		query	int		false	"Limit"
 //	@Param			provider	query	string	false	"Provider"
-// @Param			status		query	string	false	"watering status (good, moderate, bad)"
-// @Param			years		query	[]int	false	"years"
-// @Param			in_cluster	query	bool	false	"is in cluster"
-//	@Security		Keycloak
+// 	@Param			status		query	string	false	"watering status (good, moderate, bad)"
+// 	@Param			years		query	[]int	false	"years"
+// 	@Param			hasCluster	query	bool	false	"has cluster"
+// 	@Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -81,20 +81,6 @@ func fillTreeQueryParams(c *fiber.Ctx) (*domain.TreeQuery, error) {
 	return &filter, nil
 }
 
-// @Summary		Get tree by ID
-// @Description	Get tree by ID
-// @Id				get-trees
-// @Tags			Tree
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id} [get]
-// @Param			tree_id	path	int	false	"Tree ID"
-// @Security		Keycloak
 //	@Summary		Get tree by ID
 //	@Description	Get tree by ID
 //	@Id				get-trees

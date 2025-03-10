@@ -50,7 +50,7 @@ type TreeUpdate struct {
 
 type TreeQuery struct {
 	WateringStatus []WateringStatus `query:"status"`
-	IsInCluster    *bool            `query:"in_cluster"`
+	HasCluster     *bool            `query:"hasCluster"`
 	Years          []int32          `query:"years"`
 	Query
 }
