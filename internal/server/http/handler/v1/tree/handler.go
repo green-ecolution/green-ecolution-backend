@@ -33,8 +33,9 @@ var (
 //	@Param			page		query	int		false	"Page"
 //	@Param			limit		query	int		false	"Limit"
 //	@Param			provider	query	string	false	"Provider"
-// 	@Param			status		query	string	false	"watering status (good, moderate, bad)"
-// 	@Param			years		query	[]int	false	"years"
+// @Param			status		query	string	false	"watering status (good, moderate, bad)"
+// @Param			years		query	[]int	false	"years"
+// @Param			in_cluster	query	bool	false	"is in cluster"
 //	@Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {

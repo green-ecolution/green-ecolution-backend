@@ -1,24 +1,30 @@
 -- name: GetAllTrees :many
 SELECT t.*
 FROM trees t
-         LEFT JOIN tree_clusters tc ON tc.id = t.tree_cluster_id
 WHERE
     (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
         OR t.watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
   AND (COALESCE(@provider, '') = '' OR t.provider = @provider)
   AND (COALESCE(array_length(@years::INTEGER[], 1), 0) = 0 OR t.planting_year = ANY(@years::INTEGER[]))
+  AND (
+    sqlc.narg('isInCluster')::BOOLEAN IS NULL
+    OR (t.tree_cluster_id IS NOT NULL) = sqlc.narg('isInCluster')::BOOLEAN
+      )
   ORDER BY t.number ASC
     LIMIT $1 OFFSET $2;
 
 -- name: GetAllTreesCount :one
 SELECT COUNT(*)
 FROM trees t
-         LEFT JOIN tree_clusters tc ON tc.id = t.tree_cluster_id
 WHERE
     (COALESCE(array_length(@watering_status::TEXT[], 1), 0) = 0
         OR t.watering_status = ANY((@watering_status::TEXT[])::watering_status[]))
   AND (COALESCE(@provider, '') = '' OR t.provider = @provider)
-  AND (COALESCE(array_length(@years::INTEGER[], 1), 0) = 0 OR t.planting_year = ANY(@years::INTEGER[]));
+  AND (COALESCE(array_length(@years::INTEGER[], 1), 0) = 0 OR t.planting_year = ANY(@years::INTEGER[]))
+  AND (
+    sqlc.narg('isInCluster')::BOOLEAN IS NULL
+    OR (t.tree_cluster_id IS NOT NULL) = sqlc.narg('isInCluster')::BOOLEAN
+      );
 
 -- name: GetTreeByID :one
 SELECT * FROM trees WHERE id = $1;
