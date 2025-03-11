@@ -50,6 +50,8 @@ var (
 
 	ErrPaginationValueInvalid = errors.New("pagination values are invalid")
 	ErrInvalidMapConfig       = errors.New("map configuration not valid")
+
+	ErrS3ServiceDisabled = errors.New("s3 service is disabled")
 )
 
 type BasicCrudRepository[T entities.Entities] interface {

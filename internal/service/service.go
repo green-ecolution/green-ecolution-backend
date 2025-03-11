@@ -67,6 +67,11 @@ func MapError(ctx context.Context, err error, errorMask ErrorLogMask) error {
 		return NewError(BadRequest, err.Error())
 	}
 
+	if errors.Is(err, storage.ErrS3ServiceDisabled) {
+		log.Warn("s3 service is disabled")
+		return NewError(Gone, err.Error())
+	}
+
 	log.Error("an error has occurred", "error", err)
 	return NewError(InternalError, err.Error())
 }
@@ -79,6 +84,7 @@ const (
 	Forbidden     ErrorCode = 403
 	NotFound      ErrorCode = 404
 	Conflict      ErrorCode = 409
+	Gone          ErrorCode = 410
 	InternalError ErrorCode = 500
 )
 

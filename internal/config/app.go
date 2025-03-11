@@ -17,6 +17,7 @@ type DatabaseConfig struct {
 }
 
 type MQTTConfig struct {
+	Enable   bool   `mapstructure:"enable"`
 	Broker   string `mapstructure:"broker"`
 	ClientID string `mapstructure:"client_id"`
 	Username string `mapstructure:"username"`
@@ -30,6 +31,7 @@ type LogConfig struct {
 }
 
 type RoutingConfig struct {
+	Enable        bool                  `mapstructure:"enable"`
 	StartPoint    []float64             `mapstructure:"start_point"`
 	EndPoint      []float64             `mapstructure:"end_point"`
 	WateringPoint []float64             `mapstructure:"watering_point"`
@@ -65,6 +67,7 @@ type MapConfig struct {
 }
 
 type S3Config struct {
+	Enable   bool            `mapstructure:"enable"`
 	Endpoint string          `mapstructure:"endpoint"`
 	Region   string          `mapstructure:"region"`
 	RouteGpx S3ServiceConfig `mapstructure:"route-gpx"`
@@ -90,6 +93,7 @@ type DashboardConfig struct {
 }
 
 type IdentityAuthConfig struct {
+	Enable       bool         `mapstructure:"enable"`
 	OidcProvider OidcProvider `mapstructure:"oidc_provider"`
 }
 
