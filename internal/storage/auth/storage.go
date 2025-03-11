@@ -12,8 +12,13 @@ func NewRepository(cfg *config.IdentityAuthConfig) *storage.Repository {
 	authRepo := keycloak.NewKeycloakRepository(cfg)
 	slog.Info("successfully initialized auth repository", "service", "keycloak")
 
-	userRepo := keycloak.NewUserRepository(cfg)
-	slog.Info("successfully initialized user repository")
+	var userRepo storage.UserRepository
+	if cfg.Enable {
+		userRepo = keycloak.NewUserRepository(cfg)
+		slog.Info("successfully initialized user repository")
+	} else {
+		userRepo = NewUserDummyRepo()
+	}
 
 	return &storage.Repository{
 		Auth: authRepo,

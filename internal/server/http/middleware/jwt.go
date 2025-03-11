@@ -18,6 +18,14 @@ import (
 )
 
 func NewJWTMiddleware(cfg *config.IdentityAuthConfig, svc service.AuthService) fiber.Handler {
+	if !cfg.Enable {
+		return func(c *fiber.Ctx) error {
+			fiberCtx := wrapper.NewFiberCtx(c)
+			_ = fiberCtx.WithLogger("user_id", -1)
+			return c.Next()
+		}
+	}
+
 	base64Str := cfg.OidcProvider.PublicKey.StaticKey
 	publicKey, err := parsePublicKey(base64Str)
 	if err != nil {
