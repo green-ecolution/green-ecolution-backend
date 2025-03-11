@@ -57,25 +57,25 @@ func NewUserDummyRepo() *UserDummyRepo {
 	}
 }
 
-func (r *UserDummyRepo) Create(ctx context.Context, user *entities.User, password string, roles []string) (*entities.User, error) {
+func (r *UserDummyRepo) Create(_ context.Context, _ *entities.User, _ string, _ []string) (*entities.User, error) {
 	return nil, storage.ErrAuthServiceDisabled
 }
 
-func (r *UserDummyRepo) RemoveSession(ctx context.Context, token string) error {
+func (r *UserDummyRepo) RemoveSession(_ context.Context, _ string) error {
 	return nil
 }
 
-func (r *UserDummyRepo) GetAll(ctx context.Context) ([]*entities.User, error) {
+func (r *UserDummyRepo) GetAll(_ context.Context) ([]*entities.User, error) {
 	return r.dummyUsers, nil
 }
 
-func (r *UserDummyRepo) GetAllByRole(ctx context.Context, role entities.UserRole) ([]*entities.User, error) {
+func (r *UserDummyRepo) GetAllByRole(_ context.Context, role entities.UserRole) ([]*entities.User, error) {
 	return utils.Filter(r.dummyUsers, func(u *entities.User) bool {
 		return slices.Contains(u.Roles, role)
 	}), nil
 }
 
-func (r *UserDummyRepo) GetByIDs(ctx context.Context, ids []string) ([]*entities.User, error) {
+func (r *UserDummyRepo) GetByIDs(_ context.Context, ids []string) ([]*entities.User, error) {
 	return utils.Filter(r.dummyUsers, func(u *entities.User) bool {
 		return slices.ContainsFunc(ids, func(id string) bool {
 			return u.ID.String() == id

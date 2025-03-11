@@ -16,29 +16,29 @@ func NewDummyPluginManager() *DummyPluginManager {
 	return &DummyPluginManager{}
 }
 
-func (s *DummyPluginManager) Register(ctx context.Context, plugin *entities.Plugin) (*entities.ClientToken, error) {
+func (s *DummyPluginManager) Register(_ context.Context, _ *entities.Plugin) (*entities.ClientToken, error) {
 	return nil, service.NewError(service.Gone, "plugin support is disabled")
 }
 
-func (s *DummyPluginManager) RefreshToken(ctx context.Context, auth *entities.AuthPlugin, slug string) (*entities.ClientToken, error) {
+func (s *DummyPluginManager) RefreshToken(_ context.Context, _ *entities.AuthPlugin, _ string) (*entities.ClientToken, error) {
 	return nil, service.NewError(service.Gone, "plugin support is disabled")
 }
 
-func (s *DummyPluginManager) Get(ctx context.Context, slug string) (entities.Plugin, error) {
+func (s *DummyPluginManager) Get(_ context.Context, _ string) (entities.Plugin, error) {
 	return entities.Plugin{}, service.NewError(service.NotFound, "plugin support is disabled")
 }
 
-func (s *DummyPluginManager) GetAll(ctx context.Context) ([]entities.Plugin, []time.Time) {
+func (s *DummyPluginManager) GetAll(_ context.Context) ([]entities.Plugin, []time.Time) {
 	return []entities.Plugin{}, []time.Time{}
 }
 
-func (s *DummyPluginManager) HeartBeat(ctx context.Context, slug string) error {
+func (s *DummyPluginManager) HeartBeat(_ context.Context, _ string) error {
 	return service.NewError(service.Gone, "plugin support is disabled")
 }
 
-func (s *DummyPluginManager) Unregister(ctx context.Context, slug string) {}
+func (s *DummyPluginManager) Unregister(_ context.Context, _ string) {}
 
-func (s *DummyPluginManager) StartCleanup(ctx context.Context) {}
+func (s *DummyPluginManager) StartCleanup(_ context.Context) {}
 
 func (s *DummyPluginManager) Ready() bool {
 	return true

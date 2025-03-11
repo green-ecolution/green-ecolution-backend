@@ -32,38 +32,38 @@ func (s *AuthDummyService) Ready() bool {
 
 func (s *AuthDummyService) LoginRequest(ctx context.Context, loginRequest *entities.LoginRequest) *entities.LoginResp {
 	log := logger.GetLogger(ctx)
-	appUrlRaw := viper.GetString("server.app_url")
-	dummyUrl, err := url.Parse(appUrlRaw + "/api/v1/user/auth/dummy")
+	appURLRaw := viper.GetString("server.app_url")
+	dummyURL, err := url.Parse(appURLRaw + "/api/v1/user/auth/dummy")
 	if err != nil {
-		log.Error("failed to parse app url in config", "error", err, "app_url", appUrlRaw)
+		log.Error("failed to parse app url in config", "error", err, "app_url", appURLRaw)
 		panic("failed to parse app url in config. Pleas check your configuration")
 	}
-	query := dummyUrl.Query()
+	query := dummyURL.Query()
 	query.Add("redirect_uri", loginRequest.RedirectURL.String())
-	dummyUrl.RawQuery = query.Encode()
+	dummyURL.RawQuery = query.Encode()
 
 	return &entities.LoginResp{
-		LoginURL: dummyUrl,
+		LoginURL: dummyURL,
 	}
 }
 
-func (s *AuthDummyService) LogoutRequest(ctx context.Context, logoutRequest *entities.Logout) error {
+func (s *AuthDummyService) LogoutRequest(_ context.Context, _ *entities.Logout) error {
 	return nil
 }
 
-func (s *AuthDummyService) ClientTokenCallback(ctx context.Context, loginCallback *entities.LoginCallback) (*entities.ClientToken, error) {
+func (s *AuthDummyService) ClientTokenCallback(_ context.Context, _ *entities.LoginCallback) (*entities.ClientToken, error) {
 	return s.generateDummyToken()
 }
 
-func (s *AuthDummyService) Register(ctx context.Context, user *entities.RegisterUser) (*entities.User, error) {
+func (s *AuthDummyService) Register(_ context.Context, _ *entities.RegisterUser) (*entities.User, error) {
 	return nil, service.NewError(service.Gone, "auth service is disabled")
 }
 
-func (s *AuthDummyService) RetrospectToken(ctx context.Context, token string) (*entities.IntroSpectTokenResult, error) {
+func (s *AuthDummyService) RetrospectToken(_ context.Context, _ string) (*entities.IntroSpectTokenResult, error) {
 	return nil, service.NewError(service.Gone, "auth service is disabled")
 }
 
-func (s *AuthDummyService) RefreshToken(ctx context.Context, refreshToken string) (*entities.ClientToken, error) {
+func (s *AuthDummyService) RefreshToken(_ context.Context, _ string) (*entities.ClientToken, error) {
 	return s.generateDummyToken()
 }
 

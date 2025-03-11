@@ -14,14 +14,14 @@ func NewDummyRoutingRepo() *DummyRoutingRepo {
 	return &DummyRoutingRepo{}
 }
 
-func (r *DummyRoutingRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
+func (r *DummyRoutingRepo) GenerateRoute(_ context.Context, _ *entities.Vehicle, _ []*entities.TreeCluster) (*entities.GeoJSON, error) {
 	return nil, storage.ErrRoutingServiceDisabled
 }
 
-func (r *DummyRoutingRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {
+func (r *DummyRoutingRepo) GenerateRawGpxRoute(_ context.Context, _ *entities.Vehicle, _ []*entities.TreeCluster) (io.ReadCloser, error) {
 	return nil, storage.ErrRoutingServiceDisabled
 }
 
-func (r *DummyRoutingRepo) GenerateRouteInformation(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.RouteMetadata, error) {
+func (r *DummyRoutingRepo) GenerateRouteInformation(_ context.Context, _ *entities.Vehicle, _ []*entities.TreeCluster) (*entities.RouteMetadata, error) {
 	return nil, storage.ErrRoutingServiceDisabled
 }
