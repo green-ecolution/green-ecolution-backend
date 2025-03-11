@@ -30,6 +30,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
@@ -132,9 +133,17 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (repos *sto
 
 	// can be switched between ors and valhalla
 	// routingRepo, err := openrouteservice.NewRepository(cfg)
-	routingRepo, err := valhalla.NewRepository(cfg)
-	if err != nil {
-		panic(err)
+	var routingRepo *storage.Repository
+	if cfg.Routing.Enable {
+		routingRepo, err = valhalla.NewRepository(cfg)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		slog.Warn("the routing service is disabled due to the configuration")
+		routingRepo = &storage.Repository{
+			Routing: routing.NewDummyRoutingRepo(),
+		}
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)

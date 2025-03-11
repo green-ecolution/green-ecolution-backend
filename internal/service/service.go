@@ -72,6 +72,16 @@ func MapError(ctx context.Context, err error, errorMask ErrorLogMask) error {
 		return NewError(Gone, err.Error())
 	}
 
+	if errors.Is(err, storage.ErrAuthServiceDisabled) {
+		log.Warn("auth service is disabled")
+		return NewError(Gone, err.Error())
+	}
+
+	if errors.Is(err, storage.ErrRoutingServiceDisabled) {
+		log.Warn("routing service is disabled")
+		return NewError(Gone, err.Error())
+	}
+
 	log.Error("an error has occurred", "error", err)
 	return NewError(InternalError, err.Error())
 }
