@@ -276,6 +276,10 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 				return false, err
 			}
 
+			if tc.Region == nil {
+				tc.Region = region
+			}
+
 			if tc.Region != nil && tc.Region.ID != region.ID {
 				tc.Region = region
 				log.Debug("updating region in tree cluster position", "id", region.ID, "name", region.Name)
