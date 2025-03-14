@@ -31,7 +31,11 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, entities.TreeClusterQuery{},
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{},
+				Regions:          []string{},
+				Query:            entities.Query{},
+			},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
@@ -63,7 +67,11 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, entities.TreeClusterQuery{},
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{},
+				Regions:          []string{},
+				Query:            entities.Query{},
+			},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=1", nil)
@@ -99,8 +107,11 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-			entities.TreeClusterQuery{Query: entities.Query{Provider: "test-provider"}},
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{},
+				Regions:          []string{},
+				Query:            entities.Query{Provider: "test-provider"},
+			},
 		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
@@ -169,7 +180,11 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, entities.TreeClusterQuery{},
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{},
+				Regions:          []string{},
+				Query:            entities.Query{},
+			},
 		).Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
@@ -202,7 +217,11 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, entities.TreeClusterQuery{},
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{},
+				Regions:          []string{},
+				Query:            entities.Query{},
+			},
 		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
@@ -224,19 +243,19 @@ func TestGetAllTreeCluster(t *testing.T) {
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
-		filter := entities.TreeClusterQuery{
-			WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
-		}
-
 		expectedFiltered := []*entities.TreeCluster{
 			TestClusterList[2],
 		}
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, filter,
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
+				Regions:          []string{},
+				Query:            entities.Query{},
+			},
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate&page=1&limit=1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?watering_statuses=moderate&page=1&limit=1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -270,20 +289,20 @@ func TestGetAllTreeCluster(t *testing.T) {
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
-		filter := entities.TreeClusterQuery{
-			Regions: []string{"Mürwik"},
-		}
-
 		expectedFiltered := []*entities.TreeCluster{
 			TestClusterList[2],
 			TestClusterList[3],
 		}
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything, filter,
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{},
+				Regions:          []string{"Mürwik"},
+				Query:            entities.Query{},
+			},
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?region=Mürwik&page=1&limit=1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?regions=Mürwik&page=1&limit=1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -330,7 +349,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 			mock.Anything, filter,
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?status=moderate&region=Mürwik&page=1&limit=1", nil)
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?watering_statuses=moderate&regions=Mürwik&page=1&limit=1", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
@@ -393,7 +412,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		req, _ := http.NewRequestWithContext(
 			context.Background(),
 			http.MethodGet,
-			"/v1/cluster?status=moderate,bad&region=Mürwik,Altstadt&page=1&limit=1",
+			"/v1/cluster?watering_statuses=moderate,bad&regions=Mürwik,Altstadt&page=1&limit=1",
 			nil,
 		)
 		resp, err := app.Test(req, -1)
