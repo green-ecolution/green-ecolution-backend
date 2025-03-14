@@ -8,6 +8,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
+// DummyRoutingRepo is used to disable the routing service by configuration
 type DummyRoutingRepo struct{}
 
 func NewDummyRoutingRepo() *DummyRoutingRepo {

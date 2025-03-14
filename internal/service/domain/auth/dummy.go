@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// AuthDummyService is used to disable the auth service by configuration
 type AuthDummyService struct {
 	repo storage.UserRepository
 }

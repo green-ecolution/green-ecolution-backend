@@ -10,6 +10,7 @@ import (
 
 var _ service.PluginService = (*DummyPluginManager)(nil)
 
+// DummyPluginManager is used to disable the plugin service
 type DummyPluginManager struct{}
 
 func NewDummyPluginManager() *DummyPluginManager {

@@ -7,6 +7,7 @@ import (
 	"golang.org/x/net/context"
 )
 
+// S3DummyRepo is used to disable the S3 service by configuration
 type S3DummyRepo struct {
 }
 

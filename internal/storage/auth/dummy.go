@@ -10,6 +10,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
+// UserDummyRepo is used to disable the auth service by configuration
 type UserDummyRepo struct {
 	dummyUsers []*entities.User
 }
