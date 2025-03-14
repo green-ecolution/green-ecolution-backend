@@ -22,7 +22,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	}
 
 	var wateringStatuses []string
-	for _, ws := range filter.WateringStatus {
+	for _, ws := range filter.WateringStatuses {
 		wateringStatuses = append(wateringStatuses, string(ws))
 	}
 
@@ -43,7 +43,7 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 
 	rows, err := r.store.GetAllTreeClusters(ctx, &sqlc.GetAllTreeClustersParams{
 		WateringStatus: wateringStatuses,
-		Region:         filter.Region,
+		Region:         filter.Regions,
 		Provider:       filter.Provider,
 		Limit:          limit,
 		Offset:         (page - 1) * limit,
@@ -72,13 +72,13 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 func (r *TreeClusterRepository) GetCount(ctx context.Context, filter entities.TreeClusterQuery) (int64, error) {
 	log := logger.GetLogger(ctx)
 	var wateringStatuses []string
-	for _, ws := range filter.WateringStatus {
+	for _, ws := range filter.WateringStatuses {
 		wateringStatuses = append(wateringStatuses, string(ws))
 	}
 
 	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
 		WateringStatus: wateringStatuses,
-		Region:         filter.Region,
+		Region:         filter.Regions,
 		Provider:       filter.Provider,
 	})
 	if err != nil {
