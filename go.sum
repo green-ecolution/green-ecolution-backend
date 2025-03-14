@@ -721,8 +721,6 @@ github.com/nunnatsa/ginkgolinter v0.19.0 h1:CnHRFAeBS3LdLI9h+Jidbcc5KH71GKOmaBZQ
 github.com/nunnatsa/ginkgolinter v0.19.0/go.mod h1:jkQ3naZDmxaZMXPWaS9rblH+i+GWXQCaS/JFIWcOH2s=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
-github.com/omniscale/go-proj/v2 v2.0.0-20221006090944-6c8a5f5a510d h1:8HGujsVC9bvR/UiSbQ8KIzk5XD8tWrgHRmHRi3AZEWk=
-github.com/omniscale/go-proj/v2 v2.0.0-20221006090944-6c8a5f5a510d/go.mod h1:/DXOw9co6sW24Uu6L+LVfH5h9AVyGOeBHPndbFAKVMo=
 github.com/onsi/ginkgo/v2 v2.22.2 h1:/3X8Panh8/WwhU/3Ssa6rCKqPLuAkVY2I0RoyDLySlU=
 github.com/onsi/ginkgo/v2 v2.22.2/go.mod h1:oeMosUL+8LtarXBHu/c0bx2D/K9zyQ6uX3cTyztHwsk=
 github.com/onsi/gomega v1.36.2 h1:koNYke6TVk6ZmnyHrCXba/T/MoLBXFjeC1PtvYgw0A8=
