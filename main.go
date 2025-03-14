@@ -30,6 +30,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
@@ -37,6 +38,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/worker/subscriber"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/spf13/viper"
 	"github.com/twpayne/go-geos"
 	pgxgeos "github.com/twpayne/pgx-geos"
 )
@@ -131,16 +133,32 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (repos *sto
 
 	// can be switched between ors and valhalla
 	// routingRepo, err := openrouteservice.NewRepository(cfg)
-	routingRepo, err := valhalla.NewRepository(cfg)
-	if err != nil {
-		panic(err)
+	var routingRepo *storage.Repository
+	if cfg.Routing.Enable {
+		routingRepo, err = valhalla.NewRepository(cfg)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		slog.Warn("the routing service is disabled due to the configuration")
+		routingRepo = &storage.Repository{
+			Routing: routing.NewDummyRoutingRepo(),
+		}
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
 
-	s3Repos, err := s3.NewRepository(cfg)
-	if err != nil {
-		panic(err)
+	var s3Repos *storage.Repository
+	if viper.GetBool("s3.enable") {
+		s3Repos, err = s3.NewRepository(cfg)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		slog.Warn("the s3 service is disabled due to the configuration")
+		s3Repos = &storage.Repository{
+			GpxBucket: s3.NewS3DummyRepo(),
+		}
 	}
 
 	repositories := &storage.Repository{
@@ -175,11 +193,15 @@ func initializeEventManager() *worker.EventManager {
 func runServices(ctx context.Context, httpServer *http.Server, mqttServer *mqtt.Mqtt, em *worker.EventManager, services *service.Services) {
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		mqttServer.RunSubscriber(ctx)
-	}()
+	if viper.GetBool("mqtt.enable") {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			mqttServer.RunSubscriber(ctx)
+		}()
+	} else {
+		slog.Warn("the mqtt service is disabled due to the configuration")
+	}
 
 	wg.Add(1)
 	go func() {

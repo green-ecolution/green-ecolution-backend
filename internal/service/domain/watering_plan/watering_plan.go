@@ -236,7 +236,12 @@ func (w *WateringPlanService) getGpxRouteURL(ctx context.Context, waterPlanID in
 func (w *WateringPlanService) GetGPXFileStream(ctx context.Context, objName string) (io.ReadSeekCloser, error) {
 	log := logger.GetLogger(ctx)
 	log.Debug("get gpx route object from bucket", "obj_name", objName, "bucket_name", viper.GetString("s3.route-gpx.bucket"))
-	return w.gpxBucket.GetObject(ctx, objName)
+	ioReader, err := w.gpxBucket.GetObject(ctx, objName)
+	if err != nil {
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
+	}
+
+	return ioReader, nil
 }
 
 func (w *WateringPlanService) Update(ctx context.Context, id int32, updateWp *entities.WateringPlanUpdate) (*entities.WateringPlan, error) {

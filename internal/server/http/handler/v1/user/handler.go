@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
@@ -276,23 +275,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
 		}
 
-		jwtClaims := jwt.MapClaims{}
-		_, err := jwt.ParseWithClaims(req.RefreshToken, jwtClaims, func(token *jwt.Token) (any, error) {
-			return token, nil
-		})
-
-		var sub string
-		if claims, ok := jwtClaims["sub"]; ok {
-			if e, ok := claims.(string); ok {
-				sub = e
-			}
-		}
-
-		if sub == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
-		}
-
-		data, err, _ := group.Do(sub, func() (any, error) {
+		data, err, _ := group.Do(req.RefreshToken, func() (any, error) {
 			return svc.RefreshToken(ctx, req.RefreshToken)
 		})
 		if err != nil {
@@ -309,5 +292,20 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.JSON(response)
+	}
+}
+
+func GetAuthDummyCode() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		redirectURL, err := url.ParseRequestURI(c.Query("redirect_uri"))
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
+		}
+
+		query := redirectURL.Query()
+		query.Set("code", "demo")
+
+		redirectURL.RawQuery = query.Encode()
+		return c.Redirect(redirectURL.String(), fiber.StatusFound)
 	}
 }

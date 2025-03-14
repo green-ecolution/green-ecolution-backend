@@ -12,6 +12,7 @@ func RegisterRoutes(r fiber.Router, svc service.AuthService) {
 }
 
 func RegisterPublicRoutes(r fiber.Router, svc service.AuthService) {
+	r.Get("/auth/dummy", GetAuthDummyCode())
 	r.Post("/logout", Logout(svc))
 	r.Get("/login", Login(svc))
 	r.Post("/login/token", RequestToken(svc))
