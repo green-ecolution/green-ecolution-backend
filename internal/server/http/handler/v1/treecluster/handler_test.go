@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"strconv"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -224,7 +225,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
@@ -270,7 +271,7 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		filter := entities.TreeClusterQuery{
-			Region: []string{"Mürwik"},
+			Regions: []string{"Mürwik"},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
@@ -317,8 +318,8 @@ func TestGetAllTreeCluster(t *testing.T) {
 		app.Get("/v1/cluster", handler)
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
-			Region:         []string{"Mürwik"},
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
+			Regions:          []string{"Mürwik"},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
@@ -375,9 +376,9 @@ func TestGetAllTreeCluster(t *testing.T) {
 		regionNames := []string{"Mürwik", "Altstadt"}
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: wateringStatues,
-			Region:         regionNames,
-			Query:          entities.Query{Provider: ""},
+			WateringStatuses: wateringStatues,
+			Regions:          regionNames,
+			Query:            entities.Query{Provider: ""},
 		}
 
 		expectedFiltered := []*entities.TreeCluster{
