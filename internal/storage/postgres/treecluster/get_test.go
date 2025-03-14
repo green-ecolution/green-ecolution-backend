@@ -186,7 +186,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: []entities.WateringStatus{entities.WateringStatusGood},
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusGood},
 		}
 
 		// when
@@ -213,7 +213,7 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterQuery{
-			Region: []string{"Mürwik"},
+			Regions: []string{"Mürwik"},
 		}
 
 		// when
@@ -241,8 +241,8 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: []entities.WateringStatus{entities.WateringStatusModerate},
-			Region:         []string{"Mürwik"},
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
+			Regions:          []string{"Mürwik"},
 		}
 
 		// when
@@ -277,9 +277,9 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		regionNames := []string{"Mürwik", "Altstadt"}
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: wateringstatues,
-			Region:         regionNames,
-			Query:          entities.Query{Provider: ""},
+			WateringStatuses: wateringstatues,
+			Regions:          regionNames,
+			Query:            entities.Query{Provider: ""},
 		}
 
 		// when
@@ -317,9 +317,9 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		regionNames := []string{"Mürwik", "Altstadt"}
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: wateringstatues,
-			Region:         regionNames,
-			Query:          entities.Query{Provider: ""},
+			WateringStatuses: wateringstatues,
+			Regions:          regionNames,
+			Query:            entities.Query{Provider: ""},
 		}
 
 		// when
@@ -353,12 +353,12 @@ func TestTreeClusterRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		filter := entities.TreeClusterQuery{
-			WateringStatus: []entities.WateringStatus{
+			WateringStatuses: []entities.WateringStatus{
 				entities.WateringStatusBad,
 				entities.WateringStatusUnknown,
 			},
-			Region: []string{"DoesNotExist", "FarAwayLand"},
-			Query:  entities.Query{Provider: ""},
+			Regions: []string{"DoesNotExist", "FarAwayLand"},
+			Query:   entities.Query{Provider: ""},
 		}
 
 		// when
