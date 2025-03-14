@@ -19,8 +19,8 @@ import (
 // @Success		200		{object}	entities.RegionListResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
+// @Param			page	query		int	false	"Page"
+// @Param			limit	query		int	false	"Limit"
 // @Router			/v1/region [get]
 // @Security		Keycloak
 func GetAllRegions(svc service.RegionService) fiber.Handler {

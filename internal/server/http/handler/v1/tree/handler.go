@@ -18,22 +18,22 @@ var (
 	sensorMapper = generated.SensorHTTPMapperImpl{}
 )
 
-// @Summary		Get all trees
-// @Description	Get all trees
-// @Id				get-all-trees
-// @Tags			Tree
-// @Produce		json
-// @Success		200	{object}	entities.TreeListResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree [get]
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
-// @Param			provider	query	string	false	"Provider"
-// @Security		Keycloak
+//	@Summary		Get all trees
+//	@Description	Get all trees
+//	@Id				get-all-trees
+//	@Tags			Tree
+//	@Produce		json
+//	@Success		200	{object}	entities.TreeListResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/tree [get]
+//	@Param			page		query	int		false	"Page"
+//	@Param			limit		query	int		false	"Limit"
+//	@Param			provider	query	string	false	"Provider"
+//	@Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -60,20 +60,20 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 	}
 }
 
-// @Summary		Get tree by ID
-// @Description	Get tree by ID
-// @Id				get-trees
-// @Tags			Tree
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id} [get]
-// @Param			tree_id	path	int	false	"Tree ID"
-// @Security		Keycloak
+//	@Summary		Get tree by ID
+//	@Description	Get tree by ID
+//	@Id				get-trees
+//	@Tags			Tree
+//	@Produce		json
+//	@Success		200	{object}	entities.TreeResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/tree/{tree_id} [get]
+//	@Param			tree_id	path	int	false	"Tree ID"
+//	@Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -96,20 +96,20 @@ func GetTreeByID(svc service.TreeService) fiber.Handler {
 	}
 }
 
-// @Summary		Get tree by sensor ID
-// @Description	Get tree by sensor ID
-// @Id				get-tree-by-sensor-id
-// @Tags			Tree Sensor
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/sensor/{sensor_id} [get]
-// @Param			sensor_id	path	string	false	"Sensor ID"
-// @Security		Keycloak
+//	@Summary		Get tree by sensor ID
+//	@Description	Get tree by sensor ID
+//	@Id				get-tree-by-sensor-id
+//	@Tags			Tree Sensor
+//	@Produce		json
+//	@Success		200	{object}	entities.TreeResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/tree/sensor/{sensor_id} [get]
+//	@Param			sensor_id	path	string	false	"Sensor ID"
+//	@Security		Keycloak
 func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -125,20 +125,20 @@ func GetTreeBySensorID(svc service.TreeService) fiber.Handler {
 	}
 }
 
-// @Summary		Create tree
-// @Description	Create tree
-// @Id				create-tree
-// @Tags			Tree
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree [post]
-// @Security		Keycloak
-// @Param			body	body	entities.TreeCreateRequest	true	"Tree to create"
+//	@Summary		Create tree
+//	@Description	Create tree
+//	@Id				create-tree
+//	@Tags			Tree
+//	@Produce		json
+//	@Success		200	{object}	entities.TreeResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/tree [post]
+//	@Security		Keycloak
+//	@Param			body	body	entities.TreeCreateRequest	true	"Tree to create"
 func CreateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -158,21 +158,21 @@ func CreateTree(svc service.TreeService) fiber.Handler {
 	}
 }
 
-// @Summary		Update tree
-// @Description	Update tree
-// @Id				update-tree
-// @Tags			Tree
-// @Produce		json
-// @Success		200	{object}	entities.TreeResponse
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id} [put]
-// @Security		Keycloak
-// @Param			tree_id	path	int							false	"Tree ID"
-// @Param			body	body	entities.TreeUpdateRequest	true	"Tree to update"
+//	@Summary		Update tree
+//	@Description	Update tree
+//	@Id				update-tree
+//	@Tags			Tree
+//	@Produce		json
+//	@Success		200	{object}	entities.TreeResponse
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/tree/{tree_id} [put]
+//	@Security		Keycloak
+//	@Param			tree_id	path	int							false	"Tree ID"
+//	@Param			body	body	entities.TreeUpdateRequest	true	"Tree to update"
 func UpdateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
@@ -195,20 +195,20 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 	}
 }
 
-// @Summary		Delete tree
-// @Description	Delete tree
-// @Id				delete-tree
-// @Tags			Tree
-// @Produce		json
-// @Success		204
-// @Failure		400	{object}	HTTPError
-// @Failure		401	{object}	HTTPError
-// @Failure		403	{object}	HTTPError
-// @Failure		404	{object}	HTTPError
-// @Failure		500	{object}	HTTPError
-// @Router			/v1/tree/{tree_id} [delete]
-// @Param			tree_id	path	int	false	"Tree ID"
-// @Security		Keycloak
+//	@Summary		Delete tree
+//	@Description	Delete tree
+//	@Id				delete-tree
+//	@Tags			Tree
+//	@Produce		json
+//	@Success		204
+//	@Failure		400	{object}	HTTPError
+//	@Failure		401	{object}	HTTPError
+//	@Failure		403	{object}	HTTPError
+//	@Failure		404	{object}	HTTPError
+//	@Failure		500	{object}	HTTPError
+//	@Router			/v1/tree/{tree_id} [delete]
+//	@Param			tree_id	path	int	false	"Tree ID"
+//	@Security		Keycloak
 func DeleteTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
