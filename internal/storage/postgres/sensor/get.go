@@ -16,9 +16,8 @@ func (r *SensorRepository) GetAll(ctx context.Context, query entities.Query) ([]
 		return nil, 0, r.store.MapError(err, sqlc.Sensor{})
 	}
 
-	totalCount, err := r.store.GetAllSensorsCount(ctx, query.Provider)
+	totalCount, err := r.GetCount(ctx, query)
 	if err != nil {
-		log.Debug("failed to get total sensor count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.Sensor{})
 	}
 
@@ -54,6 +53,17 @@ func (r *SensorRepository) GetAll(ctx context.Context, query entities.Query) ([]
 	}
 
 	return data, totalCount, nil
+}
+
+func (r *SensorRepository) GetCount(ctx context.Context, query entities.Query) (int64, error) {
+	log := logger.GetLogger(ctx)
+	totalCount, err := r.store.GetAllSensorsCount(ctx, query.Provider)
+	if err != nil {
+		log.Debug("failed to get total sensor count in db", "error", err)
+		return 0, err
+	}
+
+	return totalCount, nil
 }
 
 func (r *SensorRepository) GetAllDataByID(ctx context.Context, id string) ([]*entities.SensorData, error) {

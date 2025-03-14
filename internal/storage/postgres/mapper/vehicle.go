@@ -14,6 +14,9 @@ type InternalVehicleRepoMapper interface {
 	// goverter:map AdditionalInformations AdditionalInfo | github.com/green-ecolution/green-ecolution-backend/internal/utils:MapAdditionalInfo
 	FromSql(src *sqlc.Vehicle) (*entities.Vehicle, error)
 	FromSqlList(src []*sqlc.Vehicle) ([]*entities.Vehicle, error)
+
+	FromSqlVehicleWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error)
+	FromSqlListVehicleWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error)
 }
 
 func MapVehicleStatus(vehicleStatus sqlc.VehicleStatus) entities.VehicleStatus {

@@ -15,6 +15,9 @@ type InternalTreeClusterRepoMapper interface {
 	// goverter:map AdditionalInformations AdditionalInfo | github.com/green-ecolution/green-ecolution-backend/internal/utils:MapAdditionalInfo
 	FromSql(*sqlc.TreeCluster) (*entities.TreeCluster, error)
 	FromSqlList([]*sqlc.TreeCluster) ([]*entities.TreeCluster, error)
+
+	FromSqlRegionWithCount(src *sqlc.GetAllTreeClusterRegionsWithWateringPlanCountRow) (*entities.RegionEvaluation, error)
+	FromSqlRegionListWithCount(src []*sqlc.GetAllTreeClusterRegionsWithWateringPlanCountRow) ([]*entities.RegionEvaluation, error)
 }
 
 func MapWateringStatus(status sqlc.WateringStatus) entities.WateringStatus {

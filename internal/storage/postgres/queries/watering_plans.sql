@@ -87,3 +87,11 @@ AND tree_cluster_id = $2;
 SELECT *
 FROM tree_cluster_watering_plans
 WHERE watering_plan_id = $1;
+
+-- name: GetTotalConsumedWater :one
+SELECT SUM(consumed_water) AS total_consumed_water
+FROM tree_cluster_watering_plans;
+
+-- name: GetAllUserWateringPlanCount :one
+SELECT COUNT(*) AS total_entries
+FROM user_watering_plans;

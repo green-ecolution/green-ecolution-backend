@@ -155,6 +155,35 @@ func TestTreeRepository_GetAll(t *testing.T) {
 	})
 }
 
+func TestTreeRepository_GetCount(t *testing.T) {
+	t.Run("should return count of all trees in db", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+		// when
+		totalCount, err := r.GetCount(context.Background(), entities.Query{})
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, int64(len(testTrees)), totalCount)
+	})
+
+	t.Run("should return error when context is canceled", func(t *testing.T) {
+		// given
+		r := NewTreeRepository(suite.Store, mappers)
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+
+		// when
+		totalCount, err := r.GetCount(ctx, entities.Query{})
+
+		// then
+		assert.Error(t, err)
+		assert.Equal(t, int64(0), totalCount)
+	})
+}
+
 func TestTreeRepository_GetByID(t *testing.T) {
 	t.Run("should return the correct tree by ID", func(t *testing.T) {
 		// given

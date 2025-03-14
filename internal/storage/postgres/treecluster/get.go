@@ -26,14 +26,9 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 		wateringStatuses = append(wateringStatuses, string(ws))
 	}
 
-	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
-		WateringStatus: wateringStatuses,
-		Region:         filter.Region,
-		Provider:       filter.Provider,
-	})
+	totalCount, err := r.GetCount(ctx, filter)
 
 	if err != nil {
-		log.Debug("failed to get total tree cluster count in db", "error", err)
 		return nil, 0, r.store.MapError(err, sqlc.TreeCluster{})
 	}
 
@@ -72,6 +67,26 @@ func (r *TreeClusterRepository) GetAll(ctx context.Context, filter entities.Tree
 	}
 
 	return data, totalCount, nil
+}
+
+func (r *TreeClusterRepository) GetCount(ctx context.Context, filter entities.TreeClusterQuery) (int64, error) {
+	log := logger.GetLogger(ctx)
+	var wateringStatuses []string
+	for _, ws := range filter.WateringStatus {
+		wateringStatuses = append(wateringStatuses, string(ws))
+	}
+
+	totalCount, err := r.store.GetTreeClustersCount(ctx, &sqlc.GetTreeClustersCountParams{
+		WateringStatus: wateringStatuses,
+		Region:         filter.Region,
+		Provider:       filter.Provider,
+	})
+	if err != nil {
+		log.Debug("failed to get total tree cluster count in db", "error", err)
+		return 0, err
+	}
+
+	return totalCount, nil
 }
 
 func (r *TreeClusterRepository) GetByID(ctx context.Context, id int32) (*entities.TreeCluster, error) {
@@ -153,4 +168,15 @@ func (r *TreeClusterRepository) GetAllLatestSensorDataByClusterID(ctx context.Co
 	}
 
 	return domainData, nil
+}
+
+func (r *TreeClusterRepository) GetAllRegionsWithWateringPlanCount(ctx context.Context) ([]*entities.RegionEvaluation, error) {
+	log := logger.GetLogger(ctx)
+	rows, err := r.store.GetAllTreeClusterRegionsWithWateringPlanCount(ctx)
+	if err != nil {
+		log.Debug("failed to get regions with watering plan count", "error", err)
+		return nil, r.store.MapError(err, sqlc.GetAllTreeClusterRegionsWithWateringPlanCountRow{})
+	}
+
+	return r.mapper.FromSqlRegionListWithCount(rows)
 }

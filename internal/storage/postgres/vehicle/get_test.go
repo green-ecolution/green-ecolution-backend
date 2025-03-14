@@ -4,6 +4,7 @@ import (
 	"context"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
@@ -295,6 +296,37 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 	})
 }
 
+func TestVehicleRepository_GetAllWithWateringPlanCount(t *testing.T) {
+	t.Run("should return all verhicles with the associated watering plan count", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		exptectedVehicles := getVehicleWateringPlanCounts()
+
+		got, err := r.GetAllWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(exptectedVehicles), len(got))
+
+		for i, entry := range got {
+			assert.Equal(t, exptectedVehicles[i].NumberPlate, entry.NumberPlate)
+			assert.Equal(t, exptectedVehicles[i].WateringPlanCount, entry.WateringPlanCount)
+		}
+	})
+
+	t.Run("should return empty slice on empty db", func(t *testing.T) {
+		suite.ResetDB(t)
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		got, err := r.GetAllWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(got))
+		assert.Empty(t, got)
+	})
+}
+
 func TestVehicleRepository_GetByID(t *testing.T) {
 	t.Run("should return verhicle by id", func(t *testing.T) {
 		// given
@@ -529,4 +561,70 @@ func sortVehicleByWaterCapacity(data []*entities.Vehicle) []*entities.Vehicle {
 	})
 
 	return sorted
+}
+
+func getVehicleWateringPlanCounts() []*entities.VehicleEvaluation {
+	vehicleCountMap := make(map[string]int)
+
+	for _, plan := range allTestWateringPlans {
+		if plan.Transporter != nil && plan.Transporter.NumberPlate != "" {
+			vehicleCountMap[plan.Transporter.NumberPlate]++
+		}
+		if plan.Trailer != nil && plan.Trailer.NumberPlate != "" {
+			vehicleCountMap[plan.Trailer.NumberPlate]++
+		}
+	}
+
+	var vehicleCounts []*entities.VehicleEvaluation
+	for plate, count := range vehicleCountMap {
+		vehicleCounts = append(vehicleCounts, &entities.VehicleEvaluation{
+			NumberPlate:       plate,
+			WateringPlanCount: int64(count),
+		})
+	}
+
+	sort.Slice(vehicleCounts, func(i, j int) bool {
+		return vehicleCounts[i].WateringPlanCount > vehicleCounts[j].WateringPlanCount
+	})
+
+	return vehicleCounts
+}
+
+type testWateringPlan struct {
+	ID          int32
+	Date        time.Time
+	Transporter *entities.Vehicle
+	Trailer     *entities.Vehicle
+}
+
+var allTestWateringPlans = []*testWateringPlan{
+	{
+		ID:          1,
+		Date:        time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     allTestVehicles[0],
+	},
+	{
+		ID:          2,
+		Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     nil,
+	},
+	{
+		ID:          3,
+		Date:        time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     nil,
+	},
+	{
+		ID:          4,
+		Date:        time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     nil,
+	},
+	{
+		ID:          5,
+		Date:        time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+	},
 }
