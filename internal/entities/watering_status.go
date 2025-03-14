@@ -40,6 +40,8 @@ func ParseWateringStatus(status string) ([]WateringStatus, error) {
 
 func parseSingleWateringStatus(status string) (WateringStatus, error) {
 	switch status {
+	case string(WateringStatusJustWatered):
+		return WateringStatusJustWatered, nil
 	case string(WateringStatusGood):
 		return WateringStatusGood, nil
 	case string(WateringStatusModerate):
