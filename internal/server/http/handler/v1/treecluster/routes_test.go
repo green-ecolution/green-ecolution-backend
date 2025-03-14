@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"net/http"
 	"testing"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
@@ -28,7 +29,11 @@ func TestRegisterRoutes(t *testing.T) {
 			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockClusterService.EXPECT().GetAll(
-				mock.Anything, entities.TreeClusterQuery{},
+				mock.Anything, entities.TreeClusterQuery{
+					WateringStatuses: []entities.WateringStatus{},
+					Regions:          []string{},
+					Query:            entities.Query{},
+				},
 			).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 			// when

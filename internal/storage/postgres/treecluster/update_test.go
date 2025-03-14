@@ -25,7 +25,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 			UpdatedAt: time.Now(),
 			Name:      "Mürwik",
 		}
-		now := time.Now()
+		now := time.Now().UTC()
 		lat := 54.3
 		long := 9.5
 
@@ -77,7 +77,7 @@ func TestTreeClusterRepository_Update(t *testing.T) {
 		assert.Equal(t, newRegion.ID, got.Region.ID)
 		assert.Equal(t, newRegion.Name, got.Region.Name)
 		assert.NotNil(t, got.LastWatered)
-		assert.WithinDuration(t, now, *got.LastWatered, time.Second)
+		assert.WithinDuration(t, now, got.LastWatered.UTC(), time.Second)
 		assert.NotNil(t, got.Latitude)
 		assert.NotNil(t, got.Longitude)
 		assert.Equal(t, lat, *got.Latitude)

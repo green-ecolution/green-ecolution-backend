@@ -29,11 +29,11 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [get]
-// @Param			page		query	string	false	"Page"
-// @Param			limit		query	string	false	"Limit"
-// @Param			status		query	string	false	"watering status (good, moderate, bad)"
-// @Param			region		query	string	false	"region name"
-// @Param			provider	query	string	false	"Provider"
+// @Param			page				query	int			false	"Page"
+// @Param			limit				query	int			false	"Limit"
+// @Param			watering_statuses	query	[]string	false	"Watering statuses"
+// @Param			regions				query	[]string	false	"Regions"
+// @Param			provider			query	string		false	"Provider"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -59,24 +59,6 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
-}
-
-func fillTreeClusterQueryParams(c *fiber.Ctx) (domain.TreeClusterQuery, error) {
-	var filter domain.TreeClusterQuery
-
-	if err := c.QueryParser(&filter); err != nil {
-		return domain.TreeClusterQuery{}, err
-	}
-
-	if c.Query("status") != "" {
-		wateringStatuses, err := domain.ParseWateringStatus(c.Query("status"))
-		if err != nil {
-			return domain.TreeClusterQuery{}, err
-		}
-		filter.WateringStatus = wateringStatuses
-	}
-
-	return filter, nil
 }
 
 // @Summary		Get tree cluster by ID
@@ -215,4 +197,28 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
+}
+
+func fillTreeClusterQueryParams(c *fiber.Ctx) (domain.TreeClusterQuery, error) {
+	var filter domain.TreeClusterQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeClusterQuery{}, err
+	}
+
+	if c.Query("regions") == "" {
+		filter.Regions = []string{}
+	}
+
+	if c.Query("watering_statuses") != "" {
+		wateringStatuses, err := domain.ParseWateringStatus(c.Query("watering_statuses"))
+		if err != nil {
+			return domain.TreeClusterQuery{}, err
+		}
+		filter.WateringStatuses = wateringStatuses
+	} else {
+		filter.WateringStatuses = []domain.WateringStatus{}
+	}
+
+	return filter, nil
 }
