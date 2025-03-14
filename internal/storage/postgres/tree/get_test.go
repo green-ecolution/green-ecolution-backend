@@ -2,10 +2,11 @@ package tree
 
 import (
 	"context"
-	"testing"
-
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
+	"strings"
+	"testing"
 )
 
 func TestTreeRepository_GetAll(t *testing.T) {
@@ -153,6 +154,38 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		assert.Nil(t, trees)
 		assert.Equal(t, totalCount, int64(0))
 	})
+
+	t.Run("should return trees filtered by watering status and planting years", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
+		r := NewTreeRepository(suite.Store, mappers)
+
+		filteredTrees := []*entities.Tree{testTrees[1], testTrees[2]}
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		wateringStatuses := []string{"good", "bad"}
+		statuses, err := entities.ParseWateringStatus(strings.Join(wateringStatuses, ","))
+		assert.Nil(t, err)
+
+		// when
+		trees, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{
+			WateringStatus: statuses,
+			PlantingYears:  []int32{2022, 2023},
+			HasCluster:     utils.P(true),
+		})
+
+		// then
+		assert.NoError(t, err)
+		assert.NotNil(t, trees)
+		assert.NotEmpty(t, trees)
+		assert.Equal(t, totalCount, int64(len(filteredTrees)))
+		for i, tree := range trees {
+			assertExpectedEqualToTree(t, filteredTrees[i], tree)
+		}
+	})
 }
 
 func TestTreeRepository_GetCount(t *testing.T) {
@@ -162,7 +195,7 @@ func TestTreeRepository_GetCount(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
 		// when
-		totalCount, err := r.GetCount(context.Background(), entities.Query{})
+		totalCount, err := r.GetCount(context.Background(), &entities.TreeQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -176,7 +209,7 @@ func TestTreeRepository_GetCount(t *testing.T) {
 		cancel()
 
 		// when
-		totalCount, err := r.GetCount(ctx, entities.Query{})
+		totalCount, err := r.GetCount(ctx, &entities.TreeQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -779,64 +812,66 @@ func assertExpectedEqualToTree(t *testing.T, expectedTree, tree *entities.Tree) 
 	assert.Equal(t, expectedTree.LastWatered, tree.LastWatered, "Last watered does not match")
 }
 
-var testTrees = []*entities.Tree{
-	{
-		ID:             1,
-		PlantingYear:   2021,
-		Species:        "Quercus robur",
-		Number:         "1005",
-		Latitude:       54.82124518093376,
-		Longitude:      9.485702120628517,
-		WateringStatus: "unknown",
-		Description:    "Sample description 1",
-		LastWatered:    nil,
-	},
-	{
-		ID:             2,
-		PlantingYear:   2022,
-		Species:        "Quercus robur",
-		Number:         "1006",
-		Latitude:       54.8215076622281,
-		Longitude:      9.487153277881877,
-		WateringStatus: "good",
-		Description:    "Sample description 2",
-		LastWatered:    nil,
-	},
-	{
-		ID:             3,
-		PlantingYear:   2023,
-		Species:        "Betula pendula",
-		Number:         "1007",
-		Latitude:       54.78780993841013,
-		Longitude:      9.444052105200551,
-		WateringStatus: "bad",
-		Description:    "Sample description 3",
-		LastWatered:    nil,
-	},
-	{
-		ID:             4,
-		PlantingYear:   2020,
-		Species:        "Quercus robur",
-		Number:         "1008",
-		Latitude:       54.1000,
-		Longitude:      9.2000,
-		WateringStatus: "bad",
-		Description:    "Sample description 4",
-		LastWatered:    nil,
-	},
-	{
-		ID:             5,
-		PlantingYear:   2022,
-		Species:        "Betula pendula",
-		Number:         "1009",
-		Latitude:       54.22,
-		Longitude:      9.11,
-		WateringStatus: "bad",
-		Description:    "Sample description 5",
-		Provider:       "test-provider",
-		AdditionalInfo: map[string]interface{}{
-			"foo": "bar",
+var (
+	testTrees = []*entities.Tree{
+		{
+			ID:             1,
+			PlantingYear:   2021,
+			Species:        "Quercus robur",
+			Number:         "1005",
+			Latitude:       54.82124518093376,
+			Longitude:      9.485702120628517,
+			WateringStatus: "unknown",
+			Description:    "Sample description 1",
+			LastWatered:    nil,
 		},
-		LastWatered: nil,
-	},
-}
+		{
+			ID:             2,
+			PlantingYear:   2022,
+			Species:        "Quercus robur",
+			Number:         "1006",
+			Latitude:       54.8215076622281,
+			Longitude:      9.487153277881877,
+			WateringStatus: "good",
+			Description:    "Sample description 2",
+			LastWatered:    nil,
+		},
+		{
+			ID:             3,
+			PlantingYear:   2023,
+			Species:        "Betula pendula",
+			Number:         "1007",
+			Latitude:       54.78780993841013,
+			Longitude:      9.444052105200551,
+			WateringStatus: "bad",
+			Description:    "Sample description 3",
+			LastWatered:    nil,
+		},
+		{
+			ID:             4,
+			PlantingYear:   2020,
+			Species:        "Quercus robur",
+			Number:         "1008",
+			Latitude:       54.1000,
+			Longitude:      9.2000,
+			WateringStatus: "bad",
+			Description:    "Sample description 4",
+			LastWatered:    nil,
+		},
+		{
+			ID:             5,
+			PlantingYear:   2022,
+			Species:        "Betula pendula",
+			Number:         "1009",
+			Latitude:       54.22,
+			Longitude:      9.11,
+			WateringStatus: "bad",
+			Description:    "Sample description 5",
+			Provider:       "test-provider",
+			AdditionalInfo: map[string]interface{}{
+				"foo": "bar",
+			},
+			LastWatered: nil,
+		},
+	}
+)

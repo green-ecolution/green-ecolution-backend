@@ -42,7 +42,7 @@ func (e *EvaluationService) GetEvaluation(ctx context.Context) (*entities.Evalua
 		return &entities.Evaluation{}, err
 	}
 
-	treeCount, err := e.treeRepo.GetCount(ctx, entities.Query{})
+	treeCount, err := e.treeRepo.GetCount(ctx, &entities.TreeQuery{})
 	if err != nil {
 		log.Error("failed to get tree count", "error", err)
 		return &entities.Evaluation{}, err
