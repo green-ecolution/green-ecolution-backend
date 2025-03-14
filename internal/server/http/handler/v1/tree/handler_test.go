@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
@@ -102,6 +104,46 @@ func TestGetAllTrees(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 
+		mockTreeService.AssertExpectations(t)
+	})
+
+	t.Run("should return trees filtered by watering status and planting years", func(t *testing.T) {
+		app := fiber.New(fiber.Config{
+			EnableSplittingOnParsers: true,
+		})
+
+		mockTreeService := serviceMock.NewMockTreeService(t)
+		app.Get("/v1/tree", tree.GetAllTrees(mockTreeService))
+
+		wateringStatuses := []string{"good", "bad"}
+		plantingYears := []string{"2022", "2023"}
+
+		statues, err := entities.ParseWateringStatus(strings.Join(wateringStatuses, ","))
+		assert.Nil(t, err)
+
+		mockTreeService.EXPECT().GetAll(
+			mock.Anything,
+			&entities.TreeQuery{
+				WateringStatus: statues,
+				PlantingYears:  []int32{2022, 2023},
+				HasCluster:     utils.P(true),
+			},
+		).Return(testFilterTrees, int64(len(testFilterTrees)), nil)
+
+		// when
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/tree", nil)
+		query := req.URL.Query()
+		query.Add("watering_statuses", strings.Join(wateringStatuses, ","))
+		query.Add("planting_years", strings.Join(plantingYears, ","))
+		query.Add("has_cluster", "true")
+		req.URL.RawQuery = query.Encode()
+
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		// then
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		mockTreeService.AssertExpectations(t)
 	})
 }

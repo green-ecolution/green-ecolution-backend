@@ -55,7 +55,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.SensorCount, nil)
 		wateringPlanRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.WateringPlanCount, nil)
 		wateringPlanRepo.EXPECT().GetTotalConsumedWater(context.Background()).Return(expectedEvaluation.TotalWaterConsumption, nil)
@@ -102,7 +102,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(int64(0), errors.New("internal error"))
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(int64(0), errors.New("internal error"))
 		evaluation, err := svc.GetEvaluation(context.Background())
 
 		assert.Error(t, err)
@@ -126,7 +126,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(int64(0), errors.New("internal error"))
 		evaluation, err := svc.GetEvaluation(context.Background())
 
@@ -151,7 +151,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.SensorCount, nil)
 		wateringPlanRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(int64(0), errors.New("internal error"))
 
@@ -178,7 +178,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.SensorCount, nil)
 		wateringPlanRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.WateringPlanCount, nil)
 		wateringPlanRepo.EXPECT().GetTotalConsumedWater(context.Background()).Return(int64(0), errors.New("internal error"))
@@ -206,7 +206,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.SensorCount, nil)
 		wateringPlanRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.WateringPlanCount, nil)
 		wateringPlanRepo.EXPECT().GetTotalConsumedWater(context.Background()).Return(expectedEvaluation.TotalWaterConsumption, nil)
@@ -235,7 +235,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.SensorCount, nil)
 		wateringPlanRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.WateringPlanCount, nil)
 		wateringPlanRepo.EXPECT().GetTotalConsumedWater(context.Background()).Return(expectedEvaluation.TotalWaterConsumption, nil)
@@ -265,7 +265,7 @@ func TestEvaluationService_GetAll(t *testing.T) {
 		svc := evaluation.NewEvaluationService(clusterRepo, treeRepo, sensorRepo, wateringPlanRepo, vehicleRepo)
 
 		clusterRepo.EXPECT().GetCount(context.Background(), entities.TreeClusterQuery{}).Return(expectedEvaluation.TreeClusterCount, nil)
-		treeRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.TreeCount, nil)
+		treeRepo.EXPECT().GetCount(context.Background(), &entities.TreeQuery{}).Return(expectedEvaluation.TreeCount, nil)
 		sensorRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.SensorCount, nil)
 		wateringPlanRepo.EXPECT().GetCount(context.Background(), entities.Query{}).Return(expectedEvaluation.WateringPlanCount, nil)
 		wateringPlanRepo.EXPECT().GetTotalConsumedWater(context.Background()).Return(expectedEvaluation.TotalWaterConsumption, nil)

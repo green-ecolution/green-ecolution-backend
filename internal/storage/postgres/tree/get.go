@@ -43,7 +43,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query *entities.TreeQuery) 
 	rows, err := r.store.GetAllTrees(ctx, &sqlc.GetAllTreesParams{
 		WateringStatus: wateringStatuses,
 		Provider:       query.Provider,
-		Years:          query.Years,
+		Years:          query.PlantingYears,
 		HasCluster:     query.HasCluster,
 		Limit:          limit,
 		Offset:         (page - 1) * limit,
@@ -80,7 +80,7 @@ func (r *TreeRepository) GetCount(ctx context.Context, query *entities.TreeQuery
 	totalCount, err := r.store.GetAllTreesCount(ctx, &sqlc.GetAllTreesCountParams{
 		WateringStatus: wateringStatuses,
 		Provider:       query.Provider,
-		Years:          query.Years,
+		Years:          query.PlantingYears,
 		HasCluster:     query.HasCluster,
 	})
 

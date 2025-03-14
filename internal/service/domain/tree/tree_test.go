@@ -3,6 +3,8 @@ package tree_test
 import (
 	"context"
 	"errors"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"strings"
 	"testing"
 	"time"
 
@@ -100,6 +102,38 @@ func TestTreeService_GetAll(t *testing.T) {
 		assert.Nil(t, trees)
 		assert.Equal(t, totalCount, int64(0))
 		// assert.EqualError(t, err, "500: GetAll failed")
+	})
+
+	t.Run("should return trees filtered by watering status and planting years", func(t *testing.T) {
+		// given
+		treeRepo := storageMock.NewMockTreeRepository(t)
+		sensorRepo := storageMock.NewMockSensorRepository(t)
+		clusterRepo := storageMock.NewMockTreeClusterRepository(t)
+		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
+		svc := tree.NewTreeService(treeRepo, sensorRepo, clusterRepo, eventManager)
+
+		wateringStatuses := []string{"good", "bad"}
+		statuses, err := entities.ParseWateringStatus(strings.Join(wateringStatuses, ","))
+		assert.Nil(t, err)
+
+		expectedTrees := testFilterTrees
+		treeRepo.EXPECT().GetAll(ctx, &entities.TreeQuery{
+			WateringStatus: statuses,
+			PlantingYears:  []int32{2022, 2023},
+			HasCluster:     utils.P(true),
+		}).Return(expectedTrees, int64(len(expectedTrees)), nil)
+
+		// when
+		trees, totalCount, err := svc.GetAll(ctx, &entities.TreeQuery{
+			WateringStatus: statuses,
+			PlantingYears:  []int32{2022, 2023},
+			HasCluster:     utils.P(true),
+		})
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, expectedTrees, trees)
+		assert.Equal(t, totalCount, int64(len(expectedTrees)))
 	})
 }
 

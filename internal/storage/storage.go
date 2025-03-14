@@ -179,7 +179,7 @@ type TreeRepository interface {
 	// GetAll returns all trees
 	GetAll(ctx context.Context, query *entities.TreeQuery) ([]*entities.Tree, int64, error)
 	// GetCount returns count of all trees
-	GetCount(ctx context.Context, query *entities.Query) (int64, error)
+	GetCount(ctx context.Context, query *entities.TreeQuery) (int64, error)
 	// GetByID returns one tree by id
 	GetByID(ctx context.Context, id int32) (*entities.Tree, error)
 	// Create creates a new tree. It accepts a function that takes a tree entity that can be modified. Any changes made to the tree will be saved in the storage. If the function returns true, the tree will be created, otherwise it will not be created.
