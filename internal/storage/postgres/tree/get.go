@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r *TreeRepository) GetAll(ctx context.Context, query *entities.TreeQuery) ([]*entities.Tree, int64, error) {
+func (r *TreeRepository) GetAll(ctx context.Context, query entities.TreeQuery) ([]*entities.Tree, int64, error) {
 	log := logger.GetLogger(ctx)
 	page, limit, err := pagination.GetValues(ctx)
 	if err != nil {
@@ -69,7 +69,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query *entities.TreeQuery) 
 	return t, totalCount, nil
 }
 
-func (r *TreeRepository) GetCount(ctx context.Context, query *entities.TreeQuery) (int64, error) {
+func (r *TreeRepository) GetCount(ctx context.Context, query entities.TreeQuery) (int64, error) {
 	log := logger.GetLogger(ctx)
 
 	var wateringStatuses []string

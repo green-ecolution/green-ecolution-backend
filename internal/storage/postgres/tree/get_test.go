@@ -20,7 +20,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{})
+		trees, totalCount, err := r.GetAll(ctx, entities.TreeQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -43,7 +43,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{Query: entities.Query{Provider: "test-provider"}})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeQuery{Query: entities.Query{Provider: "test-provider"}})
 
 		// then
 		assert.NoError(t, err)
@@ -74,7 +74,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{})
+		trees, totalCount, err := r.GetAll(ctx, entities.TreeQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -97,7 +97,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(2))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -115,7 +115,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(0))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -132,7 +132,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
 		// when
-		got, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{})
+		got, totalCount, err := r.GetAll(ctx, entities.TreeQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -147,7 +147,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{})
+		trees, totalCount, err := r.GetAll(ctx, entities.TreeQuery{})
 
 		// then
 		assert.Error(t, err)
@@ -171,7 +171,7 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		assert.Nil(t, err)
 
 		// when
-		trees, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{
+		trees, totalCount, err := r.GetAll(ctx, entities.TreeQuery{
 			WateringStatuses: statuses,
 			PlantingYears:    []int32{2022, 2023},
 			HasCluster:       utils.P(true),
@@ -195,7 +195,7 @@ func TestTreeRepository_GetCount(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/tree")
 		r := NewTreeRepository(suite.Store, mappers)
 		// when
-		totalCount, err := r.GetCount(context.Background(), &entities.TreeQuery{})
+		totalCount, err := r.GetCount(context.Background(), entities.TreeQuery{})
 
 		// then
 		assert.NoError(t, err)
@@ -209,7 +209,7 @@ func TestTreeRepository_GetCount(t *testing.T) {
 		cancel()
 
 		// when
-		totalCount, err := r.GetCount(ctx, &entities.TreeQuery{})
+		totalCount, err := r.GetCount(ctx, entities.TreeQuery{})
 
 		// then
 		assert.Error(t, err)
