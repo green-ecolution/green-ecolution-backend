@@ -63,22 +63,22 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 	}
 }
 
-func fillTreeQueryParams(c *fiber.Ctx) (*domain.TreeQuery, error) {
+func fillTreeQueryParams(c *fiber.Ctx) (domain.TreeQuery, error) {
 	var filter domain.TreeQuery
 
 	if err := c.QueryParser(&filter); err != nil {
-		return &domain.TreeQuery{}, err
+		return domain.TreeQuery{}, err
 	}
 
 	if c.Query("status") != "" {
 		wateringStatuses, err := domain.ParseWateringStatus(c.Query("status"))
 		if err != nil {
-			return &domain.TreeQuery{}, err
+			return domain.TreeQuery{}, err
 		}
 		filter.WateringStatuses = wateringStatuses
 	}
 
-	return &filter, nil
+	return filter, nil
 }
 
 // @Summary		Get tree by ID

@@ -114,7 +114,7 @@ type InfoService interface {
 
 type TreeService interface {
 	Service
-	GetAll(ctx context.Context, query *domain.TreeQuery) ([]*domain.Tree, int64, error)
+	GetAll(ctx context.Context, query domain.TreeQuery) ([]*domain.Tree, int64, error)
 	GetByID(ctx context.Context, id int32) (*domain.Tree, error)
 	Create(ctx context.Context, createData *domain.TreeCreate) (*domain.Tree, error)
 	Update(ctx context.Context, id int32, updateData *domain.TreeUpdate) (*domain.Tree, error)

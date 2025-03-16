@@ -25,7 +25,7 @@ func TestRegisterTreeRoutes(t *testing.T) {
 
 			mockTreeService.EXPECT().GetAll(
 				mock.Anything,
-				&entities.TreeQuery{},
+				entities.TreeQuery{},
 			).Return(TestTrees, int64(len(TestTrees)), nil)
 
 			// when
