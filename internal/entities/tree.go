@@ -49,8 +49,8 @@ type TreeUpdate struct {
 }
 
 type TreeQuery struct {
-	WateringStatus []WateringStatus `query:"watering_statuses"`
-	HasCluster     *bool            `query:"has_cluster"`
-	PlantingYears  []int32          `query:"planting_years"`
+	WateringStatuses []WateringStatus `query:"watering_statuses"`
+	HasCluster       *bool            `query:"has_cluster"`
+	PlantingYears    []int32          `query:"planting_years"`
 	Query
 }
