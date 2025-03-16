@@ -124,9 +124,9 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			&entities.TreeQuery{
-				WateringStatus: statues,
-				PlantingYears:  []int32{2022, 2023},
-				HasCluster:     utils.P(true),
+				WateringStatuses: statues,
+				PlantingYears:    []int32{2022, 2023},
+				HasCluster:       utils.P(true),
 			},
 		).Return(testFilterTrees, int64(len(testFilterTrees)), nil)
 

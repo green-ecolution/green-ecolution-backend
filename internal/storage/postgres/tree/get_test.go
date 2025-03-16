@@ -172,9 +172,9 @@ func TestTreeRepository_GetAll(t *testing.T) {
 
 		// when
 		trees, totalCount, err := r.GetAll(ctx, &entities.TreeQuery{
-			WateringStatus: statuses,
-			PlantingYears:  []int32{2022, 2023},
-			HasCluster:     utils.P(true),
+			WateringStatuses: statuses,
+			PlantingYears:    []int32{2022, 2023},
+			HasCluster:       utils.P(true),
 		})
 
 		// then

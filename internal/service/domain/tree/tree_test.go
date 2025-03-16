@@ -118,16 +118,16 @@ func TestTreeService_GetAll(t *testing.T) {
 
 		expectedTrees := testFilterTrees
 		treeRepo.EXPECT().GetAll(ctx, &entities.TreeQuery{
-			WateringStatus: statuses,
-			PlantingYears:  []int32{2022, 2023},
-			HasCluster:     utils.P(true),
+			WateringStatuses: statuses,
+			PlantingYears:    []int32{2022, 2023},
+			HasCluster:       utils.P(true),
 		}).Return(expectedTrees, int64(len(expectedTrees)), nil)
 
 		// when
 		trees, totalCount, err := svc.GetAll(ctx, &entities.TreeQuery{
-			WateringStatus: statuses,
-			PlantingYears:  []int32{2022, 2023},
-			HasCluster:     utils.P(true),
+			WateringStatuses: statuses,
+			PlantingYears:    []int32{2022, 2023},
+			HasCluster:       utils.P(true),
 		})
 
 		// then

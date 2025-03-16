@@ -36,7 +36,7 @@ func (r *TreeRepository) GetAll(ctx context.Context, query *entities.TreeQuery) 
 	}
 
 	var wateringStatuses []string
-	for _, ws := range query.WateringStatus {
+	for _, ws := range query.WateringStatuses {
 		wateringStatuses = append(wateringStatuses, string(ws))
 	}
 
@@ -73,7 +73,7 @@ func (r *TreeRepository) GetCount(ctx context.Context, query *entities.TreeQuery
 	log := logger.GetLogger(ctx)
 
 	var wateringStatuses []string
-	for _, ws := range query.WateringStatus {
+	for _, ws := range query.WateringStatuses {
 		wateringStatuses = append(wateringStatuses, string(ws))
 	}
 
