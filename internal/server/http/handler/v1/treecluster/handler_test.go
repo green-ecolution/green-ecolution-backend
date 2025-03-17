@@ -232,8 +232,6 @@ func TestGetAllTreeCluster(t *testing.T) {
 		mockClusterService.EXPECT().GetAll(
 			mock.Anything, entities.TreeClusterQuery{
 				WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
-				Regions:          []string{},
-				Query:            entities.Query{},
 			},
 		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
 
