@@ -63,24 +63,6 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 	}
 }
 
-func fillTreeQueryParams(c *fiber.Ctx) (domain.TreeQuery, error) {
-	var filter domain.TreeQuery
-
-	if err := c.QueryParser(&filter); err != nil {
-		return domain.TreeQuery{}, err
-	}
-
-	if c.Query("status") != "" {
-		wateringStatuses, err := domain.ParseWateringStatus(c.Query("status"))
-		if err != nil {
-			return domain.TreeQuery{}, err
-		}
-		filter.WateringStatuses = wateringStatuses
-	}
-
-	return filter, nil
-}
-
 // @Summary		Get tree by ID
 // @Description	Get tree by ID
 // @Id				get-trees
@@ -251,4 +233,14 @@ func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
 	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
 
 	return dto
+}
+
+func fillTreeQueryParams(c *fiber.Ctx) (domain.TreeQuery, error) {
+	var filter domain.TreeQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeQuery{}, err
+	}
+
+	return filter, nil
 }
