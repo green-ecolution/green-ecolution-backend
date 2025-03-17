@@ -29,11 +29,7 @@ func TestRegisterRoutes(t *testing.T) {
 			ctx = context.WithValue(ctx, "limit", int32(-1))
 
 			mockClusterService.EXPECT().GetAll(
-				mock.Anything, entities.TreeClusterQuery{
-					WateringStatuses: []entities.WateringStatus{},
-					Regions:          []string{},
-					Query:            entities.Query{},
-				},
+				mock.Anything, entities.TreeClusterQuery{},
 			).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
 			// when

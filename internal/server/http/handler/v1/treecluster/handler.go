@@ -206,18 +206,12 @@ func fillTreeClusterQueryParams(c *fiber.Ctx) (domain.TreeClusterQuery, error) {
 		return domain.TreeClusterQuery{}, err
 	}
 
-	if c.Query("regions") == "" {
-		filter.Regions = []string{}
-	}
-
 	if c.Query("watering_statuses") != "" {
 		wateringStatuses, err := domain.ParseWateringStatus(c.Query("watering_statuses"))
 		if err != nil {
 			return domain.TreeClusterQuery{}, err
 		}
 		filter.WateringStatuses = wateringStatuses
-	} else {
-		filter.WateringStatuses = []domain.WateringStatus{}
 	}
 
 	return filter, nil
