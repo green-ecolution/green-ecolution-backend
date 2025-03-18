@@ -3,10 +3,10 @@ package tree_test
 import (
 	"context"
 	"errors"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
-	"strings"
 	"testing"
 	"time"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/service/domain/tree"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
@@ -112,20 +112,16 @@ func TestTreeService_GetAll(t *testing.T) {
 		eventManager := worker.NewEventManager(entities.EventTypeUpdateTree)
 		svc := tree.NewTreeService(treeRepo, sensorRepo, clusterRepo, eventManager)
 
-		wateringStatuses := []string{"good", "bad"}
-		statuses, err := entities.ParseWateringStatus(strings.Join(wateringStatuses, ","))
-		assert.Nil(t, err)
-
 		expectedTrees := testFilterTrees
 		treeRepo.EXPECT().GetAll(ctx, entities.TreeQuery{
-			WateringStatuses: statuses,
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusGood, entities.WateringStatusBad},
 			PlantingYears:    []int32{2022, 2023},
 			HasCluster:       utils.P(true),
 		}).Return(expectedTrees, int64(len(expectedTrees)), nil)
 
 		// when
 		trees, totalCount, err := svc.GetAll(ctx, entities.TreeQuery{
-			WateringStatuses: statuses,
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusGood, entities.WateringStatusBad},
 			PlantingYears:    []int32{2022, 2023},
 			HasCluster:       utils.P(true),
 		})
