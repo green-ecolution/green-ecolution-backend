@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -118,13 +119,10 @@ func TestGetAllTrees(t *testing.T) {
 		wateringStatuses := []string{"good", "bad"}
 		plantingYears := []string{"2022", "2023"}
 
-		statues, err := entities.ParseWateringStatus(strings.Join(wateringStatuses, ","))
-		assert.Nil(t, err)
-
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			entities.TreeQuery{
-				WateringStatuses: statues,
+				WateringStatuses: []entities.WateringStatus{entities.WateringStatusBad, entities.WateringStatusGood},
 				PlantingYears:    []int32{2022, 2023},
 				HasCluster:       utils.P(true),
 			},

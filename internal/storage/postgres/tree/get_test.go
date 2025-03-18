@@ -2,11 +2,11 @@ package tree
 
 import (
 	"context"
+	"testing"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 func TestTreeRepository_GetAll(t *testing.T) {
@@ -166,13 +166,9 @@ func TestTreeRepository_GetAll(t *testing.T) {
 		ctx := context.WithValue(context.Background(), "page", int32(1))
 		ctx = context.WithValue(ctx, "limit", int32(-1))
 
-		wateringStatuses := []string{"good", "bad"}
-		statuses, err := entities.ParseWateringStatus(strings.Join(wateringStatuses, ","))
-		assert.Nil(t, err)
-
 		// when
 		trees, totalCount, err := r.GetAll(ctx, entities.TreeQuery{
-			WateringStatuses: statuses,
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusBad, entities.WateringStatusGood},
 			PlantingYears:    []int32{2022, 2023},
 			HasCluster:       utils.P(true),
 		})
