@@ -122,7 +122,7 @@ func TestGetAllTrees(t *testing.T) {
 		mockTreeService.EXPECT().GetAll(
 			mock.Anything,
 			entities.TreeQuery{
-				WateringStatuses: []entities.WateringStatus{entities.WateringStatusBad, entities.WateringStatusGood},
+				WateringStatuses: []entities.WateringStatus{entities.WateringStatusGood, entities.WateringStatusBad},
 				PlantingYears:    []int32{2022, 2023},
 				HasCluster:       utils.P(true),
 			},
