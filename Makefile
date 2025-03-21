@@ -40,7 +40,6 @@ help:
 	@echo "  generate/client                   Generate client pkg"
 	@echo "  setup                             Install dependencies"
 	@echo "  setup/macos                       Install dependencies for macOS"
-	@echo "  setup/ci                          Install dependencies for CI"
 	@echo "  clean                             Clean"
 	@echo "  run                               Run"
 	@echo "  run/live                          Run live"
