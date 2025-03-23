@@ -230,7 +230,6 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			tree.WateringStatus = entities.WateringStatusUnknown
 		}
 
-		fmt.Println("test")
 		return true, nil
 	})
 
