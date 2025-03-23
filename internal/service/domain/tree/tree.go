@@ -204,6 +204,8 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 				return false, service.MapError(ctx, fmt.Errorf("failed to find TreeCluster with ID %d: %w", *tu.TreeClusterID, err), service.ErrorLogEntityNotFound)
 			}
 			tree.TreeCluster = treeCluster
+		} else {
+			tree.TreeCluster = nil
 		}
 
 		if tu.SensorID != nil {
@@ -227,6 +229,7 @@ func (s *TreeService) Update(ctx context.Context, id int32, tu *entities.TreeUpd
 			tree.Sensor = nil
 			tree.WateringStatus = entities.WateringStatusUnknown
 		}
+
 		return true, nil
 	})
 
