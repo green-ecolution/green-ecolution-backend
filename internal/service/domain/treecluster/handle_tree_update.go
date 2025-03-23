@@ -78,7 +78,7 @@ func (s *TreeClusterService) isNoUpdateNeeded(event *entities.EventUpdateTree) b
 
 func (s *TreeClusterService) handleTreeClusterUpdate(ctx context.Context, tc *entities.TreeCluster, tree *entities.Tree) error {
 	log := logger.GetLogger(ctx)
-	if tc == nil {
+	if tc == nil || tree.TreeCluster == nil {
 		return nil
 	}
 
