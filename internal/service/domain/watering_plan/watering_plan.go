@@ -449,9 +449,6 @@ func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid
 		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	fmt.Println(("VALIDATEUSERS"))
-	fmt.Println(users)
-
 	if len(users) == 0 {
 		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStrings)
 		return service.MapError(ctx, storage.ErrEntityNotFound("users"), service.ErrorLogEntityNotFound)
@@ -492,8 +489,6 @@ func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User
 	if trailer != nil {
 		requiredLicenses = append(requiredLicenses, trailer.DrivingLicense)
 	}
-
-	fmt.Println("VALIDATE USER DRIVING LICENSES")
 
 	for _, user := range users {
 		if hasAllRequiredLicenses(user, requiredLicenses) {
