@@ -31,8 +31,7 @@ VALUES
     ('sensor-5', 'offline', 54.782630, 9.423792, ST_SetSRID(ST_MakePoint(54.782630, 9.423792), 4326)),
     ('sensor-6', 'offline', 54.796916, 9.421332, ST_SetSRID(ST_MakePoint(54.796916, 9.421332), 4326)),
     ('sensor-7', 'offline', 54.7697451282801, 9.439562555553788, ST_SetSRID(ST_MakePoint(54.7697451282801, 9.439562555553788), 4326)),
-    ('sensor-8', 'offline', 54.792472, 9.450000, ST_SetSRID(ST_MakePoint(54.792472, 9.450000), 4326)),
-    ('tree-sensor', 'online', 54.774932, 9.450000, ST_SetSRID(ST_MakePoint(54.774932, 9.450000), 4326));
+    ('sensor-8', 'offline', 54.792472, 9.450000, ST_SetSRID(ST_MakePoint(54.792472, 9.450000), 4326));
 
 INSERT INTO trees (tree_cluster_id, sensor_id, planting_year, species, number, latitude, longitude, geometry, watering_status, description)
 VALUES
