@@ -449,6 +449,9 @@ func (w *WateringPlanService) validateUsers(ctx context.Context, userIDs []*uuid
 		return service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
+	fmt.Println(("VALIDATEUSERS"))
+	fmt.Println(users)
+
 	if len(users) == 0 {
 		log.Debug("requested user ids in watering plan not found", "error", err, "user_ids", userIDStrings)
 		return service.MapError(ctx, storage.ErrEntityNotFound("users"), service.ErrorLogEntityNotFound)
@@ -490,15 +493,15 @@ func (w *WateringPlanService) validateUserDrivingLicenses(users []*entities.User
 		requiredLicenses = append(requiredLicenses, trailer.DrivingLicense)
 	}
 
+	fmt.Println("VALIDATE USER DRIVING LICENSES")
+
 	for _, user := range users {
-		for _, requiredLicense := range requiredLicenses {
-			if !hasValidLicense(user, requiredLicense) {
-				return service.NewError(service.BadRequest, fmt.Sprintf("user %s does not have the required license %s", user.ID, requiredLicense))
-			}
+		if hasAllRequiredLicenses(user, requiredLicenses) {
+			return nil
 		}
 	}
 
-	return nil
+	return service.NewError(service.BadRequest, "no user has all the required licenses")
 }
 
 func (w *WateringPlanService) validateStatusDependentValues(ctx context.Context, entity *entities.WateringPlanUpdate) error {
@@ -566,6 +569,15 @@ func containsUserRoleTbz(roles []entities.UserRole) bool {
 		}
 	}
 	return false
+}
+
+func hasAllRequiredLicenses(user *entities.User, requiredLicenses []entities.DrivingLicense) bool {
+	for _, requiredLicense := range requiredLicenses {
+		if !hasValidLicense(user, requiredLicense) {
+			return false
+		}
+	}
+	return true
 }
 
 func hasValidLicense(user *entities.User, requiredLicense entities.DrivingLicense) bool {
