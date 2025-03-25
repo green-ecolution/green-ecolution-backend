@@ -9,6 +9,18 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
+// HandleUpdateWateringPlan processes an update event for a watering plan and updates tree clusters if necessary.
+//
+// The function only triggers updates if the watering plan status has changed to "finished," the date remains
+// the same, and the linked tree clusters have not changed in number. If these conditions are met, all affected
+// tree clusters will have their watering status updated.
+//
+// Parameters:
+//   - ctx: The request context, enabling logging and tracing.
+//   - event: Contains details about the updated watering plan, including its previous and new state.
+//
+// Returns:
+//   - error: An error if updating the previous tree cluster fails; otherwise, nil.
 func (s *TreeClusterService) HandleUpdateWateringPlan(ctx context.Context, event *entities.EventUpdateWateringPlan) error {
 	log := logger.GetLogger(ctx)
 	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
