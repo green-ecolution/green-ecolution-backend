@@ -35,21 +35,23 @@ type TreeClusterResponse struct {
 } // @Name TreeCluster
 
 type TreeClusterInListResponse struct {
-	ID             int32             `json:"id"`
-	CreatedAt      time.Time         `json:"created_at"`
-	UpdatedAt      time.Time         `json:"updated_at"`
-	WateringStatus WateringStatus    `json:"watering_status"`
-	LastWatered    *time.Time        `json:"last_watered,omitempty" validate:"optional"`
-	MoistureLevel  float64           `json:"moisture_level"`
-	Region         *RegionResponse   `json:"region,omitempty" validate:"optional"`
-	Address        string            `json:"address"`
-	Description    string            `json:"description"`
-	Archived       bool              `json:"archived"`
-	Latitude       *float64          `json:"latitude"`
-	Longitude      *float64          `json:"longitude"`
-	TreeIDs        []*int32          `json:"tree_ids" validate:"optional"`
-	SoilCondition  TreeSoilCondition `json:"soil_condition"`
-	Name           string            `json:"name"`
+	ID             int32                  `json:"id"`
+	CreatedAt      time.Time              `json:"created_at"`
+	UpdatedAt      time.Time              `json:"updated_at"`
+	WateringStatus WateringStatus         `json:"watering_status"`
+	LastWatered    *time.Time             `json:"last_watered,omitempty" validate:"optional"`
+	MoistureLevel  float64                `json:"moisture_level"`
+	Region         *RegionResponse        `json:"region,omitempty" validate:"optional"`
+	Address        string                 `json:"address"`
+	Description    string                 `json:"description"`
+	Archived       bool                   `json:"archived"`
+	Latitude       *float64               `json:"latitude"`
+	Longitude      *float64               `json:"longitude"`
+	TreeIDs        []*int32               `json:"tree_ids" validate:"optional"`
+	SoilCondition  TreeSoilCondition      `json:"soil_condition"`
+	Name           string                 `json:"name"`
+	Provider       string                 `json:"provider,omitempty"`
+	AdditionalInfo map[string]interface{} `json:"additional_information,omitempty" validate:"optional"`
 } // @Name TreeClusterInList
 
 type TreeClusterListResponse struct {
