@@ -53,6 +53,8 @@ type WateringPlanInListResponse struct {
 	Transporter        *VehicleResponse             `json:"transporter"`
 	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
 	CancellationNote   string                       `json:"cancellation_note"`
+	Provider           string                       `json:"provider,omitempty"`
+	AdditionalInfo     map[string]interface{}       `json:"additional_information,omitempty" validate:"optional"`
 } // @Name WateringPlanInList
 
 type WateringPlanListResponse struct {
