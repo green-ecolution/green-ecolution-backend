@@ -13,7 +13,9 @@ import (
 //
 // The function only triggers updates if the watering plan status has changed to "finished," the date remains
 // the same, and the linked tree clusters have not changed in number. If these conditions are met, all affected
-// tree clusters will have their watering status updated.
+// tree clusters will have their watering status updated. For each tree cluster in the watering plan as well
+// as the trees to this tree cluster, the watering status is set to "just watered," and the last watered date
+// is updated. An update event is then published.
 //
 // Parameters:
 //   - ctx: The request context, enabling logging and tracing.
