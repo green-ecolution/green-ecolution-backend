@@ -12,6 +12,18 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
+// HandleNewSensorData processes new sensor data and updates the watering status of a tree cluster if necessary.
+//
+// The function retrieves the tree associated with the given sensor ID and determines whether it belongs to a tree cluster.
+// If the tree has a linked cluster, the watering status of the entire cluster is calculated based on the latest sensor data.
+// If the calculated watering status differs from the current one, the tree cluster is updated accordingly, and an update event is published.
+//
+// Parameters:
+//   - ctx: The request context, enabling logging and tracing.
+//   - event: Contains the new sensor data, including the sensor ID and measured watermarks.
+//
+// Returns:
+//   - error: Always returns nil, as errors during tree or cluster retrieval are logged but do not interrupt execution.
 func (s *TreeClusterService) HandleNewSensorData(ctx context.Context, event *entities.EventNewSensorData) error {
 	log := logger.GetLogger(ctx)
 	log.Debug("handle event", "event", event.Type(), "service", "TreeClusterService")
