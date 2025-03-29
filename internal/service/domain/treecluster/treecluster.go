@@ -121,6 +121,10 @@ func (s *TreeClusterService) Create(ctx context.Context, createTc *domain.TreeCl
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
+	if err := s.UpdateWateringStatuses(ctx); err != nil {
+		log.Warn("failed to update watering status after creating tree cluster", "error", err, "cluster_id", c.ID)
+	}
+
 	if err := s.updateTreeClusterPosition(ctx, c.ID); err != nil {
 		log.Debug("error while update the cluster locations", "error", err, "cluster_id", c.ID)
 		return nil, service.MapError(ctx, err, service.ErrorLogAll)
@@ -177,6 +181,10 @@ func (s *TreeClusterService) Update(ctx context.Context, id int32, tcUpdate *dom
 	}
 	log.Info("tree cluster updated successfully", "cluster_id", id)
 
+	if err := s.UpdateWateringStatuses(ctx); err != nil {
+		log.Warn("failed to update watering status after updating tree cluster", "error", err, "cluster_id", id)
+	}
+
 	var eventTreeClusters []*domain.TreeCluster
 	if len(trees) > 0 {
 		eventTreeClusters = utils.Filter(utils.Map(trees, func(t *domain.Tree) *domain.TreeCluster {
@@ -232,27 +240,28 @@ func (s *TreeClusterService) UpdateWateringStatuses(ctx context.Context) error {
 
 	cutoffTime := time.Now().Add(-24 * time.Hour) // 1 day ago
 	for _, cluster := range treeClusters {
-		// Do nothing if watering status is not »just watered«
-		if cluster.WateringStatus != domain.WateringStatusJustWatered {
-			continue
-		}
+		var wateringStatus domain.WateringStatus
 
-		if cluster.LastWatered.Before(cutoffTime) {
-			wateringStatus, err := s.getWateringStatusOfTreeCluster(ctx, cluster.ID)
+		if cluster.Trees == nil || (cluster.Trees != nil && len(cluster.Trees) == 0) {
+			// tree cluster has no trees
+			wateringStatus = domain.WateringStatusUnknown
+		} else if cluster.LastWatered != nil && cluster.LastWatered.Before(cutoffTime) {
+			wateringStatus, err = s.getWateringStatusOfTreeCluster(ctx, cluster.ID)
 			if err != nil {
 				log.Error("failed to get watering status of cluster", "cluster_id", cluster.ID, "error", err)
 				return err
 			}
+		}
 
+		if wateringStatus != "" {
 			err = s.treeClusterRepo.Update(ctx, cluster.ID, func(tc *domain.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 				tc.WateringStatus = wateringStatus
 				return true, nil
 			})
-
 			if err != nil {
 				log.Error("failed to update watering status of tree cluster", "cluster_id", cluster.ID, "error", err)
 			} else {
-				log.Debug("watering status of tree cluster is updated by scheduler", "cluster_id", cluster.ID)
+				log.Debug("watering status of tree cluster is updated", "cluster_id", cluster.ID)
 			}
 		}
 	}
