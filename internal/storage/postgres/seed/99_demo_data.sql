@@ -116,7 +116,7 @@ INSERT INTO trees (tree_cluster_id, sensor_id, planting_year, species, number, l
 VALUES
   (NULL, NULL, 2023, 'Quercus robur', 1065, 54.780394213230196, 9.417514801025392, ST_SetSRID(ST_MakePoint(54.780394213230196, 9.417514801025392), 4326), 'unknown', 'Dieser Baum wurde im August das letzte mal gestuzt', '2025-02-14 12:34:56');
 
-ALTER SEQUENCE trees_id_seq RESTART WITH 67;
+ALTER SEQUENCE trees_id_seq RESTART WITH 68;
 
 INSERT INTO sensor_data (sensor_id, data)
 VALUES
