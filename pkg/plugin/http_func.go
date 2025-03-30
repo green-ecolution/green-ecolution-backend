@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // Register registers the plugin with the plugin host and returns an authentication token. Upon successful registration of the plugin, the Authorisation header is set on every protected route to the backend, which already contains this token.
@@ -19,8 +20,6 @@ import (
 //
 // Parameters:
 // - ctx: The context for managing request deadlines and cancellation.
-// - clientID: The client identifier used for authenticating the plugin.
-// - clientSecret: The secret key corresponding to the client identifier.
 //
 // Returns:
 //   - A pointer to a Token struct containing the access and refresh tokens if registration is successful.
@@ -36,12 +35,12 @@ import (
 //
 // Example usage:
 //
-//	token, err := pluginWorker.Register(ctx, "client-id", "client-secret")
+//	token, err := pluginWorker.Register(ctx)
 //	if err != nil {
 //		log.Fatalf("Failed to register plugin: %v", err)
 //	}
 //	log.Printf("Successfully registered. Access token: %s", token.AccessToken)
-func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret string) (*Token, error) {
+func (w *PluginWorker) Register(ctx context.Context) (*Token, error) {
 	reqBody := PluginRegisterRequest{
 		Slug:        w.cfg.plugin.Slug,
 		Name:        w.cfg.plugin.Name,
@@ -49,8 +48,8 @@ func (w *PluginWorker) Register(ctx context.Context, clientID, clientSecret stri
 		Version:     w.cfg.plugin.Version,
 		Description: w.cfg.plugin.Description,
 		Auth: PluginAuth{
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
+			ClientID:     w.cfg.clientID,
+			ClientSecret: w.cfg.clientSecret,
 		},
 	}
 
@@ -127,6 +126,7 @@ func (w *PluginWorker) Unregister(ctx context.Context) error {
 		return err
 	}
 
+	w.checkAndRenewToken(ctx)
 	req.Header.Set("Authorization", fmt.Sprintf("%s %s", w.cfg.token.TokenType, w.cfg.token.AccessToken))
 	resp, err := w.cfg.client.Do(req)
 	if err != nil {
@@ -142,10 +142,10 @@ func (w *PluginWorker) Unregister(ctx context.Context) error {
 }
 
 // RefreshToken refreshes the authentication token for the plugin.
-func (w *PluginWorker) RefreshToken(ctx context.Context, clientID, clientSecret string) (*Token, error) {
+func (w *PluginWorker) RefreshToken(ctx context.Context) (*Token, error) {
 	reqBody := PluginAuth{
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
+		ClientID:     w.cfg.clientID,
+		ClientSecret: w.cfg.clientSecret,
 	}
 
 	buf, err := json.Marshal(reqBody)
@@ -225,6 +225,7 @@ func (w *PluginWorker) Heartbeat(ctx context.Context) error {
 		return err
 	}
 
+	w.checkAndRenewToken(ctx)
 	req.Header.Set("Authorization", fmt.Sprintf("%s %s", w.cfg.token.TokenType, w.cfg.token.AccessToken))
 	resp, err := w.cfg.client.Do(req)
 	if err != nil {
@@ -234,6 +235,19 @@ func (w *PluginWorker) Heartbeat(ctx context.Context) error {
 
 	if resp.StatusCode != http.StatusOK {
 		return errors.New("failed to send heartbeat")
+	}
+
+	return nil
+}
+
+func (w *PluginWorker) checkAndRenewToken(ctx context.Context) error {
+	if w.cfg.token.Expiry.Before(time.Now()) {
+		newToken, err := w.RefreshToken(ctx)
+		if err != nil {
+			return err
+		}
+
+		w.cfg.token = newToken
 	}
 
 	return nil
