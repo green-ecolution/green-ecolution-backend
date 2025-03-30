@@ -53,7 +53,7 @@ s3:
         secretAccessKey: secret_secret_secret
 map:
     center: [54.792277136221905, 9.43580607453268]
-    bbox: [54.751799,9.357298,54.837072,9.506812]
+    bbox: [54.714822,9.285796,54.860127,9.583800]
 mqtt:
   broker: eu1.cloud.thethings.industries:1883
   client_id: tree-sensor
