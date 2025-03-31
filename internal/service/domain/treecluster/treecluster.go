@@ -316,6 +316,8 @@ func (s *TreeClusterService) updateTreeClusterPosition(ctx context.Context, id i
 					slog.Group("new_position", "latitude", lat, "longitude", long),
 				)
 			}
+		} else {
+			tc.Region = nil
 		}
 
 		return true, nil
@@ -370,6 +372,8 @@ func (s *TreeClusterService) handlePrevTreeLocation(ctx context.Context, trees [
 				tc.Latitude = &lat
 				tc.Longitude = &long
 				tc.Region = region
+			} else {
+				tc.Region = nil
 			}
 
 			return true, nil
