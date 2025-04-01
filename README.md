@@ -13,13 +13,19 @@ Smart irrigation is needed to save water, staff and costs. This project is the s
 - trees
 - tree clusters
 - sensors
+- watering plans
+- vehicles
+- users
 
 In the current setup sensors are connected to an ESP32 with an integrated LoRaWAN module.
 Sensor data is send using LoraWAN to a MQTT-Gateway and then to the server to further process the data.
 
-While the project is created in collaboration with the local green space management (TBZ Flensburg) this software aims to be applicable for other cities.
+While the project is created in collaboration with the local green space management (TBZ Flensburg), this software aims to be applicable to other cities. It was initially developed at the University of Applied Sciences Flensburg as a research project within the Applied Computer Science masters degree program.
 
-- [Roadmap](https://github.com/orgs/green-ecolution/projects/5/views/3)
+For more information please refer to:
+- [Project website](https://green-ecolution.de/)
+- [University of Applied Sciences Flensburg](https://hs-flensburg.de/en)
+- [Try it out | Demo](https://demo.green-ecolution.de)
 
 ## Project structure
 
