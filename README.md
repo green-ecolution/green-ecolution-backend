@@ -27,6 +27,17 @@ For more information please refer to:
 - [University of Applied Sciences Flensburg](https://hs-flensburg.de/en)
 - [Try it out | Demo](https://demo.green-ecolution.de)
 
+## Quick start guide
+
+This is a simple way to start the application locally without a lot of setup.
+The first command you need to execute is to download the docker compose configuration file from the specified GitHub repository:
+`wget https://raw.githubusercontent.com/green-ecolution/green-ecolution-backend/refs/heads/develop/.docker/docker-compose.yaml`
+
+The next command builds and starts the application containers as defined in the configuration file.
+`docker compose up`
+
+Now you can run the application with `make run/live`. For further information you can take a look at the setup section down below.
+
 ## Project structure
 
 ```
