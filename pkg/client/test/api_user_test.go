@@ -11,10 +11,10 @@ package client
 
 import (
 	"context"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_UserAPIService(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_client_UserAPIService(t *testing.T) {
 
 	t.Run("Test UserAPIService GetAllUsers", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.UserAPI.GetAllUsers(context.Background()).Execute()
 
@@ -34,9 +34,23 @@ func Test_client_UserAPIService(t *testing.T) {
 
 	})
 
+	t.Run("Test UserAPIService GetUsersByRole", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var role string
+
+		resp, httpRes, err := apiClient.UserAPI.GetUsersByRole(context.Background(), role).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test UserAPIService V1UserLoginGet", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.UserAPI.V1UserLoginGet(context.Background()).Execute()
 
@@ -48,7 +62,7 @@ func Test_client_UserAPIService(t *testing.T) {
 
 	t.Run("Test UserAPIService V1UserLoginTokenPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.UserAPI.V1UserLoginTokenPost(context.Background()).Execute()
 
@@ -60,7 +74,7 @@ func Test_client_UserAPIService(t *testing.T) {
 
 	t.Run("Test UserAPIService V1UserLogoutPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.UserAPI.V1UserLogoutPost(context.Background()).Execute()
 
@@ -72,7 +86,7 @@ func Test_client_UserAPIService(t *testing.T) {
 
 	t.Run("Test UserAPIService V1UserPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.UserAPI.V1UserPost(context.Background()).Execute()
 
@@ -84,7 +98,7 @@ func Test_client_UserAPIService(t *testing.T) {
 
 	t.Run("Test UserAPIService V1UserTokenRefreshPost", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.UserAPI.V1UserTokenRefreshPost(context.Background()).Execute()
 

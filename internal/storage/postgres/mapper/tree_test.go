@@ -19,10 +19,11 @@ func TestTreeMapper_FromSql(t *testing.T) {
 		src := allTestTrees[0]
 
 		// when
-		got := treeMapper.FromSql(src)
+		got, err := treeMapper.FromSql(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Equal(t, src.ID, got.ID)
 		assert.Equal(t, src.CreatedAt.Time, got.CreatedAt)
 		assert.Equal(t, src.UpdatedAt.Time, got.UpdatedAt)
@@ -32,7 +33,7 @@ func TestTreeMapper_FromSql(t *testing.T) {
 		assert.Equal(t, src.Latitude, got.Latitude)
 		assert.Equal(t, src.Longitude, got.Longitude)
 		assert.Equal(t, src.WateringStatus, sqlc.WateringStatus(got.WateringStatus))
-		assert.Equal(t, src.Readonly, got.Readonly)
+		assert.Equal(t, *src.Provider, got.Provider)
 		assert.Equal(t, *src.Description, got.Description)
 	})
 
@@ -41,10 +42,11 @@ func TestTreeMapper_FromSql(t *testing.T) {
 		var src *sqlc.Tree = nil
 
 		// when
-		got := treeMapper.FromSql(src)
+		got, err := treeMapper.FromSql(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -56,10 +58,11 @@ func TestTreeMapper_FromSqlList(t *testing.T) {
 		src := allTestTrees
 
 		// when
-		got := treeMapper.FromSqlList(src)
+		got, err := treeMapper.FromSqlList(src)
 
 		// then
 		assert.NotNil(t, got)
+		assert.NoError(t, err)
 		assert.Len(t, got, 2)
 
 		for i, src := range src {
@@ -73,7 +76,7 @@ func TestTreeMapper_FromSqlList(t *testing.T) {
 			assert.Equal(t, src.Latitude, got[i].Latitude)
 			assert.Equal(t, src.Longitude, got[i].Longitude)
 			assert.Equal(t, src.WateringStatus, sqlc.WateringStatus(got[i].WateringStatus))
-			assert.Equal(t, src.Readonly, got[i].Readonly)
+			assert.Equal(t, *src.Provider, got[i].Provider)
 			assert.Equal(t, *src.Description, got[i].Description)
 		}
 	})
@@ -83,10 +86,11 @@ func TestTreeMapper_FromSqlList(t *testing.T) {
 		var src []*sqlc.Tree = nil
 
 		// when
-		got := treeMapper.FromSqlList(src)
+		got, err := treeMapper.FromSqlList(src)
 
 		// then
 		assert.Nil(t, got)
+		assert.NoError(t, err)
 	})
 }
 
@@ -100,9 +104,9 @@ var allTestTrees = []*sqlc.Tree{
 		Latitude:       52.5200,
 		Longitude:      13.4050,
 		WateringStatus: sqlc.WateringStatusGood,
-		Readonly:       true,
 		Description:    utils.P("Newly planted tree"),
 		Number:         "P 1234",
+		Provider:       utils.P(""),
 	},
 	{
 		ID:             2,
@@ -113,8 +117,8 @@ var allTestTrees = []*sqlc.Tree{
 		Latitude:       52.5200,
 		Longitude:      13.4050,
 		WateringStatus: sqlc.WateringStatusModerate,
-		Readonly:       true,
 		Description:    utils.P("Also newly planted tree"),
 		Number:         "P 2345",
+		Provider:       utils.P("foo-provider"),
 	},
 }

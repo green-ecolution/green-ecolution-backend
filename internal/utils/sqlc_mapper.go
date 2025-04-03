@@ -1,11 +1,10 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
-	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -52,16 +51,32 @@ func TimeToPgDate(date time.Time) (pgtype.Date, error) {
 	return pgDate, nil
 }
 
-//nolint:gocritic
-func ConvertNullableImage(img sqlc.Image) *entities.Image {
-	if img.ID == 0 {
-		return nil
+func MapAdditionalInfo(src []byte) (map[string]any, error) {
+	if len(src) == 0 {
+		return nil, nil
 	}
 
-	return &entities.Image{
-		ID:        img.ID,
-		CreatedAt: img.CreatedAt.Time,
-		UpdatedAt: img.UpdatedAt.Time,
-		URL:       img.Url,
+	additionalInfo := make(map[string]any, 0)
+	err := json.Unmarshal(src, &additionalInfo)
+	if err != nil {
+		return nil, err
 	}
+	return additionalInfo, nil
+}
+
+func MapAdditionalInfoToByte(src map[string]any) ([]byte, error) {
+	if src == nil {
+		return nil, nil
+	}
+
+	if len(src) == 0 {
+		return nil, nil
+	}
+
+	additionalInfo, err := json.Marshal(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return additionalInfo, nil
 }

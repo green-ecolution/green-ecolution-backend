@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
@@ -40,11 +39,7 @@ func Login(svc service.AuthService) fiber.Handler {
 			RedirectURL: redirectURL,
 		}
 
-		resp, err := svc.LoginRequest(ctx, &req)
-		if err != nil {
-			return errorhandler.HandleError(service.NewError(service.InternalError, errors.Wrap(err, "failed to login").Error()))
-		}
-
+		resp := svc.LoginRequest(ctx, &req)
 		response := entities.LoginResponse{
 			LoginURL: resp.LoginURL.String(),
 		}
@@ -118,6 +113,7 @@ func RequestToken(svc service.AuthService) fiber.Handler {
 
 		response := entities.ClientTokenResponse{
 			AccessToken:  token.AccessToken,
+			Expiry:       token.Expiry,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
 			TokenType:    token.TokenType,
@@ -180,9 +176,6 @@ func parseURL(rawURL string) (*url.URL, error) {
 // @Success		200			{object}	entities.UserListResponse
 // @Failure		400			{object}	HTTPError
 // @Failure		500			{object}	HTTPError
-// @Param			page		query		string	false	"Page"
-// @Param			limit		query		string	false	"Limit"
-// @Param			limit		query		string	false	"Limit"
 // @Param			user_ids	query		string	false	"User IDs"
 // @Router			/v1/user [get]
 // @Security		Keycloak
@@ -212,8 +205,7 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Data: data,
 		})
 	}
 }
@@ -227,8 +219,6 @@ func GetAllUsers(svc service.AuthService) fiber.Handler {
 // @Failure		400	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/user/role/{role} [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
 // @Param			role	path	string	true	"Role"
 // @Security		Keycloak
 func GetUsersByRole(svc service.AuthService) fiber.Handler {
@@ -240,10 +230,9 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role format"))
 		}
 
-		var userRole domain.Role
-		userRole.SetName(role)
-		if userRole.Name == domain.UserRoleUnknown {
-			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role name"))
+		userRole := domain.ParseUserRole(role)
+		if userRole == domain.UserRoleUnknown {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, "invalid role type"))
 		}
 
 		users, err := svc.GetAllByRole(ctx, userRole)
@@ -257,8 +246,7 @@ func GetUsersByRole(svc service.AuthService) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusOK).JSON(entities.UserListResponse{
-			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Data: data,
 		})
 	}
 }
@@ -287,23 +275,7 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(service.NewError(service.BadRequest, errors.New("refresh token is required").Error()))
 		}
 
-		jwtClaims := jwt.MapClaims{}
-		_, err := jwt.ParseWithClaims(req.RefreshToken, jwtClaims, func(token *jwt.Token) (any, error) {
-			return token, nil
-		})
-
-		var sub string
-		if claims, ok := jwtClaims["sub"]; ok {
-			if e, ok := claims.(string); ok {
-				sub = e
-			}
-		}
-
-		if sub == "" {
-			return c.Status(fiber.StatusBadRequest).JSON(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse request").Error()))
-		}
-
-		data, err, _ := group.Do(sub, func() (any, error) {
+		data, err, _ := group.Do(req.RefreshToken, func() (any, error) {
 			return svc.RefreshToken(ctx, req.RefreshToken)
 		})
 		if err != nil {
@@ -315,9 +287,25 @@ func RefreshToken(svc service.AuthService) fiber.Handler {
 			AccessToken:  token.AccessToken,
 			ExpiresIn:    token.ExpiresIn,
 			RefreshToken: token.RefreshToken,
+			Expiry:       token.Expiry,
 			TokenType:    token.TokenType,
 		}
 
 		return c.JSON(response)
+	}
+}
+
+func GetAuthDummyCode() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		redirectURL, err := url.ParseRequestURI(c.Query("redirect_uri"))
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, errors.Wrap(err, "failed to parse redirect url").Error()))
+		}
+
+		query := redirectURL.Query()
+		query.Set("code", "demo")
+
+		redirectURL.RawQuery = query.Encode()
+		return c.Redirect(redirectURL.String(), fiber.StatusFound)
 	}
 }

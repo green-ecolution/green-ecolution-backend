@@ -21,6 +21,11 @@ func InitViper() (*Config, error) {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
+	viper.SetDefault("s3.enable", true)
+	viper.SetDefault("auth.enable", true)
+	viper.SetDefault("routing.enable", true)
+	viper.SetDefault("mqtt.enable", true)
+
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}

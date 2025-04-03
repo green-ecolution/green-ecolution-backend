@@ -12,6 +12,7 @@ import (
 	"net/url"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 type OrsClientConfig struct {
@@ -32,6 +33,7 @@ func WithClient(client *http.Client) OrsClientOption {
 }
 
 func WithHostURL(hostURL *url.URL) OrsClientOption {
+	slog.Debug("use ors client with host url", "host_url", hostURL)
 	return func(cfg *OrsClientConfig) {
 		cfg.url = hostURL
 	}
@@ -52,9 +54,10 @@ func NewOrsClient(opts ...OrsClientOption) OrsClient {
 }
 
 func (o *OrsClient) DirectionsGeoJSON(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*entities.GeoJSON, error) {
+	log := logger.GetLogger(ctx)
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
-		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
+		log.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
@@ -67,7 +70,7 @@ func (o *OrsClient) DirectionsGeoJSON(ctx context.Context, profile string, reqBo
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := o.cfg.client.Do(req)
 	if err != nil {
-		slog.Error("failed to send request to ors service", "error", err)
+		log.Error("failed to send request to ors service", "error", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -75,25 +78,26 @@ func (o *OrsClient) DirectionsGeoJSON(ctx context.Context, profile string, reqBo
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
-			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode, "body", body)
+			log.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode, "body", body)
 		} else {
-			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode)
+			log.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode)
 		}
 		return nil, errors.New("response not successful")
 	}
 
 	var geoJSON entities.GeoJSON
 	if err := json.NewDecoder(resp.Body).Decode(&geoJSON); err != nil {
-		slog.Error("failed to decode ors response")
+		log.Error("failed to decode ors response")
 	}
 
 	return &geoJSON, nil
 }
 
 func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (io.ReadCloser, error) {
+	log := logger.GetLogger(ctx)
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
-		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
+		log.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
@@ -106,7 +110,7 @@ func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBod
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := o.cfg.client.Do(req)
 	if err != nil {
-		slog.Error("failed to send request to ors service", "error", err)
+		log.Error("failed to send request to ors service", "error", err)
 		return nil, err
 	}
 
@@ -114,9 +118,9 @@ func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBod
 		defer resp.Body.Close()
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
-			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode, "body", body)
+			log.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode, "body", body)
 		} else {
-			slog.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode)
+			log.Error("response from the ORS service with a not successful code", "status_code", resp.StatusCode)
 		}
 		return nil, errors.New("response not successful")
 	}
@@ -125,9 +129,10 @@ func (o *OrsClient) DirectionsRawGpx(ctx context.Context, profile string, reqBod
 }
 
 func (o *OrsClient) DirectionsJSON(ctx context.Context, profile string, reqBody *OrsDirectionRequest) (*OrsResponse, error) {
+	log := logger.GetLogger(ctx)
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
-		slog.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
+		log.Error("failed to marshal ors req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
@@ -140,14 +145,14 @@ func (o *OrsClient) DirectionsJSON(ctx context.Context, profile string, reqBody 
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := o.cfg.client.Do(req)
 	if err != nil {
-		slog.Error("failed to send request to ors service", "error", err)
+		log.Error("failed to send request to ors service", "error", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var response OrsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		slog.Error("failed to decode ors response")
+		log.Error("failed to decode ors response")
 	}
 
 	return &response, nil

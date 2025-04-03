@@ -1,4 +1,4 @@
-ENV ?= dev
+export ENV ?= dev
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := green-ecolution-backend
 APP_VERSION ?= $(shell git describe --tags --always --dirty)
@@ -40,7 +40,6 @@ help:
 	@echo "  generate/client                   Generate client pkg"
 	@echo "  setup                             Install dependencies"
 	@echo "  setup/macos                       Install dependencies for macOS"
-	@echo "  setup/ci                          Install dependencies for CI"
 	@echo "  clean                             Clean"
 	@echo "  run                               Run"
 	@echo "  run/live                          Run live"
@@ -98,7 +97,7 @@ build: generate
 .PHONY: generate
 generate:
 	@echo "Generating..."
-	sqlc generate
+	go tool sqlc generate
 	go generate 
 
 .PHONY: generate/client
@@ -109,13 +108,6 @@ generate/client: generate
 .PHONY: setup
 setup:
 	@echo "Installing..."
-	go install github.com/air-verse/air@latest
-	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
-	go install github.com/swaggo/swag/cmd/swag@latest
-	go install github.com/pressly/goose/v3/cmd/goose@latest
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-	go install github.com/jmattheis/goverter/cmd/goverter@latest
-	go install github.com/go-delve/delve/cmd/dlv@latest
 	go mod download
 
 .PHONY: setup/macos
@@ -129,19 +121,6 @@ setup/macos:
 	brew install geos
 	brew install sops
 	brew install age
-	go install github.com/air-verse/air@latest
-	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
-	go install github.com/swaggo/swag/cmd/swag@latest
-	go install github.com/jmattheis/goverter/cmd/goverter@latest
-	go mod download
-
-.PHONY: setup/ci
-setup/ci:
-	@echo "Installing..."
-	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
-	go install github.com/swaggo/swag/cmd/swag@latest
-	go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-	go install github.com/jmattheis/goverter/cmd/goverter@latest
 	go mod download
 
 .PHONY: clean
@@ -168,7 +147,7 @@ run: build
 .PHONY: run/live
 run/live: generate
 	@echo "Running live..."
-	air
+	go tool air
 
 .PHONY: run/docker/prepare
 run/docker/prepare:
@@ -223,37 +202,37 @@ migrate/new:
 		echo "usage: make migrate/new name=name_of_migration"; \
 		exit 1; \
 	fi
-	goose -dir internal/storage/postgres/migrations create $(name) sql
+	go tool goose -dir internal/storage/postgres/migrations create $(name) sql
 
 .PHONY: migrate/up
 migrate/up:
 	@echo "Migrating up..."
-	goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" up
+	go tool goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" up
 
 .PHONY: migrate/down
 migrate/down:
 	@echo "Migrating down..."
-	goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" down
+	go tool goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" down
 
 .PHONY: migrate/reset
 migrate/reset:
 	@echo "Migrating reset..."
-	goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" reset
+	go tool goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" reset
 
 .PHONY: migrate/status
 migrate/status:
 	@echo "Migrating status..."
-	goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" status
+	go tool goose -dir internal/storage/postgres/migrations postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" status
 
 .PHONY: seed/up
 seed/up: migrate/up
 	@echo "Seeding up..."
-	goose -dir internal/storage/postgres/seed -no-versioning postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" up
+	go tool goose -dir internal/storage/postgres/seed -no-versioning postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" up
 
 .PHONY: seed/reset
 seed/reset: migrate/up
 	@echo "Seeding reset..."
-	goose -dir internal/storage/postgres/seed -no-versioning postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" reset
+	go tool goose -dir internal/storage/postgres/seed -no-versioning postgres "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)" reset
 
 .PHONY: tidy
 tidy:
@@ -266,7 +245,7 @@ lint:
 	@echo "Go fmt..."
 	go fmt ./...
 	@echo "Linting..."
-	golangci-lint run
+	go tool golangci-lint run
 
 .PHONY: test
 test:

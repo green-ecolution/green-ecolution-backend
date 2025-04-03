@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,16 +22,19 @@ var _ MappedNullable = &VehicleUpdate{}
 
 // VehicleUpdate struct for VehicleUpdate
 type VehicleUpdate struct {
-	Description string `json:"description"`
-	DrivingLicense DrivingLicense `json:"driving_license"`
-	Height float32 `json:"height"`
-	Length float32 `json:"length"`
-	Model string `json:"model"`
-	NumberPlate string `json:"number_plate"`
-	Status VehicleStatus `json:"status"`
-	Type VehicleType `json:"type"`
-	WaterCapacity float32 `json:"water_capacity"`
-	Width float32 `json:"width"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	Description           string                 `json:"description"`
+	DrivingLicense        DrivingLicense         `json:"driving_license"`
+	Height                float32                `json:"height"`
+	Length                float32                `json:"length"`
+	Model                 string                 `json:"model"`
+	NumberPlate           string                 `json:"number_plate"`
+	Provider              *string                `json:"provider,omitempty"`
+	Status                VehicleStatus          `json:"status"`
+	Type                  VehicleType            `json:"type"`
+	WaterCapacity         float32                `json:"water_capacity"`
+	Weight                float32                `json:"weight"`
+	Width                 float32                `json:"width"`
 }
 
 type _VehicleUpdate VehicleUpdate
@@ -40,7 +43,7 @@ type _VehicleUpdate VehicleUpdate
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewVehicleUpdate(description string, drivingLicense DrivingLicense, height float32, length float32, model string, numberPlate string, status VehicleStatus, type_ VehicleType, waterCapacity float32, width float32) *VehicleUpdate {
+func NewVehicleUpdate(description string, drivingLicense DrivingLicense, height float32, length float32, model string, numberPlate string, status VehicleStatus, type_ VehicleType, waterCapacity float32, weight float32, width float32) *VehicleUpdate {
 	this := VehicleUpdate{}
 	this.Description = description
 	this.DrivingLicense = drivingLicense
@@ -51,6 +54,7 @@ func NewVehicleUpdate(description string, drivingLicense DrivingLicense, height 
 	this.Status = status
 	this.Type = type_
 	this.WaterCapacity = waterCapacity
+	this.Weight = weight
 	this.Width = width
 	return &this
 }
@@ -61,6 +65,38 @@ func NewVehicleUpdate(description string, drivingLicense DrivingLicense, height 
 func NewVehicleUpdateWithDefaults() *VehicleUpdate {
 	this := VehicleUpdate{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
+func (o *VehicleUpdate) GetAdditionalInformation() map[string]interface{} {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		var ret map[string]interface{}
+		return ret
+	}
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *VehicleUpdate) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *VehicleUpdate) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *VehicleUpdate) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetDescription returns the Description field value
@@ -207,6 +243,38 @@ func (o *VehicleUpdate) SetNumberPlate(v string) {
 	o.NumberPlate = v
 }
 
+// GetProvider returns the Provider field value if set, zero value otherwise.
+func (o *VehicleUpdate) GetProvider() string {
+	if o == nil || IsNil(o.Provider) {
+		var ret string
+		return ret
+	}
+	return *o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *VehicleUpdate) GetProviderOk() (*string, bool) {
+	if o == nil || IsNil(o.Provider) {
+		return nil, false
+	}
+	return o.Provider, true
+}
+
+// HasProvider returns a boolean if a field has been set.
+func (o *VehicleUpdate) HasProvider() bool {
+	if o != nil && !IsNil(o.Provider) {
+		return true
+	}
+
+	return false
+}
+
+// SetProvider gets a reference to the given string and assigns it to the Provider field.
+func (o *VehicleUpdate) SetProvider(v string) {
+	o.Provider = &v
+}
+
 // GetStatus returns the Status field value
 func (o *VehicleUpdate) GetStatus() VehicleStatus {
 	if o == nil {
@@ -279,6 +347,30 @@ func (o *VehicleUpdate) SetWaterCapacity(v float32) {
 	o.WaterCapacity = v
 }
 
+// GetWeight returns the Weight field value
+func (o *VehicleUpdate) GetWeight() float32 {
+	if o == nil {
+		var ret float32
+		return ret
+	}
+
+	return o.Weight
+}
+
+// GetWeightOk returns a tuple with the Weight field value
+// and a boolean to check if the value has been set.
+func (o *VehicleUpdate) GetWeightOk() (*float32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Weight, true
+}
+
+// SetWeight sets field value
+func (o *VehicleUpdate) SetWeight(v float32) {
+	o.Weight = v
+}
+
 // GetWidth returns the Width field value
 func (o *VehicleUpdate) GetWidth() float32 {
 	if o == nil {
@@ -304,7 +396,7 @@ func (o *VehicleUpdate) SetWidth(v float32) {
 }
 
 func (o VehicleUpdate) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -313,15 +405,22 @@ func (o VehicleUpdate) MarshalJSON() ([]byte, error) {
 
 func (o VehicleUpdate) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["description"] = o.Description
 	toSerialize["driving_license"] = o.DrivingLicense
 	toSerialize["height"] = o.Height
 	toSerialize["length"] = o.Length
 	toSerialize["model"] = o.Model
 	toSerialize["number_plate"] = o.NumberPlate
+	if !IsNil(o.Provider) {
+		toSerialize["provider"] = o.Provider
+	}
 	toSerialize["status"] = o.Status
 	toSerialize["type"] = o.Type
 	toSerialize["water_capacity"] = o.WaterCapacity
+	toSerialize["weight"] = o.Weight
 	toSerialize["width"] = o.Width
 	return toSerialize, nil
 }
@@ -340,6 +439,7 @@ func (o *VehicleUpdate) UnmarshalJSON(data []byte) (err error) {
 		"status",
 		"type",
 		"water_capacity",
+		"weight",
 		"width",
 	}
 
@@ -348,10 +448,10 @@ func (o *VehicleUpdate) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -407,5 +507,3 @@ func (v *NullableVehicleUpdate) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

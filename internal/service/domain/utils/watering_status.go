@@ -1,12 +1,13 @@
 package utils
 
 import (
+	"context"
 	"errors"
-	"log/slog"
 	"slices"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 )
 
 var mapWateringStatus = map[int]entities.WateringStatus{
@@ -78,7 +79,7 @@ func CheckAndSortWatermarks(w []entities.Watermark) (w30, w60, w90 entities.Wate
 // Notes:
 //   - The function assumes that watermarks are provided as a slice, where each entry represents a sensor reading at a specific depth.
 //   - Any changes to the mapping of centibar ranges or tree lifetime logic should be reflected here.
-func CalculateWateringStatus(plantingYear int32, watermarks []entities.Watermark) entities.WateringStatus {
+func CalculateWateringStatus(ctx context.Context, plantingYear int32, watermarks []entities.Watermark) entities.WateringStatus {
 	/*
 		Tree 1st year:
 		30cm: <25kPA: green; 25-32kPA orange; >32kPA red
@@ -95,11 +96,12 @@ func CalculateWateringStatus(plantingYear int32, watermarks []entities.Watermark
 		60cm: <80kPA: green; >80kPA red
 		90cm: <80kPA: green; >80kPA red
 	*/
+	log := logger.GetLogger(ctx)
 	currentYear := int32(time.Now().Year())
 	treeLifetime := currentYear - plantingYear
 	w30, w60, w90, err := CheckAndSortWatermarks(watermarks)
 	if err != nil {
-		slog.Error("sensor data watermarks are malformed", "watermarks", watermarks)
+		log.Error("sensor data watermarks are malformed", "watermarks", watermarks)
 		return entities.WateringStatusUnknown
 	}
 

@@ -6,29 +6,27 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
-func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn func(*entities.WateringPlan) (bool, error)) error {
+func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn func(*entities.WateringPlan, storage.WateringPlanRepository) (bool, error)) error {
+	log := logger.GetLogger(ctx)
 	return w.store.WithTx(ctx, func(s *store.Store) error {
-		oldStore := w.store
-		defer func() {
-			w.store = oldStore
-		}()
-		w.store = s
-
-		entity, err := w.GetByID(ctx, id)
+		newRepo := NewWateringPlanRepository(s, w.WateringPlanMappers)
+		entity, err := newRepo.GetByID(ctx, id)
 		if err != nil {
-			return w.store.HandleError(err)
+			return err
 		}
 
 		if updateFn == nil {
 			return errors.New("updateFn is nil")
 		}
 
-		updated, err := updateFn(entity)
+		updated, err := updateFn(entity, newRepo)
 		if err != nil {
 			return err
 		}
@@ -37,15 +35,28 @@ func (w *WateringPlanRepository) Update(ctx context.Context, id int32, updateFn 
 			return nil
 		}
 
-		if err := w.validateWateringPlan(entity); err != nil {
+		if err := newRepo.validateWateringPlan(entity); err != nil {
 			return err
 		}
 
-		return w.updateEntity(ctx, entity)
+		if err := newRepo.updateEntity(ctx, entity); err != nil {
+			log.Error("failed to updated watering plan entity in db", "error", err, "watering_plan_id", id)
+			return err
+		}
+
+		log.Debug("watering plan entity updated successfully", "watering_plan_id", id)
+		return nil
 	})
 }
 
 func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entities.WateringPlan) error {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return err
+	}
+
 	date, err := utils.TimeToPgDate(entity.Date)
 	if err != nil {
 		return errors.New("failed to convert date")
@@ -56,44 +67,46 @@ func (w *WateringPlanRepository) updateEntity(ctx context.Context, entity *entit
 	}
 
 	params := sqlc.UpdateWateringPlanParams{
-		ID:                 entity.ID,
-		Date:               date,
-		Description:        entity.Description,
-		Distance:           entity.Distance,
-		TotalWaterRequired: entity.TotalWaterRequired,
-		Status:             sqlc.WateringPlanStatus(entity.Status),
-		CancellationNote:   entity.CancellationNote,
-		GpxUrl:             &entity.GpxURL,
-		Duration:           float64(entity.Duration) / float64(time.Second),
-		RefillCount:        entity.RefillCount,
+		ID:                     entity.ID,
+		Date:                   date,
+		Description:            entity.Description,
+		Distance:               entity.Distance,
+		TotalWaterRequired:     entity.TotalWaterRequired,
+		Status:                 sqlc.WateringPlanStatus(entity.Status),
+		CancellationNote:       entity.CancellationNote,
+		GpxUrl:                 &entity.GpxURL,
+		Duration:               float64(entity.Duration) / float64(time.Second),
+		RefillCount:            entity.RefillCount,
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	if err := w.store.DeleteAllVehiclesFromWateringPlan(ctx, entity.ID); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	if err := w.setLinkedVehicles(ctx, entity, entity.ID); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	if err := w.store.DeleteAllTreeClusterFromWateringPlan(ctx, entity.ID); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	if err := w.setLinkedTreeClusters(ctx, entity, entity.ID); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	if err := w.updateConsumedWaterValues(ctx, entity); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	if err := w.store.DeleteAllUsersFromWateringPlan(ctx, entity.ID); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	if err := w.setLinkedUsers(ctx, entity, entity.ID); err != nil {
-		return w.store.HandleError(err)
+		return err
 	}
 
 	return w.store.UpdateWateringPlan(ctx, &params)
@@ -112,7 +125,7 @@ func (w *WateringPlanRepository) updateConsumedWaterValues(ctx context.Context, 
 			TreeClusterID:  value.TreeClusterID,
 			ConsumedWater:  *value.ConsumedWater,
 		}); err != nil {
-			return w.store.HandleError(err)
+			return err
 		}
 	}
 

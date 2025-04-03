@@ -17,6 +17,8 @@ import (
 // - interval: The interval for periodic tasks, such as heartbeats.
 // - client: The HTTP client used for making requests to the plugin host.
 // - token: The authentication token used for secure communication.
+// - clientID: The client id from the oidc provider
+// - clientSecret: The client secret from the oidc provider
 type PluginWorkerConfig struct {
 	plugin         Plugin
 	host           *url.URL
@@ -24,6 +26,8 @@ type PluginWorkerConfig struct {
 	interval       time.Duration
 	client         *http.Client
 	token          *Token
+	clientID       string
+	clientSecret   string
 }
 
 // PluginWorker is responsible for managing the lifecycle of a plugin.
@@ -119,6 +123,20 @@ func WithInterval(interval time.Duration) PluginWorkerOption {
 func WithToken(token *Token) PluginWorkerOption {
 	return func(cfg *PluginWorkerConfig) {
 		cfg.token = token
+	}
+}
+
+// WithClientID sets the client id from oidc provider for the PluginWorker.
+func WithClientID(clientID string) PluginWorkerOption {
+	return func(cfg *PluginWorkerConfig) {
+		cfg.clientID = clientID
+	}
+}
+
+// WithClientSecret sets the client secret from oidc provider for the PluginWorker.
+func WithClientSecret(clientSecret string) PluginWorkerOption {
+	return func(cfg *PluginWorkerConfig) {
+		cfg.clientSecret = clientSecret
 	}
 }
 

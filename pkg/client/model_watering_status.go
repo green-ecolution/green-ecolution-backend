@@ -21,10 +21,11 @@ type WateringStatus string
 
 // List of WateringStatus
 const (
-	WateringStatusGood WateringStatus = "good"
-	WateringStatusModerate WateringStatus = "moderate"
-	WateringStatusBad WateringStatus = "bad"
-	WateringStatusUnknown WateringStatus = "unknown"
+	WateringStatusGood        WateringStatus = "good"
+	WateringStatusModerate    WateringStatus = "moderate"
+	WateringStatusBad         WateringStatus = "bad"
+	WateringStatusJustWatered WateringStatus = "just watered"
+	WateringStatusUnknown     WateringStatus = "unknown"
 )
 
 // All allowed values of WateringStatus enum
@@ -32,6 +33,7 @@ var AllowedWateringStatusEnumValues = []WateringStatus{
 	"good",
 	"moderate",
 	"bad",
+	"just watered",
 	"unknown",
 }
 
@@ -113,4 +115,3 @@ func (v *NullableWateringStatus) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

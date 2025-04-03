@@ -19,10 +19,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable
-
-      - name: Setup
-        run: make setup/ci
+          go-version-file: ./go.mod
 
       - name: Generate Client Package
         run: make generate/client

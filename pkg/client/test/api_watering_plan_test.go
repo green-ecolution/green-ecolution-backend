@@ -11,10 +11,10 @@ package client
 
 import (
 	"context"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_WateringPlanAPIService(t *testing.T) {
@@ -24,7 +24,7 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 	t.Run("Test WateringPlanAPIService CreateWateringPlan", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.WateringPlanAPI.CreateWateringPlan(context.Background()).Execute()
 
@@ -36,9 +36,9 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 	t.Run("Test WateringPlanAPIService DeleteWateringPlan", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		httpRes, err := apiClient.WateringPlanAPI.DeleteWateringPlan(context.Background(), id).Execute()
 
@@ -49,7 +49,7 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 	t.Run("Test WateringPlanAPIService GetAllWateringPlans", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.WateringPlanAPI.GetAllWateringPlans(context.Background()).Execute()
 
@@ -61,9 +61,9 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 	t.Run("Test WateringPlanAPIService GetWateringPlanById", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		resp, httpRes, err := apiClient.WateringPlanAPI.GetWateringPlanById(context.Background(), id).Execute()
 
@@ -75,11 +75,37 @@ func Test_client_WateringPlanAPIService(t *testing.T) {
 
 	t.Run("Test WateringPlanAPIService UpdateWateringPlan", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var id string
 
 		resp, httpRes, err := apiClient.WateringPlanAPI.UpdateWateringPlan(context.Background(), id).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
+	t.Run("Test WateringPlanAPIService V1WateringPlanRouteGpxGpxNameGet", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var gpxName string
+
+		resp, httpRes, err := apiClient.WateringPlanAPI.V1WateringPlanRouteGpxGpxNameGet(context.Background(), gpxName).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
+	t.Run("Test WateringPlanAPIService V1WateringPlanRoutePreviewPost", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		resp, httpRes, err := apiClient.WateringPlanAPI.V1WateringPlanRoutePreviewPost(context.Background()).Execute()
 
 		require.Nil(t, err)
 		require.NotNil(t, resp)

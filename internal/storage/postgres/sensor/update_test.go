@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,12 +26,13 @@ func TestSensorRepository_Update(t *testing.T) {
 			Data:      TestMqttPayload,
 		}
 
-		got, err := r.Update(context.Background(),
-			"sensor-1",
-			WithStatus(entities.SensorStatusOffline),
-			WithLatitude(newLat),
-			WithLongitude(newLong),
-			WithLatestData(newLatestData))
+		got, err := r.Update(context.Background(), "sensor-1", func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.Status = entities.SensorStatusOffline
+			sensor.Latitude = newLat
+			sensor.Longitude = newLong
+			sensor.LatestData = newLatestData
+			return true, nil
+		})
 
 		// then
 		assert.NoError(t, err)
@@ -49,7 +51,10 @@ func TestSensorRepository_Update(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Update(context.Background(), "sensor-1", WithStatus(""))
+		got, err := r.Update(context.Background(), "sensor-1", func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.Status = ""
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -61,7 +66,9 @@ func TestSensorRepository_Update(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Update(context.Background(), "")
+		got, err := r.Update(context.Background(), "", func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -73,7 +80,9 @@ func TestSensorRepository_Update(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Update(context.Background(), "notFoundID")
+		got, err := r.Update(context.Background(), "notFoundID", func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -87,7 +96,10 @@ func TestSensorRepository_Update(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Update(ctx, "sensor-1", WithStatus(entities.SensorStatusOffline))
+		got, err := r.Update(ctx, "sensor-1", func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.Status = entities.SensorStatusOffline
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)

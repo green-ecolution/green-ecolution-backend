@@ -8,10 +8,15 @@ import (
 // goverter:converter
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTime
 // goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:PgTimestampToTimePtr
+// goverter:extend github.com/green-ecolution/green-ecolution-backend/internal/utils:StringPtrToString
 // goverter:extend MapDrivingLicense MapVehicleStatus MapVehicleType
 type InternalVehicleRepoMapper interface {
-	FromSql(src *sqlc.Vehicle) *entities.Vehicle
-	FromSqlList(src []*sqlc.Vehicle) []*entities.Vehicle
+	// goverter:map AdditionalInformations AdditionalInfo | github.com/green-ecolution/green-ecolution-backend/internal/utils:MapAdditionalInfo
+	FromSql(src *sqlc.Vehicle) (*entities.Vehicle, error)
+	FromSqlList(src []*sqlc.Vehicle) ([]*entities.Vehicle, error)
+
+	FromSqlVehicleWithCount(src *sqlc.GetAllVehiclesWithWateringPlanCountRow) (*entities.VehicleEvaluation, error)
+	FromSqlListVehicleWithCount(src []*sqlc.GetAllVehiclesWithWateringPlanCountRow) ([]*entities.VehicleEvaluation, error)
 }
 
 func MapVehicleStatus(vehicleStatus sqlc.VehicleStatus) entities.VehicleStatus {

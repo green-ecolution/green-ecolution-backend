@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"net/http"
 	"testing"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/vehicle"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,14 +21,18 @@ func TestRegisterRoutes(t *testing.T) {
 		t.Run("should call GET handler", func(t *testing.T) {
 			mockVehicleService := serviceMock.NewMockVehicleService(t)
 			app := fiber.New()
+			app.Use(middleware.PaginationMiddleware())
 			vehicle.RegisterRoutes(app, mockVehicleService)
 
+			ctx := context.WithValue(context.Background(), "page", int32(1))
+			ctx = context.WithValue(ctx, "limit", int32(-1))
+
 			mockVehicleService.EXPECT().GetAll(
-				mock.Anything,
-			).Return(TestVehicles, nil)
+				mock.Anything, domain.VehicleQuery{},
+			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", nil)
+			req, _ := http.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 
 			// then
 			resp, err := app.Test(req)
@@ -41,10 +46,9 @@ func TestRegisterRoutes(t *testing.T) {
 			app := fiber.New()
 			vehicle.RegisterRoutes(app, mockVehicleService)
 
-			mockVehicleService.EXPECT().GetAllByType(
-				mock.Anything,
-				entities.VehicleType("transporter"),
-			).Return(TestVehicles, nil)
+			mockVehicleService.EXPECT().GetAll(
+				mock.Anything, domain.VehicleQuery{Type: "transporter"},
+			).Return(TestVehicles, int64(len(TestVehicles)), nil)
 
 			// when
 			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/?type=transporter", nil)

@@ -4,9 +4,13 @@ import (
 	"context"
 	"errors"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 func defaultTree() entities.Tree {
@@ -14,62 +18,73 @@ func defaultTree() entities.Tree {
 		TreeCluster:    nil,
 		Species:        "",
 		Number:         "",
-		Readonly:       false,
 		Sensor:         nil,
 		PlantingYear:   0,
 		Latitude:       0,
 		Longitude:      0,
-		Images:         nil,
 		WateringStatus: entities.WateringStatusUnknown,
 		Description:    "",
+		Provider:       "",
+		AdditionalInfo: nil,
+		LastWatered:    nil,
 	}
 }
 
-func (r *TreeRepository) Create(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
+func (r *TreeRepository) Create(ctx context.Context, createFn func(*entities.Tree, storage.TreeRepository) (bool, error)) (*entities.Tree, error) {
+	log := logger.GetLogger(ctx)
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
 	}
 
-	if err := r.validateTreeEntity(&entity); err != nil {
-		return nil, err
-	}
+	var createdTree *entities.Tree
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		newRepo := NewTreeRepository(s, r.TreeMappers)
+		entity := defaultTree()
 
-	id, err := r.createEntity(ctx, &entity)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-	entity.ID = id
-
-	return r.GetByID(ctx, id)
-}
-
-func (r *TreeRepository) CreateAndLinkImages(ctx context.Context, tFn ...entities.EntityFunc[entities.Tree]) (*entities.Tree, error) {
-	createdEntity, err := r.Create(ctx, tFn...)
-	if err != nil {
-		return nil, err
-	}
-
-	entity := defaultTree()
-	for _, fn := range tFn {
-		fn(&entity)
-	}
-
-	if entity.Images != nil {
-		if err := r.handleImages(ctx, createdEntity.ID, entity.Images); err != nil {
-			return nil, err
-		}
-		linkedImages, err := r.GetAllImagesByID(ctx, createdEntity.ID)
+		created, err := createFn(&entity, newRepo)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		createdEntity.Images = linkedImages
+
+		if !created {
+			return nil
+		}
+
+		if err := newRepo.validateTreeEntity(&entity); err != nil {
+			return err
+		}
+
+		id, err := newRepo.createEntity(ctx, &entity)
+		if err != nil {
+			log.Error("failed to create tree entity in db", "error", err)
+			return err
+		}
+		entity.ID = id
+
+		createdTree, err = newRepo.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return createdEntity, nil
+	log.Debug("tree entity created successfully in db", "tree_id", createdTree.ID)
+	return createdTree, nil
 }
 
 func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree) (int32, error) {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(entity.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", entity.AdditionalInfo)
+		return -1, err
+	}
+
 	var treeClusterID *int32
 	if entity.TreeCluster != nil {
 		treeClusterID = &entity.TreeCluster.ID
@@ -84,16 +99,17 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	}
 
 	args := sqlc.CreateTreeParams{
-		TreeClusterID:  treeClusterID,
-		Species:        entity.Species,
-		Readonly:       entity.Readonly,
-		SensorID:       sensorID,
-		PlantingYear:   entity.PlantingYear,
-		Latitude:       entity.Latitude,
-		Longitude:      entity.Longitude,
-		WateringStatus: sqlc.WateringStatus(entity.WateringStatus),
-		Description:    &entity.Description,
-		Number:         entity.Number,
+		TreeClusterID:          treeClusterID,
+		Species:                entity.Species,
+		SensorID:               sensorID,
+		PlantingYear:           entity.PlantingYear,
+		Latitude:               entity.Latitude,
+		Longitude:              entity.Longitude,
+		WateringStatus:         sqlc.WateringStatus(entity.WateringStatus),
+		Description:            &entity.Description,
+		Number:                 entity.Number,
+		Provider:               &entity.Provider,
+		AdditionalInformations: additionalInfo,
 	}
 
 	id, err := r.store.CreateTree(ctx, &args)
@@ -110,26 +126,6 @@ func (r *TreeRepository) createEntity(ctx context.Context, entity *entities.Tree
 	}
 
 	return id, nil
-}
-
-func (r *TreeRepository) handleImages(ctx context.Context, treeID int32, images []*entities.Image) error {
-	for _, img := range images {
-		err := r.linkImages(ctx, treeID, img.ID)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (r *TreeRepository) linkImages(ctx context.Context, treeID, imgID int32) error {
-	params := sqlc.LinkTreeImageParams{
-		TreeID:  treeID,
-		ImageID: imgID,
-	}
-
-	return r.store.LinkTreeImage(ctx, &params)
 }
 
 func (r *TreeRepository) validateTreeEntity(tree *entities.Tree) error {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log/slog"
 	"net/url"
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla/valhalla"
@@ -58,32 +58,54 @@ func NewRouteRepo(cfg *RouteRepoConfig) (*RouteRepo, error) {
 }
 
 func (r *RouteRepo) GenerateRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (*entities.GeoJSON, error) {
+	log := logger.GetLogger(ctx)
 	_, route, err := r.prepareRoute(ctx, vehicle, clusters)
 	if err != nil {
+		log.Error("failed to prepare route", "error", err,
+			"vehicle_id", vehicle.ID,
+			"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+		)
 		return nil, err
 	}
 
 	entity, err := r.valhalla.DirectionsGeoJSON(ctx, route)
 	if err != nil {
+		log.Error("failed to generate route in valhalla", "error", err,
+			"vehicle_id", vehicle.ID,
+			"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+		)
 		return nil, err
 	}
 
 	metadata, err := routing.ConvertLocations(&r.cfg.routing)
 	if err != nil {
+		log.Error("failed to convert generated locations", "error", err,
+			"vehicle_id", vehicle.ID,
+			"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+		)
 		return nil, err
 	}
 
 	entity.Metadata = *metadata
 
+	log.Debug("route generated successfully",
+		"vehicle_id", vehicle.ID,
+		"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+	)
 	return entity, nil
 }
 
 func (r *RouteRepo) GenerateRawGpxRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (io.ReadCloser, error) {
+	log := logger.GetLogger(ctx)
 	_, route, err := r.prepareRoute(ctx, vehicle, clusters)
 	if err != nil {
 		return nil, err
 	}
 
+	log.Debug("route generated successfully as gpx file",
+		"vehicle_id", vehicle.ID,
+		"clusters_ids", utils.Map(clusters, func(c *entities.TreeCluster) int32 { return c.ID }),
+	)
 	return r.valhalla.DirectionsRawGpx(ctx, route)
 }
 
@@ -114,15 +136,16 @@ func (r *RouteRepo) GenerateRouteInformation(ctx context.Context, vehicle *entit
 }
 
 func (r *RouteRepo) prepareRoute(ctx context.Context, vehicle *entities.Vehicle, clusters []*entities.TreeCluster) (optimized *vroom.VroomResponse, routes *valhalla.DirectionRequest, err error) {
+	log := logger.GetLogger(ctx)
 	optimizedRoutes, err := r.vroom.OptimizeRoute(ctx, vehicle, clusters)
 	if err != nil {
-		slog.Error("failed to optimize route", "error", err)
+		log.Error("failed to optimize route", "error", err)
 		return nil, nil, err
 	}
 
 	// currently handle only the first route
 	if len(optimizedRoutes.Routes) == 0 {
-		slog.Error("there are no routes in vroom response", "routes", optimizedRoutes)
+		log.Error("there are no routes in vroom response", "routes", optimizedRoutes)
 		return nil, nil, errors.New("empty routes")
 	}
 	oRoute := optimizedRoutes.Routes[0]

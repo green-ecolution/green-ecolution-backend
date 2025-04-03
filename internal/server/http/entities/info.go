@@ -6,6 +6,7 @@ type AppInfoResponse struct {
 	GoVersion string         `json:"goVersion"`
 	Git       GitResponse    `json:"git"`
 	Server    ServerResponse `json:"server"`
+	Map       MapResponse    `json:"map"`
 } // @Name AppInfo
 
 type GitResponse struct {
@@ -24,3 +25,8 @@ type ServerResponse struct {
 	Interface string `json:"interface"`
 	Uptime    string `json:"uptime"`
 } // @Name ServerInfo
+
+type MapResponse struct {
+	Center [2]float64 `json:"center"`
+	BBox   [4]float64 `json:"bbox"`
+} // @Name MapInfo

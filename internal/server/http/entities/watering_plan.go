@@ -35,6 +35,8 @@ type WateringPlanResponse struct {
 	GpxURL             string                       `json:"gpx_url"`
 	Duration           *float64                     `json:"duration"`
 	RefillCount        int32                        `json:"refill_count"`
+	Provider           string                       `json:"provider,omitempty"`
+	AdditionalInfo     map[string]interface{}       `json:"additional_information,omitempty" validate:"optional"`
 } // @Name WateringPlan
 
 type WateringPlanInListResponse struct {
@@ -51,32 +53,38 @@ type WateringPlanInListResponse struct {
 	Transporter        *VehicleResponse             `json:"transporter"`
 	Trailer            *VehicleResponse             `json:"trailer" validate:"optional"`
 	CancellationNote   string                       `json:"cancellation_note"`
+	Provider           string                       `json:"provider,omitempty"`
+	AdditionalInfo     map[string]interface{}       `json:"additional_information,omitempty" validate:"optional"`
 } // @Name WateringPlanInList
 
 type WateringPlanListResponse struct {
 	Data       []*WateringPlanInListResponse `json:"data"`
-	Pagination *Pagination                   `json:"pagination"`
+	Pagination *Pagination                   `json:"pagination,omitempty" validate:"optional"`
 } // @Name WateringPlanList
 
 type WateringPlanCreateRequest struct {
-	Date           time.Time `json:"date"`
-	Description    string    `json:"description"`
-	TreeClusterIDs []*int32  `json:"tree_cluster_ids"`
-	TransporterID  *int32    `json:"transporter_id"`
-	TrailerID      *int32    `json:"trailer_id" validate:"optional"`
-	UserIDs        []string  `json:"user_ids"`
+	Date           time.Time              `json:"date"`
+	Description    string                 `json:"description"`
+	TreeClusterIDs []*int32               `json:"tree_cluster_ids"`
+	TransporterID  *int32                 `json:"transporter_id"`
+	TrailerID      *int32                 `json:"trailer_id" validate:"optional"`
+	UserIDs        []string               `json:"user_ids"`
+	Provider       string                 `json:"provider" validate:"optional"`
+	AdditionalInfo map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name WateringPlanCreate
 
 type WateringPlanUpdateRequest struct {
-	Date             time.Time          `json:"date"`
-	Description      string             `json:"description"`
-	TreeClusterIDs   []*int32           `json:"tree_cluster_ids"`
-	TransporterID    *int32             `json:"transporter_id"`
-	TrailerID        *int32             `json:"trailer_id" validate:"optional"`
-	UserIDs          []string           `json:"user_ids"`
-	CancellationNote string             `json:"cancellation_note"`
-	Status           WateringPlanStatus `json:"status"`
-	Evaluation       []*EvaluationValue `json:"evaluation" validate:"optional"`
+	Date             time.Time              `json:"date"`
+	Description      string                 `json:"description"`
+	TreeClusterIDs   []*int32               `json:"tree_cluster_ids"`
+	TransporterID    *int32                 `json:"transporter_id"`
+	TrailerID        *int32                 `json:"trailer_id" validate:"optional"`
+	UserIDs          []string               `json:"user_ids"`
+	CancellationNote string                 `json:"cancellation_note"`
+	Status           WateringPlanStatus     `json:"status"`
+	Evaluation       []*EvaluationValue     `json:"evaluation" validate:"optional"`
+	Provider         string                 `json:"provider" validate:"optional"`
+	AdditionalInfo   map[string]interface{} `json:"additional_information" validate:"optional"`
 } // @Name WateringPlanUpdate
 
 type EvaluationValue struct {

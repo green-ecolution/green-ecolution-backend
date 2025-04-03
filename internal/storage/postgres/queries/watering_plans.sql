@@ -1,15 +1,21 @@
 -- name: GetAllWateringPlans :many
 SELECT * FROM watering_plans
-ORDER BY date DESC;
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider)
+ORDER BY date DESC
+LIMIT $1 OFFSET $2;
+
+-- name: GetAllWateringPlansCount :one
+SELECT COUNT(*) FROM watering_plans
+WHERE (COALESCE(@provider, '') = '' OR provider = @provider);
 
 -- name: GetWateringPlanByID :one
 SELECT * FROM watering_plans WHERE id = $1;
 
 -- name: CreateWateringPlan :one
 INSERT INTO watering_plans (
-  date, description, status, distance, total_water_required, cancellation_note
+  date, description, status, distance, total_water_required, cancellation_note, provider, additional_informations
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4, $5, $6, $7, $8
 ) RETURNING id;
 
 -- name: UpdateWateringPlan :exec
@@ -22,7 +28,9 @@ UPDATE watering_plans SET
   cancellation_note = $7,
   gpx_url = $8,
   duration = $9,
-  refill_count = $10
+  refill_count = $10,
+  provider = $11,
+  additional_informations = $12
 WHERE id = $1;
 
 -- name: DeleteWateringPlan :one
@@ -79,3 +87,11 @@ AND tree_cluster_id = $2;
 SELECT *
 FROM tree_cluster_watering_plans
 WHERE watering_plan_id = $1;
+
+-- name: GetTotalConsumedWater :one
+SELECT SUM(consumed_water) AS total_consumed_water
+FROM tree_cluster_watering_plans;
+
+-- name: GetAllUserWateringPlanCount :one
+SELECT COUNT(*) AS total_entries
+FROM user_watering_plans;

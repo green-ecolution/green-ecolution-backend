@@ -120,10 +120,7 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: stable
-
-      - name: Install dependencies
-        run: make setup/ci
+          go-version-file: ./go.mod
 
       - name: Go generate
         run: make generate

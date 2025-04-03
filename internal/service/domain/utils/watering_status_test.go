@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -234,7 +235,7 @@ func Test_CalculateWateringStatus(t *testing.T) {
 			plantingYear := tt.input.plantingYear
 
 			// when
-			got := CalculateWateringStatus(plantingYear, watermarks)
+			got := CalculateWateringStatus(context.Background(), plantingYear, watermarks)
 
 			// then
 			assert.Equal(t, tt.output, got)

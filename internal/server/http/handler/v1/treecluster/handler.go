@@ -3,11 +3,14 @@ package treecluster
 import (
 	"strconv"
 
+	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 var (
@@ -26,14 +29,22 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			status	query	string	false	"Status"
+// @Param			page				query	int			false	"Page"
+// @Param			limit				query	int			false	"Limit"
+// @Param			watering_statuses	query	[]string	false	"Watering statuses"
+// @Param			regions				query	[]string	false	"Regions"
+// @Param			provider			query	string		false	"Provider"
 // @Security		Keycloak
 func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+
+		filter, err := fillTreeClusterQueryParams(c)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, err.Error()))
+		}
+
+		domainData, totalCount, err := svc.GetAll(ctx, filter)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -45,7 +56,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 
 		return c.JSON(entities.TreeClusterListResponse{
 			Data:       data,
-			Pagination: &entities.Pagination{}, // TODO: Handle pagination
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }
@@ -62,7 +73,7 @@ func GetAllTreeClusters(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [get]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Param			cluster_id	path	int	true	"Tree Cluster ID"
 // @Security		Keycloak
 func GetTreeClusterByID(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -129,7 +140,7 @@ func CreateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [put]
-// @Param			cluster_id	path	string								true	"Tree Cluster ID"
+// @Param			cluster_id	path	int									true	"Tree Cluster ID"
 // @Param			body		body	entities.TreeClusterUpdateRequest	true	"Tree Cluster Update Request"
 // @Security		Keycloak
 func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
@@ -168,7 +179,7 @@ func UpdateTreeCluster(svc service.TreeClusterService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/cluster/{cluster_id} [delete]
-// @Param			cluster_id	path	string	true	"Tree Cluster ID"
+// @Param			cluster_id	path	int	true	"Tree Cluster ID"
 // @Security		Keycloak
 func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -186,4 +197,14 @@ func DeleteTreeCluster(svc service.TreeClusterService) fiber.Handler {
 
 		return c.SendStatus(fiber.StatusNoContent)
 	}
+}
+
+func fillTreeClusterQueryParams(c *fiber.Ctx) (domain.TreeClusterQuery, error) {
+	var filter domain.TreeClusterQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeClusterQuery{}, err
+	}
+
+	return filter, nil
 }

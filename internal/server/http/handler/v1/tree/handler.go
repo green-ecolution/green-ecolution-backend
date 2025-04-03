@@ -10,6 +10,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 var (
@@ -29,14 +30,23 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree [get]
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
-// @Param			age		query	string	false	"Age"
+// @Param			page				query	int			false	"Page"
+// @Param			limit				query	int			false	"Limit"
+// @Param			provider			query	string		false	"Provider"
+// @Param			watering_statuses	query	[]string	false	"watering status (good, moderate, bad)"
+// @Param			planting_years		query	[]int		false	"planting_years"
+// @Param			has_cluster			query	bool		false	"has cluster"
 // @Security		Keycloak
 func GetAllTrees(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+
+		filter, err := fillTreeQueryParams(c)
+		if err != nil {
+			return errorhandler.HandleError(service.NewError(service.BadRequest, err.Error()))
+		}
+
+		domainData, totalCount, err := svc.GetAll(ctx, filter)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -48,7 +58,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 
 		return c.JSON(entities.TreeListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }
@@ -65,7 +75,7 @@ func GetAllTrees(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [get]
-// @Param			tree_id	path	string	false	"Tree ID"
+// @Param			tree_id	path	int	false	"Tree ID"
 // @Security		Keycloak
 func GetTreeByID(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -164,7 +174,7 @@ func CreateTree(svc service.TreeService) fiber.Handler {
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [put]
 // @Security		Keycloak
-// @Param			tree_id	path	string						false	"Tree ID"
+// @Param			tree_id	path	int							false	"Tree ID"
 // @Param			body	body	entities.TreeUpdateRequest	true	"Tree to update"
 func UpdateTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -200,7 +210,7 @@ func UpdateTree(svc service.TreeService) fiber.Handler {
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/tree/{tree_id} [delete]
-// @Param			tree_id	path	string	false	"Tree ID"
+// @Param			tree_id	path	int	false	"Tree ID"
 // @Security		Keycloak
 func DeleteTree(svc service.TreeService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -223,4 +233,14 @@ func mapTreeToDto(t *domain.Tree) *entities.TreeResponse {
 	dto.Sensor = sensorMapper.FromResponse(t.Sensor)
 
 	return dto
+}
+
+func fillTreeQueryParams(c *fiber.Ctx) (domain.TreeQuery, error) {
+	var filter domain.TreeQuery
+
+	if err := c.QueryParser(&filter); err != nil {
+		return domain.TreeQuery{}, err
+	}
+
+	return filter, nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/mapper/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 var (
@@ -27,14 +28,20 @@ var (
 // @Failure		404	{object}	HTTPError
 // @Failure		500	{object}	HTTPError
 // @Router			/v1/sensor [get]
-// @Param			status	query	string	false	"Sensor Status"
-// @Param			page	query	string	false	"Page"
-// @Param			limit	query	string	false	"Limit"
+// @Param			page		query	int		false	"Page"
+// @Param			limit		query	int		false	"Limit"
+// @Param			provider	query	string	false	"Provider"
 // @Security		Keycloak
 func GetAllSensors(svc service.SensorService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		domainData, err := svc.GetAll(ctx)
+		var query domain.Query
+
+		if err := c.QueryParser(&query); err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, totalCount, err := svc.GetAll(ctx, query)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -46,7 +53,7 @@ func GetAllSensors(svc service.SensorService) fiber.Handler {
 
 		return c.JSON(entities.SensorListResponse{
 			Data:       data,
-			Pagination: entities.Pagination{}, // TODO: Handle Pagination
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }
@@ -75,14 +82,50 @@ func GetSensorByID(svc service.SensorService) fiber.Handler {
 		}
 
 		domainData, err := svc.GetByID(ctx, id)
-
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
 
-		data := mapToDto(domainData)
+		return c.JSON(mapToDto(domainData))
+	}
+}
 
-		return c.JSON(data)
+// @Summary		Get all sensor data by id
+// @Description	Get all sensor data by id
+// @Id				get-all-sensor-data-by-id
+// @Tags			Sensor
+// @Produce		json
+// @Success		200	{object}	entities.SensorDataListResponse
+// @Failure		400	{object}	HTTPError
+// @Failure		401	{object}	HTTPError
+// @Failure		403	{object}	HTTPError
+// @Failure		404	{object}	HTTPError
+// @Failure		500	{object}	HTTPError
+// @Router			/v1/sensor/data/{sensor_id} [get]
+// @Param			sensor_id	path	string	true	"Sensor ID"
+// @Security		Keycloak
+func GetAllSensorDataByID(svc service.SensorService) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		ctx := c.Context()
+		id := strings.Clone(c.Params("id"))
+		if id == "" {
+			err := service.NewError(service.BadRequest, "invalid ID format")
+			return errorhandler.HandleError(err)
+		}
+
+		domainData, err := svc.GetAllDataByID(ctx, id)
+		if err != nil {
+			return errorhandler.HandleError(err)
+		}
+
+		data := make([]*entities.SensorDataResponse, len(domainData))
+		for i, domain := range domainData {
+			data[i] = sensorMapper.FromDataResponse(domain)
+		}
+
+		return c.JSON(entities.SensorDataListResponse{
+			Data: data,
+		})
 	}
 }
 
@@ -118,6 +161,8 @@ func DeleteSensor(svc service.SensorService) fiber.Handler {
 		return c.SendStatus(fiber.StatusNoContent)
 	}
 }
+
+// TODO: Create / Update Sensor
 
 func mapToDto(t *domain.Sensor) *entities.SensorResponse {
 	dto := sensorMapper.FromResponse(t)

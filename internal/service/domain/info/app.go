@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
@@ -20,20 +21,23 @@ func NewInfoService(infoRepository storage.InfoRepository) *InfoService {
 }
 
 func (s *InfoService) GetAppInfo(ctx context.Context) (*domain.App, error) {
+	log := logger.GetLogger(ctx)
 	appInfo, err := s.infoRepository.GetAppInfo(ctx)
 	if err != nil {
 		if errors.Is(err, storage.ErrIPNotFound) {
-			return nil, service.NewError(service.InternalError, err.Error())
+			log.Debug("failed to receive ip from local system", "error", err)
 		}
 		if errors.Is(err, storage.ErrIFacesNotFound) {
-			return nil, service.NewError(service.InternalError, err.Error())
+			log.Debug("failed to receive network interfaces from local system", "error", err)
 		}
 		if errors.Is(err, storage.ErrIFacesAddressNotFound) {
-			return nil, service.NewError(service.InternalError, err.Error())
+			log.Debug("failed to receive network interfaces address from local system", "error", err)
 		}
 		if errors.Is(err, storage.ErrHostnameNotFound) {
-			return nil, service.NewError(service.InternalError, err.Error())
+			log.Debug("failed to receive network hostname from local system", "error", err)
 		}
+
+		return nil, service.MapError(ctx, err, service.ErrorLogAll)
 	}
 
 	return appInfo, nil

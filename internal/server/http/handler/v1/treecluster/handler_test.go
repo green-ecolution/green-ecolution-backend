@@ -8,55 +8,170 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	serverEntities "github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/treecluster"
+	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/middleware"
+	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	serviceMock "github.com/green-ecolution/green-ecolution-backend/internal/service/_mock"
-	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestGetAllTreeCluster(t *testing.T) {
-	t.Run("should return all tree clusters successfully", func(t *testing.T) {
+	t.Run("should return all tree clusters successfully with default pagination values", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-		).Return(TestClusterList, nil)
+			mock.Anything, entities.TreeClusterQuery{},
+		).Return(TestClusterList, int64(len(TestClusterList)), nil)
 
-		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
 		resp, err := app.Test(req, -1)
 		defer resp.Body.Close()
 
-		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var response serverEntities.TreeClusterListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
-		assert.Equal(t, 2, len(response.Data))
+
+		// assert data
+		assert.Equal(t, len(TestClusterList), len(response.Data))
 		assert.Equal(t, TestClusterList[0].Name, response.Data[0].Name)
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters successfully with limit 1 and offset 0", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, entities.TreeClusterQuery{},
+		).Return(TestClusterList, int64(len(TestClusterList)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Equal(t, len(TestClusterList), len(response.Data))
+		assert.Equal(t, TestClusterList[0].Name, response.Data[0].Name)
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(TestClusterList)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(TestClusterList))/1), response.Pagination.TotalPages)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters successfully with provider", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, entities.TreeClusterQuery{
+				Query: entities.Query{Provider: "test-provider"},
+			},
+		).Return(TestClusterList, int64(len(TestClusterList)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
+		query := req.URL.Query()
+		query.Add("provider", "test-provider")
+		req.URL.RawQuery = query.Encode()
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		// assert data
+		assert.Equal(t, len(TestClusterList), len(response.Data))
+		assert.Equal(t, TestClusterList[0].Name, response.Data[0].Name)
+
+		// assert pagination
+		assert.Nil(t, response.Pagination)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when page is invalid", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=0&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return error when limit is invalid", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?page=1&limit=0", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 
 		mockClusterService.AssertExpectations(t)
 	})
 
 	t.Run("should return an empty list when no tree clusters are available", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-		).Return([]*entities.TreeCluster{}, nil)
+			mock.Anything, entities.TreeClusterQuery{},
+		).Return([]*entities.TreeCluster{}, int64(0), nil)
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
@@ -70,20 +185,26 @@ func TestGetAllTreeCluster(t *testing.T) {
 		var response serverEntities.TreeClusterListResponse
 		err = utils.ParseJSONResponse(resp, &response)
 		assert.NoError(t, err)
+
+		// assert data
 		assert.Equal(t, 0, len(response.Data))
+
+		// assert pagination
+		assert.Empty(t, response.Pagination)
 
 		mockClusterService.AssertExpectations(t)
 	})
 
 	t.Run("should return 500 Internal Server Error when service fails", func(t *testing.T) {
 		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
 		mockClusterService := serviceMock.NewMockTreeClusterService(t)
 		handler := treecluster.GetAllTreeClusters(mockClusterService)
 		app.Get("/v1/cluster", handler)
 
 		mockClusterService.EXPECT().GetAll(
-			mock.Anything,
-		).Return(nil, fiber.NewError(fiber.StatusInternalServerError, "service error"))
+			mock.Anything, entities.TreeClusterQuery{},
+		).Return(nil, int64(0), fiber.NewError(fiber.StatusInternalServerError, "service error"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster", nil)
@@ -93,6 +214,217 @@ func TestGetAllTreeCluster(t *testing.T) {
 		// then
 		assert.Nil(t, err)
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters filtered by watering status", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2],
+		}
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, entities.TreeClusterQuery{
+				WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
+			},
+		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?watering_statuses=moderate&page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+		for _, cluster := range response.Data {
+			assert.EqualValues(t, entities.WateringStatusModerate, cluster.WateringStatus)
+		}
+
+		// assert pagination
+		assert.NotEmpty(t, response.Pagination)
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Empty(t, response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters filtered by region", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2],
+			TestClusterList[3],
+		}
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, entities.TreeClusterQuery{
+				Regions: []string{"Mürwik"},
+			},
+		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?regions=Mürwik&page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+		for _, cluster := range response.Data {
+			assert.NotNil(t, cluster.Region)
+			assert.Equal(t, "Mürwik", cluster.Region.Name)
+		}
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters filtered by watering status and region", func(t *testing.T) {
+		app := fiber.New()
+		app.Use(middleware.PaginationMiddleware())
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		filter := entities.TreeClusterQuery{
+			WateringStatuses: []entities.WateringStatus{entities.WateringStatusModerate},
+			Regions:          []string{"Mürwik"},
+		}
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2],
+		}
+
+		mockClusterService.EXPECT().GetAll(
+			mock.Anything, filter,
+		).Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster?watering_statuses=moderate&regions=Mürwik&page=1&limit=1", nil)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+		for _, cluster := range response.Data {
+			assert.EqualValues(t, entities.WateringStatusModerate, cluster.WateringStatus)
+			assert.NotNil(t, cluster.Region)
+			assert.Equal(t, "Mürwik", cluster.Region.Name)
+		}
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Empty(t, response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
+
+		mockClusterService.AssertExpectations(t)
+	})
+
+	t.Run("should return tree clusters filtered by multiple watering statuses and multiple regions", func(t *testing.T) {
+		app := fiber.New(fiber.Config{
+			EnableSplittingOnParsers: true,
+		})
+
+		app.Use(middleware.PaginationMiddleware())
+
+		mockClusterService := serviceMock.NewMockTreeClusterService(t)
+		handler := treecluster.GetAllTreeClusters(mockClusterService)
+		app.Get("/v1/cluster", handler)
+
+		wateringStatues := []entities.WateringStatus{
+			entities.WateringStatusModerate,
+			entities.WateringStatusBad,
+		}
+		regionNames := []string{"Mürwik", "Altstadt"}
+
+		filter := entities.TreeClusterQuery{
+			WateringStatuses: wateringStatues,
+			Regions:          regionNames,
+			Query:            entities.Query{Provider: ""},
+		}
+
+		expectedFiltered := []*entities.TreeCluster{
+			TestClusterList[2], //  moderate + Mürwik
+			TestClusterList[3], //  Bad + Mürwik
+		}
+
+		mockClusterService.EXPECT().
+			GetAll(mock.Anything, filter).
+			Return(expectedFiltered, int64(len(expectedFiltered)), nil)
+
+		req, _ := http.NewRequestWithContext(
+			context.Background(),
+			http.MethodGet,
+			"/v1/cluster?watering_statuses=moderate,bad&regions=Mürwik,Altstadt&page=1&limit=1",
+			nil,
+		)
+		resp, err := app.Test(req, -1)
+		defer resp.Body.Close()
+
+		assert.Nil(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		var response serverEntities.TreeClusterListResponse
+		err = utils.ParseJSONResponse(resp, &response)
+		assert.NoError(t, err)
+
+		assert.Equal(t, len(expectedFiltered), len(response.Data))
+
+		for _, cluster := range response.Data {
+			assert.Contains(t, wateringStatues,
+				entities.WateringStatus(cluster.WateringStatus),
+				"Cluster watering status is outside the expected list",
+			)
+
+			require.NotNil(t, cluster.Region, "Cluster region must not be nil")
+			assert.Contains(t,
+				regionNames,
+				cluster.Region.Name,
+				"Cluster region is outside the expected list",
+			)
+		}
+
+		// assert pagination
+		assert.Equal(t, int32(1), response.Pagination.CurrentPage)
+		assert.Equal(t, int64(len(expectedFiltered)), response.Pagination.Total)
+		assert.Equal(t, int32(2), *response.Pagination.NextPage)
+		assert.Empty(t, response.Pagination.PrevPage)
+		assert.Equal(t, int32((len(expectedFiltered))/1), response.Pagination.TotalPages)
 
 		mockClusterService.AssertExpectations(t)
 	})
@@ -152,7 +484,7 @@ func TestGetTreeClusterByID(t *testing.T) {
 		mockClusterService.EXPECT().GetByID(
 			mock.Anything,
 			int32(999),
-		).Return(nil, storage.ErrTreeClusterNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "/v1/cluster/999", nil)
@@ -346,7 +678,7 @@ func TestUpdateTreeCluster(t *testing.T) {
 			mock.Anything,
 			int32(1),
 			mock.Anything,
-		).Return(nil, storage.ErrTreeClusterNotFound)
+		).Return(nil, service.NewError(service.NotFound, "not found"))
 
 		// when
 		body, _ := json.Marshal(TestClusterRequest)
@@ -433,7 +765,7 @@ func TestDeleteTreeCluster(t *testing.T) {
 		mockClusterService.EXPECT().Delete(
 			mock.Anything,
 			int32(clusterID),
-		).Return(storage.ErrTreeClusterNotFound)
+		).Return(service.NewError(service.NotFound, "not found"))
 
 		// when
 		req, _ := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/v1/cluster/"+strconv.Itoa(clusterID), nil)

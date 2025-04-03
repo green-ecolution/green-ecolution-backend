@@ -15,6 +15,7 @@ packages:
       VehicleService:
       PluginService:
       WateringPlanService:
+      EvaluationService:
       Service:
       ServicesInterface:
   github.com/green-ecolution/green-ecolution-backend/internal/storage:
@@ -30,7 +31,6 @@ packages:
       RegionRepository:
       ImageRepository:
       VehicleRepository:
-      FlowerbedRepository:
       WateringPlanRepository:
       RoutingRepository:
       S3Repository:

@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,12 +17,20 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 
-	testVehicles, err := suite.Store.GetAllVehicles(context.Background())
+	vehicleCount, _ := suite.Store.GetAllVehiclesCount(context.Background(), "")
+	testVehicles, err := suite.Store.GetAllVehicles(context.Background(), &sqlc.GetAllVehiclesParams{
+		Provider: "",
+		Limit:    int32(vehicleCount),
+		Offset:   0,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	testCluster, err := suite.Store.GetAllTreeClusters(context.Background())
+	testCluster, err := suite.Store.GetAllTreeClusters(context.Background(), &sqlc.GetAllTreeClustersParams{
+		Offset: 0,
+		Limit:  5,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,13 +41,22 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	vehicle, err := mappers.vehicleMapper.FromSqlList(testVehicles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	treeClusters, err := mappers.clusterMapper.FromSqlList(testCluster)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	input := entities.WateringPlan{
 		Date:         time.Date(2024, 11, 22, 0, 0, 0, 0, time.UTC),
 		Description:  "Updated watering plan",
 		Distance:     utils.P(50.0),
-		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[3],
-		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[1],
-		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		Trailer:      vehicle[3],
+		Transporter:  vehicle[1],
+		TreeClusters: treeClusters[0:3],
 		UserIDs:      []*uuid.UUID{&testUUID},
 		Status:       entities.WateringPlanStatusActive,
 	}
@@ -66,7 +85,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
@@ -119,7 +138,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
@@ -174,7 +193,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 
 		cancellationNote := "This watering plan is canceled"
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
@@ -204,7 +223,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Distance = input.Distance
 			wp.Transporter = input.Transporter
@@ -241,7 +260,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
@@ -281,7 +300,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Distance = input.Distance
 			wp.Transporter = input.Transporter
@@ -304,7 +323,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = time.Time{}
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
@@ -324,7 +343,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Transporter
@@ -345,7 +364,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -366,7 +385,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Trailer
 			wp.Trailer = input.Trailer
@@ -387,7 +406,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = nil
 			wp.Trailer = input.Trailer
@@ -408,7 +427,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -441,7 +460,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -461,7 +480,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -481,7 +500,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -500,7 +519,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -533,7 +552,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	t.Run("should return error when updateFn returns error", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			return true, assert.AnError
 		}
 
@@ -547,7 +566,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	t.Run("should not update when updateFn returns false", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			return false, nil
 		}
 
@@ -564,7 +583,7 @@ func TestWateringPlanRepository_Update(t *testing.T) {
 	t.Run("should not rollback when updateFn returns false", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		updateFn := func(wp *entities.WateringPlan) (bool, error) {
+		updateFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Description = "Test"
 			wp.Transporter = input.Transporter

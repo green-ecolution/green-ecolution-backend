@@ -12,12 +12,13 @@ import (
 	"net/url"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 )
 
 const (
-	treeScale = 120 // how much water does a tree need
+	treeScale = 80 // how much water does a tree need
 )
 
 type VroomClientConfig struct {
@@ -41,24 +42,28 @@ func WithClient(client *http.Client) VroomClientOption {
 }
 
 func WithHostURL(hostURL *url.URL) VroomClientOption {
+	slog.Debug("use vroom client with host url", "host_url", hostURL)
 	return func(cfg *VroomClientConfig) {
 		cfg.url = hostURL
 	}
 }
 
 func WithStartPoint(startPoint []float64) VroomClientOption {
+	slog.Debug("use vroom client with start point", "start_point", startPoint)
 	return func(cfg *VroomClientConfig) {
 		cfg.startPoint = startPoint
 	}
 }
 
 func WithEndPoint(endPoint []float64) VroomClientOption {
+	slog.Debug("use vroom client with end point", "end_point", endPoint)
 	return func(cfg *VroomClientConfig) {
 		cfg.endPoint = endPoint
 	}
 }
 
 func WithWateringPoint(wateringPoint []float64) VroomClientOption {
+	slog.Debug("use vroom client with watering point", "watering_point", wateringPoint)
 	return func(cfg *VroomClientConfig) {
 		cfg.wateringPoint = wateringPoint
 	}
@@ -79,9 +84,10 @@ func NewVroomClient(opts ...VroomClientOption) VroomClient {
 }
 
 func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomResponse, error) {
+	log := logger.GetLogger(ctx)
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(reqBody); err != nil {
-		slog.Error("failed to marshal vroom req body", "error", err, "req_body", reqBody)
+		log.Error("failed to marshal vroom req body", "error", err, "req_body", reqBody)
 		return nil, err
 	}
 
@@ -93,7 +99,7 @@ func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomRespon
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := v.cfg.client.Do(req)
 	if err != nil {
-		slog.Error("failed to send request to vroom service", "error", err)
+		log.Error("failed to send request to vroom service", "error", err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -101,21 +107,21 @@ func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomRespon
 	if resp.StatusCode != http.StatusOK {
 		body, err := io.ReadAll(resp.Body)
 		if err == nil {
-			slog.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode, "body", body)
+			log.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode, "body", body)
 		} else {
-			slog.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode)
+			log.Error("response from the vroom service with a not successful code", "status_code", resp.StatusCode)
 		}
 		return nil, errors.New("failed to optimize route")
 	}
 
 	var vroomResp VroomResponse
 	if err := json.NewDecoder(resp.Body).Decode(&vroomResp); err != nil {
-		slog.Error("failed to decode vroom response")
+		log.Error("failed to decode vroom response")
 		return nil, errors.New("failed to optimize route")
 	}
 
 	if vroomResp.Code != 0 {
-		slog.Error("vroom returned error", "vroom_error", vroomResp.Error)
+		log.Error("vroom returned error", "vroom_error", vroomResp.Error)
 		return nil, errors.New("failed to optimize route")
 	}
 
@@ -123,10 +129,11 @@ func (v *VroomClient) Send(ctx context.Context, reqBody *VroomReq) (*VroomRespon
 }
 
 func (v *VroomClient) OptimizeRoute(ctx context.Context, vehicle *entities.Vehicle, cluster []*entities.TreeCluster) (*VroomResponse, error) {
+	log := logger.GetLogger(ctx)
 	vroomVehicle, err := v.toVroomVehicle(vehicle)
 	if err != nil {
 		if errors.Is(err, storage.ErrUnknownVehicleType) {
-			slog.Error("unknown vehicle type. please specify vehicle type", "error", err, "vehicle_type", vehicle.Type)
+			log.Error("unknown vehicle type. please specify vehicle type", "error", err, "vehicle_type", vehicle.Type)
 		}
 
 		return nil, err

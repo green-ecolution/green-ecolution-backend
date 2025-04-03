@@ -10,6 +10,7 @@ import (
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
 
@@ -26,6 +27,7 @@ type InfoRepository struct {
 	localInterface string
 	buildTime      time.Time
 	gitRepository  *url.URL
+	mapInfo        entities.Map
 }
 
 func init() {
@@ -55,23 +57,32 @@ func NewInfoRepository(cfg *config.Config) (*InfoRepository, error) {
 		return nil, err
 	}
 
+	mapInfo, err := getMapInfo(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	return &InfoRepository{
 		cfg:            cfg,
 		localIP:        localIP,
 		localInterface: localInterface,
 		buildTime:      buildTime,
 		gitRepository:  gitRepository,
+		mapInfo:        mapInfo,
 	}, nil
 }
 
-func (r *InfoRepository) GetAppInfo(_ context.Context) (*entities.App, error) {
+func (r *InfoRepository) GetAppInfo(ctx context.Context) (*entities.App, error) {
+	log := logger.GetLogger(ctx)
 	hostname, err := r.getHostname()
 	if err != nil {
+		log.Error("failed to get hostname from host", "error", err)
 		return nil, storage.ErrHostnameNotFound
 	}
 
 	appURL, err := r.getAppURL()
 	if err != nil {
+		log.Error("failed to parse configured app url", "error", err, "app_url", r.cfg.Server.AppURL)
 		return nil, storage.ErrCannotGetAppURL
 	}
 
@@ -94,6 +105,18 @@ func (r *InfoRepository) GetAppInfo(_ context.Context) (*entities.App, error) {
 			Interface: r.localInterface,
 			Uptime:    r.getUptime(),
 		},
+		Map: r.mapInfo,
+	}, nil
+}
+
+func getMapInfo(cfg *config.Config) (entities.Map, error) {
+	if len(cfg.Map.Center) != 2 || len(cfg.Map.BBox) != 4 {
+		return entities.Map{}, storage.ErrInvalidMapConfig
+	}
+
+	return entities.Map{
+		Center: cfg.Map.Center,
+		BBox:   cfg.Map.BBox,
 	}, nil
 }
 

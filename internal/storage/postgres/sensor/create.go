@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
@@ -13,51 +17,82 @@ import (
 
 func defaultSensor() *entities.Sensor {
 	return &entities.Sensor{
-		Status:     entities.SensorStatusUnknown,
-		LatestData: nil,
-		Latitude:   0,
-		Longitude:  0,
+		Status:         entities.SensorStatusUnknown,
+		LatestData:     nil,
+		Latitude:       0,
+		Longitude:      0,
+		Provider:       "",
+		AdditionalInfo: nil,
 	}
 }
 
-func (r *SensorRepository) Create(ctx context.Context, sFn ...entities.EntityFunc[entities.Sensor]) (*entities.Sensor, error) {
-	entity := defaultSensor()
-	for _, fn := range sFn {
-		fn(entity)
+func (r *SensorRepository) Create(ctx context.Context, createFn func(*entities.Sensor, storage.SensorRepository) (bool, error)) (*entities.Sensor, error) {
+	log := logger.GetLogger(ctx)
+	if createFn == nil {
+		return nil, errors.New("createFn is nil")
 	}
 
-	sensor, _ := r.GetByID(ctx, entity.ID)
-	if sensor != nil {
-		return nil, errors.New("sensor with same ID already exists")
-	}
+	var createdSensor *entities.Sensor
+	err := r.store.WithTx(ctx, func(s *store.Store) error {
+		newRepo := NewSensorRepository(s, r.SensorRepositoryMappers)
+		entity := defaultSensor()
 
-	if err := r.validateSensorEntity(entity); err != nil {
+		created, err := createFn(entity, newRepo)
+		if err != nil {
+			return err
+		}
+
+		if !created {
+			return nil
+		}
+
+		existingSensor, _ := newRepo.GetByID(ctx, entity.ID)
+		if existingSensor != nil {
+			return errors.New("sensor with same ID already exists")
+		}
+
+		if err := newRepo.validateSensorEntity(entity); err != nil {
+			return err
+		}
+
+		id, err := newRepo.createEntity(ctx, entity)
+		if err != nil {
+			log.Error("failed to create sensor entity in db", "error", err)
+			return err
+		}
+		entity.ID = id
+		log.Debug("sensor entity created successfully in db", "sensor_id", id)
+
+		if entity.LatestData != nil && entity.LatestData.Data != nil {
+			err = newRepo.InsertSensorData(ctx, entity.LatestData, id)
+			if err != nil {
+				return err
+			}
+		}
+
+		createdSensor, err = newRepo.GetByID(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
 		return nil, err
 	}
 
-	id, err := r.createEntity(ctx, entity)
-	if err != nil {
-		return nil, r.store.HandleError(err)
-	}
-
-	entity.ID = id
-	if entity.LatestData != nil && entity.LatestData.Data != nil {
-		err = r.InsertSensorData(ctx, entity.LatestData, id)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return r.GetByID(ctx, id)
+	return createdSensor, nil
 }
 
 func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *entities.SensorData, id string) error {
+	log := logger.GetLogger(ctx)
 	if latestData == nil || latestData.Data == nil {
 		return errors.New("latest data cannot be empty")
 	}
 
 	if id == "" {
-		return r.store.HandleError(errors.New("sensor id cannot be empty"))
+		return errors.New("sensor id cannot be empty")
 	}
 
 	mqttData := r.mapper.FromDomainSensorData(latestData.Data)
@@ -73,6 +108,7 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *ent
 
 	err = r.store.InsertSensorData(ctx, params)
 	if err != nil {
+		log.Error("failed to insert sensor data in db", "error", err, "sensor_id", id)
 		return err
 	}
 
@@ -80,9 +116,18 @@ func (r *SensorRepository) InsertSensorData(ctx context.Context, latestData *ent
 }
 
 func (r *SensorRepository) createEntity(ctx context.Context, sensor *entities.Sensor) (string, error) {
+	log := logger.GetLogger(ctx)
+	additionalInfo, err := utils.MapAdditionalInfoToByte(sensor.AdditionalInfo)
+	if err != nil {
+		log.Debug("failed to marshal additional informations to byte array", "error", err, "additional_info", sensor.AdditionalInfo)
+		return "", err
+	}
+
 	id, err := r.store.CreateSensor(ctx, &sqlc.CreateSensorParams{
-		ID:     sensor.ID,
-		Status: sqlc.SensorStatus(sensor.Status),
+		ID:                     sensor.ID,
+		Status:                 sqlc.SensorStatus(sensor.Status),
+		Provider:               &sensor.Provider,
+		AdditionalInformations: additionalInfo,
 	})
 	if err != nil {
 		return "", err
@@ -102,10 +147,10 @@ func (r *SensorRepository) validateSensorEntity(sensor *entities.Sensor) error {
 	if sensor.ID == "" {
 		return errors.New("sensor id cannot be empty")
 	}
-	if sensor.Latitude < -90 || sensor.Latitude > 90 || sensor.Latitude == 0 {
+	if sensor.Latitude < -90 || sensor.Latitude > 90 {
 		return storage.ErrInvalidLatitude
 	}
-	if sensor.Longitude < -180 || sensor.Longitude > 180 || sensor.Longitude == 0 {
+	if sensor.Longitude < -180 || sensor.Longitude > 180 {
 		return storage.ErrInvalidLongitude
 	}
 

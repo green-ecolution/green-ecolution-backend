@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,20 +22,25 @@ var _ MappedNullable = &WateringPlan{}
 
 // WateringPlan struct for WateringPlan
 type WateringPlan struct {
-	CancellationNote string `json:"cancellation_note"`
-	CreatedAt string `json:"created_at"`
-	Date string `json:"date"`
-	Description string `json:"description"`
-	Distance float32 `json:"distance"`
-	Evaluation []EvaluationValue `json:"evaluation"`
-	Id int32 `json:"id"`
-	Status WateringPlanStatus `json:"status"`
-	TotalWaterRequired float32 `json:"total_water_required"`
-	Trailer *Vehicle `json:"trailer,omitempty"`
-	Transporter Vehicle `json:"transporter"`
-	Treeclusters []TreeClusterInList `json:"treeclusters"`
-	UpdatedAt string `json:"updated_at"`
-	UserIds []string `json:"user_ids"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	CancellationNote      string                 `json:"cancellation_note"`
+	CreatedAt             string                 `json:"created_at"`
+	Date                  string                 `json:"date"`
+	Description           string                 `json:"description"`
+	Distance              float32                `json:"distance"`
+	Duration              float32                `json:"duration"`
+	Evaluation            []EvaluationValue      `json:"evaluation"`
+	GpxUrl                string                 `json:"gpx_url"`
+	Id                    int32                  `json:"id"`
+	Provider              string                 `json:"provider"`
+	RefillCount           int32                  `json:"refill_count"`
+	Status                WateringPlanStatus     `json:"status"`
+	TotalWaterRequired    float32                `json:"total_water_required"`
+	Trailer               *Vehicle               `json:"trailer,omitempty"`
+	Transporter           Vehicle                `json:"transporter"`
+	Treeclusters          []TreeClusterInList    `json:"treeclusters"`
+	UpdatedAt             string                 `json:"updated_at"`
+	UserIds               []string               `json:"user_ids"`
 }
 
 type _WateringPlan WateringPlan
@@ -44,15 +49,19 @@ type _WateringPlan WateringPlan
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewWateringPlan(cancellationNote string, createdAt string, date string, description string, distance float32, evaluation []EvaluationValue, id int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlan {
+func NewWateringPlan(cancellationNote string, createdAt string, date string, description string, distance float32, duration float32, evaluation []EvaluationValue, gpxUrl string, id int32, provider string, refillCount int32, status WateringPlanStatus, totalWaterRequired float32, transporter Vehicle, treeclusters []TreeClusterInList, updatedAt string, userIds []string) *WateringPlan {
 	this := WateringPlan{}
 	this.CancellationNote = cancellationNote
 	this.CreatedAt = createdAt
 	this.Date = date
 	this.Description = description
 	this.Distance = distance
+	this.Duration = duration
 	this.Evaluation = evaluation
+	this.GpxUrl = gpxUrl
 	this.Id = id
+	this.Provider = provider
+	this.RefillCount = refillCount
 	this.Status = status
 	this.TotalWaterRequired = totalWaterRequired
 	this.Transporter = transporter
@@ -68,6 +77,38 @@ func NewWateringPlan(cancellationNote string, createdAt string, date string, des
 func NewWateringPlanWithDefaults() *WateringPlan {
 	this := WateringPlan{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
+func (o *WateringPlan) GetAdditionalInformation() map[string]interface{} {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		var ret map[string]interface{}
+		return ret
+	}
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WateringPlan) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *WateringPlan) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *WateringPlan) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetCancellationNote returns the CancellationNote field value
@@ -190,6 +231,30 @@ func (o *WateringPlan) SetDistance(v float32) {
 	o.Distance = v
 }
 
+// GetDuration returns the Duration field value
+func (o *WateringPlan) GetDuration() float32 {
+	if o == nil {
+		var ret float32
+		return ret
+	}
+
+	return o.Duration
+}
+
+// GetDurationOk returns a tuple with the Duration field value
+// and a boolean to check if the value has been set.
+func (o *WateringPlan) GetDurationOk() (*float32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Duration, true
+}
+
+// SetDuration sets field value
+func (o *WateringPlan) SetDuration(v float32) {
+	o.Duration = v
+}
+
 // GetEvaluation returns the Evaluation field value
 func (o *WateringPlan) GetEvaluation() []EvaluationValue {
 	if o == nil {
@@ -214,6 +279,30 @@ func (o *WateringPlan) SetEvaluation(v []EvaluationValue) {
 	o.Evaluation = v
 }
 
+// GetGpxUrl returns the GpxUrl field value
+func (o *WateringPlan) GetGpxUrl() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.GpxUrl
+}
+
+// GetGpxUrlOk returns a tuple with the GpxUrl field value
+// and a boolean to check if the value has been set.
+func (o *WateringPlan) GetGpxUrlOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.GpxUrl, true
+}
+
+// SetGpxUrl sets field value
+func (o *WateringPlan) SetGpxUrl(v string) {
+	o.GpxUrl = v
+}
+
 // GetId returns the Id field value
 func (o *WateringPlan) GetId() int32 {
 	if o == nil {
@@ -236,6 +325,54 @@ func (o *WateringPlan) GetIdOk() (*int32, bool) {
 // SetId sets field value
 func (o *WateringPlan) SetId(v int32) {
 	o.Id = v
+}
+
+// GetProvider returns the Provider field value
+func (o *WateringPlan) GetProvider() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value
+// and a boolean to check if the value has been set.
+func (o *WateringPlan) GetProviderOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Provider, true
+}
+
+// SetProvider sets field value
+func (o *WateringPlan) SetProvider(v string) {
+	o.Provider = v
+}
+
+// GetRefillCount returns the RefillCount field value
+func (o *WateringPlan) GetRefillCount() int32 {
+	if o == nil {
+		var ret int32
+		return ret
+	}
+
+	return o.RefillCount
+}
+
+// GetRefillCountOk returns a tuple with the RefillCount field value
+// and a boolean to check if the value has been set.
+func (o *WateringPlan) GetRefillCountOk() (*int32, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.RefillCount, true
+}
+
+// SetRefillCount sets field value
+func (o *WateringPlan) SetRefillCount(v int32) {
+	o.RefillCount = v
 }
 
 // GetStatus returns the Status field value
@@ -415,7 +552,7 @@ func (o *WateringPlan) SetUserIds(v []string) {
 }
 
 func (o WateringPlan) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -424,13 +561,20 @@ func (o WateringPlan) MarshalJSON() ([]byte, error) {
 
 func (o WateringPlan) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["cancellation_note"] = o.CancellationNote
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["date"] = o.Date
 	toSerialize["description"] = o.Description
 	toSerialize["distance"] = o.Distance
+	toSerialize["duration"] = o.Duration
 	toSerialize["evaluation"] = o.Evaluation
+	toSerialize["gpx_url"] = o.GpxUrl
 	toSerialize["id"] = o.Id
+	toSerialize["provider"] = o.Provider
+	toSerialize["refill_count"] = o.RefillCount
 	toSerialize["status"] = o.Status
 	toSerialize["total_water_required"] = o.TotalWaterRequired
 	if !IsNil(o.Trailer) {
@@ -453,8 +597,12 @@ func (o *WateringPlan) UnmarshalJSON(data []byte) (err error) {
 		"date",
 		"description",
 		"distance",
+		"duration",
 		"evaluation",
+		"gpx_url",
 		"id",
+		"provider",
+		"refill_count",
 		"status",
 		"total_water_required",
 		"transporter",
@@ -468,10 +616,10 @@ func (o *WateringPlan) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -527,5 +675,3 @@ func (v *NullableWateringPlan) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

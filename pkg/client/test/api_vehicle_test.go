@@ -11,10 +11,10 @@ package client
 
 import (
 	"context"
+	openapiclient "github.com/green-ecolution/green-ecolution-backend/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"testing"
-	openapiclient "github.com/green-ecolution/green-ecolution-backend/client"
 )
 
 func Test_client_VehicleAPIService(t *testing.T) {
@@ -22,9 +22,22 @@ func Test_client_VehicleAPIService(t *testing.T) {
 	configuration := openapiclient.NewConfiguration()
 	apiClient := openapiclient.NewAPIClient(configuration)
 
+	t.Run("Test VehicleAPIService ArchiveVehicle", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		var id int32
+
+		httpRes, err := apiClient.VehicleAPI.ArchiveVehicle(context.Background(), id).Execute()
+
+		require.Nil(t, err)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test VehicleAPIService CreateVehicle", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.VehicleAPI.CreateVehicle(context.Background()).Execute()
 
@@ -36,9 +49,9 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 	t.Run("Test VehicleAPIService DeleteVehicle", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		httpRes, err := apiClient.VehicleAPI.DeleteVehicle(context.Background(), id).Execute()
 
@@ -49,7 +62,7 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 	t.Run("Test VehicleAPIService GetAllVehicles", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		resp, httpRes, err := apiClient.VehicleAPI.GetAllVehicles(context.Background()).Execute()
 
@@ -59,11 +72,23 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 	})
 
+	t.Run("Test VehicleAPIService GetArchiveVehicle", func(t *testing.T) {
+
+		t.Skip("skip test") // remove to run test
+
+		resp, httpRes, err := apiClient.VehicleAPI.GetArchiveVehicle(context.Background()).Execute()
+
+		require.Nil(t, err)
+		require.NotNil(t, resp)
+		assert.Equal(t, 200, httpRes.StatusCode)
+
+	})
+
 	t.Run("Test VehicleAPIService GetVehicleById", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
-		var id string
+		var id int32
 
 		resp, httpRes, err := apiClient.VehicleAPI.GetVehicleById(context.Background(), id).Execute()
 
@@ -75,7 +100,7 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 	t.Run("Test VehicleAPIService GetVehicleByPlate", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var plate string
 
@@ -89,7 +114,7 @@ func Test_client_VehicleAPIService(t *testing.T) {
 
 	t.Run("Test VehicleAPIService UpdateVehicle", func(t *testing.T) {
 
-		t.Skip("skip test")  // remove to run test
+		t.Skip("skip test") // remove to run test
 
 		var id string
 

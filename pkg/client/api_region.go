@@ -20,15 +20,14 @@ import (
 	"strings"
 )
 
-
 // RegionAPIService RegionAPI service
 type RegionAPIService service
 
 type ApiV1RegionGetRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *RegionAPIService
-	page *string
-	limit *string
+	page       *string
+	limit      *string
 }
 
 // Page
@@ -52,24 +51,25 @@ V1RegionGet Get all regions
 
 Get all regions
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiV1RegionGetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiV1RegionGetRequest
 */
 func (a *RegionAPIService) V1RegionGet(ctx context.Context) ApiV1RegionGetRequest {
 	return ApiV1RegionGetRequest{
 		ApiService: a,
-		ctx: ctx,
+		ctx:        ctx,
 	}
 }
 
 // Execute executes the request
-//	@return	RegionList
+//
+//	@return RegionList
 func (a *RegionAPIService) V1RegionGetExecute(r ApiV1RegionGetRequest) (*RegionList, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *RegionList
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *RegionList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RegionAPIService.V1RegionGet")
@@ -135,8 +135,8 @@ func (a *RegionAPIService) V1RegionGetExecute(r ApiV1RegionGetRequest) (*RegionL
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -146,8 +146,8 @@ func (a *RegionAPIService) V1RegionGetExecute(r ApiV1RegionGetRequest) (*RegionL
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
@@ -165,9 +165,9 @@ func (a *RegionAPIService) V1RegionGetExecute(r ApiV1RegionGetRequest) (*RegionL
 }
 
 type ApiV1RegionIdGetRequest struct {
-	ctx context.Context
+	ctx        context.Context
 	ApiService *RegionAPIService
-	id string
+	id         string
 }
 
 func (r ApiV1RegionIdGetRequest) Execute() (*Region, *http.Response, error) {
@@ -179,26 +179,27 @@ V1RegionIdGet Get a region by ID
 
 Get a region by ID
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param id Region ID
- @return ApiV1RegionIdGetRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param id Region ID
+	@return ApiV1RegionIdGetRequest
 */
 func (a *RegionAPIService) V1RegionIdGet(ctx context.Context, id string) ApiV1RegionIdGetRequest {
 	return ApiV1RegionIdGetRequest{
 		ApiService: a,
-		ctx: ctx,
-		id: id,
+		ctx:        ctx,
+		id:         id,
 	}
 }
 
 // Execute executes the request
-//	@return	Region
+//
+//	@return Region
 func (a *RegionAPIService) V1RegionIdGetExecute(r ApiV1RegionIdGetRequest) (*Region, *http.Response, error) {
 	var (
-		localVarHTTPMethod   = http.MethodGet
-		localVarPostBody     interface{}
-		formFiles            []formFile
-		localVarReturnValue  *Region
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *Region
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "RegionAPIService.V1RegionIdGet")
@@ -259,8 +260,8 @@ func (a *RegionAPIService) V1RegionIdGetExecute(r ApiV1RegionIdGetRequest) (*Reg
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 404 {
@@ -270,8 +271,8 @@ func (a *RegionAPIService) V1RegionIdGetExecute(r ApiV1RegionIdGetRequest) (*Reg
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 			return localVarReturnValue, localVarHTTPResponse, newErr
 		}
 		if localVarHTTPResponse.StatusCode == 500 {
@@ -281,8 +282,8 @@ func (a *RegionAPIService) V1RegionIdGetExecute(r ApiV1RegionIdGetRequest) (*Reg
 				newErr.error = err.Error()
 				return localVarReturnValue, localVarHTTPResponse, newErr
 			}
-					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
-					newErr.model = v
+			newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+			newErr.model = v
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}

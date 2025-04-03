@@ -10,6 +10,13 @@ func TimeToTime(t time.Time) time.Time {
 	return t
 }
 
+func TimeToPtrTime(t time.Time) *time.Time {
+	if t.IsZero() {
+		return nil
+	}
+	return &t
+}
+
 func TimeToTimePtr(t *time.Time) *time.Time {
 	return t
 }
@@ -78,4 +85,8 @@ func Float64ToDuration(source float64) time.Duration {
 
 func DurationToPtrFloat64(source time.Duration) *float64 {
 	return P(float64(source))
+}
+
+func MapKeyValueInterface(src map[string]interface{}) map[string]interface{} {
+	return src
 }

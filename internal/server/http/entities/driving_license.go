@@ -3,7 +3,8 @@ package entities
 type DrivingLicense string // @Name DrivingLicense
 
 const (
-	DrivingLicenseCar         DrivingLicense = "B"
-	DrivingLicenseTrailer     DrivingLicense = "BE"
-	DrivingLicenseTransporter DrivingLicense = "C"
+	DrivingLicenseB  DrivingLicense = "B"
+	DrivingLicenseBE DrivingLicense = "BE"
+	DrivingLicenseC  DrivingLicense = "C"
+	DrivingLicenseCE DrivingLicense = "CE"
 )

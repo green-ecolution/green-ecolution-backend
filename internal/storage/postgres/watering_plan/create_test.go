@@ -7,6 +7,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,12 +17,22 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	suite.ResetDB(t)
 	suite.InsertSeed(t, "internal/storage/postgres/seed/test/watering_plan")
 
-	testVehicles, err := suite.Store.GetAllVehicles(context.Background())
+	vehicleCount, _ := suite.Store.GetAllVehiclesCount(context.Background(), "")
+	testVehicles, err := suite.Store.GetAllVehicles(context.Background(), &sqlc.GetAllVehiclesParams{
+		Provider: "",
+		Limit:    int32(vehicleCount),
+		Offset:   0,
+	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	testCluster, err := suite.Store.GetAllTreeClusters(context.Background())
+	testCluster, err := suite.Store.GetAllTreeClusters(context.Background(), &sqlc.GetAllTreeClustersParams{
+		Offset: 0,
+		Limit:  5,
+	})
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,13 +43,26 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	trailer, err := mappers.vehicleMapper.FromSqlList(testVehicles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	transporter, err := mappers.vehicleMapper.FromSqlList(testVehicles)
+	if err != nil {
+		t.Fatal(err)
+	}
+	treeClusters, err := mappers.clusterMapper.FromSqlList(testCluster)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	input := entities.WateringPlan{
 		Date:         time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
 		Description:  "New watering plan",
 		Distance:     utils.P(50.0),
-		Trailer:      mappers.vehicleMapper.FromSqlList(testVehicles)[2],
-		Transporter:  mappers.vehicleMapper.FromSqlList(testVehicles)[0],
-		TreeClusters: mappers.clusterMapper.FromSqlList(testCluster)[0:3],
+		Trailer:      trailer[2],
+		Transporter:  transporter[0],
+		TreeClusters: treeClusters[0:3],
 		UserIDs:      []*uuid.UUID{&testUUID},
 	}
 
@@ -47,7 +72,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Description = input.Description
 			wp.Distance = input.Distance
@@ -103,7 +128,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
@@ -155,7 +180,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = time.Time{}
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
@@ -176,7 +201,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Transporter
@@ -198,7 +223,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -220,7 +245,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Trailer
 			wp.Trailer = input.Trailer
@@ -242,7 +267,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = nil
 			wp.Trailer = input.Trailer
@@ -264,7 +289,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
 
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer
@@ -298,7 +323,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	t.Run("should return error if context is canceled", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.TreeClusters = input.TreeClusters
@@ -320,7 +345,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	t.Run("should return error when createFn returns error", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			return false, assert.AnError
 		}
 
@@ -332,7 +357,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 	t.Run("should not create watering plan when createFn returns false", func(t *testing.T) {
 		// given
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			return false, nil
 		}
 
@@ -349,7 +374,7 @@ func TestWateringPlanRepository_Create(t *testing.T) {
 		newID := int32(9)
 
 		r := NewWateringPlanRepository(suite.Store, mappers)
-		createFn := func(wp *entities.WateringPlan) (bool, error) {
+		createFn := func(wp *entities.WateringPlan, _ storage.WateringPlanRepository) (bool, error) {
 			wp.Date = input.Date
 			wp.Transporter = input.Transporter
 			wp.Trailer = input.Trailer

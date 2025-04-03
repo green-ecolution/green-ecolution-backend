@@ -22,7 +22,6 @@ func TestNewService(t *testing.T) {
 		mockSensorRepo := storageMock.NewMockSensorRepository(t)
 		mockAuthRepo := storageMock.NewMockAuthRepository(t)
 		mockUserRepo := storageMock.NewMockUserRepository(t)
-		mockImageRepo := storageMock.NewMockImageRepository(t)
 		mockVehicleRepo := storageMock.NewMockVehicleRepository(t)
 
 		mockRepos := &storage.Repository{
@@ -31,7 +30,6 @@ func TestNewService(t *testing.T) {
 			Sensor:      mockSensorRepo,
 			Tree:        mockTreeRepo,
 			User:        mockUserRepo,
-			Image:       mockImageRepo,
 			TreeCluster: mockClusterRepo,
 			Region:      mockRegionRepo,
 			Vehicle:     mockVehicleRepo,

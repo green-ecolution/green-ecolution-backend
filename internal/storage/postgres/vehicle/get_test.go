@@ -4,24 +4,29 @@ import (
 	"context"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestVehicleRepository_GetAll(t *testing.T) {
-	t.Run("should return all verhicles ordered by water capacity", func(t *testing.T) {
+	t.Run("should return all verhicles ordered by water capacity and no limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, len(allTestVehicles), len(got))
+		assert.Equal(t, totalCount, int64(len(allTestVehicles)))
 
 		sortedVehicles := sortVehicleByWaterCapacity(allTestVehicles)
 
@@ -43,17 +48,116 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		}
 	})
 
+	t.Run("should return all verhicles with provider", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		expectedVehicle := allTestVehicles[len(allTestVehicles)-1]
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, entities.Query{Provider: "test-provider"})
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, expectedVehicle.ID, got[0].ID)
+		assert.Equal(t, expectedVehicle.Description, got[0].Description)
+		assert.Equal(t, expectedVehicle.NumberPlate, got[0].NumberPlate)
+		assert.Equal(t, expectedVehicle.WaterCapacity, got[0].WaterCapacity)
+		assert.Equal(t, expectedVehicle.Type, got[0].Type)
+		assert.Equal(t, expectedVehicle.Status, got[0].Status)
+		assert.Equal(t, expectedVehicle.DrivingLicense, got[0].DrivingLicense)
+		assert.Equal(t, expectedVehicle.Height, got[0].Height)
+		assert.Equal(t, expectedVehicle.Width, got[0].Width)
+		assert.Equal(t, expectedVehicle.Length, got[0].Length)
+		assert.Equal(t, expectedVehicle.Weight, got[0].Weight)
+		assert.Equal(t, expectedVehicle.Model, got[0].Model)
+		assert.Equal(t, expectedVehicle.Provider, got[0].Provider)
+		assert.Equal(t, expectedVehicle.AdditionalInfo, got[0].AdditionalInfo)
+		assert.NotZero(t, got[0].CreatedAt)
+		assert.NotZero(t, got[0].UpdatedAt)
+	})
+
+	t.Run("should return all verhicles ordered by water capacity limited by 1 and with an offset of 1", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(1))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
+
+		// then
+		assert.NoError(t, err)
+		assert.Len(t, got, 1)
+		assert.Equal(t, totalCount, int64(len(allTestVehicles)))
+
+		sortedVehicles := sortVehicleByWaterCapacity(allTestVehicles)[0:1]
+
+		for i, vehicle := range got {
+			assert.Equal(t, sortedVehicles[i].ID, vehicle.ID)
+		}
+	})
+
+	t.Run("should return error on invalid page value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(0))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+
+	t.Run("should return error on invalid limit value", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(0))
+
+		// when
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
+
+		// then
+		assert.Error(t, err)
+		assert.Empty(t, got)
+		assert.Equal(t, int64(0), totalCount)
+	})
+
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(2))
+
 		// when
-		got, err := r.GetAll(context.Background())
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -63,47 +167,100 @@ func TestVehicleRepository_GetAll(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetAll(ctx)
+		got, totalCount, err := r.GetAll(ctx, entities.Query{})
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 }
 
 func TestVehicleRepository_GetAllByType(t *testing.T) {
-	t.Run("should return all verhicles of type transporter", func(t *testing.T) {
+	t.Run("should return all verhicles of type transporter without limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAllByType(context.Background(), entities.VehicleTypeTransporter)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeTransporter)
 
 		// then
 		assert.NoError(t, err)
-		assert.Equal(t, 1, len(got))
+		assert.Len(t, got, 2)
+		assert.Equal(t, 2, len(got))
+		assert.Equal(t, int64(2), totalCount)
+
 		for _, vehicle := range got {
 			assert.Equal(t, entities.VehicleTypeTransporter, vehicle.Type)
 		}
 	})
 
-	t.Run("should return all verhicles of type trailer", func(t *testing.T) {
+	t.Run("should return all verhicles of type trailer and no limitation", func(t *testing.T) {
 		// given
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAllByType(context.Background(), entities.VehicleTypeTrailer)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeTrailer)
 
 		// then
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(got))
+		assert.Equal(t, totalCount, int64(1))
+
 		for _, vehicle := range got {
 			assert.Equal(t, entities.VehicleTypeTrailer, vehicle.Type)
 		}
+	})
+
+	t.Run("should return all verhicles with provider and transporter type", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		expectedVehicle := allTestVehicles[len(allTestVehicles)-1]
+
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
+		// when
+		got, totalCount, err := r.GetAllByType(ctx, "test-provider", entities.VehicleTypeTransporter)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, totalCount, int64(1))
+		assert.Equal(t, expectedVehicle.ID, got[0].ID)
+		assert.Equal(t, expectedVehicle.Provider, got[0].Provider)
+		assert.Equal(t, expectedVehicle.AdditionalInfo, got[0].AdditionalInfo)
+		assert.Equal(t, entities.VehicleTypeTransporter, got[0].Type)
+	})
+
+	t.Run("should return all verhicles of type trailer and with an limit of 1 and an offset of 2", func(t *testing.T) {
+		// given
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		ctx := context.WithValue(context.Background(), "page", int32(2))
+		ctx = context.WithValue(ctx, "limit", int32(1))
+
+		// when
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeTrailer)
+
+		// then
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(got))
+		assert.Equal(t, totalCount, int64(1))
 	})
 
 	t.Run("should return empty slice when db is empty", func(t *testing.T) {
@@ -111,12 +268,16 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		suite.ResetDB(t)
 		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
 
+		ctx := context.WithValue(context.Background(), "page", int32(1))
+		ctx = context.WithValue(ctx, "limit", int32(-1))
+
 		// when
-		got, err := r.GetAllByType(context.Background(), entities.VehicleTypeUnknown)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeUnknown)
 
 		// then
 		assert.NoError(t, err)
 		assert.Empty(t, got)
+		assert.Equal(t, totalCount, int64(0))
 	})
 
 	t.Run("should return error when context is canceled", func(t *testing.T) {
@@ -126,11 +287,43 @@ func TestVehicleRepository_GetAllByType(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.GetAllByType(ctx, entities.VehicleTypeUnknown)
+		got, totalCount, err := r.GetAllByType(ctx, "", entities.VehicleTypeUnknown)
 
 		// then
 		assert.Error(t, err)
 		assert.Nil(t, got)
+		assert.Equal(t, totalCount, int64(0))
+	})
+}
+
+func TestVehicleRepository_GetAllWithWateringPlanCount(t *testing.T) {
+	t.Run("should return all verhicles with the associated watering plan count", func(t *testing.T) {
+		suite.ResetDB(t)
+		suite.InsertSeed(t, "internal/storage/postgres/seed/test/vehicle")
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		exptectedVehicles := getVehicleWateringPlanCounts()
+
+		got, err := r.GetAllWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, len(exptectedVehicles), len(got))
+
+		for i, entry := range got {
+			assert.Equal(t, exptectedVehicles[i].NumberPlate, entry.NumberPlate)
+			assert.Equal(t, exptectedVehicles[i].WateringPlanCount, entry.WateringPlanCount)
+		}
+	})
+
+	t.Run("should return empty slice on empty db", func(t *testing.T) {
+		suite.ResetDB(t)
+		r := NewVehicleRepository(suite.Store, defaultVehicleMappers())
+
+		got, err := r.GetAllWithWateringPlanCount(context.Background())
+
+		assert.NoError(t, err)
+		assert.Equal(t, 0, len(got))
+		assert.Empty(t, got)
 	})
 }
 
@@ -319,7 +512,7 @@ var allTestVehicles = []*entities.Vehicle{
 		Type:           entities.VehicleTypeTrailer,
 		Status:         entities.VehicleStatusActive,
 		Model:          "1615/17 - Conrad - MAN TGE 3.180",
-		DrivingLicense: entities.DrivingLicenseTrailer,
+		DrivingLicense: entities.DrivingLicenseBE,
 		Height:         1.5,
 		Length:         2.0,
 		Width:          2.0,
@@ -333,11 +526,29 @@ var allTestVehicles = []*entities.Vehicle{
 		Type:           entities.VehicleTypeTransporter,
 		Status:         entities.VehicleStatusUnknown,
 		Model:          "Actros L Mercedes Benz",
-		DrivingLicense: entities.DrivingLicenseTransporter,
+		DrivingLicense: entities.DrivingLicenseC,
 		Height:         2.1,
 		Length:         5.0,
 		Width:          2.4,
 		Weight:         3.7,
+	},
+	{
+		ID:             3,
+		NumberPlate:    "B-1001",
+		Description:    "Test vehicle 3",
+		WaterCapacity:  150.0,
+		Type:           entities.VehicleTypeTransporter,
+		Status:         entities.VehicleStatusUnknown,
+		Model:          "Actros L Mercedes Benz",
+		DrivingLicense: entities.DrivingLicenseC,
+		Height:         2.1,
+		Length:         5.0,
+		Width:          2.4,
+		Weight:         3.7,
+		Provider:       "test-provider",
+		AdditionalInfo: map[string]interface{}{
+			"foo": "bar",
+		},
 	},
 }
 
@@ -350,4 +561,70 @@ func sortVehicleByWaterCapacity(data []*entities.Vehicle) []*entities.Vehicle {
 	})
 
 	return sorted
+}
+
+func getVehicleWateringPlanCounts() []*entities.VehicleEvaluation {
+	vehicleCountMap := make(map[string]int)
+
+	for _, plan := range allTestWateringPlans {
+		if plan.Transporter != nil && plan.Transporter.NumberPlate != "" {
+			vehicleCountMap[plan.Transporter.NumberPlate]++
+		}
+		if plan.Trailer != nil && plan.Trailer.NumberPlate != "" {
+			vehicleCountMap[plan.Trailer.NumberPlate]++
+		}
+	}
+
+	var vehicleCounts []*entities.VehicleEvaluation
+	for plate, count := range vehicleCountMap {
+		vehicleCounts = append(vehicleCounts, &entities.VehicleEvaluation{
+			NumberPlate:       plate,
+			WateringPlanCount: int64(count),
+		})
+	}
+
+	sort.Slice(vehicleCounts, func(i, j int) bool {
+		return vehicleCounts[i].WateringPlanCount > vehicleCounts[j].WateringPlanCount
+	})
+
+	return vehicleCounts
+}
+
+type testWateringPlan struct {
+	ID          int32
+	Date        time.Time
+	Transporter *entities.Vehicle
+	Trailer     *entities.Vehicle
+}
+
+var allTestWateringPlans = []*testWateringPlan{
+	{
+		ID:          1,
+		Date:        time.Date(2024, 9, 22, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     allTestVehicles[0],
+	},
+	{
+		ID:          2,
+		Date:        time.Date(2024, 8, 3, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     nil,
+	},
+	{
+		ID:          3,
+		Date:        time.Date(2024, 6, 12, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     nil,
+	},
+	{
+		ID:          4,
+		Date:        time.Date(2024, 6, 10, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+		Trailer:     nil,
+	},
+	{
+		ID:          5,
+		Date:        time.Date(2024, 6, 4, 0, 0, 0, 0, time.UTC),
+		Transporter: allTestVehicles[1],
+	},
 }

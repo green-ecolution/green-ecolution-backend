@@ -2,9 +2,9 @@ package region
 
 import (
 	"context"
-	"errors"
 
 	domain "github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 )
@@ -19,19 +19,23 @@ func NewRegionService(regionRepository storage.RegionRepository) service.RegionS
 	}
 }
 
-func (s *RegionService) GetAll(ctx context.Context) ([]*domain.Region, error) {
-	regions, err := s.regionRepo.GetAll(ctx)
+func (s *RegionService) GetAll(ctx context.Context) ([]*domain.Region, int64, error) {
+	log := logger.GetLogger(ctx)
+	regions, totalCount, err := s.regionRepo.GetAll(ctx)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get region by id", "error", err)
+		return nil, 0, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
-	return regions, nil
+	return regions, totalCount, nil
 }
 
 func (s *RegionService) GetByID(ctx context.Context, id int32) (*domain.Region, error) {
+	log := logger.GetLogger(ctx)
 	region, err := s.regionRepo.GetByID(ctx, id)
 	if err != nil {
-		return nil, handleError(err)
+		log.Debug("failed to get region by id", "error", err, "region_id", id)
+		return nil, service.MapError(ctx, err, service.ErrorLogEntityNotFound)
 	}
 
 	return region, nil
@@ -39,12 +43,4 @@ func (s *RegionService) GetByID(ctx context.Context, id int32) (*domain.Region, 
 
 func (s *RegionService) Ready() bool {
 	return s.regionRepo != nil
-}
-
-func handleError(err error) error {
-	if errors.Is(err, storage.ErrEntityNotFound) {
-		return service.NewError(service.NotFound, storage.ErrRegionNotFound.Error())
-	}
-
-	return service.NewError(service.InternalError, err.Error())
 }

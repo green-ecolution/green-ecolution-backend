@@ -3,10 +3,13 @@ package wateringplan
 import (
 	"context"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/logger"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/store"
 )
+
+var _ storage.WateringPlanRepository = (*WateringPlanRepository)(nil)
 
 type WateringPlanRepository struct {
 	store *store.Store
@@ -31,7 +34,7 @@ func NewWateringPlanRepositoryMappers(
 	}
 }
 
-func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) storage.WateringPlanRepository {
+func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) *WateringPlanRepository {
 	return &WateringPlanRepository{
 		store:               s,
 		WateringPlanMappers: mappers,
@@ -39,10 +42,13 @@ func NewWateringPlanRepository(s *store.Store, mappers WateringPlanMappers) stor
 }
 
 func (w *WateringPlanRepository) Delete(ctx context.Context, id int32) error {
+	log := logger.GetLogger(ctx)
 	_, err := w.store.DeleteWateringPlan(ctx, id)
 	if err != nil {
+		log.Error("failed to delete watering plan entity in db", "error", err, "watering_plan_id", id)
 		return err
 	}
 
+	log.Debug("watering plan entity deleted successfully", "watering_plan_id", id)
 	return nil
 }

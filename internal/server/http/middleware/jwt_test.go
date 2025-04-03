@@ -24,7 +24,7 @@ func validKey(t testing.TB) *rsa.PrivateKey {
 	t.Helper()
 	t.Log("Generating a valid public key")
 	random := rand.Reader
-	key, err := rsa.GenerateKey(random, 512)
+	key, err := rsa.GenerateKey(random, 2048)
 	if err != nil {
 		t.Fatalf("Failed to generate key: %v", err)
 	}
@@ -58,6 +58,7 @@ func Test_NewJWTMiddleware(t *testing.T) {
 		validKey := validKey(t)
 		base64Key := base64EncodePublicKey(&validKey.PublicKey)
 		cfg := &config.IdentityAuthConfig{
+			Enable: true,
 			OidcProvider: config.OidcProvider{
 				PublicKey: config.OidcPublicKey{
 					StaticKey: base64Key,
@@ -76,6 +77,7 @@ func Test_NewJWTMiddleware(t *testing.T) {
 		// given
 		authSvc := serviceMock.NewMockAuthService(t)
 		cfg := &config.IdentityAuthConfig{
+			Enable: true,
 			OidcProvider: config.OidcProvider{
 				PublicKey: config.OidcPublicKey{
 					StaticKey: "invalid_base64_encoded_key",
@@ -140,6 +142,7 @@ func Test_successHandler(t *testing.T) {
 		validKey := validKey(t)
 		base64Key := base64EncodePublicKey(&validKey.PublicKey)
 		cfg := &config.IdentityAuthConfig{
+			Enable: true,
 			OidcProvider: config.OidcProvider{
 				PublicKey: config.OidcPublicKey{
 					StaticKey: base64Key,
@@ -170,7 +173,9 @@ func Test_successHandler(t *testing.T) {
 		// given
 		mockSvc := serviceMock.NewMockAuthService(t)
 		app := fiber.New()
-		handler := NewJWTMiddleware(&config.IdentityAuthConfig{}, mockSvc)
+		handler := NewJWTMiddleware(&config.IdentityAuthConfig{
+			Enable: true,
+		}, mockSvc)
 		app.Use(handler)
 		app.Get("/", func(c *fiber.Ctx) error {
 			return c.SendString("Hello, World!")
@@ -191,6 +196,7 @@ func Test_successHandler(t *testing.T) {
 		validKey := validKey(t)
 		base64Key := base64EncodePublicKey(&validKey.PublicKey)
 		cfg := &config.IdentityAuthConfig{
+			Enable: true,
 			OidcProvider: config.OidcProvider{
 				PublicKey: config.OidcPublicKey{
 					StaticKey: base64Key,

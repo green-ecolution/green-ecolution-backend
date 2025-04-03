@@ -9,6 +9,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/http/handler/v1/errorhandler"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
+	"github.com/green-ecolution/green-ecolution-backend/internal/utils/pagination"
 )
 
 // @Summary		Get all regions
@@ -18,14 +19,14 @@ import (
 // @Success		200		{object}	entities.RegionListResponse
 // @Failure		400		{object}	HTTPError
 // @Failure		500		{object}	HTTPError
-// @Param			page	query		string	false	"Page"
-// @Param			limit	query		string	false	"Limit"
+// @Param			page	query		int	false	"Page"
+// @Param			limit	query		int	false	"Limit"
 // @Router			/v1/region [get]
 // @Security		Keycloak
 func GetAllRegions(svc service.RegionService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ctx := c.Context()
-		r, err := svc.GetAll(ctx)
+		r, totalCount, err := svc.GetAll(ctx)
 		if err != nil {
 			return errorhandler.HandleError(err)
 		}
@@ -38,8 +39,8 @@ func GetAllRegions(svc service.RegionService) fiber.Handler {
 		})
 
 		return c.JSON(entities.RegionListResponse{
-			Regions:    dto,
-			Pagination: entities.Pagination{}, // TODO: Handle pagination
+			Data:       dto,
+			Pagination: pagination.Create(ctx, totalCount),
 		})
 	}
 }

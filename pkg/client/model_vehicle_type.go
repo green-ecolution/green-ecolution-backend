@@ -22,8 +22,8 @@ type VehicleType string
 // List of VehicleType
 const (
 	VehicleTypeTransporter VehicleType = "transporter"
-	VehicleTypeTrailer VehicleType = "trailer"
-	VehicleTypeUnknown VehicleType = "unknown"
+	VehicleTypeTrailer     VehicleType = "trailer"
+	VehicleTypeUnknown     VehicleType = "unknown"
 )
 
 // All allowed values of VehicleType enum
@@ -111,4 +111,3 @@ func (v *NullableVehicleType) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

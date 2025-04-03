@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,8 +22,8 @@ var _ MappedNullable = &RegionList{}
 
 // RegionList struct for RegionList
 type RegionList struct {
-	Pagination Pagination `json:"pagination"`
-	Regions []Region `json:"regions"`
+	Pagination *Pagination `json:"pagination,omitempty"`
+	Regions    []Region    `json:"regions"`
 }
 
 type _RegionList RegionList
@@ -32,9 +32,8 @@ type _RegionList RegionList
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRegionList(pagination Pagination, regions []Region) *RegionList {
+func NewRegionList(regions []Region) *RegionList {
 	this := RegionList{}
-	this.Pagination = pagination
 	this.Regions = regions
 	return &this
 }
@@ -47,28 +46,36 @@ func NewRegionListWithDefaults() *RegionList {
 	return &this
 }
 
-// GetPagination returns the Pagination field value
+// GetPagination returns the Pagination field value if set, zero value otherwise.
 func (o *RegionList) GetPagination() Pagination {
-	if o == nil {
+	if o == nil || IsNil(o.Pagination) {
 		var ret Pagination
 		return ret
 	}
-
-	return o.Pagination
+	return *o.Pagination
 }
 
-// GetPaginationOk returns a tuple with the Pagination field value
+// GetPaginationOk returns a tuple with the Pagination field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RegionList) GetPaginationOk() (*Pagination, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.Pagination) {
 		return nil, false
 	}
-	return &o.Pagination, true
+	return o.Pagination, true
 }
 
-// SetPagination sets field value
+// HasPagination returns a boolean if a field has been set.
+func (o *RegionList) HasPagination() bool {
+	if o != nil && !IsNil(o.Pagination) {
+		return true
+	}
+
+	return false
+}
+
+// SetPagination gets a reference to the given Pagination and assigns it to the Pagination field.
 func (o *RegionList) SetPagination(v Pagination) {
-	o.Pagination = v
+	o.Pagination = &v
 }
 
 // GetRegions returns the Regions field value
@@ -96,7 +103,7 @@ func (o *RegionList) SetRegions(v []Region) {
 }
 
 func (o RegionList) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -105,7 +112,9 @@ func (o RegionList) MarshalJSON() ([]byte, error) {
 
 func (o RegionList) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
-	toSerialize["pagination"] = o.Pagination
+	if !IsNil(o.Pagination) {
+		toSerialize["pagination"] = o.Pagination
+	}
 	toSerialize["regions"] = o.Regions
 	return toSerialize, nil
 }
@@ -115,7 +124,6 @@ func (o *RegionList) UnmarshalJSON(data []byte) (err error) {
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
-		"pagination",
 		"regions",
 	}
 
@@ -124,10 +132,10 @@ func (o *RegionList) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -183,5 +191,3 @@ func (v *NullableRegionList) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

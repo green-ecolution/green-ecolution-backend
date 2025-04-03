@@ -19,14 +19,14 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(
-			context.Background(),
-			WithSensorID(input.ID),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude),
-			WithStatus(input.Status),
-			WithLatestData(input.LatestData),
-		)
+		got, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = input.ID
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = input.Longitude
+			sensor.Status = input.Status
+			sensor.LatestData = input.LatestData
+			return true, nil
+		})
 
 		// then
 		assert.NoError(t, err)
@@ -47,10 +47,12 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-124"),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude))
+		got, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = "sensor-124"
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = input.Longitude
+			return true, nil
+		})
 
 		// then
 		assert.NoError(t, err)
@@ -70,10 +72,12 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-125"),
-			WithLatitude(-200),
-			WithLongitude(input.Longitude))
+		got, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = "sensor-125"
+			sensor.Latitude = -200
+			sensor.Longitude = input.Longitude
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -86,10 +90,12 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithSensorID("sensor-125"),
-			WithLatitude(input.Latitude),
-			WithLongitude(200))
+		got, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = "sensor-125"
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = 200
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -102,9 +108,11 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(context.Background(),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude))
+		got, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = input.Longitude
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -117,14 +125,14 @@ func TestSensorRepository_Create(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
 		// when
-		got, err := r.Create(
-			context.Background(),
-			WithSensorID(input.ID),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude),
-			WithStatus(input.Status),
-			WithLatestData(input.LatestData),
-		)
+		got, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = input.ID
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = input.Longitude
+			sensor.Status = input.Status
+			sensor.LatestData = input.LatestData
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -139,7 +147,10 @@ func TestSensorRepository_Create(t *testing.T) {
 		cancel()
 
 		// when
-		got, err := r.Create(ctx, WithSensorID("sensor-5"))
+		got, err := r.Create(ctx, func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = "sensor-5"
+			return true, nil
+		})
 
 		// then
 		assert.Error(t, err)
@@ -154,11 +165,13 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 		// given
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
-		_, err := r.Create(context.Background(),
-			WithSensorID(input.ID),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude),
-			WithStatus(input.Status))
+		_, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = input.ID
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = input.Longitude
+			sensor.Status = input.Status
+			return true, nil
+		})
 
 		assert.NoError(t, err)
 
@@ -172,11 +185,13 @@ func TestSensorRepository_InsertSensorData(t *testing.T) {
 	t.Run("should return error when data is empty", func(t *testing.T) {
 		r := NewSensorRepository(suite.Store, defaultSensorMappers())
 
-		_, err := r.Create(context.Background(),
-			WithSensorID("sensor-124"),
-			WithLatitude(input.Latitude),
-			WithLongitude(input.Longitude),
-			WithStatus(input.Status))
+		_, err := r.Create(context.Background(), func(sensor *entities.Sensor, _ storage.SensorRepository) (bool, error) {
+			sensor.ID = "sensor-124"
+			sensor.Latitude = input.Latitude
+			sensor.Longitude = input.Longitude
+			sensor.Status = input.Status
+			return true, nil
+		})
 
 		assert.NoError(t, err)
 

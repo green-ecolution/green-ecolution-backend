@@ -33,19 +33,21 @@ var (
 		},
 	}
 
-	TestSensor = &entities.Sensor{
-		ID:        TestSensorID,
+	TestSensorData = &entities.SensorData{
+		ID:        1,
 		CreatedAt: currentTime,
 		UpdatedAt: currentTime,
-		Latitude:  54.82124518093376,
-		Longitude: 9.485702120628517,
-		Status:    entities.SensorStatusOnline,
-		LatestData: &entities.SensorData{
-			ID:        1,
-			CreatedAt: currentTime,
-			UpdatedAt: currentTime,
-			Data:      TestMqttPayload,
-		},
+		Data:      TestMqttPayload,
+	}
+
+	TestSensor = &entities.Sensor{
+		ID:         TestSensorID,
+		CreatedAt:  currentTime,
+		UpdatedAt:  currentTime,
+		Latitude:   54.82124518093376,
+		Longitude:  9.485702120628517,
+		Status:     entities.SensorStatusOnline,
+		LatestData: TestSensorData,
 	}
 
 	TestSensorList = []*entities.Sensor{

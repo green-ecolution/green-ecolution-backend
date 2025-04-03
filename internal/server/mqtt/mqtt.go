@@ -3,15 +3,19 @@ package mqtt
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
-	"strconv"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor"
 	"github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/sensor/generated"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
+)
+
+var (
+	ErrCastValue = errors.New("failed to cast mqtt payload")
 )
 
 type Mqtt struct {
@@ -36,15 +40,15 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	opts.SetPassword(m.cfg.MQTT.Password)
 
 	opts.OnConnect = func(_ MQTT.Client) {
-		slog.Info("Connected to MQTT Broker")
+		slog.Info("connected to mqtt broker")
 	}
 	opts.OnConnectionLost = func(_ MQTT.Client, err error) {
-		slog.Error("Connection to MQTT Broker lost", "error", err)
+		slog.Error("lost connection to mqtt broker", "error", err)
 	}
 
 	client := MQTT.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		slog.Error("Error connecting to MQTT Broker", "error", token.Error())
+		slog.Error("error connecting to mqtt broker", "error", token.Error())
 		return
 	}
 
@@ -52,67 +56,139 @@ func (m *Mqtt) RunSubscriber(ctx context.Context) {
 	go func(token MQTT.Token) {
 		_ = token.Wait()
 		if token.Error() != nil {
-			slog.Error("Error while subscribing to MQTT Broker", "error", token.Error())
+			slog.Error("error while subscribing to mqtt broker", "error", token.Error())
 		}
 	}(token)
 
 	<-ctx.Done()
-	slog.Info("Shutting down MQTT Subscriber")
+	slog.Info("shutting down mqtt subscriber")
 }
 
 func (m *Mqtt) handleMqttMessage(_ MQTT.Client, msg MQTT.Message) {
 	sensorData, err := m.convertToMqttPayloadResponse(msg)
 	if err != nil {
-		slog.Error("Error while converting MQTT payload to sensor data", "error", err)
+		slog.Error("error while converting mqtt payload to sensor data", "error", err)
+		return
 	}
 
-	slog.Info("Logging sensor data", "sensorData", sensorData)
+	slog.Info("received sensor data", "sensor_id", sensorData.Device)
+	slog.Debug("detailed sensor data", "sensor_raw_data", fmt.Sprintf("%+v", sensorData))
 
 	domainPayload := m.mapper.FromResponse(sensorData)
 	_, err = m.svc.SensorService.HandleMessage(context.Background(), domainPayload)
 	if err != nil {
-		slog.Error("Error handling message", "error", err)
 		return
 	}
 }
 
+func saveCastPayload[T any](raw map[string]any, key string) (T, bool) {
+	v, ok := raw[key].(T)
+	if !ok {
+		slog.Debug("failed to cast value in payload", "key", key, "raw", raw)
+		return *new(T), false
+	}
+
+	return v, true
+}
+
+//nolint:gocyclo // quick and dirty safe cast for the user tests tomorrow, I want to go to bed
 func (m *Mqtt) convertToMqttPayloadResponse(msg MQTT.Message) (*sensor.MqttPayloadResponse, error) {
 	var raw map[string]any
 	if err := json.Unmarshal(msg.Payload(), &raw); err != nil {
-		return nil, fmt.Errorf("error unmarshalling JSON: %w", err)
+		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
-	endDevices := raw["end_device_ids"].(map[string]any)
-	uplinkMessage := raw["uplink_message"].(map[string]any)
-	decodedPayload := uplinkMessage["decoded_payload"].(map[string]any)
+	uplinkMessage, ok := saveCastPayload[map[string]any](raw, "uplink_message")
+	if !ok {
+		return nil, ErrCastValue
+	}
 
-	// Parse temperature from string to float64
-	temperature, err := strconv.ParseFloat(decodedPayload["temperature"].(string), 64)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing temperature: %w", err)
+	decodedPayload, ok := saveCastPayload[map[string]any](uplinkMessage, "decoded_payload")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	deviceName, ok := saveCastPayload[string](decodedPayload, "deviceName")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	batteryVoltage, ok := saveCastPayload[float64](decodedPayload, "batteryVoltage")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	waterContent, ok := saveCastPayload[float64](decodedPayload, "waterContent")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	temperature, ok := saveCastPayload[float64](decodedPayload, "temperature")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	latitude, ok := saveCastPayload[float64](decodedPayload, "latitude")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	longitude, ok := saveCastPayload[float64](decodedPayload, "longitude")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm30Res, ok := saveCastPayload[float64](decodedPayload, "WM30_Resistance")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm30Cb, ok := saveCastPayload[float64](decodedPayload, "WM30_CB")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm60Res, ok := saveCastPayload[float64](decodedPayload, "WM60_Resistance")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm60Cb, ok := saveCastPayload[float64](decodedPayload, "WM60_CB")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm90Res, ok := saveCastPayload[float64](decodedPayload, "WM90_Resistance")
+	if !ok {
+		return nil, ErrCastValue
+	}
+
+	wm90Cb, ok := saveCastPayload[float64](decodedPayload, "WM90_CB")
+	if !ok {
+		return nil, ErrCastValue
 	}
 
 	payload := &sensor.MqttPayloadResponse{
-		Device:      endDevices["device_id"].(string),
-		Battery:     decodedPayload["battery"].(float64),
-		Humidity:    decodedPayload["humidity"].(float64),
+		Device:      deviceName,
+		Battery:     batteryVoltage,
+		Humidity:    waterContent,
 		Temperature: temperature,
-		Latitude:    decodedPayload["latitude"].(float64),
-		Longitude:   decodedPayload["longitude"].(float64),
+		Latitude:    latitude,
+		Longitude:   longitude,
 		Watermarks: []sensor.WatermarkResponse{
 			{
-				Resistance: int(decodedPayload["watermarkOneResistanceValue"].(float64)),
-				Centibar:   int(decodedPayload["watermarkOneCentibarValue"].(float64)),
+				Resistance: int(wm30Res),
+				Centibar:   int(wm30Cb),
 				Depth:      30,
 			},
 			{
-				Resistance: int(decodedPayload["watermarkTwoResistanceValue"].(float64)),
-				Centibar:   int(decodedPayload["watermarkTwoCentibarValue"].(float64)),
+				Resistance: int(wm60Res),
+				Centibar:   int(wm60Cb),
 				Depth:      60,
 			},
 			{
-				Resistance: int(decodedPayload["watermarkThreeResistanceValue"].(float64)),
-				Centibar:   int(decodedPayload["watermarkThreeCentibarValue"].(float64)),
+				Resistance: int(wm90Res),
+				Centibar:   int(wm90Cb),
 				Depth:      90,
 			},
 		},

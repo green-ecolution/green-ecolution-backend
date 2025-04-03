@@ -22,10 +22,10 @@ type SoilCondition string
 // List of SoilCondition
 const (
 	TreeSoilConditionSchluffig SoilCondition = "schluffig"
-	TreeSoilConditionSandig SoilCondition = "sandig"
-	TreeSoilConditionLehmig SoilCondition = "lehmig"
-	TreeSoilConditionTonig SoilCondition = "tonig"
-	TreeSoilConditionUnknown SoilCondition = "unknown"
+	TreeSoilConditionSandig    SoilCondition = "sandig"
+	TreeSoilConditionLehmig    SoilCondition = "lehmig"
+	TreeSoilConditionTonig     SoilCondition = "tonig"
+	TreeSoilConditionUnknown   SoilCondition = "unknown"
 )
 
 // All allowed values of SoilCondition enum
@@ -115,4 +115,3 @@ func (v *NullableSoilCondition) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-

@@ -1,10 +1,10 @@
-//go:generate mockery
-//go:generate swag fmt
-//go:generate swag init --requiredByDefault
-//go:generate goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/...
-//go:generate goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/...
-//go:generate goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/entities/...
-//go:generate goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/...
+//go:generate go tool mockery
+//go:generate go tool swag fmt
+//go:generate go tool swag init --requiredByDefault
+//go:generate go tool goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/http/entities/...
+//go:generate go tool goverter gen github.com/green-ecolution/green-ecolution-backend/internal/server/mqtt/entities/...
+//go:generate go tool goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/mongodb/entities/...
+//go:generate go tool goverter gen github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/mapper/...
 package main
 
 import (
@@ -30,6 +30,7 @@ import (
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/auth"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/local"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing"
 	_ "github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/openrouteservice"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/routing/valhalla"
 	"github.com/green-ecolution/green-ecolution-backend/internal/storage/s3"
@@ -67,20 +68,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Version: %s\n", version)
-	fmt.Println("Server Port: ", viper.GetInt("server.port"))
-
 	if cfg.Server.Development {
-		fmt.Println("Running in dev mode")
 		cfg.Server.Logs.Level = "debug"
 	}
 
-	logg := logger.CreateLogger(os.Stdout, cfg.Server.Logs.Format, cfg.Server.Logs.Level)
-	slog.SetDefault(logg)
+	logg := logger.CreateLogger(os.Stdout, "console", cfg.Server.Logs.Level)
+	slog.SetDefault(logg())
+
+	osEnv := os.Getenv("ENV")
+	slog.Info("starting green ecolution Server", "version", version, "debug_mode", cfg.Server.Development, "env", osEnv)
 
 	setSwaggerInfo(cfg.Server.AppURL)
-
-	slog.Info("Starting Green Space Management API")
 
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
@@ -89,12 +87,15 @@ func main() {
 }
 
 func postgresRepo(ctx context.Context, cfg *config.Config) (repo *storage.Repository, closeFn func()) {
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Server.Database.Host, cfg.Server.Database.Port, cfg.Server.Database.Username, cfg.Server.Database.Password, cfg.Server.Database.Name)
+	dbCfg := cfg.Server.Database
+	slog.Info("try to connect to PostgreSQL database")
+	slog.Debug("try to connect to PostgreSQL database with the current configurations", "host", dbCfg.Host, "port", dbCfg.Port, "db_name", dbCfg.Name, "user", dbCfg.Username, "password", "*******")
+	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", dbCfg.Host, dbCfg.Port, dbCfg.Username, dbCfg.Password, dbCfg.Name)
 
 	pgxConfig, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
-		slog.Error("Error while parsing PostgreSQL connection string", "error", err)
-		return nil, nil
+		slog.Error("error while parsing PostgreSQL connection string", "error", err, "connection_string", connStr)
+		panic(err)
 	}
 
 	pgxConfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
@@ -103,19 +104,15 @@ func postgresRepo(ctx context.Context, cfg *config.Config) (repo *storage.Reposi
 
 	pool, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
-		slog.Error("Error while connecting to PostgreSQL", "error", err)
-		return nil, nil
+		slog.Error("error while connecting to PostgreSQL", "error", err)
+		panic(err)
 	}
 
 	return postgres.NewRepository(pool), pool.Close
 }
 
 func startAppServices(ctx context.Context, cfg *config.Config) {
-	repositories, closeFn, err := initializeRepositories(ctx, cfg)
-	if err != nil {
-		slog.Error("Failed to initialize repositories", "error", err)
-		return
-	}
+	repositories, closeFn := initializeRepositories(ctx, cfg)
 	defer closeFn()
 
 	em := initializeEventManager()
@@ -127,27 +124,42 @@ func startAppServices(ctx context.Context, cfg *config.Config) {
 	runServices(ctx, httpServer, mqttServer, em, services)
 }
 
-func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.Repository, func(), error) {
+func initializeRepositories(ctx context.Context, cfg *config.Config) (repos *storage.Repository, closeFn func()) {
+	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 	localRepo, err := local.NewRepository(cfg)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating local repository: %w", err)
+		panic(err)
 	}
 
 	// can be switched between ors and valhalla
 	// routingRepo, err := openrouteservice.NewRepository(cfg)
-	routingRepo, err := valhalla.NewRepository(cfg)
-	if err != nil {
-		panic(err)
+	var routingRepo *storage.Repository
+	if cfg.Routing.Enable {
+		routingRepo, err = valhalla.NewRepository(cfg)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		slog.Warn("the routing service is disabled due to the configuration")
+		routingRepo = &storage.Repository{
+			Routing: routing.NewDummyRoutingRepo(),
+		}
 	}
 
 	keycloakRepo := auth.NewRepository(&cfg.IdentityAuth)
 
-	s3Repos, err := s3.NewRepository(cfg)
-	if err != nil {
-		panic(err)
+	var s3Repos *storage.Repository
+	if viper.GetBool("s3.enable") {
+		s3Repos, err = s3.NewRepository(cfg)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		slog.Warn("the s3 service is disabled due to the configuration")
+		s3Repos = &storage.Repository{
+			GpxBucket: s3.NewS3DummyRepo(),
+		}
 	}
-
-	postgresRepo, closeFn := postgresRepo(ctx, cfg)
 
 	repositories := &storage.Repository{
 		Auth: keycloakRepo.Auth,
@@ -158,15 +170,13 @@ func initializeRepositories(ctx context.Context, cfg *config.Config) (*storage.R
 		Tree:         postgresRepo.Tree,
 		TreeCluster:  postgresRepo.TreeCluster,
 		Vehicle:      postgresRepo.Vehicle,
-		Flowerbed:    postgresRepo.Flowerbed,
-		Image:        postgresRepo.Image,
 		Region:       postgresRepo.Region,
 		WateringPlan: postgresRepo.WateringPlan,
 		Routing:      routingRepo.Routing,
 		GpxBucket:    s3Repos.GpxBucket,
 	}
 
-	return repositories, closeFn, nil
+	return repositories, closeFn
 }
 
 func initializeEventManager() *worker.EventManager {
@@ -183,11 +193,15 @@ func initializeEventManager() *worker.EventManager {
 func runServices(ctx context.Context, httpServer *http.Server, mqttServer *mqtt.Mqtt, em *worker.EventManager, services *service.Services) {
 	var wg sync.WaitGroup
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		mqttServer.RunSubscriber(ctx)
-	}()
+	if viper.GetBool("mqtt.enable") {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			mqttServer.RunSubscriber(ctx)
+		}()
+	} else {
+		slog.Warn("the mqtt service is disabled due to the configuration")
+	}
 
 	wg.Add(1)
 	go func() {
@@ -229,7 +243,9 @@ func runEventSubscriptions(ctx context.Context, wg *sync.WaitGroup, em *worker.E
 }
 
 func setSwaggerInfo(appURL string) {
-	slog.Info("Setting Swagger info")
+	title := "Green Ecolution Management API"
+	description := "This is the API for the Green Ecolution Management System."
+	basePath := "/api"
 
 	var schemes []string
 	var trimmedAppURL string
@@ -241,10 +257,12 @@ func setSwaggerInfo(appURL string) {
 		schemes = []string{"https"}
 	}
 
-	docs.SwaggerInfo.Title = "Green Ecolution Management API"
+	docs.SwaggerInfo.Title = title
 	docs.SwaggerInfo.Version = version
-	docs.SwaggerInfo.Description = "This is the API for the Green Ecolution Management System."
+	docs.SwaggerInfo.Description = description
 	docs.SwaggerInfo.Host = trimmedAppURL
-	docs.SwaggerInfo.BasePath = "/api"
+	docs.SwaggerInfo.BasePath = basePath
 	docs.SwaggerInfo.Schemes = schemes
+
+	slog.Info("setting up swagger docs", "app_url", trimmedAppURL, "title", title, "description", description, "base_path", basePath, "schemes", schemes)
 }

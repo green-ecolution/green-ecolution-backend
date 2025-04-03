@@ -12,8 +12,8 @@ Contact: info@green-ecolution.de
 package client
 
 import (
-	"encoding/json"
 	"bytes"
+	"encoding/json"
 	"fmt"
 )
 
@@ -22,20 +22,21 @@ var _ MappedNullable = &Tree{}
 
 // Tree struct for Tree
 type Tree struct {
-	CreatedAt string `json:"created_at"`
-	Description string `json:"description"`
-	Id int32 `json:"id"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	Number string `json:"number"`
-	PlantingYear int32 `json:"planting_year"`
-	// Images              []*ImageResponse `json:\"images\"`
-	Readonly bool `json:"readonly"`
-	Sensor *Sensor `json:"sensor,omitempty"`
-	Species string `json:"species"`
-	TreeClusterId *int32 `json:"tree_cluster_id,omitempty"`
-	UpdatedAt string `json:"updated_at"`
-	WateringStatus WateringStatus `json:"watering_status"`
+	AdditionalInformation map[string]interface{} `json:"additional_information,omitempty"`
+	CreatedAt             string                 `json:"created_at"`
+	Description           string                 `json:"description"`
+	Id                    int32                  `json:"id"`
+	LastWatered           *string                `json:"last_watered,omitempty"`
+	Latitude              float32                `json:"latitude"`
+	Longitude             float32                `json:"longitude"`
+	Number                string                 `json:"number"`
+	PlantingYear          int32                  `json:"planting_year"`
+	Provider              string                 `json:"provider"`
+	Sensor                *Sensor                `json:"sensor,omitempty"`
+	Species               string                 `json:"species"`
+	TreeClusterId         *int32                 `json:"tree_cluster_id,omitempty"`
+	UpdatedAt             string                 `json:"updated_at"`
+	WateringStatus        WateringStatus         `json:"watering_status"`
 }
 
 type _Tree Tree
@@ -44,7 +45,7 @@ type _Tree Tree
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, readonly bool, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
+func NewTree(createdAt string, description string, id int32, latitude float32, longitude float32, number string, plantingYear int32, provider string, species string, updatedAt string, wateringStatus WateringStatus) *Tree {
 	this := Tree{}
 	this.CreatedAt = createdAt
 	this.Description = description
@@ -53,7 +54,7 @@ func NewTree(createdAt string, description string, id int32, latitude float32, l
 	this.Longitude = longitude
 	this.Number = number
 	this.PlantingYear = plantingYear
-	this.Readonly = readonly
+	this.Provider = provider
 	this.Species = species
 	this.UpdatedAt = updatedAt
 	this.WateringStatus = wateringStatus
@@ -66,6 +67,38 @@ func NewTree(createdAt string, description string, id int32, latitude float32, l
 func NewTreeWithDefaults() *Tree {
 	this := Tree{}
 	return &this
+}
+
+// GetAdditionalInformation returns the AdditionalInformation field value if set, zero value otherwise.
+func (o *Tree) GetAdditionalInformation() map[string]interface{} {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		var ret map[string]interface{}
+		return ret
+	}
+	return o.AdditionalInformation
+}
+
+// GetAdditionalInformationOk returns a tuple with the AdditionalInformation field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Tree) GetAdditionalInformationOk() (map[string]interface{}, bool) {
+	if o == nil || IsNil(o.AdditionalInformation) {
+		return map[string]interface{}{}, false
+	}
+	return o.AdditionalInformation, true
+}
+
+// HasAdditionalInformation returns a boolean if a field has been set.
+func (o *Tree) HasAdditionalInformation() bool {
+	if o != nil && !IsNil(o.AdditionalInformation) {
+		return true
+	}
+
+	return false
+}
+
+// SetAdditionalInformation gets a reference to the given map[string]interface{} and assigns it to the AdditionalInformation field.
+func (o *Tree) SetAdditionalInformation(v map[string]interface{}) {
+	o.AdditionalInformation = v
 }
 
 // GetCreatedAt returns the CreatedAt field value
@@ -138,6 +171,38 @@ func (o *Tree) GetIdOk() (*int32, bool) {
 // SetId sets field value
 func (o *Tree) SetId(v int32) {
 	o.Id = v
+}
+
+// GetLastWatered returns the LastWatered field value if set, zero value otherwise.
+func (o *Tree) GetLastWatered() string {
+	if o == nil || IsNil(o.LastWatered) {
+		var ret string
+		return ret
+	}
+	return *o.LastWatered
+}
+
+// GetLastWateredOk returns a tuple with the LastWatered field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Tree) GetLastWateredOk() (*string, bool) {
+	if o == nil || IsNil(o.LastWatered) {
+		return nil, false
+	}
+	return o.LastWatered, true
+}
+
+// HasLastWatered returns a boolean if a field has been set.
+func (o *Tree) HasLastWatered() bool {
+	if o != nil && !IsNil(o.LastWatered) {
+		return true
+	}
+
+	return false
+}
+
+// SetLastWatered gets a reference to the given string and assigns it to the LastWatered field.
+func (o *Tree) SetLastWatered(v string) {
+	o.LastWatered = &v
 }
 
 // GetLatitude returns the Latitude field value
@@ -236,28 +301,28 @@ func (o *Tree) SetPlantingYear(v int32) {
 	o.PlantingYear = v
 }
 
-// GetReadonly returns the Readonly field value
-func (o *Tree) GetReadonly() bool {
+// GetProvider returns the Provider field value
+func (o *Tree) GetProvider() string {
 	if o == nil {
-		var ret bool
+		var ret string
 		return ret
 	}
 
-	return o.Readonly
+	return o.Provider
 }
 
-// GetReadonlyOk returns a tuple with the Readonly field value
+// GetProviderOk returns a tuple with the Provider field value
 // and a boolean to check if the value has been set.
-func (o *Tree) GetReadonlyOk() (*bool, bool) {
+func (o *Tree) GetProviderOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
-	return &o.Readonly, true
+	return &o.Provider, true
 }
 
-// SetReadonly sets field value
-func (o *Tree) SetReadonly(v bool) {
-	o.Readonly = v
+// SetProvider sets field value
+func (o *Tree) SetProvider(v string) {
+	o.Provider = v
 }
 
 // GetSensor returns the Sensor field value if set, zero value otherwise.
@@ -397,7 +462,7 @@ func (o *Tree) SetWateringStatus(v WateringStatus) {
 }
 
 func (o Tree) MarshalJSON() ([]byte, error) {
-	toSerialize,err := o.ToMap()
+	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -406,14 +471,20 @@ func (o Tree) MarshalJSON() ([]byte, error) {
 
 func (o Tree) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !IsNil(o.AdditionalInformation) {
+		toSerialize["additional_information"] = o.AdditionalInformation
+	}
 	toSerialize["created_at"] = o.CreatedAt
 	toSerialize["description"] = o.Description
 	toSerialize["id"] = o.Id
+	if !IsNil(o.LastWatered) {
+		toSerialize["last_watered"] = o.LastWatered
+	}
 	toSerialize["latitude"] = o.Latitude
 	toSerialize["longitude"] = o.Longitude
 	toSerialize["number"] = o.Number
 	toSerialize["planting_year"] = o.PlantingYear
-	toSerialize["readonly"] = o.Readonly
+	toSerialize["provider"] = o.Provider
 	if !IsNil(o.Sensor) {
 		toSerialize["sensor"] = o.Sensor
 	}
@@ -438,7 +509,7 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 		"longitude",
 		"number",
 		"planting_year",
-		"readonly",
+		"provider",
 		"species",
 		"updated_at",
 		"watering_status",
@@ -449,10 +520,10 @@ func (o *Tree) UnmarshalJSON(data []byte) (err error) {
 	err = json.Unmarshal(data, &allProperties)
 
 	if err != nil {
-		return err;
+		return err
 	}
 
-	for _, requiredProperty := range(requiredProperties) {
+	for _, requiredProperty := range requiredProperties {
 		if _, exists := allProperties[requiredProperty]; !exists {
 			return fmt.Errorf("no value given for required property %v", requiredProperty)
 		}
@@ -508,5 +579,3 @@ func (v *NullableTree) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
-
-

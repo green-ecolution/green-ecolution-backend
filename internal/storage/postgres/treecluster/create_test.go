@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/green-ecolution/green-ecolution-backend/internal/entities"
+	"github.com/green-ecolution/green-ecolution-backend/internal/storage"
+	sqlc "github.com/green-ecolution/green-ecolution-backend/internal/storage/postgres/_sqlc"
 	"github.com/green-ecolution/green-ecolution-backend/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +18,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			return true, nil
 		}
@@ -49,13 +51,39 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+
+		newRegion := &entities.Region{
+			ID:        1,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      "Mürwik",
+		}
+		lat := 54.3
+		long := 9.5
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Limit:  int32(totalCountTree),
+			Offset: 0,
+		})
+		assert.NoError(t, err)
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
+
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			tc.Address = "address"
 			tc.Description = "description"
 			tc.MoistureLevel = 1.0
 			tc.WateringStatus = entities.WateringStatusGood
 			tc.SoilCondition = entities.TreeSoilConditionSchluffig
+			tc.Region = newRegion
+			tc.Latitude = &lat
+			tc.Longitude = &long
+			tc.Trees = trees
 			return true, nil
 		}
 
@@ -69,17 +97,23 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		assert.NotZero(t, got.ID)
 		assert.WithinDuration(t, got.CreatedAt, time.Now(), time.Second)
 		assert.WithinDuration(t, got.UpdatedAt, time.Now(), time.Second)
-		assert.Nil(t, got.Region)
-		assert.Empty(t, got.Trees)
+		assert.Equal(t, newRegion.ID, got.Region.ID)
+		assert.Equal(t, newRegion.Name, got.Region.Name)
 		assert.Equal(t, "address", got.Address)
 		assert.Equal(t, "description", got.Description)
 		assert.Equal(t, 1.0, got.MoistureLevel)
-		assert.Nil(t, got.Latitude)
-		assert.Nil(t, got.Longitude)
+		assert.NotNil(t, got.Latitude)
+		assert.NotNil(t, got.Longitude)
+		assert.Equal(t, lat, *got.Latitude)
+		assert.Equal(t, long, *got.Longitude)
 		assert.Equal(t, entities.WateringStatusGood, got.WateringStatus)
 		assert.Equal(t, entities.TreeSoilConditionSchluffig, got.SoilCondition)
 		assert.False(t, got.Archived)
 		assert.Nil(t, got.LastWatered)
+		assert.NotNil(t, got.Trees)
+		assert.Len(t, got.Trees, len(trees))
+		assert.Equal(t, trees[0].ID, got.Trees[0].ID)
+		assert.Equal(t, trees[1].ID, got.Trees[1].ID)
 	})
 
 	t.Run("should return tree cluster with trees and link tree cluster id to trees", func(t *testing.T) {
@@ -87,12 +121,23 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Provider: "",
+			Limit:    int32(totalCountTree),
+			Offset:   0,
+		})
+
 		if err != nil {
 			t.Fatal(err)
 		}
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			tc.Trees = trees
 			return true, nil
@@ -122,7 +167,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			tc.Latitude = utils.P(54.81269326939148)
 			tc.Longitude = utils.P(9.484419532963013)
@@ -162,7 +207,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = ""
 			return true, nil
 		}
@@ -180,7 +225,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			return true, nil
 		}
@@ -201,7 +246,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			return false, assert.AnError
 		}
 
@@ -215,7 +260,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			return false, nil
 		}
 
@@ -234,7 +279,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		newID := int32(9)
 
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			return false, nil
 		}
@@ -256,7 +301,7 @@ func TestTreeClusterRepository_Create(t *testing.T) {
 		newID := int32(9)
 
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			return false, assert.AnError
 		}
@@ -278,14 +323,24 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.ResetDB(t)
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			return true, nil
 		}
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Provider: "",
+			Limit:    int32(totalCountTree),
+			Offset:   0,
+		})
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 
 		tc, err := r.Create(context.Background(), createFn)
 		assert.NoError(t, err)
@@ -317,9 +372,19 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Provider: "",
+			Limit:    int32(totalCountTree),
+			Offset:   0,
+		})
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
 
 		// when
 		err = r.LinkTreesToCluster(context.Background(), 99, utils.Map(trees, func(t *entities.Tree) int32 {
@@ -336,10 +401,20 @@ func TestTreeClusterRepository_LinkTreesToCluster(t *testing.T) {
 		suite.InsertSeed(t, "internal/storage/postgres/seed/test/treecluster")
 		r := NewTreeClusterRepository(suite.Store, mappers)
 
-		testTrees, err := suite.Store.GetAllTrees(context.Background())
+		totalCountTree, _ := suite.Store.GetAllTreesCount(context.Background(), &sqlc.GetAllTreesCountParams{})
+		testTrees, err := suite.Store.GetAllTrees(context.Background(), &sqlc.GetAllTreesParams{
+			Provider: "",
+			Limit:    int32(totalCountTree),
+			Offset:   0,
+		})
 		assert.NoError(t, err)
-		trees := mappers.treeMapper.FromSqlList(testTrees)[0:2]
-		createFn := func(tc *entities.TreeCluster) (bool, error) {
+		trees, err := mappers.treeMapper.FromSqlList(testTrees) // [0:2]
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		trees = trees[0:2]
+		createFn := func(tc *entities.TreeCluster, _ storage.TreeClusterRepository) (bool, error) {
 			tc.Name = "test"
 			return true, nil
 		}

@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/green-ecolution/green-ecolution-backend/internal/worker"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/green-ecolution/green-ecolution-backend/internal/config"
 	"github.com/green-ecolution/green-ecolution-backend/internal/service"
@@ -33,30 +35,42 @@ func NewServer(cfg *config.Config, services *service.Services) *Server {
 
 func (s *Server) Run(ctx context.Context) error {
 	app := fiber.New(fiber.Config{
-		AppName:      s.cfg.Dashboard.Title,
-		ServerHeader: s.cfg.Dashboard.Title,
-		ErrorHandler: errorHandler,
+		AppName:                  s.cfg.Dashboard.Title,
+		ServerHeader:             s.cfg.Dashboard.Title,
+		ErrorHandler:             errorHandler,
+		EnableSplittingOnParsers: true,
 	})
 
 	app.Mount("/", s.middleware())
 
 	go func() {
-		err := s.services.PluginService.StartCleanup(ctx)
-		slog.Error("Error while running plugin cleanup", "error", err)
+		slog.Info("starting plugin cleanup service: cleaning up unhealthy plugins")
+		s.services.PluginService.StartCleanup(ctx)
 	}()
 
-	go func() {
-		s.services.SensorService.RunStatusUpdater(ctx, 1*time.Hour)
-	}()
+	sensorStatusScheduler := worker.NewScheduler(3*time.Hour, worker.SchedulerFunc(s.services.SensorService.UpdateStatuses))
+	go sensorStatusScheduler.Run(ctx)
+
+	var onceADay = 24 * time.Hour
+
+	wateringPlanStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.WateringPlanService.UpdateStatuses))
+	go wateringPlanStatusScheduler.Run(ctx)
+
+	clusterWateringStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.TreeClusterService.UpdateWateringStatuses))
+	go clusterWateringStatusScheduler.Run(ctx)
+
+	treeWateringStatusScheduler := worker.NewScheduler(onceADay, worker.SchedulerFunc(s.services.TreeService.UpdateWateringStatuses))
+	go treeWateringStatusScheduler.Run(ctx)
 
 	go func() {
 		<-ctx.Done()
-		fmt.Println("Shutting down HTTP Server")
+		slog.Info("shutting down http server")
 		if err := app.Shutdown(); err != nil {
-			fmt.Println("Error while shutting down HTTP Server:", err)
+			slog.Error("error while shutting down http server", "error", err, "service", "fiber")
 		}
 	}()
 
+	slog.Info("starting server", "url", s.cfg.Server.AppURL, "port", s.cfg.Server.Port, "service", "fiber")
 	return app.Listen(fmt.Sprintf(":%d", s.cfg.Server.Port))
 }
 

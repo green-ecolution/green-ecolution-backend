@@ -24,15 +24,10 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable
-
-      - name: Setup
-        run: make setup/ci
+          go-version-file: ./go.mod
 
       - name: Generate
         run: make generate
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v1.60.3
+        run: make lint

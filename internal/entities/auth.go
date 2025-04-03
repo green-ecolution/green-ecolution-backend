@@ -1,6 +1,9 @@
 package entities
 
-import "net/url"
+import (
+	"net/url"
+	"time"
+)
 
 type IntroSpectTokenResult struct {
 	Exp      *int
@@ -12,6 +15,7 @@ type IntroSpectTokenResult struct {
 type ClientToken struct {
 	AccessToken      string
 	IDToken          string
+	Expiry           time.Time
 	ExpiresIn        int
 	RefreshExpiresIn int
 	RefreshToken     string

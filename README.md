@@ -12,15 +12,32 @@ Smart irrigation is needed to save water, staff and costs. This project is the s
 
 - trees
 - tree clusters
-- flowerbeds
 - sensors
+- watering plans
+- vehicles
+- users
 
 In the current setup sensors are connected to an ESP32 with an integrated LoRaWAN module.
 Sensor data is send using LoraWAN to a MQTT-Gateway and then to the server to further process the data.
 
-While the project is created in collaboration with the local green space management (TBZ Flensburg) this software aims to be applicable for other cities.
+While the project is created in collaboration with the local green space management (TBZ Flensburg), this software aims to be applicable to other cities. It was initially developed at the University of Applied Sciences Flensburg as a research project within the Applied Computer Science masters degree program.
 
-- [Roadmap](https://github.com/orgs/green-ecolution/projects/5/views/3)
+For more information please refer to:
+
+- [Project website](https://green-ecolution.de/)
+- [University of Applied Sciences Flensburg](https://hs-flensburg.de/en)
+- [Try it out | Demo](https://demo.green-ecolution.de)
+
+## Quick start guide
+
+This is an easy way to run the application locally without a lot of setup. The first command you need to run is to download the docker compose configuration file from the specified GitHub repository. The next command will build and launch the application containers. This compose file will disable all external services such as `auth`, `mqtt`, `routing` and `s3`, but can be enabled through configuration. For more information, see the [Demo Setup](https://github.com/green-ecolution/green-ecolution-backend/wiki/Demo-Setup) wiki page.
+
+```bash
+wget https://raw.githubusercontent.com/green-ecolution/green-ecolution-backend/refs/heads/develop/.docker/docker-compose.yaml`
+docker compose up
+```
+
+Once the service has been launched with Docker Compose, the application can be accessed by typing <http://localhost:8123>
 
 ## Project structure
 

@@ -1,7 +1,7 @@
 #############################################
 # Preparer go
 #############################################
-FROM golang:1.23-alpine AS preparer_go
+FROM golang:1.24-alpine AS preparer_go
 
 ARG MOCKER_VERSION="v2.43.2"
 
@@ -10,7 +10,7 @@ WORKDIR /app/build
 # install build dependencies
 COPY ./Makefile ./go.mod ./go.sum ./
 RUN apk add --no-cache make git geos-dev build-base proj-dev
-RUN make setup/ci
+RUN make setup
 
 COPY . .
 

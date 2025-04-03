@@ -105,10 +105,10 @@ var defaultPlugin = Plugin{
 //		WithVersion("1.0.0"),
 //		WithDescription("An example plugin."),
 //	)
-func NewPlugin(opts ...PluginOption) *Plugin {
+func NewPlugin(opts ...PluginOption) Plugin {
 	p := defaultPlugin
 	for _, opt := range opts {
 		opt(&p)
 	}
-	return &p
+	return p
 }
