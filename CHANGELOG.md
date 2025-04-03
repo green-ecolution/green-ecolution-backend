@@ -7,9 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Telemetry (#90)
+- Pagination for treecluster, tree, sensor, region, watering plans and vehicles (#128)
+- Create a generic infrastructure for schedulars (#365)
+- Add provider and additional information fields to entities (#395)
+- Add Endpoint to unregister plugins (#402)
+- Extend plugin package and add refresh token function (#408)
+- Archive vehicles (#433)
+- Evaluation Service (#448)
+- Map sensor to tree when receiving sensor data (#452)
+- Implement filtering (#84)
+
+### Changed
+
+- Add map boundings to config (#405)
+- Update go version to 1.24 (#420)
+- Change TTN attributes names (#440)
+- Add ability to disable services like `auth`, `routing`, `s3` and `mqtt` (#458)
+
+### Fixed
+
+- Set watering status on sensor change (#409)
+- App panics if tree cluster has no region (#422)
+- Fix conn busy error message (#436)
+- Only one user needs required driving licences (#470)
+- Watering status is not updated on tree cluster create (#473)
+
+### Removed
+
+- Flowerbeds (#407)
+- Images (#443)
+- Removed readonly attributes from tree entities (#428)
+- Remove DriverLicenseUnkown (#438)
+
 ## [v1.1.0] - 2024-01-13
 
 ### Added
+
 - Support for watering plans: storage, server layer, and additional properties (#278, #251).
 - Tracking water usage per tree cluster (#290).
 - Enhanced vehicle management with new fields and filtering capabilities (#243, #288).
@@ -24,18 +60,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Save routing gpx file in s3 storage (#328)
 
 ### Changed
+
 - Refactored sensor entities for better structure (#231).
 - Renamed `wateringPlanStatus` to `status` in watering plan entities (#281).
 
 ### Fixed
+
 - Resolved errors when linking sensors to trees or creating tree clusters (#345, #340, #339).
 - Fixed authentication errors in MQTT handling and API responses (#316, #330).
 
 ### Testing
+
 - Comprehensive test coverage improvements across repositories, services and server layers (#275, #247, #186).
 - Cleanup of test utilities for improved maintainability (#274).
 
 ### Removed
+
 - Removed unused entity types and cleaned up legacy code (#284).
 
 ## [v1.0.0] - 2024-10-22
@@ -45,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release
 - Create database scheme
 - Implement sqlc to generate type-safe code from SQL (#35)
-- Implement repository pattern for database access for postgres 
+- Implement repository pattern for database access for postgres
 - Added seed for demo data (#110)
 - Versioning in API routes (#34)
 - Implement api endpoints for trees, tree cluster, sensor, etc. (#107)
@@ -53,16 +93,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement user authentication (#37)
 - Implement base structure for user management (#38)
 - Implement logging using slogger (#26)
-- Use Linter to analyze Code 
+- Use Linter to analyze Code
 - Implement import of trees over csv file (#43)
 - Calculate tree cluster center point based on region (#86)
 - Get region by coordinates (#60)
 - Build, test and deploy pipeline
 
 ### Fixed
+
 - Use pgxpool for concurrency-safe connection pool for pgx (#94)
 
 [Unreleased]: https://github.com/green-ecolution/green-ecolution-backend/compare/v1.0.0...HEAD
 [v1.0.0]: https://github.com/green-ecolution/green-ecolution-backend/compare/dfdebe...v1.0.0
 [v1.1.0]: https://github.com/green-ecolution/green-ecolution-backend/compare/v1.0.0...v1.1.0
-
